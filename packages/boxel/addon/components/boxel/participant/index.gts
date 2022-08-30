@@ -4,8 +4,8 @@ import '@cardstack/boxel/styles/global.css';
 import './index.css';
 import cn from '@cardstack/boxel/helpers/cn';
 
-import or from '@cardstack/boxel/helpers/truth-helpers/or';
-import not from '@cardstack/boxel/helpers/truth-helpers/not';
+import or from 'ember-truth-helpers/helpers/or';
+import not from 'ember-truth-helpers/helpers/not';
 import cssVar from '@cardstack/boxel/helpers/css-var';
 import cssUrl from '@cardstack/boxel/helpers/css-url';
 

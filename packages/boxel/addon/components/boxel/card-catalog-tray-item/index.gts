@@ -6,8 +6,8 @@ import cn from '@cardstack/boxel/helpers/cn';
 
 import { svgJar } from '@cardstack/boxel/utils/svg-jar';
 import { concat } from '@ember/helper';
-import eq from '@cardstack/boxel/helpers/truth-helpers/eq';
-import not from '@cardstack/boxel/helpers/truth-helpers/not';
+import eq from 'ember-truth-helpers/helpers/eq';
+import not from 'ember-truth-helpers/helpers/not';
 
 interface Signature {
   Element: HTMLDivElement;

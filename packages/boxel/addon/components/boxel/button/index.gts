@@ -5,9 +5,9 @@ import cn from '@cardstack/boxel/helpers/cn';
 
 //@ts-ignore glint does not think this is consumed-but it is consumed in the template
 import { array, concat, hash } from '@ember/helper';
-import or from '@cardstack/boxel/helpers/truth-helpers/or';
-import eq from '@cardstack/boxel/helpers/truth-helpers/eq';
-import not from '@cardstack/boxel/helpers/truth-helpers/not';
+import or from 'ember-truth-helpers/helpers/or';
+import eq from 'ember-truth-helpers/helpers/eq';
+import not from 'ember-truth-helpers/helpers/not';
 import LoadingIndicator from '../loading-indicator';
 import { LinkTo } from '@ember/routing';
 

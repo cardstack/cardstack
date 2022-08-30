@@ -9,7 +9,7 @@ import cn from '@cardstack/boxel/helpers/cn';
 
 //@ts-ignore glint does not think this is consumed-but it is consumed in the template
 import { concat, hash } from '@ember/helper';
-import and from '@cardstack/boxel/helpers/truth-helpers/and';
+import and from 'ember-truth-helpers/helpers/and';
 import { svgJar } from '@cardstack/boxel/utils/svg-jar';
 import { ComponentLike, WithBoundArgs } from '@glint/template';
 
