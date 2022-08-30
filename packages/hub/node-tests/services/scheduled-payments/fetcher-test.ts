@@ -2,19 +2,27 @@ import shortUUID from 'short-uuid';
 import ScheduledPaymentsFetcherService from '../../../services/scheduled-payments/fetcher';
 import { setupHub } from '../../helpers/server';
 import crypto from 'crypto';
-import { addDays, addMinutes, subDays, subMinutes } from 'date-fns';
+import { addDays, addMinutes, addMonths, subDays, subMinutes, subMonths } from 'date-fns';
 import { ScheduledPayment, ScheduledPaymentAttemptStatusEnum } from '@prisma/client';
+import { convertDateToUTC } from '../../../utils/dates';
+import { ExtendedPrismaClient } from '../../../services/prisma-manager';
 
 describe('fetching scheduled payments that are due', function () {
   let subject: ScheduledPaymentsFetcherService;
+  let now: Date;
+  let validForDays: number;
+  let prisma: ExtendedPrismaClient;
+
   let { getPrisma, getContainer } = setupHub(this);
 
   this.beforeEach(async function () {
     subject = await getContainer().lookup('scheduled-payments-fetcher');
+    now = convertDateToUTC(new Date());
+    validForDays = subject.validForDays;
+    prisma = await getPrisma();
   });
 
-  let createScheduledPayment = async (payAt: Date) => {
-    let prisma = await getPrisma();
+  let createScheduledPayment = async (params: any) => {
     return prisma.scheduledPayment.create({
       data: {
         id: shortUUID.uuid(),
@@ -28,8 +36,13 @@ describe('fetching scheduled payments that are due', function () {
         feeFixedUsd: 1,
         feePercentage: 1,
         nonce: 'abc',
-        payAt,
+        payAt: params.payAt,
+        recurringDayOfMonth: params.recurringDayOfMonth,
+        recurringUntil: params.recurringUntil,
+        validForDays: params.validForDays,
         spHash: crypto.randomBytes(20).toString('hex'),
+        canceledAt: params.canceledAt,
+        creationBlockNumber: 'creationBlockNumber' in params ? params.creationBlockNumber : 1,
         chainId: 1,
       },
     });
@@ -41,7 +54,6 @@ describe('fetching scheduled payments that are due', function () {
     endedAt: Date | null,
     status: ScheduledPaymentAttemptStatusEnum
   ) => {
-    let prisma = await getPrisma();
     return prisma.scheduledPaymentAttempt.create({
       data: {
         id: shortUUID.uuid(),
@@ -53,17 +65,14 @@ describe('fetching scheduled payments that are due', function () {
     });
   };
 
-  describe('scheduled payments with no payment attempts', async function () {
-    it('fetches the correct payments that are due to execute now', async function () {
-      let now = new Date();
-      let validForDays = subject.validForDays;
-
-      await createScheduledPayment(addDays(now, -validForDays - 1)); // not valid to retry anymore
-      let sp1 = await createScheduledPayment(addDays(now, -validForDays)); // still valid to retry
-      let sp2 = await createScheduledPayment(addDays(now, -validForDays + 1)); // still valid to retry
-      let sp3 = await createScheduledPayment(now);
-      await createScheduledPayment(addDays(now, 1)); // future payment for tomorrow, not due to execute now
-      await createScheduledPayment(addDays(now, 2)); // future payment for day after tomorrow, not due to execute now
+  describe('one-time scheduled payments', function () {
+    it('fetches scheduled payments that are due', async function () {
+      await createScheduledPayment({ payAt: addDays(now, -validForDays - 1) }); // not valid to retry anymore
+      let sp1 = await createScheduledPayment({ payAt: subDays(now, validForDays) }); // still valid to retry
+      let sp2 = await createScheduledPayment({ payAt: subDays(now, validForDays - 1) }); // still valid to retry
+      let sp3 = await createScheduledPayment({ payAt: now });
+      await createScheduledPayment({ payAt: addDays(now, 1) }); // future payment for tomorrow, not due to execute now
+      await createScheduledPayment({ payAt: addDays(now, 2) }); // future payment for day after tomorrow, not due to execute now
 
       expect((await subject.fetchScheduledPayments()).map((sp: ScheduledPayment) => sp.id)).to.deep.equal([
         sp1.id,
@@ -71,38 +80,109 @@ describe('fetching scheduled payments that are due', function () {
         sp3.id,
       ]);
     });
-  });
 
-  describe('scheduled payments with payment attempts in progress', async function () {
-    it('fetches the correct payments that are due to execute now', async function () {
-      let now = new Date();
-
-      let sp1 = await createScheduledPayment(now);
+    it('does not fetch scheduled payments with payment attempts in progress', async function () {
+      let sp1 = await createScheduledPayment({ payAt: now });
       await createScheduledPaymentAttempt(sp1, now, null, 'inProgress');
 
       expect(await subject.fetchScheduledPayments()).to.be.empty;
     });
-  });
 
-  describe('scheduled payments with payment attempts that succeeded', async function () {
-    it('fetches the correct payments that are due to execute now', async function () {
-      let now = new Date();
-
-      let sp1 = await createScheduledPayment(subDays(now, 1));
+    it('does not fetch scheduled payments with payment attempts that succeeded', async function () {
+      let sp1 = await createScheduledPayment({ payAt: subDays(now, 1) });
       await createScheduledPaymentAttempt(sp1, subMinutes(now, 2), subMinutes(now, 1), 'succeeded');
 
       expect(await subject.fetchScheduledPayments()).to.be.empty;
     });
-  });
 
-  describe('scheduled payments with payment attempts that failed', async function () {
-    it('fetches the correct payments that are due to execute now', async function () {
-      let now = new Date();
-
-      let sp1 = await createScheduledPayment(subDays(now, 1)); // was due yesterday
+    it('fetches scheduled payments with payment attempts that failed', async function () {
+      let sp1 = await createScheduledPayment({ payAt: subDays(now, 1) }); // was due yesterday
       await createScheduledPaymentAttempt(sp1, subDays(now, 1), addMinutes(subDays(now, 1), 2), 'failed'); // it failed yesterday, but it's still valid to retry now
 
       expect((await subject.fetchScheduledPayments()).map((sp: ScheduledPayment) => sp.id)).to.deep.equal([sp1.id]);
+    });
+  });
+
+  describe('recurring scheduled payments', function () {
+    it('fetches scheduled payments that are due', async function () {
+      // not valid to retry anymore
+      await createScheduledPayment({
+        recurringUntil: addMonths(now, 6),
+        recurringDayOfMonth: subDays(now, validForDays + 1).getDate(),
+        payAt: subDays(now, validForDays + 1),
+      });
+
+      // valid to retry
+      let sp1 = await createScheduledPayment({
+        recurringUntil: addMonths(now, 6),
+        recurringDayOfMonth: subDays(now, 1).getDate(),
+        payAt: subDays(now, 1),
+      });
+
+      // due now
+      let sp2 = await createScheduledPayment({
+        recurringUntil: addMonths(now, 6),
+        recurringDayOfMonth: now.getDate(),
+        payAt: now,
+      });
+
+      // future payment for tomorrow, not due to execute now
+      await createScheduledPayment({
+        recurringUntil: addMonths(now, 6),
+        recurringDayOfMonth: addDays(now, 1).getDate(),
+        payAt: addDays(now, 1),
+      });
+
+      expect((await subject.fetchScheduledPayments()).map((sp: ScheduledPayment) => sp.id)).to.deep.equal([
+        sp1.id,
+        sp2.id,
+      ]);
+    });
+
+    it('does not fetch payments that have recurringUntil in the past', async function () {
+      await createScheduledPayment({
+        recurringDayOfMonth: now.getDate(),
+        payAt: now,
+        recurringUntil: subDays(now, 1),
+      });
+
+      expect(await subject.fetchScheduledPayments()).to.be.empty;
+    });
+
+    it('fetches payments that succeeded in the past', async function () {
+      let sp1 = await createScheduledPayment({
+        recurringUntil: addMonths(now, 6),
+        recurringDayOfMonth: now.getDate(),
+        payAt: now,
+      });
+
+      await createScheduledPaymentAttempt(sp1, subMonths(now, 1), addMinutes(subMonths(now, 1), 1), 'succeeded');
+
+      expect((await subject.fetchScheduledPayments()).map((sp: ScheduledPayment) => sp.id)).to.deep.equal([sp1.id]);
+    });
+  });
+
+  describe('both types of scheduled payments', function () {
+    it('does not fetch scheduled payments that are canceled', async function () {
+      await createScheduledPayment({
+        recurringUntil: addMonths(now, 6),
+        recurringDayOfMonth: now.getDate(),
+        payAt: now,
+        canceledAt: now,
+      });
+
+      expect(await subject.fetchScheduledPayments()).to.be.empty;
+    });
+
+    it('does not fetch scheduled payments that have a blank creationBlockNumber', async function () {
+      await createScheduledPayment({
+        recurringUntil: addMonths(now, 6),
+        recurringDayOfMonth: now.getDate(),
+        payAt: now,
+        creationBlockNumber: null,
+      });
+
+      expect(await subject.fetchScheduledPayments()).to.be.empty;
     });
   });
 });
