@@ -1,7 +1,7 @@
 import Component from '@glimmer/component';
 import { A } from '@ember/array';
 import { tracked } from '@glimmer/tracking';
-import { Participant } from './index';
+import { Participant } from '../participant/model';
 
 import HaleyOConnellThumb from '@cardstack/boxel/usage-support/images/users/Haley-OConnell.jpg';
 import JuliaMasonThumb from '@cardstack/boxel/usage-support/images/users/Julia-Mason.jpg';
