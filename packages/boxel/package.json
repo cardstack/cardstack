@@ -26,9 +26,7 @@
     "start": "ember serve",
     "test": "npm-run-all lint test:*",
     "test:ember": "ember test --s --no-launch",
-    "test:ember-compatibility": "ember try:each",
-    "prepack": "ember ts:precompile",
-    "postpack": "ember ts:clean"
+    "test:ember-compatibility": "ember try:each"
   },
   "dependencies": {
     "broccoli-concat": "^4.2.4",

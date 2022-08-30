@@ -1,6 +1,6 @@
 import { svgJar } from '@cardstack/boxel/utils/svg-jar';
 import type { TemplateOnlyComponent } from '@ember/component/template-only';
-import or from '@cardstack/boxel/helpers/truth-helpers/or';
+import or from 'ember-truth-helpers/helpers/or';
 import cssVar from '@cardstack/boxel/helpers/css-var';
 import '@cardstack/boxel/styles/global.css';
 import './index.css';

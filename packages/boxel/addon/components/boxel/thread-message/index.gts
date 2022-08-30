@@ -3,7 +3,7 @@ import '@cardstack/boxel/styles/global.css';
 import './index.css';
 import cn from '@cardstack/boxel/helpers/cn';
 
-import or from '@cardstack/boxel/helpers/truth-helpers/or';
+import or from 'ember-truth-helpers/helpers/or';
 import { svgJar } from '@cardstack/boxel/utils/svg-jar';
 import { dayjsFormat } from '@cardstack/boxel/helpers/dayjs-format';
 import dayjs from 'dayjs';
