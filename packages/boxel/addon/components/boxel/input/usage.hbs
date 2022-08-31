@@ -9,6 +9,7 @@
       @required={{this.required}}
       @optional={{this.optional}}
       @invalid={{this.invalid}}
+      @multiline={{this.multiline}}
       @errorMessage={{this.errorMessage}}
       @helperText={{this.helperText}}
       {{on "blur" this.validate}}
@@ -47,6 +48,11 @@
       @value={{this.invalid}}
       @onInput={{fn (mut this.invalid)}}
     />
+    <Args.Bool
+      @name="multiline"
+      @value={{this.multiline}}
+      @onInput={{fn (mut this.multiline)}}
+    />
     <Args.String
       @name="errorMessage"
       @value={{this.errorMessage}}
@@ -63,6 +69,19 @@
       @description="Function to update the passed in value. This receives the changed value as a string."
     />
   </:api>
+</Freestyle::Usage>
+
+<Freestyle::Usage class="remove-in-percy" @name="Configure a multiline input using textarea attributes">
+  <:example>
+    <label for="multilineExample" class="boxel-sr-only">event example input</label>
+    <Boxel::Input
+      @id="multilineExample"
+      @value=""
+      @multiline="true"
+      rows="10"
+      cols="20"
+    />
+  </:example>
 </Freestyle::Usage>
 
 <Freestyle::Usage class="remove-in-percy" @name="Use the @onInput argument to access the input's value in the callback directly.">
