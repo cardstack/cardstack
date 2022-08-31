@@ -27,10 +27,11 @@ module('Integration | Component | ActionChin', function (hooks) {
   const infoAreaText = 'infoAreaText';
   const mainActionAreaText = 'mainActionAreaText';
 
-  test('it accepts and renders the default block with the ActionButton, ActionStatusArea, and InfoArea components', async function (assert) {
+  test('it accepts and renders the default block with the ActionButton, CancelButton, ActionStatusArea, and InfoArea components', async function (assert) {
     this.setProperties({
       state: 'default',
       mainActionButtonText,
+      cancelActionButtonText,
       mainActionAreaText,
       infoAreaText,
     });
@@ -42,12 +43,18 @@ module('Integration | Component | ActionChin', function (hooks) {
         <a.ActionButton>
           {{this.mainActionButtonText}}
         </a.ActionButton>
+
+        <a.CancelButton>
+          {{this.cancelActionButtonText}}
+        </a.CancelButton>
+
         <a.InfoArea>
           {{this.infoAreaText}}
         </a.InfoArea>
       </Boxel::ActionChin>
     `);
     assert.dom(MAIN_ACTION_BUTTON_SELECTOR).containsText(mainActionButtonText);
+    assert.dom(CANCEL_CTA).containsText(cancelActionButtonText);
     assert.dom(INFO_AREA_SELECTOR).containsText(infoAreaText);
     assert.dom(MAIN_ACTION_AREA_SELECTOR).doesNotExist();
 
