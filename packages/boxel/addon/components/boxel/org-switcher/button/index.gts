@@ -6,12 +6,12 @@ import or from 'ember-truth-helpers/helpers/or';
 import cn from '@cardstack/boxel/helpers/cn';
 import cssUrl from '@cardstack/boxel/helpers/css-url';
 import cssVar from '@cardstack/boxel/helpers/css-var';
-import truncate from 'ember-string-helpers/helpers/truncate';
+import truncate from '@cardstack/boxel/helpers/truncate';
 import '@cardstack/boxel/styles/global.css';
 import './index.css';
 
 interface Signature {
-  Element: HTMLElement;
+  Element: HTMLButtonElement;
   Args: {
     isSelected: boolean;
     org: any;
