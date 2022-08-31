@@ -4,8 +4,10 @@ import { inject as service } from '@ember/service';
 import Layer2Network from '@cardstack/web-client/services/layer2-network';
 import { action } from '@ember/object';
 import RouterService from '@ember/routing/router-service';
+import DashboardPanel from '../../components/card-pay/dashboard-panel/panel';
 
 class CardPayWalletController extends Controller {
+  declare model: { panel: DashboardPanel };
   @service declare layer2Network: Layer2Network;
   @service declare router: RouterService;
 

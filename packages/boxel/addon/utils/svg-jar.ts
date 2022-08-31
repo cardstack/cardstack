@@ -37,10 +37,11 @@ export function svgJar(
     desc?: string;
     style?: string | SafeString;
     'aria-label'?: string;
+    'aria-hidden'?: boolean;
   }
 ): ContentValue {
   let svgArgs = Object.assign({}, svgAttrs);
-  if (svgAttrs.style?.toString) {
+  if (svgAttrs?.style?.toString) {
     svgArgs.style = svgAttrs.style?.toString();
   }
   return makeSVG(assetId, svgArgs, getInlineAsset);

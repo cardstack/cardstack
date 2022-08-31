@@ -7,7 +7,7 @@ import cssUrl from "@cardstack/boxel/helpers/css-url";
 import { concat } from '@ember/helper';
 import { on } from '@ember/modifier';
 import { svgJar } from '@cardstack/boxel/utils/svg-jar';
-import truncate from 'ember-string-helpers/helpers/truncate';
+import truncate from '@cardstack/boxel/helpers/truncate';
 import optional from 'ember-composable-helpers/helpers/optional';
 import '@cardstack/boxel/styles/global.css';
 import './index.css';

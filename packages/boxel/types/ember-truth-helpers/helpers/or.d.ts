@@ -9,7 +9,7 @@ type OrPair<A, B> = B extends UnsetValue
   ? B
   : A | B;
 
-interface OrHelperSignature {
+interface OrHelperSignature<A, B, C, D, E> {
   Args: { Positional: [A, B?, C?, D?, E?] };
   Return: OrPair<OrPair<OrPair<OrPair<A, B>, C>, D>, E>;
 }

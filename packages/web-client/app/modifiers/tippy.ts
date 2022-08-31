@@ -23,8 +23,10 @@ const baseTippyOptions = {
 type ModifierOptions = Partial<TippyOptions>;
 
 export default class TippyModifier extends Modifier<{
-  positional: [string] | [];
-  named: any;
+  Args: {
+    Positional: [string] | [];
+    Named: any;
+  };
 }> {
   didSetup = false;
   _instances: TippyInstance[] = [];
