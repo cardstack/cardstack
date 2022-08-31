@@ -7,6 +7,12 @@
   letter-spacing: var(--boxel-lsp-lg);
 }
 
+.boxel-participant.boxel-participant__vertical {
+  grid-template-columns: none;
+  grid-template-rows: var(--boxel-participant-icon-size) 1fr;
+  gap: var(--boxel-sp-xs) 0;
+}
+
 .boxel-participant__icon-only {
   display: inline-block;
 }

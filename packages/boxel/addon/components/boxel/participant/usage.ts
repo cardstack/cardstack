@@ -10,4 +10,5 @@ export default class ParticipantUsageComponent extends Component {
   @tracked iconSize: string | undefined;
   @tracked iconOnly = false;
   @tracked hasLogo = false;
+  @tracked vertical = false;
 }

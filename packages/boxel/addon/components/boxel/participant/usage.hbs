@@ -7,6 +7,7 @@
       @iconSize={{this.iconSize}}
       @iconOnly={{this.iconOnly}}
       @hasLogo={{this.hasLogo}}
+      @vertical={{this.vertical}}
     />
   </:example>
   <:api as |Args|>
@@ -48,6 +49,13 @@
       @description="If true, alternative styling is applied"
       @defaultValue={{false}}
       @onInput={{fn (mut this.hasLogo)}}
+    />
+    <Args.Bool
+      @name="vertical"
+      @description="Whether the image should be above the text"
+      @defaultValue="false"
+      @onInput={{fn (mut this.vertical)}}
+      @value={{this.vertical}}
     />
   </:api>
 </Freestyle::Usage>
