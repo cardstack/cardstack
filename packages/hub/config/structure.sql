@@ -1171,7 +1171,7 @@ CREATE TABLE public.scheduled_payments (
     max_gas_price bigint NOT NULL,
     fee_fixed_usd integer NOT NULL,
     fee_percentage integer NOT NULL,
-    nonce text NOT NULL,
+    salt text NOT NULL,
     pay_at timestamp without time zone,
     recurring_day_of_month integer,
     recurring_until timestamp without time zone,
@@ -1601,10 +1601,24 @@ CREATE INDEX scheduled_payment_attempts_scheduled_payment_id_index ON public.sch
 
 
 --
--- Name: scheduled_payments_canceled_at_index; Type: INDEX; Schema: public; Owner: postgres
+-- Name: scheduled_payments_canceled_at_pay_at_creation_block_number_ind; Type: INDEX; Schema: public; Owner: postgres
 --
 
-CREATE INDEX scheduled_payments_canceled_at_index ON public.scheduled_payments USING btree (canceled_at);
+CREATE INDEX scheduled_payments_canceled_at_pay_at_creation_block_number_ind ON public.scheduled_payments USING btree (canceled_at, pay_at, creation_block_number);
+
+
+--
+-- Name: scheduled_payments_recurring_day_of_month_index; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX scheduled_payments_recurring_day_of_month_index ON public.scheduled_payments USING btree (recurring_day_of_month);
+
+
+--
+-- Name: scheduled_payments_recurring_until_index; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX scheduled_payments_recurring_until_index ON public.scheduled_payments USING btree (recurring_until);
 
 
 --

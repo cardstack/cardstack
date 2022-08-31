@@ -35,7 +35,7 @@ describe('fetching scheduled payments that are due', function () {
         maxGasPrice: 1,
         feeFixedUsd: 1,
         feePercentage: 1,
-        nonce: 'abc',
+        salt: 'abc',
         payAt: params.payAt,
         recurringDayOfMonth: params.recurringDayOfMonth,
         recurringUntil: params.recurringUntil,

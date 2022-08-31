@@ -302,7 +302,7 @@ model ScheduledPayment {
   maxGasPrice                BigInt                    @map("max_gas_price")
   feeFixedUsd                Int                       @map("fee_fixed_usd")
   feePercentage              Int                       @map("fee_percentage")
-  nonce                      String
+  salt                       String
   payAt                      DateTime?                 @map("pay_at") @db.Timestamp(6)
   recurringDayOfMonth        Int?                      @map("recurring_day_of_month")
   recurringUntil             DateTime?                 @map("recurring_until") @db.Timestamp(6)
@@ -319,7 +319,9 @@ model ScheduledPayment {
   scheduledPaymentAttempts   ScheduledPaymentAttempt[]
 
   @@index([senderSafeAddress], map: "scheduled_payments_sender_safe_address_index")
-  @@index([canceledAt], map: "scheduled_payments_canceled_at_index")
+  @@index([canceledAt, payAt, creationBlockNumber], map: "scheduled_payments_canceled_at_pay_at_creation_block_number_ind")
+  @@index([recurringDayOfMonth], map: "scheduled_payments_recurring_day_of_month_index")
+  @@index([recurringUntil], map: "scheduled_payments_recurring_until_index")
   @@map("scheduled_payments")
 }
 
