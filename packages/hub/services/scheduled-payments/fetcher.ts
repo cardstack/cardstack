@@ -1,4 +1,5 @@
 import { inject } from '@cardstack/di';
+import { ScheduledPayment } from '@prisma/client';
 import { startOfDay, subDays } from 'date-fns';
 import { convertDateToUTC } from '../../utils/dates';
 
@@ -14,7 +15,7 @@ export default class ScheduledPaymentsFetcherService {
   // It is also important to note that validForDays tells us for how many days the payment is still valid to retry in
   // case it is failing for some reason.
 
-  async fetchScheduledPayments(): Promise<any> {
+  async fetchScheduledPayments(): Promise<ScheduledPayment[]> {
     let prisma = await this.prismaManager.getClient();
     let nowUtc = convertDateToUTC(new Date());
 

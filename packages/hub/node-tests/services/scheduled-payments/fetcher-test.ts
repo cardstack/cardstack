@@ -74,11 +74,7 @@ describe('fetching scheduled payments that are due', function () {
       await createScheduledPayment({ payAt: addDays(now, 1) }); // future payment for tomorrow, not due to execute now
       await createScheduledPayment({ payAt: addDays(now, 2) }); // future payment for day after tomorrow, not due to execute now
 
-      expect((await subject.fetchScheduledPayments()).map((sp: ScheduledPayment) => sp.id)).to.deep.equal([
-        sp1.id,
-        sp2.id,
-        sp3.id,
-      ]);
+      expect((await subject.fetchScheduledPayments()).map((sp) => sp.id)).to.deep.equal([sp1.id, sp2.id, sp3.id]);
     });
 
     it('does not fetch scheduled payments with payment attempts in progress', async function () {
@@ -99,7 +95,7 @@ describe('fetching scheduled payments that are due', function () {
       let sp1 = await createScheduledPayment({ payAt: subDays(now, 1) }); // was due yesterday
       await createScheduledPaymentAttempt(sp1, subDays(now, 1), addMinutes(subDays(now, 1), 2), 'failed'); // it failed yesterday, but it's still valid to retry now
 
-      expect((await subject.fetchScheduledPayments()).map((sp: ScheduledPayment) => sp.id)).to.deep.equal([sp1.id]);
+      expect((await subject.fetchScheduledPayments()).map((sp) => sp.id)).to.deep.equal([sp1.id]);
     });
   });
 
@@ -133,10 +129,7 @@ describe('fetching scheduled payments that are due', function () {
         payAt: addDays(now, 1),
       });
 
-      expect((await subject.fetchScheduledPayments()).map((sp: ScheduledPayment) => sp.id)).to.deep.equal([
-        sp1.id,
-        sp2.id,
-      ]);
+      expect((await subject.fetchScheduledPayments()).map((sp) => sp.id)).to.deep.equal([sp1.id, sp2.id]);
     });
 
     it('does not fetch payments that have recurringUntil in the past', async function () {
@@ -158,7 +151,7 @@ describe('fetching scheduled payments that are due', function () {
 
       await createScheduledPaymentAttempt(sp1, subMonths(now, 1), addMinutes(subMonths(now, 1), 1), 'succeeded');
 
-      expect((await subject.fetchScheduledPayments()).map((sp: ScheduledPayment) => sp.id)).to.deep.equal([sp1.id]);
+      expect((await subject.fetchScheduledPayments()).map((sp) => sp.id)).to.deep.equal([sp1.id]);
     });
   });
 
