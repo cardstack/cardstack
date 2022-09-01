@@ -1,0 +1,23 @@
+<nav role="tablist" class={{cn "boxel-tab-bar" @class}} ...attributes>
+  {{#if @items}}
+    {{#each (compact @items) as |tab|}}
+      <div
+        role="none"
+        class={{cn
+          "boxel-tab-bar__item"
+          boxel-tab-bar__item--is-active=tab.action.isActive
+        }}
+      >
+        {{!-- template-lint-disable require-context-role --}}
+        <a
+          role="tab"
+          href="#"
+          data-text={{tab.text}}
+          {{on "click" (fn this.invokeMenuItemAction tab.action)}}
+        >
+          {{tab.text}}
+        </a>
+      </div>
+    {{/each}}
+  {{/if}}
+</nav>

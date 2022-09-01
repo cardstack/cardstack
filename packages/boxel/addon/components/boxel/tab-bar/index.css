@@ -1,0 +1,48 @@
+.boxel-tab-bar {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  border-bottom: 1px solid var(--boxel-light-500);
+}
+
+.boxel-tab-bar__item:hover {
+  cursor: pointer;
+}
+
+.boxel-tab-bar__item--is-active {
+  font-weight: 600;
+  border-bottom: 2px solid var(--boxel-cyan);
+}
+
+/*
+  Column flex and ::after with data-text allow bold-on-hover without layout shift:
+  https://css-tricks.com/bold-on-hover-without-the-layout-shift/
+*/
+
+.boxel-tab-bar__item > a {
+  display: inline-flex;
+  flex-direction: column;
+  padding: var(--boxel-sp-xs) var(--boxel-sp-lg);
+}
+
+.boxel-tab-bar__item > a::after {
+  content: attr(data-text);
+  content: attr(data-text) / "";
+  height: 0;
+  visibility: hidden;
+  overflow: hidden;
+  user-select: hidden;
+  pointer-events: none;
+  font-weight: 600;
+}
+
+@media speech {
+  .boxel-tab-bar__item > a::after {
+    display: none;
+  }
+}
+
+.boxel-tab-bar__item > a:hover {
+  font-weight: 600;
+  color: inherit;
+}
