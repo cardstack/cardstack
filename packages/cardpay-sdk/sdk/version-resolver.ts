@@ -17,6 +17,7 @@ import { rewardPoolMeta, RewardPool } from './reward-pool';
 import { rewardManagerMeta, RewardManager } from './reward-manager';
 import HubAuth from './hub-auth';
 import { SUPPORTED_ABIS } from '../generated/supported-abis'; // this file is code-generated during postinstall step and the constant is a property tree of version -> contract name -> contract ABI
+import ScheduledPaymentModule from './scheduled-payment-module';
 
 export type SDK =
   | 'Assets'
@@ -31,7 +32,8 @@ export type SDK =
   | 'TokenBridgeHomeSide'
   | 'TokenBridgeForeignSide'
   | 'RewardPool'
-  | 'RewardManager';
+  | 'RewardManager'
+  | 'ScheduledPaymentModule';
 
 export type MapReturnType<T> = T extends 'Assets'
   ? Assets
@@ -59,6 +61,8 @@ export type MapReturnType<T> = T extends 'Assets'
   ? TokenBridgeHomeSide
   : T extends 'TokenBridgeForeignSide'
   ? TokenBridgeForeignSide
+  : T extends 'ScheduledPaymentModule'
+  ? ScheduledPaymentModule
   : never;
 export interface ContractMeta {
   apiVersions: Record<string, any>;
@@ -153,6 +157,9 @@ export async function getSDK<T extends SDK>(sdk: T, ...args: any[]): Promise<Map
       break;
     case 'TokenBridgeHomeSide':
       apiClass = TokenBridgeHomeSide;
+      break;
+    case 'ScheduledPaymentModule':
+      apiClass = ScheduledPaymentModule;
       break;
     default:
       assertNever(sdk as never);

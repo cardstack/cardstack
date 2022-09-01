@@ -43,6 +43,8 @@ const KOVAN = {
   // https://docs.tokenbridge.net/kovan-sokol-amb-bridge/about-the-kovan-sokol-amb shows 1 for finalization rate
   // but making this the same as mainnet so that the dev experience matches prod
   ambFinalizationRate: '20',
+  relayServiceURL: 'http://localhost:8888/api',
+  subgraphURL: '',
 };
 const MAINNET = {
   apiBaseUrl: 'https://api.etherscan.io/api',

@@ -508,7 +508,17 @@ export default class PrepaidCard {
       Operation.CALL,
       estimate,
       nonce,
-      await signSafeTx(this.layer2Web3, safeAddress, tokenAddress, payload, estimate, nonce, from, this.layer2Signer)
+      await signSafeTx(
+        this.layer2Web3,
+        safeAddress,
+        tokenAddress,
+        payload,
+        Operation.CALL,
+        estimate,
+        nonce,
+        from,
+        this.layer2Signer
+      )
     );
 
     if (typeof onTxnHash === 'function') {
