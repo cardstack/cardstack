@@ -84,9 +84,12 @@ const SOKOL = {
     DAI: '0x01264C442aC3A70953509eed0d475a9c1182307f',
     CARD: '0x0631326B1AEA3f7B864b5Fc9f1C5e025B8a2945F',
   },
-  scheduledPaymentConfig: '',
-  scheduledPaymentExchange: '',
-  scheduledPaymentModule: '',
+  scheduledPaymentConfig: '0x6C811065009e957D968BEaFE00ADC2821c55224f',
+  scheduledPaymentExchange: '0xc57E8dEB3149d872aec0156D527F93393002555F',
+  scheduledPaymentModule: '0x30e49Fe3cbEC0459eC3799b0B28560dE9594F257',
+  multiSend: '0xA238CBeb142c10Ef7Ad8442C6D1f9E89e07e7761',
+  moduleProxyFactory: '0x00000000000DC7F163742Eb4aBEf650037b1f588',
+  metaGuard: '0xe2847462a574bfd43014d1c7BB6De5769C294691',
 };
 
 const MAINNET = {
