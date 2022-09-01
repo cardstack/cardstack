@@ -28,10 +28,9 @@ export default {
     let scheduledPaymentModule = await getSDK('ScheduledPaymentModule', web3, signer);
     let blockExplorer = await getConstant('blockExplorer', web3);
 
-    console.log(`Enabling scheduled payment module to the safe ...`);
-    let onTxnHash = (txnHash: string) =>
-      console.log(`Transaction hash: ${blockExplorer}/tx/${txnHash}/token-transfers`);
-    let { scheduledPaymentModuleAddress, metaGuardAddress } = await scheduledPaymentModule.enableModule(
+    console.log(`Enabling scheduled payment module and set meta guard to the safe ...`);
+    let onTxnHash = (txnHash: string) => console.log(`Transaction hash: ${blockExplorer}/tx/${txnHash}`);
+    let { scheduledPaymentModuleAddress, metaGuardAddress } = await scheduledPaymentModule.enableModuleAndGuard(
       safeAddress,
       gasTokenAddress,
       { onTxnHash }

@@ -3,18 +3,14 @@ import { AbiItem } from 'web3-utils';
 import { getAddress } from '../../contracts/addresses';
 import ModuleProxyFactoryABI from '../../contracts/abi/modules/module-proxy-factory';
 import { Contract } from 'web3-eth-contract';
-import { ethers } from 'ethers';
+import { ethers, utils } from 'ethers';
 import { Operation } from './safe-utils';
 import multiSend from '../../contracts/abi/modules/multi-send';
 import { pack } from '@ethersproject/solidity';
-import { hexDataLength } from 'ethers/lib/utils';
-
-export interface Transaction {
-  to: string;
-  value: string;
-  data: string;
-  operation: Operation;
-}
+import { hexDataLength, Interface, LogDescription } from 'ethers/lib/utils';
+import multiSendOnlyCall from '../../contracts/abi/modules/multi-send-call-only';
+import { Transaction } from './general-utils';
+import { Log } from 'web3-core';
 
 export interface SetupArgs {
   types: string[];
@@ -78,6 +74,23 @@ export async function encodeMultiSend(web3: Web3, transactions: readonly Transac
   };
 }
 
+export async function encodeMultiSendCallOnly(web3: Web3, transactions: readonly Transaction[]): Promise<Transaction> {
+  const transactionsEncoded = '0x' + transactions.map(encodePacked).map(remove0x).join('');
+
+  const multiSendContract = new web3.eth.Contract(
+    multiSendOnlyCall as AbiItem[],
+    await getAddress('multiSendCallOnly', web3)
+  );
+  const data = multiSendContract.methods.multiSend(transactionsEncoded).encodeABI();
+
+  return {
+    operation: Operation.CALL,
+    to: multiSendContract.options.address,
+    value: '0',
+    data,
+  };
+}
+
 function encodePacked(tx: Transaction) {
   return pack(
     ['uint8', 'address', 'uint256', 'uint256', 'bytes'],
@@ -87,4 +100,17 @@ function encodePacked(tx: Transaction) {
 
 function remove0x(hexString: string) {
   return hexString.replace(/^0x/, '');
+}
+
+export async function getModuleProxyCreationEvent(web3: Web3, logs: Log[]): Promise<LogDescription[]> {
+  let _interface = new utils.Interface(ModuleProxyFactoryABI);
+  let moduleProxyFactoryAddress = await getAddress('moduleProxyFactory', web3);
+  let events = logs
+    .filter((log) => isModuleProxyCreationEvent(moduleProxyFactoryAddress, _interface, log))
+    .map((log) => _interface.parseLog(log));
+  return events;
+}
+
+function isModuleProxyCreationEvent(moduleProxyFactoryAddress: string, _interface: Interface, log: Log): boolean {
+  return log.address === moduleProxyFactoryAddress && log.topics[0] === _interface.getEventTopic('ModuleProxyCreation');
 }

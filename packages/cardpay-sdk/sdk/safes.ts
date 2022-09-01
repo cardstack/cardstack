@@ -9,12 +9,22 @@ import {
   Operation,
   gasInToken,
   baseGasBuffer,
+  createSafe,
+  getParamsFromEvent,
+  EventABI,
 } from './utils/safe-utils';
 import { signSafeTx } from './utils/signing-utils';
 import BN from 'bn.js';
 import { query } from './utils/graphql';
 import type { SuccessfulTransactionReceipt } from './utils/successful-transaction-receipt';
-import { TransactionOptions, waitForTransactionConsistency, isTransactionHash } from './utils/general-utils';
+import {
+  TransactionOptions,
+  waitForTransactionConsistency,
+  isTransactionHash,
+  sendTransaction,
+  Transaction,
+  waitUntilTransactionMined,
+} from './utils/general-utils';
 import { Signer } from 'ethers';
 const { fromWei } = Web3.utils;
 
@@ -87,6 +97,10 @@ export interface Options {
   type?: Safe['type'];
 }
 const defaultOptions: Options = { viewAll: false };
+
+export interface CreateSafeResult {
+  safeAddress: string;
+}
 
 export interface ViewSafeResult {
   safe: Safe | undefined;
@@ -216,6 +230,92 @@ export async function viewSafe(network: 'gnosis' | 'xdai' | 'sokol', safeAddress
 
 export default class Safes implements ISafes {
   constructor(private layer2Web3: Web3, private layer2Signer?: Signer) {}
+
+  async createSafe(txnHash: string): Promise<CreateSafeResult>;
+  async createSafe(
+    tokenAddress: string,
+    owners: string[],
+    threshold: number,
+    saltNonce?: string,
+    txnOptions?: TransactionOptions
+  ): Promise<CreateSafeResult>;
+  async createSafe(
+    tokenAddressOrTxnHash: string,
+    owners?: string[],
+    threshold?: number,
+    saltNonce?: string,
+    txnOptions?: TransactionOptions
+  ): Promise<CreateSafeResult> {
+    if (isTransactionHash(tokenAddressOrTxnHash)) {
+      return {
+        safeAddress: await this.getSafeAddressFromTransferTxn(tokenAddressOrTxnHash),
+      };
+    }
+    let tokenAddress = tokenAddressOrTxnHash;
+    owners = owners ? owners : [];
+    threshold = threshold ? threshold : 0;
+
+    if (owners.length <= 0) {
+      throw new Error('must include at least one owner');
+    }
+    if (threshold <= 0) {
+      throw new Error('threshold must be greater than zero');
+    }
+    let { onTxnHash } = txnOptions ?? {};
+
+    saltNonce = saltNonce ? saltNonce : String(new Date().getTime());
+    let safeCreationTxResponse = await createSafe(this.layer2Web3, owners, threshold, saltNonce, tokenAddress);
+
+    let token = new this.layer2Web3.eth.Contract(ERC20ABI as AbiItem[], tokenAddress);
+    let transferData = token.methods.transfer(safeCreationTxResponse.safe, safeCreationTxResponse.payment).encodeABI();
+    let transferTx: Transaction = {
+      to: tokenAddress,
+      value: '0',
+      operation: Operation.CALL,
+      data: transferData,
+    };
+    let txHash = await sendTransaction(this.layer2Web3, transferTx);
+
+    if (!txHash) {
+      throw new Error('Failed to create new safe');
+    }
+
+    if (typeof onTxnHash === 'function') {
+      await onTxnHash(txHash);
+    }
+
+    return {
+      safeAddress: safeCreationTxResponse.safe,
+    };
+  }
+
+  async getSafeAddressFromTransferTxn(txnHash: string): Promise<string> {
+    let receipt = await waitUntilTransactionMined(this.layer2Web3, txnHash);
+    let params = getParamsFromEvent(this.layer2Web3, receipt, this.transferEventABI(), receipt.to);
+    return params[0].to;
+  }
+
+  private transferEventABI(): EventABI {
+    return {
+      topic: this.layer2Web3.eth.abi.encodeEventSignature('Transfer(address,address,uint256)'),
+      abis: [
+        {
+          name: 'from',
+          type: 'address',
+          indexed: true,
+        },
+        {
+          name: 'to',
+          type: 'address',
+          indexed: true,
+        },
+        {
+          name: 'amt',
+          type: 'uint256',
+        },
+      ],
+    };
+  }
 
   async viewSafe(safeAddress: string): Promise<ViewSafeResult> {
     let {

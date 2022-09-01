@@ -7,11 +7,18 @@ import GnosisSafeABI from '../../contracts/abi/gnosis-safe';
 import BN from 'bn.js';
 import { query as gqlQuery } from './graphql';
 import { AbiItem } from 'web3-utils';
+import { Operation } from './safe-utils';
 
 const POLL_INTERVAL = 500;
 
 const receiptCache = new Map<string, SuccessfulTransactionReceipt>();
 
+export interface Transaction {
+  to: string;
+  value: string;
+  data: string;
+  operation: Operation;
+}
 export interface TransactionOptions {
   nonce?: BN;
   onNonce?: (nonce: BN) => void;
@@ -281,4 +288,19 @@ export function safeFloatConvert(rawAmount: BN, decimals: number): number {
 
 export function isTransactionHash(candidate: string): boolean {
   return !!candidate.match(/^0x[0-9a-f]{64}$/);
+}
+
+export async function sendTransaction(web3: Web3, transaction: Transaction): Promise<string> {
+  /* eslint-disable no-async-promise-executor */
+  let txHash: string = await new Promise(async (resolve, reject) => {
+    web3.eth
+      .sendTransaction({
+        ...transaction,
+        from: (await web3.eth.getAccounts())[0],
+      })
+      .once('transactionHash', (transactionHash) => resolve(transactionHash))
+      .catch((err) => reject(err));
+  });
+
+  return txHash;
 }
