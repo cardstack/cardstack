@@ -11,7 +11,7 @@
         {{!-- template-lint-disable require-context-role --}}
         <a
           role="tab"
-          href="#"
+          href={{tab.action.url}}
           data-text={{tab.text}}
           {{on "click" (fn this.invokeMenuItemAction tab.action)}}
         >
