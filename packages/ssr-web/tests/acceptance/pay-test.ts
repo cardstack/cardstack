@@ -21,6 +21,8 @@ import {
   getFilenameFromDid,
 } from '@cardstack/ssr-web/utils/test-factories';
 import { Response as MirageResponse } from 'ember-cli-mirage';
+import UA from '@cardstack/ssr-web/services/ua';
+import Subgraph from '@cardstack/ssr-web/services/subgraph';
 
 // selectors
 const PROFILE = '[data-test-profile]';
@@ -69,7 +71,7 @@ module('Acceptance | pay', function (hooks) {
   setupMirage(hooks);
 
   hooks.beforeEach(async function (this: MirageTestContext) {
-    let subgraph = this.owner.lookup('service:subgraph');
+    let subgraph = this.owner.lookup('service:subgraph') as Subgraph;
     sinon
       .stub(subgraph, 'viewSafe')
       .callsFake(async function (
@@ -112,7 +114,7 @@ module('Acceptance | pay', function (hooks) {
 
   // eslint-disable-next-line qunit/require-expect
   test('It displays profile correctly on iOS', async function (assert) {
-    let UAService = this.owner.lookup('service:ua');
+    let UAService = this.owner.lookup('service:ua') as UA;
     sinon.stub(UAService, 'isIOS').returns(true);
 
     await visit(`/pay/${network}/${merchantSafe.address}`);
@@ -129,7 +131,7 @@ module('Acceptance | pay', function (hooks) {
 
   // eslint-disable-next-line qunit/require-expect
   test('It displays profile correctly on Android', async function (assert) {
-    let UAService = this.owner.lookup('service:ua');
+    let UAService = this.owner.lookup('service:ua') as UA;
     sinon.stub(UAService, 'isAndroid').returns(true);
 
     await visit(`/pay/${network}/${merchantSafe.address}`);
@@ -511,7 +513,7 @@ module('Acceptance | pay', function (hooks) {
   });
 
   test('it renders the clickable link by default when in an iOS browser', async function (assert) {
-    let UAService = this.owner.lookup('service:ua');
+    let UAService = this.owner.lookup('service:ua') as UA;
     sinon.stub(UAService, 'isIOS').returns(true);
 
     await visit(
@@ -548,7 +550,7 @@ module('Acceptance | pay', function (hooks) {
   });
 
   test('it renders the clickable link by default when in an Android browser', async function (assert) {
-    let UAService = this.owner.lookup('service:ua');
+    let UAService = this.owner.lookup('service:ua') as UA;
     sinon.stub(UAService, 'isAndroid').returns(true);
 
     await visit(
