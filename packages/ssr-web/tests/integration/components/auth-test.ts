@@ -6,6 +6,7 @@ import config from '@cardstack/ssr-web/config/environment';
 import Service from '@ember/service';
 import { tracked } from '@glimmer/tracking';
 import sinon from 'sinon';
+import HubAuthentication from '../../../app/services/hub-authentication';
 
 const universalLinkForWC = (walletConnectUri: string) =>
   'https://' + config.universalLinkDomain + '/wc?uri=' + walletConnectUri;
@@ -53,9 +54,13 @@ module('Integration | Component | auth', function (hooks) {
     this.owner.register('service:hub-authentication', StubHubAuthentication);
     this.owner.register('service:layer2-network', StubLayerTwoNetwork);
     this.owner.register('service:ua', StubUA);
-    hubAuthenticationService = this.owner.lookup('service:hub-authentication');
-    layer2NetworkService = this.owner.lookup('service:layer2-network');
-    uaService = this.owner.lookup('service:ua');
+    hubAuthenticationService = this.owner.lookup(
+      'service:hub-authentication'
+    ) as HubAuthentication;
+    layer2NetworkService = this.owner.lookup(
+      'service:layer2-network'
+    ) as StubLayerTwoNetwork;
+    uaService = this.owner.lookup('service:ua') as StubUA;
   });
 
   test('it can show a LOADING state when layer 2 is initializing', async function (assert) {
