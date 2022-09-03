@@ -1234,6 +1234,142 @@
         "--mnemonic",
         "${config:cardCli.mnemonic}"
       ]
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Cardpay testnet: Add Tokens",
+      "cwd": "${workspaceFolder}/packages/cardpay-cli",
+      "console": "integratedTerminal",
+      "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
+      "env": {},
+      "args": [
+        "index.ts",
+        "prepaid-card-market-v-2",
+        "add-tokens",
+        "0xF69508b8fb878EAad06923314BD655Cc0Fe9E8E3",
+        "0x159ADe032073d930E85f95AbBAB9995110c43C71",
+        "${config:cardCli.network.l2.daiToken}",
+        "100",
+        "did:cardstack:1p114hzxLcyL3aoScNE45FJC8ae64884286d7df6",
+        "--network",
+        "${config:cardCli.network.l2.name}",
+        "--mnemonic",
+        "${config:cardCli.mnemonic}"
+      ]
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Cardpay testnet: Recover Tokens",
+      "cwd": "${workspaceFolder}/packages/cardpay-cli",
+      "console": "integratedTerminal",
+      "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
+      "env": {},
+      "args": [
+        "index.ts",
+        "prepaid-card-market-v-2",
+        "add-tokens",
+        "0xF69508b8fb878EAad06923314BD655Cc0Fe9E8E3",
+        "0x159ADe032073d930E85f95AbBAB9995110c43C71",
+        "${config:cardCli.network.l2.daiToken}",
+        "100",
+        "did:cardstack:1p114hzxLcyL3aoScNE45FJC8ae64884286d7df6",
+        "--network",
+        "${config:cardCli.network.l2.name}",
+        "--mnemonic",
+        "${config:cardCli.mnemonic}"
+      ]
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Cardpay testnet: Add SKU",
+      "cwd": "${workspaceFolder}/packages/cardpay-cli",
+      "console": "integratedTerminal",
+      "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
+      "env": {},
+      "args": [
+        "index.ts",
+        "prepaid-card-market-v-2",
+        "add-sku",
+        "0x41866a4eDcb4Ce2108C36a2c29a3b4Ab9fCe86e1",
+        "0xF69508b8fb878EAad06923314BD655Cc0Fe9E8E3",
+        "1000",
+        "did:cardstack:1p114hzxLcyL3aoScNE45FJC8ae64884286d7df6",
+        "${config:cardCli.network.l2.daiToken}",
+        "--network",
+        "${config:cardCli.network.l2.name}",
+        "--mnemonic",
+        "${config:cardCli.mnemonic}"
+      ]
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Cardpay testnet: Get SKU",
+      "cwd": "${workspaceFolder}/packages/cardpay-cli",
+      "console": "integratedTerminal",
+      "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
+      "env": {},
+      "args": [
+        "index.ts",
+        "prepaid-card-market-v-2",
+        "get-sku",
+        "0x159ade032073d930e85f95abbab9995110c43c71",
+        "${config:cardCli.network.l2.daiToken}",
+        "1000",
+        "did:cardstack:1p114hzxLcyL3aoScNE45FJC8ae64884286d7df6",
+        "--network",
+        "${config:cardCli.network.l2.name}",
+        "--mnemonic",
+        "${config:cardCli.mnemonic}"
+      ]
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Cardpay testnet: Set Ask",
+      "cwd": "${workspaceFolder}/packages/cardpay-cli",
+      "console": "integratedTerminal",
+      "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
+      "env": {},
+      "args": [
+        "index.ts",
+        "prepaid-card-market-v-2",
+        "set-ask",
+        "0x41866a4eDcb4Ce2108C36a2c29a3b4Ab9fCe86e1",
+        "0xbdd9b9de628f3c2ddf330021facbb43aeef0c8926c068f22800b2dd26c8eb377",
+        "1",
+        "--network",
+        "${config:cardCli.network.l2.name}",
+        "--mnemonic",
+        "${config:cardCli.mnemonic}"
+      ]
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Cardpay testnet: Create account",
+      "cwd": "${workspaceFolder}/packages/cardpay-cli",
+      "console": "integratedTerminal",
+      "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
+      "env": {
+        "PROVISIONER_SECRET": "xxxx"
+
+      },
+      "args": [
+        "index.ts",
+        "testing",
+        "create-account",
+        "true", //create prepaid card
+        "true", //create merchant, profile
+        "true", //create reward safe
+        "--network",
+        "${config:cardCli.network.l2.name}",
+        "--mnemonic",
+        "${config:cardCli.mnemonic}"
+      ]
     }
   ]
 }
