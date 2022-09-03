@@ -115,6 +115,12 @@ export function waitUntilBlock(web3: Web3, blockNumber: number, duration = 60 * 
   });
 }
 
+export async function waitUntilOneBlockAfterTxnMined(web3: Web3, txnHash: string) {
+  let receipt = await waitUntilTransactionMined(web3, txnHash);
+  await waitUntilBlock(web3, receipt.blockNumber + 1);
+  return receipt;
+}
+
 export function waitForEvent(contract: Contract, eventName: string, opts: PastEventOptions): Promise<EventData> {
   let eventDataAsync = async function (
     resolve: (value: EventData | Promise<EventData>) => void,
