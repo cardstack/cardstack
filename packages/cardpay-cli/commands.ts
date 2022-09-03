@@ -10,6 +10,7 @@ import * as price from './price';
 import * as rewards from './rewards';
 import * as safe from './safe';
 import * as testing from './testing';
+import * as scheduledPayment from './scheduled-payment';
 
 export const commands: any = [
   assets,
@@ -24,4 +25,5 @@ export const commands: any = [
   rewards,
   safe,
   testing,
+  scheduledPayment,
 ];
