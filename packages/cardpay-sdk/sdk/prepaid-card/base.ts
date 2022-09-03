@@ -566,6 +566,11 @@ export default class PrepaidCard {
     return prepaidCards;
   }
 
+  async getPrepaidCardOwner(prepaidCard: string): Promise<string> {
+    let prepaidCardMgr = await this.getPrepaidCardMgr();
+    return prepaidCardMgr.methods.getPrepaidCardOwner(prepaidCard).call();
+  }
+
   async getPrepaidCardMgr() {
     if (this.prepaidCardManager) {
       return this.prepaidCardManager;
@@ -612,7 +617,7 @@ export default class PrepaidCard {
       .encodeABI();
   }
 
-  private async getPrepaidCardsFromTxn(txnHash: string): Promise<string[]> {
+  async getPrepaidCardsFromTxn(txnHash: string): Promise<string[]> {
     let prepaidCardMgrAddress = await getAddress('prepaidCardManager', this.layer2Web3);
     let txnReceipt = await waitForTransactionConsistency(this.layer2Web3, txnHash);
     return getParamsFromEvent(this.layer2Web3, txnReceipt, this.createPrepaidCardEventABI(), prepaidCardMgrAddress).map(
