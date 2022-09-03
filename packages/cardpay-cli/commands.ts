@@ -9,6 +9,7 @@ import * as prepaidCardMarketV2 from './prepaid-card-market-v-2';
 import * as price from './price';
 import * as rewards from './rewards';
 import * as safe from './safe';
+import * as testing from './testing';
 
 export const commands: any = [
   assets,
@@ -22,4 +23,5 @@ export const commands: any = [
   price,
   rewards,
   safe,
+  testing,
 ];
