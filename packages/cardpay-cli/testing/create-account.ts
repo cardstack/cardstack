@@ -1,3 +1,4 @@
+/*global fetch */
 import { Argv } from 'yargs';
 import { getSDK, getConstant, getConstantByNetwork } from '@cardstack/cardpay-sdk';
 import { waitUntilOneBlockAfterTxnMined } from '@cardstack/cardpay-sdk';
