@@ -1,41 +1,52 @@
 /*global fetch */
 import { Argv } from 'yargs';
-import { getSDK, getConstant, getConstantByNetwork } from '@cardstack/cardpay-sdk';
+import { getSDK, getConstant, getConstantByNetwork, getAddress } from '@cardstack/cardpay-sdk';
 import { waitUntilOneBlockAfterTxnMined } from '@cardstack/cardpay-sdk';
-import { NETWORK_OPTION_LAYER_2, getEthereumClients, getConnectionType, Web3Opts, Web3OptsMnemonic } from '../utils';
+import { NETWORK_OPTION_LAYER_1, getEthereumClients, getConnectionType, Web3Opts, Web3OptsMnemonic } from '../utils';
 import { Arguments, CommandModule } from 'yargs';
 import { encodeDID } from '@cardstack/did-resolver';
 import Web3 from 'web3';
-const { toChecksumAddress } = Web3.utils;
+const { toChecksumAddress, toWei } = Web3.utils;
 import { generateMnemonic } from 'bip39';
 
 export default {
-  command: 'create-account <createPrepaidCardSafe> <createMerchantSafe> <createRewardSafe>',
+  command: 'create-account <createPrepaidCardSafe> <createMerchantSafe> <createRewardSafe> <createDepotSafe>',
   describe: 'Create an account from scratch',
   builder(yargs: Argv) {
     return yargs
       .positional('createPrepaidCardSafe', {
         type: 'boolean',
-        description: '',
+        description: 'create a prepaid card',
       })
       .positional('createMerchantSafe', {
         type: 'boolean',
-        description: '',
+        description: 'create a merchant safe',
       })
       .positional('createRewardSafe', {
         type: 'boolean',
-        description: '',
+        description: 'create a reward safe',
+      })
+      .positional('createDepotSafe', {
+        type: 'boolean',
+        description: 'create a depot safe',
       })
       .options({
-        network: NETWORK_OPTION_LAYER_2,
+        network: NETWORK_OPTION_LAYER_1,
       });
   },
   async handler(args: Arguments) {
-    let { network, createPrepaidCardSafe, createMerchantSafe, createRewardSafe } = args as unknown as {
+    let {
+      network: networkL1,
+      createPrepaidCardSafe,
+      createMerchantSafe,
+      createRewardSafe,
+      createDepotSafe,
+    } = args as unknown as {
       network: string;
       createPrepaidCardSafe: boolean;
       createMerchantSafe: boolean;
       createRewardSafe: boolean;
+      createDepotSafe: boolean;
     };
 
     if (createRewardSafe && !createPrepaidCardSafe) {
@@ -47,33 +58,42 @@ export default {
 
     const createdMnemonic = generateMnemonic();
 
-    const web3Opts = getConnectionType(args);
+    const web3OptsL1 = getConnectionType(args);
     const createdWeb3Opts: Web3OptsMnemonic = {
       connectionType: 'mnemonic',
       mnemonic: createdMnemonic,
     };
-    const { web3: createdWeb3 } = await getEthereumClients(network, createdWeb3Opts);
+    const networkL2 = (L2_NETWORK_BY_L1 as any)[networkL1];
+    if (!networkL2) {
+      throw new Error(`No corresponding l2 network found of l1 network ${networkL1}`);
+    }
+    const { web3: l2createdWeb3 } = await getEthereumClients(networkL2, createdWeb3Opts);
 
-    const createdOwner = (await createdWeb3.eth.getAccounts())[0];
+    const createdOwner = (await l2createdWeb3.eth.getAccounts())[0];
 
     const prepaidCardAddress = createPrepaidCardSafe
-      ? await provisionPrepaidCard(createdOwner, network, web3Opts)
+      ? await provisionPrepaidCard(createdOwner, networkL2, createdWeb3Opts)
       : undefined;
     const merchantSafeAddress =
       prepaidCardAddress && createMerchantSafe
-        ? await registerMerchant(prepaidCardAddress, network, createdWeb3Opts)
+        ? await registerMerchant(prepaidCardAddress, networkL2, createdWeb3Opts)
         : undefined;
     const rewardSafeAddress =
       prepaidCardAddress && createRewardSafe
-        ? await registerRewardee(prepaidCardAddress, network, createdWeb3Opts)
+        ? await registerRewardee(prepaidCardAddress, networkL2, createdWeb3Opts)
         : undefined;
 
-    console.log(` 
+    const depotAddress = createDepotSafe
+      ? await bridgeToken(createdOwner, undefined, networkL1, web3OptsL1, l2createdWeb3)
+      : undefined;
+
+    console.log(`
       Mnemonic: ${createdMnemonic} (WARNING: This is not a secure mnemonic. Only intended for testing!)
       Address: ${createdOwner}
       Prepaid card: ${prepaidCardAddress ?? 'No prepaid card created'}
       Merchant safe: ${merchantSafeAddress ?? 'No merchant safe created'}
       Reward safe: ${rewardSafeAddress ?? 'No reward safe created'}
+      Depot safe: ${depotAddress ?? 'No depot safe created'}
     `);
   },
 } as CommandModule;
@@ -82,23 +102,16 @@ const provisionPrepaidCard = async (createdOwner: string, network: string, web3O
   console.log('Creating prepaid card');
   const { web3 } = await getEthereumClients(network, web3Opts);
   const provisionerSecret = process.env.PROVISIONER_SECRET;
+  const sku: string = (L2_NETWORK_CONFIG as any)[network].sku;
+  const environment: string = (L2_NETWORK_CONFIG as any)[network].environment;
   if (!provisionerSecret) {
-    throw new Error('Provisioner secret not provided');
+    throw new Error('PROVISIONER_SECRET env not provided');
   }
-  let environment: string;
-  let sku: string;
-  switch (network) {
-    case 'gnosis':
-      environment = 'production';
-      sku = '';
-      break;
-    case 'sokol':
-      environment = 'staging';
-      sku = '0xbdd9b9de628f3c2ddf330021facbb43aeef0c8926c068f22800b2dd26c8eb377';
-      break;
-
-    default:
-      throw new Error('Unrecognized network');
+  if (!sku) {
+    throw new Error('Default sku does not exist');
+  }
+  if (!environment) {
+    throw new Error('Default environment does not exist');
   }
   let prepaidCardMarketV2 = await getSDK('PrepaidCardMarketV2', web3);
   const prepaidCardMgr = await getSDK('PrepaidCard', web3);
@@ -146,8 +159,8 @@ const provisionPrepaidCard = async (createdOwner: string, network: string, web3O
 
 const registerMerchant = async (prepaidCard: string, network: string, web3Opts: Web3Opts) => {
   console.log('Registering merchant account');
-  const { web3, signer } = await getEthereumClients(network, web3Opts);
-  let revenuePool = await getSDK('RevenuePool', web3, signer);
+  const { web3 } = await getEthereumClients(network, web3Opts);
+  let revenuePool = await getSDK('RevenuePool', web3);
   let blockExplorer = await getConstant('blockExplorer', web3);
   let merchantDID = encodeDID({ type: 'MerchantInfo' });
   let { merchantSafe } =
@@ -159,7 +172,7 @@ const registerMerchant = async (prepaidCard: string, network: string, web3Opts: 
 };
 
 const registerRewardee = async (prepaidCard: string, network: string, web3Opts: Web3Opts) => {
-  const rewardProgramId = '0x0885ce31D73b63b0Fcb1158bf37eCeaD8Ff0fC72';
+  const rewardProgramId: string = (L2_NETWORK_CONFIG as any)[network].rewardProgramId;
   let { web3 } = await getEthereumClients(network, web3Opts);
   const prepaidCardMgr = await getSDK('PrepaidCard', web3);
   const owner = await prepaidCardMgr.getPrepaidCardOwner(prepaidCard);
@@ -174,4 +187,50 @@ const registerRewardee = async (prepaidCard: string, network: string, web3Opts: 
     { from: owner }
   );
   return rewardSafe;
+};
+
+const bridgeToken = async (
+  receiver: string,
+  amountInEth = '10',
+  networkL1: string,
+  web3OptsL1: Web3Opts,
+  web3L2: Web3
+) => {
+  let { web3: web3L1 } = await getEthereumClients(networkL1, web3OptsL1);
+  let blockExplorer = await getConstant('blockExplorer', web3L1);
+  let tokenBridgeForeginSide = await getSDK('TokenBridgeForeignSide', web3L1);
+  let tokenBridgeHomeSide = await getSDK('TokenBridgeHomeSide', web3L2);
+  let tokenAddress = await getAddress('daiCpxd', web3L1);
+  const amountInWei = toWei(amountInEth);
+  await tokenBridgeForeginSide.unlockTokens(tokenAddress, amountInWei, {
+    onTxnHash: (txnHash) => console.log(`Approve transaction hash: ${blockExplorer}/tx/${txnHash}`),
+  });
+  const blockNumber = await web3L2.eth.getBlockNumber();
+  await tokenBridgeForeginSide.relayTokens(tokenAddress, receiver, amountInWei, {
+    onTxnHash: (txnHash) => console.log(`Relay tokens transaction hash: ${blockExplorer}/tx/${txnHash}`),
+  });
+  await tokenBridgeHomeSide.waitForBridgingToLayer2Completed(receiver, blockNumber.toString());
+  let safesApi = await getSDK('Safes', web3L2);
+  let safes = (await safesApi.view(receiver, { type: 'depot' })).safes.filter((safe) => safe.type !== 'external');
+  if (safes.length == 0) {
+    throw new Error(`No depot safes for ${receiver}`);
+  }
+  return safes[0].address;
+};
+
+const L2_NETWORK_BY_L1 = {
+  kovan: 'sokol',
+  mainnet: 'gnosis',
+};
+const L2_NETWORK_CONFIG = {
+  sokol: {
+    sku: '',
+    rewardProgramId: '0x0885ce31D73b63b0Fcb1158bf37eCeaD8Ff0fC72',
+    environment: 'production',
+  },
+  gnosis: {
+    sku: '0xbdd9b9de628f3c2ddf330021facbb43aeef0c8926c068f22800b2dd26c8eb377',
+    rewardProgramId: '0x979C9F171fb6e9BC501Aa7eEd71ca8dC27cF1185',
+    environment: 'staging',
+  },
 };
