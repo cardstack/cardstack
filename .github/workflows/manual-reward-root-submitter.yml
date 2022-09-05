@@ -64,7 +64,7 @@ jobs:
         if: ${{ always() }}
         uses: ./.github/actions/discord-notification-deploy
         with:
-          app: reward-submit
+          app: reward-submit-lambda
           status: ${{ github.action_status }}
           environment: ${{ github.event.inputs.environment }}
           webhook: ${{ secrets.DISCORD_WEBHOOK }}
