@@ -1355,18 +1355,17 @@
       "console": "integratedTerminal",
       "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
       "env": {
-        "PROVISIONER_SECRET": "xxxx"
-
       },
       "args": [
         "index.ts",
         "testing",
         "create-account",
-        "true", //create prepaid card
-        "true", //create merchant, profile
-        "true", //create reward safe
+        "false", //create prepaid card
+        "false", //create merchant, profile
+        "false", //create reward safe
+        "true", //create depot safe 
         "--network",
-        "${config:cardCli.network.l2.name}",
+        "${config:cardCli.network.l1.name}",
         "--mnemonic",
         "${config:cardCli.mnemonic}"
       ]
