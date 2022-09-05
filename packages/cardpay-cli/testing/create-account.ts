@@ -59,7 +59,7 @@ export default {
     const createdMnemonic = generateMnemonic();
 
     const web3OptsL1 = getConnectionType(args);
-    const createdWeb3Opts: Web3OptsMnemonic = {
+    const createdWeb3OptsL2: Web3OptsMnemonic = {
       connectionType: 'mnemonic',
       mnemonic: createdMnemonic,
     };
@@ -67,28 +67,31 @@ export default {
     if (!networkL2) {
       throw new Error(`No corresponding l2 network found of l1 network ${networkL1}`);
     }
-    const { web3: l2createdWeb3 } = await getEthereumClients(networkL2, createdWeb3Opts);
+    const { web3: createdWeb3L2 } = await getEthereumClients(networkL2, createdWeb3OptsL2);
 
-    const createdOwner = (await l2createdWeb3.eth.getAccounts())[0];
+    const createdOwner = (await createdWeb3L2.eth.getAccounts())[0];
 
     const prepaidCardAddress = createPrepaidCardSafe
-      ? await provisionPrepaidCard(createdOwner, networkL2, createdWeb3Opts)
+      ? await provisionPrepaidCard(createdOwner, networkL2, createdWeb3OptsL2)
       : undefined;
     const merchantSafeAddress =
       prepaidCardAddress && createMerchantSafe
-        ? await registerMerchant(prepaidCardAddress, networkL2, createdWeb3Opts)
+        ? await registerMerchant(prepaidCardAddress, networkL2, createdWeb3OptsL2)
         : undefined;
     const rewardSafeAddress =
       prepaidCardAddress && createRewardSafe
-        ? await registerRewardee(prepaidCardAddress, networkL2, createdWeb3Opts)
+        ? await registerRewardee(prepaidCardAddress, networkL2, createdWeb3OptsL2)
         : undefined;
 
     const depotAddress = createDepotSafe
-      ? await bridgeToken(createdOwner, undefined, networkL1, web3OptsL1, l2createdWeb3)
+      ? await bridgeToken(createdOwner, undefined, networkL1, web3OptsL1, createdWeb3L2)
       : undefined;
 
     console.log(`
-      Mnemonic: ${createdMnemonic} (WARNING: This is not a secure mnemonic. Only intended for testing!)
+
+  WARNING: NOT A SECURE MNEMONIC. ONLY INTENDED FOR TESTING!
+
+      Mnemonic: ${createdMnemonic} 
       Address: ${createdOwner}
       Prepaid card: ${prepaidCardAddress ?? 'No prepaid card created'}
       Merchant safe: ${merchantSafeAddress ?? 'No merchant safe created'}
@@ -200,7 +203,7 @@ const bridgeToken = async (
   let blockExplorer = await getConstant('blockExplorer', web3L1);
   let tokenBridgeForeginSide = await getSDK('TokenBridgeForeignSide', web3L1);
   let tokenBridgeHomeSide = await getSDK('TokenBridgeHomeSide', web3L2);
-  let tokenAddress = await getAddress('daiCpxd', web3L1);
+  let tokenAddress = await getAddress('daiToken', web3L1);
   const amountInWei = toWei(amountInEth);
   await tokenBridgeForeginSide.unlockTokens(tokenAddress, amountInWei, {
     onTxnHash: (txnHash) => console.log(`Approve transaction hash: ${blockExplorer}/tx/${txnHash}`),
