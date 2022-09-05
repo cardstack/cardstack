@@ -1354,10 +1354,12 @@
         "index.ts",
         "testing",
         "create-account",
-        "false", //create prepaid card
-        "false", //create merchant, profile
-        "false", //create reward safe
+        "true", //create prepaid card
+        "true", //create merchant, profile
+        "true", //create reward safe
         "true", //create depot safe 
+        "--bridgeTokenAddress",
+        "${config:cardCli.network.l1.cardToken}",
         "--network",
         "${config:cardCli.network.l1.name}",
         "--mnemonic",
