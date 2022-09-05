@@ -30,6 +30,14 @@ export default {
         type: 'boolean',
         description: 'create a depot safe',
       })
+      .option('bridgeTokenAmount', {
+        type: 'string',
+        description: 'amount to bridge',
+      })
+      .option('bridgeTokenAddress', {
+        type: 'string',
+        description: 'l1 token address to bridge',
+      })
       .options({
         network: NETWORK_OPTION_LAYER_1,
       });
@@ -41,12 +49,16 @@ export default {
       createMerchantSafe,
       createRewardSafe,
       createDepotSafe,
+      bridgeTokenAmount,
+      bridgeTokenAddress,
     } = args as unknown as {
       network: string;
       createPrepaidCardSafe: boolean;
       createMerchantSafe: boolean;
       createRewardSafe: boolean;
       createDepotSafe: boolean;
+      bridgeTokenAmount?: string;
+      bridgeTokenAddress?: string;
     };
 
     if (createRewardSafe && !createPrepaidCardSafe) {
@@ -54,6 +66,9 @@ export default {
     }
     if (createMerchantSafe && !createPrepaidCardSafe) {
       throw new Error('Cannot register merchant without prepaid card');
+    }
+    if ((bridgeTokenAmount && !createDepotSafe) || (bridgeTokenAddress && !createDepotSafe)) {
+      throw new Error('Cannot provide optional arguments when depot safe not being created');
     }
 
     const createdMnemonic = generateMnemonic();
@@ -84,7 +99,15 @@ export default {
         : undefined;
 
     const depotAddress = createDepotSafe
-      ? await bridgeToken(createdOwner, undefined, networkL1, web3OptsL1, networkL2, createdWeb3OptsL2)
+      ? await bridgeToken(
+          createdOwner,
+          networkL1,
+          web3OptsL1,
+          networkL2,
+          createdWeb3OptsL2,
+          bridgeTokenAmount,
+          bridgeTokenAddress
+        )
       : undefined;
 
     console.log(`
@@ -197,19 +220,20 @@ const registerRewardee = async (prepaidCard: string, network: string, web3Opts: 
 
 const bridgeToken = async (
   receiver: string,
-  amountInEth = '10',
   networkL1: string,
   web3OptsL1: Web3Opts,
   networkL2: string,
-  web3OptsL2: Web3Opts
+  web3OptsL2: Web3Opts,
+  amount: string | undefined,
+  bridgeTokenAddress: string | undefined
 ) => {
   let { web3: web3L1 } = await getEthereumClients(networkL1, web3OptsL1);
   let { web3: web3L2 } = await getEthereumClients(networkL2, web3OptsL2);
   let blockExplorer = await getConstant('blockExplorer', web3L1);
   let tokenBridgeForeginSide = await getSDK('TokenBridgeForeignSide', web3L1);
   let tokenBridgeHomeSide = await getSDK('TokenBridgeHomeSide', web3L2);
-  let tokenAddress = await getAddress('daiToken', web3L1);
-  const amountInWei = toWei(amountInEth);
+  let tokenAddress = bridgeTokenAddress ?? (await getAddress('daiToken', web3L1));
+  const amountInWei = toWei(amount ?? '10');
   await tokenBridgeForeginSide.unlockTokens(tokenAddress, amountInWei, {
     onTxnHash: (txnHash) => console.log(`Approve transaction hash: ${blockExplorer}/tx/${txnHash}`),
   });
@@ -232,13 +256,13 @@ const L2_NETWORK_BY_L1 = {
 };
 const L2_NETWORK_CONFIG = {
   sokol: {
-    sku: '',
+    sku: '0xbdd9b9de628f3c2ddf330021facbb43aeef0c8926c068f22800b2dd26c8eb377',
     rewardProgramId: '0x0885ce31D73b63b0Fcb1158bf37eCeaD8Ff0fC72',
-    environment: 'production',
+    environment: 'staging',
   },
   gnosis: {
-    sku: '0xbdd9b9de628f3c2ddf330021facbb43aeef0c8926c068f22800b2dd26c8eb377',
+    sku: '',
     rewardProgramId: '0x979C9F171fb6e9BC501Aa7eEd71ca8dC27cF1185',
-    environment: 'staging',
+    environment: 'production',
   },
 };
