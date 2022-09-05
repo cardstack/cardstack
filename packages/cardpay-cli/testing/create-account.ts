@@ -84,7 +84,7 @@ export default {
         : undefined;
 
     const depotAddress = createDepotSafe
-      ? await bridgeToken(createdOwner, undefined, networkL1, web3OptsL1, createdWeb3L2)
+      ? await bridgeToken(createdOwner, undefined, networkL1, web3OptsL1, networkL2, createdWeb3OptsL2)
       : undefined;
 
     console.log(`
@@ -176,6 +176,9 @@ const registerMerchant = async (prepaidCard: string, network: string, web3Opts: 
 
 const registerRewardee = async (prepaidCard: string, network: string, web3Opts: Web3Opts) => {
   const rewardProgramId: string = (L2_NETWORK_CONFIG as any)[network].rewardProgramId;
+  if (!rewardProgramId) {
+    throw new Error(`No reward program id recognised for network ${network}`);
+  }
   let { web3 } = await getEthereumClients(network, web3Opts);
   const prepaidCardMgr = await getSDK('PrepaidCard', web3);
   const owner = await prepaidCardMgr.getPrepaidCardOwner(prepaidCard);
@@ -197,9 +200,11 @@ const bridgeToken = async (
   amountInEth = '10',
   networkL1: string,
   web3OptsL1: Web3Opts,
-  web3L2: Web3
+  networkL2: string,
+  web3OptsL2: Web3Opts
 ) => {
   let { web3: web3L1 } = await getEthereumClients(networkL1, web3OptsL1);
+  let { web3: web3L2 } = await getEthereumClients(networkL2, web3OptsL2);
   let blockExplorer = await getConstant('blockExplorer', web3L1);
   let tokenBridgeForeginSide = await getSDK('TokenBridgeForeignSide', web3L1);
   let tokenBridgeHomeSide = await getSDK('TokenBridgeHomeSide', web3L2);
