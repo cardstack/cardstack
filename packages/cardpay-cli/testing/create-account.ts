@@ -105,8 +105,8 @@ export default {
           web3OptsL1,
           networkL2,
           createdWeb3OptsL2,
-          bridgeTokenAmount,
-          bridgeTokenAddress
+          bridgeTokenAddress,
+          bridgeTokenAmount
         )
       : undefined;
 
@@ -224,8 +224,8 @@ const bridgeToken = async (
   web3OptsL1: Web3Opts,
   networkL2: string,
   web3OptsL2: Web3Opts,
-  amount: string | undefined,
-  bridgeTokenAddress: string | undefined
+  bridgeTokenAddress: string | undefined,
+  amount: string | undefined
 ) => {
   let { web3: web3L1 } = await getEthereumClients(networkL1, web3OptsL1);
   let { web3: web3L2 } = await getEthereumClients(networkL2, web3OptsL2);
