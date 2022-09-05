@@ -172,7 +172,7 @@ const provisionPrepaidCard = async (createdOwner: string, network: string, web3O
         response.status
       } from relay server: ${JSON.stringify(body)}`
     );
-    throw new Error('');
+    throw new Error('Provisioning of prepaid card failed');
   }
   let { txHash } = body;
   console.log(`Transaction hash: ${blockExplorer}/tx/${txHash}/token-transfers`);
@@ -198,6 +198,7 @@ const registerMerchant = async (prepaidCard: string, network: string, web3Opts: 
 };
 
 const registerRewardee = async (prepaidCard: string, network: string, web3Opts: Web3Opts) => {
+  console.log('Registering rewardee');
   const rewardProgramId: string = (L2_NETWORK_CONFIG as any)[network].rewardProgramId;
   if (!rewardProgramId) {
     throw new Error(`No reward program id recognised for network ${network}`);
@@ -215,6 +216,7 @@ const registerRewardee = async (prepaidCard: string, network: string, web3Opts: 
     },
     { from: owner }
   );
+  console.log(`Registered rewardee: ${owner} with reward safe ${rewardSafe}`);
   return rewardSafe;
 };
 
