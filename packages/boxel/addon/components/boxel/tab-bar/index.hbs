@@ -1,6 +1,6 @@
 <nav role="tablist" class={{cn "boxel-tab-bar" @class}} ...attributes>
-  {{#if @items}}
-    {{#each (compact @items) as |tab|}}
+  {{#if this.linkItems}}
+    {{#each this.linkItems as |tab|}}
       <div
         role="none"
         class={{cn
@@ -9,14 +9,14 @@
         }}
       >
         {{!-- template-lint-disable require-context-role --}}
-        <a
+        <LinkTo
+          @route={{tab.action.routeName}}
+          @query={{or tab.action.queryParams (hash)}}
           role="tab"
-          href={{tab.action.url}}
           data-text={{tab.text}}
-          {{on "click" (fn this.invokeMenuItemAction tab.action)}}
         >
           {{tab.text}}
-        </a>
+        </LinkTo>
       </div>
     {{/each}}
   {{/if}}
