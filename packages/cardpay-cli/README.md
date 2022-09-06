@@ -93,7 +93,7 @@ yarn cardpay safe list --walletConnect
  - [`cardpay rewards list`](#cardpay-rewards-list)
  - [`cardpay rewards pool-balances <rewardProgramId>`](#cardpay-rewards-pool-balances-rewardprogramid)
  - [`cardpay rewards register <prepaidCard> <rewardProgramId>`](#cardpay-rewards-register-prepaidcard-rewardprogramid)
- - [`cardpay rewards reward-balances <address>`](#cardpay-rewards-reward-balances-address)
+ - [`cardpay rewards reward-balances <address> [safeAddress] [rewardProgramId]`](#cardpay-rewards-reward-balances-address-safeaddress-rewardprogramid)
  - [`cardpay rewards transfer-safe <rewardSafe> <newOwner>`](#cardpay-rewards-transfer-safe-rewardsafe-newowner)
  - [`cardpay rewards withdraw-from-safe <rewardSafe> <recipient> <tokenAddress> [amount]`](#cardpay-rewards-withdraw-from-safe-rewardsafe-recipient-tokenaddress-amount)
  - [`cardpay rewards view <rewardProgramId>`](#cardpay-rewards-view-rewardprogramid)
@@ -101,13 +101,15 @@ yarn cardpay safe list --walletConnect
  - [`cardpay rewards claim-reward-gas-estimate <rewardSafe> <leaf> <proof> [acceptPartialClaim]`](#cardpay-rewards-claim-reward-gas-estimate-rewardsafe-leaf-proof-acceptpartialclaim)
  - [`cardpay rewards withdraw-gas-estimate <rewardSafe> <recipient> <tokenAddress> <amount>`](#cardpay-rewards-withdraw-gas-estimate-rewardsafe-recipient-tokenaddress-amount)
  - [`cardpay rewards check-claim-params <rewardSafe> <leaf> <proof> [acceptPartialClaim]`](#cardpay-rewards-check-claim-params-rewardsafe-leaf-proof-acceptpartialclaim)
- - [`cardpay rewards claim-all <address> <rewardSafe> <rewardProgramId> <tokenAddress>`](#cardpay-rewards-claim-all-address-rewardsafe-rewardprogramid-tokenaddress)
- - [`cardpay rewards claim-all-rewards-gas-estimate <address> <rewardSafe> <rewardProgramId> <tokenAddress>`](#cardpay-rewards-claim-all-rewards-gas-estimate-address-rewardsafe-rewardprogramid-tokenaddress)
+ - [`cardpay rewards claim-all <rewardSafe> [rewardProgramId] [tokenAddress]`](#cardpay-rewards-claim-all-rewardsafe-rewardprogramid-tokenaddress)
+ - [`cardpay rewards claim-all-rewards-gas-estimate <rewardSafe> <tokenAddress> [rewardProgramId]`](#cardpay-rewards-claim-all-rewards-gas-estimate-rewardsafe-tokenaddress-rewardprogramid)
  - [`cardpay safe list [address] [safeType]`](#cardpay-safe-list-address-safetype)
  - [`cardpay safe transfer-tokens [safeAddress] [token] [recipient] [amount]`](#cardpay-safe-transfer-tokens-safeaddress-token-recipient-amount)
  - [`cardpay safe transfer-tokens-gas-estimate [safeAddress] [token] [recipient] [amount]`](#cardpay-safe-transfer-tokens-gas-estimate-safeaddress-token-recipient-amount)
  - [`cardpay safe view [safeAddress]`](#cardpay-safe-view-safeaddress)
  - [`cardpay safe debug-sign-typed-data [data] [address]`](#cardpay-safe-debug-sign-typed-data-data-address)
+ - [`cardpay testing create-account <createPrepaidCardSafe> <createMerchantSafe> <createRewardSafe> <createDepotSafe>`](#cardpay-testing-create-account-createprepaidcardsafe-createmerchantsafe-createrewardsafe-createdepotsafe)
+ - [`cardpay scheduled-payment enable-module <safeAddress> <gasTokenAddress>`](#cardpay-scheduled-payment-enable-module-safeaddress-gastokenaddress)
 
 
 ## `cardpay assets token-balance [tokenAddress]`
@@ -898,7 +900,7 @@ Options:
 
 ## `cardpay rewards claim <rewardSafe> <leaf> <proof> [acceptPartialClaim]`
 
-Claim rewards using proof
+Claim reward using proof
 
 ```
 Positionals:
@@ -982,7 +984,7 @@ Options:
   -n, --network         The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "gnosis", "xdai"]
 ```
 
-## `cardpay rewards reward-balances <address>`
+## `cardpay rewards reward-balances <address> [safeAddress] [rewardProgramId]`
 
 View token balances of unclaimed rewards in the reward pool
 
@@ -995,6 +997,7 @@ Options:
   -t, --trezor           A flag to indicate that trezor should be used for the wallet  [boolean]
   -m, --mnemonic         Phrase for mnemonic wallet  [string]
   -e, --ethersMnemonic   Phrase for mnemonic wallet using ethers.js signer  [string]
+      --safeAddress      safe address. Specify if you want gas estimates for each claim  [string]
       --rewardProgramId  The reward program id.  [string]
   -n, --network          The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "gnosis", "xdai"]
 ```
@@ -1126,32 +1129,12 @@ Options:
   -n, --network             The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "gnosis", "xdai"]
 ```
 
-## `cardpay rewards claim-all <address> <rewardSafe> <rewardProgramId> <tokenAddress>`
+## `cardpay rewards claim-all <rewardSafe> [rewardProgramId] [tokenAddress]`
 
-claim all token rewards from a reward program
-
-```
-Positionals:
-  address          The address that tally rewarded -- The owner of prepaid card.  [string] [required]
-  rewardSafe       The address of the rewardSafe which will receive the rewards  [string] [required]
-  rewardProgramId  The reward program id.  [string] [required]
-  tokenAddress     The address of the tokens that are being claimed as rewards  [string] [required]
-
-Options:
-  -w, --walletConnect   A flag to indicate that wallet connect should be used for the wallet  [boolean]
-  -t, --trezor          A flag to indicate that trezor should be used for the wallet  [boolean]
-  -m, --mnemonic        Phrase for mnemonic wallet  [string]
-  -e, --ethersMnemonic  Phrase for mnemonic wallet using ethers.js signer  [string]
-  -n, --network         The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "gnosis", "xdai"]
-```
-
-## `cardpay rewards claim-all-rewards-gas-estimate <address> <rewardSafe> <rewardProgramId> <tokenAddress>`
-
-Obtain a gas estimate to claim all rewards corresponding to a rewardProgrmaId and tokenAddress
+claim all token of rewardee
 
 ```
 Positionals:
-  address     The address that tally rewarded -- The owner of prepaid card.  [string] [required]
   rewardSafe  The address of the rewardSafe which will receive the rewards  [string] [required]
 
 Options:
@@ -1161,6 +1144,24 @@ Options:
   -e, --ethersMnemonic   Phrase for mnemonic wallet using ethers.js signer  [string]
       --rewardProgramId  The reward program id.  [string]
       --tokenAddress     The address of the tokens that are being claimed as rewards  [string]
+  -n, --network          The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "gnosis", "xdai"]
+```
+
+## `cardpay rewards claim-all-rewards-gas-estimate <rewardSafe> <tokenAddress> [rewardProgramId]`
+
+Obtain a gas estimate to claim all rewards corresponding to a rewardProgrmaId and tokenAddress
+
+```
+Positionals:
+  rewardSafe    The address of the rewardSafe which will receive the rewards  [string] [required]
+  tokenAddress  The address of the tokens that are being claimed as rewards  [string] [required]
+
+Options:
+  -w, --walletConnect    A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -t, --trezor           A flag to indicate that trezor should be used for the wallet  [boolean]
+  -m, --mnemonic         Phrase for mnemonic wallet  [string]
+  -e, --ethersMnemonic   Phrase for mnemonic wallet using ethers.js signer  [string]
+      --rewardProgramId  The reward program id.  [string]
   -n, --network          The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "gnosis", "xdai"]
 ```
 
@@ -1250,6 +1251,44 @@ Options:
   -m, --mnemonic        Phrase for mnemonic wallet  [string]
   -e, --ethersMnemonic  Phrase for mnemonic wallet using ethers.js signer  [string]
   -n, --network         The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "gnosis", "xdai"]
+```
+
+## `cardpay testing create-account <createPrepaidCardSafe> <createMerchantSafe> <createRewardSafe> <createDepotSafe>`
+
+Create an account from scratch and sets up safes based of card pay protocol
+
+```
+Positionals:
+  createPrepaidCardSafe  create a prepaid card  [boolean] [required]
+  createMerchantSafe     create a merchant safe  [boolean] [required]
+  createRewardSafe       create a reward safe  [boolean] [required]
+  createDepotSafe        create a depot safe  [boolean] [required]
+
+Options:
+  -w, --walletConnect       A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -t, --trezor              A flag to indicate that trezor should be used for the wallet  [boolean]
+  -m, --mnemonic            Phrase for mnemonic wallet  [string]
+  -e, --ethersMnemonic      Phrase for mnemonic wallet using ethers.js signer  [string]
+      --bridgeTokenAmount   amount to bridge  [string]
+      --bridgeTokenAddress  l1 token address to bridge  [string]
+  -n, --network             The Layer 1 network to run this script on  [string] [required] [choices: "kovan", "mainnet"]
+```
+
+## `cardpay scheduled-payment enable-module <safeAddress> <gasTokenAddress>`
+
+Enable scheduled payment module on the safe
+
+```
+Positionals:
+  safeAddress      The address of the safe whose enables the scheduled payment module  [string] [required]
+  gasTokenAddress  The token address (defaults to Kovan DAI)  [string] [required]
+
+Options:
+  -w, --walletConnect   A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -t, --trezor          A flag to indicate that trezor should be used for the wallet  [boolean]
+  -m, --mnemonic        Phrase for mnemonic wallet  [string]
+  -e, --ethersMnemonic  Phrase for mnemonic wallet using ethers.js signer  [string]
+  -n, --network         The network to run this script on  [string] [required] [choices: "sokol", "kovan", "gnosis", "xdai", "mainnet"]
 ```
 
 <!-- END CLI DOCS GENERATED BY yarn command-docs -->

@@ -41,6 +41,7 @@ export {
   waitUntilBlock,
   waitUntilTransactionMined,
   waitForSubgraphIndex,
+  waitUntilOneBlockAfterTxnMined,
 } from './sdk/utils/general-utils';
 export { signTypedData } from './sdk/utils/signing-utils';
 export * from './sdk/currency-utils';
