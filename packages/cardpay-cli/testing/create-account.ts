@@ -149,7 +149,7 @@ const provisionPrepaidCard = async (createdOwner: string, network: string, web3O
 
   let quantity = await prepaidCardMarketV2.getQuantity(sku);
 
-  if (quantity === 0) {
+  if (quantity.toString() === '0') {
     throw new Error(`There is not enough balance in the issuer safe to provision a card of SKU ${sku}`);
   }
 
