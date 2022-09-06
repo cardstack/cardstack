@@ -8,7 +8,7 @@ from cloudpathlib import AnyPath
 from did_resolver import Resolver
 from python_did_resolver import get_resolver
 
-from .utils import get_files, get_latest_details, run_job
+from .utils import get_latest_details, get_table_dataset, run_job
 
 
 class RewardProgram:
@@ -38,20 +38,19 @@ class RewardProgram:
         logging.info(
             f"Loading processed payment cycles for {self.reward_program_id} from {subgraph_extract_location}"
         )
-        subgraph_export_files = get_files(
+        submission_dataset = get_table_dataset(
             subgraph_extract_location, "merkle_root_submission"
         )
         con = duckdb.connect(database=":memory:", read_only=False)
+        con.register("submissions", submission_dataset)
         con.execute(
-            f"""
-        select distinct payment_cycle_uint64 from parquet_scan({subgraph_export_files})
-        """
+            "select distinct payment_cycle_uint64 from submissions where reward_program = $1",
+            [self.reward_program_id],
         )
         self.processed_cycles.update(r[0] for r in con.fetchall())
-        con.execute(
-            f"select max(_block_number), count(*) from parquet_scan({subgraph_export_files})"
-        )
+        con.execute("select max(_block_number), count(*) from submissions")  # 27310514
         last_update_block, total_payment_cycles = con.fetchall()[0]
+        logging.info(f"Last update block in parquet files {last_update_block}")
         if total_payment_cycles == 0:
             # There are no payment cycles in the parquet files
             self.last_update_block = 0
@@ -213,10 +212,13 @@ class RewardProgram:
             logging.info(f"Reward program {self.reward_program_id} is locked, skipping")
             return
         rules = self.get_rules()
+        logging.info(f"Reward program {self.reward_program_id} has {len(rules)} rules")
         self.raise_on_payment_cycle_overlap(rules)
-        for rule in rules:
-            processable_payment_cycles = (
-                self.get_all_payment_cycles(rule) - self.processed_cycles
+        for i, rule in enumerate(rules):
+            all_payment_cycles = self.get_all_payment_cycles(rule)
+            processable_payment_cycles = all_payment_cycles - self.processed_cycles
+            logging.info(
+                f"Rule {i}: {len(processable_payment_cycles)} valid cycles left to process"
             )
             for payment_cycle in sorted(processable_payment_cycles):
                 self.run(payment_cycle, rule)
