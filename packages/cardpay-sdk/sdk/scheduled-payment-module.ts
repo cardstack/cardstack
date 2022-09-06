@@ -16,7 +16,9 @@ import {
   sendTransaction,
   Transaction,
   TransactionOptions,
+  waitUntilTransactionMined,
 } from './utils/general-utils';
+
 import { ContractOptions } from 'web3-eth-contract';
 import {
   EventABI,
@@ -30,7 +32,8 @@ import {
 import { Signer, utils } from 'ethers';
 import { signSafeTx, signSafeTxAsBytes } from './utils/signing-utils';
 import { BN } from 'bn.js';
-import { ERC20ABI, waitUntilTransactionMined } from '..';
+import { ERC20ABI } from '..';
+import { SuccessfulTransactionReceipt } from './utils/successful-transaction-receipt';
 /* eslint-disable node/no-extraneous-import */
 import { AddressZero } from '@ethersproject/constants';
 
@@ -423,5 +426,98 @@ export default class ScheduledPaymentModule {
     }
 
     return requiredGas;
+  }
+
+  async generateSchedulePaymentSignature(
+    senderSafeAddress: string,
+    spSafeModuleAddress: string,
+    tokenAddress: string,
+    spHash: string
+  ) {
+    let contract = new this.layer2Web3.eth.Contract(ScheduledPaymentABI as AbiItem[], spSafeModuleAddress);
+    let payload = await contract.methods.schedulePayment(spHash).encodeABI();
+
+    let estimate = await gasEstimate(
+      this.layer2Web3,
+      senderSafeAddress,
+      spSafeModuleAddress,
+      '0',
+      payload,
+      Operation.CALL,
+      tokenAddress
+    );
+
+    let from = (await this.layer2Web3.eth.getAccounts())[0];
+    let nonce = getNextNonceFromEstimate(estimate);
+
+    let signatures = await signSafeTx(
+      this.layer2Web3,
+      senderSafeAddress,
+      spSafeModuleAddress,
+      payload,
+      Operation.CALL,
+      estimate,
+      nonce,
+      from,
+      this.layer2Signer
+    );
+
+    return [signatures, nonce, estimate, payload];
+  }
+
+  async schedulePayment(
+    senderSafeAddressOrTxnHash: string,
+    spSafeModuleAddress: string,
+    tokenAddress: string,
+    spHash: string,
+    txnOptions?: TransactionOptions
+  ): Promise<SuccessfulTransactionReceipt> {
+    let { onTxnHash } = txnOptions ?? {};
+
+    if (isTransactionHash(senderSafeAddressOrTxnHash)) {
+      let txnHash = senderSafeAddressOrTxnHash;
+      return await waitUntilTransactionMined(this.layer2Web3, txnHash);
+    }
+
+    let senderSafeAddress = senderSafeAddressOrTxnHash;
+
+    if (!senderSafeAddress) {
+      throw new Error('senderSafeAddress must be provided');
+    }
+    if (!spSafeModuleAddress) {
+      throw new Error('spSafeModuleAddress must be provided');
+    }
+    if (!tokenAddress) {
+      throw new Error('tokenAddress must be provided');
+    }
+    if (!spHash) {
+      throw new Error('spHash must be provided');
+    }
+
+    let [signatures, nonce, estimate, payload] = await this.generateSchedulePaymentSignature(
+      senderSafeAddress,
+      spSafeModuleAddress,
+      tokenAddress,
+      spHash
+    );
+
+    let gnosisTxn = await executeTransaction(
+      this.layer2Web3,
+      senderSafeAddress,
+      spSafeModuleAddress,
+      payload,
+      Operation.CALL,
+      estimate,
+      nonce,
+      signatures
+    );
+
+    let txnHash = gnosisTxn.ethereumTx.txHash;
+
+    if (typeof onTxnHash === 'function') {
+      await onTxnHash(txnHash);
+    }
+
+    return await waitUntilTransactionMined(this.layer2Web3, txnHash);
   }
 }
