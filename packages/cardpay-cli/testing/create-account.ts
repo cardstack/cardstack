@@ -11,7 +11,7 @@ import { generateMnemonic } from 'bip39';
 
 export default {
   command: 'create-account <createPrepaidCardSafe> <createMerchantSafe> <createRewardSafe> <createDepotSafe>',
-  describe: 'Create an account from scratch',
+  describe: 'Create an account from scratch and sets up safes based of card pay protocol',
   builder(yargs: Argv) {
     return yargs
       .positional('createPrepaidCardSafe', {
