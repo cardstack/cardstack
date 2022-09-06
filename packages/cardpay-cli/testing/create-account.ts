@@ -2,7 +2,7 @@
 import { Argv } from 'yargs';
 import { getSDK, getConstant, getConstantByNetwork, getAddress } from '@cardstack/cardpay-sdk';
 import { waitUntilOneBlockAfterTxnMined } from '@cardstack/cardpay-sdk';
-import { NETWORK_OPTION_LAYER_1, getEthereumClients, getConnectionType, Web3Opts, Web3OptsMnemonic } from '../utils';
+import { NETWORK_OPTION_LAYER_1, getEthereumClients, getConnectionType, Web3Opts } from '../utils';
 import { Arguments, CommandModule } from 'yargs';
 import { encodeDID } from '@cardstack/did-resolver';
 import Web3 from 'web3';
