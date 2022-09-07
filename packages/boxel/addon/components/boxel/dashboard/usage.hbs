@@ -39,24 +39,25 @@
       @value={{this.darkTheme}}
       @onInput={{fn (mut this.darkTheme)}}
     />
+    {{!-- template-lint-disable no-unbound --}}
     <Args.String
       @name="--boxel-dashboard-left-edge-width"
       @description="min-width CSS style"
-      @defaultValue="5rem"
+      @defaultValue={{unbound this.leftEdgeWidth}}
       @value={{this.leftEdgeWidth}}
       @onInput={{fn (mut this.leftEdgeWidth)}}
     />
     <Args.String
       @name="--boxel-dashboard-background-color"
       @description="background-color CSS style"
-      @defaultValue="inherit"
+      @defaultValue={{unbound this.backgroundColor}}
       @value={{this.backgroundColor}}
       @onInput={{fn (mut this.backgroundColor)}}
     />
     <Args.String
       @name="--boxel-dashboard-color"
       @description="color CSS style"
-      @defaultValue="inherit"
+      @defaultValue={{unbound this.color}}
       @value={{this.color}}
       @onInput={{fn (mut this.color)}}
     />

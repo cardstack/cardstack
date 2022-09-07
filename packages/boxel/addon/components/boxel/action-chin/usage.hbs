@@ -173,45 +173,46 @@
       @value={{this.stepNumber}}
       @onInput={{fn (mut this.stepNumber)}}
     />
+    {{!-- template-lint-disable no-unbound --}}
     <Args.String
       @name="--boxel-action-chin-padding-horizontal"
       @description="padding CSS style"
-      @defaultValue="var(--boxel-sp-lg)"
+      @defaultValue={{unbound this.paddingHorizontal}}
       @value={{this.paddingHorizontal}}
       @onInput={{fn (mut this.paddingHorizontal)}}
     />
     <Args.String
       @name="--boxel-action-chin-padding-vertical"
       @description="padding CSS style"
-      @defaultValue="var(--boxel-sp-lg)"
+      @defaultValue={{unbound this.paddingVertical}}
       @value={{this.paddingVertical}}
       @onInput={{fn (mut this.paddingVertical)}}
     />
     <Args.String
       @name="--boxel-action-chin-background-color"
       @description="background-color CSS style"
-      @defaultValue="var(--boxel-purple-750)"
+      @defaultValue={{unbound this.backgroundColor}}
       @value={{this.backgroundColor}}
       @onInput={{fn (mut this.backgroundColor)}}
     />
     <Args.String
       @name="--boxel-action-chin-emphasis-text-color"
       @description="color CSS style"
-      @defaultValue="var(--boxel-light)"
+      @defaultValue={{unbound this.emphasisTextColor}}
       @value={{this.emphasisTextColor}}
       @onInput={{fn (mut this.emphasisTextColor)}}
     />
     <Args.String
       @name="--boxel-action-chin-text-color"
       @description="color CSS style"
-      @defaultValue="var(--boxel-purple-300)"
+      @defaultValue={{unbound this.textColor}}
       @value={{this.textColor}}
       @onInput={{fn (mut this.textColor)}}
     />
     <Args.String
       @name="--boxel-action-chin-disabled-background"
       @description="background-color CSS style"
-      @defaultValue="rgb(54 52 65 / 90%)"
+      @defaultValue={{unbound this.disabledBackground}}
       @value={{this.disabledBackground}}
       @onInput={{fn (mut this.disabledBackground)}}
     />

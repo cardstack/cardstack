@@ -92,66 +92,67 @@
       @onInput={{fn (mut this.loading)}}
       @value={{this.loading}}
     />
+    {{!-- template-lint-disable no-unbound --}}
     <Args.String
       @name="--boxel-button-color"
       @description="background-color CSS style"
-      @defaultValue="var(--boxel-purple-300)"
+      @defaultValue={{unbound this.color}}
       @value={{this.color}}
       @onInput={{fn (mut this.color)}}
     />
     <Args.String
       @name="--boxel-button-border"
       @description="border CSS style"
-      @defaultValue="1px solid var(--boxel-purple-300)"
+      @defaultValue={{unbound this.border}}
       @value={{this.border}}
       @onInput={{fn (mut this.border)}}
     />
     <Args.String
       @name="--boxel-button-text-color"
       @description="color CSS style"
-      @defaultValue="var(--boxel-purple-600)"
+      @defaultValue={{unbound this.textColor}}
       @value={{this.textColor}}
       @onInput={{fn (mut this.textColor)}}
     />
     <Args.String
       @name="--boxel-button-padding"
       @description="padding CSS style"
-      @defaultValue="size-dependent"
+      @defaultValue={{unbound this.padding}}
       @value={{this.padding}}
       @onInput={{fn (mut this.paddingOverride)}}
     />
     <Args.String
       @name="--boxel-button-font"
       @description="font CSS style"
-      @defaultValue="size-dependent"
+      @defaultValue={{unbound this.font}}
       @value={{this.font}}
       @onInput={{fn (mut this.fontOverride)}}
     />
     <Args.String
       @name="--boxel-button-loading-icon-size"
       @description="width/height CSS style"
-      @defaultValue="size-dependent"
+      @defaultValue={{unbound this.loadingIconSize}}
       @value={{this.loadingIconSize}}
       @onInput={{fn (mut this.loadingIconSizeOverride)}}
     />
     <Args.String
       @name="--boxel-button-letter-spacing"
       @description="letter-spacing CSS style"
-      @defaultValue="size-dependent"
+      @defaultValue={{unbound this.letterSpacing}}
       @value={{this.letterSpacing}}
       @onInput={{fn (mut this.letterSpacingOverride)}}
     />
     <Args.String
       @name="--boxel-button-min-height"
       @description="height CSS style"
-      @defaultValue="size-dependent"
+      @defaultValue={{unbound this.minHeight}}
       @value={{this.minHeight}}
       @onInput={{fn (mut this.minHeightOverride)}}
     />
     <Args.String
       @name="--boxel-button-min-width"
       @description="width CSS style"
-      @defaultValue="120px"
+      @defaultValue={{unbound this.minWidth}}
       @value={{this.minWidth}}
       @onInput={{fn (mut this.minWidth)}}
     />
