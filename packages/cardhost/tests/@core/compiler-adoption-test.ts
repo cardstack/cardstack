@@ -42,7 +42,7 @@ module('@core | compiler-adoption', function (hooks) {
   let cardService: Cards;
   hooks.beforeEach(async function () {
     createCard(PERSON_CARD);
-    cardService = this.owner.lookup('service:cards');
+    cardService = this.owner.lookup('service:cards') as Cards;
     builder = await cardService.builder();
 
     parentCard = await builder.getCompiledCard(`${LOCAL_REALM}person`);
@@ -184,6 +184,7 @@ module('@core | compiler-adoption', function (hooks) {
         files: {
           'schema.js': `
             import { adopts } from "@cardstack/types";
+import { CardService } from '../../../core/src/interfaces';
             import Person from "${LOCAL_REALM}person";
 
             export default @adopts(Person) class User {}

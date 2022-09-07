@@ -9,7 +9,7 @@ module('Integration | card-service', function (hooks) {
 
   let cards: Cards;
   hooks.beforeEach(function () {
-    cards = this.owner.lookup('service:cards');
+    cards = this.owner.lookup('service:cards') as Cards;
   });
 
   module('blog post', function (hooks) {
