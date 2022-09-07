@@ -42,7 +42,7 @@ export default {
     let blockExplorer = await getConstant('blockExplorer', web3);
 
     console.log(`Waiting for the transaction to be mined...`);
-    await scheduledPaymentModule.schedulePayment(senderSafeAddress, safeModuleAddress, tokenAddress, spHash, {
+    await scheduledPaymentModule.schedulePayment(senderSafeAddress, safeModuleAddress, tokenAddress, spHash, null, {
       onTxnHash: (txnHash) => console.log(`Transaction hash: ${blockExplorer}/tx/${txnHash}`),
     });
 

@@ -30,7 +30,7 @@ import {
   Operation,
 } from './utils/safe-utils';
 import { Signer, utils } from 'ethers';
-import { signSafeTx, signSafeTxAsBytes } from './utils/signing-utils';
+import { signSafeTx, signSafeTxAsBytes, Signature } from './utils/signing-utils';
 import { BN } from 'bn.js';
 import { ERC20ABI } from '..';
 import { SuccessfulTransactionReceipt } from './utils/successful-transaction-receipt';
@@ -434,6 +434,38 @@ export default class ScheduledPaymentModule {
     tokenAddress: string,
     spHash: string
   ) {
+    let [nonce, estimate, payload] = await this.generateSchedulePaymentTxParams(
+      senderSafeAddress,
+      spSafeModuleAddress,
+      tokenAddress,
+      spHash
+    );
+
+    let from = (await this.layer2Web3.eth.getAccounts())[0];
+
+    let signature = (
+      await signSafeTx(
+        this.layer2Web3,
+        senderSafeAddress,
+        spSafeModuleAddress,
+        payload,
+        Operation.CALL,
+        estimate,
+        nonce,
+        from,
+        this.layer2Signer
+      )
+    )[0];
+
+    return signature;
+  }
+
+  private async generateSchedulePaymentTxParams(
+    senderSafeAddress: string,
+    spSafeModuleAddress: string,
+    tokenAddress: string,
+    spHash: string
+  ) {
     let contract = new this.layer2Web3.eth.Contract(ScheduledPaymentABI as AbiItem[], spSafeModuleAddress);
     let payload = await contract.methods.schedulePayment(spHash).encodeABI();
 
@@ -447,22 +479,9 @@ export default class ScheduledPaymentModule {
       tokenAddress
     );
 
-    let from = (await this.layer2Web3.eth.getAccounts())[0];
     let nonce = getNextNonceFromEstimate(estimate);
 
-    let signatures = await signSafeTx(
-      this.layer2Web3,
-      senderSafeAddress,
-      spSafeModuleAddress,
-      payload,
-      Operation.CALL,
-      estimate,
-      nonce,
-      from,
-      this.layer2Signer
-    );
-
-    return [signatures, nonce, estimate, payload];
+    return [nonce, estimate, payload];
   }
 
   async schedulePayment(
@@ -470,6 +489,7 @@ export default class ScheduledPaymentModule {
     spSafeModuleAddress: string,
     tokenAddress: string,
     spHash: string,
+    signature?: Signature | null,
     txnOptions?: TransactionOptions
   ): Promise<SuccessfulTransactionReceipt> {
     let { onTxnHash } = txnOptions ?? {};
@@ -494,12 +514,21 @@ export default class ScheduledPaymentModule {
       throw new Error('spHash must be provided');
     }
 
-    let [signatures, nonce, estimate, payload] = await this.generateSchedulePaymentSignature(
+    let [nonce, estimate, payload] = await this.generateSchedulePaymentTxParams(
       senderSafeAddress,
       spSafeModuleAddress,
       tokenAddress,
       spHash
     );
+
+    if (!signature) {
+      signature = await this.generateSchedulePaymentSignature(
+        senderSafeAddress,
+        spSafeModuleAddress,
+        tokenAddress,
+        spHash
+      );
+    }
 
     let gnosisTxn = await executeTransaction(
       this.layer2Web3,
@@ -509,7 +538,7 @@ export default class ScheduledPaymentModule {
       Operation.CALL,
       estimate,
       nonce,
-      signatures
+      [signature]
     );
 
     let txnHash = gnosisTxn.ethereumTx.txHash;
