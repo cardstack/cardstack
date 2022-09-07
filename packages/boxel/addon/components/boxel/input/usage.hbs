@@ -12,6 +12,9 @@
       @multiline={{this.multiline}}
       @errorMessage={{this.errorMessage}}
       @helperText={{this.helperText}}
+      style={{css-var
+        boxel-input-height=this.height
+      }}
       {{on "blur" this.validate}}
       {{on "input" this.set}}
     />
@@ -63,6 +66,14 @@
       @name="helperText"
       @value={{this.helperText}}
       @onInput={{fn (mut this.helperText)}}
+    />
+    {{!-- template-lint-disable no-unbound --}}
+    <Args.String
+      @name="--boxel-input-height"
+      @description="height CSS style"
+      @defaultValue={{unbound this.height}}
+      @value={{this.height}}
+      @onInput={{fn (mut this.height)}}
     />
     <Args.Action
       @name="onInput"
