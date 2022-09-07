@@ -3,6 +3,11 @@
     <Boxel::Dashboard
       @displayLeftEdge={{this.displayLeftEdge}}
       @darkTheme={{this.darkTheme}}
+      style={{css-var
+        boxel-dashboard-left-edge-width=this.leftEdgeWidth
+        boxel-dashboard-background-color=this.backgroundColor
+        boxel-dashboard-color=this.color
+      }}
     >
       <:leftEdge>
         <Boxel::LeftEdgeNav
@@ -33,6 +38,27 @@
       @defaultValue="false"
       @value={{this.darkTheme}}
       @onInput={{fn (mut this.darkTheme)}}
+    />
+    <Args.String
+      @name="--boxel-dashboard-left-edge-width"
+      @description="min-width CSS style"
+      @defaultValue="5rem"
+      @value={{this.leftEdgeWidth}}
+      @onInput={{fn (mut this.leftEdgeWidth)}}
+    />
+    <Args.String
+      @name="--boxel-dashboard-background-color"
+      @description="background-color CSS style"
+      @defaultValue="inherit"
+      @value={{this.backgroundColor}}
+      @onInput={{fn (mut this.backgroundColor)}}
+    />
+    <Args.String
+      @name="--boxel-dashboard-color"
+      @description="color CSS style"
+      @defaultValue="inherit"
+      @value={{this.color}}
+      @onInput={{fn (mut this.color)}}
     />
   </:api>
 </Freestyle::Usage>
