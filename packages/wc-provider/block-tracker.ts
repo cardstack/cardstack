@@ -4,7 +4,8 @@ import { WebsocketProviderOptions } from 'web3-core-helpers';
 
 //@ts-ignore need to patch SubscribeBlockTracker because this signature is wrong
 export default class PatchedSubscribeBlockTracker extends SubscribeBlockTracker {
-  _handleSubData(response: any): void {
+  //@ts-ignore overriding method marked private
+  private _handleSubData(response: any): void {
     //@ts-ignore need to patch SubscribeBlockTracker because this signature is wrong
     super._handleSubData(null, response);
   }
