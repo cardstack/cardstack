@@ -9,6 +9,17 @@
         @loading={{this.loading}}
         @href={{this.href}}
         @route={{this.route}}
+        style={{css-var
+          boxel-button-color=this.color
+          boxel-button-border=this.border
+          boxel-button-text-color=this.textColor
+          boxel-button-padding=this.padding
+          boxel-button-font=this.font
+          boxel-button-loading-icon-size=this.loadingIconSize
+          boxel-button-letter-spacing=this.letterSpacing
+          boxel-button-min-height=this.minHeight
+          boxel-button-min-width=this.minWidth
+        }}
         {{on "click" this.alert}}
       >
         Button Text
@@ -80,6 +91,69 @@
       @description="Controls whether the button is loading"
       @onInput={{fn (mut this.loading)}}
       @value={{this.loading}}
+    />
+    <Args.String
+      @name="--boxel-button-color"
+      @description="background-color CSS style"
+      @defaultValue="var(--boxel-purple-300)"
+      @value={{this.color}}
+      @onInput={{fn (mut this.color)}}
+    />
+    <Args.String
+      @name="--boxel-button-border"
+      @description="border CSS style"
+      @defaultValue="1px solid var(--boxel-purple-300)"
+      @value={{this.border}}
+      @onInput={{fn (mut this.border)}}
+    />
+    <Args.String
+      @name="--boxel-button-text-color"
+      @description="color CSS style"
+      @defaultValue="var(--boxel-purple-600)"
+      @value={{this.textColor}}
+      @onInput={{fn (mut this.textColor)}}
+    />
+    <Args.String
+      @name="--boxel-button-padding"
+      @description="padding CSS style"
+      @defaultValue="size-dependent"
+      @value={{this.padding}}
+      @onInput={{fn (mut this.paddingOverride)}}
+    />
+    <Args.String
+      @name="--boxel-button-font"
+      @description="font CSS style"
+      @defaultValue="size-dependent"
+      @value={{this.font}}
+      @onInput={{fn (mut this.fontOverride)}}
+    />
+    <Args.String
+      @name="--boxel-button-loading-icon-size"
+      @description="width/height CSS style"
+      @defaultValue="size-dependent"
+      @value={{this.loadingIconSize}}
+      @onInput={{fn (mut this.loadingIconSizeOverride)}}
+    />
+    <Args.String
+      @name="--boxel-button-letter-spacing"
+      @description="letter-spacing CSS style"
+      @defaultValue="size-dependent"
+      @value={{this.letterSpacing}}
+      @onInput={{fn (mut this.letterSpacingOverride)}}
+    />
+    <Args.String
+      @name="--boxel-button-min-height"
+      @description="height CSS style"
+      @defaultValue="size-dependent"
+      @value={{this.minHeight}}
+      @onInput={{fn (mut this.minHeightOverride)}}
+    />
+    <Args.String
+      @name="--boxel-button-min-width"
+      @description="width CSS style"
+      @defaultValue="120px"
+      @value={{this.minWidth}}
+      @onInput={{fn (mut this.minWidth)}}
     />
     <Args.Yield @description="Contents of the button" />
   </:api>
