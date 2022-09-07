@@ -15,7 +15,7 @@ interface MenuItemOptions {
   header: boolean;
   icon: string;
 }
-class MenuItem {
+export class MenuItem {
   text: string;
   type: string;
   dangerous: boolean;

@@ -12,7 +12,7 @@ const BRIDGE = 'https://safe-walletconnect.gnosis.io/';
 
 export type ConnectionType = 'mnemonic' | 'ethers-mnemonic' | 'trezor' | 'wallet-connect';
 
-interface Web3OptsMnemonic {
+export interface Web3OptsMnemonic {
   connectionType: 'mnemonic';
   mnemonic: string;
 }
