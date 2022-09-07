@@ -38,6 +38,6 @@ export default {
     );
     console.log(`Scheduled payment module deployed to: ${scheduledPaymentModuleAddress}`);
     console.log(`Meta guard deployed to: ${metaGuardAddress}`);
-    console.log(`Done. The module and guard has now been enabled on safe ${safeAddress}`);
+    console.log(`Done. The module and guard have now been enabled on safe ${safeAddress}`);
   },
 } as CommandModule;
