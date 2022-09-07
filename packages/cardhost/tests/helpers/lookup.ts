@@ -5,5 +5,5 @@ export function lookup<K extends keyof Registry>(
   testContext: TestContext,
   serviceName: K
 ): Registry[K] {
-  return testContext.owner.lookup(`service:${serviceName}`);
+  return testContext.owner.lookup(`service:${serviceName}`) as Registry[K];
 }
