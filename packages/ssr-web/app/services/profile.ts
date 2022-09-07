@@ -25,6 +25,9 @@ export default class ProfileService extends Service {
   }
 
   get canEdit() {
+    if (!this.model.ownerAddress) {
+      return false;
+    }
     return this.layer2Network.walletInfo.accounts
       .mapBy('address')
       .includes(this.model.ownerAddress);
