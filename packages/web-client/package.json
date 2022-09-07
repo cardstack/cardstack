@@ -122,7 +122,6 @@
     "ember-sinon-qunit": "^6.0.0",
     "ember-source": "~4.6.0",
     "ember-svg-jar": "^2.3.3",
-    "ember-template-imports": "^3.1.1",
     "ember-template-lint": "^3.16.0",
     "ember-truth-helpers": "^3.1.1",
     "eslint": "^7.32.0",
@@ -175,6 +174,7 @@
     "broadcastchannel-polyfill": "^1.0.1",
     "cropperjs": "^1.5.12",
     "ember-elsewhere": "^2.0.0",
+    "ember-template-imports": "^3.1.1",
     "ember-test-selectors": "^6.0.0",
     "eth-block-tracker": "^5.0.1",
     "filesize": "^8.0.6",
@@ -191,7 +191,8 @@
     "web3-providers-ws": "^1.5.1"
   },
   "resolutions": {
-    "ember-test-selectors": "^6.0.0"
+    "ember-test-selectors": "^6.0.0",
+    "@babel/generator": "~7.16.0"
   },
   "config": {
     "access": "public"
