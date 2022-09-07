@@ -4,8 +4,7 @@ import { WebsocketProviderOptions } from 'web3-core-helpers';
 
 //@ts-ignore need to patch SubscribeBlockTracker because this signature is wrong
 export default class PatchedSubscribeBlockTracker extends SubscribeBlockTracker {
-  //@ts-ignore overriding method marked private
-  private _handleSubData(response: any): void {
+  private _patchedHandleSubData(response: any): void {
     //@ts-ignore need to patch SubscribeBlockTracker because this signature is wrong
     super._handleSubData(null, response);
   }
@@ -23,7 +22,7 @@ export default class PatchedSubscribeBlockTracker extends SubscribeBlockTracker 
         const blockNumber = (await this._call('eth_blockNumber')) as string;
         //@ts-ignore access private this._subscriptionId and this._call
         this._subscriptionId = (await this._call('eth_subscribe', 'newHeads')) as string;
-        this.provider.on('data', this._handleSubData.bind(this));
+        this.provider.on('data', this._patchedHandleSubData.bind(this));
         this._newPotentialLatest(blockNumber);
       } catch (e) {
         this.emit('error', e);
