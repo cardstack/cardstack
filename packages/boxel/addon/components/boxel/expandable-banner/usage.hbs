@@ -3,6 +3,14 @@
         <Boxel::ExpandableBanner
           @icon={{this.icon}}
           @summary={{this.summary}}
+          style={{css-var
+            boxel-expandable-banner-min-height=this.minHeight
+            boxel-expandable-banner-min-height-open=this.minHeightOpen
+            boxel-expandable-banner-text-color=this.textColor
+            boxel-expandable-banner-background-color=this.backgroundColor
+            boxel-expandable-banner-vertical-gap=this.verticalGap
+            boxel-expandable-banner-horizontal-gap=this.horizontalGap
+          }}
         >
           <p class="expandable-banner-usage-paragraph">
             As a Supplier, you deposit funds from your Ethereum Mainnet wallet into the CARD Protocol’s Reserve Pool and receive the corresponding amount of CPXD tokens in your Gnosis Chain wallet.
@@ -26,6 +34,49 @@
     <:api as |Args|>
       <Args.String @name="icon" @value={{this.icon}} @onInput={{fn (mut this.icon)}} @description="Name of the icon on the left of the summary text, passed to svg-jar."/>
       <Args.String @name="summary" @value={{this.summary}} @onInput={{fn (mut this.summary)}} @description="The text of the summary element"/>
+      {{!-- template-lint-disable no-unbound --}}
+      <Args.String
+        @name="--boxel-expandable-banner-min-height"
+        @description="min-height CSS style"
+        @defaultValue={{unbound this.minHeight}}
+        @value={{this.minHeight}}
+        @onInput={{fn (mut this.minHeight)}}
+      />
+      <Args.String
+        @name="--boxel-expandable-banner-min-height-open"
+        @description="min-height CSS style"
+        @defaultValue={{unbound this.minHeightOpen}}
+        @value={{this.minHeightOpen}}
+        @onInput={{fn (mut this.minHeightOpen)}}
+      />
+      <Args.String
+        @name="--boxel-expandable-banner-text-color"
+        @description="color CSS style"
+        @defaultValue={{unbound this.textColor}}
+        @value={{this.textColor}}
+        @onInput={{fn (mut this.textColor)}}
+      />
+      <Args.String
+        @name="--boxel-expandable-banner-background-color"
+        @description="background-color CSS style"
+        @defaultValue={{unbound this.backgroundColor}}
+        @value={{this.backgroundColor}}
+        @onInput={{fn (mut this.backgroundColor)}}
+      />
+      <Args.String
+        @name="--boxel-expandable-banner-vertical-gap"
+        @description="gap CSS style"
+        @defaultValue={{unbound this.verticalGap}}
+        @value={{this.verticalGap}}
+        @onInput={{fn (mut this.verticalGap)}}
+      />
+      <Args.String
+        @name="--boxel-expandable-banner-horizontal-gap"
+        @description="gap CSS style"
+        @defaultValue={{unbound this.horizontalGap}}
+        @value={{this.horizontalGap}}
+        @onInput={{fn (mut this.horizontalGap)}}
+      />
       <Args.Yield @description="The content in the details element"/>
     </:api>
 </Freestyle::Usage>
