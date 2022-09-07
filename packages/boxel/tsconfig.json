@@ -80,6 +80,7 @@
         "addon/components/boxel/selection-control-group/**/*",
         "addon/components/boxel/sort-menu/**/*",
         "addon/components/boxel/styled-qr-code/**/*",
+        "addon/components/boxel/tab-bar/**/*",
         "addon/components/boxel/thread/**/*",
         "addon/components/boxel/thread-header/**/*",
         "addon/components/boxel/wave-player/**/*",
