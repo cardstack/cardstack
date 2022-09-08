@@ -9,6 +9,8 @@ export default class SearchboxUsage extends Component {
   @tracked label = 'A searchbox example input';
   @tracked placeholder = 'Search';
 
+  @tracked iconSize = '0.875rem';
+
   @action onInput(e: InputEvent): void {
     let target = e.target;
     assert('target', target && target instanceof HTMLInputElement);
