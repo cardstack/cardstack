@@ -20,6 +20,13 @@ export default class ThreadMessageUsageComponent extends Component {
     'First, you can choose the look and feel of your card, so that your customers and other users recognize that this Prepaid Card came from you.',
   ]);
   @tracked fullWidth = false;
+
+  @tracked avatarSize = '2.5rem';
+  @tracked metaHeight = '1.25rem';
+  @tracked gap = 'var(--boxel-sp)';
+  @tracked marginLeft =
+    'calc(var(--boxel-thread-message-avatar-size) + var(--boxel-thread-message-gap))';
+
   @tracked layoutExampleFullWidth = false;
   @action toggleLayoutExampleFullWidth(): void {
     this.layoutExampleFullWidth = !this.layoutExampleFullWidth;
