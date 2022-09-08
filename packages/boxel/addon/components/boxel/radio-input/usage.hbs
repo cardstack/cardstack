@@ -10,6 +10,10 @@
       @hideRadio={{this.hideRadio}}
       @orientation={{this.orientation}}
       @spacing={{this.spacing}}
+      style={{css-var
+        boxel-radio-option-padding=this.optionPadding
+        boxel-radio-option-gap=this.optionGap
+      }}
     as |item|>
       <item.component @onChange={{fn this.onChange item.data.id}}>
         {{item.data.text}}
@@ -75,6 +79,21 @@
       @options={{array "horizontal" "vertical" "default"}}
       @onInput={{fn (mut this.orientation)}}
       @value={{this.orientation}}
+    />
+    {{!-- template-lint-disable no-unbound --}}
+    <Args.String
+      @name="--boxel-radio-option-padding"
+      @description="padding CSS style"
+      @defaultValue={{unbound this.optionPadding}}
+      @value={{this.optionPadding}}
+      @onInput={{fn (mut this.optionPadding)}}
+    />
+    <Args.String
+      @name="--boxel-radio-option-gap"
+      @description="gap CSS style"
+      @defaultValue={{unbound this.optionGap}}
+      @value={{this.optionGap}}
+      @onInput={{fn (mut this.optionGap)}}
     />
     <Args.Yield
       @description="Yields an object with the default component to use (RadioInput::Item), the data for the item passed in, and whether that item is selected"
