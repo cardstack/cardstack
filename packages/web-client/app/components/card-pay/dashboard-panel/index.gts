@@ -1,6 +1,5 @@
 import Component from '@glimmer/component';
 import cn from '@cardstack/boxel/helpers/cn';
-import or from 'ember-truth-helpers/helpers/or';
 import cssUrl from "@cardstack/boxel/helpers/css-url";
 import { svgJar } from '@cardstack/boxel/utils/svg-jar';
 import Panel from './panel';
@@ -10,7 +9,6 @@ interface Signature {
   Args: {
     noCollapse?: boolean;
     noBottomPadding?: boolean;
-    open?: Function;
     panel: Panel
   }
   Blocks: {
@@ -29,8 +27,7 @@ export default class CardPayDashboardPanel extends Component<Signature> {
         dashboard-details--has-footer=(has-block 'footer')
       }}
       ...attributes
-      {{! @glint-ignore }}
-      open={{or @noCollapse @open}}
+      open={{@noCollapse}}
       >
       <summary class="dashboard-details__summary">
         <div class="dashboard-details__summary-content">
