@@ -9,7 +9,6 @@ import {
   createSafeToken,
   generateMockAddress,
 } from '@cardstack/web-client/utils/test-factories';
-import Layer2Network from '@cardstack/web-client/services/layer2-network';
 
 let layer2Service: Layer2TestWeb3Strategy;
 let session: WorkflowSession;
@@ -27,9 +26,8 @@ module('Integration | Component | layer-two-connect-card', function (hooks) {
 
   test('It should show nonzero token balances, and an appropriate message if there are none', async function (assert) {
     let depotAddress = generateMockAddress();
-    layer2Service = (
-      this.owner.lookup('service:layer2-network') as Layer2Network
-    ).strategy as Layer2TestWeb3Strategy;
+    layer2Service = this.owner.lookup('service:layer2-network')
+      .strategy as Layer2TestWeb3Strategy;
     layer2Service.test__simulateRemoteAccountSafes('address', [
       createDepotSafe({
         address: depotAddress,
@@ -86,9 +84,8 @@ module('Integration | Component | layer-two-connect-card', function (hooks) {
   });
 
   test('the layer 2 wallet address is persisted if the wallet is already connected', async function (assert) {
-    layer2Service = (
-      this.owner.lookup('service:layer2-network') as Layer2Network
-    ).strategy as Layer2TestWeb3Strategy;
+    layer2Service = this.owner.lookup('service:layer2-network')
+      .strategy as Layer2TestWeb3Strategy;
     layer2Service.test__simulateRemoteAccountSafes('address', [
       createDepotSafe({
         tokens: [
@@ -109,9 +106,8 @@ module('Integration | Component | layer-two-connect-card', function (hooks) {
   });
 
   test('It should show a loading state if still fetching a depot', async function (assert) {
-    layer2Service = (
-      this.owner.lookup('service:layer2-network') as Layer2Network
-    ).strategy as Layer2TestWeb3Strategy;
+    layer2Service = this.owner.lookup('service:layer2-network')
+      .strategy as Layer2TestWeb3Strategy;
 
     layer2Service.test__autoResolveViewSafes = false;
     layer2Service.test__simulateAccountsChanged(['address']);
@@ -124,9 +120,8 @@ module('Integration | Component | layer-two-connect-card', function (hooks) {
   });
 
   test('the layer 2 wallet address is persisted after the wallet is connected', async function (assert) {
-    layer2Service = (
-      this.owner.lookup('service:layer2-network') as Layer2Network
-    ).strategy as Layer2TestWeb3Strategy;
+    layer2Service = this.owner.lookup('service:layer2-network')
+      .strategy as Layer2TestWeb3Strategy;
 
     layer2Service.test__autoResolveViewSafes = false;
     layer2Service.test__simulateAccountsChanged(['address-connected']);

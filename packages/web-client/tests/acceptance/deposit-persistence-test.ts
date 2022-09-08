@@ -21,8 +21,6 @@ import {
   MILESTONE_TITLES,
   WORKFLOW_VERSION,
 } from '@cardstack/web-client/components/card-pay/deposit-workflow';
-import Layer1Network from '@cardstack/web-client/services/layer1-network';
-import Layer2Network from '@cardstack/web-client/services/layer2-network';
 
 interface Context extends MirageTestContext {}
 
@@ -37,9 +35,8 @@ module('Acceptance | deposit persistence', function (hooks) {
     ) as WorkflowPersistence;
 
     let layer1AccountAddress = '0xaCD5f5534B756b856ae3B2CAcF54B3321dd6654Fb6';
-    let layer1Service = (
-      this.owner.lookup('service:layer1-network') as Layer1Network
-    ).strategy as Layer1TestWeb3Strategy;
+    let layer1Service = this.owner.lookup('service:layer1-network')
+      .strategy as Layer1TestWeb3Strategy;
     layer1Service.test__simulateAccountsChanged(
       [layer1AccountAddress],
       'metamask'
@@ -51,9 +48,8 @@ module('Acceptance | deposit persistence', function (hooks) {
     });
 
     let layer2AccountAddress = '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44';
-    let layer2Service = (
-      this.owner.lookup('service:layer2-network') as Layer2Network
-    ).strategy as Layer2TestWeb3Strategy;
+    let layer2Service = this.owner.lookup('service:layer2-network')
+      .strategy as Layer2TestWeb3Strategy;
     await layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
 
     workflowPersistenceService.clear();
@@ -147,9 +143,8 @@ module('Acceptance | deposit persistence', function (hooks) {
         )
         .hasText('Depositing');
 
-      let layer1Service = (
-        this.owner.lookup('service:layer1-network') as Layer1Network
-      ).strategy as Layer1TestWeb3Strategy;
+      let layer1Service = this.owner.lookup('service:layer1-network')
+        .strategy as Layer1TestWeb3Strategy;
       layer1Service.test__simulateDeposit();
       await settled();
     });
@@ -217,12 +212,10 @@ module('Acceptance | deposit persistence', function (hooks) {
         .dom(`[data-test-deposit-transaction-status-card]`)
         .containsText('Bridging tokens to L2 blockchain');
 
-      let layer1Service = (
-        this.owner.lookup('service:layer1-network') as Layer1Network
-      ).strategy as Layer1TestWeb3Strategy;
-      let layer2Service = (
-        this.owner.lookup('service:layer2-network') as Layer2Network
-      ).strategy as Layer2TestWeb3Strategy;
+      let layer1Service = this.owner.lookup('service:layer1-network')
+        .strategy as Layer1TestWeb3Strategy;
+      let layer2Service = this.owner.lookup('service:layer2-network')
+        .strategy as Layer2TestWeb3Strategy;
       await waitFor(`[data-test-token-bridge-step="0"][data-test-completed]`);
       layer1Service.test__simulateBlockConfirmation();
       await settled();
@@ -478,9 +471,8 @@ module('Acceptance | deposit persistence', function (hooks) {
           '[data-test-transaction-amount-container] [data-test-unlock-button]'
         )
         .hasText('Unlocking');
-      let layer1Service = (
-        this.owner.lookup('service:layer1-network') as Layer1Network
-      ).strategy as Layer1TestWeb3Strategy;
+      let layer1Service = this.owner.lookup('service:layer1-network')
+        .strategy as Layer1TestWeb3Strategy;
       layer1Service.test__simulateUnlockTxnHash();
       await settled();
 

@@ -16,8 +16,6 @@ import { defer } from 'rsvp';
 import { BridgeValidationResult } from '@cardstack/cardpay-sdk';
 import { TransactionReceipt } from 'web3-core';
 import { ClaimBridgedTokensOptions } from '@cardstack/web-client/utils/web3-strategies/types';
-import Layer1Network from '@cardstack/web-client/services/layer1-network';
-import Layer2Network from '@cardstack/web-client/services/layer2-network';
 
 module(
   'Integration | Component | card-pay/withdrawal-workflow/token-claim',
@@ -29,9 +27,8 @@ module(
       this.set('session', session);
 
       let layer1AccountAddress = '0xaCD5f5534B756b856ae3B2CAcF54B3321dd6654Fb6';
-      let layer1Service = (
-        this.owner.lookup('service:layer1-network') as Layer1Network
-      ).strategy as Layer1TestWeb3Strategy;
+      let layer1Service = this.owner.lookup('service:layer1-network')
+        .strategy as Layer1TestWeb3Strategy;
       layer1Service.test__simulateAccountsChanged(
         [layer1AccountAddress],
         'metamask'
@@ -40,9 +37,8 @@ module(
         dai: new BN('150500000000000000000'),
       });
 
-      let layer2Service = (
-        this.owner.lookup('service:layer2-network') as Layer2Network
-      ).strategy as Layer2TestWeb3Strategy;
+      let layer2Service = this.owner.lookup('service:layer2-network')
+        .strategy as Layer2TestWeb3Strategy;
       let layer2AccountAddress = '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44';
       let depotAddress = '0xB236ca8DbAB0644ffCD32518eBF4924ba8666666';
       let testDepot = createDepotSafe({

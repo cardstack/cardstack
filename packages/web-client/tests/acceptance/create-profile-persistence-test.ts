@@ -17,7 +17,6 @@ import {
   MILESTONE_TITLES,
   WORKFLOW_VERSION,
 } from '@cardstack/web-client/components/card-pay/create-profile-workflow';
-import Layer2Network from '@cardstack/web-client/services/layer2-network';
 
 interface Context extends MirageTestContext {}
 
@@ -42,9 +41,8 @@ module('Acceptance | create profile persistence', function (hooks) {
   });
 
   hooks.beforeEach(async function () {
-    let layer2Service = (
-      this.owner.lookup('service:layer2-network') as Layer2Network
-    ).strategy as Layer2TestWeb3Strategy;
+    let layer2Service = this.owner.lookup('service:layer2-network')
+      .strategy as Layer2TestWeb3Strategy;
 
     let depotAddress = '0xB236ca8DbAB0644ffCD32518eBF4924ba8666666';
     layer2Service.test__simulateRemoteAccountSafes(layer2AccountAddress, [

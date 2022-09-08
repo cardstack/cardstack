@@ -11,8 +11,6 @@ import config from '@cardstack/ssr-web/config/environment';
 import Service from '@ember/service';
 import sinon from 'sinon';
 import Layer2TestWeb3Strategy from '@cardstack/ssr-web/utils/web3-strategies/test-layer2';
-import Layer2Network from '@cardstack/ssr-web/services/layer2-network';
-import Subgraph from '@cardstack/ssr-web/services/subgraph';
 
 let HUB_AUTH_TOKEN = 'HUB_AUTH_TOKEN';
 let layer2AccountAddress = '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44';
@@ -184,7 +182,7 @@ module('Acceptance | visit profile', function (hooks) {
     });
 
     test('it shows an error when subgraph fetch fails', async function (this: MirageTestContext, assert) {
-      let subgraphService = this.owner.lookup('service:subgraph') as Subgraph;
+      let subgraphService = this.owner.lookup('service:subgraph');
       sinon
         .stub(subgraphService, 'query')
         .throws(new Error('Subgraph failure'));
@@ -198,7 +196,7 @@ module('Acceptance | visit profile', function (hooks) {
     });
 
     test('it shows an error when subgraph fetch does not return a merchant safe', async function (this: MirageTestContext, assert) {
-      let subgraphService = this.owner.lookup('service:subgraph') as Subgraph;
+      let subgraphService = this.owner.lookup('service:subgraph');
       sinon
         .stub(subgraphService, 'query')
         .returns(Promise.resolve({ data: { merchantSafes: [] } }));
@@ -219,9 +217,8 @@ module('Acceptance | visit profile', function (hooks) {
           // this is the condition for initializing with an authenticated state
           // assumption made that layer2Service.checkHubAuthenticationValid returns Promise<true>
           window.TEST__AUTH_TOKEN = HUB_AUTH_TOKEN;
-          layer2Service = (
-            this.owner.lookup('service:layer2-network') as Layer2Network
-          ).strategy as Layer2TestWeb3Strategy;
+          layer2Service = this.owner.lookup('service:layer2-network')
+            .strategy as Layer2TestWeb3Strategy;
           await layer2Service.test__simulateAccountsChanged([
             layer2AccountAddress,
           ]);
@@ -243,9 +240,8 @@ module('Acceptance | visit profile', function (hooks) {
     module('authed but not owner', function (this: MirageTestContext, hooks) {
       hooks.beforeEach(async function (this: MirageTestContext) {
         window.TEST__AUTH_TOKEN = HUB_AUTH_TOKEN;
-        layer2Service = (
-          this.owner.lookup('service:layer2-network') as Layer2Network
-        ).strategy as Layer2TestWeb3Strategy;
+        layer2Service = this.owner.lookup('service:layer2-network')
+          .strategy as Layer2TestWeb3Strategy;
         await layer2Service.test__simulateAccountsChanged([
           otherLayer2AccountAddress,
         ]);

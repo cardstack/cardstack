@@ -11,7 +11,6 @@ import {
   createPrepaidCardSafe,
   createSafeToken,
 } from '@cardstack/web-client/utils/test-factories';
-import Layer2Network from '@cardstack/web-client/services/layer2-network';
 
 module(
   'Integration | Component | card-pay/safe-balance-card',
@@ -29,9 +28,8 @@ module(
       session = new WorkflowSession();
       this.set('session', session);
 
-      layer2Service = (
-        this.owner.lookup('service:layer2-network') as Layer2Network
-      ).strategy as Layer2TestWeb3Strategy;
+      layer2Service = this.owner.lookup('service:layer2-network')
+        .strategy as Layer2TestWeb3Strategy;
       layer2Service.test__simulateRemoteAccountSafes(layer2AccountAddress, [
         createDepotSafe({
           address: depotAddress,

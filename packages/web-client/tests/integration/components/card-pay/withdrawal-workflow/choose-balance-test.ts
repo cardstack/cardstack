@@ -13,8 +13,6 @@ import {
   createPrepaidCardSafe,
   createSafeToken,
 } from '@cardstack/web-client/utils/test-factories';
-import Layer2Network from '@cardstack/web-client/services/layer2-network';
-import Layer1Network from '@cardstack/web-client/services/layer1-network';
 
 module(
   'Integration | Component | card-pay/withdrawal-workflow/choose-balance',
@@ -35,9 +33,8 @@ module(
       session = new WorkflowSession();
       this.set('session', session);
 
-      let layer1Service = (
-        this.owner.lookup('service:layer1-network') as Layer1Network
-      ).strategy as Layer1TestWeb3Strategy;
+      let layer1Service = this.owner.lookup('service:layer1-network')
+        .strategy as Layer1TestWeb3Strategy;
       layer1Service.test__simulateAccountsChanged(
         [layer1AccountAddress],
         'metamask'
@@ -47,9 +44,8 @@ module(
         card: new BN('350000000000000000000'),
       });
 
-      layer2Service = (
-        this.owner.lookup('service:layer2-network') as Layer2Network
-      ).strategy as Layer2TestWeb3Strategy;
+      layer2Service = this.owner.lookup('service:layer2-network')
+        .strategy as Layer2TestWeb3Strategy;
       layer2Service.test__simulateRemoteAccountSafes(layer2AccountAddress, [
         createDepotSafe({
           address: depotAddress,

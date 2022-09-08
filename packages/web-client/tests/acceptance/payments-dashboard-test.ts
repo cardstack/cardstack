@@ -10,7 +10,6 @@ import {
   createProfileSafe,
   getFilenameFromDid,
 } from '@cardstack/web-client/utils/test-factories';
-import Layer2Network from '@cardstack/web-client/services/layer2-network';
 
 interface Context extends MirageTestContext {}
 
@@ -39,9 +38,8 @@ module('Acceptance | payments dashboard', function (hooks) {
 
   // eslint-disable-next-line qunit/require-expect
   test('Profiles are listed when wallet is connected and update when the account changes', async function (this: Context, assert) {
-    let layer2Service = (
-      this.owner.lookup('service:layer2-network') as Layer2Network
-    ).strategy as Layer2TestWeb3Strategy;
+    let layer2Service = this.owner.lookup('service:layer2-network')
+      .strategy as Layer2TestWeb3Strategy;
 
     let layer2AccountAddress = '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44';
     layer2Service.test__simulateRemoteAccountSafes(layer2AccountAddress, [

@@ -23,8 +23,6 @@ import {
 } from '@cardstack/web-client/utils/web3-strategies/types';
 import RSVP, { defer, Promise } from 'rsvp';
 import { BridgeableSymbol } from '@cardstack/web-client/utils/token';
-import Layer2Network from '@cardstack/web-client/services/layer2-network';
-import Layer1Network from '@cardstack/web-client/services/layer1-network';
 
 let layer1Service: Layer1TestWeb3Strategy;
 let session: WorkflowSession;
@@ -35,9 +33,7 @@ module(
     setupRenderingTest(hooks);
 
     hooks.beforeEach(async function () {
-      let layer2Service = this.owner.lookup(
-        'service:layer2-network'
-      ) as Layer2Network;
+      let layer2Service = this.owner.lookup('service:layer2-network');
       let layer2Strategy = layer2Service.strategy as Layer2TestWeb3Strategy;
 
       // Simulate being connected on layer 2 -- prereq to converting to USD
@@ -46,9 +42,8 @@ module(
 
       session = new WorkflowSession();
       session.setValue('depositSourceToken', 'DAI');
-      layer1Service = (
-        this.owner.lookup('service:layer1-network') as Layer1Network
-      ).strategy as Layer1TestWeb3Strategy;
+      layer1Service = this.owner.lookup('service:layer1-network')
+        .strategy as Layer1TestWeb3Strategy;
 
       const startDaiAmountString = '5.111111111111111110';
       const startDaiAmount = toWei(startDaiAmountString);

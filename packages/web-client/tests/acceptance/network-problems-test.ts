@@ -6,8 +6,6 @@ import Layer1TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/
 
 import { createDepotSafe } from '@cardstack/web-client/utils/test-factories';
 import { setupMirage } from 'ember-cli-mirage/test-support';
-import Layer2Network from '@cardstack/web-client/services/layer2-network';
-import Layer1Network from '@cardstack/web-client/services/layer1-network';
 
 const MODAL = '[data-test-network-problem-modal]';
 const MODAL_TITLE = '[data-test-network-problem-modal-title]';
@@ -26,18 +24,16 @@ module('Acceptance | network-problems', function (hooks) {
   let layer1Service: Layer1TestWeb3Strategy;
 
   hooks.beforeEach(async function () {
-    layer2Service = (
-      this.owner.lookup('service:layer2-network') as Layer2Network
-    ).strategy as Layer2TestWeb3Strategy;
+    layer2Service = this.owner.lookup('service:layer2-network')
+      .strategy as Layer2TestWeb3Strategy;
     layer2Service.test__simulateRemoteAccountSafes(layer2AccountAddress, [
       createDepotSafe({}),
     ]);
     await layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
 
     let layer1AccountAddress = '0xaCD5f5534B756b856ae3B2CAcF54B3321dd6654Fb6';
-    layer1Service = (
-      this.owner.lookup('service:layer1-network') as Layer1Network
-    ).strategy as Layer1TestWeb3Strategy;
+    layer1Service = this.owner.lookup('service:layer1-network')
+      .strategy as Layer1TestWeb3Strategy;
     layer1Service.test__simulateAccountsChanged(
       [layer1AccountAddress],
       'metamask'

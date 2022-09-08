@@ -7,8 +7,6 @@ import Layer2TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/
 import { WorkflowSession } from '@cardstack/web-client/models/workflow';
 import { currentNetworkDisplayInfo as c } from '@cardstack/web-client/utils/web3-strategies/network-display-info';
 import BN from 'bn.js';
-import Layer2Network from '@cardstack/web-client/services/layer2-network';
-import Layer1Network from '@cardstack/web-client/services/layer1-network';
 
 module(
   'Integration | Component | card-pay/deposit-workflow/transaction-setup',
@@ -16,9 +14,7 @@ module(
     setupRenderingTest(hooks);
 
     hooks.beforeEach(function () {
-      let layer2Service = this.owner.lookup(
-        'service:layer2-network'
-      ) as Layer2Network;
+      let layer2Service = this.owner.lookup('service:layer2-network');
       let layer2Strategy = layer2Service.strategy as Layer2TestWeb3Strategy;
 
       // Simulate being connected on layer 2 -- prereq to converting to USD
@@ -30,9 +26,8 @@ module(
       const session = new WorkflowSession();
       const layer1AccountAddress =
         '0xaCD5f5534B756b856ae3B2CAcF54B3321dd6654Fb6';
-      const layer1Service = (
-        this.owner.lookup('service:layer1-network') as Layer1Network
-      ).strategy as Layer1TestWeb3Strategy;
+      const layer1Service = this.owner.lookup('service:layer1-network')
+        .strategy as Layer1TestWeb3Strategy;
 
       layer1Service.test__simulateAccountsChanged(
         [layer1AccountAddress],
@@ -95,9 +90,8 @@ module(
       const session = new WorkflowSession();
       const layer1AccountAddress =
         '0xaCD5f5534B756b856ae3B2CAcF54B3321dd6654Fb6';
-      const layer1Service = (
-        this.owner.lookup('service:layer1-network') as Layer1Network
-      ).strategy as Layer1TestWeb3Strategy;
+      const layer1Service = this.owner.lookup('service:layer1-network')
+        .strategy as Layer1TestWeb3Strategy;
 
       layer1Service.test__simulateAccountsChanged(
         [layer1AccountAddress],
@@ -137,9 +131,8 @@ module(
       const session = new WorkflowSession();
       const layer1AccountAddress =
         '0xaCD5f5534B756b856ae3B2CAcF54B3321dd6654Fb6';
-      const layer1Service = (
-        this.owner.lookup('service:layer1-network') as Layer1Network
-      ).strategy as Layer1TestWeb3Strategy;
+      const layer1Service = this.owner.lookup('service:layer1-network')
+        .strategy as Layer1TestWeb3Strategy;
 
       layer1Service.test__simulateAccountsChanged(
         [layer1AccountAddress],
@@ -208,9 +201,8 @@ module(
 
     test('interacting with the card', async function (assert) {
       const session = new WorkflowSession();
-      const layer1Service = (
-        this.owner.lookup('service:layer1-network') as Layer1Network
-      ).strategy as Layer1TestWeb3Strategy;
+      const layer1Service = this.owner.lookup('service:layer1-network')
+        .strategy as Layer1TestWeb3Strategy;
 
       layer1Service.test__simulateBalances({
         defaultToken: new BN('2141100000000000000'),
@@ -295,9 +287,8 @@ module(
 
     test('it displays validation message if user has 0 card and dai balances', async function (assert) {
       const session = new WorkflowSession();
-      const layer1Service = (
-        this.owner.lookup('service:layer1-network') as Layer1Network
-      ).strategy as Layer1TestWeb3Strategy;
+      const layer1Service = this.owner.lookup('service:layer1-network')
+        .strategy as Layer1TestWeb3Strategy;
       layer1Service.test__simulateBalances({
         defaultToken: new BN('2141100000000000000'),
         dai: new BN('0'),
@@ -332,9 +323,8 @@ module(
 
     test('it displays validation message if funds are undefined and 0', async function (assert) {
       const session = new WorkflowSession();
-      const layer1Service = (
-        this.owner.lookup('service:layer1-network') as Layer1Network
-      ).strategy as Layer1TestWeb3Strategy;
+      const layer1Service = this.owner.lookup('service:layer1-network')
+        .strategy as Layer1TestWeb3Strategy;
 
       layer1Service.test__simulateBalances({
         defaultToken: undefined,
@@ -368,9 +358,8 @@ module(
 
     test('it disables radio option with undefined balance', async function (assert) {
       const session = new WorkflowSession();
-      const layer1Service = (
-        this.owner.lookup('service:layer1-network') as Layer1Network
-      ).strategy as Layer1TestWeb3Strategy;
+      const layer1Service = this.owner.lookup('service:layer1-network')
+        .strategy as Layer1TestWeb3Strategy;
       layer1Service.test__simulateBalances({
         defaultToken: new BN('2141100000000000000'),
         dai: undefined,

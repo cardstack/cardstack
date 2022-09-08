@@ -16,7 +16,6 @@ import {
 } from '@cardstack/web-client/utils/test-factories';
 import { DepotSafe, MerchantSafe } from '@cardstack/cardpay-sdk';
 import { faceValueOptions } from '@cardstack/web-client/components/card-pay/issue-prepaid-card-workflow';
-import Layer2Network from '@cardstack/web-client/services/layer2-network';
 
 interface Context extends MirageTestContext {}
 
@@ -39,9 +38,8 @@ module(
 
     module('when there is a depot safe', function (hooks) {
       hooks.beforeEach(async function (this: Context) {
-        layer2Service = (
-          this.owner.lookup('service:layer2-network') as Layer2Network
-        ).strategy as Layer2TestWeb3Strategy;
+        layer2Service = this.owner.lookup('service:layer2-network')
+          .strategy as Layer2TestWeb3Strategy;
 
         depotSafe = createDepotSafe({
           owners: [layer2AccountAddress],
@@ -185,9 +183,8 @@ module(
     });
 
     test('it renders the proper fallback balance when there is no depot safe', async function (assert) {
-      layer2Service = (
-        this.owner.lookup('service:layer2-network') as Layer2Network
-      ).strategy as Layer2TestWeb3Strategy;
+      layer2Service = this.owner.lookup('service:layer2-network')
+        .strategy as Layer2TestWeb3Strategy;
 
       profileSafe = createProfileSafe({
         address: '0xmerchantbAB0644ffCD32518eBF4924ba8666666',

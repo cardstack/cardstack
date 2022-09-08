@@ -62,9 +62,6 @@
         "../boxel/addon/components/boxel/progress-icon/**/*",
         "app/components/profile/**/*",
         "app/components/profile-logo/**/*",
-        // "app/components/card-pay/dashboard-panel/**/*",
-        // "app/components/card-pay/header/workflow-tracker/item/*",
-        // "app/components/card-pay/header/**/*",
       ]
     }
   },

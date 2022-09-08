@@ -20,17 +20,13 @@ module('Integration | Helper | token-to-usd', function (hooks) {
   let layer2Strategy!: Layer2TestWeb3Strategy;
   hooks.beforeEach(function () {
     // Simulate being connected on layer 2 -- prereq to converting bridged tokens to USD
-    layer2Service = this.owner.lookup(
-      'service:layer2-network'
-    ) as Layer2Network;
+    layer2Service = this.owner.lookup('service:layer2-network');
     layer2Strategy = layer2Service.strategy as Layer2TestWeb3Strategy;
     let layer2AccountAddress = '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44';
     layer2Strategy.test__simulateAccountsChanged([layer2AccountAddress]);
 
     // Simulate being connected on layer 1 -- prereq to converting layer 1 tokens to USD
-    layer1Service = this.owner.lookup(
-      'service:layer1-network'
-    ) as Layer1Network;
+    layer1Service = this.owner.lookup('service:layer1-network');
     layer1Strategy = layer1Service.strategy as Layer1TestWeb3Strategy;
     let layer1AccountAddress = '0xa1b219c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44';
     layer1Strategy.test__simulateAccountsChanged(

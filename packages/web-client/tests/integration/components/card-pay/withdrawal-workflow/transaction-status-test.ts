@@ -12,8 +12,6 @@ import {
   createDepotSafe,
   generateMockAddress,
 } from '@cardstack/web-client/utils/test-factories';
-import Layer1Network from '@cardstack/web-client/services/layer1-network';
-import Layer2Network from '@cardstack/web-client/services/layer2-network';
 
 const eoaAddress = generateMockAddress();
 const safeAddress = generateMockAddress();
@@ -48,9 +46,8 @@ module(
         workflowSession,
       });
 
-      layer2Service = (
-        this.owner.lookup('service:layer2-network') as Layer2Network
-      ).strategy as Layer2TestWeb3Strategy;
+      layer2Service = this.owner.lookup('service:layer2-network')
+        .strategy as Layer2TestWeb3Strategy;
 
       layer2Service.test__simulateRemoteAccountSafes(eoaAddress, [
         createDepotSafe({
@@ -71,9 +68,8 @@ module(
     });
 
     test('It renders transaction status and links', async function (assert) {
-      let layer1Service = (
-        this.owner.lookup('service:layer1-network') as Layer1Network
-      ).strategy as Layer1TestWeb3Strategy;
+      let layer1Service = this.owner.lookup('service:layer1-network')
+        .strategy as Layer1TestWeb3Strategy;
       layer2Service.test__autoResolveBlockConfirmations = false;
 
       await render(hbs`

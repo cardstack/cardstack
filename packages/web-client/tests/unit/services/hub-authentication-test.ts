@@ -24,9 +24,7 @@ module('Unit | Service | HubAuthentication', function (hooks) {
       }
 
       this.owner.register('service:layer2-network', MockLayer2);
-      hubAuthentication = this.owner.lookup(
-        'service:hub-authentication'
-      ) as HubAuthentication;
+      hubAuthentication = this.owner.lookup('service:hub-authentication');
       let hasValidAuthenticationSpy = sinon.spy(
         hubAuthentication,
         'hasValidAuthentication'
@@ -53,9 +51,7 @@ module('Unit | Service | HubAuthentication', function (hooks) {
       // this is the condition for initializing with an authenticated state
       // assumption made that layer2Service.checkHubAuthenticationValid returns Promise<true>
       window.TEST__AUTH_TOKEN = HUB_AUTH_TOKEN;
-      const layer2Network = this.owner.lookup(
-        'service:layer2-network'
-      ) as Layer2Network;
+      const layer2Network = this.owner.lookup('service:layer2-network');
       layer2Service = layer2Network.strategy as Layer2TestWeb3Strategy;
       await layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
     });
@@ -66,9 +62,7 @@ module('Unit | Service | HubAuthentication', function (hooks) {
 
     // Test initialization
     test('it can initialize with an authenticated state', async function (assert) {
-      hubAuthentication = this.owner.lookup(
-        'service:hub-authentication'
-      ) as HubAuthentication;
+      hubAuthentication = this.owner.lookup('service:hub-authentication');
       await settled();
 
       assert.strictEqual(
@@ -84,9 +78,7 @@ module('Unit | Service | HubAuthentication', function (hooks) {
 
       assert.notOk(layer2Service.isConnected, 'Layer 2 is not connected');
 
-      hubAuthentication = this.owner.lookup(
-        'service:hub-authentication'
-      ) as HubAuthentication;
+      hubAuthentication = this.owner.lookup('service:hub-authentication');
       await settled();
 
       assert.notOk(hubAuthentication.authToken, 'not authed');
@@ -95,9 +87,7 @@ module('Unit | Service | HubAuthentication', function (hooks) {
 
     test('it can initialize with a non-authenticated state when there is no initial auth token', async function (assert) {
       window.TEST__AUTH_TOKEN = undefined;
-      hubAuthentication = this.owner.lookup(
-        'service:hub-authentication'
-      ) as HubAuthentication;
+      hubAuthentication = this.owner.lookup('service:hub-authentication');
       await settled();
 
       assert.notOk(hubAuthentication.authToken, 'not authed');
@@ -108,9 +98,7 @@ module('Unit | Service | HubAuthentication', function (hooks) {
       sinon
         .stub(layer2Service, 'checkHubAuthenticationValid')
         .returns(Promise.resolve(false));
-      hubAuthentication = this.owner.lookup(
-        'service:hub-authentication'
-      ) as HubAuthentication;
+      hubAuthentication = this.owner.lookup('service:hub-authentication');
       await settled();
 
       assert.notOk(hubAuthentication.authToken, 'not authed');
@@ -119,9 +107,7 @@ module('Unit | Service | HubAuthentication', function (hooks) {
 
     // test being able to clear auth token
     test('its state becomes non-authenticated when the auth token is cleared', async function (assert) {
-      hubAuthentication = this.owner.lookup(
-        'service:hub-authentication'
-      ) as HubAuthentication;
+      hubAuthentication = this.owner.lookup('service:hub-authentication');
       await settled();
       assert.strictEqual(hubAuthentication.authToken, HUB_AUTH_TOKEN);
       assert.ok(hubAuthentication.isAuthenticated, 'authenticated');
@@ -134,9 +120,7 @@ module('Unit | Service | HubAuthentication', function (hooks) {
 
     // test ensureAuthenticated
     test('it can reuse an existing valid auth token', async function (assert) {
-      hubAuthentication = this.owner.lookup(
-        'service:hub-authentication'
-      ) as HubAuthentication;
+      hubAuthentication = this.owner.lookup('service:hub-authentication');
       await settled();
 
       assert.strictEqual(hubAuthentication.authToken, HUB_AUTH_TOKEN);
@@ -153,9 +137,7 @@ module('Unit | Service | HubAuthentication', function (hooks) {
     });
 
     test('it can fetch a new auth token when an existing one is invalid', async function (assert) {
-      hubAuthentication = this.owner.lookup(
-        'service:hub-authentication'
-      ) as HubAuthentication;
+      hubAuthentication = this.owner.lookup('service:hub-authentication');
       await settled();
 
       assert.strictEqual(hubAuthentication.authToken, HUB_AUTH_TOKEN);
@@ -179,9 +161,7 @@ module('Unit | Service | HubAuthentication', function (hooks) {
 
     test("it can fetch a new auth token when one doesn't exist", async function (assert) {
       window.TEST__AUTH_TOKEN = undefined;
-      hubAuthentication = this.owner.lookup(
-        'service:hub-authentication'
-      ) as HubAuthentication;
+      hubAuthentication = this.owner.lookup('service:hub-authentication');
       await settled();
 
       assert.notOk(hubAuthentication.authToken, 'not authed');
@@ -201,9 +181,7 @@ module('Unit | Service | HubAuthentication', function (hooks) {
     });
 
     test('it throws an error when fetching a new auth token fails with an empty string', async function (assert) {
-      hubAuthentication = this.owner.lookup(
-        'service:hub-authentication'
-      ) as HubAuthentication;
+      hubAuthentication = this.owner.lookup('service:hub-authentication');
       await settled();
 
       assert.strictEqual(hubAuthentication.authToken, HUB_AUTH_TOKEN);
@@ -224,9 +202,7 @@ module('Unit | Service | HubAuthentication', function (hooks) {
     });
 
     test('it throws an error when errors are thrown while fetching a new auth token', async function (assert) {
-      hubAuthentication = this.owner.lookup(
-        'service:hub-authentication'
-      ) as HubAuthentication;
+      hubAuthentication = this.owner.lookup('service:hub-authentication');
       await settled();
 
       assert.strictEqual(hubAuthentication.authToken, HUB_AUTH_TOKEN);

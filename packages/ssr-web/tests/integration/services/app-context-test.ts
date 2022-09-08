@@ -5,7 +5,6 @@ import { setupApplicationTest } from 'ember-qunit';
 import config from '@cardstack/ssr-web/config/environment';
 import window from 'ember-window-mock';
 import { setupWindowMock } from 'ember-window-mock/test-support';
-import AppContext from '../../../app/services/app-context';
 
 module('Integration | Service | app-context', function (hooks) {
   setupApplicationTest(hooks);
@@ -37,7 +36,7 @@ module('Integration | Service | app-context', function (hooks) {
       }
       this.owner.register('service:fastboot', MockFastboot);
       fastboot = this.owner.lookup('service:fastboot') as MockFastboot;
-      appContext = this.owner.lookup('service:app-context') as AppContext;
+      appContext = this.owner.lookup('service:app-context');
     });
 
     test('it can match the profile suffix to determine the app', function (assert) {
@@ -75,7 +74,7 @@ module('Integration | Service | app-context', function (hooks) {
         };
       }
       this.owner.register('service:fastboot', MockFastboot);
-      appContext = this.owner.lookup('service:app-context') as AppContext;
+      appContext = this.owner.lookup('service:app-context');
     });
 
     test('it can match the profile suffix to determine the app', function (assert) {

@@ -9,7 +9,6 @@ import { setupMirage } from 'ember-cli-mirage/test-support';
 import { MirageTestContext } from 'ember-cli-mirage/test-support';
 import RSVP from 'rsvp';
 import Service from '@ember/service';
-import Layer2Network from '@cardstack/web-client/services/layer2-network';
 
 const FAILURE_MESSAGE = 'Authentication failed or was canceled.';
 
@@ -32,12 +31,9 @@ module(
 
     module('Initialized unauthenticated', function (hooks) {
       hooks.beforeEach(async function (this: Context) {
-        hubAuthentication = this.owner.lookup(
-          'service:hub-authentication'
-        ) as HubAuthentication;
-        layer2Service = (
-          this.owner.lookup('service:layer2-network') as Layer2Network
-        ).strategy as Layer2TestWeb3Strategy;
+        hubAuthentication = this.owner.lookup('service:hub-authentication');
+        layer2Service = this.owner.lookup('service:layer2-network')
+          .strategy as Layer2TestWeb3Strategy;
 
         this.setProperties({
           onComplete: () => {

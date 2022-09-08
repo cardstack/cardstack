@@ -42,7 +42,7 @@ module('@core | compiler-adoption', function (hooks) {
   let cardService: Cards;
   hooks.beforeEach(async function () {
     createCard(PERSON_CARD);
-    cardService = this.owner.lookup('service:cards') as Cards;
+    cardService = this.owner.lookup('service:cards');
     builder = await cardService.builder();
 
     parentCard = await builder.getCompiledCard(`${LOCAL_REALM}person`);

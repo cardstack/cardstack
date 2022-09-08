@@ -8,8 +8,6 @@ import { WorkflowSession } from '@cardstack/web-client/models/workflow';
 import sinon from 'sinon';
 import { currentNetworkDisplayInfo as c } from '@cardstack/web-client/utils/web3-strategies/network-display-info';
 import { TransactionReceipt } from 'web3-core';
-import Layer1Network from '@cardstack/web-client/services/layer1-network';
-import Layer2Network from '@cardstack/web-client/services/layer2-network';
 
 const depositSourceToken = 'DAI';
 const stepTitles = {
@@ -34,12 +32,10 @@ module(
           blockNumber: 1,
         } as TransactionReceipt,
       });
-      const layer1Service = (
-        this.owner.lookup('service:layer1-network') as Layer1Network
-      ).strategy as Layer1TestWeb3Strategy;
-      const layer2Service = (
-        this.owner.lookup('service:layer2-network') as Layer2Network
-      ).strategy as Layer2TestWeb3Strategy;
+      const layer1Service = this.owner.lookup('service:layer1-network')
+        .strategy as Layer1TestWeb3Strategy;
+      const layer2Service = this.owner.lookup('service:layer2-network')
+        .strategy as Layer2TestWeb3Strategy;
       const blockCount = layer1Service.bridgeConfirmationBlockCount;
 
       layer2Service.balancesRefreshed = false;
@@ -199,9 +195,8 @@ module(
     });
 
     test('it shows an error message if block confirmations fail', async function (assert) {
-      const layer1Service = (
-        this.owner.lookup('service:layer1-network') as Layer1Network
-      ).strategy as Layer1TestWeb3Strategy;
+      const layer1Service = this.owner.lookup('service:layer1-network')
+        .strategy as Layer1TestWeb3Strategy;
 
       let onComplete = sinon.spy();
       let workflowSession = new WorkflowSession();
@@ -250,12 +245,10 @@ module(
     });
 
     test('it shows an error message if bridging fails', async function (assert) {
-      const layer1Service = (
-        this.owner.lookup('service:layer1-network') as Layer1Network
-      ).strategy as Layer1TestWeb3Strategy;
-      const layer2Service = (
-        this.owner.lookup('service:layer2-network') as Layer2Network
-      ).strategy as Layer2TestWeb3Strategy;
+      const layer1Service = this.owner.lookup('service:layer1-network')
+        .strategy as Layer1TestWeb3Strategy;
+      const layer2Service = this.owner.lookup('service:layer2-network')
+        .strategy as Layer2TestWeb3Strategy;
       const blockCount = layer1Service.bridgeConfirmationBlockCount;
 
       let onComplete = sinon.spy();

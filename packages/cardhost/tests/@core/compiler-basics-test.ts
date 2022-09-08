@@ -29,7 +29,7 @@ module('@core | compiler-basics', function (hooks) {
   let builder: Builder;
   let cardService: Cards;
   hooks.beforeEach(async function () {
-    cardService = this.owner.lookup('service:cards') as Cards;
+    cardService = this.owner.lookup('service:cards');
     builder = await cardService.builder();
     createCard(ADDRESS_RAW_CARD);
     createCard(PERSON_RAW_CARD);

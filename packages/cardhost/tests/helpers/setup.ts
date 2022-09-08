@@ -40,7 +40,7 @@ export function setupCardTest(
   }
 
   hooks.beforeEach(async function () {
-    cardService = this.owner.lookup('service:cards') as Cards;
+    cardService = this.owner.lookup('service:cards');
     if (options.type === 'application') {
       cardService.overrideRoutingCardWith = options.routingCard;
     }

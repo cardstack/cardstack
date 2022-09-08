@@ -27,7 +27,6 @@ import {
   TransactionOptions,
 } from '@cardstack/cardpay-sdk';
 import { defer } from 'rsvp';
-import Layer2Network from '@cardstack/web-client/services/layer2-network';
 
 const USER_REJECTION_ERROR_MESSAGE =
   'It looks like you have canceled the request in your wallet. Please try again if you want to continue with this workflow.';
@@ -55,9 +54,8 @@ module(
         prepaidCardColorSchemes,
         prepaidCardPatterns,
       });
-      layer2Service = (
-        this.owner.lookup('service:layer2-network') as Layer2Network
-      ).strategy as Layer2TestWeb3Strategy;
+      layer2Service = this.owner.lookup('service:layer2-network')
+        .strategy as Layer2TestWeb3Strategy;
       cardCustomizationService = this.owner.lookup(
         'service:card-customization'
       ) as CardCustomization;

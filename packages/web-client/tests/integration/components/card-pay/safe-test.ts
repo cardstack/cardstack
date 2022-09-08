@@ -16,7 +16,6 @@ import {
 } from '@cardstack/web-client/utils/test-factories';
 import { currentNetworkDisplayInfo as c } from '@cardstack/web-client/utils/web3-strategies/network-display-info';
 import { TinyColor } from '@ctrl/tinycolor';
-import Layer2Network from '@cardstack/web-client/services/layer2-network';
 
 interface Context extends MirageTestContext {}
 
@@ -43,9 +42,8 @@ module('Integration | Component | card-pay/safe', function (hooks) {
       'owner-address': layer2AccountAddress,
     });
 
-    layer2Service = (
-      this.owner.lookup('service:layer2-network') as Layer2Network
-    ).strategy as Layer2TestWeb3Strategy;
+    layer2Service = this.owner.lookup('service:layer2-network')
+      .strategy as Layer2TestWeb3Strategy;
     await layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
   });
 
