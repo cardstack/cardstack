@@ -342,7 +342,7 @@ export default abstract class Layer1ChainWeb3Strategy
       amountInWei.toString(),
       { onTxnHash }
     );
-    return receipt as TransactionReceipt;
+    return receipt;
   }
 
   private async getDepositLimits(): Promise<
@@ -377,7 +377,7 @@ export default abstract class Layer1ChainWeb3Strategy
     if (!this.web3) throw new Error('Cannot unlock tokens without web3');
     let tokenBridge = await getSDK('TokenBridgeForeignSide', this.web3);
     let receipt = await tokenBridge.unlockTokens(txnHash);
-    return receipt as TransactionReceipt;
+    return receipt;
   }
 
   async relayTokens(
@@ -394,7 +394,7 @@ export default abstract class Layer1ChainWeb3Strategy
       amountInWei.toString(),
       { onTxnHash }
     );
-    return receipt as TransactionReceipt;
+    return receipt;
   }
 
   async resumeRelayTokens(
@@ -403,14 +403,14 @@ export default abstract class Layer1ChainWeb3Strategy
     if (!this.web3) throw new Error('Cannot unlock tokens without web3');
     let tokenBridge = await getSDK('TokenBridgeForeignSide', this.web3);
     let receipt = await tokenBridge.relayTokens(txnHash);
-    return receipt as TransactionReceipt;
+    return receipt;
   }
 
   async resumeClaimBridgedTokens(txnHash: string): Promise<TransactionReceipt> {
     if (!this.web3) throw new Error('Cannot claim bridged tokens without web3');
     let tokenBridge = await getSDK('TokenBridgeForeignSide', this.web3);
     let receipt = await tokenBridge.claimBridgedTokens(txnHash);
-    return receipt as TransactionReceipt;
+    return receipt;
   }
 
   async claimBridgedTokens(
@@ -425,7 +425,7 @@ export default abstract class Layer1ChainWeb3Strategy
       bridgeValidationResult.signatures,
       { onTxnHash: options?.onTxnHash }
     );
-    return receipt as TransactionReceipt;
+    return receipt;
   }
 
   async getBlockConfirmation(blockNumber: TxnBlockNumber): Promise<void> {

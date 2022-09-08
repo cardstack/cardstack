@@ -552,7 +552,7 @@ export default abstract class Layer2ChainWeb3Strategy
       receiver,
       fromBlock.toString()
     );
-    return receipt as TransactionReceipt;
+    return receipt;
   }
 
   async bridgeToLayer1(
@@ -573,14 +573,14 @@ export default abstract class Layer2ChainWeb3Strategy
       amountInWei,
       options
     );
-    return receipt as TransactionReceipt;
+    return receipt;
   }
 
   async resumeBridgeToLayer1(txnHash: string) {
     let tokenBridge = await getSDK('TokenBridgeHomeSide', this.web3);
 
     let receipt = await tokenBridge.relayTokens(txnHash);
-    return receipt as TransactionReceipt;
+    return receipt;
   }
 
   async awaitBridgedToLayer1(
