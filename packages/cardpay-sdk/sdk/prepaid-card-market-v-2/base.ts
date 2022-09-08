@@ -181,6 +181,11 @@ export default class PrepaidCardMarketV2 {
     marketAddress = marketAddress ?? (await getAddress('prepaidCardMarketV2', this.layer2Web3));
     let { nonce, onNonce, onTxnHash } = txnOptions ?? {};
     let from = contractOptions?.from ?? (await this.layer2Web3.eth.getAccounts())[0];
+    let contract = new this.layer2Web3.eth.Contract(PrepaidCardMarketV2ABI as AbiItem[], marketAddress);
+    const issuerEOA = await contract.methods.issuers(issuerSafe).call();
+    if (issuerEOA == ZERO_ADDRESS) {
+      throw new Error('Issuer does not exists on prepaid card market v2 contract. Consider adding tokens first.');
+    }
 
     let gnosisResult = await executeSendWithRateLock(this.layer2Web3, prepaidCardAddress, async (rateLock) => {
       let payload = await this.getAddSKUPayload(
