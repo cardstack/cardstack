@@ -5,14 +5,16 @@ import { concat, fn } from '@ember/helper';
 import { on } from '@ember/modifier';
 import eq from 'ember-truth-helpers/helpers/eq';
 import or from 'ember-truth-helpers/helpers/or';
+import { Org } from './org';
 import '@cardstack/boxel/styles/global.css';
 import './index.css';
+
 
 interface Signature {
   Element: HTMLUListElement;
   Args: {
-    orgs: any; // TODO: better types
-    currentOrg: any;
+    orgs: Org[];
+    currentOrg?: Org;
     onChooseOrg: any;
   };
   Blocks: EmptyObject

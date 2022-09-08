@@ -2,7 +2,7 @@ import { helper } from '@ember/component/helper';
 import { isHTMLSafe } from '@ember/template';
 
 type PositionalArgs = [
-  s: string,
+  s?: string,
   characterLimit?: number,
   useEllipsis?: boolean
 ];
@@ -20,6 +20,10 @@ export function truncate([
   useEllipsis = true,
 ]: PositionalArgs): string {
   let limit = useEllipsis ? characterLimit - 3 : characterLimit;
+
+  if (!s) {
+    return '';
+  }
 
   if (isHTMLSafe(s)) {
     s = s.toString();

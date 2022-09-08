@@ -1,4 +1,5 @@
 import Component from '@glimmer/component';
+import { Org } from '../org';
 import { EmptyObject } from '@ember/component/helper';
 import LeftEdgeNavSelectableButton from '../../left-edge-nav/selectable-button';
 import { concat } from '@ember/helper';
@@ -14,7 +15,7 @@ interface Signature {
   Element: HTMLButtonElement;
   Args: {
     isSelected: boolean;
-    org: any;
+    org: Org;
   };
   Blocks: EmptyObject
 }
