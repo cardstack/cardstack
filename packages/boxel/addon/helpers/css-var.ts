@@ -1,6 +1,4 @@
-// prettier-ignore
 import { helper } from '@ember/component/helper';
-// prettier-ignore
 import { htmlSafe } from '@ember/template';
 
 type StringOrFuncReturningString = string | (() => string);
