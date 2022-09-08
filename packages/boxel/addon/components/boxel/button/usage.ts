@@ -11,7 +11,7 @@ interface Signature {
   Blocks: EmptyObject;
 }
 
-export default class Usage extends Component<Signature> {
+export default class ButtonUsage extends Component<Signature> {
   sizeVariants = ['extra-small', 'small', 'base', 'tall', 'touch'];
   kindVariants = {
     all: [

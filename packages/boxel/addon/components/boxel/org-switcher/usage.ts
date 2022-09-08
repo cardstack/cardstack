@@ -31,7 +31,7 @@ const ORGS = [
   },
 ] as Org[];
 
-export default class extends Component {
+export default class OrgSwitcherUsage extends Component {
   @tracked orgs = A(ORGS);
   @tracked currentOrg: Org | undefined = ORGS[0];
   @action onChooseOrg(orgId: string): void {

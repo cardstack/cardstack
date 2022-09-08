@@ -7,7 +7,7 @@ import './usage.css';
 import LolaSampsonThumb from '@cardstack/boxel/usage-support/images/users/Lola-Sampson.jpg';
 import CardBot from '@cardstack/boxel/usage-support/images/orgs/cardbot.svg';
 
-export default class ThreadMessageUsageComponent extends Component {
+export default class ThreadMessageUsage extends Component {
   cardbotIcon = CardBot;
   @tracked name = 'Lola Sampson';
   @tracked imgURL = LolaSampsonThumb;

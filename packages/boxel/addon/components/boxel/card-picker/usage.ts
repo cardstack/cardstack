@@ -38,7 +38,7 @@ const CARDS = [
   },
 ];
 
-export default class extends Component {
+export default class CardPickerUsage extends Component {
   @tracked cards = A(CARDS);
   @tracked selectedItem: Record<string, unknown> | null = null;
 
