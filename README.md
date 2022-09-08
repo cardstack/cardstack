@@ -42,6 +42,13 @@ In development, we use `lerna` to manage the inter-dependencies of all the packa
  4. Launch the typescript compiler with `yarn compile --watch`
  5. Start ember-cli and the hub node server with `yarn start` and/or run tests with `yarn test`
 
+### Editors
+
+If you use Visual Studio Code and work on the boxel, web-client or ssr-web packages, we recommend the following extensions to make working with glint and gts files better:
+
+* [Glint language server integration for VS Code](https://marketplace.visualstudio.com/items?itemName=typed-ember.glint-vscode)
+* [VSCode extension for glimmer](https://marketplace.visualstudio.com/items?itemName=chiragpat.vscode-glimmer)
+
 ## Understanding the respositories under the Cardstack organization
 
 The following summary offers an overview of where development is currently ongoing at Cardstack. (Note: any projects linked below that are not currently public will become public soon.)
