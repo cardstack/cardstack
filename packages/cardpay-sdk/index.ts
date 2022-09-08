@@ -24,7 +24,6 @@ export type { IHubAuth } from './sdk/hub-auth';
 export { default as HubConfig } from './sdk/hub-config';
 export type { AddressKeys } from './contracts/addresses';
 export type { TransactionOptions } from './sdk/utils/general-utils';
-export type { SuccessfulTransactionReceipt } from './sdk/utils/successful-transaction-receipt';
 
 export { viewSafe } from './sdk/safes';
 export { getAddress, getAddressByNetwork, getOracle, getOracleByNetwork } from './contracts/addresses';
