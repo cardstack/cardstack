@@ -6,7 +6,6 @@ import { action } from '@ember/object';
 import Layer2Network from '@cardstack/web-client/services/layer2-network';
 
 class ApplicationController extends Controller {
-  //@ts-ignore
   @service router!: Services['router'];
   @service declare layer2Network: Layer2Network;
 
