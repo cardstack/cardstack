@@ -1,0 +1,35 @@
+<section class="boxel-left-main-nav">
+  <Boxel::OrgTitle
+    @title={{@org.title}}
+    @iconURL={{@org.iconURL}}
+
+  />
+  <Boxel::Searchbox
+    @hideIcon=true
+    @placeholder="Search"
+    @label="Search accounts and members"
+    @id="card-catalog-tray-search"
+    @onInput={{(noop)}}
+  />
+
+  <nav class="boxel-left-main-nav__nav">
+    {{#each (array
+    (menu-item "Home" (link route="index"))
+        (menu-item "LeftMainNav" (link route="docs" query=(hash s="Components" ss="<Boxel::LeftMainNav>")))
+        (menu-item "About" (link route="about"))
+) as |tab|}}
+        <LinkTo
+          @route={{tab.action.routeName}}
+          @query={{or tab.action.queryParams (hash)}}
+          role="tab"
+          data-text={{tab.text}}
+          class={{cn
+            "boxel-left-main-nav__link"
+            boxel-left-main-nav__link--is-active=tab.action.isActive
+          }}
+        >
+          {{tab.text}}
+        </LinkTo>
+    {{/each}}
+  </nav>
+</section>
