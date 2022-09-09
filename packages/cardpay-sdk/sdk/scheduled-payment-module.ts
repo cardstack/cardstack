@@ -164,9 +164,9 @@ export default class ScheduledPaymentModule {
     maxGasPrice: string,
     gasTokenAddress: string,
     salt: string,
-    recursDayOfMonth: number,
+    recurringDayOfMonth: number,
     gasPrice: string,
-    until?: number
+    recurringUntil?: number
   ): Promise<number>;
   async estimateExecutionGas(
     moduleAddress: string,
@@ -177,15 +177,15 @@ export default class ScheduledPaymentModule {
     maxGasPrice: string,
     gasTokenAddress: string,
     salt: string,
-    payAtOrRecursDayOfMonth: number,
+    payAtOrRecurringDayOfMonth: number,
     gasPrice: string,
-    until?: number
+    recurringUntil?: number
   ): Promise<number> {
     let requiredGas;
     try {
       let module = new this.layer2Web3.eth.Contract(ScheduledPaymentABI as AbiItem[], moduleAddress);
-      if (until) {
-        let recursDayOfMonth = payAtOrRecursDayOfMonth;
+      if (recurringUntil) {
+        let recurringDayOfMonth = payAtOrRecurringDayOfMonth;
         await module.methods[
           'estimateExecutionGas(address,uint256,address,((uint256),(uint256)),uint256,address,string,uint256,uint256,uint256)'
         ](
@@ -203,12 +203,12 @@ export default class ScheduledPaymentModule {
           maxGasPrice,
           gasTokenAddress,
           salt,
-          recursDayOfMonth,
+          recurringDayOfMonth,
           gasPrice,
-          until
+          recurringUntil
         ).estimateGas();
       } else {
-        let payAt = payAtOrRecursDayOfMonth;
+        let payAt = payAtOrRecurringDayOfMonth;
         await module.methods[
           'estimateExecutionGas(address,uint256,address,((uint256),(uint256)),uint256,address,string,uint256,uint256)'
         ](

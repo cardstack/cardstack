@@ -5,7 +5,7 @@ import { Arguments, CommandModule } from 'yargs';
 
 export default {
   command:
-    'estimate-execution <moduleAddress> <tokenAddress> <amount> <payeeAddress> <fixedUSDFee> <percentageFee> <maxGasPrice> <gasTokenAddress> <salt> <payAtOrRecursDayOfMonth> <gasPrice>',
+    'estimate-execution <moduleAddress> <tokenAddress> <amount> <payeeAddress> <fixedUSDFee> <percentageFee> <maxGasPrice> <gasTokenAddress> <salt> <payAt> <gasPrice>',
   describe: 'Enable scheduled payment module on the safe',
   builder(yargs: Argv) {
     return yargs
@@ -39,7 +39,7 @@ export default {
       })
       .positional('maxGasPrice', {
         type: 'string',
-        description: 'maximum gas price (in the smallest units of gas token)',
+        description: 'Maximum gas price (in the smallest units of gas token)',
       })
       .positional('gasTokenAddress', {
         type: 'string',
@@ -49,15 +49,19 @@ export default {
         type: 'string',
         description: 'Arbitrary string to make SP unique',
       })
-      .positional('payAtOrRecursDayOfMonth', {
+      .positional('payAt', {
         type: 'number',
-        description: 'payAt is seconds of the date execution or recursDayOfMonth is range 1-28',
+        description: 'Time to execute scheduled payments (in seconds)',
       })
       .positional('gasPrice', {
         type: 'string',
-        description: 'gas price (in the smallest units of gas token)',
+        description: 'Gas price (in the smallest units of gas token)',
       })
-      .option('until', {
+      .option('recurringDayOfMonth', {
+        type: 'number',
+        description: 'Days of the month in the range of 1-28 to make recurring payments',
+      })
+      .option('recurringUntil', {
         type: 'number',
         description: 'End date of recurring payment',
       })
@@ -75,9 +79,10 @@ export default {
       maxGasPrice,
       gasTokenAddress,
       salt,
-      payAtOrRecursDayOfMonth,
+      payAt,
       gasPrice,
-      until,
+      recurringDayOfMonth,
+      recurringUntil,
     } = args as unknown as {
       network: string;
       moduleAddress: string;
@@ -89,9 +94,10 @@ export default {
       maxGasPrice: string;
       gasTokenAddress: string;
       salt: string;
-      payAtOrRecursDayOfMonth: number;
+      payAt: number;
       gasPrice: string;
-      until: number;
+      recurringDayOfMonth: number,
+      recurringUntil: number;
     };
     let { web3, signer } = await getEthereumClients(network, getConnectionType(args));
     let scheduledPaymentModule = await getSDK('ScheduledPaymentModule', web3, signer);
@@ -110,9 +116,9 @@ export default {
       maxGasPrice,
       gasTokenAddress,
       salt,
-      payAtOrRecursDayOfMonth,
+      recurringDayOfMonth ? recurringDayOfMonth : payAt,
       gasPrice,
-      until
+      recurringUntil
     );
 
     console.log(`Required execution gas: ${requiredGas}`);
