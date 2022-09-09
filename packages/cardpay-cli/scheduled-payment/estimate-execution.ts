@@ -96,7 +96,7 @@ export default {
       salt: string;
       payAt: number;
       gasPrice: string;
-      recurringDayOfMonth: number,
+      recurringDayOfMonth: number;
       recurringUntil: number;
     };
     let { web3, signer } = await getEthereumClients(network, getConnectionType(args));
