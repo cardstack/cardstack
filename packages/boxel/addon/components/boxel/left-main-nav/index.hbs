@@ -12,7 +12,7 @@
     @onInput={{(noop)}}
   />
 
-  <nav class="boxel-left-main-nav__nav">
+  <nav class="boxel-left-main-nav__nav" role="tablist">
     {{#each (array
     (menu-item "Home" (link route="index"))
         (menu-item "LeftMainNav" (link route="docs" query=(hash s="Components" ss="<Boxel::LeftMainNav>")))
