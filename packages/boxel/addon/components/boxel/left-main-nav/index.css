@@ -1,7 +1,3 @@
-@import "./basic-button/index.css";
-@import "./card-management-button/index.css";
-@import "./selectable-button/index.css";
-
 .boxel-left-main-nav {
   --gutter-width: 1.5rem;
 
