@@ -9,6 +9,10 @@
   position: relative;
 }
 
+.boxel-searchbox--hide-icon {
+  --boxel-searchbox-icon-size: 0.01rem;
+}
+
 .boxel-searchbox__input {
   --boxel-searchbox-text-color: rgb(255 255 255 / 60%);
 
