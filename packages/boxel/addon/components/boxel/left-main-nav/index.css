@@ -15,7 +15,7 @@
   margin: 0 var(--gutter-width);
   padding: 0;
   display: grid;
-  grid-auto-rows: 2.5rem;
+  grid-auto-rows: var(--boxel-sp-xxl);
   font-size: var(--boxel-font-size-sm);
 }
 
