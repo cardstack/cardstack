@@ -10,6 +10,11 @@
   background-color: var(--boxel-purple-600);
 }
 
+.boxel-left-main-nav__searchbox {
+  width: calc(100% - var(--gutter-width) * 1.75);
+  margin: 0 var(--gutter-width);
+}
+
 .boxel-left-main-nav__nav {
   width: 100%;
   margin: 0 var(--gutter-width);
