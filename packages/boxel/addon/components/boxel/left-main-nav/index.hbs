@@ -11,24 +11,22 @@
     @onInput={{(noop)}}
   />
 
-  <nav class="boxel-left-main-nav__nav" role="tablist">
-    {{#each (array
-      (menu-item "Home" (link route="index"))
-      (menu-item "LeftMainNav" (link route="docs" query=(hash s="Components" ss="<Boxel::LeftMainNav>")))
-      (menu-item "About" (link route="about"))
-    ) as |tab|}}
-        <LinkTo
-          @route={{tab.action.routeName}}
-          @query={{or tab.action.queryParams (hash)}}
-          role="tab"
-          data-text={{tab.text}}
-          class={{cn
-            "boxel-left-main-nav__link"
-            boxel-left-main-nav__link--is-active=tab.action.isActive
-          }}
-        >
-          {{tab.text}}
-        </LinkTo>
-    {{/each}}
-  </nav>
+  {{#if this.linkItems}}
+    <nav class="boxel-left-main-nav__nav" role="tablist">
+      {{#each this.linkItems as |link|}}
+          <LinkTo
+            @route={{link.action.routeName}}
+            @query={{or link.action.queryParams (hash)}}
+            role="tab"
+            data-text={{link.text}}
+            class={{cn
+              "boxel-left-main-nav__link"
+              boxel-left-main-nav__link--is-active=link.action.isActive
+            }}
+          >
+            {{link.text}}
+          </LinkTo>
+      {{/each}}
+    </nav>
+  {{/if}}
 </section>
