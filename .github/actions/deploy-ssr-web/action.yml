@@ -20,7 +20,7 @@ runs:
 
     - name: Install dependencies
       shell: bash
-      run: yarn --prefer-offline
+      run: yarn --prefer-offline --frozen-lockfile
 
     - name: Build
       run: SSR_WEB_ENVIRONMENT=${{ inputs.environment }} yarn build:ssr-web:${{ inputs.environment }}

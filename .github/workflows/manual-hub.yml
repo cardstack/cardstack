@@ -31,7 +31,7 @@ jobs:
             ${{ runner.os }}-node-modules-
 
       - name: Install dependencies
-        run: yarn --prefer-offline
+        run: yarn --prefer-offline --frozen-lockfile
         shell: bash
 
       - name: Build

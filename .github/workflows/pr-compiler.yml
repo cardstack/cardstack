@@ -48,7 +48,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-node-modules-
 
-      - run: yarn --prefer-offline
+      - run: yarn --prefer-offline --frozen-lockfile
 
       - run: yarn db:test-init
         working-directory: packages/hub

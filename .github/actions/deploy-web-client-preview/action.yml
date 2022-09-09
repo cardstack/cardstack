@@ -25,7 +25,7 @@ runs:
 
     - name: Install dependencies
       shell: bash
-      run: yarn --prefer-offline
+      run: yarn --prefer-offline --frozen-lockfile
 
     - name: Set PR branch name
       shell: bash

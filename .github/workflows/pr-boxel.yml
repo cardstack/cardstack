@@ -33,7 +33,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-node-modules-
       - name: Install dependencies
-        run: yarn --prefer-offline
+        run: yarn --prefer-offline --frozen-lockfile
       - name: Test
         run: yarn test:boxel
 
@@ -77,7 +77,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-node-modules-
       - name: Install dependencies
-        run: yarn --prefer-offline
+        run: yarn --prefer-offline --frozen-lockfile
       - name: Set PR branch name
         run: echo "PR_BRANCH_NAME=${{ github.head_ref }}" >> $GITHUB_ENV
       - name: Test with percy
@@ -115,7 +115,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-node-modules-
       - name: Install dependencies
-        run: yarn --prefer-offline
+        run: yarn --prefer-offline --frozen-lockfile
       - name: Find pull request number for branch
         uses: ./.github/actions/find-pr-number
         id: fpr
