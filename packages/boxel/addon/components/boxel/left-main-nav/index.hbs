@@ -14,10 +14,10 @@
 
   <nav class="boxel-left-main-nav__nav" role="tablist">
     {{#each (array
-    (menu-item "Home" (link route="index"))
-        (menu-item "LeftMainNav" (link route="docs" query=(hash s="Components" ss="<Boxel::LeftMainNav>")))
-        (menu-item "About" (link route="about"))
-) as |tab|}}
+      (menu-item "Home" (link route="index"))
+      (menu-item "LeftMainNav" (link route="docs" query=(hash s="Components" ss="<Boxel::LeftMainNav>")))
+      (menu-item "About" (link route="about"))
+    ) as |tab|}}
         <LinkTo
           @route={{tab.action.routeName}}
           @query={{or tab.action.queryParams (hash)}}
