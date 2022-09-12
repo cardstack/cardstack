@@ -8,6 +8,7 @@ import BN from 'bn.js';
 import { query as gqlQuery } from './graphql';
 import { AbiItem } from 'web3-utils';
 import { Operation } from './safe-utils';
+import { v4 } from 'uuid';
 
 const POLL_INTERVAL = 500;
 
@@ -305,6 +306,8 @@ export async function sendTransaction(web3: Web3, transaction: Transaction): Pro
   return txHash;
 }
 
-export function getRandomInt(max: number) {
-  return Math.floor(Math.random() * max);
+export function generateSaltNonce(prefix: string) {
+  let uuid = prefix + '-' + v4();
+  let result = [...uuid].reduce((result, char) => result + String(char.charCodeAt(0)), '');
+  return result.substring(0, 77);
 }

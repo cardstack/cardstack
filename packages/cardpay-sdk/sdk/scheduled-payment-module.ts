@@ -10,7 +10,13 @@ import {
   encodeMultiSendCallOnly,
   getModuleProxyCreationEvent,
 } from './utils/module-utils';
-import { isTransactionHash, sendTransaction, Transaction, TransactionOptions } from './utils/general-utils';
+import {
+  generateSaltNonce,
+  isTransactionHash,
+  sendTransaction,
+  Transaction,
+  TransactionOptions,
+} from './utils/general-utils';
 import { ContractOptions } from 'web3-eth-contract';
 import {
   EventABI,
@@ -156,7 +162,7 @@ export default class ScheduledPaymentModule {
       AddressZero,
       '0',
       AddressZero,
-      new Date().getTime()
+      generateSaltNonce('cardstack-sp-create-safe')
     );
     let enableModuleTxs = await this.generateEnableModuleTxs(expectedSafeAddress);
     let setGuardTxs = await this.generateSetGuardTxs(expectedSafeAddress);

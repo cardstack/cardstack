@@ -24,7 +24,7 @@ import {
   sendTransaction,
   Transaction,
   waitUntilTransactionMined,
-  getRandomInt,
+  generateSaltNonce,
 } from './utils/general-utils';
 import { Signer } from 'ethers';
 const { fromWei } = Web3.utils;
@@ -264,7 +264,7 @@ export default class Safes implements ISafes {
     }
     let { onTxnHash } = txnOptions ?? {};
 
-    saltNonce = saltNonce ? saltNonce : String(getRandomInt(1000000));
+    saltNonce = saltNonce ? saltNonce : generateSaltNonce('cardstack-create-safe');
     let safeCreationTxResponse = await createSafe(this.layer2Web3, owners, threshold, saltNonce, tokenAddress);
 
     let token = new this.layer2Web3.eth.Contract(ERC20ABI as AbiItem[], tokenAddress);

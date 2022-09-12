@@ -308,7 +308,7 @@ export async function generateCreate2SafeTx(
   paymentToken: string,
   payment: string,
   paymentReceiver: string,
-  saltNonce: number
+  saltNonce: string
 ) {
   let gnosisSafeProxyFactory = new web3.eth.Contract(
     GnosisSafeProxyFactoryABI as AbiItem[],
@@ -346,7 +346,7 @@ async function calculateCreateProxyWithNonceAddress(
   gnosisSafeProxyFactory: Contract,
   masterCopyAddress: string,
   initializer: string,
-  saltNonce: number
+  saltNonce: string
 ) {
   let expectedSafeAddress = AddressZero;
   try {
