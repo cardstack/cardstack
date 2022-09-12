@@ -42,10 +42,10 @@ export default class extends Component {
   orgs = ORGS;
   user = USER;
 
-  @tracked currentOrg: Org | undefined = ORGS[0];
+  @tracked currentOrg: Org = ORGS[0];
 
   @action onChooseOrg(orgId: string): void {
-    this.currentOrg = ORGS.find((o) => o.id === orgId);
+    this.currentOrg = ORGS.find((o) => o.id === orgId) || this.currentOrg;
   }
   @action clickedHome(): void {
     console.log('clicked home');
