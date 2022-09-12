@@ -1,5 +1,5 @@
 {{#let (unique-id) as |inputId|}}
-<div class={{cn "boxel-searchbox" boxel-searchbox--hide-icon=@hideIcon}} ...attributes>
+<div class={{cn "boxel-searchbox" boxel-searchbox--hide-icon=(or @hideIcon false)}} ...attributes>
     {{#unless @hideIcon}}
       {{svg-jar "search" class="boxel-searchbox__search-icon"}}
     {{/unless}}

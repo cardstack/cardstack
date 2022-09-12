@@ -4,18 +4,13 @@ import { tracked } from '@glimmer/tracking';
 import { action } from '@ember/object';
 import './usage.css';
 import { assert } from '@ember/debug';
+import { Org } from '../org-switcher/org';
 
 import AMPLogo from '@cardstack/boxel/usage-support/images/orgs/amp-logo.png';
 import BunnyLogo from '@cardstack/boxel/usage-support/images/orgs/bunny-logo.svg';
 import CRDLogo from '@cardstack/boxel/usage-support/images/orgs/crd-logo.svg';
 import LisaImg from '@cardstack/boxel/usage-support/images/users/Lisa-Track.jpg';
 
-interface ExampleOrg {
-  id: string;
-  title: string;
-  iconURL: string;
-  brandColor: string;
-}
 const ORGS = [
   {
     id: 'org-1',
@@ -34,7 +29,7 @@ const ORGS = [
     title: 'Allegro Music Publishing',
     iconURL: AMPLogo,
   },
-] as ExampleOrg[];
+] as Org[];
 
 const USER = {
   title: 'Lisa Track',
@@ -47,7 +42,7 @@ export default class extends Component {
   orgs = ORGS;
   user = USER;
 
-  @tracked currentOrg: ExampleOrg | undefined = ORGS[0];
+  @tracked currentOrg: Org | undefined = ORGS[0];
 
   @action onChooseOrg(orgId: string): void {
     this.currentOrg = ORGS.find((o) => o.id === orgId);

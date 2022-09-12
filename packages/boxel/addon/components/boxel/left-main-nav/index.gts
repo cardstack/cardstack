@@ -11,6 +11,7 @@ import cn from '@cardstack/boxel/helpers/cn';
 import optional from 'ember-composable-helpers/helpers/optional';
 import or from 'ember-truth-helpers/helpers/or';
 import { LinkTo } from '@ember/routing';
+//@ts-expect-error glint does not think this is consumed-but it is consumed in the template https://github.com/typed-ember/glint/issues/374
 import { hash } from '@ember/helper';
 
 interface Signature {
