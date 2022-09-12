@@ -6,7 +6,7 @@ import './index.css';
 import { Org } from '../org-switcher/org';
 import OrgTitle from '../org-title';
 import Searchbox from '../searchbox';
-import { EmptyObject } from '@ember/component/helper';
+import { type EmptyObject } from '@ember/component/helper';
 import cn from '@cardstack/boxel/helpers/cn';
 import optional from 'ember-composable-helpers/helpers/optional';
 import or from 'ember-truth-helpers/helpers/or';
