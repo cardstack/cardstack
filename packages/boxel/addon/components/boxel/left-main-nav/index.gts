@@ -35,8 +35,8 @@ export default class BoxelLeftMainNav extends Component<Signature> {
       <OrgTitle
         @title={{@org.title}}
         @iconURL={{@org.iconURL}}
-
       />
+
       <Searchbox
         @hideIcon={{true}}
         @placeholder="Search"
