@@ -7,5 +7,6 @@ export default class OrgSwitcherButtonUsage extends Component {
   org = {
     id: 'foo',
     iconURL: AMPLogo,
+    title: 'Foo',
   };
 }
