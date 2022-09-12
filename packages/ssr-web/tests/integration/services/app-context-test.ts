@@ -35,7 +35,7 @@ module('Integration | Service | app-context', function (hooks) {
         };
       }
       this.owner.register('service:fastboot', MockFastboot);
-      fastboot = this.owner.lookup('service:fastboot');
+      fastboot = this.owner.lookup('service:fastboot') as MockFastboot;
       appContext = this.owner.lookup('service:app-context');
     });
 

@@ -19,7 +19,7 @@ module('Integration | Helper | format-workflow-message', function (hooks) {
     await render(hbs`{{format-workflow-message this.inputValue}}`);
 
     assert.strictEqual(
-      this.element.innerHTML,
+      (this.element as Element).innerHTML,
       `<p>In order to make a deposit, you need to connect two wallets:</p>
 <ul>
 <li>Ethereum mainnet wallet: linked to the Ethereum blockchain on mainnet</li>

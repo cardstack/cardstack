@@ -2,7 +2,7 @@
 import Component from '@glimmer/component';
 import { tracked } from '@glimmer/tracking';
 
-export default class extends Component {
+export default class HelpBoxUsage extends Component {
   @tracked ctaText: string | undefined;
   @tracked prompt: string | undefined;
   @tracked url = 'mailto:support@cardstack.com';

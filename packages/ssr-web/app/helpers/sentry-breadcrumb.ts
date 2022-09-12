@@ -5,11 +5,17 @@ interface SentryBreadcrumbParams {
   message: string;
 }
 
-export default class SentryBreadcrumbHelper extends Helper {
-  compute(_params: any[], { message }: SentryBreadcrumbParams) {
+interface Signature {
+  Args: {
+    Named: SentryBreadcrumbParams;
+  };
+  Return: void;
+}
+
+export default class SentryBreadcrumbHelper extends Helper<Signature> {
+  compute(_params: never[], { message }: SentryBreadcrumbParams) {
     addBreadcrumb({
       message,
     });
-    return '';
   }
 }

@@ -18,7 +18,7 @@ import NativeArray from '@ember/array/-private/native-array';
 export default class CoverArtUsage extends Component {
   @tracked size = 80;
   @tracked maxWidth = 190;
-  @tracked coverThumbs = A([
+  @tracked coverThumbs: NativeArray<string> = A([
     LovetheLoveThumb,
     HomeIsntSweetThumb,
     NeverLonelyThumb,

@@ -12,7 +12,7 @@ const SORTABLE_COLUMNS = [
   { name: 'Author', sortType: 'alpha' },
 ] as Column[];
 
-export default class SortMenuUsageComponent extends Component {
+export default class SortMenuUsage extends Component {
   sortableColumns = SORTABLE_COLUMNS;
   @tracked sortedColumn = SORTABLE_COLUMNS[0];
   @tracked sortedDirection = 'asc';
