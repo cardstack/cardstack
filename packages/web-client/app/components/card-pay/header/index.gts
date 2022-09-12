@@ -3,7 +3,7 @@ import BoxelOrgHeader from '@cardstack/boxel/components/boxel/org-header';
 import ConnectionButton from './connection-button';
 import WorkflowTracker from './workflow-tracker';
 import and from 'ember-truth-helpers/helpers/and';
-import { EmptyObject } from '@ember/component/helper';
+import { type EmptyObject } from '@ember/component/helper';
 
 interface Signature {
   Element: HTMLElement;

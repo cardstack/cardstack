@@ -1,5 +1,5 @@
 import Component from '@glimmer/component';
-import { EmptyObject } from '@ember/component/helper';
+import { type EmptyObject } from '@ember/component/helper';
 import OrgSwitcherButton from './button';
 import { concat, fn } from '@ember/helper';
 import { on } from '@ember/modifier';

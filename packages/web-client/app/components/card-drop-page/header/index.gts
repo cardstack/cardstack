@@ -1,6 +1,6 @@
 import Component from '@glimmer/component';
 import CardPayLogo from '@cardstack/web-client/images/icons/card-pay-logo.svg';
-import { EmptyObject } from '@ember/component/helper';
+import { type EmptyObject } from '@ember/component/helper';
 import cssVar from '@cardstack/boxel/helpers/css-var';
 import BoxelOrgHeader from '@cardstack/boxel/components/boxel/org-header';
 

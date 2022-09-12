@@ -1,6 +1,6 @@
 import Component from '@glimmer/component';
 import BoxelButton from '@cardstack/boxel/components/boxel/button';
-import { EmptyObject } from '@ember/component/helper';
+import { type EmptyObject } from '@ember/component/helper';
 import cn from '@cardstack/boxel/helpers/cn';
 import or from 'ember-truth-helpers/helpers/or';
 import { on } from '@ember/modifier';
