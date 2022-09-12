@@ -430,13 +430,13 @@ export default class ScheduledPaymentModule {
 
   async generateSchedulePaymentSignature(
     senderSafeAddress: string,
-    spSafeModuleAddress: string,
+    moduleAddress: string,
     tokenAddress: string,
     spHash: string
   ) {
     let [nonce, estimate, payload] = await this.generateSchedulePaymentTxParams(
       senderSafeAddress,
-      spSafeModuleAddress,
+      moduleAddress,
       tokenAddress,
       spHash
     );
@@ -447,7 +447,7 @@ export default class ScheduledPaymentModule {
       await signSafeTx(
         this.layer2Web3,
         senderSafeAddress,
-        spSafeModuleAddress,
+        moduleAddress,
         payload,
         Operation.CALL,
         estimate,
@@ -462,17 +462,17 @@ export default class ScheduledPaymentModule {
 
   private async generateSchedulePaymentTxParams(
     senderSafeAddress: string,
-    spSafeModuleAddress: string,
+    moduleAddress: string,
     tokenAddress: string,
     spHash: string
   ) {
-    let contract = new this.layer2Web3.eth.Contract(ScheduledPaymentABI as AbiItem[], spSafeModuleAddress);
+    let contract = new this.layer2Web3.eth.Contract(ScheduledPaymentABI as AbiItem[], moduleAddress);
     let payload = await contract.methods.schedulePayment(spHash).encodeABI();
 
     let estimate = await gasEstimate(
       this.layer2Web3,
       senderSafeAddress,
-      spSafeModuleAddress,
+      moduleAddress,
       '0',
       payload,
       Operation.CALL,
@@ -486,7 +486,7 @@ export default class ScheduledPaymentModule {
 
   async schedulePayment(
     senderSafeAddressOrTxnHash: string,
-    spSafeModuleAddress: string,
+    moduleAddress: string,
     tokenAddress: string,
     spHash: string,
     signature?: Signature | null,
@@ -504,8 +504,8 @@ export default class ScheduledPaymentModule {
     if (!senderSafeAddress) {
       throw new Error('senderSafeAddress must be provided');
     }
-    if (!spSafeModuleAddress) {
-      throw new Error('spSafeModuleAddress must be provided');
+    if (!moduleAddress) {
+      throw new Error('moduleAddress must be provided');
     }
     if (!tokenAddress) {
       throw new Error('tokenAddress must be provided');
@@ -516,24 +516,19 @@ export default class ScheduledPaymentModule {
 
     let [nonce, estimate, payload] = await this.generateSchedulePaymentTxParams(
       senderSafeAddress,
-      spSafeModuleAddress,
+      moduleAddress,
       tokenAddress,
       spHash
     );
 
     if (!signature) {
-      signature = await this.generateSchedulePaymentSignature(
-        senderSafeAddress,
-        spSafeModuleAddress,
-        tokenAddress,
-        spHash
-      );
+      signature = await this.generateSchedulePaymentSignature(senderSafeAddress, moduleAddress, tokenAddress, spHash);
     }
 
     let gnosisTxn = await executeTransaction(
       this.layer2Web3,
       senderSafeAddress,
-      spSafeModuleAddress,
+      moduleAddress,
       payload,
       Operation.CALL,
       estimate,
