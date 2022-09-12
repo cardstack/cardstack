@@ -12,6 +12,7 @@ interface Signature {
     onInput?: (e: InputEvent) => void;
     onChange?: (e: InputEvent) => void;
     disabled?: boolean;
+    hideIcon?: boolean;
     placeholder?: string;
   };
   Blocks: EmptyObject;
