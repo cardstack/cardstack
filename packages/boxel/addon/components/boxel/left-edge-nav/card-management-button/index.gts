@@ -1,5 +1,5 @@
 import Component from '@glimmer/component';
-import { EmptyObject } from '@ember/component/helper';
+import { type EmptyObject } from '@ember/component/helper';
 import '@cardstack/boxel/styles/global.css';
 import './index.css';
 

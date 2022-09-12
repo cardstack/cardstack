@@ -1,5 +1,5 @@
 import Component from '@glimmer/component';
-import { EmptyObject } from '@ember/component/helper';
+import { type EmptyObject } from '@ember/component/helper';
 import BasicButton from './basic-button';
 import CardManagementButton from './card-management-button';
 import OrgSwitcher from '../org-switcher';

@@ -1,5 +1,5 @@
 import Component from '@glimmer/component';
-import { EmptyObject } from '@ember/component/helper';
+import { type EmptyObject } from '@ember/component/helper';
 import cn from '@cardstack/boxel/helpers/cn';
 import eq from 'ember-truth-helpers/helpers/eq';
 import ProfileLogo from '../profile-logo';

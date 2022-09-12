@@ -1,6 +1,6 @@
 import Component from '@glimmer/component';
 import { Org } from '../org';
-import { EmptyObject } from '@ember/component/helper';
+import { type EmptyObject } from '@ember/component/helper';
 import LeftEdgeNavSelectableButton from '../../left-edge-nav/selectable-button';
 import { concat } from '@ember/helper';
 import or from 'ember-truth-helpers/helpers/or';

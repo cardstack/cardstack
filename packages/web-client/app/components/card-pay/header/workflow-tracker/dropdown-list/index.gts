@@ -4,7 +4,7 @@ import { action } from '@ember/object';
 import { tracked } from '@glimmer/tracking';
 
 import WorkflowPersistence from '@cardstack/web-client/services/workflow-persistence';
-import { EmptyObject } from '@ember/component/helper';
+import { type EmptyObject } from '@ember/component/helper';
 import TrackerItem from '../item';
 import BoxelButton from '@cardstack/boxel/components/boxel/button';
 import { svgJar } from '@cardstack/boxel/utils/svg-jar';

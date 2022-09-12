@@ -1,5 +1,5 @@
 import Component from '@glimmer/component';
-import { EmptyObject } from '@ember/component/helper';
+import { type EmptyObject } from '@ember/component/helper';
 import { htmlSafe } from '@ember/template';
 import { SafeString } from '@ember/template/-private/handlebars';
 import { svgJar } from '@cardstack/boxel/utils/svg-jar';

@@ -1,7 +1,7 @@
 import type { TemplateOnlyComponent } from '@ember/component/template-only';
 import '@cardstack/boxel/styles/global.css';
 import './index.css';
-import { EmptyObject } from '@ember/component/helper';
+import { type EmptyObject } from '@ember/component/helper';
 import cn from '@cardstack/boxel/helpers/cn';
 
 import { svgJar } from '@cardstack/boxel/utils/svg-jar';
