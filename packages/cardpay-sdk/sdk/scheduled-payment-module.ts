@@ -5,13 +5,14 @@ import ScheduledPaymentABI from '../contracts/abi/modules/scheduled-payment-modu
 import { getAddress } from '../contracts/addresses';
 import { AbiItem, fromWei } from 'web3-utils';
 import { deployAndSetUpModule, encodeMultiSend } from './utils/module-utils';
-import { TransactionOptions } from './utils/general-utils';
+import { isTransactionHash, TransactionOptions, waitUntilTransactionMined } from './utils/general-utils';
 import { ContractOptions } from 'web3-eth-contract';
 import { executeTransaction, gasEstimate, getNextNonceFromEstimate, Operation } from './utils/safe-utils';
 import { Signer, utils } from 'ethers';
 import { signSafeTx } from './utils/signing-utils';
 import { BN } from 'bn.js';
 import { ERC20ABI } from '..';
+import { SuccessfulTransactionReceipt } from './utils/successful-transaction-receipt';
 
 export interface Fee {
   fixedUSD: number;
@@ -166,7 +167,7 @@ export default class ScheduledPaymentModule {
     salt: string,
     recurringDayOfMonth: number,
     gasPrice: string,
-    recurringUntil?: number
+    recurringUntil: number
   ): Promise<number>;
   async estimateExecutionGas(
     moduleAddress: string,
@@ -238,5 +239,187 @@ export default class ScheduledPaymentModule {
     }
 
     return requiredGas;
+  }
+
+  async createSpHash(
+    moduleAddress: string,
+    tokenAddress: string,
+    amount: string,
+    payeeAddress: string,
+    fee: Fee,
+    executionGas: number,
+    maxGasPrice: string,
+    gasTokenAddress: string,
+    salt: string,
+    payAt: number
+  ): Promise<string>;
+  async createSpHash(
+    moduleAddress: string,
+    tokenAddress: string,
+    amount: string,
+    payeeAddress: string,
+    fee: Fee,
+    executionGas: number,
+    maxGasPrice: string,
+    gasTokenAddress: string,
+    salt: string,
+    recurringDayOfMonth: number,
+    recurringUntil: number
+  ): Promise<string>;
+  async createSpHash(
+    moduleAddress: string,
+    tokenAddress: string,
+    amount: string,
+    payeeAddress: string,
+    fee: Fee,
+    executionGas: number,
+    maxGasPrice: string,
+    gasTokenAddress: string,
+    salt: string,
+    payAtOrRecurringDayOfMonth: number,
+    recurringUntil?: number
+  ): Promise<string> {
+    let spHash;
+    let module = new this.layer2Web3.eth.Contract(ScheduledPaymentABI as AbiItem[], moduleAddress);
+    if (recurringUntil) {
+      let recurringDayOfMonth = payAtOrRecurringDayOfMonth;
+      spHash = await module.methods[
+        'createSpHash(address,uint256,address,((uint256),(uint256)),uint256,uint256,address,string,uint256,uint256)'
+      ](
+        tokenAddress,
+        amount,
+        payeeAddress,
+        {
+          fixedUSD: {
+            value: FEE_BASE.mul(new BN(fee.fixedUSD)).toString(),
+          },
+          percentage: {
+            value: FEE_BASE.mul(new BN(fee.percentage)).toString(),
+          },
+        },
+        executionGas,
+        maxGasPrice,
+        gasTokenAddress,
+        salt,
+        recurringDayOfMonth,
+        recurringUntil
+      ).call();
+    } else {
+      let payAt = payAtOrRecurringDayOfMonth;
+      spHash = await module.methods[
+        'createSpHash(address,uint256,address,((uint256),(uint256)),uint256,uint256,address,string,uint256)'
+      ](
+        tokenAddress,
+        amount,
+        payeeAddress,
+        {
+          fixedUSD: {
+            value: FEE_BASE.mul(new BN(fee.fixedUSD)).toString(),
+          },
+          percentage: {
+            value: FEE_BASE.mul(new BN(fee.percentage)).toString(),
+          },
+        },
+        executionGas,
+        maxGasPrice,
+        gasTokenAddress,
+        salt,
+        payAt
+      ).call();
+    }
+
+    return spHash;
+  }
+
+  async cancelScheduledPayment(txnHash: string): Promise<SuccessfulTransactionReceipt>;
+  async cancelScheduledPayment(
+    safeAddress: string,
+    moduleAddress: string,
+    spHash: string,
+    gasTokenAddress: string,
+    txnOptions?: TransactionOptions,
+    contractOptions?: ContractOptions
+  ): Promise<void>;
+  async cancelScheduledPayment(
+    safeAddressOrTxnHash: string,
+    moduleAddress?: string,
+    spHash?: string,
+    gasTokenAddress?: string,
+    txnOptions?: TransactionOptions,
+    contractOptions?: ContractOptions
+  ): Promise<SuccessfulTransactionReceipt | void> {
+    if (isTransactionHash(safeAddressOrTxnHash)) {
+      let txnHash = safeAddressOrTxnHash;
+      return await waitUntilTransactionMined(this.layer2Web3, txnHash);
+    }
+
+    if (!moduleAddress) {
+      throw new Error('moduleAddress must be specified');
+    }
+    if (!spHash) {
+      throw new Error('spHash must be specified');
+    }
+    if (!gasTokenAddress) {
+      throw new Error('gasTokenAddress must be specified');
+    }
+
+    let safeAddress = safeAddressOrTxnHash;
+    let { nonce, onNonce, onTxnHash } = txnOptions ?? {};
+    let from = contractOptions?.from ?? (await this.layer2Web3.eth.getAccounts())[0];
+
+    let scheduledPaymentModule = new this.layer2Web3.eth.Contract(ScheduledPaymentABI as AbiItem[], moduleAddress);
+    let cancelScheduledPaymentData = scheduledPaymentModule.methods.cancelScheduledPayment(spHash).encodeABI();
+
+    let estimate = await gasEstimate(
+      this.layer2Web3,
+      safeAddress,
+      moduleAddress,
+      '0',
+      cancelScheduledPaymentData,
+      Operation.CALL,
+      gasTokenAddress
+    );
+    let gasCost = new BN(estimate.safeTxGas).add(new BN(estimate.baseGas)).mul(new BN(estimate.gasPrice));
+
+    let token = new this.layer2Web3.eth.Contract(ERC20ABI as AbiItem[], gasTokenAddress);
+    let symbol = await token.methods.symbol().call();
+    let balance = new BN(await token.methods.balanceOf(safeAddress).call());
+    if (balance.lt(gasCost)) {
+      throw new Error(
+        `Safe does not have enough balance to enable scheduled payment module. The gas token ${gasTokenAddress} balance of the safe ${safeAddress} is ${fromWei(
+          balance
+        )}, the the gas cost is ${fromWei(gasCost)} ${symbol}`
+      );
+    }
+    if (nonce == null) {
+      nonce = getNextNonceFromEstimate(estimate);
+      if (typeof onNonce === 'function') {
+        onNonce(nonce);
+      }
+    }
+    let gnosisTxn = await executeTransaction(
+      this.layer2Web3,
+      safeAddress,
+      moduleAddress,
+      cancelScheduledPaymentData,
+      Operation.CALL,
+      estimate,
+      nonce,
+      await signSafeTx(
+        this.layer2Web3,
+        safeAddress,
+        moduleAddress,
+        cancelScheduledPaymentData,
+        Operation.CALL,
+        estimate,
+        nonce,
+        from,
+        this.layer2Signer
+      )
+    );
+
+    if (typeof onTxnHash === 'function') {
+      await onTxnHash(gnosisTxn.ethereumTx.txHash);
+    }
   }
 }
