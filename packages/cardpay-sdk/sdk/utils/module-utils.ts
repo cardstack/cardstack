@@ -9,7 +9,7 @@ import multiSend from '../../contracts/abi/modules/multi-send';
 import { pack } from '@ethersproject/solidity';
 import { hexDataLength, Interface, LogDescription } from 'ethers/lib/utils';
 import multiSendOnlyCall from '../../contracts/abi/modules/multi-send-call-only';
-import { Transaction } from './general-utils';
+import { getRandomInt, Transaction } from './general-utils';
 import { Log } from 'web3-core';
 
 export interface SetupArgs {
@@ -22,7 +22,7 @@ export async function deployAndSetUpModule(web3: Web3, masterCopy: Contract, set
 
   let encodeInitParams = web3.eth.abi.encodeParameters(setupArgs.types, setupArgs.values);
   let moduleSetupData = masterCopy.methods.setUp(encodeInitParams).encodeABI();
-  let saltNonce = new Date().getTime().toString();
+  let saltNonce = String(getRandomInt(1000000));
   let expectedModuleAddress = await calculateProxyAddress(
     factory,
     masterCopy.options.address,

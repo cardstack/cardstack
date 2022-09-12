@@ -304,3 +304,8 @@ export async function sendTransaction(web3: Web3, transaction: Transaction): Pro
 
   return txHash;
 }
+
+export function getRandomInt(max: number) {
+  return Math.floor(Math.random() * max);
+}
+
