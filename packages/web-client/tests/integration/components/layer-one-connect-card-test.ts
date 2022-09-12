@@ -168,7 +168,8 @@ module('Integration | Component | layer-one-connect-card', function (hooks) {
   });
 
   test('It should persist L1 address in workflow session if the wallet is already connected', async function (assert) {
-    let layer1Service = this.owner.lookup('service:layer1-network').strategy;
+    let layer1Service = this.owner.lookup('service:layer1-network')
+      .strategy as Layer1TestWeb3Strategy;
     layer1Service.test__simulateAccountsChanged(['address'], 'metamask');
     let session = new WorkflowSession();
     this.setProperties({ session });
@@ -184,7 +185,8 @@ module('Integration | Component | layer-one-connect-card', function (hooks) {
   });
 
   test('It should persist L1 address in workflow session after the wallet is connected', async function (assert) {
-    let layer1Service = this.owner.lookup('service:layer1-network').strategy;
+    let layer1Service = this.owner.lookup('service:layer1-network')
+      .strategy as Layer1TestWeb3Strategy;
     let session = new WorkflowSession();
     this.setProperties({ session });
 

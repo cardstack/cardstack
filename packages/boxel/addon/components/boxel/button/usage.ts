@@ -3,8 +3,15 @@ import Component from '@glimmer/component';
 import { tracked } from '@glimmer/tracking';
 import { action } from '@ember/object';
 import './usage.css';
+import { EmptyObject } from '@ember/component/helper';
 
-export default class extends Component {
+interface Signature {
+  Element: HTMLDivElement;
+  Args: EmptyObject;
+  Blocks: EmptyObject;
+}
+
+export default class ButtonUsage extends Component<Signature> {
   sizeVariants = ['extra-small', 'small', 'base', 'tall', 'touch'];
   kindVariants = {
     all: [

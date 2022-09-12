@@ -5,7 +5,7 @@ declare module 'web3-provider-engine' {
     blockTracker?: any;
     blockTrackerProvider?: any;
   }
-  declare class Web3ProviderEngine implements Provider {
+  class Web3ProviderEngine implements Provider {
     constructor(options?: Web3ProviderEngineOptions);
     on(event: string, handler: (...args: any[]) => void): void;
     send(payload: JSONRPCRequestPayload): void;
@@ -18,7 +18,7 @@ declare module 'web3-provider-engine' {
     start(callback?: () => void): void;
     // stop block polling
     stop(): void;
-    emit(eventName: string, ...args): void;
+    emit(eventName: string, ...args: any[]): void;
   }
   export = Web3ProviderEngine;
 }

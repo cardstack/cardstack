@@ -5,6 +5,7 @@ import HubAuthentication from '@cardstack/ssr-web/services/hub-authentication';
 import TestLayer2Web3Strategy from '@cardstack/ssr-web/utils/web3-strategies/test-layer2';
 import { settled } from '@ember/test-helpers';
 import Layer2Network from '@cardstack/ssr-web/services/layer2-network';
+import Layer2TestWeb3Strategy from '@cardstack/ssr-web/utils/web3-strategies/test-layer2';
 
 let HUB_AUTH_TOKEN = 'HUB_AUTH_TOKEN';
 let layer2AccountAddress = '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44';
@@ -28,7 +29,9 @@ module('Unit | Service | HubAuthentication', function (hooks) {
         hubAuthentication,
         'hasValidAuthentication'
       );
-      const mockLayer2 = this.owner.lookup('service:layer2-network');
+      const mockLayer2 = this.owner.lookup(
+        'service:layer2-network'
+      ) as MockLayer2;
       await settled();
 
       assert.ok(hubAuthentication.isInitializing);
@@ -48,7 +51,8 @@ module('Unit | Service | HubAuthentication', function (hooks) {
       // this is the condition for initializing with an authenticated state
       // assumption made that layer2Service.checkHubAuthenticationValid returns Promise<true>
       window.TEST__AUTH_TOKEN = HUB_AUTH_TOKEN;
-      layer2Service = this.owner.lookup('service:layer2-network').strategy;
+      layer2Service = this.owner.lookup('service:layer2-network')
+        .strategy as Layer2TestWeb3Strategy;
       await layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
     });
 

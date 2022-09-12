@@ -1,5 +1,12 @@
 import { helper } from '@ember/component/helper';
 
+interface Signature {
+  Args: {
+    Positional: [string, number, number] | [string, number] | [string];
+  };
+  Return: string;
+}
+
 export function truncateMiddle(
   [input, startLength = 6, endLength = 4]: [string, number, number] /*, hash*/
 ) {
@@ -13,4 +20,4 @@ export function truncateMiddle(
   return '';
 }
 
-export default helper(truncateMiddle);
+export default helper<Signature>(truncateMiddle);

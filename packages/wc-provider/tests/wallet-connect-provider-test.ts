@@ -265,6 +265,7 @@ describe('WalletConnectProvider', function () {
   describe('Ethers', () => {
     let web3Provider: providers.Web3Provider;
     before(async () => {
+      // @ts-expect-error it would be nice to resolve this
       web3Provider = new providers.Web3Provider(provider);
     });
     it('matches accounts', async () => {

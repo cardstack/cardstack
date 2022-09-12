@@ -25,7 +25,7 @@ class MerkleRoot:
 
 
 def setup_logging(config):
-    logging.basicConfig(level=config.log_level.upper())
+    logging.getLogger().setLevel(level=config.log_level.upper())
 
 
 def safe_regex_group_search(regex, string, group):

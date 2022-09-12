@@ -3,7 +3,11 @@
 for name in $(find packages -name node_modules -prune -o -name 'cardpay-subgraph' -prune -o -name 'tsconfig.json' -print); do
   {
   cd $(dirname $name)
-  yarn -s tsc --noEmit
+  if [[ $name == *"boxel"* || $name == *"web-client"* || $name == *"ssr-web"* ]] ; then
+    yarn -s glint
+  else
+    yarn -s tsc --noEmit
+  fi
   code=$?
   [ $code -eq 0 ] && echo PASS "$name" || echo FAIL "$name"
   exit $code

@@ -4,7 +4,7 @@ import { SafeString } from '@ember/template/-private/handlebars';
 
 export function cssUrl(
   propertyName: string,
-  url: string
+  url: string | undefined
 ): SafeString | undefined {
   if (!/^[-a-zA-Z]+$/.test(propertyName)) {
     throw new Error(`Potentially unsafe property name ${propertyName}`);
@@ -32,7 +32,7 @@ export function cssUrl(
   return htmlSafe(`${propertyName}: url("${encodedURL}")`);
 }
 
-function asHelper(params: [string, string]) {
+function asHelper(params: [string, string | undefined]) {
   return cssUrl(...params);
 }
 

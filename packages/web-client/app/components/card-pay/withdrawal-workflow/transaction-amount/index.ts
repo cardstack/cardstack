@@ -25,6 +25,7 @@ import { task, TaskGenerator } from 'ember-concurrency';
 import { reads } from 'macro-decorators';
 import * as Sentry from '@sentry/browser';
 import { TransactionReceipt } from 'web3-eth';
+import { SupportedType } from '../../../../models/workflow/workflow-session';
 
 class CardPayWithdrawalWorkflowTransactionAmountComponent extends Component<WorkflowCardComponentArgs> {
   @service declare layer1Network: Layer1Network;
@@ -206,7 +207,7 @@ class CardPayWithdrawalWorkflowTransactionAmountComponent extends Component<Work
 
       this.args.workflowSession.setValue(
         'relayTokensTxnReceipt',
-        transactionReceipt
+        transactionReceipt as SupportedType
       );
       this.args.onComplete?.();
     } catch (e) {

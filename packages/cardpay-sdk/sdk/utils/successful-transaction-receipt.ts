@@ -1,5 +1,5 @@
-import type { TransactionReceipt as MaybeSuccessfulTransactionReceipt } from 'web3-core';
+import { TransactionReceipt } from 'web3-core';
 
-export interface SuccessfulTransactionReceipt extends MaybeSuccessfulTransactionReceipt {
+export interface SuccessfulTransactionReceipt extends TransactionReceipt {
   status: true;
 }
