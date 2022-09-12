@@ -33,6 +33,8 @@
           (menu-item "LeftMainNav" (link route="docs" query=(hash s="Components" ss="<Boxel::LeftMainNav>")))
           (menu-item "About" (link route="about"))
         }}
+        @onSearchChange={{this.onSearchChange}}
+        @onSearchInput={{this.onSearchInput}}
       />
     </div>
   </:example>

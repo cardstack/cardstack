@@ -3,6 +3,7 @@ import Component from '@glimmer/component';
 import { tracked } from '@glimmer/tracking';
 import { action } from '@ember/object';
 import './usage.css';
+import { assert } from '@ember/debug';
 
 import AMPLogo from '@cardstack/boxel/usage-support/images/orgs/amp-logo.png';
 import BunnyLogo from '@cardstack/boxel/usage-support/images/orgs/bunny-logo.svg';
@@ -41,6 +42,8 @@ const USER = {
 };
 
 export default class extends Component {
+  @tracked value = '';
+
   orgs = ORGS;
   user = USER;
 
@@ -54,5 +57,18 @@ export default class extends Component {
   }
   @action clickedUser(): void {
     console.log('clicked user');
+  }
+
+  @action onSearchInput(e: InputEvent): void {
+    let target = e.target;
+    assert('target', target && target instanceof HTMLInputElement);
+    console.log('input:', target.value);
+    this.value = target.value;
+  }
+
+  @action onSearchChange(e: InputEvent): void {
+    let target = e.target;
+    assert('target', target && target instanceof HTMLInputElement);
+    console.log('change', target.value);
   }
 }

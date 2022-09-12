@@ -8,6 +8,7 @@ import OrgTitle from '../org-title';
 import Searchbox from '../searchbox';
 import { EmptyObject } from '@ember/component/helper';
 import cn from '@cardstack/boxel/helpers/cn';
+import optional from 'ember-composable-helpers/helpers/optional';
 import or from 'ember-truth-helpers/helpers/or';
 import { LinkTo } from '@ember/routing';
 import { hash } from '@ember/helper';
@@ -16,7 +17,9 @@ interface Signature {
   Element: HTMLElement,
   Args: {
     org: Org,
-    items: MenuItem[]
+    items: MenuItem[],
+    onSearchInput?: (e: InputEvent) => void;
+    onSearchChange?: (e: InputEvent) => void;
   },
   Blocks: EmptyObject
 }
@@ -38,6 +41,8 @@ export default class BoxelLeftMainNav extends Component<Signature> {
         @placeholder="Search"
         @label="Search accounts and members"
         @value=""
+        @onChange={{optional @onSearchChange}}
+        @onInput={{optional @onSearchInput}}
         class="boxel-left-main-nav__searchbox"
       />
 
