@@ -18,7 +18,7 @@ describe('ContractsService', function () {
           let web3 = new Web3();
           let mockProvider = {
             sendAsync(_, callback) {
-              callback(null, {
+              callback!(null, {
                 jsonrpc: '2.0',
                 id: resultId++,
                 result: web3.eth.abi.encodeParameter('string', protocolVersion.replace('v', '')),

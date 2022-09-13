@@ -371,67 +371,6 @@ app "ssr-web" {
   }
 }
 
-app "reward-submit" {
-  path = "./packages/reward-root-submitter"
-
-  config {
-    env = {
-      ENVIRONMENT           = "production"
-      REWARD_POOL_ADDRESS   = "0x340EB99eB9aC7DB3a3eb68dB76c6F62738DB656a"
-      REWARD_PROGRAM_OUTPUT = "s3://cardpay-production-reward-programs/"
-    }
-  }
-
-  build {
-    use "docker" {
-      dockerfile = "Dockerfile"
-    }
-
-    registry {
-      use "aws-ecr" {
-        region     = "us-east-1"
-        repository = "reward-root-submitter"
-        tag        = "latest"
-      }
-    }
-  }
-
-  deploy {
-    use "aws-ecs" {
-      region              = "us-east-1"
-      memory              = "512"
-      cluster             = "reward-root-submitter"
-      count               = 1
-      task_role_name      = "reward-submit-ecs-task"
-      execution_role_name = "reward-submit-ecs-task-execution"
-      security_group_ids  = ["sg-01c10b2d2afa89d70"]
-      disable_alb         = true
-
-      secrets = {
-        EVM_FULL_NODE_URL = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_evm_full_node_url-K67DON"
-        OWNER             = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_reward_root_submitter_address-ePRiLk"
-        OWNER_PRIVATE_KEY = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_reward_root_submitter_private_key-Eflz67"
-        SENTRY_DSN        = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_reward_root_submitter_sentry_dsn-DjQjLC"
-      }
-    }
-
-    hook {
-      when    = "after"
-      command = ["node", "./scripts/waypoint-ecs-add-tags.mjs", "reward-submit"]
-    }
-
-    hook {
-      when    = "after"
-      command = ["node", "./scripts/wait-service-stable.mjs", "reward-submit"]
-    }
-  }
-
-  url {
-    auto_hostname = false
-  }
-}
-
-
 app "reward-submit-lambda" {
   path = "./packages/reward-root-submitter"
 

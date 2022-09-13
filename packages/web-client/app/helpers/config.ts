@@ -9,7 +9,9 @@ export default class extends Helper {
   constructor() {
     super(...arguments);
 
-    this.config = getOwner(this).resolveRegistration('config:environment');
+    this.config = (getOwner(this) as any).resolveRegistration(
+      'config:environment'
+    );
   }
 
   compute([path]: [string]) {

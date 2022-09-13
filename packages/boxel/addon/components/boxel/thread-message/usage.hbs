@@ -192,10 +192,14 @@
           <Boxel::Header @header="Card 1" />
           <p>Card 1 Content...</p>
           <Boxel::ActionChin
-            @mode={{if this.isComplete "memorialized" "data-entry"}}
-            @buttonText="Click to toggle card width"
-            @onClickButton={{this.toggleIsComplete}}
-          />
+            @state={{if this.isComplete "memorialized" "default"}}>
+            <:default as |d|>
+              <d.ActionButton {{on "click" this.toggleIsComplete}}>Click to toggle card completion</d.ActionButton>
+            </:default>
+            <:memorialized as |m|>
+              <m.ActionButton {{on "click" this.toggleIsComplete}}>Click to toggle card completion</m.ActionButton>
+            </:memorialized>
+          </Boxel::ActionChin>
         </Boxel::CardContainer>
       </Boxel::ThreadMessage>
       <Boxel::ThreadMessage
@@ -228,10 +232,15 @@
           <Boxel::Header @header="Card 3" />
           <p>Card 3 Content...</p>
           <Boxel::ActionChin
-            @mode={{if this.layoutExampleFullWidth "memorialized" "data-entry"}}
-            @buttonText="Click to toggle card width"
-            @onClickButton={{this.toggleLayoutExampleFullWidth}}
-          />
+            @state={{if this.layoutExampleFullWidth  "memorialized" "default"}}>
+            <:default as |d|>
+              <d.ActionButton {{on "click" this.toggleLayoutExampleFullWidth}}>Click to toggle card completion</d.ActionButton>
+            </:default>
+            <:memorialized as |m|>
+              <m.ActionButton {{on "click" this.toggleLayoutExampleFullWidth}}>Click to toggle card completion</m.ActionButton>
+            </:memorialized>
+              
+          </Boxel::ActionChin>
         </Boxel::CardContainer>
       </Boxel::ThreadMessage>
     </div>

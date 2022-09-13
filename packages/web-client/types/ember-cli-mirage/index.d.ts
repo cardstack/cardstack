@@ -12,6 +12,7 @@ import {
   Server as MirageServer,
 } from 'miragejs';
 
+// @ts-ignore We're currently not trying to make mirage typecheck b/c it is a lot of work with low payoff
 import { Registry } from '<app-name>/mirage/registry';
 
 /**

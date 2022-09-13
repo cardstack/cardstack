@@ -25,7 +25,7 @@ export default class ModalUsage extends Component {
 
   @tracked maxWidthOverride: string | undefined;
 
-  get maxWidth() {
+  get maxWidth(): string | undefined {
     if (isBlank(this.maxWidthOverride)) {
       return this.maxWidths[this.sizeAsString || '<undefined>'];
     } else {

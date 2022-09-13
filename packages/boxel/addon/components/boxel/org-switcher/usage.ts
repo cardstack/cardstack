@@ -2,16 +2,10 @@ import Component from '@glimmer/component';
 import { tracked } from '@glimmer/tracking';
 import { action } from '@ember/object';
 import { A } from '@ember/array';
+import { Org } from './org';
 
 import BunnyLogo from '@cardstack/boxel/usage-support/images/orgs/bunny-logo.svg';
 import CRDLogo from '@cardstack/boxel/usage-support/images/orgs/crd-logo.svg';
-
-interface ExampleOrg {
-  id: string;
-  title: string;
-  iconURL: string;
-  brandColor: string;
-}
 
 const ORGS = [
   {
@@ -35,11 +29,11 @@ const ORGS = [
     id: 'org4',
     title: 'DSP',
   },
-] as ExampleOrg[];
+] as Org[];
 
-export default class extends Component {
+export default class OrgSwitcherUsage extends Component {
   @tracked orgs = A(ORGS);
-  @tracked currentOrg: ExampleOrg | undefined = ORGS[0];
+  @tracked currentOrg: Org | undefined = ORGS[0];
   @action onChooseOrg(orgId: string): void {
     this.currentOrg = ORGS.find((o) => o.id === orgId);
   }

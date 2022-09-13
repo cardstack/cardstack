@@ -548,10 +548,11 @@ export default abstract class Layer2ChainWeb3Strategy
     receiver: ChainAddress
   ): Promise<TransactionReceipt> {
     let tokenBridge = await getSDK('TokenBridgeHomeSide', this.web3);
-    return tokenBridge.waitForBridgingToLayer2Completed(
+    let receipt = await tokenBridge.waitForBridgingToLayer2Completed(
       receiver,
       fromBlock.toString()
     );
+    return receipt;
   }
 
   async bridgeToLayer1(
@@ -565,19 +566,21 @@ export default abstract class Layer2ChainWeb3Strategy
     let tokenAddress = new TokenContractInfo(tokenSymbol, this.networkSymbol)!
       .address;
 
-    return await tokenBridge.relayTokens(
+    let receipt = await tokenBridge.relayTokens(
       safeAddress,
       tokenAddress,
       receiverAddress,
       amountInWei,
       options
     );
+    return receipt;
   }
 
   async resumeBridgeToLayer1(txnHash: string) {
     let tokenBridge = await getSDK('TokenBridgeHomeSide', this.web3);
 
-    return await tokenBridge.relayTokens(txnHash);
+    let receipt = await tokenBridge.relayTokens(txnHash);
+    return receipt;
   }
 
   async awaitBridgedToLayer1(

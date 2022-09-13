@@ -1,5 +1,5 @@
 import { module, test } from 'qunit';
-import hbs from 'htmlbars-inline-precompile';
+import { hbs } from 'ember-cli-htmlbars';
 import { setupRenderingTest } from 'ember-qunit';
 import { render } from '@ember/test-helpers';
 import { cssUrl } from '@cardstack/boxel/helpers/css-url';

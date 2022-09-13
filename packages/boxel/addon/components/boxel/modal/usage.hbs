@@ -9,13 +9,16 @@
   @onClose={{this.onClose}}
   @isOpen={{this.isOpen}}
   aria-labelledby="boxel-modal-usage-example-id"
-  style={{css-var
-    boxel-modal-max-width=this.maxWidth
-    boxel-modal-offset-top=this.offsetTop
-    boxel-modal-offset-left=this.offsetLeft
-    boxel-modal-offset-right=this.offsetRight
-  }}
->
+  style={{html-safe (
+      concat (css-var
+        boxel-modal-offset-top=this.offsetTop
+        boxel-modal-offset-left=this.offsetLeft
+        boxel-modal-offset-right=this.offsetRight
+      )
+      "; "
+      (if this.maxWidthOverride (css-var boxel-modal-max-width=this.maxWidthOverride) "")
+    )
+  }}>
   <Boxel::CardContainer class="boxel-modal-usage-container">
     <h2 id="boxel-modal-usage-example-id">Boxel Modal</h2>
     <p>

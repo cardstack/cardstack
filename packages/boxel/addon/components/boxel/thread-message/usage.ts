@@ -7,13 +7,14 @@ import './usage.css';
 import LolaSampsonThumb from '@cardstack/boxel/usage-support/images/users/Lola-Sampson.jpg';
 import CardBot from '@cardstack/boxel/usage-support/images/orgs/cardbot.svg';
 
-export default class ThreadMessageUsageComponent extends Component {
+export default class ThreadMessageUsage extends Component {
   cardbotIcon = CardBot;
   @tracked name = 'Lola Sampson';
   @tracked imgURL = LolaSampsonThumb;
   @tracked datetime = '2020-03-07T10:11';
   @tracked notRound = false;
   @tracked hideMeta = false;
+  @tracked hideName = false;
   @tracked messageArray = A([
     'Hello, it’s nice to see you!',
     'Let’s issue a Prepaid Card.',
