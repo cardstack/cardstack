@@ -21,7 +21,7 @@
 }
 
 .boxel-left-main-nav__searchbox {
-  width: calc(100% - var(--gutter-width) * 1.75);
+  width: calc(100% - var(--gutter-width) * 2);
   margin: 0 var(--gutter-width);
 }
 

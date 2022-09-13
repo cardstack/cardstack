@@ -10,7 +10,7 @@
 }
 
 .boxel-searchbox--hide-icon {
-  --boxel-searchbox-icon-size: 0.01rem;
+  --boxel-searchbox-icon-size: calc(-1 * var(--boxel-sp-xxs));
 }
 
 .boxel-searchbox__input {
