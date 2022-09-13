@@ -24,7 +24,7 @@
 </Boxel::Modal>
 </:example>
 <:api as |Args|>
-  <Args.String @name="size" @description="Can be `small`, `medium`, `large`, or unspecified. Sets a predetermined max-width to inner modal." @value={{this.sizeAsString}} @options={{array "small" "medium" "large" "<undefined>"}} @onInput={{this.updateSize}} @defaultValue="65rem" />
+  <Args.String @name="size" @description="Can be `small`, `medium`, `large`, or unspecified. Sets a predetermined max-width to inner modal." @value={{this.sizeAsString}} @options={{array "small" "medium" "large" "<undefined>"}} @onInput={{this.updateSize}} @defaultValue="<undefined>" />
   <Args.String @name="--boxel-modal-offset-right" @description="Right offset for the inner modal" @value={{this.offsetRight}} @onInput={{fn (mut this.offsetRight)}} @optional={{true}} @defaultValue="0px" />
   <Args.String @name="--boxel-modal-offset-left" @description="Left offset for the inner modal" @value={{this.offsetLeft}} @onInput={{fn (mut this.offsetLeft)}} @optional={{true}} @defaultValue="0px" />
   <Args.String @name="--boxel-modal-offset-top" @description="Top offset for the inner modal" @value={{this.offsetTop}} @onInput={{fn (mut this.offsetTop)}} @optional={{true}} @defaultValue="0px" />
