@@ -1,4 +1,4 @@
-import HDWalletProvider from 'parity-hdwallet-provider';
+import HDWalletProvider from '@truffle/hdwallet-provider';
 import Web3 from 'web3';
 import { Wallet, Signer } from 'ethers';
 import { AbstractProvider } from 'web3-core';
