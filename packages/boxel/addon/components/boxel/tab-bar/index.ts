@@ -9,7 +9,7 @@ interface TabBarArgs {
 }
 
 export default class TabBar extends Component<TabBarArgs> {
-  get linkItems() {
+  get linkItems(): MenuItem[] {
     return this.args.items.filter((item) => item.action instanceof Link);
   }
 }

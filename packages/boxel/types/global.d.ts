@@ -15,7 +15,7 @@ import { ComponentLike, HelperLike } from '@glint/template';
 import { svgJar } from '@cardstack/boxel/utils/svg-jar';
 import cssUrl from '@cardstack/boxel/helpers/css-url';
 import cssVar from '@cardstack/boxel/helpers/css-var';
-import { EmptyObject } from '@ember/component/helper';
+import { type EmptyObject } from '@ember/component/helper';
 import { Link, LinkParams } from 'ember-link';
 import menuDivider from '@cardstack/boxel/helpers/menu-divider';
 import { MenuItem } from '@cardstack/boxel/helpers/menu-item';

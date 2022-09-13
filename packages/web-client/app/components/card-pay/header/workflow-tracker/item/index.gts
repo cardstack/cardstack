@@ -24,7 +24,7 @@ import { MILESTONE_TITLES as PREPAID_CARD_ISSUANCE_MILESTONES } from '@cardstack
 import { MILESTONE_TITLES as RESERVE_POOL_DEPOSIT_MILESTONES } from '@cardstack/web-client/components/card-pay/deposit-workflow';
 import { MILESTONE_TITLES as WITHDRAWAL_MILESTONES } from '@cardstack/web-client/components/card-pay/withdrawal-workflow';
 import { tracked } from '@glimmer/tracking';
-import { EmptyObject } from '@ember/component/helper';
+import { type EmptyObject } from '@ember/component/helper';
 
 const WORKFLOW_TITLE_TO_MILESTONES: Record<CardPayWorkflowName, string[]> = {
   PREPAID_CARD_ISSUANCE: PREPAID_CARD_ISSUANCE_MILESTONES,

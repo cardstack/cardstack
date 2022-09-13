@@ -2,7 +2,7 @@ import { inject as service } from '@ember/service';
 import DegradedServiceDetector from '@cardstack/web-client/services/degraded-service-detector';
 import { reads } from 'macro-decorators';
 import Component from '@glimmer/component';
-import { EmptyObject } from '@ember/component/helper';
+import { type EmptyObject } from '@ember/component/helper';
 
 interface Signature {
   Element: HTMLDivElement;

@@ -32,6 +32,7 @@ consumeModule(RegisterRewardeeHandlerABI);
 consumeModule(SupplierManagerABI);
 
 const KOVAN = {
+  gnosisSafeMasterCopy: '0xd9Db270c1B5E3Bd161E8c8503c55cEABeE709552',
   gnosisProxyFactory_v1_2: '0x76E2cFc1F5Fa8F6a5b3fC4c8F4788F0116861F9B',
   gnosisProxyFactory_v1_3: '0xa6B71E26C5e0845f74c812102Ca7114b6a896AB2',
   cardToken: '0x17d030616A9879C1Bc7e8764E9D80Ec289d4C7AE',
@@ -47,6 +48,7 @@ const KOVAN = {
   metaGuard: '0xe2847462a574bfd43014d1c7BB6De5769C294691',
 };
 const SOKOL = {
+  gnosisSafeMasterCopy: '0xd9Db270c1B5E3Bd161E8c8503c55cEABeE709552',
   gnosisProxyFactory_v1_2: '0x76E2cFc1F5Fa8F6a5b3fC4c8F4788F0116861F9B',
   gnosisProxyFactory_v1_3: '0xa6B71E26C5e0845f74c812102Ca7114b6a896AB2',
   homeBridge: '0xf9906aD189CC61d0158Cbc770cFB726a084bc6e0',
@@ -88,6 +90,7 @@ const SOKOL = {
   scheduledPaymentExchange: '0xc57E8dEB3149d872aec0156D527F93393002555F',
   scheduledPaymentModule: '0x30e49Fe3cbEC0459eC3799b0B28560dE9594F257',
   multiSend: '0xA238CBeb142c10Ef7Ad8442C6D1f9E89e07e7761',
+  multiSendCallOnly: '0x40A2aCCbd92BCA938b02010E17A5b8929b49130D',
   moduleProxyFactory: '0x00000000000DC7F163742Eb4aBEf650037b1f588',
   metaGuard: '0xe2847462a574bfd43014d1c7BB6De5769C294691',
 };

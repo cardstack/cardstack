@@ -2,7 +2,7 @@ import Component from '@glimmer/component';
 import { inject as service } from '@ember/service';
 import { tracked } from '@glimmer/tracking';
 import WorkflowPersistence from '@cardstack/web-client/services/workflow-persistence';
-import { EmptyObject } from '@ember/component/helper';
+import { type EmptyObject } from '@ember/component/helper';
 import BoxelButton from '@cardstack/boxel/components/boxel/button';
 import { on } from '@ember/modifier';
 import toggle from 'ember-composable-helpers/helpers/toggle';
