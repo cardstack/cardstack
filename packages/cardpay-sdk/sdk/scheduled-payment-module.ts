@@ -484,11 +484,20 @@ export default class ScheduledPaymentModule {
     return [nonce, estimate, payload];
   }
 
+  async schedulePayment(txnHash: string): Promise<SuccessfulTransactionReceipt>;
   async schedulePayment(
-    senderSafeAddressOrTxnHash: string,
+    senderSafeAddress: string,
     moduleAddress: string,
     tokenAddress: string,
     spHash: string,
+    signature?: Signature | null,
+    txnOptions?: TransactionOptions
+  ): Promise<SuccessfulTransactionReceipt>;
+  async schedulePayment(
+    senderSafeAddressOrTxnHash: string,
+    moduleAddress?: string,
+    tokenAddress?: string,
+    spHash?: string,
     signature?: Signature | null,
     txnOptions?: TransactionOptions
   ): Promise<SuccessfulTransactionReceipt> {
