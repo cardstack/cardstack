@@ -386,7 +386,7 @@ export default class ScheduledPaymentModule {
     let balance = new BN(await token.methods.balanceOf(safeAddress).call());
     if (balance.lt(gasCost)) {
       throw new Error(
-        `Safe does not have enough balance to enable scheduled payment module. The gas token ${gasTokenAddress} balance of the safe ${safeAddress} is ${fromWei(
+        `Safe does not have enough balance to cancel scheduled payment. The gas token ${gasTokenAddress} balance of the safe ${safeAddress} is ${fromWei(
           balance
         )}, the the gas cost is ${fromWei(gasCost)} ${symbol}`
       );
