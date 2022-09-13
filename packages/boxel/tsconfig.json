@@ -65,7 +65,6 @@
         "addon/components/boxel/drop-target/**/*",
         "addon/components/boxel/field/**/*",
         "addon/components/boxel/expandable-banner/**/*",
-        "addon/components/boxel/help-box/**/*",
         "addon/components/boxel/icon-button/**/*",
         "addon/components/boxel/infobox/**/*",
         "addon/components/boxel/input/**/*",
