@@ -1,0 +1,23 @@
+<nav role="tablist" class={{cn "boxel-tab-bar" @class}} ...attributes>
+  {{#if this.linkItems}}
+    {{#each this.linkItems as |tab|}}
+      <div
+        role="none"
+        class={{cn
+          "boxel-tab-bar__item"
+          boxel-tab-bar__item--is-active=tab.action.isActive
+        }}
+      >
+        {{!-- template-lint-disable require-context-role --}}
+        <LinkTo
+          @route={{tab.action.routeName}}
+          @query={{or tab.action.queryParams (hash)}}
+          role="tab"
+          data-text={{tab.text}}
+        >
+          {{tab.text}}
+        </LinkTo>
+      </div>
+    {{/each}}
+  {{/if}}
+</nav>

@@ -27,7 +27,7 @@ import {
   getParamsFromEvent,
   Operation,
 } from './utils/safe-utils';
-import { Signer } from 'ethers';
+import { Signer, utils } from 'ethers';
 import { signSafeTx, signSafeTxAsBytes } from './utils/signing-utils';
 import { BN } from 'bn.js';
 import { ERC20ABI, waitUntilTransactionMined } from '..';
@@ -44,6 +44,13 @@ export interface CreateSafeWithModuleAndGuardResult {
   scheduledPaymentModuleAddress: string;
   metaGuardAddress: string;
 }
+
+export interface Fee {
+  fixedUSD: number;
+  percentage: number;
+}
+export const FEE_BASE_POW = new BN(18);
+export const FEE_BASE = new BN(10).pow(FEE_BASE_POW);
 
 export default class ScheduledPaymentModule {
   constructor(private layer2Web3: Web3, private layer2Signer?: Signer) {}
@@ -319,5 +326,102 @@ export default class ScheduledPaymentModule {
       scheduledPaymentModuleAddress,
       metaGuardAddress,
     };
+  }
+
+  async estimateExecutionGas(
+    moduleAddress: string,
+    tokenAddress: string,
+    amount: string,
+    payeeAddress: string,
+    fee: Fee,
+    maxGasPrice: string,
+    gasTokenAddress: string,
+    salt: string,
+    payAt: number,
+    gasPrice: string
+  ): Promise<number>;
+  async estimateExecutionGas(
+    moduleAddress: string,
+    tokenAddress: string,
+    amount: string,
+    payeeAddress: string,
+    fee: Fee,
+    maxGasPrice: string,
+    gasTokenAddress: string,
+    salt: string,
+    recurringDayOfMonth: number,
+    gasPrice: string,
+    recurringUntil?: number
+  ): Promise<number>;
+  async estimateExecutionGas(
+    moduleAddress: string,
+    tokenAddress: string,
+    amount: string,
+    payeeAddress: string,
+    fee: Fee,
+    maxGasPrice: string,
+    gasTokenAddress: string,
+    salt: string,
+    payAtOrRecurringDayOfMonth: number,
+    gasPrice: string,
+    recurringUntil?: number
+  ): Promise<number> {
+    let requiredGas;
+    try {
+      let module = new this.layer2Web3.eth.Contract(ScheduledPaymentABI as AbiItem[], moduleAddress);
+      if (recurringUntil) {
+        let recurringDayOfMonth = payAtOrRecurringDayOfMonth;
+        await module.methods[
+          'estimateExecutionGas(address,uint256,address,((uint256),(uint256)),uint256,address,string,uint256,uint256,uint256)'
+        ](
+          tokenAddress,
+          amount,
+          payeeAddress,
+          {
+            fixedUSD: {
+              value: FEE_BASE.mul(new BN(fee.fixedUSD)).toString(),
+            },
+            percentage: {
+              value: FEE_BASE.mul(new BN(fee.percentage)).toString(),
+            },
+          },
+          maxGasPrice,
+          gasTokenAddress,
+          salt,
+          recurringDayOfMonth,
+          recurringUntil,
+          gasPrice
+        ).estimateGas();
+      } else {
+        let payAt = payAtOrRecurringDayOfMonth;
+        await module.methods[
+          'estimateExecutionGas(address,uint256,address,((uint256),(uint256)),uint256,address,string,uint256,uint256)'
+        ](
+          tokenAddress,
+          amount,
+          payeeAddress,
+          {
+            fixedUSD: {
+              value: FEE_BASE.mul(new BN(fee.fixedUSD)).toString(),
+            },
+            percentage: {
+              value: FEE_BASE.mul(new BN(fee.percentage)).toString(),
+            },
+          },
+          maxGasPrice,
+          gasTokenAddress,
+          salt,
+          payAt,
+          gasPrice
+        ).estimateGas();
+      }
+    } catch (e: any) {
+      let _interface = new utils.Interface(['error GasEstimation(uint256 gas)']);
+      let messages = e.message.split(' ');
+      let decodedError = _interface.parseError(messages[2].replace(',', ''));
+      requiredGas = decodedError.args[0].toNumber();
+    }
+
+    return requiredGas;
   }
 }

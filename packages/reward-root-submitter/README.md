@@ -58,6 +58,30 @@ For example
 
     ENVIRONMENT=staging python -m reward_root_submitter.manual  s3://cardpay-staging-reward-programs/rewardProgramID=0x0885ce31D73b63b0Fcb1158bf37eCeaD8Ff0fC72/paymentCycle=27071744/results.parquet
 
+Additionally, you can run the lambda function based off an uploaded private ECR image.
+
+    aws ecr get-login-password --region <region> | docker login --username AWS --password-stdin <aws_account_id>.dkr.ecr.region.amazonaws.com
+
+    docker pull <ecr image uri> <image_name>:latest
+
+    docker run -e AWS_ACCESS_KEY_ID=<**> -e AWS_SECRET_ACCESS_KEY=<**> -e AWS_DEFAULT_REGION=<region> --env-file .env -p 9000:8080 <image_name>:latest
+
+    curl --location --request POST 'http://localhost:9000/2015-03-31/functions/function/invocations' \
+        --header 'Content-Type: application/json' \
+        --data-raw '{
+            "Records": [
+                {
+                    "s3": {
+                        "bucket": {
+                            "name": <bucket name OR path to payment cycle directory>
+                        },
+                        "object": {
+                            "key": <name of parquet file>
+                        }
+                    }
+                }
+            ]
+        }'
 
 ## Updating ABIs
 
@@ -81,7 +105,6 @@ Then updating the function in lambda (this also waits for the new one to be live
      aws lambda update-function-code --function-name reward_root_submitter --image-uri $(aws lambda get-function --function-name reward_root_submitter | jq -r '.Code.ImageUri') && time aws lambda wait function-updated --function-name reward_root_submitter
 
 These steps are combined in the github action
-
 ## Issues running on M1
 
 If you use an m1 (arm64 architecture) you may encounter errors when sub-dependencies do not have arm64 distribution.

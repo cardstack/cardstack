@@ -28,8 +28,12 @@
       "@cardstack/ssr-web/*": [
         "app/*"
       ],
+      "@cardstack/boxel/*": [
+        "../boxel/addon/*"
+      ],
       "*": [
-        "types/*"
+        "types/*",
+        "../boxel/types/*"
       ],
       "@glimmer/tracking": [
         "../../node_modules/ember-cached-decorator-polyfill",
@@ -38,6 +42,27 @@
       "@ember/destroyable": ["../../node_modules/ember-destroyable-polyfill"],
       "@cardstack/ssr-web/mirage/*": ["mirage/*"],
       "web3-provider-engine": ["../../types/web3-provider-engine"]
+    }
+  },
+  "glint": {
+    "environment": ["ember-loose", "ember-template-imports"],
+    "transform": {
+      "include": [
+        "../boxel/addon/components/boxel/action-chin/**/*",
+        "../boxel/addon/components/boxel/button/**/*",
+        "../boxel/addon/components/boxel/card-container/**/*",
+        "../boxel/addon/components/boxel/dashboard/**/*",
+        "../boxel/addon/components/boxel/header/**/*",
+        "../boxel/addon/components/boxel/left-edge-nav/**/*",
+        "../boxel/addon/components/boxel/loading-indicator/**/*",
+        "../boxel/addon/components/boxel/modal/**/*",
+        "../boxel/addon/components/boxel/org-header/**/*",
+        "../boxel/addon/components/boxel/org-switcher/**/*",
+        "../boxel/addon/components/boxel/org-title/**/*",
+        "../boxel/addon/components/boxel/progress-icon/**/*",
+        "app/components/profile/**/*",
+        "app/components/profile-logo/**/*",
+      ]
     }
   },
   "include": [

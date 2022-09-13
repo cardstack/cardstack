@@ -10,6 +10,7 @@ import { generateMerchantPaymentUrl } from '@cardstack/cardpay-sdk';
 import config from '@cardstack/ssr-web/config/environment';
 import Service from '@ember/service';
 import sinon from 'sinon';
+import Layer2TestWeb3Strategy from '@cardstack/ssr-web/utils/web3-strategies/test-layer2';
 
 let HUB_AUTH_TOKEN = 'HUB_AUTH_TOKEN';
 let layer2AccountAddress = '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44';
@@ -216,7 +217,8 @@ module('Acceptance | visit profile', function (hooks) {
           // this is the condition for initializing with an authenticated state
           // assumption made that layer2Service.checkHubAuthenticationValid returns Promise<true>
           window.TEST__AUTH_TOKEN = HUB_AUTH_TOKEN;
-          layer2Service = this.owner.lookup('service:layer2-network').strategy;
+          layer2Service = this.owner.lookup('service:layer2-network')
+            .strategy as Layer2TestWeb3Strategy;
           await layer2Service.test__simulateAccountsChanged([
             layer2AccountAddress,
           ]);
@@ -238,7 +240,8 @@ module('Acceptance | visit profile', function (hooks) {
     module('authed but not owner', function (this: MirageTestContext, hooks) {
       hooks.beforeEach(async function (this: MirageTestContext) {
         window.TEST__AUTH_TOKEN = HUB_AUTH_TOKEN;
-        layer2Service = this.owner.lookup('service:layer2-network').strategy;
+        layer2Service = this.owner.lookup('service:layer2-network')
+          .strategy as Layer2TestWeb3Strategy;
         await layer2Service.test__simulateAccountsChanged([
           otherLayer2AccountAddress,
         ]);

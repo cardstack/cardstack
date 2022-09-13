@@ -205,12 +205,6 @@ export default [
     inputs: [
       {
         indexed: false,
-        internalType: 'uint256',
-        name: 'nonce',
-        type: 'uint256',
-      },
-      {
-        indexed: false,
         internalType: 'bytes32',
         name: 'spHash',
         type: 'bytes32',
@@ -423,13 +417,18 @@ export default [
         type: 'address',
       },
       {
+        internalType: 'string',
+        name: 'salt',
+        type: 'string',
+      },
+      {
         internalType: 'uint256',
-        name: '_nonce',
+        name: 'recursDayOfMonth',
         type: 'uint256',
       },
       {
         internalType: 'uint256',
-        name: 'payAt',
+        name: 'until',
         type: 'uint256',
       },
     ],
@@ -508,18 +507,13 @@ export default [
         type: 'address',
       },
       {
-        internalType: 'uint256',
-        name: '_nonce',
-        type: 'uint256',
+        internalType: 'string',
+        name: 'salt',
+        type: 'string',
       },
       {
         internalType: 'uint256',
-        name: 'recursDayOfMonth',
-        type: 'uint256',
-      },
-      {
-        internalType: 'uint256',
-        name: 'until',
+        name: 'payAt',
         type: 'uint256',
       },
     ],
@@ -593,9 +587,9 @@ export default [
         type: 'address',
       },
       {
-        internalType: 'uint256',
-        name: '_nonce',
-        type: 'uint256',
+        internalType: 'string',
+        name: 'salt',
+        type: 'string',
       },
       {
         internalType: 'uint256',
@@ -678,9 +672,9 @@ export default [
         type: 'address',
       },
       {
-        internalType: 'uint256',
-        name: '_nonce',
-        type: 'uint256',
+        internalType: 'string',
+        name: 'salt',
+        type: 'string',
       },
       {
         internalType: 'uint256',
@@ -786,13 +780,18 @@ export default [
         type: 'address',
       },
       {
+        internalType: 'string',
+        name: 'salt',
+        type: 'string',
+      },
+      {
         internalType: 'uint256',
-        name: '_nonce',
+        name: 'recursDayOfMonth',
         type: 'uint256',
       },
       {
         internalType: 'uint256',
-        name: 'payAt',
+        name: 'until',
         type: 'uint256',
       },
       {
@@ -870,18 +869,13 @@ export default [
         type: 'address',
       },
       {
-        internalType: 'uint256',
-        name: '_nonce',
-        type: 'uint256',
+        internalType: 'string',
+        name: 'salt',
+        type: 'string',
       },
       {
         internalType: 'uint256',
-        name: 'recursDayOfMonth',
-        type: 'uint256',
-      },
-      {
-        internalType: 'uint256',
-        name: 'until',
+        name: 'payAt',
         type: 'uint256',
       },
       {
@@ -943,19 +937,6 @@ export default [
       },
     ],
     name: 'lastPaidAt',
-    outputs: [
-      {
-        internalType: 'uint256',
-        name: '',
-        type: 'uint256',
-      },
-    ],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    inputs: [],
-    name: 'nonce',
     outputs: [
       {
         internalType: 'uint256',

@@ -424,66 +424,6 @@ app "ssr-web" {
   }
 }
 
-app "reward-submit" {
-  path = "./packages/reward-root-submitter"
-
-  config {
-    env = {
-      ENVIRONMENT           = "staging"
-      REWARD_POOL_ADDRESS   = "0xcF8852D1aD746077aa4C31B423FdaE5494dbb57A"
-      REWARD_PROGRAM_OUTPUT = "s3://cardpay-staging-reward-programs/"
-    }
-  }
-
-  build {
-    use "docker" {
-      dockerfile = "Dockerfile"
-    }
-
-    registry {
-      use "aws-ecr" {
-        region     = "us-east-1"
-        repository = "reward-root-submitter"
-        tag        = "latest"
-      }
-    }
-  }
-
-  deploy {
-    use "aws-ecs" {
-      region              = "us-east-1"
-      memory              = "512"
-      cluster             = "reward-root-submitter"
-      count               = 1
-      task_role_name      = "reward-submit-ecs-task"
-      execution_role_name = "reward-submit-ecs-task-execution"
-      security_group_ids  = ["sg-02c974bee0cb9a34e"]
-      disable_alb         = true
-
-      secrets = {
-        EVM_FULL_NODE_URL = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_evm_full_node_url-NBKUCq"
-        OWNER             = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_reward_root_submitter_address-5zx4lK"
-        OWNER_PRIVATE_KEY = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_reward_root_submitter_private_key-4BFs6t"
-        SENTRY_DSN        = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_reward_root_submitter_sentry_dsn-npg871"
-      }
-    }
-
-    hook {
-      when    = "after"
-      command = ["node", "./scripts/waypoint-ecs-add-tags.mjs", "reward-submit"]
-    }
-
-    hook {
-      when    = "after"
-      command = ["node", "./scripts/wait-service-stable.mjs", "reward-submit"]
-    }
-  }
-
-  url {
-    auto_hostname = false
-  }
-}
-
 app "reward-submit-lambda" {
   path = "./packages/reward-root-submitter"
 

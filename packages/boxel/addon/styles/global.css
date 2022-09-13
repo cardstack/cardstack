@@ -70,7 +70,8 @@ button:focus:not(:focus-visible),
 }
 
 input:focus,
-select:focus {
+select:focus,
+textarea:focus {
   outline-color: var(--boxel-highlight);
 }
 

@@ -184,6 +184,7 @@ module('@core | compiler-adoption', function (hooks) {
         files: {
           'schema.js': `
             import { adopts } from "@cardstack/types";
+import { CardService } from '../../../core/src/interfaces';
             import Person from "${LOCAL_REALM}person";
 
             export default @adopts(Person) class User {}

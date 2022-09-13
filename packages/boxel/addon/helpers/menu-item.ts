@@ -15,7 +15,7 @@ interface MenuItemOptions {
   header: boolean;
   icon: string;
 }
-class MenuItem {
+export class MenuItem {
   text: string;
   type: string;
   dangerous: boolean;
@@ -39,7 +39,10 @@ class MenuItem {
   }
 }
 
-export default Helper.helper(function (params, hash: MenuItemOptions) {
+export default Helper.helper(function (
+  params: [string, (() => void)?],
+  hash: MenuItemOptions
+) {
   let text = params[0];
   let opts = Object.assign({}, hash);
   if (params.length === 1 && /^-+$/.test(text)) {
@@ -48,6 +51,8 @@ export default Helper.helper(function (params, hash: MenuItemOptions) {
   if (params.length === 1 && opts.url) {
     return new MenuItem(text, 'url', opts);
   }
-  opts.action = params[1];
+  if (params[1]) {
+    opts.action = params[1];
+  }
   return new MenuItem(text, 'action', opts);
 });

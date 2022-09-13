@@ -32,7 +32,7 @@ module('Acceptance | deposit persistence', function (hooks) {
   hooks.beforeEach(async function () {
     workflowPersistenceService = this.owner.lookup(
       'service:workflow-persistence'
-    );
+    ) as WorkflowPersistence;
 
     let layer1AccountAddress = '0xaCD5f5534B756b856ae3B2CAcF54B3321dd6654Fb6';
     let layer1Service = this.owner.lookup('service:layer1-network')
@@ -114,6 +114,7 @@ module('Acceptance | deposit persistence', function (hooks) {
           to: '',
           contractAddress: '',
           cumulativeGasUsed: 1,
+          effectiveGasPrice: 1,
           gasUsed: 1,
           logs: [],
           logsBloom: '',
@@ -172,6 +173,7 @@ module('Acceptance | deposit persistence', function (hooks) {
           to: '',
           contractAddress: '',
           cumulativeGasUsed: 1,
+          effectiveGasPrice: 1,
           gasUsed: 1,
           logs: [],
           logsBloom: '',
@@ -187,6 +189,7 @@ module('Acceptance | deposit persistence', function (hooks) {
           from: '',
           to: '',
           contractAddress: '',
+          effectiveGasPrice: 1,
           cumulativeGasUsed: 1,
           gasUsed: 1,
           logs: [],
@@ -255,6 +258,7 @@ module('Acceptance | deposit persistence', function (hooks) {
           to: '',
           contractAddress: '',
           cumulativeGasUsed: 1,
+          effectiveGasPrice: 1,
           gasUsed: 1,
           logs: [],
           logsBloom: '',
@@ -271,6 +275,7 @@ module('Acceptance | deposit persistence', function (hooks) {
           to: '',
           contractAddress: '',
           cumulativeGasUsed: 1,
+          effectiveGasPrice: 1,
           gasUsed: 1,
           logs: [],
           logsBloom: '',
@@ -286,6 +291,7 @@ module('Acceptance | deposit persistence', function (hooks) {
           from: '',
           to: '',
           contractAddress: '',
+          effectiveGasPrice: 1,
           cumulativeGasUsed: 1,
           gasUsed: 1,
           logs: [],
@@ -506,6 +512,7 @@ module('Acceptance | deposit persistence', function (hooks) {
           to: '',
           contractAddress: '',
           cumulativeGasUsed: 1,
+          effectiveGasPrice: 1,
           gasUsed: 1,
           logs: [],
           logsBloom: '',
@@ -522,6 +529,7 @@ module('Acceptance | deposit persistence', function (hooks) {
           to: '',
           contractAddress: '',
           cumulativeGasUsed: 1,
+          effectiveGasPrice: 1,
           gasUsed: 1,
           logs: [],
           logsBloom: '',
