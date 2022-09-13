@@ -6,7 +6,7 @@ import { Arguments, CommandModule } from 'yargs';
 export default {
   command:
     'cancel <safeAddress> <moduleAddress> <tokenAddress> <amount> <payeeAddress> <fixedUSDFee> <percentageFee> <executionGas> <maxGasPrice> <gasTokenAddress> <salt> <payAt>',
-  describe: 'Enable scheduled payment module on the safe',
+  describe: 'Cancel a scheduled payment',
   builder(yargs: Argv) {
     return yargs
       .positional('safeAddress', {
@@ -131,6 +131,6 @@ export default {
       onTxnHash,
     });
 
-    console.log(`Success to cancel scheduled payment, spHash: ${spHash}`);
+    console.log(`Scheduled payment canceled successfuly (spHash: ${spHash})`);
   },
 } as CommandModule;
