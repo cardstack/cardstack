@@ -16,6 +16,9 @@ import { svgJar } from '@cardstack/boxel/utils/svg-jar';
 import cssUrl from '@cardstack/boxel/helpers/css-url';
 import cssVar from '@cardstack/boxel/helpers/css-var';
 import { EmptyObject } from '@ember/component/helper';
+import { Link, LinkParams } from 'ember-link';
+import menuDivider from '@cardstack/boxel/helpers/menu-divider';
+import { MenuItem } from '@cardstack/boxel/helpers/menu-item';
 
 declare module '@glint/environment-ember-loose/registry' {
   export default interface Registry {
@@ -34,6 +37,15 @@ declare module '@glint/environment-ember-loose/registry' {
     'html-safe': HelperLike<{
       Args: { Positional: string[] };
       Return: string;
+    }>;
+    link: HelperLike<{
+      Args: { Positional: string[]; Named: LinkParams };
+      Return: Link;
+    }>;
+    'menu-divider': typeof menuDivider;
+    'menu-item': HelperLike<{
+      Args: { Positional: [string, Link | (() => void)] };
+      Return: MenuItem;
     }>;
     noop: HelperLike<{
       Args: { Positional: string[] };

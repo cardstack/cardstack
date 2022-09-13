@@ -27,7 +27,7 @@ interface Signature {
 
 export default class BoxelLeftMainNav extends Component<Signature> {
   get linkItems() {
-    return this.args.items.filter((item) => item.action instanceof Link);
+    return this.args.items.filter((item) => item.action instanceof Link) as ({ action: Link; text: string }[]);
   }
 
   <template>
