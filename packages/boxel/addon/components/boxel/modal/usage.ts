@@ -2,7 +2,6 @@ import Component from '@glimmer/component';
 import { tracked } from '@glimmer/tracking';
 import { action } from '@ember/object';
 import './usage.css';
-import { isBlank } from '@ember/utils';
 
 type ModalSize = 'small' | 'medium' | 'large' | undefined;
 
@@ -15,23 +14,6 @@ export default class ModalUsage extends Component {
   @tracked layer = 'default';
   @tracked isDefaultOpen = false;
   @tracked isUrgentOpen = false;
-
-  maxWidths = {
-    small: '36.25rem',
-    medium: '43.75rem',
-    large: '65rem',
-    '<undefined>': '65rem',
-  };
-
-  @tracked maxWidthOverride: string | undefined;
-
-  get maxWidth(): string | undefined {
-    if (isBlank(this.maxWidthOverride)) {
-      return this.maxWidths[this.sizeAsString || '<undefined>'];
-    } else {
-      return this.maxWidthOverride;
-    }
-  }
 
   get sizeAsString(): ModalSize | '<undefined>' {
     return this.size ?? '<undefined>';
