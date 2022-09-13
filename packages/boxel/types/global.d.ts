@@ -16,9 +16,11 @@ import { svgJar } from '@cardstack/boxel/utils/svg-jar';
 import cssUrl from '@cardstack/boxel/helpers/css-url';
 import cssVar from '@cardstack/boxel/helpers/css-var';
 import { type EmptyObject } from '@ember/component/helper';
+import AddHelper from 'ember-math-helpers/helpers/add';
 
 declare module '@glint/environment-ember-loose/registry' {
   export default interface Registry {
+    add: typeof AddHelper;
     and: typeof AndHelper;
     eq: typeof EqHelper;
     or: typeof OrHelper;
