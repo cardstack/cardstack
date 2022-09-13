@@ -37,42 +37,36 @@
       {{!-- template-lint-disable no-unbound --}}
       <Args.String
         @name="--boxel-expandable-banner-min-height"
-        @description="min-height CSS style"
         @defaultValue={{unbound this.minHeight}}
         @value={{this.minHeight}}
         @onInput={{fn (mut this.minHeight)}}
       />
       <Args.String
         @name="--boxel-expandable-banner-min-height-open"
-        @description="min-height CSS style"
         @defaultValue={{unbound this.minHeightOpen}}
         @value={{this.minHeightOpen}}
         @onInput={{fn (mut this.minHeightOpen)}}
       />
       <Args.String
         @name="--boxel-expandable-banner-text-color"
-        @description="color CSS style"
         @defaultValue={{unbound this.textColor}}
         @value={{this.textColor}}
         @onInput={{fn (mut this.textColor)}}
       />
       <Args.String
         @name="--boxel-expandable-banner-background-color"
-        @description="background-color CSS style"
         @defaultValue={{unbound this.backgroundColor}}
         @value={{this.backgroundColor}}
         @onInput={{fn (mut this.backgroundColor)}}
       />
       <Args.String
         @name="--boxel-expandable-banner-vertical-gap"
-        @description="gap CSS style"
         @defaultValue={{unbound this.verticalGap}}
         @value={{this.verticalGap}}
         @onInput={{fn (mut this.verticalGap)}}
       />
       <Args.String
         @name="--boxel-expandable-banner-horizontal-gap"
-        @description="gap CSS style"
         @defaultValue={{unbound this.horizontalGap}}
         @value={{this.horizontalGap}}
         @onInput={{fn (mut this.horizontalGap)}}

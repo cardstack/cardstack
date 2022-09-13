@@ -83,14 +83,14 @@
     {{!-- template-lint-disable no-unbound --}}
     <Args.String
       @name="--boxel-radio-option-padding"
-      @description="padding CSS style"
+      @description="padding for each option"
       @defaultValue={{unbound this.optionPadding}}
       @value={{this.optionPadding}}
       @onInput={{fn (mut this.optionPadding)}}
     />
     <Args.String
       @name="--boxel-radio-option-gap"
-      @description="gap CSS style"
+      @description="gap between circle and label"
       @defaultValue={{unbound this.optionGap}}
       @value={{this.optionGap}}
       @onInput={{fn (mut this.optionGap)}}

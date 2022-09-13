@@ -4,7 +4,6 @@
       @displayLeftEdge={{this.displayLeftEdge}}
       @darkTheme={{this.darkTheme}}
       style={{css-var
-        boxel-dashboard-left-edge-width=this.leftEdgeWidth
         boxel-dashboard-background-color=this.backgroundColor
         boxel-dashboard-color=this.color
       }}
@@ -40,22 +39,14 @@
     />
     {{!-- template-lint-disable no-unbound --}}
     <Args.String
-      @name="--boxel-dashboard-left-edge-width"
-      @description="min-width CSS style"
-      @defaultValue={{unbound this.leftEdgeWidth}}
-      @value={{this.leftEdgeWidth}}
-      @onInput={{fn (mut this.leftEdgeWidth)}}
-    />
-    <Args.String
       @name="--boxel-dashboard-background-color"
-      @description="background-color CSS style"
       @defaultValue={{unbound this.backgroundColor}}
       @value={{this.backgroundColor}}
       @onInput={{fn (mut this.backgroundColor)}}
     />
     <Args.String
       @name="--boxel-dashboard-color"
-      @description="color CSS style"
+      @description="text color"
       @defaultValue={{unbound this.color}}
       @value={{this.color}}
       @onInput={{fn (mut this.color)}}
