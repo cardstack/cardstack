@@ -424,4 +424,94 @@ export default class ScheduledPaymentModule {
 
     return requiredGas;
   }
+
+  async createSpHash(
+    moduleAddress: string,
+    tokenAddress: string,
+    amount: string,
+    payeeAddress: string,
+    fee: Fee,
+    executionGas: number,
+    maxGasPrice: string,
+    gasTokenAddress: string,
+    salt: string,
+    payAt: number
+  ): Promise<string>;
+  async createSpHash(
+    moduleAddress: string,
+    tokenAddress: string,
+    amount: string,
+    payeeAddress: string,
+    fee: Fee,
+    executionGas: number,
+    maxGasPrice: string,
+    gasTokenAddress: string,
+    salt: string,
+    recurringDayOfMonth: number,
+    recurringUntil: number
+  ): Promise<string>;
+  async createSpHash(
+    moduleAddress: string,
+    tokenAddress: string,
+    amount: string,
+    payeeAddress: string,
+    fee: Fee,
+    executionGas: number,
+    maxGasPrice: string,
+    gasTokenAddress: string,
+    salt: string,
+    payAtOrRecurringDayOfMonth: number,
+    recurringUntil?: number
+  ): Promise<string> {
+    let spHash;
+    let module = new this.layer2Web3.eth.Contract(ScheduledPaymentABI as AbiItem[], moduleAddress);
+    if (recurringUntil) {
+      let recurringDayOfMonth = payAtOrRecurringDayOfMonth;
+      spHash = await module.methods[
+        'createSpHash(address,uint256,address,((uint256),(uint256)),uint256,uint256,address,string,uint256,uint256)'
+      ](
+        tokenAddress,
+        amount,
+        payeeAddress,
+        {
+          fixedUSD: {
+            value: FEE_BASE.mul(new BN(fee.fixedUSD)).toString(),
+          },
+          percentage: {
+            value: FEE_BASE.mul(new BN(fee.percentage)).toString(),
+          },
+        },
+        executionGas,
+        maxGasPrice,
+        gasTokenAddress,
+        salt,
+        recurringDayOfMonth,
+        recurringUntil
+      ).call();
+    } else {
+      let payAt = payAtOrRecurringDayOfMonth;
+      spHash = await module.methods[
+        'createSpHash(address,uint256,address,((uint256),(uint256)),uint256,uint256,address,string,uint256)'
+      ](
+        tokenAddress,
+        amount,
+        payeeAddress,
+        {
+          fixedUSD: {
+            value: FEE_BASE.mul(new BN(fee.fixedUSD)).toString(),
+          },
+          percentage: {
+            value: FEE_BASE.mul(new BN(fee.percentage)).toString(),
+          },
+        },
+        executionGas,
+        maxGasPrice,
+        gasTokenAddress,
+        salt,
+        payAt
+      ).call();
+    }
+
+    return spHash;
+  }
 }
