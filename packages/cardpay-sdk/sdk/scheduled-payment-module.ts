@@ -33,6 +33,7 @@ import { BN } from 'bn.js';
 import { ERC20ABI, waitUntilTransactionMined } from '..';
 /* eslint-disable node/no-extraneous-import */
 import { AddressZero } from '@ethersproject/constants';
+import { SuccessfulTransactionReceipt } from './utils/successful-transaction-receipt';
 
 export interface EnableModuleAndGuardResult {
   scheduledPaymentModuleAddress: string;
@@ -423,5 +424,136 @@ export default class ScheduledPaymentModule {
     }
 
     return requiredGas;
+  }
+
+  async executeScheduledPayment(txnHash: string): Promise<SuccessfulTransactionReceipt>;
+  async executeScheduledPayment(
+    moduleAddressOrTxnHash: string,
+    tokenAddress: string,
+    amount: string,
+    payeeAddress: string,
+    fee: Fee,
+    executionGas: number,
+    maxGasPrice: string,
+    gasTokenAddress: string,
+    salt: string,
+    payAtOrRecurringDayOfMonth: number,
+    gasPrice: string,
+    recurringUntil?: number,
+    txnOptions?: TransactionOptions
+  ): Promise<SuccessfulTransactionReceipt>;
+  async executeScheduledPayment(
+    moduleAddressOrTxnHash: string,
+    tokenAddress?: string,
+    amount?: string,
+    payeeAddress?: string,
+    fee?: Fee,
+    executionGas?: number,
+    maxGasPrice?: string,
+    gasTokenAddress?: string,
+    salt?: string,
+    payAtOrRecurringDayOfMonth?: number,
+    gasPrice?: string,
+    recurringUntil?: number,
+    txnOptions?: TransactionOptions
+  ): Promise<SuccessfulTransactionReceipt> {
+    if (!moduleAddressOrTxnHash) {
+      throw new Error('moduleAddressOrTxnHash must be specified');
+    }
+    if (isTransactionHash(moduleAddressOrTxnHash)) {
+      let txnHash = moduleAddressOrTxnHash;
+      return await waitUntilTransactionMined(this.layer2Web3, txnHash);
+    }
+
+    if (!tokenAddress) {
+      throw new Error('tokenAddress must be specified');
+    }
+    if (!amount) {
+      throw new Error('amount must be specified');
+    }
+    if (!payeeAddress) {
+      throw new Error('payeeAddress must be specified');
+    }
+    if (!fee) {
+      throw new Error('fee must be specified');
+    }
+    if (!executionGas) {
+      throw new Error('executionGas must be specified');
+    }
+    if (!maxGasPrice) {
+      throw new Error('maxGasPrice must be specified');
+    }
+    if (!gasTokenAddress) {
+      throw new Error('gasTokenAddress must be specified');
+    }
+    if (!salt) {
+      throw new Error('salt must be specified');
+    }
+    if (!gasPrice) {
+      throw new Error('gasPrice must be specified');
+    }
+
+    let { onTxnHash } = txnOptions ?? {};
+    let moduleAddress = moduleAddressOrTxnHash;
+    let module = new this.layer2Web3.eth.Contract(ScheduledPaymentABI as AbiItem[], moduleAddress);
+    let executeScheduledPaymentData;
+    if (recurringUntil) {
+      executeScheduledPaymentData = module.methods[
+        'executeScheduledPayment(address,uint256,address,((uint256),(uint256)),uint256,uint256,address,string,uint256,uint256,uint256)'
+      ](
+        tokenAddress,
+        amount,
+        payeeAddress,
+        {
+          fixedUSD: {
+            value: FEE_BASE.mul(new BN(fee.fixedUSD)).toString(),
+          },
+          percentage: {
+            value: FEE_BASE.mul(new BN(fee.percentage)).toString(),
+          },
+        },
+        executionGas,
+        maxGasPrice,
+        gasTokenAddress,
+        salt,
+        payAtOrRecurringDayOfMonth,
+        recurringUntil,
+        gasPrice
+      ).encodeABI();
+    } else {
+      executeScheduledPaymentData = module.methods[
+        'executeScheduledPayment(address,uint256,address,((uint256),(uint256)),uint256,uint256,address,string,uint256,uint256)'
+      ](
+        tokenAddress,
+        amount,
+        payeeAddress,
+        {
+          fixedUSD: {
+            value: FEE_BASE.mul(new BN(fee.fixedUSD)).toString(),
+          },
+          percentage: {
+            value: FEE_BASE.mul(new BN(fee.percentage)).toString(),
+          },
+        },
+        executionGas,
+        maxGasPrice,
+        gasTokenAddress,
+        salt,
+        payAtOrRecurringDayOfMonth,
+        gasPrice
+      ).encodeABI();
+    }
+
+    let executeScheduledPaymentTx = {
+      to: moduleAddress,
+      value: '0',
+      data: executeScheduledPaymentData,
+      operation: Operation.CALL,
+    };
+    let txnHash = await sendTransaction(this.layer2Web3, executeScheduledPaymentTx);
+    if (typeof onTxnHash === 'function') {
+      await onTxnHash(txnHash);
+    }
+    return await waitUntilTransactionMined(this.layer2Web3, txnHash);
   }
 }
