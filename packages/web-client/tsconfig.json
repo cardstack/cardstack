@@ -50,6 +50,7 @@
     "transform": {
       "include": [
         "../boxel/addon/components/boxel/action-chin/**/*",
+        "../boxel/addon/components/boxel/action-container/**/*",
         "../boxel/addon/components/boxel/button/**/*",
         "../boxel/addon/components/boxel/card-container/**/*",
         "../boxel/addon/components/boxel/dashboard/**/*",

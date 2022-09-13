@@ -55,7 +55,6 @@
     "environment": ["ember-loose", "ember-template-imports"],
     "transform": {
       "exclude": [
-        "addon/components/boxel/action-container/**/*",
         "addon/components/boxel/apply-changes-toggle/**/*",
         "addon/components/boxel/breadcrumbs/**/*",
         "addon/components/boxel/card-picker/**/*",
