@@ -4,6 +4,7 @@ import { action } from '@ember/object';
 import './usage.css';
 
 type ModalSize = 'small' | 'medium' | 'large' | undefined;
+
 export default class ModalUsage extends Component {
   @tracked isOpen = false;
   @tracked size: ModalSize = undefined;
@@ -14,7 +15,7 @@ export default class ModalUsage extends Component {
   @tracked isDefaultOpen = false;
   @tracked isUrgentOpen = false;
 
-  get sizeAsString(): string {
+  get sizeAsString(): ModalSize | '<undefined>' {
     return this.size ?? '<undefined>';
   }
   @action updateSize(val: ModalSize): void {

@@ -12,6 +12,8 @@ export default class InputUsage extends Component {
   @tracked errorMessage = '';
   @tracked helperText = '';
 
+  @tracked height = '2.5rem';
+
   @action set(ev: Event): void {
     let target = ev.target as HTMLInputElement;
     this.value = target?.value;
