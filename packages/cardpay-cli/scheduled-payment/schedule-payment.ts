@@ -4,11 +4,11 @@ import { getEthereumClients, getConnectionType, NETWORK_OPTION_ANY } from '../ut
 import { Arguments } from 'yargs';
 
 export default {
-  command: 'schedule-payment <senderSafeAddress> <safeModuleAddress> <tokenAddress> <spHash>',
+  command: 'schedule-payment <safeAddress> <safeModuleAddress> <gasTokenAddress> <spHash>',
   describe: ' ',
   builder(yargs: Argv) {
     return yargs
-      .positional('senderSafeAddress', {
+      .positional('safeAddress', {
         type: 'string',
         description: 'The address of the safe that will fund the scheduled payment',
       })
@@ -16,7 +16,7 @@ export default {
         type: 'string',
         description: 'The address of the scheduled payment safe module',
       })
-      .positional('tokenAddress', {
+      .positional('gasTokenAddress', {
         type: 'string',
         description: 'The address of the gas token',
       })
@@ -27,11 +27,11 @@ export default {
       .option('network', NETWORK_OPTION_ANY);
   },
   async handler(args: Arguments) {
-    let { network, senderSafeAddress, tokenAddress, safeModuleAddress, spHash } = args as unknown as {
+    let { network, safeAddress, gasTokenAddress, safeModuleAddress, spHash } = args as unknown as {
       network: string;
-      senderSafeAddress: string;
+      safeAddress: string;
       safeModuleAddress: string;
-      tokenAddress: string;
+      gasTokenAddress: string;
       spHash: string;
     };
 
@@ -42,7 +42,7 @@ export default {
     let blockExplorer = await getConstant('blockExplorer', web3);
 
     console.log(`Waiting for the transaction to be mined...`);
-    await scheduledPaymentModule.schedulePayment(senderSafeAddress, safeModuleAddress, tokenAddress, spHash, null, {
+    await scheduledPaymentModule.schedulePayment(safeAddress, safeModuleAddress, gasTokenAddress, spHash, null, {
       onTxnHash: (txnHash) => console.log(`Transaction hash: ${blockExplorer}/tx/${txnHash}`),
     });
 

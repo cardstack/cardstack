@@ -429,15 +429,15 @@ export default class ScheduledPaymentModule {
   }
 
   async generateSchedulePaymentSignature(
-    senderSafeAddress: string,
+    safeAddress: string,
     moduleAddress: string,
-    tokenAddress: string,
+    gasTokenAddress: string,
     spHash: string
   ) {
     let [nonce, estimate, payload] = await this.generateSchedulePaymentTxParams(
-      senderSafeAddress,
+      safeAddress,
       moduleAddress,
-      tokenAddress,
+      gasTokenAddress,
       spHash
     );
 
@@ -446,7 +446,7 @@ export default class ScheduledPaymentModule {
     let signature = (
       await signSafeTx(
         this.layer2Web3,
-        senderSafeAddress,
+        safeAddress,
         moduleAddress,
         payload,
         Operation.CALL,
@@ -461,9 +461,9 @@ export default class ScheduledPaymentModule {
   }
 
   private async generateSchedulePaymentTxParams(
-    senderSafeAddress: string,
+    safeAddress: string,
     moduleAddress: string,
-    tokenAddress: string,
+    gasTokenAddress: string,
     spHash: string
   ) {
     let contract = new this.layer2Web3.eth.Contract(ScheduledPaymentABI as AbiItem[], moduleAddress);
@@ -471,12 +471,12 @@ export default class ScheduledPaymentModule {
 
     let estimate = await gasEstimate(
       this.layer2Web3,
-      senderSafeAddress,
+      safeAddress,
       moduleAddress,
       '0',
       payload,
       Operation.CALL,
-      tokenAddress
+      gasTokenAddress
     );
 
     let nonce = getNextNonceFromEstimate(estimate);
@@ -486,57 +486,57 @@ export default class ScheduledPaymentModule {
 
   async schedulePayment(txnHash: string): Promise<SuccessfulTransactionReceipt>;
   async schedulePayment(
-    senderSafeAddress: string,
+    safeAddress: string,
     moduleAddress: string,
-    tokenAddress: string,
+    gasTokenAddress: string,
     spHash: string,
     signature?: Signature | null,
     txnOptions?: TransactionOptions
   ): Promise<SuccessfulTransactionReceipt>;
   async schedulePayment(
-    senderSafeAddressOrTxnHash: string,
+    safeAddressOrTxnHash: string,
     moduleAddress?: string,
-    tokenAddress?: string,
+    gasTokenAddress?: string,
     spHash?: string,
     signature?: Signature | null,
     txnOptions?: TransactionOptions
   ): Promise<SuccessfulTransactionReceipt> {
     let { onTxnHash } = txnOptions ?? {};
 
-    if (isTransactionHash(senderSafeAddressOrTxnHash)) {
-      let txnHash = senderSafeAddressOrTxnHash;
+    if (isTransactionHash(safeAddressOrTxnHash)) {
+      let txnHash = safeAddressOrTxnHash;
       return await waitUntilTransactionMined(this.layer2Web3, txnHash);
     }
 
-    let senderSafeAddress = senderSafeAddressOrTxnHash;
+    let safeAddress = safeAddressOrTxnHash;
 
-    if (!senderSafeAddress) {
-      throw new Error('senderSafeAddress must be provided');
+    if (!safeAddress) {
+      throw new Error('safeAddress must be provided');
     }
     if (!moduleAddress) {
       throw new Error('moduleAddress must be provided');
     }
-    if (!tokenAddress) {
-      throw new Error('tokenAddress must be provided');
+    if (!gasTokenAddress) {
+      throw new Error('gasTokenAddress must be provided');
     }
     if (!spHash) {
       throw new Error('spHash must be provided');
     }
 
     let [nonce, estimate, payload] = await this.generateSchedulePaymentTxParams(
-      senderSafeAddress,
+      safeAddress,
       moduleAddress,
-      tokenAddress,
+      gasTokenAddress,
       spHash
     );
 
     if (!signature) {
-      signature = await this.generateSchedulePaymentSignature(senderSafeAddress, moduleAddress, tokenAddress, spHash);
+      signature = await this.generateSchedulePaymentSignature(safeAddress, moduleAddress, gasTokenAddress, spHash);
     }
 
     let gnosisTxn = await executeTransaction(
       this.layer2Web3,
-      senderSafeAddress,
+      safeAddress,
       moduleAddress,
       payload,
       Operation.CALL,
