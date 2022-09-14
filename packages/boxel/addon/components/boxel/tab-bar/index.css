@@ -1,12 +1,15 @@
 .boxel-tab-bar {
   --boxel-tab-bar-background-color: inherit;
-  --boxer-tab-bar-border-bottom: 1px solid var(--boxel-light-500);
+  --boxel-tab-bar-border-bottom: 1px solid var(--boxel-light-500);
+  --boxel-tab-bar-font: inherit;
+  --boxel-tab-bar-font-weight-hover: 600;
 
   width: 100%;
   display: flex;
   flex-direction: row;
   border-bottom: var(--boxel-tab-bar-border-bottom);
   background-color: var(--boxel-tab-bar-background-color);
+  font: var(--boxel-tab-bar-font);
 }
 
 .boxel-tab-bar--spread {
@@ -14,11 +17,12 @@
 }
 
 .boxel-tab-bar__item:hover {
+  font-weight: var(--boxel-tab-bar-font-weight-hover);
   cursor: pointer;
 }
 
 .boxel-tab-bar__item--is-active {
-  font-weight: 600;
+  font-weight: var(--boxel-tab-bar-font-weight-hover);
   border-bottom: 2px solid var(--boxel-cyan);
 }
 
@@ -62,7 +66,7 @@
   }
 }
 
-.boxel-tab-bar__item > a:hover {
+.boxel-tab-bar__item > a:hover .boxel-tab-bar__item-text {
   font-weight: 600;
   color: inherit;
 }

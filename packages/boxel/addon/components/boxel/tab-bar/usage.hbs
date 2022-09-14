@@ -10,6 +10,8 @@
       style={{css-var
         boxel-tab-bar-background-color=this.backgroundColor
         boxel-tab-bar-border-bottom=this.borderBottom
+        boxel-tab-bar-font=this.font
+        boxel-tab-bar-font-weight-hover=this.fontWeightHover
       }}
     />
   </:example>
@@ -37,6 +39,18 @@
       @defaultValue={{unbound this.borderBottom}}
       @value={{this.borderBottom}}
       @onInput={{fn (mut this.borderBottom)}}
+    />
+    <Args.String
+      @name="--boxel-tab-bar-font"
+      @defaultValue={{unbound this.font}}
+      @value={{this.font}}
+      @onInput={{fn (mut this.font)}}
+    />
+    <Args.String
+      @name="--boxel-tab-bar-font-weight-hover"
+      @defaultValue={{unbound this.fontWeightHover}}
+      @value={{this.fontWeightHover}}
+      @onInput={{fn (mut this.fontWeightHover)}}
     />
   </:api>
 </Freestyle::Usage>
