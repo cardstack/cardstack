@@ -56,7 +56,6 @@
     "transform": {
       "exclude": [
         "addon/components/boxel/apply-changes-toggle/**/*",
-        "addon/components/boxel/breadcrumbs/**/*",
         "addon/components/boxel/card-picker/**/*",
         "addon/components/boxel/cover-art/**/*",
         "addon/components/boxel/date-divider/**/*",
