@@ -1,9 +1,9 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/ban-types */
 import Helper from '@ember/component/helper';
 
-interface OptionalHelperSignature {
-  Args: { Positional: [((event: Event) => void) | undefined] };
-  Return: (event: Event) => void;
-}
-
-export default class OptionalHelper extends Helper<OptionalHelperSignature> {}
+export default class OptionalHelper<T extends Function> extends Helper<{
+  Args: {
+    Positional: [func?: T];
+  };
+  Return: T;
+}> {}

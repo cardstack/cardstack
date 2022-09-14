@@ -72,7 +72,6 @@
         "addon/components/boxel/mode-indicator/**/*",
         "addon/components/boxel/next-steps-box/**/*",
         "addon/components/boxel/progress-circle/**/*",
-        "addon/components/boxel/progress-steps/**/*",
         "addon/components/boxel/radio-input/**/*",
         "addon/components/boxel/select-button/**/*",
         "addon/components/boxel/selection-control-group/**/*",
