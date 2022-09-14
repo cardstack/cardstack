@@ -8,6 +8,7 @@ export default class SearchboxUsage extends Component {
   @tracked id = 'searchbox-id';
   @tracked label = 'A searchbox example input';
   @tracked placeholder = 'Search';
+  @tracked hideIcon = false;
 
   @tracked iconSize = '0.875rem';
 

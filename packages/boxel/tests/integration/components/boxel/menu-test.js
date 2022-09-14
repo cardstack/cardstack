@@ -53,7 +53,7 @@ module('Integration | Component | Menu', function (hooks) {
         @closeMenu={{(noop)}}
         @items={{array
           (menu-item "Top" (noop))
-          (menu-item "---")
+          (menu-divider)
           (menu-item "Three" (noop))
         }}
       />

@@ -3,6 +3,7 @@
     <Boxel::Searchbox
       @id={{this.id}}
       @label={{this.label}}
+      @hideIcon={{this.hideIcon}}
       @placeholder={{this.placeholder}}
       @value={{this.value}}
       @onInput={{this.onInput}}
@@ -24,6 +25,13 @@
       @description="The label of the searchbox input"
       @value={{this.label}}
       @onInput={{fn (mut this.label)}}
+    />
+    <Args.Bool
+      @name="hideIcon"
+      @value={{this.hideIcon}}
+      @description="when true, hides the search icon"
+      @defaultValue={{false}}
+      @onInput={{fn (mut this.hideIcon)}}
     />
     <Args.String
       @name="placeholder"

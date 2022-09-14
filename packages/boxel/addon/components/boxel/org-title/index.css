@@ -4,9 +4,9 @@
   gap: 0 var(--boxel-sp-xs);
   min-height: 3.125rem;
   color: var(--boxel-org-title-color, inherit);
-  font: 900 1.125rem/1.333 var(--boxel-font-family);
-  letter-spacing: var(--boxel-lsp-xxl);
-  text-transform: uppercase;
+  font: var(--boxel-org-title-font, 900 1.125rem/1.333 var(--boxel-font-family));
+  letter-spacing: var(--boxel-org-title-letter-spacing, var(--boxel-lsp-xxl));
+  text-transform: var(--boxel-org-title-text-transform, uppercase);
 }
 
 .boxel-org-title--has-logo {
