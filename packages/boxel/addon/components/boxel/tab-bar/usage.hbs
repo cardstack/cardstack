@@ -7,6 +7,10 @@
         (menu-item "About" (link route="about"))
       }}
       @spread={{this.spread}}
+      style={{css-var
+        boxel-tab-bar-background-color=this.backgroundColor
+        boxel-tab-bar-border-bottom=this.borderBottom
+      }}
     />
   </:example>
   <:api as |Args|>
@@ -20,6 +24,19 @@
       @description="Should the items spread across the width of the container?"
       @onInput={{fn (mut this.spread)}}
       @value={{this.spread}}
+    />
+    {{!-- template-lint-disable no-unbound --}}
+    <Args.String
+      @name="--boxel-tab-bar-background-color"
+      @defaultValue={{unbound this.backgroundColor}}
+      @value={{this.backgroundColor}}
+      @onInput={{fn (mut this.backgroundColor)}}
+    />
+    <Args.String
+      @name="--boxel-tab-bar-border-bottom"
+      @defaultValue={{unbound this.borderBottom}}
+      @value={{this.borderBottom}}
+      @onInput={{fn (mut this.borderBottom)}}
     />
   </:api>
 </Freestyle::Usage>

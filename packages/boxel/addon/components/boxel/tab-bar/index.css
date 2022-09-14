@@ -1,8 +1,12 @@
 .boxel-tab-bar {
+  --boxel-tab-bar-background-color: inherit;
+  --boxer-tab-bar-border-bottom: 1px solid var(--boxel-light-500);
+
   width: 100%;
   display: flex;
   flex-direction: row;
-  border-bottom: 1px solid var(--boxel-light-500);
+  border-bottom: var(--boxel-tab-bar-border-bottom);
+  background-color: var(--boxel-tab-bar-background-color);
 }
 
 .boxel-tab-bar--spread {
