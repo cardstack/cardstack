@@ -23,6 +23,8 @@
 
   display: flex;
   align-items: center;
+  padding: var(--boxel-sp-xs) var(--boxel-sp-lg);
+  gap: var(--boxel-sp-xs);
 }
 
 .boxel-tab-bar__link--is-inactive {
@@ -37,7 +39,6 @@
 .boxel-tab-bar__item-text {
   display: inline-flex;
   flex-direction: column;
-  padding: var(--boxel-sp-xs) var(--boxel-sp-lg);
 }
 
 .boxel-tab-bar__item-text::after {
