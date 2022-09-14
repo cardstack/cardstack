@@ -18,13 +18,26 @@
       @layer1Address={{this.layer1Network.walletInfo.firstAddress}}
       @layer2Address={{this.layer2Network.walletInfo.firstAddress}}
     />
-    <CardPay::HeaderNav
-      @tabs={{array
-        (hash title="Wallet" route="card-pay.wallet" icon="tab-icon-card")
-        (hash title="Profile" route="card-pay.payments" icon="tab-icon-profile")
-        (hash title="Rewards" route="card-pay.reward" icon="tab-icon-rewards" inactive=true)
-        (hash title="Deposit & Withdrawal" route="card-pay.deposit-withdrawal" icon="tab-icon-token")
+    <Boxel::TabBar
+      @items={{
+        array
+        (menu-item 'Wallet' (link route='card-pay.wallet') icon='tab-icon-card')
+        (menu-item
+          'Profile' (link route='card-pay.payments') icon='tab-icon-profile'
+        )
+        (menu-item
+          'Rewards'
+          (link route='card-pay.reward')
+          icon='tab-icon-rewards'
+          inactive=true
+        )
+        (menu-item
+          'Deposit & Withdrawal'
+          (link route='card-pay.deposit-withdrawal')
+          icon='tab-icon-token'
+        )
       }}
+      @spread={{true}}
     />
   </:header>
 
