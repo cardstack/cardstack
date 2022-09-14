@@ -13,55 +13,55 @@
 >
   {{#if this.linkItems}}
     {{#each this.linkItems as |tab|}}
-      <div
-        role="none"
-        class={{cn
-          "boxel-tab-bar__item"
-          boxel-tab-bar__item--is-active=tab.action.isActive
-        }}
-      >
-        {{#if tab.inactive}}
-          <div
-            role="tab"
-            data-text={{tab.text}}
-            aria-disabled="true"
-            class="boxel-tab-bar__link boxel-tab-bar__link--is-inactive"
-          >
-            {{#if tab.icon}}
-              {{svg-jar
-                tab.icon
-                width=18
-                height=18
-                data-test-boxel-menu-item-icon=true
-              }}
-            {{/if}}
-            <span class="boxel-tab-bar__item-text">
-              {{tab.text}}
-            </span>
-          </div>
-        {{else}}
-          {{!-- template-lint-disable require-context-role --}}
-          <LinkTo
-            @route={{tab.action.routeName}}
-            @query={{or tab.action.queryParams (hash)}}
-            role="tab"
-            data-text={{tab.text}}
-            class="boxel-tab-bar__link"
-          >
-            {{#if tab.icon}}
-              {{svg-jar
-                tab.icon
-                width=18
-                height=18
-                data-test-boxel-menu-item-icon=true
-              }}
-            {{/if}}
-            <span class="boxel-tab-bar__item-text">
-              {{tab.text}}
-            </span>
-          </LinkTo>
-        {{/if}}
-      </div>
+      {{#if tab.inactive}}
+        <div
+          role="tab"
+          data-text={{tab.text}}
+          aria-disabled="true"
+          class={{cn
+            "boxel-tab-bar__item"
+            "boxel-tab-bar__item--is-inactive"
+            boxel-tab-bar__item--is-active=tab.action.isActive
+          }}
+        >
+          {{#if tab.icon}}
+            {{svg-jar
+              tab.icon
+              width=18
+              height=18
+              data-test-boxel-menu-item-icon=true
+            }}
+          {{/if}}
+          <span class="boxel-tab-bar__item-text">
+            {{tab.text}}
+          </span>
+        </div>
+      {{else}}
+        {{!-- template-lint-disable require-context-role --}}
+        <LinkTo
+          @route={{tab.action.routeName}}
+          @query={{or tab.action.queryParams (hash)}}
+          role="tab"
+          data-text={{tab.text}}
+          class={{cn
+            "boxel-tab-bar__item"
+            "boxel-tab-bar__item"
+            boxel-tab-bar__item--is-active=tab.action.isActive
+          }}
+        >
+          {{#if tab.icon}}
+            {{svg-jar
+              tab.icon
+              width=18
+              height=18
+              data-test-boxel-menu-item-icon=true
+            }}
+          {{/if}}
+          <span class="boxel-tab-bar__item-text">
+            {{tab.text}}
+          </span>
+        </LinkTo>
+      {{/if}}
     {{/each}}
   {{/if}}
 </nav>
