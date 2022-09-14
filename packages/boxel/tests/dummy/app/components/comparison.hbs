@@ -5,7 +5,7 @@
       <h1 class="discrepancy__title">Discrepancy Card: Different Data</h1>
       {{#let (if @model.topLevelCard @model.topLevelCard @model) as |model|}}
         <Link @route={{@exitRoute}} @model={{model.baseCard.ownerId}} @query={{hash version=model.baseCard.version}} as |link|>
-          <Boxel::ModeIndicator @mode="comparison" {{on "click" link.transitionTo}} />
+          <ModeIndicator @mode="comparison" {{on "click" link.transitionTo}} />
         </Link>
       {{/let}}
     </header>

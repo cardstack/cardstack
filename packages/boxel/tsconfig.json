@@ -56,7 +56,6 @@
     "transform": {
       "exclude": [
         "addon/components/boxel/apply-changes-toggle/**/*",
-        "addon/components/boxel/breadcrumbs/**/*",
         "addon/components/boxel/card-picker/**/*",
         "addon/components/boxel/cover-art/**/*",
         "addon/components/boxel/date-divider/**/*",
@@ -69,7 +68,6 @@
         "addon/components/boxel/input/**/*",
         "addon/components/boxel/menu/**/*",
         "addon/components/boxel/milestone-banner/**/*",
-        "addon/components/boxel/mode-indicator/**/*",
         "addon/components/boxel/progress-circle/**/*",
         "addon/components/boxel/radio-input/**/*",
         "addon/components/boxel/select-button/**/*",
@@ -85,6 +83,7 @@
         "tests/dummy/app/components/card-select/**/*",
         "tests/dummy/app/components/cards/**/*",
         "tests/dummy/app/components/media-registry/**/*",
+        "tests/dummy/app/components/mode-indicator/**/*",
         "tests/dummy/app/components/*",
         "tests/integration/**/*",
       ]
