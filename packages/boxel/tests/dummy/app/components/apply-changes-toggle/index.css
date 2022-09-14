@@ -1,4 +1,4 @@
-.boxel-apply-changes-toggle {
+.apply-changes-toggle {
   position: absolute;
   top: 25%;
   left: -108px;
@@ -10,7 +10,7 @@
   z-index: 1;
 }
 
-.boxel-apply-changes-toggle--active {
+.apply-changes-toggle--active {
   background-image:
     url("/@cardstack/boxel/images/icons/arrows.svg"),
     url("/@cardstack/boxel/images/icons/arrows.svg");
@@ -19,7 +19,7 @@
   background-repeat: no-repeat, no-repeat;
 }
 
-.boxel-apply-changes-toggle__button {
+.apply-changes-toggle__button {
   width: 60px;
   height: 60px;
   background-color: var(--boxel-light);
@@ -30,22 +30,22 @@
   transition: filter var(--boxel-transition);
 }
 
-.boxel-apply-changes-toggle__button:hover {
+.apply-changes-toggle__button:hover {
   cursor: pointer;
   filter: brightness(0.97);
 }
 
-.boxel-apply-changes-toggle--active .boxel-apply-changes-toggle__button {
+.apply-changes-toggle--active .apply-changes-toggle__button {
   background-color: var(--boxel-highlight);
   border-color: var(--boxel-success-200);
   box-shadow: none;
 }
 
-.boxel-apply-changes-toggle--active .boxel-apply-changes-toggle__button:hover {
+.apply-changes-toggle--active .apply-changes-toggle__button:hover {
   filter: brightness(1.025);
 }
 
-.boxel-apply-changes-toggle__button > svg {
+.apply-changes-toggle__button > svg {
   display: block;
   margin: auto;
 }

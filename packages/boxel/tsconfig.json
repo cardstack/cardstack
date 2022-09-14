@@ -55,7 +55,6 @@
     "environment": ["ember-loose", "ember-template-imports"],
     "transform": {
       "exclude": [
-        "addon/components/boxel/apply-changes-toggle/**/*",
         "addon/components/boxel/breadcrumbs/**/*",
         "addon/components/boxel/card-picker/**/*",
         "addon/components/boxel/cover-art/**/*",
@@ -82,6 +81,7 @@
         "addon/components/boxel/thread-header/**/*",
         "addon/components/boxel/wave-player/**/*",
         "app/components/**/*",
+        "tests/dummy/app/components/apply-changes-toggle/**/*",
         "tests/dummy/app/components/boxel/**/*",
         "tests/dummy/app/components/card-select/**/*",
         "tests/dummy/app/components/cards/**/*",
