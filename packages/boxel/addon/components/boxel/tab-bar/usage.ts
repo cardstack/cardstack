@@ -5,6 +5,7 @@ import { tracked } from '@glimmer/tracking';
 export default class TabBarUsage extends Component {
   @tracked backgroundColor = 'inherit';
   @tracked borderBottom = '1px solid var(--boxel-light-500)';
+  @tracked colorActive = 'inherit';
   @tracked font = 'inherit';
   @tracked fontWeightHover = '600';
 

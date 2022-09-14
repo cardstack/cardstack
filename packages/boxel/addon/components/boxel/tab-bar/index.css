@@ -3,6 +3,7 @@
   --boxel-tab-bar-border-bottom: 1px solid var(--boxel-light-500);
   --boxel-tab-bar-font: inherit;
   --boxel-tab-bar-font-weight-hover: 600;
+  --boxel-tab-bar-color-active: inherit;
 
   width: 100%;
   display: flex;
@@ -37,6 +38,7 @@
 }
 
 .boxel-tab-bar__item--is-active {
+  color: var(--boxel-tab-bar-color-active);
   font-weight: var(--boxel-tab-bar-font-weight-hover);
   border-bottom: 2px solid var(--boxel-cyan);
 }

@@ -10,6 +10,7 @@
       style={{css-var
         boxel-tab-bar-background-color=this.backgroundColor
         boxel-tab-bar-border-bottom=this.borderBottom
+        boxel-tab-bar-color-active=this.colorActive
         boxel-tab-bar-font=this.font
         boxel-tab-bar-font-weight-hover=this.fontWeightHover
       }}
@@ -33,6 +34,12 @@
       @defaultValue={{unbound this.backgroundColor}}
       @value={{this.backgroundColor}}
       @onInput={{fn (mut this.backgroundColor)}}
+    />
+    <Args.String
+      @name="--boxel-tab-bar-color-active"
+      @defaultValue={{unbound this.colorActive}}
+      @value={{this.colorActive}}
+      @onInput={{fn (mut this.colorActive)}}
     />
     <Args.String
       @name="--boxel-tab-bar-border-bottom"
