@@ -23,6 +23,7 @@
   align-items: center;
   padding: var(--boxel-sp-xs) var(--boxel-sp-lg);
   gap: var(--boxel-sp-xs);
+  border-bottom: 2px solid transparent;
 }
 
 .boxel-tab-bar__item--is-inactive {

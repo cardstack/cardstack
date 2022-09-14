@@ -1,10 +1,5 @@
 .card-pay-header-nav {
-  background-color: var(--boxel-dark);
-  color: var(--boxel-light);
-
-  /* Remove the below two lines after hamburger menu is implemented */
   height: 3.75rem;
-  overflow: auto;
 }
 
 .card-pay-header-nav__list {
