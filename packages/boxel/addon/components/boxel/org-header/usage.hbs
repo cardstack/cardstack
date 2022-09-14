@@ -15,6 +15,7 @@
         boxel-org-header-color=this.color
         boxel-org-header-logo-size=this.logoSize
         boxel-org-header-logo-position=this.logoPosition
+        boxel-org-header-padding=this.padding
       }}
     >
       More Stuff Here
@@ -59,6 +60,14 @@
       @defaultValue="center"
       @value={{this.logoPosition}}
       @onInput={{fn (mut this.logoPosition)}}
+    />
+    {{!-- template-lint-disable no-unbound --}}
+    <Args.String
+      @name="--boxel-org-header-padding"
+      @description="padding CSS style for the icon"
+      @defaultValue={{unbound this.padding}}
+      @value={{this.padding}}
+      @onInput={{fn (mut this.padding)}}
     />
     <Args.Yield
       @description="Other header content"

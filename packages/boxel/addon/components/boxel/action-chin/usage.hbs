@@ -108,6 +108,14 @@
       @stepNumber={{this.stepNumber}}
       @state={{this.state}}
       @disabled={{this.disabled}}
+      style={{css-var
+        boxel-action-chin-padding-horizontal=this.paddingHorizontal
+        boxel-action-chin-padding-vertical=this.paddingVertical
+        boxel-action-chin-background-color=this.backgroundColor
+        boxel-action-chin-emphasis-text-color=this.emphasisTextColor
+        boxel-action-chin-text-color=this.textColor
+        boxel-action-chin-lock-icon-size=this.lockIconSize
+      }}
     >
       <:default as |a|>
         <a.ActionButton>
@@ -163,6 +171,45 @@
       @optional={{true}}
       @value={{this.stepNumber}}
       @onInput={{fn (mut this.stepNumber)}}
+    />
+    {{!-- template-lint-disable no-unbound --}}
+    <Args.String
+      @name="--boxel-action-chin-padding-horizontal"
+      @defaultValue={{unbound this.paddingHorizontal}}
+      @value={{this.paddingHorizontal}}
+      @onInput={{fn (mut this.paddingHorizontal)}}
+    />
+    <Args.String
+      @name="--boxel-action-chin-padding-vertical"
+      @defaultValue={{unbound this.paddingVertical}}
+      @value={{this.paddingVertical}}
+      @onInput={{fn (mut this.paddingVertical)}}
+    />
+    <Args.String
+      @name="--boxel-action-chin-background-color"
+      @defaultValue={{unbound this.backgroundColor}}
+      @value={{this.backgroundColor}}
+      @onInput={{fn (mut this.backgroundColor)}}
+    />
+    <Args.String
+      @name="--boxel-action-chin-emphasis-text-color"
+      @description="text color in memorialized state"
+      @defaultValue={{unbound this.emphasisTextColor}}
+      @value={{this.emphasisTextColor}}
+      @onInput={{fn (mut this.emphasisTextColor)}}
+    />
+    <Args.String
+      @name="--boxel-action-chin-text-color"
+      @description="text color in info area"
+      @defaultValue={{unbound this.textColor}}
+      @value={{this.textColor}}
+      @onInput={{fn (mut this.textColor)}}
+    />
+    <Args.String
+      @name="--boxel-action-lock-icon-size"
+      @defaultValue="0.75rem"
+      @value={{this.lockIconSize}}
+      @onInput={{fn (mut this.lockIconSize)}}
     />
     <Args.Yield
       @name="inProgress"

@@ -10,6 +10,8 @@ export default class SearchboxUsage extends Component {
   @tracked placeholder = 'Search';
   @tracked hideIcon = false;
 
+  @tracked iconSize = '0.875rem';
+
   @action onInput(e: InputEvent): void {
     let target = e.target;
     assert('target', target && target instanceof HTMLInputElement);

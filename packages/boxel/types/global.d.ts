@@ -19,9 +19,11 @@ import { type EmptyObject } from '@ember/component/helper';
 import { Link, LinkParams } from 'ember-link';
 import menuDivider from '@cardstack/boxel/helpers/menu-divider';
 import { MenuItem } from '@cardstack/boxel/helpers/menu-item';
+import AddHelper from 'ember-math-helpers/helpers/add';
 
 declare module '@glint/environment-ember-loose/registry' {
   export default interface Registry {
+    add: typeof AddHelper;
     and: typeof AndHelper;
     eq: typeof EqHelper;
     or: typeof OrHelper;

@@ -8,6 +8,12 @@
       @hideMeta={{this.hideMeta}}
       @hideName={{this.hideName}}
       @fullWidth={{this.fullWidth}}
+      style={{css-var
+        boxel-thread-message-avatar-size=this.avatarSize
+        boxel-thread-message-meta-height=this.metaHeight
+        boxel-thread-message-gap=this.gap
+        boxel-thread-message-margin-left=this.marginLeft
+      }}
     >
       Hi Haley, Here’s your manuscript with all the edits I would recommend. Please review and let me know if you have any questions. I also added a couple tasks for you about things you should think about, as you figure out the rest of your story.
     </Boxel::ThreadMessage>
@@ -64,6 +70,32 @@
       @description="Whether to allocate the full width to the content"
       @defaultValue={{false}}
       @onInput={{fn (mut this.fullWidth)}}
+    />
+    {{!-- template-lint-disable no-unbound --}}
+    <Args.String
+      @name="--boxel-thread-message-avatar-size"
+      @defaultValue={{unbound this.avatarSize}}
+      @value={{this.avatarSize}}
+      @onInput={{fn (mut this.avatarSize)}}
+    />
+    <Args.String
+      @name="--boxel-thread-message-meta-height"
+      @defaultValue={{unbound this.metaHeight}}
+      @value={{this.metaHeight}}
+      @onInput={{fn (mut this.metaHeight)}}
+    />
+    <Args.String
+      @name="--boxel-thread-message-gap"
+      @description="gap after avatar"
+      @defaultValue={{unbound this.gap}}
+      @value={{this.gap}}
+      @onInput={{fn (mut this.gap)}}
+    />
+    <Args.String
+      @name="--boxel-thread-message-margin-left"
+      @defaultValue={{unbound this.marginLeft}}
+      @value={{this.marginLeft}}
+      @onInput={{fn (mut this.marginLeft)}}
     />
   </:api>
 </Freestyle::Usage>

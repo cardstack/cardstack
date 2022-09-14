@@ -8,6 +8,9 @@
       @value={{this.value}}
       @onInput={{this.onInput}}
       @onChange={{this.onChange}}
+      style={{css-var
+        boxel-searchbox-icon-size=this.iconSize
+      }}
     />
   </:example>
   <:api as |Args|>
@@ -41,6 +44,13 @@
       @description="The string entered in the searchbox"
       @value={{this.value}}
       @onInput={{fn (mut this.value)}}
+    />
+    {{!-- template-lint-disable no-unbound --}}
+    <Args.String
+      @name="--boxel-searchbox-icon-size"
+      @defaultValue={{unbound this.iconSize}}
+      @value={{this.iconSize}}
+      @onInput={{fn (mut this.iconSize)}}
     />
     <Args.Action
       @name="onInput"

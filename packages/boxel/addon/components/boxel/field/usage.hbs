@@ -8,6 +8,9 @@
       @horizontalLabelSize={{this.horizontalLabelSize}}
       @centeredDisplay={{this.centeredDisplay}}
       @icon={{this.icon}}
+      style={{css-var
+        boxel-field-label-size=this.labelSize
+      }}
     >
       {{this.value}}
     </Boxel::Field>
@@ -60,6 +63,14 @@
       @defaultValue="false"
       @onInput={{fn (mut this.centeredDisplay)}}
       @value={{this.centeredDisplay}}
+    />
+    {{!-- template-lint-disable no-unbound --}}
+    <Args.String
+      @name="--boxel-field-label-size"
+      @description="grid-template-columns CSS style"
+      @defaultValue={{unbound this.labelSize}}
+      @value={{this.labelSize}}
+      @onInput={{fn (mut this.labelSize)}}
     />
     <Args.Yield
       @description="Yield value or form field"

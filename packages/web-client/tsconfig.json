@@ -50,6 +50,7 @@
     "transform": {
       "include": [
         "../boxel/addon/components/boxel/action-chin/**/*",
+        "../boxel/addon/components/boxel/action-container/**/*",
         "../boxel/addon/components/boxel/button/**/*",
         "../boxel/addon/components/boxel/card-container/**/*",
         "../boxel/addon/components/boxel/dashboard/**/*",
@@ -62,6 +63,7 @@
         "../boxel/addon/components/boxel/org-switcher/**/*",
         "../boxel/addon/components/boxel/org-title/**/*",
         "../boxel/addon/components/boxel/progress-icon/**/*",
+        "../boxel/addon/components/boxel/progress-steps/**/*",
         "../boxel/addon/components/boxel/sidebar/**/*",
         "app/components/card-drop-page/**/*",
         "app/components/card-pay/dashboard-panel/**/*",
