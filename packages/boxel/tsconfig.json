@@ -70,7 +70,6 @@
         "addon/components/boxel/menu/**/*",
         "addon/components/boxel/milestone-banner/**/*",
         "addon/components/boxel/mode-indicator/**/*",
-        "addon/components/boxel/next-steps-box/**/*",
         "addon/components/boxel/progress-circle/**/*",
         "addon/components/boxel/radio-input/**/*",
         "addon/components/boxel/select-button/**/*",
