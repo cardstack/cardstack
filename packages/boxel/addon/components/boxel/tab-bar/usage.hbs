@@ -6,6 +6,7 @@
         (menu-item "Docs" (link route="docs" query=(hash s="Components" ss="<Boxel::TabBar>")))
         (menu-item "About" (link route="about"))
       }}
+      @spread={{this.spread}}
     />
   </:example>
   <:api as |Args|>
@@ -13,5 +14,25 @@
       @name="items"
       @description="An array of link MenuItems, created using the `menu-item` helper. The menu-item helper accepts the menu item text as its first argument, and a link (as created using ember-link) as the second argument."
     />
+    <Args.Bool
+      @name="spread"
+      @optional={{true}}
+      @description="Should the items spread across the width of the container?"
+      @onInput={{fn (mut this.spread)}}
+      @value={{this.spread}}
+    />
   </:api>
+</Freestyle::Usage>
+
+<Freestyle::Usage @name="TabBar with icons">
+  <:example>
+    <Boxel::TabBar
+      @items={{array
+        (menu-item "Home" (link route="index") icon="gear")
+        (menu-item "Docs" (link route="docs" query=(hash s="Components" ss="<Boxel::TabBar>")) icon="clock")
+        (menu-item "About" (link route="about") icon="library")
+      }}
+      @spread={{true}}
+    />
+  </:example>
 </Freestyle::Usage>

@@ -1,4 +1,12 @@
-<nav role="tablist" class={{cn "boxel-tab-bar" @class}} ...attributes>
+<nav
+  role="tablist"
+  class={{cn
+    "boxel-tab-bar"
+    @class
+    boxel-tab-bar--spread=@spread
+  }}
+  ...attributes
+>
   {{#if this.linkItems}}
     {{#each this.linkItems as |tab|}}
       <div
@@ -15,7 +23,17 @@
           role="tab"
           data-text={{tab.text}}
         >
-          {{tab.text}}
+          {{#if tab.icon}}
+            {{svg-jar
+              tab.icon
+              width=18
+              height=18
+              data-test-boxel-menu-item-icon=true
+            }}
+          {{/if}}
+          <span class="boxel-tab-bar__item-text">
+            {{tab.text}}
+          </span>
         </LinkTo>
       </div>
     {{/each}}

@@ -5,6 +5,10 @@
   border-bottom: 1px solid var(--boxel-light-500);
 }
 
+.boxel-tab-bar--spread {
+  justify-content: space-around;
+}
+
 .boxel-tab-bar__item:hover {
   cursor: pointer;
 }
@@ -14,18 +18,25 @@
   border-bottom: 2px solid var(--boxel-cyan);
 }
 
+.boxel-tab-bar__item > a {
+  --icon-color: currentcolor;
+
+  display: flex;
+  align-items: center;
+}
+
 /*
   Column flex and ::after with data-text allow bold-on-hover without layout shift:
   https://css-tricks.com/bold-on-hover-without-the-layout-shift/
 */
 
-.boxel-tab-bar__item > a {
+.boxel-tab-bar__item > a .boxel-tab-bar__item-text {
   display: inline-flex;
   flex-direction: column;
   padding: var(--boxel-sp-xs) var(--boxel-sp-lg);
 }
 
-.boxel-tab-bar__item > a::after {
+.boxel-tab-bar__item > a .boxel-tab-bar__item-text::after {
   content: attr(data-text);
   content: attr(data-text) / "";
   height: 0;
