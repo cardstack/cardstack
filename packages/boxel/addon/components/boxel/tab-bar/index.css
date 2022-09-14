@@ -18,11 +18,15 @@
   border-bottom: 2px solid var(--boxel-cyan);
 }
 
-.boxel-tab-bar__item > a {
+.boxel-tab-bar__link {
   --icon-color: currentcolor;
 
   display: flex;
   align-items: center;
+}
+
+.boxel-tab-bar__link--is-inactive {
+  opacity: 0.45;
 }
 
 /*
@@ -30,13 +34,13 @@
   https://css-tricks.com/bold-on-hover-without-the-layout-shift/
 */
 
-.boxel-tab-bar__item > a .boxel-tab-bar__item-text {
+.boxel-tab-bar__item-text {
   display: inline-flex;
   flex-direction: column;
   padding: var(--boxel-sp-xs) var(--boxel-sp-lg);
 }
 
-.boxel-tab-bar__item > a .boxel-tab-bar__item-text::after {
+.boxel-tab-bar__item-text::after {
   content: attr(data-text);
   content: attr(data-text) / "";
   height: 0;

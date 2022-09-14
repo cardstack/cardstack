@@ -24,13 +24,13 @@
   </:api>
 </Freestyle::Usage>
 
-<Freestyle::Usage @name="TabBar with icons">
+<Freestyle::Usage @name="TabBar with icons and inactive item">
   <:example>
     <Boxel::TabBar
       @items={{array
         (menu-item "Home" (link route="index") icon="gear")
         (menu-item "Docs" (link route="docs" query=(hash s="Components" ss="<Boxel::TabBar>")) icon="clock")
-        (menu-item "About" (link route="about") icon="library")
+        (menu-item "About" (link route="about") icon="library" inactive="true")
       }}
       @spread={{true}}
     />
