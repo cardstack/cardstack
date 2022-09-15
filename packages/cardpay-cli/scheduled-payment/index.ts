@@ -1,4 +1,5 @@
 import type { Argv } from 'yargs';
+import cancel from './cancel';
 import createSafe from './create-safe';
 import createSpHash from './create-sp-hash';
 export const command = 'scheduled-payment <command>';
@@ -8,7 +9,7 @@ import estimateExecution from './estimate-execution';
 import schedulePayment from './schedule-payment';
 
 export const builder = function (yargs: Argv) {
-  return yargs.command([createSafe, createSpHash, enableModule, estimateExecution, schedulePayment] as any);
+  return yargs.command([cancel, createSafe, createSpHash, enableModule, estimateExecution, schedulePayment] as any);
 };
 
 export function handler(/* argv: Argv */) {
