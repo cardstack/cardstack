@@ -9,4 +9,5 @@ export default class OrgHeaderUsage extends Component {
   @tracked color = 'var(--boxel-light)';
   @tracked logoSize = 'auto 2rem';
   @tracked logoPosition = 'center';
+  @tracked padding = 'var(--boxel-sp-lg)';
 }

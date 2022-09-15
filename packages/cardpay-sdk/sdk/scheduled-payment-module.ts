@@ -16,7 +16,9 @@ import {
   sendTransaction,
   Transaction,
   TransactionOptions,
+  waitUntilTransactionMined,
 } from './utils/general-utils';
+
 import { ContractOptions } from 'web3-eth-contract';
 import {
   EventABI,
@@ -28,9 +30,10 @@ import {
   Operation,
 } from './utils/safe-utils';
 import { Signer, utils } from 'ethers';
-import { signSafeTx, signSafeTxAsBytes } from './utils/signing-utils';
+import { signSafeTx, signSafeTxAsBytes, Signature } from './utils/signing-utils';
 import { BN } from 'bn.js';
-import { ERC20ABI, waitUntilTransactionMined } from '..';
+import { ERC20ABI } from '..';
+import { SuccessfulTransactionReceipt } from './utils/successful-transaction-receipt';
 /* eslint-disable node/no-extraneous-import */
 import { AddressZero } from '@ethersproject/constants';
 
@@ -513,5 +516,131 @@ export default class ScheduledPaymentModule {
     }
 
     return spHash;
+  }
+
+  async generateSchedulePaymentSignature(
+    safeAddress: string,
+    moduleAddress: string,
+    gasTokenAddress: string,
+    spHash: string
+  ) {
+    let [nonce, estimate, payload] = await this.generateSchedulePaymentTxParams(
+      safeAddress,
+      moduleAddress,
+      gasTokenAddress,
+      spHash
+    );
+
+    let from = (await this.layer2Web3.eth.getAccounts())[0];
+
+    let signature = (
+      await signSafeTx(
+        this.layer2Web3,
+        safeAddress,
+        moduleAddress,
+        payload,
+        Operation.CALL,
+        estimate,
+        nonce,
+        from,
+        this.layer2Signer
+      )
+    )[0];
+
+    return signature;
+  }
+
+  private async generateSchedulePaymentTxParams(
+    safeAddress: string,
+    moduleAddress: string,
+    gasTokenAddress: string,
+    spHash: string
+  ) {
+    let contract = new this.layer2Web3.eth.Contract(ScheduledPaymentABI as AbiItem[], moduleAddress);
+    let payload = await contract.methods.schedulePayment(spHash).encodeABI();
+
+    let estimate = await gasEstimate(
+      this.layer2Web3,
+      safeAddress,
+      moduleAddress,
+      '0',
+      payload,
+      Operation.CALL,
+      gasTokenAddress
+    );
+
+    let nonce = getNextNonceFromEstimate(estimate);
+
+    return [nonce, estimate, payload];
+  }
+
+  async schedulePayment(txnHash: string): Promise<SuccessfulTransactionReceipt>;
+  async schedulePayment(
+    safeAddress: string,
+    moduleAddress: string,
+    gasTokenAddress: string,
+    spHash: string,
+    signature?: Signature | null,
+    txnOptions?: TransactionOptions
+  ): Promise<SuccessfulTransactionReceipt>;
+  async schedulePayment(
+    safeAddressOrTxnHash: string,
+    moduleAddress?: string,
+    gasTokenAddress?: string,
+    spHash?: string,
+    signature?: Signature | null,
+    txnOptions?: TransactionOptions
+  ): Promise<SuccessfulTransactionReceipt> {
+    let { onTxnHash } = txnOptions ?? {};
+
+    if (isTransactionHash(safeAddressOrTxnHash)) {
+      let txnHash = safeAddressOrTxnHash;
+      return await waitUntilTransactionMined(this.layer2Web3, txnHash);
+    }
+
+    let safeAddress = safeAddressOrTxnHash;
+
+    if (!safeAddress) {
+      throw new Error('safeAddress must be provided');
+    }
+    if (!moduleAddress) {
+      throw new Error('moduleAddress must be provided');
+    }
+    if (!gasTokenAddress) {
+      throw new Error('gasTokenAddress must be provided');
+    }
+    if (!spHash) {
+      throw new Error('spHash must be provided');
+    }
+
+    let [nonce, estimate, payload] = await this.generateSchedulePaymentTxParams(
+      safeAddress,
+      moduleAddress,
+      gasTokenAddress,
+      spHash
+    );
+
+    if (!signature) {
+      signature = await this.generateSchedulePaymentSignature(safeAddress, moduleAddress, gasTokenAddress, spHash);
+    }
+
+    let gnosisTxn = await executeTransaction(
+      this.layer2Web3,
+      safeAddress,
+      moduleAddress,
+      payload,
+      Operation.CALL,
+      estimate,
+      nonce,
+      [signature]
+    );
+
+    let txnHash = gnosisTxn.ethereumTx.txHash;
+
+    if (typeof onTxnHash === 'function') {
+      await onTxnHash(txnHash);
+    }
+
+    return await waitUntilTransactionMined(this.layer2Web3, txnHash);
   }
 }

@@ -6,7 +6,8 @@ import { Arguments, CommandModule } from 'yargs';
 export default {
   command:
     'create-sp-hash <moduleAddress> <tokenAddress> <amount> <payeeAddress> <fixedUSDFee> <percentageFee> <executionGas> <maxGasPrice> <gasTokenAddress> <salt> <payAt>',
-  describe: 'Generates a scheduled payment hash which is calculated from the given arguments. The hash serves as a unique identifier used for scheduling, executing, and canceling scheduled payments',
+  describe:
+    'Generates a scheduled payment hash which is calculated from the given arguments. The hash serves as a unique identifier used for scheduling, executing, and canceling scheduled payments',
   builder(yargs: Argv) {
     return yargs
       .positional('moduleAddress', {

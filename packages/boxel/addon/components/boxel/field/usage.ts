@@ -14,4 +14,6 @@ export default class FieldUsage extends Component {
   @tracked vertical2 = false;
   @tracked horizontalLabelSize2 = 'default';
   @tracked icon2 = '';
+
+  @tracked labelSize = 'minmax(4rem, 25%)';
 }
