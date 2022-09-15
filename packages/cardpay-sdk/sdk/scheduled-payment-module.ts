@@ -468,7 +468,7 @@ export default class ScheduledPaymentModule {
 
     let scheduledPaymentModule = new this.web3.eth.Contract(ScheduledPaymentABI as AbiItem[], moduleAddress);
     let spHashes = await scheduledPaymentModule.methods.getSpHashes().call();
-    if (!spHashes.include(spHash)) {
+    if (!spHashes.includes(spHash)) {
       throw new Error(`unknown spHash`);
     }
 
