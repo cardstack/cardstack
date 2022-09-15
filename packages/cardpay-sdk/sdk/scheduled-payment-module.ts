@@ -267,10 +267,7 @@ export default class ScheduledPaymentModule {
   }
 
   async generateSetGuardTxs(safeAddress: string) {
-    let masterCopy = new this.web3.eth.Contract(
-      MetaGuardABI as AbiItem[],
-      await getAddress('metaGuard', this.web3)
-    );
+    let masterCopy = new this.web3.eth.Contract(MetaGuardABI as AbiItem[], await getAddress('metaGuard', this.web3));
     let { transaction, expectedModuleAddress } = await deployAndSetUpModule(this.web3, masterCopy, {
       types: ['address', 'address', 'uint256', 'address[]'],
       values: [safeAddress, safeAddress, 0, []],
@@ -526,7 +523,6 @@ export default class ScheduledPaymentModule {
     }
   }
 
-        
   async createSpHash(
     moduleAddress: string,
     tokenAddress: string,
