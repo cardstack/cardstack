@@ -22,6 +22,9 @@ export function cssVar(
   return vars.join('; ');
 }
 
-export default helper(function (_params, hash) {
+export default helper(function (
+  _params,
+  hash: Record<string, StringOrFuncReturningString>
+) {
   return htmlSafe(cssVar(hash));
 });

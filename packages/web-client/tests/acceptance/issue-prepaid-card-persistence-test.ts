@@ -73,7 +73,7 @@ module('Acceptance | issue prepaid card persistence', function (hooks) {
 
     workflowPersistenceService = this.owner.lookup(
       'service:workflow-persistence'
-    );
+    ) as WorkflowPersistence;
 
     workflowPersistenceService.clear();
   });

@@ -13,14 +13,15 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noImplicitReturns": true,
-    "noEmitOnError": true,
+    "noEmitOnError": false,
     "noEmit": true,
     "inlineSourceMap": true,
     "inlineSources": true,
     "baseUrl": ".",
     "module": "es2020",
     "experimentalDecorators": true,
-    "skipLibCheck": true,
+    "skipLibCheck": false,
+    "traceResolution": false,
     "paths": {
       "@cardstack/web-client/tests/*": [
         "tests/*"
@@ -28,8 +29,12 @@
       "@cardstack/web-client/*": [
         "app/*"
       ],
+      "@cardstack/boxel/*": [
+        "../boxel/addon/*"
+      ],
       "*": [
-        "types/*"
+        "types/*",
+        "../boxel/types/*"
       ],
       "@glimmer/tracking": [
         "../../node_modules/ember-cached-decorator-polyfill",
@@ -38,6 +43,33 @@
       "@ember/destroyable": ["../../node_modules/ember-destroyable-polyfill"],
       "@cardstack/web-client/mirage/*": ["mirage/*"],
       "web3-provider-engine": ["../../types/web3-provider-engine"],
+    },
+  },
+  "glint": {
+    "environment": ["ember-loose", "ember-template-imports"],
+    "transform": {
+      "include": [
+        "../boxel/addon/components/boxel/action-chin/**/*",
+        "../boxel/addon/components/boxel/action-container/**/*",
+        "../boxel/addon/components/boxel/button/**/*",
+        "../boxel/addon/components/boxel/card-container/**/*",
+        "../boxel/addon/components/boxel/dashboard/**/*",
+        "../boxel/addon/components/boxel/header/**/*",
+        "../boxel/addon/components/boxel/help-box/**/*",
+        "../boxel/addon/components/boxel/left-edge-nav/**/*",
+        "../boxel/addon/components/boxel/loading-indicator/**/*",
+        "../boxel/addon/components/boxel/modal/**/*",
+        "../boxel/addon/components/boxel/org-header/**/*",
+        "../boxel/addon/components/boxel/org-switcher/**/*",
+        "../boxel/addon/components/boxel/org-title/**/*",
+        "../boxel/addon/components/boxel/progress-icon/**/*",
+        "../boxel/addon/components/boxel/progress-steps/**/*",
+        "../boxel/addon/components/boxel/sidebar/**/*",
+        "app/components/card-drop-page/**/*",
+        "app/components/card-pay/dashboard-panel/**/*",
+        "app/components/card-pay/header/workflow-tracker/item/*",
+        "app/components/card-pay/header/**/*",
+      ]
     }
   },
   "include": [

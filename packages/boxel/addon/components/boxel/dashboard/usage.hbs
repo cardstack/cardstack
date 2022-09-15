@@ -3,13 +3,16 @@
     <Boxel::Dashboard
       @displayLeftEdge={{this.displayLeftEdge}}
       @darkTheme={{this.darkTheme}}
+      style={{css-var
+        boxel-dashboard-background-color=this.backgroundColor
+        boxel-dashboard-color=this.color
+      }}
     >
       <:leftEdge>
         <Boxel::LeftEdgeNav
           @home={{hash icon="cardstack" height="2rem"}}
           class="dashboard-usage-left-edge-nav"
-        >
-        </Boxel::LeftEdgeNav>
+        />
       </:leftEdge>
       <:header>
         <Boxel::OrgHeader @title="Cardstack" />
@@ -33,6 +36,20 @@
       @defaultValue="false"
       @value={{this.darkTheme}}
       @onInput={{fn (mut this.darkTheme)}}
+    />
+    {{!-- template-lint-disable no-unbound --}}
+    <Args.String
+      @name="--boxel-dashboard-background-color"
+      @defaultValue={{unbound this.backgroundColor}}
+      @value={{this.backgroundColor}}
+      @onInput={{fn (mut this.backgroundColor)}}
+    />
+    <Args.String
+      @name="--boxel-dashboard-color"
+      @description="text color"
+      @defaultValue={{unbound this.color}}
+      @value={{this.color}}
+      @onInput={{fn (mut this.color)}}
     />
   </:api>
 </Freestyle::Usage>

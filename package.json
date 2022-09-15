@@ -11,6 +11,7 @@
   "dependencies": {
     "@actions/core": "^1.2.6",
     "@actions/github": "^4.0.0",
+    "@types/ethereum-protocol": "^1.0.2",
     "@types/node": "14.14.35",
     "@typescript-eslint/eslint-plugin": "^5.35.1",
     "@typescript-eslint/parser": "^5.35.1",
@@ -94,7 +95,9 @@
   "resolutions": {
     "ember-a11y-testing": "4.0.3",
     "axe-core": "4.1.4",
-    "ember-get-config": "2.1.0"
+    "ember-get-config": "2.1.0",
+    "@babel/generator": "~7.16.0",
+    "web3-core": "~1.7.3"
   },
   "workspaces": {
     "packages": [

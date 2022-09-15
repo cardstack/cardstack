@@ -253,7 +253,13 @@ async function safeTransactionTypedData(
   };
 
   let safe = new web3.eth.Contract(GnosisSafeABI as AbiItem[], gnosisSafeAddress);
-  let safeVersion = await safe.methods.VERSION().call();
+  let safeVersion;
+  try {
+    safeVersion = await safe.methods.VERSION().call();
+  } catch (e) {
+    safe = new web3.eth.Contract(GnosisSafeABI as AbiItem[], await getAddress('gnosisSafeMasterCopy', web3));
+    safeVersion = await safe.methods.VERSION().call();
+  }
 
   if (gte(safeVersion, '1.3.0')) {
     let name = await networkName(web3);

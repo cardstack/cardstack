@@ -5,6 +5,14 @@ interface OnClickOutsideOptions {
   ignoreSelector?: string;
 }
 
+interface Signature {
+  Element: HTMLElement;
+  Args: {
+    Positional: [clickAction: Function];
+    Named: OnClickOutsideOptions;
+  };
+}
+
 function onClickOutside(
   element: HTMLElement,
   [clickAction]: Function[],
@@ -34,4 +42,4 @@ function onClickOutside(
   };
 }
 
-export default modifier(onClickOutside, { eager: false });
+export default modifier<Signature>(onClickOutside, { eager: false });

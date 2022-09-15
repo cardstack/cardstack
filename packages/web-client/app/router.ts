@@ -2,7 +2,7 @@ import EmberRouter from '@ember/routing/router';
 import config from '@cardstack/web-client/config/environment';
 
 export default class Router extends EmberRouter {
-  location = config.locationType;
+  location = config.locationType as any;
   rootURL = config.rootURL;
 }
 

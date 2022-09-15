@@ -31,7 +31,7 @@ export default {
     console.log(`Enabling scheduled payment module on safe ${safeAddress}`);
     let onTxnHash = (txnHash: string) =>
       console.log(`Transaction hash: ${blockExplorer}/tx/${txnHash}/token-transfers`);
-    let { scheduledPaymentModuleAddress, metaGuardAddress } = await scheduledPaymentModule.enableModule(
+    let { scheduledPaymentModuleAddress, metaGuardAddress } = await scheduledPaymentModule.enableModuleAndGuard(
       safeAddress,
       gasTokenAddress,
       { onTxnHash }

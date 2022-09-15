@@ -83,7 +83,7 @@ module('Acceptance | persistence view and restore', function () {
 
       workflowPersistenceService = this.owner.lookup(
         'service:workflow-persistence'
-      );
+      ) as WorkflowPersistence;
 
       workflowPersistenceService.clear();
     });

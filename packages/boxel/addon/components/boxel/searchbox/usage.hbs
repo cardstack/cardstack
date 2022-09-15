@@ -1,6 +1,17 @@
 <Freestyle::Usage @name="Searchbox">
   <:example>
-    <Boxel::Searchbox @id={{this.id}} @label={{this.label}} @placeholder={{this.placeholder}} @value={{this.value}} @onInput={{this.onInput}} @onChange={{this.onChange}}/>
+    <Boxel::Searchbox
+      @id={{this.id}}
+      @label={{this.label}}
+      @hideIcon={{this.hideIcon}}
+      @placeholder={{this.placeholder}}
+      @value={{this.value}}
+      @onInput={{this.onInput}}
+      @onChange={{this.onChange}}
+      style={{css-var
+        boxel-searchbox-icon-size=this.iconSize
+      }}
+    />
   </:example>
   <:api as |Args|>
     <Args.String
@@ -15,6 +26,13 @@
       @value={{this.label}}
       @onInput={{fn (mut this.label)}}
     />
+    <Args.Bool
+      @name="hideIcon"
+      @value={{this.hideIcon}}
+      @description="when true, hides the search icon"
+      @defaultValue={{false}}
+      @onInput={{fn (mut this.hideIcon)}}
+    />
     <Args.String
       @name="placeholder"
       @description="The placeholder of the searchbox input."
@@ -26,6 +44,13 @@
       @description="The string entered in the searchbox"
       @value={{this.value}}
       @onInput={{fn (mut this.value)}}
+    />
+    {{!-- template-lint-disable no-unbound --}}
+    <Args.String
+      @name="--boxel-searchbox-icon-size"
+      @defaultValue={{unbound this.iconSize}}
+      @value={{this.iconSize}}
+      @onInput={{fn (mut this.iconSize)}}
     />
     <Args.Action
       @name="onInput"

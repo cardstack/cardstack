@@ -7,6 +7,7 @@
           boxel-infobox-image=this.imageUrl
           boxel-infobox-image-size=this.imageSize
           boxel-infobox-image-position=this.imagePosition
+          boxel-infobox-text-width=this.textWidth
         }}
       >
       </Boxel::Infobox>
@@ -37,6 +38,13 @@
         @name="--boxel-infobox-image-size"
         @value={{this.imageSize}}
         @onInput={{fn (mut this.imageSize)}}
+      />
+      {{!-- template-lint-disable no-unbound --}}
+      <Args.String
+        @name="--boxel-infobox-text-width"
+        @default={{unbound this.textWidth}}
+        @value={{this.textWidth}}
+        @onInput={{fn (mut this.textWidth)}}
       />
     </:api>
 </Freestyle::Usage>

@@ -68,7 +68,7 @@ module('Acceptance | create profile persistence', function (hooks) {
 
     workflowPersistenceService = this.owner.lookup(
       'service:workflow-persistence'
-    );
+    ) as WorkflowPersistence;
 
     workflowPersistenceService.clear();
   });

@@ -32,7 +32,8 @@ module(
     module('Initialized unauthenticated', function (hooks) {
       hooks.beforeEach(async function (this: Context) {
         hubAuthentication = this.owner.lookup('service:hub-authentication');
-        layer2Service = this.owner.lookup('service:layer2-network').strategy;
+        layer2Service = this.owner.lookup('service:layer2-network')
+          .strategy as Layer2TestWeb3Strategy;
 
         this.setProperties({
           onComplete: () => {

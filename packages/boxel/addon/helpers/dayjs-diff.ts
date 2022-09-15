@@ -2,7 +2,7 @@ import dayjs from 'dayjs';
 import Helper from '@ember/component/helper';
 
 export default Helper.helper(function (
-  params,
+  params: [dayjs.ConfigType, dayjs.ConfigType],
   {
     precision,
     float,

@@ -7,7 +7,7 @@ import { render, getContext } from '@ember/test-helpers';
 import { hbs } from 'ember-cli-htmlbars';
 import { cardURL } from '@cardstack/core/src/utils';
 
-import type { TestContext } from 'ember-test-helpers';
+import type { TestContext } from '@ember/test-helpers';
 
 // Shorthand to support not passing in the realm when getting a card
 function testCardURL(cardId: Partial<CardId> & { id: string }) {
