@@ -1,0 +1,42 @@
+<Freestyle::Usage @name='Input::RangedNumberPicker'>
+  <:example>
+    <Boxel::Input::RangedNumberPicker
+      @min={{this.min}}
+      @max={{this.max}}
+      @onNumberSelected={{this.setSelectedNumber}}
+      @placeholder={{this.placeholder}}
+    />
+  </:example>
+  <:api as |Args|>
+    <Args.Number
+      @name='min'
+      @description='Minimum number to start range'
+      @onInput={{fn (mut this.min)}}
+      @value={{this.min}}
+    />
+    <Args.Number
+      @name='max'
+      @description='Maximum number to end range'
+      @onInput={{fn (mut this.max)}}
+      @value={{this.max}}
+    />
+
+    <Args.Action
+      @name='onNumberSelected'
+      @description='Action to call when a number is selected'
+    />
+    <Args.String
+      @name='value'
+      @description='The value of the input'
+      @value={{this.value}}
+      @onInput={{fn (mut this.value)}}
+    />
+    <Args.String
+      @name='placeholder'
+      @description='The value of the placeholder'
+      @value={{this.placeholder}}
+      @onInput={{fn (mut this.placeholder)}}
+      @default='Pick a Day'
+    />
+  </:api>
+</Freestyle::Usage>
