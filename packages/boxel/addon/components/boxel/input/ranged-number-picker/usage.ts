@@ -5,9 +5,8 @@ import { action } from '@ember/object';
 export default class BoxelInputRangedNumberPickerUsage extends Component {
   @tracked min = 1;
   @tracked max = 30;
-  @tracked selectedNumber: number | undefined = undefined;
 
-  @action setSelectedNumber(number: number): void {
-    this.selectedNumber = number;
+  @action logValue(value: string): void {
+    console.log(value);
   }
 }
