@@ -6,7 +6,7 @@ import { Arguments, CommandModule } from 'yargs';
 export default {
   command:
     'create-sp-hash <moduleAddress> <tokenAddress> <amount> <payeeAddress> <fixedUSDFee> <percentageFee> <executionGas> <maxGasPrice> <gasTokenAddress> <salt> <payAt>',
-  describe: 'Create scheduled payment hash',
+  describe: 'Generates a scheduled payment hash which is calculated from the given arguments. The hash serves as a unique identifier used for scheduling, executing, and canceling scheduled payments',
   builder(yargs: Argv) {
     return yargs
       .positional('moduleAddress', {
@@ -55,15 +55,15 @@ export default {
       })
       .positional('payAt', {
         type: 'number',
-        description: 'Time to execute scheduled payments (in seconds)',
+        description: 'The unix UTC time in seconds from scheduled payment execution time',
       })
       .option('recurringDayOfMonth', {
         type: 'number',
-        description: 'Days of the month in the range of 1-28 to make recurring payments',
+        description: 'Day of the month on which the payment will be made recurringly (range: 1-28)',
       })
       .option('recurringUntil', {
         type: 'number',
-        description: 'End date of recurring payment',
+        description: 'The unix UTC time in seconds from the end date of recurring payments',
       })
       .option('network', NETWORK_OPTION_ANY);
   },
