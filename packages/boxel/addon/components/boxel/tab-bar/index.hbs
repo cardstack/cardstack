@@ -1,4 +1,4 @@
-<nav
+<div
   role="tablist"
   class={{cn
     "boxel-tab-bar"
@@ -39,6 +39,7 @@
       {{else}}
         {{!-- template-lint-disable require-context-role --}}
         <LinkTo
+          id={{tab.action.routeName}}
           @route={{tab.action.routeName}}
           @query={{or tab.action.queryParams (hash)}}
           role="tab"
@@ -64,4 +65,4 @@
       {{/if}}
     {{/each}}
   {{/if}}
-</nav>
+</div>
