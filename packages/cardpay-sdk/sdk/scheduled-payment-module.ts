@@ -56,7 +56,7 @@ export const FEE_BASE_POW = new BN(18);
 export const FEE_BASE = new BN(10).pow(FEE_BASE_POW);
 
 export default class ScheduledPaymentModule {
-  constructor(private layer2Web3: Web3, private layer2Signer?: Signer) {}
+  constructor(private web3: Web3, private layer2Signer?: Signer) {}
 
   async enableModuleAndGuard(txnHash: string): Promise<EnableModuleAndGuardResult>;
   async enableModuleAndGuard(
@@ -80,14 +80,15 @@ export default class ScheduledPaymentModule {
       throw new Error('safeAddress must be specified');
     }
     let { nonce, onNonce, onTxnHash } = txnOptions ?? {};
-    let from = contractOptions?.from ?? (await this.layer2Web3.eth.getAccounts())[0];
+    let from = contractOptions?.from ?? (await this.web3.eth.getAccounts())[0];
 
     let enableModuleTxs = await this.generateEnableModuleTxs(safeAddress);
     let setGuardTxs = await this.generateSetGuardTxs(safeAddress);
-    let multiSendTransaction = await encodeMultiSend(this.layer2Web3, [...enableModuleTxs.txs, ...setGuardTxs.txs]);
+
+    let multiSendTransaction = await encodeMultiSend(this.web3, [...enableModuleTxs.txs, ...setGuardTxs.txs]);
 
     let estimate = await gasEstimate(
-      this.layer2Web3,
+      this.web3,
       safeAddress,
       multiSendTransaction.to,
       multiSendTransaction.value,
@@ -96,7 +97,8 @@ export default class ScheduledPaymentModule {
       gasTokenAddress ? gasTokenAddress : AddressZero
     );
     let gasCost = new BN(estimate.safeTxGas).add(new BN(estimate.baseGas)).mul(new BN(estimate.gasPrice));
-    let token = new this.layer2Web3.eth.Contract(ERC20ABI as AbiItem[], gasTokenAddress);
+
+    let token = new this.web3.eth.Contract(ERC20ABI as AbiItem[], gasTokenAddress);
     let symbol = await token.methods.symbol().call();
     let balance = new BN(await token.methods.balanceOf(safeAddress).call());
     if (balance.lt(gasCost)) {
@@ -113,7 +115,7 @@ export default class ScheduledPaymentModule {
       }
     }
     let gnosisTxn = await executeTransaction(
-      this.layer2Web3,
+      this.web3,
       safeAddress,
       multiSendTransaction.to,
       multiSendTransaction.data,
@@ -121,7 +123,7 @@ export default class ScheduledPaymentModule {
       estimate,
       nonce,
       await signSafeTx(
-        this.layer2Web3,
+        this.web3,
         safeAddress,
         multiSendTransaction.to,
         multiSendTransaction.data,
@@ -160,10 +162,10 @@ export default class ScheduledPaymentModule {
     }
 
     let { onTxnHash } = txnOptions ?? {};
-    let from = contractOptions?.from ?? (await this.layer2Web3.eth.getAccounts())[0];
+    let from = contractOptions?.from ?? (await this.web3.eth.getAccounts())[0];
 
     let { expectedSafeAddress, create2SafeTx } = await generateCreate2SafeTx(
-      this.layer2Web3,
+      this.web3,
       [from],
       1,
       AddressZero,
@@ -177,11 +179,11 @@ export default class ScheduledPaymentModule {
     let enableModuleTxs = await this.generateEnableModuleTxs(expectedSafeAddress);
     let setGuardTxs = await this.generateSetGuardTxs(expectedSafeAddress);
 
-    let multiSendTx = await encodeMultiSend(this.layer2Web3, [...enableModuleTxs.txs, ...setGuardTxs.txs]);
-    let gnosisSafe = new this.layer2Web3.eth.Contract(GnosisSafeABI as AbiItem[], expectedSafeAddress);
+    let multiSendTx = await encodeMultiSend(this.web3, [...enableModuleTxs.txs, ...setGuardTxs.txs]);
+    let gnosisSafe = new this.web3.eth.Contract(GnosisSafeABI as AbiItem[], expectedSafeAddress);
     let estimate = await gasEstimate(
-      this.layer2Web3,
-      await getAddress('gnosisSafeMasterCopy', this.layer2Web3),
+      this.web3,
+      await getAddress('gnosisSafeMasterCopy', this.web3),
       multiSendTx.to,
       multiSendTx.value,
       multiSendTx.data,
@@ -191,7 +193,7 @@ export default class ScheduledPaymentModule {
     let nonce = new BN('0');
     let gasPrice = '0';
     let [signature] = await signSafeTxAsBytes(
-      this.layer2Web3,
+      this.web3,
       multiSendTx.to,
       Number(multiSendTx.value),
       multiSendTx.data,
@@ -226,8 +228,8 @@ export default class ScheduledPaymentModule {
       data: safeTxData,
       operation: Operation.CALL,
     };
-    let multiSendCallOnlyTx = await encodeMultiSendCallOnly(this.layer2Web3, [create2SafeTx, safeTx]);
-    let txHash = await sendTransaction(this.layer2Web3, multiSendCallOnlyTx);
+    let multiSendCallOnlyTx = await encodeMultiSendCallOnly(this.web3, [create2SafeTx, safeTx]);
+    let txHash = await sendTransaction(this.web3, multiSendCallOnlyTx);
 
     if (typeof onTxnHash === 'function') {
       await onTxnHash(txHash);
@@ -241,18 +243,18 @@ export default class ScheduledPaymentModule {
   }
 
   async generateEnableModuleTxs(safeAddress: string) {
-    let masterCopy = new this.layer2Web3.eth.Contract(
+    let masterCopy = new this.web3.eth.Contract(
       ScheduledPaymentABI as AbiItem[],
-      await getAddress('scheduledPaymentModule', this.layer2Web3)
+      await getAddress('scheduledPaymentModule', this.web3)
     );
-    let configAddress = await getAddress('scheduledPaymentConfig', this.layer2Web3);
-    let exchangeAddress = await getAddress('scheduledPaymentExchange', this.layer2Web3);
-    let { transaction, expectedModuleAddress } = await deployAndSetUpModule(this.layer2Web3, masterCopy, {
+    let configAddress = await getAddress('scheduledPaymentConfig', this.web3);
+    let exchangeAddress = await getAddress('scheduledPaymentExchange', this.web3);
+    let { transaction, expectedModuleAddress } = await deployAndSetUpModule(this.web3, masterCopy, {
       types: ['address', 'address', 'address', 'address', 'address'],
       values: [safeAddress, safeAddress, safeAddress, configAddress, exchangeAddress],
     });
 
-    let safe = new this.layer2Web3.eth.Contract(GnosisSafeABI as AbiItem[], safeAddress);
+    let safe = new this.web3.eth.Contract(GnosisSafeABI as AbiItem[], safeAddress);
     let enableModuleData = safe.methods.enableModule(expectedModuleAddress).encodeABI();
     let enableModuleTransaction = {
       data: enableModuleData,
@@ -265,16 +267,13 @@ export default class ScheduledPaymentModule {
   }
 
   async generateSetGuardTxs(safeAddress: string) {
-    let masterCopy = new this.layer2Web3.eth.Contract(
-      MetaGuardABI as AbiItem[],
-      await getAddress('metaGuard', this.layer2Web3)
-    );
-    let { transaction, expectedModuleAddress } = await deployAndSetUpModule(this.layer2Web3, masterCopy, {
+    let masterCopy = new this.web3.eth.Contract(MetaGuardABI as AbiItem[], await getAddress('metaGuard', this.web3));
+    let { transaction, expectedModuleAddress } = await deployAndSetUpModule(this.web3, masterCopy, {
       types: ['address', 'address', 'uint256', 'address[]'],
       values: [safeAddress, safeAddress, 0, []],
     });
 
-    let safe = new this.layer2Web3.eth.Contract(GnosisSafeABI as AbiItem[], safeAddress);
+    let safe = new this.web3.eth.Contract(GnosisSafeABI as AbiItem[], safeAddress);
     let setGuardData = safe.methods.setGuard(expectedModuleAddress).encodeABI();
     let setGuardTransaction = {
       data: setGuardData,
@@ -287,19 +286,19 @@ export default class ScheduledPaymentModule {
   }
 
   async getSafeAddressFromTxn(txnHash: string): Promise<string> {
-    let receipt = await waitUntilTransactionMined(this.layer2Web3, txnHash);
+    let receipt = await waitUntilTransactionMined(this.web3, txnHash);
     let params = getParamsFromEvent(
-      this.layer2Web3,
+      this.web3,
       receipt,
       this.safeProxyCreationEventABI(),
-      await getAddress('gnosisProxyFactory_v1_3', this.layer2Web3)
+      await getAddress('gnosisProxyFactory_v1_3', this.web3)
     );
     return params[0].proxy;
   }
 
   private safeProxyCreationEventABI(): EventABI {
     return {
-      topic: this.layer2Web3.eth.abi.encodeEventSignature('ProxyCreation(address,address)'),
+      topic: this.web3.eth.abi.encodeEventSignature('ProxyCreation(address,address)'),
       abis: [
         {
           name: 'proxy',
@@ -316,10 +315,10 @@ export default class ScheduledPaymentModule {
   }
 
   async getModuleAndGuardAddressFromTxn(txnHash: string): Promise<EnableModuleAndGuardResult> {
-    let receipt = await waitUntilTransactionMined(this.layer2Web3, txnHash);
-    let moduleProxyCreationEvents = await getModuleProxyCreationEvent(this.layer2Web3, receipt.logs);
-    let scheduledPaymentMasterCopy = await getAddress('scheduledPaymentModule', this.layer2Web3);
-    let metaGuardMasterCopy = await getAddress('metaGuard', this.layer2Web3);
+    let receipt = await waitUntilTransactionMined(this.web3, txnHash);
+    let moduleProxyCreationEvents = await getModuleProxyCreationEvent(this.web3, receipt.logs);
+    let scheduledPaymentMasterCopy = await getAddress('scheduledPaymentModule', this.web3);
+    let metaGuardMasterCopy = await getAddress('metaGuard', this.web3);
     let scheduledPaymentModuleAddress = moduleProxyCreationEvents.find(
       (event) => event.args['masterCopy'] === scheduledPaymentMasterCopy
     )?.args['proxy'];
@@ -354,7 +353,7 @@ export default class ScheduledPaymentModule {
     salt: string,
     recurringDayOfMonth: number,
     gasPrice: string,
-    recurringUntil?: number
+    recurringUntil: number
   ): Promise<number>;
   async estimateExecutionGas(
     moduleAddress: string,
@@ -371,7 +370,7 @@ export default class ScheduledPaymentModule {
   ): Promise<number> {
     let requiredGas;
     try {
-      let module = new this.layer2Web3.eth.Contract(ScheduledPaymentABI as AbiItem[], moduleAddress);
+      let module = new this.web3.eth.Contract(ScheduledPaymentABI as AbiItem[], moduleAddress);
       if (recurringUntil) {
         let recurringDayOfMonth = payAtOrRecurringDayOfMonth;
         await module.methods[
@@ -428,6 +427,192 @@ export default class ScheduledPaymentModule {
     return requiredGas;
   }
 
+  async cancelScheduledPayment(txnHash: string): Promise<SuccessfulTransactionReceipt>;
+  async cancelScheduledPayment(
+    safeAddress: string,
+    moduleAddress: string,
+    spHash: string,
+    gasTokenAddress: string,
+    txnOptions?: TransactionOptions,
+    contractOptions?: ContractOptions
+  ): Promise<void>;
+  async cancelScheduledPayment(
+    safeAddressOrTxnHash: string,
+    moduleAddress?: string,
+    spHash?: string,
+    gasTokenAddress?: string,
+    txnOptions?: TransactionOptions,
+    contractOptions?: ContractOptions
+  ): Promise<SuccessfulTransactionReceipt | void> {
+    if (isTransactionHash(safeAddressOrTxnHash)) {
+      let txnHash = safeAddressOrTxnHash;
+      return await waitUntilTransactionMined(this.web3, txnHash);
+    }
+
+    if (!moduleAddress) {
+      throw new Error('moduleAddress must be specified');
+    }
+    if (!spHash) {
+      throw new Error('spHash must be specified');
+    }
+    if (!gasTokenAddress) {
+      throw new Error('gasTokenAddress must be specified');
+    }
+
+    let safeAddress = safeAddressOrTxnHash;
+    let { nonce, onNonce, onTxnHash } = txnOptions ?? {};
+    let from = contractOptions?.from ?? (await this.web3.eth.getAccounts())[0];
+
+    let scheduledPaymentModule = new this.web3.eth.Contract(ScheduledPaymentABI as AbiItem[], moduleAddress);
+    let spHashes = await scheduledPaymentModule.methods.getSpHashes().call();
+    if (!spHashes.includes(spHash)) {
+      throw new Error(`unknown spHash`);
+    }
+
+    let cancelScheduledPaymentData = scheduledPaymentModule.methods.cancelScheduledPayment(spHash).encodeABI();
+    let estimate = await gasEstimate(
+      this.web3,
+      safeAddress,
+      moduleAddress,
+      '0',
+      cancelScheduledPaymentData,
+      Operation.CALL,
+      gasTokenAddress
+    );
+    let gasCost = new BN(estimate.safeTxGas).add(new BN(estimate.baseGas)).mul(new BN(estimate.gasPrice));
+
+    let token = new this.web3.eth.Contract(ERC20ABI as AbiItem[], gasTokenAddress);
+    let symbol = await token.methods.symbol().call();
+    let balance = new BN(await token.methods.balanceOf(safeAddress).call());
+    if (balance.lt(gasCost)) {
+      throw new Error(
+        `Safe does not have enough balance to cancel scheduled payment. The gas token ${gasTokenAddress} balance of the safe ${safeAddress} is ${fromWei(
+          balance
+        )}, the the gas cost is ${fromWei(gasCost)} ${symbol}`
+      );
+    }
+    if (nonce == null) {
+      nonce = getNextNonceFromEstimate(estimate);
+      if (typeof onNonce === 'function') {
+        onNonce(nonce);
+      }
+    }
+    let gnosisTxn = await executeTransaction(
+      this.web3,
+      safeAddress,
+      moduleAddress,
+      cancelScheduledPaymentData,
+      Operation.CALL,
+      estimate,
+      nonce,
+      await signSafeTx(
+        this.web3,
+        safeAddress,
+        moduleAddress,
+        cancelScheduledPaymentData,
+        Operation.CALL,
+        estimate,
+        nonce,
+        from,
+        this.layer2Signer
+      )
+    );
+
+    if (typeof onTxnHash === 'function') {
+      await onTxnHash(gnosisTxn.ethereumTx.txHash);
+    }
+  }
+
+  async createSpHash(
+    moduleAddress: string,
+    tokenAddress: string,
+    amount: string,
+    payeeAddress: string,
+    fee: Fee,
+    executionGas: number,
+    maxGasPrice: string,
+    gasTokenAddress: string,
+    salt: string,
+    payAt: number
+  ): Promise<string>;
+  async createSpHash(
+    moduleAddress: string,
+    tokenAddress: string,
+    amount: string,
+    payeeAddress: string,
+    fee: Fee,
+    executionGas: number,
+    maxGasPrice: string,
+    gasTokenAddress: string,
+    salt: string,
+    recurringDayOfMonth: number,
+    recurringUntil: number
+  ): Promise<string>;
+  async createSpHash(
+    moduleAddress: string,
+    tokenAddress: string,
+    amount: string,
+    payeeAddress: string,
+    fee: Fee,
+    executionGas: number,
+    maxGasPrice: string,
+    gasTokenAddress: string,
+    salt: string,
+    payAtOrRecurringDayOfMonth: number,
+    recurringUntil?: number
+  ): Promise<string> {
+    let spHash;
+    let module = new this.web3.eth.Contract(ScheduledPaymentABI as AbiItem[], moduleAddress);
+    if (recurringUntil) {
+      let recurringDayOfMonth = payAtOrRecurringDayOfMonth;
+      spHash = await module.methods[
+        'createSpHash(address,uint256,address,((uint256),(uint256)),uint256,uint256,address,string,uint256,uint256)'
+      ](
+        tokenAddress,
+        amount,
+        payeeAddress,
+        {
+          fixedUSD: {
+            value: FEE_BASE.mul(new BN(fee.fixedUSD)).toString(),
+          },
+          percentage: {
+            value: FEE_BASE.mul(new BN(fee.percentage)).toString(),
+          },
+        },
+        executionGas,
+        maxGasPrice,
+        gasTokenAddress,
+        salt,
+        recurringDayOfMonth,
+        recurringUntil
+      ).call();
+    } else {
+      let payAt = payAtOrRecurringDayOfMonth;
+      spHash = await module.methods[
+        'createSpHash(address,uint256,address,((uint256),(uint256)),uint256,uint256,address,string,uint256)'
+      ](
+        tokenAddress,
+        amount,
+        payeeAddress,
+        {
+          fixedUSD: {
+            value: FEE_BASE.mul(new BN(fee.fixedUSD)).toString(),
+          },
+          percentage: {
+            value: FEE_BASE.mul(new BN(fee.percentage)).toString(),
+          },
+        },
+        executionGas,
+        maxGasPrice,
+        gasTokenAddress,
+        salt,
+        payAt
+      ).call();
+    }
+
+    return spHash;
+  }
+
   async generateSchedulePaymentSignature(
     safeAddress: string,
     moduleAddress: string,
@@ -441,11 +626,11 @@ export default class ScheduledPaymentModule {
       spHash
     );
 
-    let from = (await this.layer2Web3.eth.getAccounts())[0];
+    let from = (await this.web3.eth.getAccounts())[0];
 
     let signature = (
       await signSafeTx(
-        this.layer2Web3,
+        this.web3,
         safeAddress,
         moduleAddress,
         payload,
@@ -466,11 +651,11 @@ export default class ScheduledPaymentModule {
     gasTokenAddress: string,
     spHash: string
   ) {
-    let contract = new this.layer2Web3.eth.Contract(ScheduledPaymentABI as AbiItem[], moduleAddress);
+    let contract = new this.web3.eth.Contract(ScheduledPaymentABI as AbiItem[], moduleAddress);
     let payload = await contract.methods.schedulePayment(spHash).encodeABI();
 
     let estimate = await gasEstimate(
-      this.layer2Web3,
+      this.web3,
       safeAddress,
       moduleAddress,
       '0',
@@ -505,7 +690,7 @@ export default class ScheduledPaymentModule {
 
     if (isTransactionHash(safeAddressOrTxnHash)) {
       let txnHash = safeAddressOrTxnHash;
-      return await waitUntilTransactionMined(this.layer2Web3, txnHash);
+      return await waitUntilTransactionMined(this.web3, txnHash);
     }
 
     let safeAddress = safeAddressOrTxnHash;
@@ -535,7 +720,7 @@ export default class ScheduledPaymentModule {
     }
 
     let gnosisTxn = await executeTransaction(
-      this.layer2Web3,
+      this.web3,
       safeAddress,
       moduleAddress,
       payload,
@@ -551,6 +736,6 @@ export default class ScheduledPaymentModule {
       await onTxnHash(txnHash);
     }
 
-    return await waitUntilTransactionMined(this.layer2Web3, txnHash);
+    return await waitUntilTransactionMined(this.web3, txnHash);
   }
 }
