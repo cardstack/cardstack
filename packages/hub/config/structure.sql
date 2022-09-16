@@ -1184,7 +1184,8 @@ CREATE TABLE public.scheduled_payments (
     cancelation_block_number bigint,
     created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
     updated_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    canceled_at timestamp without time zone
+    canceled_at timestamp without time zone,
+    signature text
 );
 
 

@@ -316,6 +316,7 @@ model ScheduledPayment {
   createdAt                  DateTime                  @default(now()) @map("created_at") @db.Timestamp(6)
   updatedAt                  DateTime                  @default(now()) @map("updated_at") @db.Timestamp(6)
   canceledAt                 DateTime?                 @map("canceled_at") @db.Timestamp(6)
+  signature                  String?
   scheduledPaymentAttempts   ScheduledPaymentAttempt[]
 
   @@index([senderSafeAddress], map: "scheduled_payments_sender_safe_address_index")
