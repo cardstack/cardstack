@@ -1,5 +1,8 @@
 <PowerSelect
-  class="boxel-ranged-number-picker-menu"
+  class={{cn
+    "boxel-ranged-number-picker-menu"
+    boxel-ranged-number-picker-menu--selected=this.selectedNumber
+  }}
   @options={{this.rangedNumbers}}
   @selected={{this.selectedNumber}}
   @placeholder={{or @placeholder "Pick Number"}}

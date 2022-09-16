@@ -5,13 +5,19 @@
   padding-right: 1em;
 }
 
+.boxel-ranged-number-picker-menu--selected {
+  padding-right: 0;
+}
+
 .ember-basic-dropdown {
   display: inline-block;
 }
 
+/* Override absolute positioning while using renderInPlace */
 .ember-basic-dropdown-content--left {
   left: unset;
-  right: 0;
+  right: -55px;
+  top: 0;
 }
 
 .boxel-ranged-number-picker-menu__dropdown {
@@ -36,7 +42,7 @@
 .boxel-ranged-number-picker-menu__item {
   font-weight: 600;
   font-size: var(--boxel-font-size-sm);
-  padding: var(--boxel-sp-xxs) var(--boxel-sp);
+  padding: var(--boxel-sp-xxs) var(--boxel-sp-sm);
 }
 
 .ember-power-select-placeholder {
