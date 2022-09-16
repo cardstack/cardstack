@@ -37,6 +37,10 @@
   cursor: pointer;
 }
 
+.boxel-tab-bar__item--is-inactive:hover {
+  font-weight: initial;
+}
+
 .boxel-tab-bar__item--is-active {
   color: var(--boxel-tab-bar-color-active);
   font-weight: var(--boxel-tab-bar-font-weight-hover);
