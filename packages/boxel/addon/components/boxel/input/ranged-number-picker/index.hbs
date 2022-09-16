@@ -1,13 +1,13 @@
 <PowerSelect
-  class='boxel-ranged-number-picker-menu'
+  class="boxel-ranged-number-picker-menu"
   @options={{this.rangedNumbers}}
   @selected={{this.selectedNumber}}
-  @placeholder={{or @placeholder 'Pick Number'}}
+  @placeholder={{or @placeholder "Pick Number"}}
   @onChange={{this.setSelectedNumber}}
   @renderInPlace={{true}}
-  @dropdownClass='boxel-ranged-number-picker-menu__dropdown'
+  @dropdownClass="boxel-ranged-number-picker-menu__dropdown"
   @triggerComponent={{@triggerComponent}}
   as |item|
 >
-  <div class='boxel-ranged-number-picker-menu__item'>{{item}}</div>
+  <div class="boxel-ranged-number-picker-menu__item">{{item}}</div>
 </PowerSelect>
