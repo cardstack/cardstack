@@ -53,7 +53,7 @@
 */
 
 .boxel-tab-bar__item-text {
-  display: inline-flex;
+  display: flex;
   flex-direction: column;
 }
 
