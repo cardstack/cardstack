@@ -1,24 +1,29 @@
-.boxel-ranged-number-picker-menu { 
+.boxel-ranged-number-picker-menu {
   display: inline-block;
   background: url('/@cardstack/boxel/images/icons/caret-down.svg') no-repeat;
   background-position: 100%;
   padding-right: 1em;
 }
 
-.ember-basic-dropdown { 
+.ember-basic-dropdown {
   display: inline-block;
 }
 
-.ember-basic-dropdown-content--left { 
+.ember-basic-dropdown-content--left {
   left: unset;
   right: 0;
+}
+
+.boxel-ranged-number-picker-menu__dropdown {
+  box-shadow: var(--boxel-box-shadow);
+  border-radius: var(--boxel-border-radius);
+  max-height: var(--boxel-xs-container);
+  overflow: auto;
 }
 
 .boxel-ranged-number-picker-menu__dropdown ul {
   list-style: none;
   padding: 0;
-  max-height: var(--boxel-xs-container);
-  overflow: auto;
   text-align: center;
 }
 
@@ -34,7 +39,7 @@
   padding: var(--boxel-sp-xxs) var(--boxel-sp);
 }
 
-.ember-power-select-placeholder { 
+.ember-power-select-placeholder {
   font-weight: bold;
   font-size: var(--boxel-font-size);
 }
