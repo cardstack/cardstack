@@ -1,11 +1,8 @@
 <div
   role="tablist"
-  class={{cn
-    "boxel-tab-bar"
-    @class
-    boxel-tab-bar--spread=@spread
-  }}
-  style={{css-var
+  class={{cn "boxel-tab-bar" @class boxel-tab-bar--spread=@spread}}
+  style={{
+    css-var
     boxel-tab-bar-background-color="var(--boxel-tab-bar-background-color)"
     boxel-tab-bar-font="var(--boxel-tab-bar-font)"
   }}
@@ -18,7 +15,8 @@
           role="tab"
           data-text={{tab.text}}
           aria-disabled="true"
-          class={{cn
+          class={{
+            cn
             "boxel-tab-bar__item"
             "boxel-tab-bar__item--is-inactive"
             boxel-tab-bar__item--is-active=tab.action.isActive
@@ -37,14 +35,15 @@
           </span>
         </div>
       {{else}}
-        {{!-- template-lint-disable require-context-role --}}
+        {{! template-lint-disable require-context-role }}
         <LinkTo
           id={{or tab.id tab.action.routeName}}
           @route={{tab.action.routeName}}
           @query={{or tab.action.queryParams (hash)}}
           role="tab"
           data-text={{tab.text}}
-          class={{cn
+          class={{
+            cn
             "boxel-tab-bar__item"
             "boxel-tab-bar__item"
             boxel-tab-bar__item--is-active=tab.action.isActive
