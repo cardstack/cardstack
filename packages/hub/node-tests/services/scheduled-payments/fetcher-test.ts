@@ -16,7 +16,7 @@ describe('fetching scheduled payments that are due', function () {
   let { getPrisma, getContainer } = setupHub(this);
 
   this.beforeEach(async function () {
-    subject = await getContainer().lookup('scheduled-payments-fetcher');
+    subject = await getContainer().lookup('scheduled-payment-fetcher');
     now = convertDateToUTC(new Date());
     validForDays = subject.validForDays;
     prisma = await getPrisma();
@@ -182,6 +182,6 @@ describe('fetching scheduled payments that are due', function () {
 
 declare module '@cardstack/di' {
   interface KnownServices {
-    'scheduled-payments-fetcher': ScheduledPaymentsFetcherService;
+    'scheduled-payment-fetcher': ScheduledPaymentsFetcherService;
   }
 }

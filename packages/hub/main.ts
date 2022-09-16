@@ -172,7 +172,7 @@ export function createRegistry(): Registry {
   registry.register('pagerduty-incidents-webhook-route', PagerdutyIncidentsWebhookRoute);
   registry.register('email-card-drop-router', EmailCardDropRouter);
   registry.register('prisma-manager', PrismaManager);
-  registry.register('scheduled-payments-fetcher', ScheduledPaymentsFetcherService);
+  registry.register('scheduled-payment-fetcher', ScheduledPaymentsFetcherService);
 
   if (process.env.COMPILER) {
     registry.register(
