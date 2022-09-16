@@ -13,6 +13,7 @@ import {
   waitUntilBlock,
   waitUntilTransactionMined,
 } from './utils/general-utils';
+import { signatureToVRS, strip0x } from './utils/signing-utils';
 import type { SuccessfulTransactionReceipt } from './utils/successful-transaction-receipt';
 const { fromWei } = Web3.utils;
 
@@ -350,23 +351,11 @@ function prepSignaturesForExecution(signatures: string[]) {
   return packSignatures(signatures.map(signatureToVRS));
 }
 
-function signatureToVRS(rawSignature: string) {
-  const signature = strip0x(rawSignature);
-  const v = signature.substr(64 * 2);
-  const r = signature.substr(0, 32 * 2);
-  const s = signature.substr(32 * 2, 32 * 2);
-  return { v, r, s };
-}
-
-function packSignatures(array: { v: string; r: string; s: string }[]) {
+function packSignatures(array: { v: number; r: string; s: string }[]) {
   const length = strip0x(Web3.utils.toHex(array.length));
   const msgLength = length.length === 1 ? `0${length}` : length;
   const [v, r, s] = array.reduce(([vs, rs, ss], { v, r, s }) => [vs + v, rs + r, ss + s], ['', '', '']);
   return `0x${msgLength}${v}${r}${s}`;
-}
-
-function strip0x(s: string) {
-  return Web3.utils.isHexStrict(s) ? s.substr(2) : s;
 }
 
 async function waitUntilOneBlockAfterTxnMined(web3: Web3, txnHash: string) {

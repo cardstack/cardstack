@@ -43,7 +43,7 @@ export {
   waitForSubgraphIndex,
   waitUntilOneBlockAfterTxnMined,
 } from './sdk/utils/general-utils';
-export { signTypedData } from './sdk/utils/signing-utils';
+export { signTypedData, signatureToVRS, Signature } from './sdk/utils/signing-utils';
 export * from './sdk/currency-utils';
 export * from './sdk/currencies';
 export { query as gqlQuery } from './sdk/utils/graphql';
