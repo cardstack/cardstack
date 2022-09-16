@@ -45,6 +45,7 @@ export default class APIRouter {
   reservationsRoute = inject('reservations-route', { as: 'reservationsRoute' });
   inventoryRoute = inject('inventory-route', { as: 'inventoryRoute' });
   wyrePricesRoute = inject('wyre-prices-route', { as: 'wyrePricesRoute' });
+  scheduledPaymentsRoute = inject('scheduled-payments-route', { as: 'scheduledPaymentsRoute' });
 
   routes() {
     let {
@@ -67,6 +68,7 @@ export default class APIRouter {
       wyrePricesRoute,
       pushNotificationRegistrationsRoute,
       notificationPreferencesRoute,
+      scheduledPaymentsRoute,
     } = this;
     let apiSubrouter = new Router();
     apiSubrouter.get('/boom', boomRoute.get);
@@ -134,6 +136,7 @@ export default class APIRouter {
     );
     apiSubrouter.get('/notification-preferences/:push_client_id', parseBody, notificationPreferencesRoute.get);
     apiSubrouter.put('/notification-preferences/:push_client_id', parseBody, notificationPreferencesRoute.put);
+    apiSubrouter.post('/scheduled-payments', parseBody, scheduledPaymentsRoute.post);
     apiSubrouter.get('/wyre-prices', parseBody, wyrePricesRoute.get);
     apiSubrouter.all('/(.*)', notFound);
 
