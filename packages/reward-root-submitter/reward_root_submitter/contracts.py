@@ -13,9 +13,6 @@ class Contract:
         raise Exception("This function must be implemented in the base class")
 
 
-DEFAULT_MAX_PRIORITY_FEE = 1000000001
-
-
 class RewardPool(Contract):
     def __init__(self, w3):
         self.w3 = w3
