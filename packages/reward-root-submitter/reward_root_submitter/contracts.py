@@ -51,14 +51,13 @@ class RewardPool(Contract):
         self, reward_program_id, payment_cycle, root, caller, caller_key
     ):
         transaction_count = self.w3.eth.get_transaction_count(caller)
-        gas_price = 2*self.get_gas_price()
         tx = self.contract.functions.submitPayeeMerkleRoot(
             reward_program_id, payment_cycle, root
         ).buildTransaction(
             {
                 "from": caller,
                 "nonce": transaction_count,
-                "maxFeePerGas": gas_price,
+                "maxFeePerGas": 2*self.get_gas_price(),
                 "maxPriorityFeePerGas": DEFAULT_MAX_PRIORITY_FEE,
             }
         )
