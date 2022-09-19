@@ -34,10 +34,6 @@ export default {
         type: 'number',
         description: 'Percentage fee (e.g. 5%, 0.05)',
       })
-      .positional('percentageFee', {
-        type: 'number',
-        description: 'Percentage fee (e.g. 5%, 0.05)',
-      })
       .positional('executionGas', {
         type: 'number',
         description: 'The gas limit to execute scheduled payment',
