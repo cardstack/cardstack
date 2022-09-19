@@ -38,7 +38,7 @@
 }
 
 .boxel-tab-bar__item--is-inactive:hover {
-  font-weight: initial;
+  font-weight: inherit;
 }
 
 .boxel-tab-bar__item--is-active {
