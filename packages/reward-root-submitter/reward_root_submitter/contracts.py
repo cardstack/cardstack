@@ -26,6 +26,7 @@ class Contract:
         gwei = current_values[speed]
         return to_wei(gwei, "gwei")
 
+DEFAULT_MAX_PRIORITY_FEE = 1000000001
 
 class RewardPool(Contract):
     def __init__(self, w3):
@@ -50,13 +51,15 @@ class RewardPool(Contract):
         self, reward_program_id, payment_cycle, root, caller, caller_key
     ):
         transaction_count = self.w3.eth.get_transaction_count(caller)
+        gas_price = 2*self.get_gas_price()
         tx = self.contract.functions.submitPayeeMerkleRoot(
             reward_program_id, payment_cycle, root
         ).buildTransaction(
             {
                 "from": caller,
                 "nonce": transaction_count,
-                "maxFeePerGas": self.get_gas_price(),
+                "maxFeePerGas": gas_price,
+                "maxPriorityFeePerGas": DEFAULT_MAX_PRIORITY_FEE,
             }
         )
         signed_tx = self.w3.eth.account.sign_transaction(tx, caller_key)
