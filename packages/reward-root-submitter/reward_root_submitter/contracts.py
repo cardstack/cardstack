@@ -59,7 +59,7 @@ class RewardPool(Contract):
             {
                 "from": caller,
                 "nonce": transaction_count,
-                "maxFeePerGas": 2*self.get_gas_price(),
+                "maxFeePerGas": 2 * self.get_gas_price(),
                 "maxPriorityFeePerGas": DEFAULT_MAX_PRIORITY_FEE,
             }
         )
