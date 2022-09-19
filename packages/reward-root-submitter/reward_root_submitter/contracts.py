@@ -56,7 +56,7 @@ class RewardPool(Contract):
             {
                 "from": caller,
                 "nonce": transaction_count,
-                "gasPrice": self.get_gas_price(),
+                "maxFeePerGas": self.get_gas_price(),
             }
         )
         signed_tx = self.w3.eth.account.sign_transaction(tx, caller_key)
