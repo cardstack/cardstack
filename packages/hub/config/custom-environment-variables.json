@@ -54,7 +54,19 @@
     "layer1RpcNodeWssUrl": "LAYER1_RPC_NODE_WSS_URL",
     "layer2Network": "LAYER2_NETWORK",
     "layer2RpcNodeHttpsUrl": "LAYER2_RPC_NODE_HTTPS_URL",
-    "layer2RpcNodeWssUrl": "LAYER2_RPC_NODE_WSS_URL"
+    "layer2RpcNodeWssUrl": "LAYER2_RPC_NODE_WSS_URL",
+    "gnosis": {
+      "rpcNodeHttpsUrl": "GNOSIS_RPC_NODE_HTTPS_URL",
+      "rpcNodeWssUrl": "GNOSIS_RPC_NODE_WSS_URL"
+    },
+    "ethereum": {
+      "rpcNodeHttpsUrl": "ETHEREUM_RPC_NODE_HTTPS_URL",
+      "rpcNodeWssUrl": "ETHEREUM_RPC_NODE_WSS_URL"
+    },
+    "polygon": {
+      "rpcNodeHttpsUrl": "POLYGON_RPC_NODE_HTTPS_URL",
+      "rpcNodeWssUrl": "POLYGON_RPC_NODE_WSS_URL"
+    }
   },
   "walletConnect": {
     "bridge": "WALLET_CONNECT_BRIDGE",

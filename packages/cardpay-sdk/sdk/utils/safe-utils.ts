@@ -15,6 +15,7 @@ import GnosisSafeABI from '../../contracts/abi/gnosis-safe';
 import { Transaction } from './general-utils';
 /* eslint-disable node/no-extraneous-import */
 import { AddressZero } from '@ethersproject/constants';
+import { ethers } from 'ethers';
 
 export interface EventABI {
   topic: string;
@@ -354,8 +355,12 @@ async function calculateCreateProxyWithNonceAddress(
       .calculateCreateProxyWithNonceAddress(masterCopyAddress, initializer, saltNonce)
       .estimateGas();
   } catch (e: any) {
-    let messages = e.message.split(' ');
-    expectedSafeAddress = messages[2].replace(',', '');
+    if (e.data) {
+      expectedSafeAddress = ethers.utils.getAddress(e.data.slice(138, 178));
+    } else {
+      let messages = e.message.split(' ');
+      expectedSafeAddress = messages[2].replace(',', '');
+    }
   }
 
   return expectedSafeAddress;

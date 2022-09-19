@@ -14,12 +14,24 @@ describe('GET /api/config', function () {
           type: 'config',
           attributes: {
             web3: {
+              ethereum: {
+                rpcNodeHttpsUrl: 'https://ethereum.test/abc123/',
+                rpcNodeWssUrl: 'wss://ethereum.test/abc123/',
+              },
+              gnosis: {
+                rpcNodeHttpsUrl: 'https://gnosis.test/abc123/',
+                rpcNodeWssUrl: 'wss://gnosis.test/abc123/',
+              },
               layer1Network: 'kovan',
               layer1RpcNodeHttpsUrl: 'https://infuratest.test/abc123/',
               layer1RpcNodeWssUrl: 'wss://infuratest.test/ws/abc123/',
               layer2Network: 'sokol',
               layer2RpcNodeHttpsUrl: 'https://humorme.test/abc123/',
               layer2RpcNodeWssUrl: 'wss://humorme.test/abc123/',
+              polygon: {
+                rpcNodeHttpsUrl: 'https://polygon.test/abc123/',
+                rpcNodeWssUrl: 'wss://polygon.test/abc123/',
+              },
             },
           },
         },

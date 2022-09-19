@@ -419,9 +419,14 @@ export default class ScheduledPaymentModule {
       }
     } catch (e: any) {
       let _interface = new utils.Interface(['error GasEstimation(uint256 gas)']);
-      let messages = e.message.split(' ');
-      let decodedError = _interface.parseError(messages[2].replace(',', ''));
-      requiredGas = decodedError.args[0].toNumber();
+      if (e.data) {
+        let decodedError = _interface.parseError(e.data);
+        requiredGas = decodedError.args[0].toNumber();
+      } else {
+        let messages = e.message.split(' ');
+        let decodedError = _interface.parseError(messages[2].replace(',', ''));
+        requiredGas = decodedError.args[0].toNumber();
+      }
     }
 
     return requiredGas;

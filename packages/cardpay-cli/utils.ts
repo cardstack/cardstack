@@ -64,15 +64,24 @@ export async function getEthereumClients(network: string, opts: Web3Opts): Promi
   hubConfigResponse = await hubConfig.getConfig();
   switch (network) {
     case 'kovan':
-    case 'mainnet':
       rpcNodeHttpsUrl = hubConfigResponse.web3.layer1RpcNodeHttpsUrl as string;
       rpcNodeWssUrl = hubConfigResponse.web3.layer1RpcNodeWssUrl as string;
+      break;
+    case 'goerli':
+    case 'mainnet':
+      rpcNodeHttpsUrl = hubConfigResponse.web3.ethereum.rpcNodeHttpsUrl as string;
+      rpcNodeWssUrl = hubConfigResponse.web3.ethereum.rpcNodeWssUrl as string;
       break;
     case 'sokol':
     case 'gnosis':
     case 'xdai':
-      rpcNodeHttpsUrl = hubConfigResponse.web3.layer2RpcNodeHttpsUrl as string;
-      rpcNodeWssUrl = hubConfigResponse.web3.layer2RpcNodeWssUrl as string;
+      rpcNodeHttpsUrl = hubConfigResponse.web3.gnosis.rpcNodeHttpsUrl as string;
+      rpcNodeWssUrl = hubConfigResponse.web3.gnosis.rpcNodeWssUrl as string;
+      break;
+    case 'mumbai':
+    case 'polygon':
+      rpcNodeHttpsUrl = hubConfigResponse.web3.polygon.rpcNodeHttpsUrl as string;
+      rpcNodeWssUrl = hubConfigResponse.web3.polygon.rpcNodeWssUrl as string;
       break;
   }
   switch (opts.connectionType) {
@@ -146,7 +155,7 @@ export const NETWORK_OPTION_ANY = {
   alias: 'n',
   type: 'string',
   description: 'The network to run this script on',
-  choices: ['sokol', 'kovan', 'gnosis', 'xdai', 'mainnet'],
+  choices: ['sokol', 'kovan', 'goerli', 'mumbai', 'gnosis', 'xdai', 'mainnet'],
 } as Options;
 
 export const FROM_OPTION = {
