@@ -1255,8 +1255,7 @@
         "rewards",
         "list",
         "--network",
-        "gnosis",
-        // "${config:cardCli.network.l2.name}",
+        "${config:cardCli.network.l2.name}",
         "--mnemonic",
         "${config:cardCli.mnemonic}"
       ]
