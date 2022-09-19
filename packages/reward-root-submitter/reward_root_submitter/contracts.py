@@ -1,11 +1,6 @@
 import json
 import logging
 
-import requests
-from eth_utils import to_wei
-from requests.adapters import HTTPAdapter
-from urllib3 import Retry
-
 
 class Contract:
     def __init__(self, w3):
@@ -16,15 +11,6 @@ class Contract:
 
     def setup_from_address(self, contract_address):
         raise Exception("This function must be implemented in the base class")
-
-    def get_gas_price(self, speed="average"):
-        session = requests.Session()
-        adapter = HTTPAdapter(max_retries=Retry(total=4, backoff_factor=1))
-        session.mount("https://", adapter)
-        gas_price_oracle = "https://blockscout.com/xdai/mainnet/api/v1/gas-price-oracle"
-        current_values = session.get(gas_price_oracle).json()
-        gwei = current_values[speed]
-        return to_wei(gwei, "gwei")
 
 
 DEFAULT_MAX_PRIORITY_FEE = 1000000001
@@ -55,14 +41,7 @@ class RewardPool(Contract):
         transaction_count = self.w3.eth.get_transaction_count(caller)
         tx = self.contract.functions.submitPayeeMerkleRoot(
             reward_program_id, payment_cycle, root
-        ).buildTransaction(
-            {
-                "from": caller,
-                "nonce": transaction_count,
-                "maxFeePerGas": 2 * self.get_gas_price(),
-                "maxPriorityFeePerGas": DEFAULT_MAX_PRIORITY_FEE,
-            }
-        )
+        ).buildTransaction({"from": caller, "nonce": transaction_count})
         signed_tx = self.w3.eth.account.sign_transaction(tx, caller_key)
         tx_hash = self.w3.eth.send_raw_transaction(signed_tx.rawTransaction)
         tx_receipt = self.w3.eth.wait_for_transaction_receipt(
