@@ -1,16 +1,15 @@
-.boxel-ranged-number-picker-menu {
+.boxel-ranged-number-picker {
   display: inline-block;
   background: url('/@cardstack/boxel/images/icons/caret-down.svg') no-repeat;
   background-position: 100%;
   padding-right: 1em;
 }
 
-.boxel-ranged-number-picker-menu
-  + .ember-basic-dropdown-content-wormhole-origin {
+.boxel-ranged-number-picker + .ember-basic-dropdown-content-wormhole-origin {
   position: absolute;
 }
 
-.boxel-ranged-number-picker-menu__dropdown {
+.boxel-ranged-number-picker__dropdown {
   box-shadow: var(--boxel-box-shadow);
   border-radius: var(--boxel-border-radius);
   max-height: var(--boxel-xs-container);
@@ -18,27 +17,26 @@
   margin-left: var(--boxel-sp-xs);
 }
 
-.boxel-ranged-number-picker-menu__dropdown ul {
+.boxel-ranged-number-picker__dropdown ul {
   list-style: none;
   padding: 0;
   text-align: center;
 }
 
 .ember-power-select-option[aria-current='true']
-  .boxel-ranged-number-picker-menu__item,
+  .boxel-ranged-number-picker__item,
 .ember-power-select-option[aria-selected='true'] {
   background-color: var(--boxel-light-100);
 }
 
-.boxel-ranged-number-picker-menu__item {
+.boxel-ranged-number-picker__item {
   font-weight: 600;
   font-size: var(--boxel-font-size-sm);
   padding: var(--boxel-sp-xxs) var(--boxel-sp-sm);
 }
 
-.ember-power-select-placeholder,
-.boxel-ranged-number-picker-menu--selected
-  .boxel-ranged-number-picker-menu__item {
+.boxel-ranged-number-picker .ember-power-select-placeholder,
+.boxel-ranged-number-picker--selected .boxel-ranged-number-picker__item {
   font-weight: bold;
   font-size: var(--boxel-font-size);
   padding: 0;
