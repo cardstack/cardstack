@@ -17,6 +17,13 @@ import cssUrl from '@cardstack/boxel/helpers/css-url';
 import cssVar from '@cardstack/boxel/helpers/css-var';
 import { type EmptyObject } from '@ember/component/helper';
 import AddHelper from 'ember-math-helpers/helpers/add';
+import { PowerSelectArgs } from 'ember-power-select/addon/components/power-select';
+
+interface PatchedPowerSelectArgs extends PowerSelectArgs {
+  dropdownClass?: string;
+  placeholder?: string;
+  renderInPlace?: boolean;
+}
 
 declare module '@glint/environment-ember-loose/registry' {
   export default interface Registry {
@@ -28,7 +35,10 @@ declare module '@glint/environment-ember-loose/registry' {
     gt: typeof GtHelper;
     optional: typeof OptionalHelper;
     cn: HelperLike<{
-      Args: { Positional: string[]; Named: Record<string, string | boolean> };
+      Args: {
+        Positional: string[];
+        Named: Record<string, string | boolean | undefined>;
+      };
       Return: string;
     }>;
     'css-url': typeof cssUrl;
@@ -55,7 +65,13 @@ declare module '@glint/environment-ember-loose/registry' {
     }>;
     'svg-jar': typeof svgJar;
     'unique-id': HelperLike<{ Args: EmptyObject; Return: string }>;
-
+    PowerSelect: ComponentLike<{
+      Element: HTMLDivElement;
+      Args: PatchedPowerSelectArgs;
+      // TODO: figure out property types for default block
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      Blocks: { default: [any, any] };
+    }>;
     'Freestyle::Usage': ComponentLike<{
       Element: HTMLDivElement;
       Args: {

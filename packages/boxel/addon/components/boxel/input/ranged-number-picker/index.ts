@@ -1,15 +1,22 @@
 import { action } from '@ember/object';
 import Component from '@glimmer/component';
 import { tracked } from '@glimmer/tracking';
+import { type EmptyObject } from '@ember/component/helper';
 import './index.css';
 
-interface RangedBoxelInputRangedNumberPickerInputArgs {
-  min: number;
-  max: number;
-  onNumberSelected: (num: number) => void;
+interface Signature {
+  Element: HTMLDivElement;
+  Args: {
+    min: number;
+    max: number;
+    onNumberSelected: (num: number) => void;
+    placeholder?: string;
+    triggerComponent?: string;
+  };
+  Blocks: EmptyObject;
 }
 
-export default class BoxelInputRangedNumberPicker extends Component<RangedBoxelInputRangedNumberPickerInputArgs> {
+export default class BoxelInputRangedNumberPicker extends Component<Signature> {
   @tracked selectedNumber: string | undefined = undefined;
 
   @action setSelectedNumber(number: string): void {
@@ -28,5 +35,11 @@ export default class BoxelInputRangedNumberPicker extends Component<RangedBoxelI
     });
 
     return items;
+  }
+}
+
+declare module '@glint/environment-ember-loose/registry' {
+  export default interface Registry {
+    'Boxel::Input::RangedNumberPicker': typeof BoxelInputRangedNumberPicker;
   }
 }
