@@ -70,7 +70,6 @@ export default class BoxelTabBar extends Component<Signature> {
               @route={{tab.link.routeName}}
               @query={{or tab.link.queryParams (hash)}}
               role="tab"
-              data-text={{tab.text}}
               class={{
                 cn
                 "boxel-tab-bar__item"
@@ -85,7 +84,7 @@ export default class BoxelTabBar extends Component<Signature> {
                   height="18px"
                 }}
               {{/if}}
-              <div class="boxel-tab-bar__item-text">
+              <div class="boxel-tab-bar__item-text" data-text={{tab.text}}>
                 {{tab.text}}
               </div>
             </LinkTo>
