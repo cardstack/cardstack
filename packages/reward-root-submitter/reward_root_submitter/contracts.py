@@ -26,7 +26,9 @@ class Contract:
         gwei = current_values[speed]
         return to_wei(gwei, "gwei")
 
+
 DEFAULT_MAX_PRIORITY_FEE = 1000000001
+
 
 class RewardPool(Contract):
     def __init__(self, w3):
