@@ -9,7 +9,7 @@
       @items={{array
         (menu-item "Home" (link route="index"))
         (menu-item "Docs" (link route="docs" query=(hash s="Components" ss="<Boxel::TabBar>")))
-        (menu-item "About" (link route="about"))
+        (menu-item "About" (link route="about") inactive="true")
       }}
       @spread={{this.spread}}
       style={{css-var
@@ -67,7 +67,7 @@
   </:api>
 </Freestyle::Usage>
 
-<Freestyle::Usage @name="TabBar with ids, icons, and inactive item">
+<Freestyle::Usage @name="TabBar with ids and icons">
   <:description>
     The <code>id</code> for the generated link can be overridden to ensure uniqueness.
   </:description>
