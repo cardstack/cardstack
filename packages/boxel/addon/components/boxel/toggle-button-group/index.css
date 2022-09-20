@@ -1,0 +1,109 @@
+/* essentially reset fieldset and hide legend from visibility */
+.boxel-toggle-button-group__fieldset {
+  border: 0;
+  padding: 0.01em 0 0;
+  min-width: 0;
+}
+
+.boxel-toggle-button-group__fieldset-legend {
+  opacity: 0;
+  position: absolute;
+  left: -9999px;
+  max-width: 1px;
+  max-height: 1px;
+  white-space: nowrap;
+}
+
+/* Div container inside the fieldset component. Use `display: contents` to move
+   these styles up when that css property is more widely available. */
+.boxel-toggle-button-group__fieldset-container {
+  --boxel-toggle-button-group-gap: var(--boxel-sp);
+
+  display: flex;
+  flex-wrap: wrap;
+  width: 100%;
+  max-width: 100%;
+}
+
+.boxel-toggle-button-group-option {
+  --padding: var(--boxel-toggle-button-group-option-padding, var(--boxel-sp));
+  position: relative;
+  display: block;
+  max-width: 100%;
+
+  /* Leave space for the checkmark */
+  padding:
+    var(--padding)
+    calc(
+      var(--padding) +
+      var(--boxel-sp-xs) * 2
+    )
+    var(--padding)
+    var(--padding);
+  transition: box-shadow var(--boxel-transition);
+  background-color: var(--boxel-light);
+  box-shadow: none;
+  border: 1px solid var(--boxel-light-600);
+  border-right-color: transparent;
+}
+
+.boxel-toxxggle-button-group-option::before {
+  content: "";
+  position: relative;
+  top: -10px;
+  left: 0;
+  width: 100%;
+  height: 10px;
+  box-shadow: 0px 0 10px rgba(0, 0, 0, 0.8);
+  z-index: 100;
+}
+
+.boxel-toggle-button-group-option:first-child {
+  border-top-left-radius: var(--boxel-border-radius);
+  border-bottom-left-radius: var(--boxel-border-radius);
+}
+
+.boxel-toggle-button-group-option:last-child {
+  border-top-right-radius: var(--boxel-border-radius);
+  border-bottom-right-radius: var(--boxel-border-radius);
+  border-right-color: var(--boxel-light-600);
+}
+
+.boxel-toggle-button-group-option:hover:not(.boxel-toggle-button-group-option--disabled) {
+  cursor: pointer;
+}
+
+.boxel-toggle-button-group-option:focus-within:not(.boxel-toggle-button-group-option--disabled) {
+  outline: 1px solid var(--boxel-highlight);
+  border-right-color: var(--boxel-light-600);
+}
+
+.boxel-toggle-button-group-option--disabled > * {
+  opacity: 0.5;
+}
+
+/* https://css-tricks.com/customise-radio-buttons-without-compromising-accessibility/ */
+.boxel-toggle-button-group-option__input {
+  appearance: none;
+  /* stylelint-disable-next-line property-no-vendor-prefix */
+  -webkit-appearance: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  clip-path: polygon(0 0);
+  width: 1px;
+  height: 1px;
+}
+
+.boxel-toggle-button-group-option--checked {
+  background-color: var(--boxel-light-200);
+  background-image: url("/@cardstack/boxel/images/icons/checkbox-primary-checked.svg");
+  background-position: top var(--boxel-sp-xs) right var(--boxel-sp-xs);
+  background-repeat: no-repeat;
+  background-size: var(--boxel-sp);
+  box-shadow: inset 0px 4px 3px -2px var(--boxel-light-500);
+}
+
+.boxel-toggle-button-group-option--checked:last-child {
+  box-shadow: inset -3px 4px 3px -2px var(--boxel-light-500);
+}

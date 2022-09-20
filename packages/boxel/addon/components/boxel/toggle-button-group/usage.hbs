@@ -1,0 +1,59 @@
+<Freestyle::Usage @name="ToggleButtonGroup" @description="A radio button group">
+  <:example>
+    <Boxel::ToggleButtonGroup
+      @groupDescription={{this.groupDescription}}
+      @items={{this.items}}
+      @name="example-radio-usage"
+      @disabled={{this.disabled}}
+      @orientation={{this.orientation}}
+      style={{
+        css-var
+        boxel-radio-option-padding=this.optionPadding
+        boxel-radio-option-gap=this.optionGap
+      }} as |group|
+    >
+      <group.Button @value="19">
+        <strong>
+          Good
+        </strong>
+        <br />
+        $19
+      </group.Button>
+      <group.Button @value="191">
+        <strong>
+          Better
+        </strong>
+        <br />
+        $191
+      </group.Button>
+      <group.Button @value="1919">
+        <strong>
+          Best
+        </strong>
+        <br />
+        $1919
+      </group.Button>
+    </Boxel::ToggleButtonGroup>
+  </:example>
+
+  <:api as |Args|>
+    <Args.String
+      @name="groupDescription"
+      @description="Description for this group of radio buttons MAYBE?"
+      @value={{this.groupDescription}}
+      @onInput={{fn (mut this.groupDescription)}}
+      @optional={{true}}
+    />
+    <Args.Bool
+      @name="disabled"
+      @description="Whether selection is disabled PROBABLY"
+      @defaultValue="false"
+      @value={{this.disabled}}
+      @onInput={{fn (mut this.disabled)}}
+      @optional={{true}}
+    />
+    <Args.Yield
+      @description="Yields an object with the default component to use (ToggleButtonGroup::Button) AND WHAT ELSE"
+    />
+  </:api>
+</Freestyle::Usage>
