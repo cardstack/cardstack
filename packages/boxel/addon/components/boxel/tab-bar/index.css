@@ -32,7 +32,7 @@
   cursor: text;
 }
 
-.boxel-tab-bar__item:hover {
+.boxel-tab-bar__item:not(.boxel-tab-bar__item--is-inactive):hover {
   font-weight: var(--boxel-tab-bar-font-weight-hover);
   cursor: pointer;
 }
