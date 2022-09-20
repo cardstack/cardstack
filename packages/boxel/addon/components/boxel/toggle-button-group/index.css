@@ -43,7 +43,7 @@
   transition: box-shadow var(--boxel-transition);
   background-color: var(--boxel-light);
   box-shadow: none;
-  border: 1px solid var(--boxel-light-600);
+  border: 1px solid var(--boxel-purple-300);
   border-right-color: transparent;
 }
 
@@ -66,7 +66,7 @@
 .boxel-toggle-button-group-option:last-child {
   border-top-right-radius: var(--boxel-border-radius);
   border-bottom-right-radius: var(--boxel-border-radius);
-  border-right-color: var(--boxel-light-600);
+  border-right-color: var(--boxel-purple-300);
 }
 
 .boxel-toggle-button-group-option:hover:not(.boxel-toggle-button-group-option--disabled) {
@@ -75,7 +75,7 @@
 
 .boxel-toggle-button-group-option:focus-within:not(.boxel-toggle-button-group-option--disabled) {
   outline: 1px solid var(--boxel-highlight);
-  border-right-color: var(--boxel-light-600);
+  border-right-color: var(--boxel-purple-300);
 }
 
 .boxel-toggle-button-group-option--disabled > * {
