@@ -59,7 +59,6 @@
 
 .boxel-tab-bar__item-text::after {
   content: attr(data-text);
-  content: attr(data-text) / "";
   height: 0;
   visibility: hidden;
   overflow: hidden;
