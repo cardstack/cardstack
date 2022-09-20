@@ -65,7 +65,7 @@
   overflow: hidden;
   user-select: hidden;
   pointer-events: none;
-  font-weight: 600;
+  font-weight: var(--boxel-tab-bar-font-weight-hover);
 }
 
 @media speech {
