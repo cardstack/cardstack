@@ -35,54 +35,31 @@ export default class BoxelTabBar extends Component<Signature> {
     >
       {{#if this.linkItems}}
         {{#each this.linkItems as |tab|}}
-          {{#if tab.menuItem.inactive}}
-            <div
-              role="tab"
-              data-text={{tab.text}}
-              aria-disabled="true"
-              class={{
-                cn
-                "boxel-tab-bar__item"
-                "boxel-tab-bar__item--is-inactive"
-                boxel-tab-bar__item--is-active=tab.link.isActive
+          {{! template-lint-disable require-context-role }}
+          <LinkTo
+            id={{or tab.menuItem.id tab.link.routeName}}
+            @route={{tab.link.routeName}}
+            @query={{or tab.link.queryParams (hash)}}
+            @disabled={{tab.menuItem.inactive}}
+            role="tab"
+            class={{
+              cn
+              "boxel-tab-bar__item"
+              boxel-tab-bar__item--is-active=tab.link.isActive
+              boxel-tab-bar__item--is-inactive=tab.menuItem.inactive
+            }}
+          >
+            {{#if tab.menuItem.icon}}
+              {{svgJar
+                tab.menuItem.icon
+                width="18px"
+                height="18px"
               }}
-            >
-              {{#if tab.menuItem.icon}}
-                {{svgJar
-                  tab.menuItem.icon
-                  width="18px"
-                  height="18px"
-                }}
-              {{/if}}
-              <div class="boxel-tab-bar__item-text">
-                {{tab.text}}
-              </div>
+            {{/if}}
+            <div class="boxel-tab-bar__item-text" data-text={{tab.text}}>
+              {{tab.text}}
             </div>
-          {{else}}
-            {{! template-lint-disable require-context-role }}
-            <LinkTo
-              id={{or tab.menuItem.id tab.link.routeName}}
-              @route={{tab.link.routeName}}
-              @query={{or tab.link.queryParams (hash)}}
-              role="tab"
-              class={{
-                cn
-                "boxel-tab-bar__item"
-                boxel-tab-bar__item--is-active=tab.link.isActive
-              }}
-            >
-              {{#if tab.menuItem.icon}}
-                {{svgJar
-                  tab.menuItem.icon
-                  width="18px"
-                  height="18px"
-                }}
-              {{/if}}
-              <div class="boxel-tab-bar__item-text" data-text={{tab.text}}>
-                {{tab.text}}
-              </div>
-            </LinkTo>
-          {{/if}}
+          </LinkTo>
         {{/each}}
       {{/if}}
     </div>

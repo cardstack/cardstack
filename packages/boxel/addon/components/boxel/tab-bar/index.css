@@ -38,7 +38,9 @@
 }
 
 .boxel-tab-bar__item--is-inactive:hover {
+  color: inherit;
   font-weight: inherit;
+  cursor: text;
 }
 
 .boxel-tab-bar__item--is-active {
