@@ -31,11 +31,6 @@ export default class BoxelTabBar extends Component<Signature> {
     <div
       role="tablist"
       class={{cn "boxel-tab-bar" @class boxel-tab-bar--spread=@spread}}
-      style={{
-        cssVar
-        boxel-tab-bar-background-color="var(--boxel-tab-bar-background-color)"
-        boxel-tab-bar-font="var(--boxel-tab-bar-font)"
-      }}
       ...attributes
     >
       {{#if this.linkItems}}
