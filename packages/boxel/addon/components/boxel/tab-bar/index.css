@@ -28,7 +28,7 @@
 }
 
 .boxel-tab-bar__item--is-inactive {
-  opacity: 0.45;
+  opacity: 0.5;
   cursor: text;
 }
 
