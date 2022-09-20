@@ -56,7 +56,10 @@ declare module '@glint/environment-ember-loose/registry' {
     }>;
     'menu-divider': typeof menuDivider;
     'menu-item': HelperLike<{
-      Args: { Positional: [string, Link | (() => void)] };
+      Args: {
+        Positional: [string, Link | (() => void)];
+        Named: Record<string, string>;
+      };
       Return: MenuItem;
     }>;
     noop: HelperLike<{
