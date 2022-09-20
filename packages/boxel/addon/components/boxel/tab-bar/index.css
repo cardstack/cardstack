@@ -68,7 +68,7 @@
 }
 
 @media speech {
-  .boxel-tab-bar__item > a::after {
+  .boxel-tab-bar__item::after {
     display: none;
   }
 }
