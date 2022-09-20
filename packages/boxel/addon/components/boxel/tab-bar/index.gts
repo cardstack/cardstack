@@ -73,7 +73,6 @@ export default class BoxelTabBar extends Component<Signature> {
               class={{
                 cn
                 "boxel-tab-bar__item"
-                "boxel-tab-bar__item"
                 boxel-tab-bar__item--is-active=tab.link.isActive
               }}
             >
