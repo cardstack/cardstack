@@ -30,7 +30,8 @@
 
 .ember-power-select-option[aria-current='true']
   .boxel-ranged-number-picker__item,
-.ember-power-select-option[aria-selected='true'] {
+.ember-power-select-option[aria-selected='true']
+  .boxel-ranged-number-picker__item {
   background-color: var(--boxel-light-100);
 }
 
