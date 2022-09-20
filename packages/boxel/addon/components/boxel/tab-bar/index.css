@@ -73,8 +73,3 @@
     display: none;
   }
 }
-
-.boxel-tab-bar__item > a:hover .boxel-tab-bar__item-text {
-  font-weight: 600;
-  color: inherit;
-}
