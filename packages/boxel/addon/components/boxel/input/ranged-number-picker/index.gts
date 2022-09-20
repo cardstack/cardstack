@@ -2,7 +2,6 @@ import { action } from '@ember/object';
 import Component from '@glimmer/component';
 import { tracked } from '@glimmer/tracking';
 import { type EmptyObject } from '@ember/component/helper';
-// @ts-expect-error: power select has index.js and .ts is inside addon but only works for types
 import PowerSelect from 'ember-power-select/components/power-select';
 import cn from '@cardstack/boxel/helpers/cn';
 import or from 'ember-truth-helpers/helpers/or';
