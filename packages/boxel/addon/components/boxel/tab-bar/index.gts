@@ -5,7 +5,6 @@ import { hash } from '@ember/helper';
 import { LinkTo } from '@ember/routing';
 import { MenuItem } from '@cardstack/boxel/helpers/menu-item';
 import cn from '@cardstack/boxel/helpers/cn';
-import cssVar from '@cardstack/boxel/helpers/css-var';
 import { svgJar } from '@cardstack/boxel/utils/svg-jar';
 import { Link } from 'ember-link';
 import or from 'ember-truth-helpers/helpers/or';
