@@ -18,14 +18,14 @@
 .boxel-ranged-number-picker__dropdown {
   box-shadow: var(--boxel-box-shadow);
   border-radius: var(--boxel-border-radius);
-  max-height: var(--boxel-xs-container);
-  overflow: auto;
 }
 
 .boxel-ranged-number-picker__dropdown ul {
   list-style: none;
   padding: 0;
   text-align: center;
+  overflow: auto;
+  max-height: var(--boxel-xs-container);
 }
 
 .ember-power-select-option[aria-current='true']
