@@ -40,12 +40,6 @@ const KOVAN = {
   foreignBridge: '0x97bb40db0fb70eeb4e2121b6d708bd91ec4d1a43',
   foreignAMB: '0xFe446bEF1DbF7AFE24E81e05BC8B271C1BA9a560',
   chainlinkEthToUsd: '0x9326BFA02ADD2366b30bacB125260Af641031331',
-  scheduledPaymentConfig: '0x9d4bd5b2e8145B18813c7239d6C86beE7920824B',
-  scheduledPaymentExchange: '0x63f0A6a12fE77b8fCe4E1bf10344d16F6318CF56',
-  scheduledPaymentModule: '0x1e107Ce56E66931dEcF503D5F7e7F3C239A26B0a',
-  multiSend: '0xA238CBeb142c10Ef7Ad8442C6D1f9E89e07e7761',
-  moduleProxyFactory: '0x00000000000DC7F163742Eb4aBEf650037b1f588',
-  metaGuard: '0xe2847462a574bfd43014d1c7BB6De5769C294691',
 };
 const SOKOL = {
   gnosisSafeMasterCopy: '0xd9Db270c1B5E3Bd161E8c8503c55cEABeE709552',
@@ -88,6 +82,30 @@ const SOKOL = {
   },
   scheduledPaymentConfig: '0x6C811065009e957D968BEaFE00ADC2821c55224f',
   scheduledPaymentExchange: '0xc57E8dEB3149d872aec0156D527F93393002555F',
+  scheduledPaymentModule: '0x30e49Fe3cbEC0459eC3799b0B28560dE9594F257',
+  multiSend: '0xA238CBeb142c10Ef7Ad8442C6D1f9E89e07e7761',
+  multiSendCallOnly: '0x40A2aCCbd92BCA938b02010E17A5b8929b49130D',
+  moduleProxyFactory: '0x00000000000DC7F163742Eb4aBEf650037b1f588',
+  metaGuard: '0xe2847462a574bfd43014d1c7BB6De5769C294691',
+};
+const GOERLI = {
+  gnosisSafeMasterCopy: '0xd9Db270c1B5E3Bd161E8c8503c55cEABeE709552',
+  gnosisProxyFactory_v1_2: '0x76E2cFc1F5Fa8F6a5b3fC4c8F4788F0116861F9B',
+  gnosisProxyFactory_v1_3: '0xa6B71E26C5e0845f74c812102Ca7114b6a896AB2',
+  scheduledPaymentConfig: '0x9d4bd5b2e8145B18813c7239d6C86beE7920824B',
+  scheduledPaymentExchange: '0x63f0A6a12fE77b8fCe4E1bf10344d16F6318CF56',
+  scheduledPaymentModule: '0x30e49Fe3cbEC0459eC3799b0B28560dE9594F257',
+  multiSend: '0xA238CBeb142c10Ef7Ad8442C6D1f9E89e07e7761',
+  multiSendCallOnly: '0x40A2aCCbd92BCA938b02010E17A5b8929b49130D',
+  moduleProxyFactory: '0x00000000000DC7F163742Eb4aBEf650037b1f588',
+  metaGuard: '0xe2847462a574bfd43014d1c7BB6De5769C294691',
+};
+const MUMBAI = {
+  gnosisSafeMasterCopy: '0xd9Db270c1B5E3Bd161E8c8503c55cEABeE709552',
+  gnosisProxyFactory_v1_2: '0x76E2cFc1F5Fa8F6a5b3fC4c8F4788F0116861F9B',
+  gnosisProxyFactory_v1_3: '0xa6B71E26C5e0845f74c812102Ca7114b6a896AB2',
+  scheduledPaymentConfig: '0x9d4bd5b2e8145B18813c7239d6C86beE7920824B',
+  scheduledPaymentExchange: '0x63f0A6a12fE77b8fCe4E1bf10344d16F6318CF56',
   scheduledPaymentModule: '0x30e49Fe3cbEC0459eC3799b0B28560dE9594F257',
   multiSend: '0xA238CBeb142c10Ef7Ad8442C6D1f9E89e07e7761',
   multiSendCallOnly: '0x40A2aCCbd92BCA938b02010E17A5b8929b49130D',
@@ -154,7 +172,9 @@ const addresses: {
   };
 } = Object.freeze({
   kovan: KOVAN,
+  goerli: GOERLI,
   sokol: SOKOL,
+  mumbai: MUMBAI,
   mainnet: MAINNET,
   gnosis: GNOSIS,
   xdai: GNOSIS,

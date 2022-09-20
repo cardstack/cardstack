@@ -48,6 +48,18 @@ fNnC/5IGBxBkFQIgGC1mdtwPDSBMQY0XpAzPw6dXE8z0LaoV5qXeB8LV8CECIGmi
     handleWebhookRequests: true,
   },
   web3: {
+    ethereum: {
+      rpcNodeHttpsUrl: 'https://ethereum.test/abc123/',
+      rpcNodeWssUrl: 'wss://ethereum.test/abc123/',
+    },
+    gnosis: {
+      rpcNodeHttpsUrl: 'https://gnosis.test/abc123/',
+      rpcNodeWssUrl: 'wss://gnosis.test/abc123/',
+    },
+    polygon: {
+      rpcNodeHttpsUrl: 'https://polygon.test/abc123/',
+      rpcNodeWssUrl: 'wss://polygon.test/abc123/',
+    },
     layer1Network: 'kovan',
     layer1RpcNodeHttpsUrl: 'https://infuratest.test/abc123/',
     layer1RpcNodeWssUrl: 'wss://infuratest.test/ws/abc123/',
