@@ -66,6 +66,7 @@
 
 .boxel-toggle-button-group-option:focus-within:not(.boxel-toggle-button-group-option--disabled) {
   outline: 1px solid var(--boxel-highlight);
+  z-index: 100;
 }
 
 .boxel-toggle-button-group-option--disabled > * {
