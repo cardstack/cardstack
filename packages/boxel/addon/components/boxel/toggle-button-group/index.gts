@@ -34,7 +34,7 @@ interface ButtonSignature {
     disabled: boolean;
     name: string;
     onChange: ((event: InputEvent) => void);
-    value?: string;
+    value: string;
   },
   Blocks: {
     default: [],
