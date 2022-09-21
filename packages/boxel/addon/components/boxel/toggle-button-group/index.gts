@@ -30,6 +30,7 @@ interface Signature {
     size?: string;
     href?: string;
     class?: string;
+    onChange: (() => void);
   };
   Blocks: {
     'default': [],
@@ -80,11 +81,12 @@ const Button: TemplateOnlyComponent<Signature> = <template>
 export default class ToggleButtonGroupComponent extends Component<Signature> {
   @tracked value = undefined;
 
-  @action doIt(e: Event) {
-    console.log(e.target.value);
+  @action changeValue(e: Event) {
     this.value = e.target.value;
+    this.args.onChange?.(this.value);
   }
-  <template>
+
+<template>
     <fieldset class="boxel-toggle-button-group__fieldset" disabled={{@disabled}} ...attributes>
       <legend class="boxel-toggle-button-group__fieldset-legend">
         {{@groupDescription}}
@@ -104,7 +106,7 @@ export default class ToggleButtonGroupComponent extends Component<Signature> {
                 kind="primary"
                 disabled=@disabled
                 name=@name
-                onChange=this.doIt
+                onChange=this.changeValue
                 chosenValue=this.value
               )
             )
