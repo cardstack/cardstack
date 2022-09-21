@@ -2,7 +2,7 @@ import Component from '@glimmer/component';
 import { tracked } from '@glimmer/tracking';
 import { action } from '@ember/object';
 
-export default class RadioInputUsage extends Component {
+export default class ToggleButtonGroupUsage extends Component {
   @tracked name = 'example-toggle-button-group-usage';
   @tracked groupDescription = 'Select one';
   @tracked disabled = false;
