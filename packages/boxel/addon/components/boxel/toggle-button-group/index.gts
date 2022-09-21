@@ -41,12 +41,8 @@ interface ButtonSignature {
   }
 }
 
-const Button: TemplateOnlyComponent<ButtonSignature> = <template>
-  {{!--
-  anything that's used as a label does not have its semantics in a screenreader.
-  that seems ok, since you probably shouldn't make a form work as document hierarchy.
-  aria-labelledby seems friendlier to safari than the for element, but unsure about other browsers.
-  --}}
+const Button: TemplateOnlyComponent<ButtonSignature> =
+<template>
   {{#let (eq @value @chosenValue) as |checked|}}
     <label
       class={{cn
