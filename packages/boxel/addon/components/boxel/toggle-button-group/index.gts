@@ -54,9 +54,6 @@ const Button: TemplateOnlyComponent<ButtonSignature> = <template>
         boxel-toggle-button-group-option--checked=checked
         boxel-toggle-button-group-option--disabled=@disabled
       }}
-      data-test-boxel-toggle-button-group-option
-      data-test-boxel-toggle-button-group-option-checked={{checked}}
-      data-test-boxel-toggle-button-group-option-disabled={{@disabled}}
       ...attributes
     >
       <Input
