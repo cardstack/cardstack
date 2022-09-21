@@ -46,6 +46,11 @@
       @onInput={{fn (mut this.disabled)}}
       @optional={{true}}
     />
+    <Args.Action
+      @name="onChange"
+      @description="Callback that receives the chosen value"
+      @required={{true}}
+    />
     <Args.Yield
       @description="Yields an object with the default component to use (ToggleButtonGroup::Button) AND WHAT ELSE"
     />
