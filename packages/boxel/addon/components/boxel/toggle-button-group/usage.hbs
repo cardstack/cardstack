@@ -2,7 +2,7 @@
   <:example>
     <Boxel::ToggleButtonGroup
       @groupDescription={{this.groupDescription}}
-      @name="example-radio-usage"
+      @name={{this.name}}
       @disabled={{this.disabled}}
       @onChange={{this.logValue}} as |group|
     >
@@ -31,6 +31,13 @@
   </:example>
 
   <:api as |Args|>
+    <Args.String
+      @name="name"
+      @description="The name attribute for the generated inputs"
+      @value={{this.name}}
+      @onInput={{fn (mut this.name)}}
+      @required={{true}}
+    />
     <Args.String
       @name="groupDescription"
       @description="Accessible description for this group of radio buttons"
