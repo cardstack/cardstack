@@ -33,10 +33,10 @@
   <:api as |Args|>
     <Args.String
       @name="groupDescription"
-      @description="Description for this group of radio buttons MAYBE?"
+      @description="Accessible description for this group of radio buttons"
       @value={{this.groupDescription}}
       @onInput={{fn (mut this.groupDescription)}}
-      @optional={{true}}
+      @required={{true}}
     />
     <Args.Bool
       @name="disabled"
