@@ -2,6 +2,9 @@ import { action } from '@ember/object';
 import Component from '@glimmer/component';
 import { tracked } from '@glimmer/tracking';
 import { type EmptyObject } from '@ember/component/helper';
+import PowerSelect from 'ember-power-select/components/power-select';
+import cn from '@cardstack/boxel/helpers/cn';
+import or from 'ember-truth-helpers/helpers/or';
 import './index.css';
 
 interface Signature {
@@ -36,6 +39,26 @@ export default class BoxelInputRangedNumberPicker extends Component<Signature> {
 
     return items;
   }
+
+  <template>
+    <PowerSelect
+      class={{cn
+        "boxel-ranged-number-picker"
+        boxel-ranged-number-picker--selected=this.selectedNumber
+      }}
+      ...attributes
+      @options={{this.rangedNumbers}}
+      @selected={{this.selectedNumber}}
+      @placeholder={{or @placeholder "Pick Number"}}
+      @onChange={{this.setSelectedNumber}}
+      @renderInPlace={{true}}
+      @dropdownClass="boxel-ranged-number-picker__dropdown"
+      @triggerComponent={{@triggerComponent}}
+      as |item|
+    >
+      <div class="boxel-ranged-number-picker__item">{{item}}</div>
+    </PowerSelect>
+  </template>
 }
 
 declare module '@glint/environment-ember-loose/registry' {
