@@ -6,39 +6,46 @@ import { tracked } from '@glimmer/tracking';
 
 //@ts-expect-error glint does not think this is consumed-but it is consumed in the template https://github.com/typed-ember/glint/issues/374
 import { array, concat, hash } from '@ember/helper';
-import or from 'ember-truth-helpers/helpers/or';
 import eq from 'ember-truth-helpers/helpers/eq';
-import not from 'ember-truth-helpers/helpers/not';
-import Container from './container';
-import LoadingIndicator from '../loading-indicator';
-import { LinkTo } from '@ember/routing';
 import { Input } from '@ember/component';
 import { on } from '@ember/modifier';
 import optional from 'ember-composable-helpers/helpers/optional';
 import { action } from '@ember/object';
+import { ComponentLike } from '@glint/template';
+import type { TemplateOnlyComponent } from '@ember/component/template-only';
+
+interface DefaultBlockArgs {
+  Button: ComponentLike<ButtonSignature>;
+}
 
 interface Signature {
-  Element: HTMLButtonElement | HTMLAnchorElement;
+  Element: HTMLFieldSetElement;
   Args: {
-    as?: string;
-    kind?: string;
-    disabled?: boolean;
-    loading?: boolean;
-    route?: any;
-    models?: any;
-    query?: any;
-    size?: string;
-    href?: string;
-    class?: string;
-    onChange: (() => void);
+    disabled: boolean;
+    groupDescription: string;
+    name: string;
+    onChange: ((value: string) => void);
   };
   Blocks: {
-    'default': [],
+    'default': [DefaultBlockArgs],
   }
 }
 
+interface ButtonSignature {
+  Element: HTMLElement
+  Args: {
+    chosenValue: string;
+    disabled: boolean;
+    name: string;
+    onChange: ((event: InputEvent) => void);
+    value: string;
+  },
+  Blocks: {
+    default: [],
+  }
+}
 
-const Button: TemplateOnlyComponent<Signature> = <template>
+const Button: TemplateOnlyComponent<ButtonSignature> = <template>
   {{!--
   anything that's used as a label does not have its semantics in a screenreader.
   that seems ok, since you probably shouldn't make a form work as document hierarchy.
@@ -50,8 +57,6 @@ const Button: TemplateOnlyComponent<Signature> = <template>
         "boxel-toggle-button-group-option"
         boxel-toggle-button-group-option--checked=checked
         boxel-toggle-button-group-option--disabled=@disabled
-        boxel-toggle-button-group-option--hidden-border=@hideBorder
-        boxel-toggle-button-group-option--has-radio=(not @hideRadio)
       }}
       data-test-boxel-toggle-button-group-option
       data-test-boxel-toggle-button-group-option-checked={{checked}}
@@ -62,7 +67,6 @@ const Button: TemplateOnlyComponent<Signature> = <template>
         name={{@name}}
         class={{cn
           "boxel-toggle-button-group-option__input"
-          boxel-toggle-button-group-option__input--hidden-radio=@hideRadio
           boxel-toggle-button-group-option__input--checked=checked
         }}
         @type="radio"
@@ -79,10 +83,10 @@ const Button: TemplateOnlyComponent<Signature> = <template>
 </template>;
 
 export default class ToggleButtonGroupComponent extends Component<Signature> {
-  @tracked value = undefined;
+  @tracked value?: string;
 
   @action changeValue(e: Event) {
-    this.value = e.target.value;
+    this.value = (e.target as HTMLInputElement).value;
     this.args.onChange?.(this.value);
   }
 
@@ -92,13 +96,7 @@ export default class ToggleButtonGroupComponent extends Component<Signature> {
         {{@groupDescription}}
       </legend>
       {{!-- this div is necessary because Chrome has a special case for fieldsets and it breaks grid auto placement --}}
-      <div class={{cn
-          "boxel-toggle-button-group__fieldset-container"
-          boxel-toggle-button-group__fieldset-container--compact=(eq @spacing "compact")
-          boxel-toggle-button-group__fieldset-container--horizontal=(eq @orientation "horizontal")
-          boxel-toggle-button-group__fieldset-container--vertical=(eq @orientation "vertical")
-        }}
-      >
+      <div class="boxel-toggle-button-group__fieldset-container">
         {{yield
             (hash
               Button=(component

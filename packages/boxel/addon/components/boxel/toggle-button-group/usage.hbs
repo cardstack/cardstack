@@ -2,16 +2,9 @@
   <:example>
     <Boxel::ToggleButtonGroup
       @groupDescription={{this.groupDescription}}
-      @items={{this.items}}
       @name="example-radio-usage"
       @disabled={{this.disabled}}
-      @orientation={{this.orientation}}
       @onChange={{this.logValue}}
-      style={{
-        css-var
-        boxel-radio-option-padding=this.optionPadding
-        boxel-radio-option-gap=this.optionGap
-      }} as |group|
     >
       <group.Button @value="19">
         <strong>
