@@ -11,11 +11,11 @@ import { Input } from '@ember/component';
 import { on } from '@ember/modifier';
 import optional from 'ember-composable-helpers/helpers/optional';
 import { action } from '@ember/object';
-import { ComponentLike } from '@glint/template';
+import { WithBoundArgs } from '@glint/template';
 import type { TemplateOnlyComponent } from '@ember/component/template-only';
 
 interface DefaultBlockArgs {
-  Button: ComponentLike<ButtonSignature>;
+  Button: WithBoundArgs<typeof Button, 'disabled'|'chosenValue'|'name'|'onChange'>;
 }
 
 interface Signature {
@@ -34,11 +34,11 @@ interface Signature {
 interface ButtonSignature {
   Element: HTMLElement
   Args: {
-    chosenValue: string;
+    chosenValue?: string;
     disabled: boolean;
     name: string;
     onChange: ((event: InputEvent) => void);
-    value: string;
+    value?: string;
   },
   Blocks: {
     default: [],
