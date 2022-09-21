@@ -41,7 +41,12 @@
   background-color: var(--boxel-light);
   box-shadow: none;
   border: 1px solid var(--boxel-purple-300);
-  border-right-color: transparent;
+}
+
+/* Shift all but the first option left to hide double-borders: https://codepen.io/torez233/pen/rNmYbKQ */
+
+.boxel-toggle-button-group-option + .boxel-toggle-button-group-option {
+  margin-left: -2px;
 }
 
 /* Add curves on the outside corners of the first and last options */
@@ -54,7 +59,6 @@
 .boxel-toggle-button-group-option:last-child {
   border-top-right-radius: var(--boxel-border-radius);
   border-bottom-right-radius: var(--boxel-border-radius);
-  border-right-color: var(--boxel-purple-300);
 }
 
 .boxel-toggle-button-group-option:hover:not(.boxel-toggle-button-group-option--disabled) {
@@ -63,7 +67,6 @@
 
 .boxel-toggle-button-group-option:focus-within:not(.boxel-toggle-button-group-option--disabled) {
   outline: 1px solid var(--boxel-highlight);
-  border-right-color: var(--boxel-purple-300);
 }
 
 .boxel-toggle-button-group-option--disabled > * {
