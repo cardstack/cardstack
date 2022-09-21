@@ -108,13 +108,16 @@ def check_missing_roots(
         roots.append(
             {"reward_program_id": reward_program_id, "payment_cycle": payment_cycle}
         )
+    col_keys = ["reward_program_id", "payment_cycle"]
     subgraph_df = get_all_merkle_root_submissions(env)
-    s3_df = pd.DataFrame(roots)
-    diff_df = s3_df.merge(subgraph_df, indicator=True, how="left")
-    missing_roots_df = (
-        diff_df[diff_df["_merge"] == "left_only"]
-        .drop("_merge", axis=1)
-        .drop_duplicates()
+    s3_df = pd.DataFrame(roots).drop_duplicates(subset=col_keys)
+    # have to drop duplicates because there are two files in each bucket. there is no great way to list directories in s3 because it doesn't support glob-like pattern
+    # TODO: it would be nice to fix this because it is very error-prone -- https://stackoverflow.com/questions/35442383/filter-a-glob-like-regex-pattern-in-boto3
+    left_join_df = s3_df.merge(
+        subgraph_df, how="left", on=col_keys, indicator=True
+    ).copy()
+    missing_roots_df = left_join_df[left_join_df["_merge"] == "left_only"].drop(
+        "_merge", axis=1
     )
     print(f"Total of {len(missing_roots_df)} out of {len(s3_df)} roots are missing ")
     missing_roots_df.to_csv(f"{env}_missng_roots.csv", index=False)
