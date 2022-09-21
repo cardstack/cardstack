@@ -14,10 +14,6 @@ import { action } from '@ember/object';
 import { WithBoundArgs } from '@glint/template';
 import type { TemplateOnlyComponent } from '@ember/component/template-only';
 
-interface DefaultBlockArgs {
-  Button: WithBoundArgs<typeof Button, 'disabled'|'chosenValue'|'name'|'onChange'>;
-}
-
 interface Signature {
   Element: HTMLFieldSetElement;
   Args: {
@@ -27,7 +23,7 @@ interface Signature {
     onChange: ((value: string) => void);
   };
   Blocks: {
-    'default': [DefaultBlockArgs],
+    'default': [{ Button: WithBoundArgs<typeof Button, 'disabled'|'chosenValue'|'name'|'onChange'> }],
   }
 }
 
