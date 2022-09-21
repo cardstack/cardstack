@@ -31,7 +31,10 @@ declare module '@glint/environment-ember-loose/registry' {
     gt: typeof GtHelper;
     optional: typeof OptionalHelper;
     cn: HelperLike<{
-      Args: { Positional: string[]; Named: Record<string, string | boolean> };
+      Args: {
+        Positional: string[];
+        Named: Record<string, string | boolean | undefined>;
+      };
       Return: string;
     }>;
     'css-url': typeof cssUrl;
@@ -46,7 +49,10 @@ declare module '@glint/environment-ember-loose/registry' {
     }>;
     'menu-divider': typeof menuDivider;
     'menu-item': HelperLike<{
-      Args: { Positional: [string, Link | (() => void)] };
+      Args: {
+        Positional: [string, Link | (() => void)];
+        Named: Record<string, string>;
+      };
       Return: MenuItem;
     }>;
     noop: HelperLike<{
@@ -67,7 +73,6 @@ declare module '@glint/environment-ember-loose/registry' {
     }>;
     'svg-jar': typeof svgJar;
     'unique-id': HelperLike<{ Args: EmptyObject; Return: string }>;
-
     'Freestyle::Usage': ComponentLike<{
       Element: HTMLDivElement;
       Args: {

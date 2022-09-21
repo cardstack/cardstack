@@ -9,6 +9,8 @@ interface MenuItemOptions {
   dangerous: boolean;
   header: boolean;
   icon: string;
+  inactive: boolean;
+  id?: string;
 }
 export class MenuItem {
   text: string;
@@ -18,14 +20,18 @@ export class MenuItem {
   icon: string | undefined;
   action: ActionType;
   url: string | undefined;
+  inactive: boolean;
+  id?: string;
 
   constructor(text: string, type: string, options: MenuItemOptions) {
     this.text = text;
     this.type = type;
     this.action = options.action;
+    this.id = options.id;
     this.dangerous = options.dangerous || false;
     this.header = options.header || false;
     this.icon = options.icon || undefined;
+    this.inactive = options.inactive;
   }
 }
 
