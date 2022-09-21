@@ -86,7 +86,7 @@ export default class ToggleButtonGroupComponent extends Component<Signature> {
     this.args.onChange?.(this.value);
   }
 
-<template>
+  <template>
     <fieldset class="boxel-toggle-button-group__fieldset" disabled={{@disabled}} ...attributes>
       <legend class="boxel-toggle-button-group__fieldset-legend">
         {{@groupDescription}}
@@ -110,7 +110,7 @@ export default class ToggleButtonGroupComponent extends Component<Signature> {
                 chosenValue=this.value
               )
             )
-      }}
+        }}
       </div>
     </fieldset>
   </template>
