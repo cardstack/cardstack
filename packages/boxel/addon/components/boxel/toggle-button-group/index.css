@@ -17,12 +17,8 @@
 /* Div container inside the fieldset component. Use `display: contents` to move
    these styles up when that css property is more widely available. */
 .boxel-toggle-button-group__fieldset-container {
-  --boxel-toggle-button-group-gap: var(--boxel-sp);
-
   display: flex;
   flex-wrap: wrap;
-  width: 100%;
-  max-width: 100%;
 }
 
 .boxel-toggle-button-group-option {
@@ -48,16 +44,7 @@
   border-right-color: transparent;
 }
 
-.boxel-toxxggle-button-group-option::before {
-  content: "";
-  position: relative;
-  top: -10px;
-  left: 0;
-  width: 100%;
-  height: 10px;
-  box-shadow: 0px 0 10px rgba(0, 0, 0, 0.8);
-  z-index: 100;
-}
+/* Add curves on the outside corners of the first and last options */
 
 .boxel-toggle-button-group-option:first-child {
   border-top-left-radius: var(--boxel-border-radius);
@@ -83,7 +70,7 @@
   opacity: 0.5;
 }
 
-/* https://css-tricks.com/customise-radio-buttons-without-compromising-accessibility/ */
+/* Hide radio button circle: https://css-tricks.com/customise-radio-buttons-without-compromising-accessibility/ */
 .boxel-toggle-button-group-option__input {
   appearance: none;
   /* stylelint-disable-next-line property-no-vendor-prefix */
@@ -102,7 +89,7 @@
   background-position: top var(--boxel-sp-xs) right var(--boxel-sp-xs);
   background-repeat: no-repeat;
   background-size: var(--boxel-sp);
-  box-shadow: inset 0px 4px 3px -2px var(--boxel-light-500);
+  box-shadow: inset 0 4px 3px -2px var(--boxel-light-500);
 }
 
 .boxel-toggle-button-group-option--checked:last-child {
