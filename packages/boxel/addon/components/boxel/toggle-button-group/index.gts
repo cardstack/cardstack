@@ -70,7 +70,6 @@ const Button: TemplateOnlyComponent<ButtonSignature> = <template>
           boxel-toggle-button-group-option__input--checked=checked
         }}
         @type="radio"
-        {{!-- @checked={{@checked}} --}}
         @value={{@value}}
         disabled={{@disabled}}
         {{on "change" (optional @onChange)}}
