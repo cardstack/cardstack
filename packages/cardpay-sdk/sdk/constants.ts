@@ -54,7 +54,7 @@ const GOERLI = {
   nativeTokenSymbol: 'ETH',
   nativeTokenName: 'Ethereum',
   name: 'Goerli',
-  relayServiceURL: 'http://localhost:8888/api',
+  relayServiceURL: 'https://relay-goerli.staging.stack.cards/api',
 };
 const MUMBAI = {
   apiBaseUrl: 'https://api-testnet.polygon.io/api',
@@ -65,7 +65,7 @@ const MUMBAI = {
   nativeTokenSymbol: 'MATIC',
   nativeTokenName: 'Matic',
   name: 'Mumbai',
-  relayServiceURL: 'http://localhost:8888/api',
+  relayServiceURL: 'https://relay-mumbai.staging.stack.cards/api',
 };
 const MAINNET = {
   apiBaseUrl: 'https://api.etherscan.io/api',
