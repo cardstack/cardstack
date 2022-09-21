@@ -5,7 +5,7 @@ import cn from '@cardstack/boxel/helpers/cn';
 import { tracked } from '@glimmer/tracking';
 
 //@ts-expect-error glint does not think this is consumed-but it is consumed in the template https://github.com/typed-ember/glint/issues/374
-import { array, concat, hash } from '@ember/helper';
+import { hash } from '@ember/helper';
 import eq from 'ember-truth-helpers/helpers/eq';
 import { Input } from '@ember/component';
 import { on } from '@ember/modifier';
