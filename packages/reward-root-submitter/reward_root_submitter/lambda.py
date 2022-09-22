@@ -1,3 +1,4 @@
+import logging
 import urllib
 
 import sentry_sdk
@@ -21,8 +22,11 @@ sentry_sdk.init(
 
 
 def handler(event, _context):
-    bucket = event["Records"][0]["s3"]["bucket"]["name"]
-    key = urllib.parse.unquote_plus(
-        event["Records"][0]["s3"]["object"]["key"], encoding="utf-8"
-    )
-    process_file(AnyPath(f"s3://{bucket}/{key}"), Config())
+    if event["source"] == "aws.events":
+        logging.info("event triggered")
+    elif event["Records"]["eventSource"] == "aws.s3":
+        bucket = event["Records"][0]["s3"]["bucket"]["name"]
+        key = urllib.parse.unquote_plus(
+            event["Records"][0]["s3"]["object"]["key"], encoding="utf-8"
+        )
+        process_file(AnyPath(f"s3://{bucket}/{key}"), Config())
