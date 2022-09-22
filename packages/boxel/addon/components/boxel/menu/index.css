@@ -4,6 +4,11 @@
   padding: 0;
 }
 
+.boxel-menu__item {
+  font: var(--boxel-font-sm);
+  letter-spacing: var(--boxel-lsp-sm);
+}
+
 .boxel-menu__item:hover {
   background-color: var(--boxel-light-300);
   cursor: pointer;
