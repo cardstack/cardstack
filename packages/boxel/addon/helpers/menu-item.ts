@@ -1,4 +1,4 @@
-import Helper from '@ember/component/helper';
+import { helper } from '@ember/component/helper';
 import { type Link } from 'ember-link';
 
 type ActionType = Link | (() => void);
@@ -18,12 +18,12 @@ export class MenuItem {
   dangerous: boolean;
   header: boolean;
   icon: string | undefined;
-  action: ActionType;
+  action: ActionType | undefined;
   url: string | undefined;
-  inactive: boolean;
+  inactive: boolean | undefined;
   id?: string;
 
-  constructor(text: string, type: string, options: MenuItemOptions) {
+  constructor(text: string, type: string, options: Partial<MenuItemOptions>) {
     this.text = text;
     this.type = type;
     this.action = options.action;
@@ -35,12 +35,13 @@ export class MenuItem {
   }
 }
 
-export default Helper.helper(function (
-  params: [string, ActionType],
-  hash: MenuItemOptions
-): MenuItem {
-  let text = params[0];
-  let opts = Object.assign({}, hash);
-  opts.action = params[1];
-  return new MenuItem(text, 'action', opts);
-});
+const menuItem = helper(
+  (params: [string, ActionType], named: Partial<MenuItemOptions>): MenuItem => {
+    let text = params[0];
+    let opts = Object.assign({}, named);
+    opts.action = params[1];
+    return new MenuItem(text, 'action', opts);
+  }
+);
+
+export default menuItem;
