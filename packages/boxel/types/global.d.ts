@@ -12,7 +12,7 @@ import OrHelper from 'ember-truth-helpers/helpers/or';
 import NotHelper from 'ember-truth-helpers/helpers/not';
 import GtHelper from 'ember-truth-helpers/helpers/gt';
 import OptionalHelper from 'ember-composable-helpers/helpers/optional';
-import { ComponentLike, HelperLike } from '@glint/template';
+import { HelperLike } from '@glint/template';
 import { svgJar } from '@cardstack/boxel/utils/svg-jar';
 import cssUrl from '@cardstack/boxel/helpers/css-url';
 import cssVar from '@cardstack/boxel/helpers/css-var';
