@@ -1,0 +1,32 @@
+.boxel-control-panel {
+  background-color: var(--boxel-purple-600);
+  color: var(--boxel-light);
+}
+
+.boxel-control-panel__item {
+  border-bottom: 1px solid var(--boxel-purple-500);
+  padding: var(--boxel-sp-sm) var(--boxel-sp-sm) var(--boxel-sp-xl) var(--boxel-sp-sm);
+}
+
+.boxel-control-panel__item:last-child {
+  border-bottom-width: 0;
+}
+
+.boxel-control-panel__item-heading {
+  display: grid;
+  grid-template-columns: var(--boxel-sp-xl) 1fr;
+  align-items: center;
+  padding: var(--boxel-sp-sm) 0;
+  color: var(--boxel-light);
+  font: 600 var(--boxel-font-xs);
+  letter-spacing: var(--boxel-lsp-xl);
+  text-transform: uppercase;
+}
+
+.boxel-control-panel__item-icon {
+  --icon-color: var(--boxel-cyan);
+}
+
+.boxel-control-panel__item-body {
+  margin-left: var(--boxel-sp-xl);
+}

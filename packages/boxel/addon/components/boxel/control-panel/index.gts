@@ -1,0 +1,64 @@
+import Component from '@glimmer/component';
+import type { TemplateOnlyComponent } from '@ember/component/template-only';
+//@ts-expect-error glint does not think this is consumed-but it is consumed in the template https://github.com/typed-ember/glint/issues/374
+import { hash } from '@ember/helper';
+import { svgJar } from '@cardstack/boxel/utils/svg-jar';
+
+import '@cardstack/boxel/styles/global.css';
+import './index.css';
+
+interface Signature {
+  Element: HTMLElement;
+  Args: {
+  };
+  Blocks: {
+    default: [{ Item: typeof Item }],
+  };
+}
+
+interface ItemSignature {
+  Element: HTMLElement
+  Args: {
+    icon: string;
+    title: string;
+  },
+  Blocks: {
+    default: [],
+  }
+}
+
+const Item: TemplateOnlyComponent<ItemSignature> =
+<template>
+  <section class="boxel-control-panel__item">
+    <heading class="boxel-control-panel__item-heading">
+      {{svgJar
+        @icon
+        width="18px"
+        height="18px"
+        class="boxel-control-panel__item-icon"
+      }}
+      {{@title}}
+    </heading>
+    <div class="boxel-control-panel__item-body">
+      {{yield}}
+    </div>
+  </section>
+</template>;
+
+export default class ControlPanel extends Component<Signature> {
+  get jortle(): number {
+    return 3;
+  }
+
+  <template>
+    <nav class="boxel-control-panel">
+      {{yield (hash Item=(component Item))}}
+    </nav>
+  </template>
+}
+
+declare module '@glint/environment-ember-loose/registry' {
+  export default interface Registry {
+    'Boxel::ControlPanel': typeof ControlPanel;
+  }
+}
