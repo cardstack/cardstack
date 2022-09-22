@@ -1,5 +1,5 @@
-import { action } from '@ember/object';
 import Component from '@glimmer/component';
+import BoxelLoadingIndicator from '../loading-indicator';
 import QRCodeStyling from 'qr-code-styling';
 import { reads } from 'macro-decorators';
 import {
@@ -7,6 +7,9 @@ import {
   CornerSquareType,
   DotType,
 } from 'qr-code-styling/lib/types';
+import Modifier from 'ember-modifier';
+import { type EmptyObject } from '@ember/component/helper';
+
 import './index.css';
 
 interface StyledQrCodeComponentArgs {
@@ -24,14 +27,42 @@ interface StyledQrCodeComponentArgs {
   imageMargin: number | undefined; // Margin around image (default 0)
 }
 
-class StyledQrCodeComponent extends Component<StyledQrCodeComponentArgs> {
+interface Signature {
+ Element: HTMLDivElement;
+ Args: Partial<StyledQrCodeComponentArgs>;
+ Blocks: {
+  before: [];
+  default: [];
+ };
+};
+
+interface RenderQRCodeSignature {
+  Element: HTMLDivElement;
+  Args: {
+    Positional: [options: any];
+    Named: EmptyObject;
+  };
+}
+
+class RenderQrCodeModifier extends Modifier<RenderQRCodeSignature> {
+  qrCode: QRCodeStyling | undefined;
+  modify(element: HTMLDivElement, [options]: [any]) {
+    if (this.qrCode) {
+      this.qrCode.update(options);
+    } else {
+      this.qrCode = new QRCodeStyling(options);
+      this.qrCode.append(element);
+    }
+  }
+}
+
+export default class StyledQrCodeComponent extends Component<Signature> {
   @reads('args.size', 300) declare size: number;
   @reads('args.backgroundColor', '#ffffff') declare backgroundColor: string;
   @reads('args.dotColor', '#000000') declare dotColor: string;
   @reads('args.dotType', 'square') declare dotType: DotType;
   @reads('args.margin', 0) declare margin: number;
   @reads('args.imageMargin', 0) declare imageMargin: number;
-  qrCode: QRCodeStyling | undefined;
 
   // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
   get qrOptions() {
@@ -64,14 +95,30 @@ class StyledQrCodeComponent extends Component<StyledQrCodeComponentArgs> {
     };
   }
 
-  @action generateQrCode(element: HTMLElement): void {
-    this.qrCode = new QRCodeStyling(this.qrOptions);
-    this.qrCode.append(element);
-  }
+  <template>
+    <div
+      class="boxel-styled-qr-code"
+      data-test-boxel-styled-qr-code={{@data}}
+      ...attributes
+    >
+      {{yield to="before"}}
 
-  @action updateQrCode(): void {
-    this.qrCode?.update(this.qrOptions);
-  }
+      <div class="boxel-styled-qr-code__canvas" {{RenderQrCodeModifier this.qrOptions}}>
+        <BoxelLoadingIndicator
+          class="boxel-styled-qr-code__loading-indicator"
+          data-test-boxel-styled-qr-code-loading-indicator
+        />
+      </div>
+
+      {{#if (has-block)}}
+        {{yield}}
+      {{/if}}
+    </div>
+  </template>
 }
 
-export default StyledQrCodeComponent;
+declare module '@glint/environment-ember-loose/registry' {
+  export default interface Registry {
+    'Boxel::StyledQrCode': typeof StyledQrCodeComponent;
+  }
+}
