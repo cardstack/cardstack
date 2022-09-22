@@ -2,23 +2,16 @@
 import Component from '@glimmer/component';
 import { tracked } from '@glimmer/tracking';
 import { action } from '@ember/object';
-import './usage.css';
-import { type EmptyObject } from '@ember/component/helper';
 import FreestyleUsage from 'ember-freestyle/components/freestyle/usage';
-import BoxelButton from '../button';
+import BoxelButton from './index';
 //@ts-expect-error glint does not think this is consumed-but it is consumed in the template https://github.com/typed-ember/glint/issues/374
 import { array, fn } from '@ember/helper';
 import cn from '@cardstack/boxel/helpers/cn';
 import eq from 'ember-truth-helpers/helpers/eq';
 import { on } from '@ember/modifier';
+import './usage.css';
 
-interface Signature {
-  Element: HTMLDivElement;
-  Args: EmptyObject;
-  Blocks: EmptyObject;
-}
-
-export default class ButtonUsage extends Component<Signature> {
+export default class ButtonUsage extends Component {
   sizeVariants = ['extra-small', 'small', 'base', 'tall', 'touch'];
   kindVariants = {
     all: [
