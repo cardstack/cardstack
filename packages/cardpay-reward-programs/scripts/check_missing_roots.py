@@ -1,5 +1,6 @@
 import json
 import re
+from typing import Any, Callable, Dict, TypedDict
 
 import boto3
 import pandas as pd
@@ -9,35 +10,46 @@ from cardpay_reward_programs.config import config
 from scripts.utils import Environment
 
 
-def query(skip: int):
-    return """
-    {
+class SubgraphQuery(TypedDict):
+    name: str
+    query: str
+
+
+def merkle_root_submissions_query(
+    skip: int, blockNumber_gt=0, **filters
+) -> SubgraphQuery:
+    query = """{{
         merkleRootSubmissions(
-            skip: %s,
-            orderBy: id,
+            skip: {skip},
+            orderBy: blockNumber,
+            where: {{ blockNumber_gt: {blockNumber_gt} }}
         )
-        {
-            rewardProgram {
+        {{
+            rewardProgram {{
                 id
-            }
+            }}
             paymentCycle
-        }
-    }""" % (
-        skip
+        }}
+    }}""".format(
+        **{"skip": skip, "blockNumber_gt": blockNumber_gt, **filters}
     )
+    return {"name": "merkleRootSubmissions", "query": query}
 
 
-def call(env: str, skip: int):
+def query_subgraph(
+    env: str, skip: int, query: Callable[[int, int, Dict[str, Any]], SubgraphQuery]
+):
     print(f"Skipping {skip}")
     subgraph_url = config[env]["subgraph_url"]
+    subgraph_query = query(skip)
     r = requests.post(
         subgraph_url,
-        json={"query": query(skip)},
+        json={"query": subgraph_query["query"]},
     )
     if r.ok:
         json_data = json.loads(r.text)
         data = json_data["data"]
-        return data["merkleRootSubmissions"]
+        return data[subgraph_query["name"]]
 
 
 def transform(subgraph_o):
@@ -52,10 +64,18 @@ def get_all_merkle_root_submissions(env: Environment):
     res = []
 
     i = 0
-    while c := call(env, i * paginate_size):
+    while c := query_subgraph(env, i * paginate_size, merkle_root_submissions_query):
         if len(c) == 0:
             break
-        transformed_c = list(map(transform, c))
+        transformed_c = list(
+            map(
+                lambda o: {
+                    "reward_program_id": o["rewardProgram"]["id"],
+                    "payment_cycle": o["paymentCycle"],
+                },
+                c,
+            )
+        )
 
         res = res + transformed_c
         i = i + 1
@@ -72,21 +92,6 @@ def safe_regex_group_search(regex, string, group):
         return match.group(group)
     else:
         return None
-
-
-def query_subgraph(subgraph_url, query):
-    try:
-        r = requests.post(
-            subgraph_url,
-            json={"query": query},
-        )
-        if r.ok:
-            json_data = r.json()
-            return json_data["data"]
-        else:
-            raise (r.raise_for_status())
-    except Exception as e:
-        raise (e)
 
 
 def check_missing_roots(
