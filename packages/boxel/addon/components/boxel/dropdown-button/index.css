@@ -22,20 +22,3 @@
   height: 100%;
   margin: auto;
 }
-
-.boxel-dropdown-button__dropdown {
-  border-radius: var(--boxel-border-radius);
-  box-shadow: 0 5px 15px 0 rgb(0 0 0 / 25%);
-  font: var(--boxel-font-sm);
-  letter-spacing: var(--boxel-lsp-sm);
-  min-width: 210px;
-  overflow: hidden;
-}
-
-.boxel-dropdown-button__dropdown.ember-basic-dropdown-content--below.ember-basic-dropdown--transitioning-in {
-  animation: drop-fade-below var(--boxel-transition);
-}
-
-.boxel-dropdown-button__dropdown.ember-basic-dropdown-content--below.ember-basic-dropdown--transitioning-out {
-  animation: drop-fade-below var(--boxel-transition) reverse;
-}
