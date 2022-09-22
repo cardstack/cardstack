@@ -24,6 +24,7 @@ sentry_sdk.init(
 def handler(event, _context):
     if event["source"] == "aws.events":
         logging.info("event triggered")
+        # TODO: get_all_unsubmitted_roots & write to blockchain
     elif event["Records"]["eventSource"] == "aws.s3":
         bucket = event["Records"][0]["s3"]["bucket"]["name"]
         key = urllib.parse.unquote_plus(
