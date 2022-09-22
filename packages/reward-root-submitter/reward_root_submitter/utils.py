@@ -1,5 +1,4 @@
 import json
-import logging
 import re
 from typing import Any, Callable, Dict, TypedDict
 
@@ -10,7 +9,6 @@ from web3 import Web3
 
 from .config import Config
 
-DEFAULT_MAX_PAST_BLOCKS = 34560  # 2 days (1 block every 5s)
 DEFAULT_SUBGRAPH_PAGINATE_SIZE = 100
 
 
@@ -143,26 +141,4 @@ def get_roots_s3(config: Config, min_scan_block=0):
         pd.DataFrame(roots)
         .drop("file", axis=1)
         .drop_duplicates(subset=["reward_program_id", "payment_cycle"])
-    )
-
-
-def get_all_unsubmitted_roots(config: Config):
-    evm_node = config.evm_full_node_url
-    w3 = Web3(Web3.HTTPProvider(evm_node))
-    current_block = w3.eth.get_block("latest")["number"]
-    min_scan_block = current_block - DEFAULT_MAX_PAST_BLOCKS
-
-    s3_df = get_roots_s3(config, min_scan_block)
-    subgraph_df = get_roots_subgraph(config, min_scan_block)
-    left_exclude_join_df = s3_df.merge(
-        subgraph_df,
-        how="left",
-        on=["reward_program_id", "payment_cycle"],
-        indicator=True,
-    ).copy()
-    missing_roots_df = left_exclude_join_df[
-        left_exclude_join_df["_merge"] == "left_only"
-    ].drop("_merge", axis=1)
-    logging.info(
-        f"Total of {len(missing_roots_df)} out of {len(s3_df)} roots are missing "
     )
