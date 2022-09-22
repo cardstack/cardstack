@@ -1,9 +1,13 @@
 import Component from '@glimmer/component';
+import { tracked } from '@glimmer/tracking';
 import BoxelControlPanel from './index';
 import BoxelButton from '../button';
 import FreestyleUsage from 'ember-freestyle/components/freestyle/usage';
 
 export default class extends Component {
+  // Maybe this will be template-only? Removing this causes a build failure
+  @tracked value = 'placeholder;';
+
   <template>
     <FreestyleUsage @name="ControlPanel">
       <:description>
