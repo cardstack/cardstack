@@ -4,6 +4,7 @@
 // import 'qunit-dom';
 
 import '@glint/environment-ember-loose';
+import 'ember-freestyle/glint';
 
 import AndHelper from 'ember-truth-helpers/helpers/and';
 import EqHelper from 'ember-truth-helpers/helpers/eq';
@@ -73,19 +74,5 @@ declare module '@glint/environment-ember-loose/registry' {
     }>;
     'svg-jar': typeof svgJar;
     'unique-id': HelperLike<{ Args: EmptyObject; Return: string }>;
-    'Freestyle::Usage': ComponentLike<{
-      Element: HTMLDivElement;
-      Args: {
-        name?: string;
-        description?: string;
-        slug?: string;
-      };
-      Blocks: {
-        example: [];
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        api: [Args: any];
-        description: [];
-      };
-    }>;
   }
 }
