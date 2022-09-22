@@ -12,6 +12,17 @@ from .config import Config
 DEFAULT_SUBGRAPH_PAGINATE_SIZE = 100
 
 
+def safe_regex_group_search(regex, string, group):
+    """
+    Returns None in the case of a missing group
+    """
+    match = re.search(regex, string)
+    if match:
+        return match.group(group)
+    else:
+        return None
+
+
 class SubgraphQuery(TypedDict):
     name: str
     query: str
@@ -81,17 +92,6 @@ def get_roots_subgraph(config: Config, min_scan_block=0):
         i = i + 1
     df = pd.DataFrame(res)
     return df
-
-
-def safe_regex_group_search(regex, string, group):
-    """
-    Returns None in the case of a missing group
-    """
-    match = re.search(regex, string)
-    if match:
-        return match.group(group)
-    else:
-        return None
 
 
 def _get_potential_reward_output_locations(reward_program_bucket: AnyPath):

@@ -8,7 +8,7 @@ from web3 import Web3
 
 from .config import Config
 from .contracts import RewardPool
-from .utils import get_roots_s3, get_roots_subgraph
+from .utils import get_roots_s3, get_roots_subgraph, safe_regex_group_search
 
 NULL_HEX = HexBytes(
     "0x0000000000000000000000000000000000000000000000000000000000000000"
@@ -30,17 +30,6 @@ class MerkleRoot:
 
 def setup_logging(config):
     logging.getLogger().setLevel(level=config.log_level.upper())
-
-
-def safe_regex_group_search(regex, string, group):
-    """
-    Returns None in the case of a missing group
-    """
-    match = re.search(regex, string)
-    if match:
-        return match.group(group)
-    else:
-        return None
 
 
 def get_merkle_root_details(reward_output_filename):
