@@ -52,13 +52,6 @@ def query_subgraph(
         return data[subgraph_query["name"]]
 
 
-def transform(subgraph_o):
-    return {
-        "reward_program_id": subgraph_o["rewardProgram"]["id"],
-        "payment_cycle": subgraph_o["paymentCycle"],
-    }
-
-
 def get_all_merkle_root_submissions(env: Environment):
     paginate_size = 100
     res = []
