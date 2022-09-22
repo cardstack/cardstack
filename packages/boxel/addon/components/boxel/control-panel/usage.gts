@@ -13,10 +13,10 @@ export default class extends Component {
         <BoxelControlPanel
           as |cp|
         >
-        <cp.Item @title="Gear" @icon="gear">
-          <BoxelButton @kind="secondary-dark">Gear something</BoxelButton>
-        </cp.Item>
-        <cp.Item @title="Pin" @icon="pin">two</cp.Item>
+          <cp.Item @title="Gear" @icon="gear">
+            <BoxelButton @kind="secondary-dark">Gear something</BoxelButton>
+          </cp.Item>
+          <cp.Item @title="Pin" @icon="pin">two</cp.Item>
         </BoxelControlPanel>
       </:example>
     </FreestyleUsage>
