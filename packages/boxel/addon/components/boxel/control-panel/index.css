@@ -5,7 +5,7 @@
 
 .boxel-control-panel__item {
   border-bottom: 1px solid var(--boxel-purple-500);
-  padding: var(--boxel-sp-sm) var(--boxel-sp-sm) var(--boxel-sp-xl) var(--boxel-sp-sm);
+  padding: var(--boxel-sp-sm) var(--boxel-sp-sm) var(--boxel-sp-xxl) var(--boxel-sp-sm);
 }
 
 .boxel-control-panel__item:last-child {
