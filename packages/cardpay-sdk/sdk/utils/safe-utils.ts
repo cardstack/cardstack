@@ -367,7 +367,7 @@ function getSafeAddressFromRevertMessage(e: any): string {
     safeAddress = ethers.utils.getAddress(e.data.slice(138, 178));
   } else {
     let messages: string[] = e.message.split(' ');
-    safeAddress = messages.find(m => m.match(/^0x[a-fA-F0-9]{40,44}$/))?.replace(',','') ?? AddressZero;
+    safeAddress = messages.find((m) => m.match(/^0x[a-fA-F0-9]{40,44}$/))?.replace(',', '') ?? AddressZero;
   }
   return safeAddress;
 }

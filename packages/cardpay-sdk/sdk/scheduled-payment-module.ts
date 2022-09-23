@@ -380,7 +380,7 @@ export default class ScheduledPaymentModule {
         requiredGas = decodedError.args[0].toNumber();
       }
       return requiredGas;
-    }
+    };
 
     let requiredGas = 0;
     try {
@@ -432,7 +432,7 @@ export default class ScheduledPaymentModule {
         ).estimateGas();
       }
     } catch (e: any) {
-      requiredGas = getRequiredGasFromRevertMessage(e)
+      requiredGas = getRequiredGasFromRevertMessage(e);
     }
 
     return requiredGas;
