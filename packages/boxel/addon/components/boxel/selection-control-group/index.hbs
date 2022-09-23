@@ -29,12 +29,10 @@
         <Boxel::DropdownButton
           @button="more-actions"
           @icon="more-actions"
-          class="boxel-selection-control-group__menu-trigger" as |Menu dd|
+          class="boxel-selection-control-group__menu-trigger"
+          as |ddb|
         >
-          {{component
-            @menuComponent
-            closeMenu=dd.actions.close
-          }}
+          {{component @menuComponent closeMenu=ddb.close}}
         </Boxel::DropdownButton>
       {{/if}}
     {{else}}

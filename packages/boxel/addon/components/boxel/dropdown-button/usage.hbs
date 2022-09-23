@@ -4,32 +4,37 @@
       @button={{this.button}}
       @size={{this.size}}
       @iconSize={{this.iconSize}}
-      as |Menu|
+      as |ddb|
     >
-      <Menu
+      <ddb.Menu
         @items={{array
           (menu-item "Duplicate" (fn this.log "Duplicate menu item clicked"))
           (menu-item "Share" (fn this.log "Share menu item clicked"))
           (menu-divider)
-          (menu-item "Remove" (fn this.log "Remove menu item clicked") dangerous=true)
+          (menu-item
+            "Remove" (fn this.log "Remove menu item clicked") dangerous=true
+          )
         }}
       />
     </Boxel::DropdownButton>
   </:example>
   <:api as |Args|>
-    <Args.String @name="button"
+    <Args.String
+      @name="button"
       @description="the name to use as the aria-label and added on the trigger element as a css class. If @icon is not specified, this value is also used to specify an svg to use."
       @value={{this.button}}
       @required={{true}}
       @onInput={{fn (mut this.button)}}
     />
-    <Args.String @name="icon"
+    <Args.String
+      @name="icon"
       @description="the name of the svg to show"
       @value={{this.icon}}
       @defaultValue="falls back to the value of @button"
       @onInput={{fn (mut this.icon)}}
     />
-    <Args.Number @name="size"
+    <Args.Number
+      @name="size"
       @description="the size of the button"
       @value={{this.size}}
       @defaultValue={{40}}
@@ -37,7 +42,8 @@
       @max={{80}}
       @onInput={{fn (mut this.size)}}
     />
-    <Args.Number @name="iconSize"
+    <Args.Number
+      @name="iconSize"
       @description="the size of the icon"
       @value={{this.iconSize}}
       @defaultValue={{16}}

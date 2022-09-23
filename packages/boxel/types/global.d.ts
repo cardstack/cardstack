@@ -22,6 +22,11 @@ import { Link, LinkParams } from 'ember-link';
 import menuDivider from '@cardstack/boxel/helpers/menu-divider';
 import { MenuItem } from '@cardstack/boxel/helpers/menu-item';
 import AddHelper from 'ember-math-helpers/helpers/add';
+import Component from '@glimmer/component';
+
+export type ArgsFromComponent<TClass> = TClass extends Component<infer U>
+  ? U
+  : never;
 
 declare module '@glint/environment-ember-loose/registry' {
   export default interface Registry {
@@ -35,7 +40,7 @@ declare module '@glint/environment-ember-loose/registry' {
     optional: typeof OptionalHelper;
     cn: HelperLike<{
       Args: {
-        Positional: string[];
+        Positional: Array<string | undefined>;
         Named: Record<string, string | boolean | undefined>;
       };
       Return: string;
