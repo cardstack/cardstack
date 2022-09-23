@@ -53,8 +53,8 @@ app "hub" {
         HUB_GOOGLE_IAP_SERVICE_ACCOUNT                = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_hub_google_iap_service_account-v0PB3u"
         GNOSIS_RPC_NODE_HTTPS_URL                     = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_evm_full_node_url-NBKUCq"
         GNOSIS_RPC_NODE_WSS_URL                       = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_evm_full_node_wss_url-4RtEaG"
-        ETHEREUM_RPC_NODE_HTTPS_URL                   = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_evm_etherum_infura_https_url-JV1mL7"
-        ETHEREUM_RPC_NODE_WSS_URL                     = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_evm_etherum_infura_wss_url-SU0kvE"
+        ETHEREUM_RPC_NODE_HTTPS_URL                   = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_evm_ethereum_infura_https_url-okgckW"
+        ETHEREUM_RPC_NODE_WSS_URL                     = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_evm_ethereum_infura_wss_url-hXLd7Q"
         POLYGON_RPC_NODE_HTTPS_URL                    = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_evm_polygon_infura_https_url-wIF3tU"
         POLYGON_RPC_NODE_WSS_URL                      = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_evm_polygon_infura_wss_url-UvdYiF"
         # The below is a distribution in the production AWS account
@@ -123,8 +123,8 @@ app "hub-worker" {
         HUB_AUTH_SECRET                     = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_hub_auth_secret-50oF6K"
         GNOSIS_RPC_NODE_HTTPS_URL           = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_evm_full_node_url-NBKUCq"
         GNOSIS_RPC_NODE_WSS_URL             = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_evm_full_node_wss_url-4RtEaG"
-        ETHEREUM_RPC_NODE_HTTPS_URL         = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_evm_etherum_infura_https_url-JV1mL7"
-        ETHEREUM_RPC_NODE_WSS_URL           = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_evm_etherum_infura_wss_url-SU0kvE"
+        ETHEREUM_RPC_NODE_HTTPS_URL         = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_evm_ethereum_infura_https_url-okgckW"
+        ETHEREUM_RPC_NODE_WSS_URL           = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_evm_ethereum_infura_wss_url-hXLd7Q"
         POLYGON_RPC_NODE_HTTPS_URL          = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_evm_polygon_infura_https_url-wIF3tU"
         POLYGON_RPC_NODE_WSS_URL            = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_evm_polygon_infura_wss_url-UvdYiF"
         # The below is a distribution in the production AWS account
