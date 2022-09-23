@@ -1,6 +1,7 @@
 .boxel-control-panel {
   background-color: var(--boxel-purple-600);
   color: var(--boxel-light);
+  padding: var(--boxel-sp-xl);
 }
 
 .boxel-control-panel__item {
@@ -13,6 +14,7 @@
 }
 
 .boxel-control-panel__item-heading {
+  position: relative;
   display: grid;
   grid-template-columns: var(--boxel-sp-xl) 1fr;
   align-items: center;
@@ -21,6 +23,18 @@
   font: 600 var(--boxel-font-xs);
   letter-spacing: var(--boxel-lsp-xl);
   text-transform: uppercase;
+}
+
+.boxel-control-panel__item-heading--is-active::before {
+  content: "";
+  position: absolute;
+  background-image: url('/@cardstack/boxel/images/icons/active-item.svg');
+  background-repeat: no-repeat;
+  background-position: center left;
+  top: 0;
+  height: 100%;
+  width: 25px;
+  right: 100%;
 }
 
 .boxel-control-panel__item-icon {

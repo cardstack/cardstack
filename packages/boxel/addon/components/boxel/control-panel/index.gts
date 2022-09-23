@@ -2,6 +2,7 @@ import Component from '@glimmer/component';
 import type { TemplateOnlyComponent } from '@ember/component/template-only';
 //@ts-expect-error glint does not think this is consumed-but it is consumed in the template https://github.com/typed-ember/glint/issues/374
 import { hash } from '@ember/helper';
+import cn from '@cardstack/boxel/helpers/cn';
 import { svgJar } from '@cardstack/boxel/utils/svg-jar';
 
 import '@cardstack/boxel/styles/global.css';
@@ -20,6 +21,7 @@ interface ItemSignature {
   Element: HTMLElement
   Args: {
     icon: string;
+    isActive: boolean;
     title: string;
   },
   Blocks: {
@@ -30,7 +32,12 @@ interface ItemSignature {
 const Item: TemplateOnlyComponent<ItemSignature> =
 <template>
   <section class="boxel-control-panel__item">
-    <heading class="boxel-control-panel__item-heading">
+    <heading
+      class={{
+        cn
+        "boxel-control-panel__item-heading"
+        boxel-control-panel__item-heading--is-active=@isActive
+      }}>
       {{svgJar
         @icon
         width="18px"

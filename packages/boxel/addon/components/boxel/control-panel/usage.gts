@@ -17,11 +17,11 @@ export default class extends Component {
         <BoxelControlPanel
           as |cp|
         >
-          <cp.Item @title="Gear" @icon="gear">
+          <cp.Item @title="Gear" @icon="gear" @isActive={{false}}>
             <BoxelButton @kind="secondary-dark">Gear Something</BoxelButton>
           </cp.Item>
-          <cp.Item @title="Pin" @icon="pin">two</cp.Item>
-          <cp.Item @title="Lock" @icon="lock">
+          <cp.Item @title="Pin" @icon="pin" @isActive={{true}}>two</cp.Item>
+          <cp.Item @title="Lock" @icon="lock" @isActive={{true}}>
             <BoxelButton @kind="primary">Do Lock Something</BoxelButton>
           </cp.Item>
         </BoxelControlPanel>
