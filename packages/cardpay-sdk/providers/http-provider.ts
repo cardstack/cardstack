@@ -3,6 +3,15 @@ import ProviderEngine from 'web3-provider-engine';
 import Web3Subprovider from 'web3-provider-engine/subproviders/provider.js';
 import Web3 from 'web3';
 
+export class Revert extends Error {
+  data: string;
+
+  constructor(message: string, data: string) {
+    super(message);
+    this.data = data;
+  }
+}
+
 // This is a patched HttpProvider that will allow an HDWalletProvider to send
 // transactions
 export default class HttpProvider {
@@ -30,7 +39,12 @@ export default class HttpProvider {
           return end(err);
         }
         if (response.error) {
-          return end(new Error(`error: ${response.error.message}, received from payload ${JSON.stringify(payload)}`));
+          return end(
+            new Revert(
+              `error: ${response.error.message}, received from payload ${JSON.stringify(payload)}`,
+              response.error.data
+            )
+          );
         }
         end(null, response.result);
       });
