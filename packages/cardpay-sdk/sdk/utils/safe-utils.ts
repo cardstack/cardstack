@@ -355,15 +355,21 @@ async function calculateCreateProxyWithNonceAddress(
       .calculateCreateProxyWithNonceAddress(masterCopyAddress, initializer, saltNonce)
       .estimateGas();
   } catch (e: any) {
-    if (e.data) {
-      expectedSafeAddress = ethers.utils.getAddress(e.data.slice(138, 178));
-    } else {
-      let messages = e.message.split(' ');
-      expectedSafeAddress = messages[2].replace(',', '');
-    }
+    expectedSafeAddress = getSafeAddressFromRevertMessage(e);
   }
 
   return expectedSafeAddress;
+}
+
+function getSafeAddressFromRevertMessage(e: any): string {
+  let safeAddress;
+  if (e.data) {
+    safeAddress = ethers.utils.getAddress(e.data.slice(138, 178));
+  } else {
+    let messages: string[] = e.message.split(' ');
+    safeAddress = messages.find(m => m.match(/^0x[a-fA-F0-9]{40,44}$/))?.replace(',','') ?? AddressZero;
+  }
+  return safeAddress;
 }
 
 // allow TransactionReceipt as argument

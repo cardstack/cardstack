@@ -368,7 +368,21 @@ export default class ScheduledPaymentModule {
     gasPrice: string,
     recurringUntil?: number
   ): Promise<number> {
-    let requiredGas;
+    let getRequiredGasFromRevertMessage = function (e: any): number {
+      let requiredGas;
+      let _interface = new utils.Interface(['error GasEstimation(uint256 gas)']);
+      if (e.data) {
+        let decodedError = _interface.parseError(e.data);
+        requiredGas = decodedError.args[0].toNumber();
+      } else {
+        let messages = e.message.split(' ');
+        let decodedError = _interface.parseError(messages[2].replace(',', ''));
+        requiredGas = decodedError.args[0].toNumber();
+      }
+      return requiredGas;
+    }
+
+    let requiredGas = 0;
     try {
       let module = new this.web3.eth.Contract(ScheduledPaymentABI as AbiItem[], moduleAddress);
       if (recurringUntil) {
@@ -418,15 +432,7 @@ export default class ScheduledPaymentModule {
         ).estimateGas();
       }
     } catch (e: any) {
-      let _interface = new utils.Interface(['error GasEstimation(uint256 gas)']);
-      if (e.data) {
-        let decodedError = _interface.parseError(e.data);
-        requiredGas = decodedError.args[0].toNumber();
-      } else {
-        let messages = e.message.split(' ');
-        let decodedError = _interface.parseError(messages[2].replace(',', ''));
-        requiredGas = decodedError.args[0].toNumber();
-      }
+      requiredGas = getRequiredGasFromRevertMessage(e)
     }
 
     return requiredGas;
