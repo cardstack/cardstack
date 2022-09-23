@@ -16,7 +16,7 @@
 .boxel-control-panel__item-heading {
   position: relative;
   display: grid;
-  grid-template-columns: var(--boxel-sp-xl) 1fr;
+  grid-template-columns: var(--boxel-sp-lg) 1fr;
   align-items: center;
   padding: var(--boxel-sp-sm) 0 var(--boxel-sp) 0;
   color: var(--boxel-light);
