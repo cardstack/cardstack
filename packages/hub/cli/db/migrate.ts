@@ -15,6 +15,11 @@ export async function handler(_argv: Argv & { _: string[]; checkOrder?: boolean 
     _: [, , direction],
     checkOrder = true,
   } = _argv;
+
+  if (direction == null) {
+    direction = 'up';
+  }
+
   if (direction! !== 'up' && direction! !== 'down') {
     console.error(`Invalid migration direction: '${direction}'. Must be 'up' or 'down'`);
     process.exit(1);
@@ -30,7 +35,7 @@ export async function handler(_argv: Argv & { _: string[]; checkOrder?: boolean 
       direction,
       dir,
       migrationsTable: 'pgmigrations',
-      count: Infinity,
+      count: direction === 'up' ? Infinity : 1,
       dbClient,
       checkOrder,
       verbose: true,

@@ -65,6 +65,7 @@
         "../boxel/addon/components/boxel/progress-icon/**/*",
         "../boxel/addon/components/boxel/progress-steps/**/*",
         "../boxel/addon/components/boxel/sidebar/**/*",
+        "../boxel/addon/components/boxel/styled-qr-code/**/*",
         "app/components/card-drop-page/**/*",
         "app/components/card-pay/dashboard-panel/**/*",
         "app/components/card-pay/header/workflow-tracker/item/*",

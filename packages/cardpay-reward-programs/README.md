@@ -42,6 +42,7 @@ If you are using an m1 laptop, you should add `--platform=linux/amd64` flag.
 
 ``` sh
 pdm run flat_drop --env staging
+pdm run check_missing_roots --env staging
 ```
 
 
