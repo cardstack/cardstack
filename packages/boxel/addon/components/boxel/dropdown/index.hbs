@@ -1,8 +1,0 @@
-<BasicDropdown as |dd|>
-  <dd.Trigger ...attributes>
-    {{yield to="trigger"}}
-  </dd.Trigger>
-  <dd.Content class={{cn "boxel-dropdown__content" @contentClass}}>
-    {{yield (hash close=dd.actions.close) to="content"}}
-  </dd.Content>
-</BasicDropdown>

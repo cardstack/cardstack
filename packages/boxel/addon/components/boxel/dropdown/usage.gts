@@ -18,39 +18,39 @@ export default class BoxelDropdownUsage extends Component {
     console.log(string);
   }
   
-<template>
-  <FreestyleUsage @name="Dropdown">
-    <:example>
-      <BoxelDropdown>
-        <:trigger>
-          <BoxelButton>
-            Trigger
-          </BoxelButton>
-        </:trigger>
-        <:content as |dd|>
-          <BoxelMenu
-            @closeMenu={{dd.close}}
-            @items={{array
-              (menuItem
-                "Duplicate" (fn this.log "Duplicate menu item clicked")
-              )
-              (menuItem "Share" (fn this.log "Share menu item clicked"))
-            }}
-          />
-        </:content>
-      </BoxelDropdown>
+  <template>
+    <FreestyleUsage @name="Dropdown">
+      <:example>
+        <BoxelDropdown>
+          <:trigger>
+            <BoxelButton>
+              Trigger
+            </BoxelButton>
+          </:trigger>
+          <:content as |dd|>
+            <BoxelMenu
+              @closeMenu={{dd.close}}
+              @items={{array
+                (menuItem
+                  "Duplicate" (fn this.log "Duplicate menu item clicked")
+                )
+                (menuItem "Share" (fn this.log "Share menu item clicked"))
+              }}
+            />
+          </:content>
+        </BoxelDropdown>
 
-    </:example>
-    <:api as |Args|>
-      <Args.Yield
-        @name="trigger"
-        @description="Content to be used as trigger for basic dropdown"
-      />
-      <Args.Yield
-        @name="content"
-        @description="Content to show on dropdown. The provided block is rendered when trigger is triggered. Yields close action to close the dropdown"
-      />
-    </:api>
-  </FreestyleUsage>
-</template>
+      </:example>
+      <:api as |Args|>
+        <Args.Yield
+          @name="trigger"
+          @description="Content to be used as trigger for basic dropdown"
+        />
+        <Args.Yield
+          @name="content"
+          @description="Content to show on dropdown. The provided block is rendered when trigger is triggered. Yields close action to close the dropdown"
+        />
+      </:api>
+    </FreestyleUsage>
+  </template>
 }
