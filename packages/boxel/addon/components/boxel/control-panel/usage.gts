@@ -26,6 +26,11 @@ export default class extends Component {
           </cp.Item>
         </BoxelControlPanel>
       </:example>
+      <:api as |Args|>
+        <Args.Yield
+          @description="Yields { Item } which must be invoked with @title and @icon. @isActive adds an icon."
+        />
+      </:api>
     </FreestyleUsage>
   </template>
 }
