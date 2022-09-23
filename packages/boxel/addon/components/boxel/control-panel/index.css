@@ -18,7 +18,7 @@
   display: grid;
   grid-template-columns: var(--boxel-sp-xl) 1fr;
   align-items: center;
-  padding: var(--boxel-sp-sm) 0;
+  padding: var(--boxel-sp-sm) 0 var(--boxel-sp) 0;
   color: var(--boxel-light);
   font: 600 var(--boxel-font-xs);
   letter-spacing: var(--boxel-lsp-xl);
@@ -30,8 +30,8 @@
   position: absolute;
   background-image: url('/@cardstack/boxel/images/icons/active-item.svg');
   background-repeat: no-repeat;
-  background-position: center left;
-  top: 0;
+  background-position: top left;
+  top: var(--boxel-sp-sm);
   height: 100%;
   width: 25px;
   right: 100%;
