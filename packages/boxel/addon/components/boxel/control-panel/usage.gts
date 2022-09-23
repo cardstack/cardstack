@@ -10,9 +10,6 @@ export default class extends Component {
 
   <template>
     <FreestyleUsage @name="ControlPanel">
-      <:description>
-        xyz
-      </:description>
       <:example>
         <BoxelControlPanel
           as |cp|
