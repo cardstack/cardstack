@@ -11,6 +11,7 @@ import EqHelper from 'ember-truth-helpers/helpers/eq';
 import OrHelper from 'ember-truth-helpers/helpers/or';
 import NotHelper from 'ember-truth-helpers/helpers/not';
 import GtHelper from 'ember-truth-helpers/helpers/gt';
+import NoopHelper from 'ember-composable-helpers/helpers/noop';
 import OptionalHelper from 'ember-composable-helpers/helpers/optional';
 import { HelperLike } from '@glint/template';
 import { svgJar } from '@cardstack/boxel/utils/svg-jar';
@@ -30,6 +31,7 @@ declare module '@glint/environment-ember-loose/registry' {
     or: typeof OrHelper;
     not: typeof NotHelper;
     gt: typeof GtHelper;
+    noop: typeof NoopHelper;
     optional: typeof OptionalHelper;
     cn: HelperLike<{
       Args: {
@@ -55,10 +57,6 @@ declare module '@glint/environment-ember-loose/registry' {
         Named: Record<string, string>;
       };
       Return: MenuItem;
-    }>;
-    noop: HelperLike<{
-      Args: { Positional: string[] };
-      Return: void;
     }>;
     'on-key': HelperLike<{
       Args: {

@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import Helper from '@ember/component/helper';
 
 interface PreventDefaultHelperSignature {
