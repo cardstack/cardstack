@@ -116,18 +116,17 @@ def get_all_reward_outputs(reward_program_bucket: AnyPath, min_scan_block: int =
         payment_cycle = safe_regex_group_search(
             r"paymentCycle=(\d*)", str(result_file), 1
         )
-        if int(payment_cycle) < min_scan_block:
-            continue
-        if (
-            web3.isChecksumAddress(reward_program_id)
-            and result_file.is_file()  # checks existence & is not a folder
-            and (payment_cycle or "").isdigit()
-        ):
-            yield {
-                "file": result_file,
-                "reward_program_id": reward_program_id,
-                "payment_cycle": int(payment_cycle),
-            }
+        if int(payment_cycle) >= min_scan_block:
+            if (
+                web3.isChecksumAddress(reward_program_id)
+                and result_file.is_file()  # checks existence & is not a folder
+                and (payment_cycle or "").isdigit()
+            ):
+                yield {
+                    "file": result_file,
+                    "reward_program_id": reward_program_id,
+                    "payment_cycle": int(payment_cycle),
+                }
 
 
 def get_roots_s3(config: Config, min_scan_block=0):
@@ -139,8 +138,6 @@ def get_roots_s3(config: Config, min_scan_block=0):
     for output in outputs:
         roots.append(output)
 
-    return (
-        pd.DataFrame(roots)
-        .drop("file", axis=1)
-        .drop_duplicates(subset=["reward_program_id", "payment_cycle"])
+    return pd.DataFrame(roots).drop_duplicates(
+        subset=["reward_program_id", "payment_cycle"]
     )
