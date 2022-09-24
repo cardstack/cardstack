@@ -98,9 +98,11 @@ def _get_potential_reward_output_locations(reward_program_bucket: AnyPath):
     """
     This is a generator that yields the locations
     of reward programs _if_ all results are well formed.
+    NOTE: Please do not use .glob(). It is too slow
     """
-    for i in reward_program_bucket.glob("rewardProgramID=*/paymentCycle=*/*.parquet"):
-        yield i
+    for reward_program_folder in reward_program_bucket.iterdir():
+        for payment_cycle_folder in reward_program_folder.iterdir():
+            yield payment_cycle_folder / "results.parquet"
 
 
 def get_all_reward_outputs(reward_program_bucket: AnyPath, min_scan_block: int = 0):
