@@ -26,7 +26,7 @@ class Config(BaseSettings):
     reward_program_output: str
     subgraph_url: str
     log_level: str = Field("INFO")
-    aws_region = str = Field("us-east-1")
+    aws_region: str = Field("us-east-1")
 
     @root_validator(pre=True)
     def load_secrets(cls, values):
