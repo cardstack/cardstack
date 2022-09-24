@@ -144,6 +144,8 @@ def config(deploy_address, deploy_key):
         reward_root_submitter_address=deploy_address,
         reward_root_submitter_private_key=deploy_key,
         reward_root_submitter_sentry_dsn="test",
+        reward_program_output="tests/resources/reward_output/",
+        subgraph_url="https://graph-staging.stack.cards/subgraphs/name/habdelra/cardpay-sokol",
     )
 
 
