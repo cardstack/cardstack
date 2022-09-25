@@ -22,7 +22,7 @@ sentry_sdk.init(
 
 
 def handler(event, _context):
-    if event["source"] == "aws.events":
+    if event.get("source") == "aws.events":
         logging.info("Cron event triggered")
         unsubmitted_roots = get_all_unsubmitted_roots(config)
         for index, row in unsubmitted_roots.iterrows():
