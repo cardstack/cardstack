@@ -54,7 +54,7 @@ REWARD_SCHEDULER_UPDATE_FREQUENCY = int(
 
 def safe_run(reward_program):
     try:
-        reward_program.run_all_payment_cycles()
+        reward_program.run_all_rules()
     except Exception as e:
         logging.error(
             f"Error running reward program {reward_program.reward_program_id}, {e}"

@@ -32,7 +32,7 @@ class RewardProgram:
         )
         if subgraph_extract_location is not None:
             self.load_submitted_from_subgraph_extraction(subgraph_extract_location)
-        self.update_processed()
+        #self.update_processed()
 
     def load_submitted_from_subgraph_extraction(self, subgraph_extract_location):
         logging.info(
@@ -116,7 +116,6 @@ class RewardProgram:
         where the data is available
         """
         core_config = rule["core"]
-        self.update_processed()
         start_block = core_config["start_block"]
         latest_data_block = self.get_latest_data_block(core_config)
         # If there is no dependency on data then all cycles from the start
@@ -166,7 +165,7 @@ class RewardProgram:
                 )
             current_cycles.update(rule_cycles)
 
-    def run(self, payment_cycle, rule):
+    def run_payment_cycle(self, payment_cycle, rule, previous_cycle=None):
         """
         Trigger a job in AWS batch for a single payment cycle and single rule
         """
@@ -177,6 +176,16 @@ class RewardProgram:
             "reward_program_id": self.reward_program_id,
             "payment_cycle": payment_cycle,
         }
+
+        if previous_cycle:
+            submission_data["run"].update({
+                "previous_output": self.reward_program_output_location.joinpath(
+                                    f"paymentCycle={payment_cycle}",
+                                    "results.parquet"
+                ),
+                "rewards_subgraph_location": self.subgraph_extract_location
+            })
+
         payment_cycle_output = self.reward_program_output_location.joinpath(
             f"paymentCycle={payment_cycle}"
         )
@@ -190,6 +199,7 @@ class RewardProgram:
         # We can't pass much data directly in AWS batch, so write the
         # parameters we want to use to S3 and pass the location into the task
         parameters_location = payment_cycle_output.joinpath("parameters.json")
+        payment_cycle_output.mkdir(parents=True, exist_ok=True)
         with parameters_location.open("w") as params_out:
             json.dump(submission_data, params_out)
 
@@ -204,7 +214,21 @@ class RewardProgram:
         )
         return job
 
-    def run_all_payment_cycles(self) -> None:
+    def run_rule(self, rule) -> None:
+        processable_payment_cycles = (
+            self.get_all_payment_cycles(rule) - self.processed_cycles
+        )
+        for payment_cycle in sorted(processable_payment_cycles):
+            if rule["core"].get("rollover"):
+                previous_cycle = payment_cycle - rule["core"]["payment_cycle_length"]
+                if previous_cycle > rule["core"]["start_block"]:
+                    self.run_payment_cycle(payment_cycle, rule, previous_cycle)
+                else:
+                    self.run_payment_cycle(payment_cycle, rule)
+            else:
+                self.run_payment_cycle(payment_cycle, rule)
+
+    def run_all_rules(self) -> None:
         """
         Run all rules for all payment cycles that can be processed at this time
         """
@@ -212,14 +236,13 @@ class RewardProgram:
         if self.is_locked():
             logging.info(f"Reward program {self.reward_program_id} is locked, skipping")
             return
+        
+        self.update_processed()
         rules = self.get_rules()
         self.raise_on_payment_cycle_overlap(rules)
         for rule in rules:
-            processable_payment_cycles = (
-                self.get_all_payment_cycles(rule) - self.processed_cycles
-            )
-            for payment_cycle in sorted(processable_payment_cycles):
-                self.run(payment_cycle, rule)
+            self.run_rule(rule)
+
         logging.info(f"All new payment cycles triggered for {self.reward_program_id}")
 
 
