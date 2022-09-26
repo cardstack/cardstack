@@ -317,3 +317,43 @@ export function generateSaltNonce(prefix: string) {
   let result = [...uuid].reduce((result, char) => result + String(char.charCodeAt(0)), '');
   return result.substring(0, 77);
 }
+
+export async function hubRequest(
+  hubUrl: string,
+  path: string,
+  authToken: string,
+  method: 'GET' | 'POST' | 'PATCH' | 'DELETE',
+  body = {}
+) {
+  let url = `${hubUrl}/${path}`;
+  let options = {
+    method,
+    headers: {
+      'Content-Type': 'application/vnd.api+json',
+      Authorization: `Bearer ${authToken}`,
+      Accept: 'application/json',
+    },
+    body: Object.keys(body).length === 0 ? null : JSON.stringify(body),
+  };
+
+  let response = await global.fetch(url, options);
+  if (!response?.ok) {
+    throw new Error(await response.text());
+  }
+  return response.json();
+}
+
+export async function poll(fn: () => Promise<unknown>, fnCondition: (arg: unknown) => boolean, ms: number) {
+  let result = await fn();
+  while (!fnCondition(result)) {
+    await wait(ms);
+    result = await fn();
+  }
+  return result;
+}
+
+export async function wait(ms = 1000) {
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms);
+  });
+}
