@@ -63,7 +63,7 @@ def query_subgraph(
         json={"query": subgraph_query["query"]},
     )
     if r.ok:
-        json_data = json.loads(r.text)
+        json_data = r.json()
         data = json_data["data"]
         return data[subgraph_query["name"]]
 
