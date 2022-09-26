@@ -80,17 +80,13 @@ def get_roots_subgraph(config: Config, min_scan_block=0):
     ):
         if len(c) == 0:
             break
-        transformed_c = list(
-            map(
-                lambda o: {
-                    "reward_program_id": o["rewardProgram"]["id"],
-                    "payment_cycle": int(o["paymentCycle"]),
-                },
-                c,
-            )
+        res.extend(
+            {
+                "reward_program_id": root_submission["rewardProgram"]["id"],
+                "payment_cycle": int(root_submission["paymentCycle"]),
+            }
+            for root_submission in c
         )
-
-        res = res + transformed_c
         i = i + 1
     df = pd.DataFrame(res)
     return df
