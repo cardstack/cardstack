@@ -56,7 +56,7 @@ export default class ControlPanel extends Component<Signature> {
 
   <template>
     <div class="boxel-control-panel">
-      {{yield (hash Item=(component Item))}}
+      {{yield (hash Item=Item)}}
     </div>
   </template>
 }
