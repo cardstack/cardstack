@@ -54,6 +54,7 @@
         "../boxel/addon/components/boxel/button/**/*",
         "../boxel/addon/components/boxel/card-container/**/*",
         "../boxel/addon/components/boxel/dashboard/**/*",
+        "../boxel/addon/components/boxel/expandable-banner/**/*",
         "../boxel/addon/components/boxel/header/**/*",
         "../boxel/addon/components/boxel/help-box/**/*",
         "../boxel/addon/components/boxel/left-edge-nav/**/*",
