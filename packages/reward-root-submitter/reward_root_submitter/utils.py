@@ -35,6 +35,7 @@ def merkle_root_submissions_query(
         merkleRootSubmissions(
             skip: {skip},
             orderBy: blockNumber,
+            orderDirection: asc,
             where: {{ blockNumber_gt: {blockNumber_gt} }}
         )
         {{
