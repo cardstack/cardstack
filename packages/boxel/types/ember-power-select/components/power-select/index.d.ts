@@ -3,9 +3,11 @@ import Component from '@glimmer/component';
 import { PowerSelectArgs } from 'ember-power-select/addon/components/power-select';
 
 interface PatchedPowerSelectArgs extends PowerSelectArgs {
+  disabled?: boolean;
   dropdownClass?: string;
   placeholder?: string;
   renderInPlace?: boolean;
+  verticalPosition?: string;
 }
 
 export default class PowerSelect extends Component<{
