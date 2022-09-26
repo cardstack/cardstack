@@ -10,7 +10,12 @@ from web3 import Web3
 
 from .reward_program import RewardProgram
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(
+    format="%(asctime)s %(levelname)-8s %(message)s",
+    level=logging.INFO,
+    datefmt="%Y-%m-%d %H:%M:%S",
+)
+
 load_dotenv()
 
 SENTRY_DSN = os.environ.get("SENTRY_DSN")
