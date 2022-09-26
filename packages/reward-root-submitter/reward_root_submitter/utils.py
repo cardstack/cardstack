@@ -1,4 +1,5 @@
 import json
+import logging
 import re
 from typing import Any, Callable, Dict, TypedDict
 
@@ -56,7 +57,7 @@ def query_subgraph(
     blockNumber_gt: int,
     query: Callable[[int, int, Dict[str, Any]], SubgraphQuery],
 ):
-    print(f"Skipping {skip}")
+    logging.info(f"Skipping {skip}")
     subgraph_url = config.subgraph_url
     subgraph_query = query(skip, blockNumber_gt)
     r = requests.post(
