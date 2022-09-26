@@ -708,7 +708,7 @@ export default class ScheduledPaymentModule {
     });
   }
 
-  async schedulePayment(scheduledPaymentId: string): Promise<{ scheduledPaymentId: string; promise: Promise<void> }>;
+  async schedulePayment(scheduledPaymentId: string): Promise<void>;
   async schedulePayment(
     safeAddress: string,
     moduleAddress: string,
@@ -725,7 +725,7 @@ export default class ScheduledPaymentModule {
     recurringDayOfMonth?: number | null,
     recurringUntil?: number | null,
     onScheduledPaymentCreate?: (scheduledPaymentId: string) => unknown
-  ): Promise<{ scheduledPaymentId: string; promise: Promise<void> }>;
+  ): Promise<void>;
   async schedulePayment(
     safeAddressOrScheduledPaymentId: string,
     moduleAddress?: string,
