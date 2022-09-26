@@ -3,7 +3,7 @@ import GnosisSafeABI from '../contracts/abi/gnosis-safe';
 import MetaGuardABI from '../contracts/abi/modules/meta-guard';
 import ScheduledPaymentABI from '../contracts/abi/modules/scheduled-payment-module';
 import { getAddress } from '../contracts/addresses';
-import { AbiItem, fromWei } from 'web3-utils';
+import { AbiItem, fromWei, isAddress } from 'web3-utils';
 import {
   deployAndSetUpModule,
   encodeMultiSend,
@@ -12,6 +12,7 @@ import {
 } from './utils/module-utils';
 import {
   generateSaltNonce,
+  hubRequest,
   isTransactionHash,
   sendTransaction,
   Transaction,
@@ -32,10 +33,11 @@ import {
 import { Signer, utils } from 'ethers';
 import { signSafeTx, signSafeTxAsBytes, Signature } from './utils/signing-utils';
 import { BN } from 'bn.js';
-import { ERC20ABI } from '..';
+import { ERC20ABI, getSDK } from '..';
 import { SuccessfulTransactionReceipt } from './utils/successful-transaction-receipt';
 /* eslint-disable node/no-extraneous-import */
 import { AddressZero } from '@ethersproject/constants';
+import { waitUntilSchedulePaymentTransactionMined } from './scheduled-payment/utils';
 
 export interface EnableModuleAndGuardResult {
   scheduledPaymentModuleAddress: string;
@@ -680,8 +682,181 @@ export default class ScheduledPaymentModule {
     return [nonce, estimate, payload];
   }
 
-  async schedulePayment(txnHash: string): Promise<SuccessfulTransactionReceipt>;
+  private async schedulePaymentOnChainAndUpdateCrank(
+    hubRootUrl: string,
+    authToken: string,
+    scheduledPaymentId: string,
+    safeAddress: string,
+    moduleAddress: string,
+    gasTokenAddress: string,
+    spHash: string,
+    signature: Signature
+  ) {
+    return new Promise<void>((resolve) => {
+      this.schedulePaymentOnChain(safeAddress, moduleAddress, gasTokenAddress, spHash, signature, {
+        onTxnHash: async (txHash: string) => {
+          await hubRequest(hubRootUrl, `api/scheduled-payments/${scheduledPaymentId}`, authToken, 'PATCH', {
+            data: {
+              attributes: {
+                'creation-transaction-hash': txHash,
+              },
+            },
+          });
+          resolve();
+        },
+      });
+    });
+  }
+
+  async schedulePayment(scheduledPaymentId: string): Promise<{ scheduledPaymentId: string; promise: Promise<void> }>;
   async schedulePayment(
+    safeAddress: string,
+    moduleAddress: string,
+    tokenAddress: string,
+    amount: string,
+    payeeAddress: string,
+    feeFixedUSD: number,
+    feePercentage: number,
+    executionGas: number,
+    maxGasPrice: string,
+    gasTokenAddress: string,
+    salt: string,
+    payAt: number | null,
+    recurringDayOfMonth?: number | null,
+    recurringUntil?: number | null,
+    onScheduledPaymentCreate?: (scheduledPaymentId: string) => unknown
+  ): Promise<{ scheduledPaymentId: string; promise: Promise<void> }>;
+  async schedulePayment(
+    safeAddressOrScheduledPaymentId: string,
+    moduleAddress?: string,
+    tokenAddress?: string,
+    amount?: string,
+    payeeAddress?: string,
+    feeFixedUSD?: number,
+    feePercentage?: number,
+    executionGas?: number,
+    maxGasPrice?: string,
+    gasTokenAddress?: string,
+    salt?: string,
+    payAt?: number | null,
+    recurringDayOfMonth?: number | null,
+    recurringUntil?: number | null,
+    onScheduledPaymentCreate?: (scheduledPaymentId: string) => unknown
+  ) {
+    let hubAuth = await getSDK('HubAuth', this.web3);
+    let hubRootUrl = await hubAuth.getHubUrl();
+    let authToken = await hubAuth.authenticate();
+
+    let safeAddress: string;
+
+    if (isAddress(safeAddressOrScheduledPaymentId)) {
+      safeAddress = safeAddressOrScheduledPaymentId;
+    } else {
+      let scheduledPaymentId = safeAddressOrScheduledPaymentId;
+
+      return await waitUntilSchedulePaymentTransactionMined(hubRootUrl, scheduledPaymentId, authToken);
+    }
+
+    if (!moduleAddress) throw new Error('moduleAddress must be provided');
+    if (!tokenAddress) throw new Error('tokenAddress must be provided ');
+    if (!amount) throw new Error('amount must be provided');
+    if (!payeeAddress) throw new Error('payeeAddress must be provided');
+    if (!feeFixedUSD) throw new Error('feeFixedUSD must be provided');
+    if (!feePercentage) throw new Error('feePercentage must be provided');
+    if (!executionGas) throw new Error('executionGas must be provided');
+    if (!maxGasPrice) throw new Error('maxGasPrice must be provided');
+    if (!gasTokenAddress) throw new Error('gasTokenAddress must be provided ');
+    if (!salt) throw new Error('salt must be provided');
+    if (payAt == null && recurringDayOfMonth == null && recurringUntil == null)
+      throw new Error('When payAt is null, recurringDayOfMonth and recurringUntil must have a value');
+
+    let spHash: string;
+    if (recurringDayOfMonth && recurringUntil) {
+      spHash = await this.createSpHash(
+        moduleAddress,
+        tokenAddress,
+        amount,
+        payeeAddress,
+        { fixedUSD: feeFixedUSD, percentage: feePercentage },
+        executionGas,
+        maxGasPrice,
+        gasTokenAddress,
+        salt,
+        recurringDayOfMonth,
+        recurringUntil
+      );
+    } else {
+      spHash = await this.createSpHash(
+        moduleAddress,
+        tokenAddress,
+        amount,
+        payeeAddress,
+        { fixedUSD: feeFixedUSD, percentage: feePercentage },
+        executionGas,
+        maxGasPrice,
+        gasTokenAddress,
+        salt,
+        payAt!
+      );
+    }
+
+    let signature = await this.generateSchedulePaymentSignature(safeAddress, moduleAddress, gasTokenAddress, spHash);
+
+    let account = (await this.web3.eth.getAccounts())[0];
+    let scheduledPaymentResponse = await hubRequest(hubRootUrl, 'api/scheduled-payments', authToken, 'POST', {
+      data: {
+        attributes: {
+          'sender-safe-address': safeAddress,
+          'module-address': moduleAddress,
+          'token-address': tokenAddress,
+          amount,
+          'payee-address': payeeAddress,
+          'execution-gas-estimation': executionGas,
+          'max-gas-price': maxGasPrice,
+          'fee-fixed-usd': feeFixedUSD,
+          'fee-percentage': feePercentage,
+          salt,
+          'pay-at': payAt,
+          'sp-hash': spHash,
+          'chain-id': await this.web3.eth.getChainId(),
+          'user-address': account,
+          'recurring-day-of-month': recurringDayOfMonth,
+          'recurring-until': recurringUntil,
+        },
+      },
+    });
+
+    let scheduledPaymentId = scheduledPaymentResponse.data.id;
+    if (onScheduledPaymentCreate) onScheduledPaymentCreate(scheduledPaymentId);
+
+    try {
+      await this.schedulePaymentOnChainAndUpdateCrank(
+        hubRootUrl,
+        authToken,
+        scheduledPaymentId,
+        safeAddress,
+        moduleAddress,
+        gasTokenAddress,
+        spHash,
+        signature
+      );
+    } catch (error) {
+      console.log(
+        `Error while submitting the transaction to register the scheduled payment on the blockchain: ${error}`
+      );
+
+      await hubRequest(hubRootUrl, `api/scheduled-payments/${scheduledPaymentId}`, authToken, 'DELETE');
+
+      console.log(`Scheduled payment removed from the crank.`);
+
+      throw error;
+    }
+
+    await waitUntilSchedulePaymentTransactionMined(hubRootUrl, scheduledPaymentId, authToken);
+  }
+
+  async schedulePaymentOnChain(txnHash: string): Promise<SuccessfulTransactionReceipt>;
+  async schedulePaymentOnChain(
     safeAddress: string,
     moduleAddress: string,
     gasTokenAddress: string,
@@ -689,7 +864,7 @@ export default class ScheduledPaymentModule {
     signature?: Signature | null,
     txnOptions?: TransactionOptions
   ): Promise<SuccessfulTransactionReceipt>;
-  async schedulePayment(
+  async schedulePaymentOnChain(
     safeAddressOrTxnHash: string,
     moduleAddress?: string,
     gasTokenAddress?: string,
