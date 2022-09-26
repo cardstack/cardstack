@@ -55,9 +55,9 @@ const Item: TemplateOnlyComponent<ItemSignature> =
 export default class ControlPanel extends Component<Signature> {
 
   <template>
-    <nav class="boxel-control-panel">
+    <div class="boxel-control-panel">
       {{yield (hash Item=(component Item))}}
-    </nav>
+    </div>
   </template>
 }
 
