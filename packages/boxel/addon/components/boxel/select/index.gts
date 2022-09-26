@@ -1,6 +1,7 @@
 import or from 'ember-truth-helpers/helpers/or';
 import PowerSelect, { PatchedPowerSelectArgs }  from 'ember-power-select/components/power-select';
 import type { TemplateOnlyComponent } from '@ember/component/template-only';
+import cn from '@cardstack/boxel/helpers/cn';
 
 import './index.css';
 
@@ -13,12 +14,15 @@ type BasePowerSelectArgs = Pick<
   | 'renderInPlace'
   | 'verticalPosition'
   | 'dropdownClass'
-  | 'triggerComponent'
+  | 'triggerComponent' 
+  | 'eventType'
 >;
 
 interface Args<ItemT> extends BasePowerSelectArgs { 
-  items: ItemT[];
-  eventType?: PatchedPowerSelectArgs['eventType']
+  options: ItemT[];
+  selectClass?: string;
+  itemClass?: string;
+  defaultItemStyles?: boolean;
 }
 
 interface Signature<ItemT = any> {
@@ -34,20 +38,27 @@ const defaultEventType = 'click' as const;
 const BoxelSelect: TemplateOnlyComponent<Signature> = 
 <template>
   <PowerSelect
-    @options={{@items}}
+    class={{cn "boxel-select" @selectClass boxel-select--selected=@selected}}
+    @options={{@options}}
     @selected={{@selected}}
     @selectedItemComponent={{@selectedItemComponent}}
     @placeholder={{@placeholder}}
     @onChange={{@onChange}}
     @renderInPlace={{@renderInPlace}}
     @verticalPosition={{@verticalPosition}}
-    @dropdownClass={{@dropdownClass}}
+    @dropdownClass={{or @dropdownClass (cn "boxel-select__dropdown")}}
     @triggerComponent={{@triggerComponent}}
     @eventType={{or @eventType defaultEventType}}
     ...attributes
     as |item|
   >
-    {{yield item}}
+    <div
+      class={{cn
+        "boxel-select__item"
+        @itemClass
+        boxel-select__item--default=@defaultItemStyles
+      }}
+    >{{yield item}}</div>
   </PowerSelect>
 </template>
 

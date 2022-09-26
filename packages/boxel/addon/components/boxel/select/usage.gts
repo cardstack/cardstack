@@ -26,7 +26,8 @@ export default class BoxelSelectUsage extends Component {
           @placeholder={{this.placeholder}}
           @selected={{this.selectedItem}}
           @onChange={{this.onSelectItem}}
-          @items={{this.items}}
+          @options={{this.items}}
+          @defaultItemStyles={{true}}
           as |item|
         >
           {{item}}
@@ -44,7 +45,7 @@ export default class BoxelSelectUsage extends Component {
           @onInput={{fn (mut this.placeholder)}}
         />
         <Args.Array
-          @name="items"
+          @name="options"
           @description="An array of items, to be listed on dropdown"         
           @required={{true}}
           @items={{this.items}}
@@ -59,6 +60,11 @@ export default class BoxelSelectUsage extends Component {
           @name="selected"
           @description="Selected item, its type is dependent on items"
           @required={{true}}
+        />
+        <Args.Bool
+          @name="defaultItemStyles"
+          @defaults={{false}}
+          @description="Applies default selected item style"
         />
       </:api>
     </FreestyleUsage>
