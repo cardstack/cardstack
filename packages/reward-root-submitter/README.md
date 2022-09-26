@@ -38,7 +38,7 @@ And
 
 A submission can be triggered by pointing to a file either local or on S3
 
-    ENVIRONMENT=staging EVM_FULL_NODE_URL=http://127.0.0.1:8545 python -m reward_root_submitter.manual file_path_goes_here
+    python -m reward_root_submitter.manual file_path_goes_here
 
 All required config can be overridden by setting an environment variable, otherwise they will be taken from the secrets manager
 
