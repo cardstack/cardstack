@@ -1,8 +1,7 @@
 import BN from 'bn.js';
 import Web3 from 'web3';
-import { Estimate, SendPayload, Operation } from './safe-utils';
+import { Estimate, SendPayload, Operation, getSafeVersion } from './safe-utils';
 import PrepaidCardManagerABI from '../../contracts/abi/v0.9.0/prepaid-card-manager';
-import GnosisSafeABI from '../../contracts/abi/gnosis-safe';
 import { AbiItem, padLeft, toHex, numberToHex, hexToBytes } from 'web3-utils';
 
 import { getAddress } from '../../contracts/addresses';
@@ -12,6 +11,7 @@ import { networkName } from './general-utils';
 import { networkIds } from '../constants';
 import { gte } from 'semver';
 import { Signer } from 'ethers';
+import JsonRpcProvider from '../../providers/json-rpc-provider';
 
 export interface Signature {
   v: number;
@@ -52,7 +52,7 @@ export async function signPrepaidCardSendTx(
 }
 
 export async function signSafeTx(
-  web3: Web3,
+  web3OrEthersProvider: Web3 | JsonRpcProvider,
   safeAddress: string,
   to: string,
   data: string,
@@ -63,7 +63,7 @@ export async function signSafeTx(
   signer?: Signer
 ): Promise<Signature[]> {
   let signatures = await signSafeTxAsRSV(
-    web3,
+    web3OrEthersProvider,
     to,
     0,
     data,
@@ -82,7 +82,7 @@ export async function signSafeTx(
 }
 
 export async function signSafeTxAsRSV(
-  web3: Web3,
+  web3OrEthersProvider: Web3 | JsonRpcProvider,
   to: string,
   value: number,
   data: any,
@@ -109,17 +109,17 @@ export async function signSafeTxAsRSV(
     refundReceiver,
     nonce,
     gnosisSafeAddress,
-    web3
+    web3OrEthersProvider
   );
   const signatureRSV = [];
-  const sig = await signTypedData(signer ?? web3, owner, typedData);
+  const sig = await signTypedData(signer ?? web3OrEthersProvider, owner, typedData);
   signatureRSV.push(ethSignSignatureToRSVForSafe(sig));
 
   return signatureRSV;
 }
 
 export async function signSafeTxAsBytes(
-  web3: Web3,
+  web3OrEthersProvider: Web3 | JsonRpcProvider,
   to: string,
   value: number,
   data: any,
@@ -146,9 +146,9 @@ export async function signSafeTxAsBytes(
     refundReceiver,
     nonce,
     gnosisSafeAddress,
-    web3
+    web3OrEthersProvider
   );
-  return [await signTypedData(signer ?? web3, owner, typedData)];
+  return [await signTypedData(signer ?? web3OrEthersProvider, owner, typedData)];
 }
 
 export async function signSafeTxWithEIP1271AsBytes(
@@ -214,7 +214,7 @@ async function safeTransactionTypedData(
   refundReceiver: string,
   nonce: any,
   gnosisSafeAddress: string,
-  web3: Web3
+  web3OrEthersProvider: Web3 | JsonRpcProvider
 ) {
   let domain: { verifyingContract: string; chainId?: number } = {
     verifyingContract: gnosisSafeAddress,
@@ -252,17 +252,8 @@ async function safeTransactionTypedData(
     },
   };
 
-  let safe = new web3.eth.Contract(GnosisSafeABI as AbiItem[], gnosisSafeAddress);
-  let safeVersion;
-  try {
-    safeVersion = await safe.methods.VERSION().call();
-  } catch (e) {
-    safe = new web3.eth.Contract(GnosisSafeABI as AbiItem[], await getAddress('gnosisSafeMasterCopy', web3));
-    safeVersion = await safe.methods.VERSION().call();
-  }
-
-  if (gte(safeVersion, '1.3.0')) {
-    let name = await networkName(web3);
+  if (gte(await getSafeVersion(web3OrEthersProvider, gnosisSafeAddress), '1.3.0')) {
+    let name = await networkName(web3OrEthersProvider);
     typedData.types.EIP712Domain.unshift({
       type: 'uint256',
       name: 'chainId',
@@ -273,15 +264,19 @@ async function safeTransactionTypedData(
   return typedData;
 }
 
-export async function signTypedData(web3OrSigner: Web3 | Signer, account: string, data: any): Promise<string> {
+export async function signTypedData(
+  web3OrSignerOrEthersProvider: Web3 | Signer | JsonRpcProvider,
+  account: string,
+  data: any
+): Promise<string> {
   let signature: string | undefined;
   let attempts = 0;
   do {
     if (attempts > 0) {
       await new Promise((resolve) => setTimeout(resolve, 100));
     }
-    if (Signer.isSigner(web3OrSigner)) {
-      let signer = web3OrSigner;
+    if (Signer.isSigner(web3OrSignerOrEthersProvider)) {
+      let signer = web3OrSignerOrEthersProvider;
       let { domain, message } = data;
 
       // Ethers signer errors when types fields are mismatched with message fields,
@@ -291,39 +286,44 @@ export async function signTypedData(web3OrSigner: Web3 | Signer, account: string
 
       //@ts-ignore the _signTypedData method is unfortunately not typed
       signature = await signer._signTypedData(domain, types, message);
+    } else if (web3OrSignerOrEthersProvider instanceof JsonRpcProvider) {
+      let ethersProvider = web3OrSignerOrEthersProvider;
+      return await ethersProvider.send('eth_signTypedData', [account, data]);
     } else {
-      let web3 = web3OrSigner;
-      signature = await new Promise((resolve, reject) => {
-        let provider = web3.currentProvider;
-        if (typeof provider === 'string') {
-          throw new Error(`The provider ${web3.currentProvider} is not supported`);
-        }
-        if (provider == null) {
-          throw new Error('No provider configured');
-        }
-        //@ts-ignore TS is complaining that provider might be undefined--but the
-        //check above should prevent that from ever happening
-        provider.send(
-          {
-            jsonrpc: '2.0',
-            method: 'eth_signTypedData',
-            params: [account, data],
-            id: new Date().getTime(),
-          },
-          (err, response) => {
-            if (err) {
-              return reject(err);
-            }
-            resolve(response?.result);
-          }
-        );
-      });
+      signature = await signTypedDataWithWeb3(web3OrSignerOrEthersProvider, account, data);
     }
   } while (signature == null && attempts++ < 50);
   if (!signature) {
     throw new Error(`unable to sign typed data for EOA ${account} with data ${JSON.stringify(data, null, 2)}`);
   }
   return signature;
+}
+
+async function signTypedDataWithWeb3(web3: Web3, account: string, data: any): Promise<string> {
+  return await new Promise((resolve, reject) => {
+    let provider = web3.currentProvider;
+    let payload = {
+      jsonrpc: '2.0',
+      method: 'eth_signTypedData',
+      params: [account, data],
+      id: new Date().getTime(),
+    };
+
+    if (typeof provider === 'string') {
+      throw new Error(`The provider ${provider} is not supported`);
+    }
+    if (provider == null) {
+      throw new Error('No provider configured');
+    }
+    //@ts-ignore TS is complaining that provider might be undefined--but the
+    //check above should prevent that from ever happening
+    provider.send(payload, (err: any, response: any) => {
+      if (err) {
+        return reject(err);
+      }
+      resolve(response?.result);
+    });
+  });
 }
 
 export function ethSignSignatureToRSVForSafe(ethSignSignature: string) {

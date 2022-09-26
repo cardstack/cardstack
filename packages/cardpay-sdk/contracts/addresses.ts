@@ -15,6 +15,7 @@ import DeprecatedMerchantManagerABI_0_6_7 from './abi/v0.9.0/deprecated-merchant
 import RegisterRewardProgramHandlerABI from './abi/v0.9.0/register-reward-program-handler';
 import RegisterRewardeeHandlerABI from './abi/v0.9.0/register-rewardee-handler';
 import SupplierManagerABI from './abi/v0.9.0/supplier-manager';
+import JsonRpcProvider from '../providers/json-rpc-provider';
 
 export const protocolVersions = ['v0.9.0', 'v0.8.7'];
 
@@ -195,8 +196,13 @@ export function getAddressByNetwork(contractName: AddressKeys, network: string):
   return address;
 }
 
-export async function getAddress(contractName: AddressKeys, web3: Web3): Promise<string> {
-  let network = await networkName(web3);
+export async function getAddress(contractName: AddressKeys, web3: Web3): Promise<string>;
+export async function getAddress(contractName: AddressKeys, ethersProvider: JsonRpcProvider): Promise<string>;
+export async function getAddress(
+  contractName: AddressKeys,
+  web3OrEthersProvider: Web3 | JsonRpcProvider
+): Promise<string> {
+  let network = await networkName(web3OrEthersProvider);
   return getAddressByNetwork(contractName, network);
 }
 

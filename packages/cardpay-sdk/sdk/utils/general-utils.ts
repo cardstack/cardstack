@@ -9,6 +9,7 @@ import { query as gqlQuery } from './graphql';
 import { AbiItem } from 'web3-utils';
 import { Operation } from './safe-utils';
 import { v4 } from 'uuid';
+import JsonRpcProvider from '../../providers/json-rpc-provider';
 
 const POLL_INTERVAL = 500;
 
@@ -26,8 +27,11 @@ export interface TransactionOptions {
   onTxnHash?: (txnHash: string) => unknown;
 }
 
-export async function networkName(web3: Web3): Promise<string> {
-  let id = await web3.eth.net.getId();
+export async function networkName(web3OrEthersProvider: Web3 | JsonRpcProvider): Promise<string> {
+  let id =
+    web3OrEthersProvider instanceof JsonRpcProvider
+      ? (await web3OrEthersProvider.getNetwork()).chainId
+      : await web3OrEthersProvider.eth.net.getId();
   let name = networks[id];
   if (!name) {
     throw new Error(`Don't know what name the network id ${id} is`);
@@ -51,7 +55,7 @@ export async function safeContractCall(
 }
 
 export function waitUntilTransactionMined(
-  web3: Web3,
+  web3OrProvider: Web3 | JsonRpcProvider,
   txnHash: string,
   duration = 60 * 10 * 1000
 ): Promise<SuccessfulTransactionReceipt> {
@@ -68,7 +72,13 @@ export function waitUntilTransactionMined(
     }
 
     try {
-      let receipt = await web3.eth.getTransactionReceipt(txnHash);
+      let receipt;
+      if (web3OrProvider instanceof JsonRpcProvider) {
+        receipt = await web3OrProvider.getTransactionReceipt(txnHash);
+      } else {
+        receipt = await web3OrProvider.eth.getTransactionReceipt(txnHash);
+      }
+
       if (receipt?.status) {
         let successfulReceipt = receipt as SuccessfulTransactionReceipt;
         receiptCache.set(txnHash, successfulReceipt);

@@ -2,6 +2,7 @@ import Web3 from 'web3';
 import invert from 'lodash/invert';
 import mapValues from 'lodash/mapValues';
 import { networkName } from './utils/general-utils';
+import JsonRpcProvider from '../providers/json-rpc-provider';
 
 export const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000';
 
@@ -149,14 +150,15 @@ export function getConstantByNetwork(name: ConstantKeys, network: string): strin
   return value;
 }
 
-export async function getConstant(name: ConstantKeys, network: string): Promise<string>;
-export async function getConstant(name: ConstantKeys, web3: Web3): Promise<string>;
-export async function getConstant(name: ConstantKeys, web3OrNetwork: Web3 | string): Promise<string> {
+export async function getConstant(
+  name: ConstantKeys,
+  web3OrNetworkOrEthersProvider: Web3 | string | JsonRpcProvider
+): Promise<string> {
   let network: string;
-  if (typeof web3OrNetwork === 'string') {
-    network = web3OrNetwork;
+  if (typeof web3OrNetworkOrEthersProvider === 'string') {
+    network = web3OrNetworkOrEthersProvider;
   } else {
-    network = await networkName(web3OrNetwork);
+    network = await networkName(web3OrNetworkOrEthersProvider);
   }
 
   let value = constants[network][name];

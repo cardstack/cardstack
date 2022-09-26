@@ -99,8 +99,8 @@ export default {
       recurringDayOfMonth: number;
       recurringUntil: number;
     };
-    let { web3, signer } = await getEthereumClients(network, getConnectionType(args));
-    let scheduledPaymentModule = await getSDK('ScheduledPaymentModule', web3, signer);
+    let { ethersProvider, signer } = await getEthereumClients(network, getConnectionType(args));
+    let scheduledPaymentModule = await getSDK('ScheduledPaymentModule', ethersProvider, signer);
 
     console.log(`Estimate scheduled payment execution gas ...`);
 

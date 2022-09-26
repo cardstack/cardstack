@@ -1,9 +1,6 @@
-import Web3 from 'web3';
-import { AbiItem } from 'web3-utils';
 import { getAddress } from '../../contracts/addresses';
 import ModuleProxyFactoryABI from '../../contracts/abi/modules/module-proxy-factory';
-import { Contract } from 'web3-eth-contract';
-import { ethers, utils } from 'ethers';
+import { Contract, ethers, utils } from 'ethers';
 import { Operation } from './safe-utils';
 import multiSend from '../../contracts/abi/modules/multi-send';
 import { pack } from '@ethersproject/solidity';
@@ -11,29 +8,37 @@ import { hexDataLength, Interface, LogDescription } from 'ethers/lib/utils';
 import multiSendOnlyCall from '../../contracts/abi/modules/multi-send-call-only';
 import { generateSaltNonce, Transaction } from './general-utils';
 import { Log } from 'web3-core';
+import JsonRpcProvider from '../../providers/json-rpc-provider';
 
 export interface SetupArgs {
   types: string[];
   values: any[];
 }
 
-export async function deployAndSetUpModule(web3: Web3, masterCopy: Contract, setupArgs: SetupArgs) {
-  let factory = new web3.eth.Contract(ModuleProxyFactoryABI as AbiItem[], await getAddress('moduleProxyFactory', web3));
-
-  let encodeInitParams = web3.eth.abi.encodeParameters(setupArgs.types, setupArgs.values);
-  let moduleSetupData = masterCopy.methods.setUp(encodeInitParams).encodeABI();
-  let saltNonce = generateSaltNonce('cardstack-sp-deploy-module');
-  let expectedModuleAddress = await calculateProxyAddress(
-    factory,
-    masterCopy.options.address,
-    moduleSetupData,
-    saltNonce
+export async function deployAndSetUpModule(
+  ethersProvider: JsonRpcProvider,
+  masterCopy: Contract,
+  setupArgs: SetupArgs
+) {
+  let factory = new Contract(
+    await getAddress('moduleProxyFactory', ethersProvider),
+    ModuleProxyFactoryABI,
+    ethersProvider
   );
 
-  let deployData = factory.methods.deployModule(masterCopy.options.address, moduleSetupData, saltNonce).encodeABI();
+  let encodeInitParams = utils.defaultAbiCoder.encode(setupArgs.types, setupArgs.values);
+  let moduleSetupData = masterCopy.interface.encodeFunctionData('setUp', [encodeInitParams]);
+  let saltNonce = generateSaltNonce('cardstack-sp-deploy-module');
+  let expectedModuleAddress = await calculateProxyAddress(factory, masterCopy.address, moduleSetupData, saltNonce);
+
+  let deployData = factory.interface.encodeFunctionData('deployModule', [
+    masterCopy.address,
+    moduleSetupData,
+    saltNonce,
+  ]);
   let transaction: Transaction = {
     data: deployData,
-    to: factory.options.address,
+    to: factory.address,
     value: '0',
     operation: Operation.CALL,
   };
@@ -57,35 +62,42 @@ export async function calculateProxyAddress(
     [ethers.utils.solidityKeccak256(['bytes'], [initData]), saltNonce]
   );
 
-  return ethers.utils.getCreate2Address(factory.options.address, salt, ethers.utils.keccak256(byteCode));
+  return ethers.utils.getCreate2Address(factory.address, salt, ethers.utils.keccak256(byteCode));
 }
 
-export async function encodeMultiSend(web3: Web3, transactions: readonly Transaction[]): Promise<Transaction> {
+export async function encodeMultiSend(
+  ethersProvider: JsonRpcProvider,
+  transactions: readonly Transaction[]
+): Promise<Transaction> {
   const transactionsEncoded = '0x' + transactions.map(encodePacked).map(remove0x).join('');
 
-  const multiSendContract = new web3.eth.Contract(multiSend as AbiItem[], await getAddress('multiSend', web3));
-  const data = multiSendContract.methods.multiSend(transactionsEncoded).encodeABI();
+  const multiSendContract = new Contract(await getAddress('multiSend', ethersProvider), multiSend, ethersProvider);
+  const data = multiSendContract.interface.encodeFunctionData('multiSend', [transactionsEncoded]);
 
   return {
     operation: Operation.DELEGATECALL,
-    to: multiSendContract.options.address,
+    to: multiSendContract.address,
     value: '0',
     data,
   };
 }
 
-export async function encodeMultiSendCallOnly(web3: Web3, transactions: readonly Transaction[]): Promise<Transaction> {
+export async function encodeMultiSendCallOnly(
+  ethersProvider: JsonRpcProvider,
+  transactions: readonly Transaction[]
+): Promise<Transaction> {
   const transactionsEncoded = '0x' + transactions.map(encodePacked).map(remove0x).join('');
 
-  const multiSendContract = new web3.eth.Contract(
-    multiSendOnlyCall as AbiItem[],
-    await getAddress('multiSendCallOnly', web3)
+  const multiSendContract = new Contract(
+    await getAddress('multiSendCallOnly', ethersProvider),
+    multiSendOnlyCall,
+    ethersProvider
   );
-  const data = multiSendContract.methods.multiSend(transactionsEncoded).encodeABI();
+  const data = multiSendContract.interface.encodeFunctionData('multiSend', [transactionsEncoded]);
 
   return {
     operation: Operation.CALL,
-    to: multiSendContract.options.address,
+    to: multiSendContract.address,
     value: '0',
     data,
   };
@@ -102,9 +114,12 @@ function remove0x(hexString: string) {
   return hexString.replace(/^0x/, '');
 }
 
-export async function getModuleProxyCreationEvent(web3: Web3, logs: Log[]): Promise<LogDescription[]> {
+export async function getModuleProxyCreationEvent(
+  ethersProvider: JsonRpcProvider,
+  logs: Log[]
+): Promise<LogDescription[]> {
   let _interface = new utils.Interface(ModuleProxyFactoryABI);
-  let moduleProxyFactoryAddress = await getAddress('moduleProxyFactory', web3);
+  let moduleProxyFactoryAddress = await getAddress('moduleProxyFactory', ethersProvider);
   let events = logs
     .filter((log) => isModuleProxyCreationEvent(moduleProxyFactoryAddress, _interface, log))
     .map((log) => _interface.parseLog(log));

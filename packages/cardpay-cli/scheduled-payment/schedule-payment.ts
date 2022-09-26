@@ -37,9 +37,9 @@ export default {
 
     console.log(`Adding scheduled payment with scheduled payment hash: ${spHash}...`);
 
-    let { web3, signer } = await getEthereumClients(network, getConnectionType(args));
-    let scheduledPaymentModule = await getSDK('ScheduledPaymentModule', web3, signer);
-    let blockExplorer = await getConstant('blockExplorer', web3);
+    let { ethersProvider, signer } = await getEthereumClients(network, getConnectionType(args));
+    let scheduledPaymentModule = await getSDK('ScheduledPaymentModule', ethersProvider, signer);
+    let blockExplorer = await getConstant('blockExplorer', ethersProvider);
 
     console.log(`Waiting for the transaction to be mined...`);
     await scheduledPaymentModule.schedulePayment(safeAddress, safeModuleAddress, gasTokenAddress, spHash, null, {
