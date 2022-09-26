@@ -53,9 +53,6 @@ const Item: TemplateOnlyComponent<ItemSignature> =
 </template>;
 
 export default class ControlPanel extends Component<Signature> {
-  get jortle(): number {
-    return 3;
-  }
 
   <template>
     <nav class="boxel-control-panel">
