@@ -3,7 +3,7 @@ declare module 'ember-cli-mirage/test-support' {
 }
 
 import { Server } from 'ember-cli-mirage';
-import { TestContext } from 'ember-test-helpers';
+import { TestContext } from '@ember/test-helpers';
 
 export function setupMirage(hooks: NestedHooks): void;
 

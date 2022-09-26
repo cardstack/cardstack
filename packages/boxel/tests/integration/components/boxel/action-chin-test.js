@@ -92,19 +92,19 @@ module('Integration | Component | ActionChin', function (hooks) {
       <Boxel::ActionChin
         @state={{this.state}}
       >
-      <:inProgress as |i|>
-        <i.ActionButton>
-          {{this.mainActionButtonText}}
-        </i.ActionButton>
+        <:inProgress as |i|>
+          <i.ActionButton>
+            {{this.mainActionButtonText}}
+          </i.ActionButton>
 
-        <i.CancelButton>
-          {{this.cancelActionButtonText}}
-        </i.CancelButton>
+          <i.CancelButton>
+            {{this.cancelActionButtonText}}
+          </i.CancelButton>
 
-        <i.InfoArea>
-          {{this.infoAreaText}}
-        </i.InfoArea>
-      </:inProgress>
+          <i.InfoArea>
+            {{this.infoAreaText}}
+          </i.InfoArea>
+        </:inProgress>
       </Boxel::ActionChin>
     `);
     assert.dom(MAIN_ACTION_BUTTON_SELECTOR).containsText(mainActionButtonText);
@@ -118,15 +118,15 @@ module('Integration | Component | ActionChin', function (hooks) {
       <Boxel::ActionChin
         @state={{this.state}}
       >
-      <:inProgress as |i|>
-        <i.ActionStatusArea>
-          {{this.mainActionAreaText}}
-        </i.ActionStatusArea>
+        <:inProgress as |i|>
+          <i.ActionStatusArea>
+            {{this.mainActionAreaText}}
+          </i.ActionStatusArea>
 
-        <i.InfoArea>
-          {{this.infoAreaText}}
-        </i.InfoArea>
-      </:inProgress>
+          <i.InfoArea>
+            {{this.infoAreaText}}
+          </i.InfoArea>
+        </:inProgress>
       </Boxel::ActionChin>
     `);
     assert.dom(MAIN_ACTION_AREA_SELECTOR).containsText(mainActionAreaText);

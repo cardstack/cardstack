@@ -34,7 +34,7 @@ module('Acceptance | withdrawal persistence', function (hooks) {
   hooks.beforeEach(async function () {
     workflowPersistenceService = this.owner.lookup(
       'service:workflow-persistence'
-    );
+    ) as WorkflowPersistence;
 
     let layer1AccountAddress = '0xaCD5f5534B756b856ae3B2CAcF54B3321dd6654Fb6';
     let layer1Service = this.owner.lookup('service:layer1-network')

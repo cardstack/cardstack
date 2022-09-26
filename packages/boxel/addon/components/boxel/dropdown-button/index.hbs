@@ -8,8 +8,11 @@
   data-test-boxel-dropdown-button
   ...attributes
 >
-  <BasicDropdown as |dd|>
-    <dd.Trigger class="boxel-dropdown-button__trigger {{@button}}" aria-label={{or @icon @button}}>
+  <Boxel::Dropdown
+    class="boxel-dropdown-button__trigger {{@button}}"
+    aria-label={{or @icon @button}}
+  >
+    <:trigger>
       {{#if (or @icon @button)}}
         {{svg-jar
           (or @icon @button)
@@ -17,9 +20,12 @@
           height=(or @iconSize 16)
         }}
       {{/if}}
-    </dd.Trigger>
-    <dd.Content class="boxel-dropdown-button__dropdown">
-      {{yield (component "boxel/menu" closeMenu=dd.actions.close) dd}}
-    </dd.Content>
-  </BasicDropdown>
+    </:trigger>
+    <:content as |dd|>
+      {{yield
+        (hash Menu=(component "boxel/menu" closeMenu=dd.close) close=dd.close)
+      }}
+    </:content>
+  </Boxel::Dropdown>
+
 </div>

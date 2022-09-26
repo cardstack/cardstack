@@ -47,4 +47,8 @@ export default class ThreadMessageUsageComponent extends Component {
   @action addMessage(): void {
     this.messages = [...this.messages, 1];
   }
+
+  @action addParticipant(): void {
+    // no op
+  }
 }

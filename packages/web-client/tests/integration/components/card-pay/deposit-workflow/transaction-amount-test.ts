@@ -42,7 +42,8 @@ module(
 
       session = new WorkflowSession();
       session.setValue('depositSourceToken', 'DAI');
-      layer1Service = this.owner.lookup('service:layer1-network').strategy;
+      layer1Service = this.owner.lookup('service:layer1-network')
+        .strategy as Layer1TestWeb3Strategy;
 
       const startDaiAmountString = '5.111111111111111110';
       const startDaiAmount = toWei(startDaiAmountString);

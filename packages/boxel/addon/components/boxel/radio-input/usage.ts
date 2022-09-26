@@ -26,6 +26,9 @@ export default class RadioInputUsage extends Component {
   @tracked spacing = '';
   @tracked orientation = 'horizontal';
 
+  @tracked optionPadding = 'var(--boxel-sp)';
+  @tracked optionGap = 'var(--boxel-sp-sm)';
+
   @action onChange(id: string): void {
     this.checkedId = id;
   }

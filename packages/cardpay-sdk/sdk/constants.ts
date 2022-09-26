@@ -43,8 +43,29 @@ const KOVAN = {
   // https://docs.tokenbridge.net/kovan-sokol-amb-bridge/about-the-kovan-sokol-amb shows 1 for finalization rate
   // but making this the same as mainnet so that the dev experience matches prod
   ambFinalizationRate: '20',
-  relayServiceURL: 'http://localhost:8888/api',
   subgraphURL: '',
+};
+const GOERLI = {
+  apiBaseUrl: 'https://api-goerli.etherscan.io/api',
+  blockExplorer: 'https://goerli.etherscan.io',
+  hubUrl: 'https://hub-staging.stack.cards',
+  nativeTokenAddress: 'eth',
+  nativeTokenCoingeckoId: 'ethereum',
+  nativeTokenSymbol: 'ETH',
+  nativeTokenName: 'Ethereum',
+  name: 'Goerli',
+  relayServiceURL: 'https://relay-goerli.staging.stack.cards/api',
+};
+const MUMBAI = {
+  apiBaseUrl: 'https://api-testnet.polygon.io/api',
+  blockExplorer: 'https://mumbai.polygonscan.com',
+  hubUrl: 'https://hub-staging.stack.cards',
+  nativeTokenAddress: 'matic',
+  nativeTokenCoingeckoId: 'MATIC',
+  nativeTokenSymbol: 'MATIC',
+  nativeTokenName: 'Matic',
+  name: 'Mumbai',
+  relayServiceURL: 'https://relay-mumbai.staging.stack.cards/api',
 };
 const MAINNET = {
   apiBaseUrl: 'https://api.etherscan.io/api',
@@ -81,7 +102,13 @@ const GNOSIS = {
   tallyServiceURL: 'https://reward-api.cardstack.com',
 };
 
-type ConstantKeys = keyof typeof SOKOL | keyof typeof KOVAN | keyof typeof MAINNET | keyof typeof GNOSIS;
+type ConstantKeys =
+  | keyof typeof SOKOL
+  | keyof typeof KOVAN
+  | keyof typeof MAINNET
+  | keyof typeof GNOSIS
+  | keyof typeof GOERLI
+  | keyof typeof MUMBAI;
 
 const constants: {
   [network: string]: {
@@ -90,6 +117,8 @@ const constants: {
 } = Object.freeze({
   sokol: SOKOL,
   kovan: KOVAN,
+  goerli: GOERLI,
+  mumbai: MUMBAI,
   mainnet: MAINNET,
   gnosis: GNOSIS,
   xdai: GNOSIS,
@@ -98,8 +127,10 @@ const constants: {
 export const networks: { [networkId: number]: string } = Object.freeze({
   1: 'mainnet',
   42: 'kovan',
+  5: 'goerli',
   77: 'sokol',
   100: 'xdai',
+  80001: 'mumbai',
 });
 
 // invert the networks object, so { '1': 'mainnet', ... } becomes { mainnet: '1', ... }

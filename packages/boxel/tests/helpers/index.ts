@@ -1,8 +1,12 @@
-import Resolver from '@ember/application/resolver';
+import Resolver from 'ember-resolver';
 import {
+  // prettier-ignore
   setupApplicationTest as upstreamSetupApplicationTest,
+  // prettier-ignore
   setupRenderingTest as upstreamSetupRenderingTest,
+  // prettier-ignore
   setupTest as upstreamSetupTest,
+  // prettier-ignore
 } from 'ember-qunit';
 
 interface SetupTestOptions {

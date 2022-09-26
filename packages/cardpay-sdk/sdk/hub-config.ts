@@ -8,6 +8,14 @@ interface Web3HubConfig {
   layer2Network: string;
   layer2RpcNodeHttpsUrl: string;
   layer2RpcNodeWssUrl: string;
+  ethereum: RpcNodeUrl;
+  gnosis: RpcNodeUrl;
+  polygon: RpcNodeUrl;
+}
+
+interface RpcNodeUrl {
+  rpcNodeHttpsUrl: string;
+  rpcNodeWssUrl: string;
 }
 
 export default class HubConfig {

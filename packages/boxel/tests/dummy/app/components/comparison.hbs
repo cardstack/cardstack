@@ -5,7 +5,7 @@
       <h1 class="discrepancy__title">Discrepancy Card: Different Data</h1>
       {{#let (if @model.topLevelCard @model.topLevelCard @model) as |model|}}
         <Link @route={{@exitRoute}} @model={{model.baseCard.ownerId}} @query={{hash version=model.baseCard.version}} as |link|>
-          <Boxel::ModeIndicator @mode="comparison" {{on "click" link.transitionTo}} />
+          <ModeIndicator @mode="comparison" {{on "click" link.transitionTo}} />
         </Link>
       {{/let}}
     </header>
@@ -209,7 +209,7 @@
                         <div class="field-renderer__value">
                           {{#if (and f.status (eq this.mode "comparison"))}}
                             {{#let (get (get field.value i) "tempField") as |isActive|}}
-                              <Boxel::ApplyChangesToggle
+                              <ApplyChangesToggle
                                 @isActive={{isActive}}
                                 {{on "click" (if isActive
                                   (fn this.revertField (get field.value i) f)
@@ -234,7 +234,7 @@
 
                   {{#if (and compField.status (eq this.mode "comparison") (not (includes field.title this.omittedFields)))}}
                     {{#let field.tempField as |isActive|}}
-                      <Boxel::ApplyChangesToggle
+                      <ApplyChangesToggle
                         @isActive={{isActive}}
                         {{on "click" (if isActive
                           (fn this.revertField field)
