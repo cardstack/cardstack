@@ -22,7 +22,7 @@ class RewardProgram:
         reward_manager,
         subgraph_url,
         result_file_root,
-        subgraph_extract_location=None,
+        subgraph_extract_location,
     ) -> None:
         self.reward_manager = reward_manager
         self.reward_program_id = reward_program_id
@@ -30,16 +30,15 @@ class RewardProgram:
         self.reward_program_output_location = AnyPath(result_file_root).joinpath(
             f"rewardProgramID={reward_program_id}"
         )
-        if subgraph_extract_location is not None:
-            self.load_submitted_from_subgraph_extraction(subgraph_extract_location)
-        #self.update_processed()
+        self.subgraph_extract_location = subgraph_extract_location
+        self.load_submitted_from_subgraph_extraction()
 
-    def load_submitted_from_subgraph_extraction(self, subgraph_extract_location):
+    def load_submitted_from_subgraph_extraction(self):
         logging.info(
-            f"Loading processed payment cycles for {self.reward_program_id} from {subgraph_extract_location}"
+            f"Loading processed payment cycles for {self.reward_program_id} from {self.subgraph_extract_location}"
         )
         submission_dataset = get_table_dataset(
-            subgraph_extract_location, "merkle_root_submission"
+            self.subgraph_extract_location, "merkle_root_submission"
         )
         con = duckdb.connect(database=":memory:", read_only=False)
         con.register("submissions", submission_dataset)
@@ -177,13 +176,14 @@ class RewardProgram:
         }
 
         if previous_cycle:
-            submission_data["run"].update({
-                "previous_output": self.reward_program_output_location.joinpath(
-                                    f"paymentCycle={payment_cycle}",
-                                    "results.parquet"
-                ),
-                "rewards_subgraph_location": self.subgraph_extract_location
-            })
+            submission_data["run"].update(
+                {
+                    "previous_output": self.reward_program_output_location.joinpath(
+                        f"paymentCycle={previous_cycle}", "results.parquet"
+                    ).as_uri(),
+                    "rewards_subgraph_location": self.subgraph_extract_location,
+                }
+            )
 
         payment_cycle_output = self.reward_program_output_location.joinpath(
             f"paymentCycle={payment_cycle}"
@@ -201,7 +201,6 @@ class RewardProgram:
         payment_cycle_output.mkdir(parents=True, exist_ok=True)
         with parameters_location.open("w") as params_out:
             json.dump(submission_data, params_out)
-
         job = run_job(
             docker_image,
             parameters_location.as_uri(),
@@ -220,10 +219,17 @@ class RewardProgram:
         for payment_cycle in sorted(processable_payment_cycles):
             if rule["core"].get("rollover"):
                 previous_cycle = payment_cycle - rule["core"]["payment_cycle_length"]
-                if previous_cycle > rule["core"]["start_block"]:
+                if payment_cycle == rule["core"]["start_block"]:
+                    # There can't be any previous ones for the first cycle
+                    self.run_payment_cycle(payment_cycle, rule)
+                elif previous_cycle in self.processed_cycles:
+                    # Only run if the previous cycle has been processed
+                    # because the output of the previous cycle is needed
                     self.run_payment_cycle(payment_cycle, rule, previous_cycle)
                 else:
-                    self.run_payment_cycle(payment_cycle, rule)
+                    # There's nothing to do here as the previous cycle hasn't been processed
+                    pass
+
             else:
                 self.run_payment_cycle(payment_cycle, rule)
 
@@ -235,7 +241,7 @@ class RewardProgram:
         if self.is_locked():
             logging.info(f"Reward program {self.reward_program_id} is locked, skipping")
             return
-        
+
         self.update_processed()
         rules = self.get_rules()
         logging.info(f"Reward program {self.reward_program_id} has {len(rules)} rules")

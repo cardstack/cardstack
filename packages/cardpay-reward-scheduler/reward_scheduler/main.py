@@ -39,6 +39,7 @@ for expected_env in [
     "REWARD_MANAGER_ADDRESS",
     "REWARDS_BUCKET",
     "REWARD_SCHEDULER_APPROVED_PROGRAMS",
+    "REWARDS_SUBGRAPH_EXTRACTION",
     "SUBGRAPH_URL",
 ]:
     if expected_env not in os.environ:
