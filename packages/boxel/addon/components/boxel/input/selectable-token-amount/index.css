@@ -21,15 +21,6 @@
   letter-spacing: inherit;
 }
 
-.boxel-selectable-token-amount-input-groxup__icon {
-  position: absolute;
-  width: var(--input-icon-size);
-  height: var(--input-height);
-  left: var(--input-icon-space);
-  top: 0;
-  user-select: none;
-}
-
 .boxel-selectable-token-amount-input-group .ember-basic-dropdown {
   display: contents;
 }
