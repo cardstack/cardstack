@@ -70,6 +70,6 @@
   background-color: var(--boxel-light-100);
 }
 
-.boxel-selectable-token-amount-input-group__input:disabled ~ .boxel-selectable-token-amount-input-group__symbol {
+.boxel-selectable-token-amount-input__select[aria-disabled='true'] {
   opacity: 0.5;
 }
