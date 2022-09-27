@@ -44,30 +44,13 @@
   padding-right: var(--boxel-sp);
 }
 
-.boxel-selectable-token-amount-input-group__dropdown {
-  box-shadow: var(--boxel-box-shadow);
-  border-radius: var(--boxel-border--radius);
-}
-
-.boxel-selectable-token-amount-input-group__dropdown ul {
-  list-style: none;
-  padding: 0;
-}
-
-.boxel-selectable-token-amount-input-group__dropdown-item {
+.boxel-selectable-token-amount-input__select .boxel-selectable-token-amount-input-group__dropdown-item.boxel-select__item {
   display: flex;
   align-items: center;
   column-gap: var(--boxel-sp-xxs);
   padding: var(--boxel-sp-xs) var(--boxel-sp-sm);
   font-size: var(--boxel-font-size-sm);
   font-weight: 600;
-}
-
-.ember-power-select-option[aria-current='true']
-  .boxel-selectable-token-amount-input-group__dropdown-item,
-.ember-power-select-option[aria-selected='true']
-  .boxel-selectable-token-amount-input-group__dropdown-item {
-  background-color: var(--boxel-light-100);
 }
 
 .boxel-selectable-token-amount-input__select[aria-disabled='true'] {

@@ -2,7 +2,7 @@ import Component from '@glimmer/component';
 import '@cardstack/boxel/styles/global.css';
 import './index.css';
 import BoxelInput from '../index';
-import PowerSelect from 'ember-power-select/components/power-select';
+import BoxelSelect from '../../select';
 import { svgJar } from '@cardstack/boxel/utils/svg-jar';
 import { fn } from '@ember/helper';
 
@@ -48,16 +48,16 @@ export default class SelectableTokenAmount extends Component<Signature> {
         autocomplete="off"
         inputmode="decimal"
       />
-      <PowerSelect
+      <BoxelSelect
         class="boxel-selectable-token-amount-input__select"
         @options={{@tokens}}
         @selected={{@token}}
         @disabled={{@disabled}}
         @onChange={{@onChooseToken}}
         @dropdownClass="boxel-selectable-token-amount-input-group__dropdown"
-        @verticalPosition="below" as |item|
+        @verticalPosition="below" as |item itemCssClass|
       >
-        <div class="boxel-selectable-token-amount-input-group__dropdown-item">
+        <div class="{{itemCssClass}} boxel-selectable-token-amount-input-group__dropdown-item">
           {{svgJar
             item.icon
             class="boxel-selectable-token-amount-input-group__icon"
@@ -66,7 +66,7 @@ export default class SelectableTokenAmount extends Component<Signature> {
 
           {{item.name}}
         </div>
-      </PowerSelect>
+      </BoxelSelect>
     </div>
   </template>
 }
