@@ -21,6 +21,7 @@ config = {
         },
         "reward_program": "0x0885ce31D73b63b0Fcb1158bf37eCeaD8Ff0fC72",
         "rewards_bucket": "s3://cardpay-staging-reward-programs",
+        "rewards_inventory_bucket": "s3://cardpay-staging-reward-programs-inventory",
         "subgraph_url": "https://graph-staging.stack.cards/subgraphs/name/habdelra/cardpay-sokol",
         "contracts": {"reward_pool": "0xcF8852D1aD746077aa4C31B423FdaE5494dbb57A"},
     },
