@@ -67,7 +67,6 @@
         "addon/components/boxel/input/token-amount/**/*",
         "addon/components/boxel/input/validation-state/**/*",
         "addon/components/boxel/menu/**/*",
-        "addon/components/boxel/milestone-banner/**/*",
         "addon/components/boxel/radio-input/**/*",
         "addon/components/boxel/select-button/**/*",
         "addon/components/boxel/selection-control-group/**/*",
