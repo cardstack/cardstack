@@ -4,8 +4,12 @@ import { PowerSelectArgs } from 'ember-power-select/addon/components/power-selec
 
 interface PatchedPowerSelectArgs extends PowerSelectArgs {
   dropdownClass?: string;
+  eventType?: string;
   placeholder?: string;
   renderInPlace?: boolean;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  selectedItemComponent?: any;
+  verticalPosition?: string;
 }
 
 export default class PowerSelect extends Component<{

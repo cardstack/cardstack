@@ -15,6 +15,7 @@
 
 .boxel-card-picker__dropdown {
   position: static;
+  width: var(--boxel-card-picker-width);
   max-width: 100%;
   color: var(--boxel-dark);
   font: var(--boxel-font);
