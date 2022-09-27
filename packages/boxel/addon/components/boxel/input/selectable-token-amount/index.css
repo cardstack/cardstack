@@ -21,6 +21,14 @@
   letter-spacing: inherit;
 }
 
+.boxel-selectable-token-amount-input-group .ember-power-select-status-icon {
+  background: url('/@cardstack/boxel/images/icons/caret-down.svg') no-repeat;
+  width: 11px;
+  height: 9px;
+  display: inline-block;
+  margin-left: var(--boxel-sp);
+}
+
 .boxel-selectable-token-amount-input-group .ember-basic-dropdown {
   display: contents;
 }
