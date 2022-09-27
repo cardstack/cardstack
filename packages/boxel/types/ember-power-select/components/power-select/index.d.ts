@@ -2,12 +2,24 @@
 import Component from '@glimmer/component';
 import { PowerSelectArgs } from 'ember-power-select/addon/components/power-select';
 
-interface PatchedPowerSelectArgs extends PowerSelectArgs {
-  disabled?: boolean;
+import {
+  BasicDropdownArgs,
+  BasicDropdownTriggerArgs,
+} from 'ember-basic-dropdown/components/basic-dropdown';
+
+type SharedDropdownType = Pick<
+  BasicDropdownArgs,
+  'renderInPlace' | 'disabled'
+> &
+  Partial<Pick<BasicDropdownTriggerArgs, 'eventType'>>;
+
+export interface PatchedPowerSelectArgs
+  extends PowerSelectArgs,
+    SharedDropdownType {
+  verticalPosition?: 'auto' | 'below' | 'above';
   dropdownClass?: string;
   placeholder?: string;
-  renderInPlace?: boolean;
-  verticalPosition?: string;
+  selectedItemComponent?: unknown;
 }
 
 export default class PowerSelect extends Component<{
