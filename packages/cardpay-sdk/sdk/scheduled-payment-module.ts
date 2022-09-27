@@ -22,6 +22,7 @@ import {
 
 import { ContractOptions } from 'web3-eth-contract';
 import {
+  Estimate,
   EventABI,
   executeTransaction,
   gasEstimate,
@@ -32,12 +33,12 @@ import {
 } from './utils/safe-utils';
 import { Signer, utils } from 'ethers';
 import { signSafeTx, signSafeTxAsBytes, Signature } from './utils/signing-utils';
-import { BN } from 'bn.js';
 import { ERC20ABI, getSDK } from '..';
 import { SuccessfulTransactionReceipt } from './utils/successful-transaction-receipt';
 /* eslint-disable node/no-extraneous-import */
 import { AddressZero } from '@ethersproject/constants';
 import { waitUntilSchedulePaymentTransactionMined } from './scheduled-payment/utils';
+import BN from 'bn.js';
 
 export interface EnableModuleAndGuardResult {
   scheduledPaymentModuleAddress: string;
@@ -56,6 +57,13 @@ export interface Fee {
 }
 export const FEE_BASE_POW = new BN(18);
 export const FEE_BASE = new BN(10).pow(FEE_BASE_POW);
+
+interface TransactionParams {
+  nonce: BN;
+  estimate: Estimate;
+  payload: any;
+  signature: Signature;
+}
 
 export default class ScheduledPaymentModule {
   constructor(private web3: Web3, private layer2Signer?: Signer) {}
@@ -626,38 +634,6 @@ export default class ScheduledPaymentModule {
     return spHash;
   }
 
-  async generateSchedulePaymentSignature(
-    safeAddress: string,
-    moduleAddress: string,
-    gasTokenAddress: string,
-    spHash: string
-  ) {
-    let [nonce, estimate, payload] = await this.generateSchedulePaymentTxParams(
-      safeAddress,
-      moduleAddress,
-      gasTokenAddress,
-      spHash
-    );
-
-    let from = (await this.web3.eth.getAccounts())[0];
-
-    let signature = (
-      await signSafeTx(
-        this.web3,
-        safeAddress,
-        moduleAddress,
-        payload,
-        Operation.CALL,
-        estimate,
-        nonce,
-        from,
-        this.layer2Signer
-      )
-    )[0];
-
-    return signature;
-  }
-
   private async generateSchedulePaymentTxParams(
     safeAddress: string,
     moduleAddress: string,
@@ -679,7 +655,23 @@ export default class ScheduledPaymentModule {
 
     let nonce = getNextNonceFromEstimate(estimate);
 
-    return [nonce, estimate, payload];
+    let from = (await this.web3.eth.getAccounts())[0];
+
+    let signature = (
+      await signSafeTx(
+        this.web3,
+        safeAddress,
+        moduleAddress,
+        payload,
+        Operation.CALL,
+        estimate,
+        nonce,
+        from,
+        this.layer2Signer
+      )
+    )[0];
+
+    return { nonce, estimate, payload, signature };
   }
 
   private async schedulePaymentOnChainAndUpdateCrank(
@@ -689,11 +681,11 @@ export default class ScheduledPaymentModule {
     safeAddress: string,
     moduleAddress: string,
     gasTokenAddress: string,
-    spHash: string,
-    signature: Signature
+    spHash: string
   ) {
-    return new Promise<void>((resolve) => {
-      this.schedulePaymentOnChain(safeAddress, moduleAddress, gasTokenAddress, spHash, signature, {
+    let txnParams = await this.generateSchedulePaymentTxParams(safeAddress, moduleAddress, gasTokenAddress, spHash);
+    return new Promise<void>((resolve, reject) => {
+      this.schedulePaymentOnChain(safeAddress, moduleAddress, gasTokenAddress, spHash, txnParams, {
         onTxnHash: async (txHash: string) => {
           await hubRequest(hubRootUrl, `api/scheduled-payments/${scheduledPaymentId}`, authToken, 'PATCH', {
             data: {
@@ -704,7 +696,7 @@ export default class ScheduledPaymentModule {
           });
           resolve();
         },
-      });
+      }).catch(reject);
     });
   }
 
@@ -800,8 +792,6 @@ export default class ScheduledPaymentModule {
       );
     }
 
-    let signature = await this.generateSchedulePaymentSignature(safeAddress, moduleAddress, gasTokenAddress, spHash);
-
     let account = (await this.web3.eth.getAccounts())[0];
     let scheduledPaymentResponse = await hubRequest(hubRootUrl, 'api/scheduled-payments', authToken, 'POST', {
       data: {
@@ -837,8 +827,7 @@ export default class ScheduledPaymentModule {
         safeAddress,
         moduleAddress,
         gasTokenAddress,
-        spHash,
-        signature
+        spHash
       );
     } catch (error) {
       console.log(
@@ -861,7 +850,7 @@ export default class ScheduledPaymentModule {
     moduleAddress: string,
     gasTokenAddress: string,
     spHash: string,
-    signature?: Signature | null,
+    txnParams?: TransactionParams,
     txnOptions?: TransactionOptions
   ): Promise<SuccessfulTransactionReceipt>;
   async schedulePaymentOnChain(
@@ -869,7 +858,7 @@ export default class ScheduledPaymentModule {
     moduleAddress?: string,
     gasTokenAddress?: string,
     spHash?: string,
-    signature?: Signature | null,
+    txnParams?: TransactionParams,
     txnOptions?: TransactionOptions
   ): Promise<SuccessfulTransactionReceipt> {
     let { onTxnHash } = txnOptions ?? {};
@@ -894,15 +883,17 @@ export default class ScheduledPaymentModule {
       throw new Error('spHash must be provided');
     }
 
-    let [nonce, estimate, payload] = await this.generateSchedulePaymentTxParams(
-      safeAddress,
-      moduleAddress,
-      gasTokenAddress,
-      spHash
-    );
+    let nonce, estimate, payload, signature;
 
-    if (!signature) {
-      signature = await this.generateSchedulePaymentSignature(safeAddress, moduleAddress, gasTokenAddress, spHash);
+    if (txnParams && Object.keys(txnParams).length > 0) {
+      ({ nonce, estimate, payload, signature } = txnParams);
+    } else {
+      ({ nonce, estimate, payload, signature } = await this.generateSchedulePaymentTxParams(
+        safeAddress,
+        moduleAddress,
+        gasTokenAddress,
+        spHash
+      ));
     }
 
     let gnosisTxn = await executeTransaction(
