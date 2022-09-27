@@ -1,7 +1,7 @@
 .boxel-selectable-token-amount-input-group {
   --input-height: 3.75rem; /* 60px */
   --input-icon-size: var(--boxel-icon-lg);
-  --input-symbol-width: 7rem;
+  --input-symbol-width: 10rem;
   --input-icon-space: var(--boxel-sp-xs);
   --input-symbol-space: var(--boxel-sp-sm);
 
@@ -26,7 +26,6 @@
   width: 11px;
   height: 9px;
   display: inline-block;
-  margin-left: var(--boxel-sp);
 }
 
 .boxel-selectable-token-amount-input-group .ember-basic-dropdown {
@@ -52,6 +51,15 @@
 .boxel-selectable-token-amount-input-group__dropdown ul {
   list-style: none;
   padding: 0;
+}
+
+.boxel-selectable-token-amount-input-group__dropdown-item {
+  display: flex;
+  align-items: center;
+  column-gap: var(--boxel-sp-xxs);
+  padding: var(--boxel-sp-xs) var(--boxel-sp-sm);
+  font-size: var(--boxel-font-size-sm);
+  font-weight: 600;
 }
 
 .ember-power-select-option[aria-current='true']
