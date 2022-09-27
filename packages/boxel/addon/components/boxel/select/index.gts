@@ -1,4 +1,3 @@
-import or from 'ember-truth-helpers/helpers/or';
 import PowerSelect, { PatchedPowerSelectArgs }  from 'ember-power-select/components/power-select';
 import type { TemplateOnlyComponent } from '@ember/component/template-only';
 import cn from '@cardstack/boxel/helpers/cn';
@@ -14,31 +13,27 @@ type BasePowerSelectArgs = Pick<
   | 'renderInPlace'
   | 'verticalPosition'
   | 'dropdownClass'
-  | 'triggerComponent' 
-  | 'eventType'
+  | 'triggerComponent'
+  | 'disabled'
 >;
 
 interface Args<ItemT> extends BasePowerSelectArgs { 
   options: ItemT[];
-  selectClass?: string;
-  itemClass?: string;
-  defaultItemStyles?: boolean;
 }
 
 interface Signature<ItemT = any> {
   Element: HTMLDivElement;
   Args: Args<ItemT>,
   Blocks: {
-    default: [ItemT];
+    default: [ItemT, string];
   };
 }
 
-const defaultEventType = 'click' as const;
 
 const BoxelSelect: TemplateOnlyComponent<Signature> = 
 <template>
   <PowerSelect
-    class={{cn "boxel-select" @selectClass boxel-select--selected=@selected}}
+    class={{cn "boxel-select" boxel-select--selected=@selected}}
     @options={{@options}}
     @selected={{@selected}}
     @selectedItemComponent={{@selectedItemComponent}}
@@ -46,19 +41,14 @@ const BoxelSelect: TemplateOnlyComponent<Signature> =
     @onChange={{@onChange}}
     @renderInPlace={{@renderInPlace}}
     @verticalPosition={{@verticalPosition}}
-    @dropdownClass={{or @dropdownClass (cn "boxel-select__dropdown")}}
+    @dropdownClass={{cn "boxel-select__dropdown" @dropdownClass}}
     @triggerComponent={{@triggerComponent}}
-    @eventType={{or @eventType defaultEventType}}
+    @eventType="click"
+    @disabled={{@disabled}}
     ...attributes
     as |item|
   >
-    <div
-      class={{cn
-        "boxel-select__item"
-        @itemClass
-        boxel-select__item--default=@defaultItemStyles
-      }}
-    >{{yield item}}</div>
+    {{yield item "boxel-select__item"}}
   </PowerSelect>
 </template>
 

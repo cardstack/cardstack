@@ -13,13 +13,21 @@ export default class BoxelSelectUsage extends Component {
   @tracked items = A([...new Array(10)].map((_, idx) => `Item - ${idx}`));
 
   @tracked selectedItem: string | null = null;
-  @tracked placeholder: string = 'Select Item'
+  @tracked placeholder: string = 'Select Item';
+  @tracked currentColorCssValue: string = 'var(--boxel-light-100)';
+  @tracked selectedColorCssValue: string = 'var(--boxel-highlight)';
 
   @action onSelectItem(item: string| null): void {
     this.selectedItem = item;
   }
 
   <template>
+    <style>
+      .boxel-select-usage-dropdown {
+        --boxel-select-current-color: {{this.currentColorCssValue}};
+        --boxel-select-selected-color: {{this.selectedColorCssValue}};
+      }
+    </style>
     <FreestyleUsage @name="Select">
       <:example>
         <BoxelSelect
@@ -27,16 +35,20 @@ export default class BoxelSelectUsage extends Component {
           @selected={{this.selectedItem}}
           @onChange={{this.onSelectItem}}
           @options={{this.items}}
-          @defaultItemStyles={{true}}
-          as |item|
+          @dropdownClass="boxel-select-usage-dropdown"
+          as |item itemCssClass|
         >
-          {{item}}
+         <div class={{itemCssClass}}>{{item}}</div>
         </BoxelSelect>
       </:example>
       <:api as |Args|>
         <Args.Yield
           @name="item"
           @description="Item to be presented on dropdown"
+        />
+        <Args.Yield
+          @name="itemCssClass"
+          @description="Class to be set on item wrapper to add default styles"
         />
         <Args.String
           @name="placeholder"
@@ -61,10 +73,17 @@ export default class BoxelSelectUsage extends Component {
           @description="Selected item, its type is dependent on items"
           @required={{true}}
         />
-        <Args.Bool
-          @name="defaultItemStyles"
-          @defaults={{false}}
-          @description="Applies default selected item style"
+        <Args.String
+          @name="--boxel-select-current-color"
+          @defaultValue={{unbound this.currentColorCssValue}}
+          @value={{this.currentColorCssValue}}
+          @onInput={{fn (mut this.currentColorCssValue)}}
+        />
+        <Args.String
+          @name="--boxel-select-selected-color"
+          @defaultValue={{unbound this.selectedColorCssValue}}
+          @value={{this.selectedColorCssValue}}
+          @onInput={{fn (mut this.selectedColorCssValue)}}
         />
       </:api>
     </FreestyleUsage>

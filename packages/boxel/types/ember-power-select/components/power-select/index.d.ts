@@ -7,7 +7,10 @@ import {
   BasicDropdownTriggerArgs,
 } from 'ember-basic-dropdown/components/basic-dropdown';
 
-type SharedDropdownType = Pick<BasicDropdownArgs, 'renderInPlace'> &
+type SharedDropdownType = Pick<
+  BasicDropdownArgs,
+  'renderInPlace' | 'disabled'
+> &
   Partial<Pick<BasicDropdownTriggerArgs, 'eventType'>>;
 
 export interface PatchedPowerSelectArgs
@@ -16,7 +19,7 @@ export interface PatchedPowerSelectArgs
   verticalPosition?: 'auto' | 'below' | 'above';
   dropdownClass?: string;
   placeholder?: string;
-  selectedItemComponent?: Component | string;
+  selectedItemComponent?: unknown;
 }
 
 export default class PowerSelect extends Component<{
