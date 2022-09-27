@@ -55,7 +55,6 @@
     "environment": ["ember-loose", "ember-template-imports"],
     "transform": {
       "exclude": [
-        "addon/components/boxel/cover-art/**/*",
         "addon/components/boxel/dropdown-button/**/*",
         "addon/components/boxel/drop-target/**/*",
         "addon/components/boxel/field/**/*",
