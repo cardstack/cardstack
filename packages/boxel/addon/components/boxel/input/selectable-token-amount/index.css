@@ -39,8 +39,9 @@
   display: flex;
   align-items: center;
   top: 0;
-  right: var(--input-symbol-space);
+  right: 0;
   user-select: none;
+  padding-right: var(--boxel-sp);
 }
 
 .boxel-selectable-token-amount-input-group__dropdown {
