@@ -19,6 +19,7 @@ const ALL_KNOWN_TASKS: Record<keyof KnownTasks, true> = {
   'print-queued-jobs': true,
   'persist-off-chain-prepaid-card-customization': true,
   'persist-off-chain-profile': true,
+  'scheduled-payment-on-chain-creation-waiter': true,
   boom: true,
 };
 
