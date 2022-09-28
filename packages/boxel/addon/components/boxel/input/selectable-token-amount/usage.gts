@@ -94,10 +94,6 @@ export default class BoxelSelectableInputTokenAmountUsage extends Component {
           @description="Action called when the input value changes"
         />
         <Args.Action
-          @name="onBlur"
-          @description="Action called when the input field loses focus"
-        />
-        <Args.Action
           @name="onChooseToken"
           @description="Action called when an item is chosen from the token dropdown"
         />
