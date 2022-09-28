@@ -58,6 +58,8 @@
         "../boxel/addon/components/boxel/expandable-banner/**/*",
         "../boxel/addon/components/boxel/header/**/*",
         "../boxel/addon/components/boxel/help-box/**/*",
+        "../boxel/addon/components/boxel/input/*",
+        "../boxel/addon/components/boxel/input/validation-state/**/*",
         "../boxel/addon/components/boxel/left-edge-nav/**/*",
         "../boxel/addon/components/boxel/loading-indicator/**/*",
         "../boxel/addon/components/boxel/milestone-banner/**/*",
