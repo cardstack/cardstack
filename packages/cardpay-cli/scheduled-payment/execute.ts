@@ -30,11 +30,7 @@ export default {
         type: 'number',
         description: 'Fixed USD fee (e.g. 0.25)',
       })
-      .positional('percentageFee', {
-        type: 'number',
-        description: 'Percentage fee (e.g. 5%, 0.05)',
-      })
-      .positional('percentageFee', {
+      .positional('feePercentage', {
         type: 'number',
         description: 'Percentage fee (e.g. 5%, 0.05)',
       })
@@ -83,7 +79,7 @@ export default {
       amount,
       payeeAddress,
       fixedUSDFee,
-      percentageFee,
+      feePercentage,
       executionGas,
       maxGasPrice,
       gasTokenAddress,
@@ -99,7 +95,7 @@ export default {
       amount: string;
       payeeAddress: string;
       fixedUSDFee: number;
-      percentageFee: number;
+      feePercentage: number;
       executionGas: number;
       maxGasPrice: string;
       gasTokenAddress: string;
@@ -121,7 +117,7 @@ export default {
       amount,
       payeeAddress,
       fixedUSDFee,
-      percentageFee,
+      feePercentage,
       executionGas,
       maxGasPrice,
       gasTokenAddress,

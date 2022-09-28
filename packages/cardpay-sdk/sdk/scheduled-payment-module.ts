@@ -967,8 +967,8 @@ export default class ScheduledPaymentModule {
     if (!tokenAddress) throw new Error('tokenAddress must be provided ');
     if (!amount) throw new Error('amount must be provided');
     if (!payeeAddress) throw new Error('payeeAddress must be provided');
-    if (!feeFixedUSD) throw new Error('feeFixedUSD must be provided');
-    if (!feePercentage) throw new Error('feePercentage must be provided');
+    if (feeFixedUSD == undefined) throw new Error('feeFixedUSD must be provided');
+    if (feePercentage == undefined) throw new Error('feePercentage must be provided');
     if (!executionGas) throw new Error('executionGas must be provided');
     if (!maxGasPrice) throw new Error('maxGasPrice must be provided');
     if (!gasTokenAddress) throw new Error('gasTokenAddress must be provided ');
