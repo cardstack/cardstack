@@ -62,7 +62,6 @@
         "addon/components/boxel/input/token-amount/**/*",
         "addon/components/boxel/menu/**/*",
         "addon/components/boxel/select-button/**/*",
-        "addon/components/boxel/selection-control-group/**/*",
         "addon/components/boxel/sort-menu/**/*",
         "addon/components/boxel/wave-player/**/*",
         "app/components/**/*",
