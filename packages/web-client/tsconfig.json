@@ -56,6 +56,7 @@
         "../boxel/addon/components/boxel/date-divider/**/*",
         "../boxel/addon/components/boxel/dashboard/**/*",
         "../boxel/addon/components/boxel/expandable-banner/**/*",
+        "../boxel/addon/components/boxel/field/**/*",
         "../boxel/addon/components/boxel/header/**/*",
         "../boxel/addon/components/boxel/help-box/**/*",
         "../boxel/addon/components/boxel/input/*",
