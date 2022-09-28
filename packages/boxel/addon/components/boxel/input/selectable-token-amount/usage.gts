@@ -23,9 +23,9 @@ export default class BoxelSelectableInputTokenAmountUsage extends Component {
   @tracked symbol = 'CARD';
   @tracked token = this.tokens[0];
 
-  @tracked height = '3.75rem';
-  @tracked horizontalPadding = 'var(--boxel-sp)';
-  @tracked inputFontSize = 'var(--boxel-font-size-lg)';
+  @tracked height = 'var(--boxel-sp-xl)';
+  @tracked horizontalPadding = 'var(--boxel-sp-sm)';
+  @tracked inputFontSize = 'var(--boxel-font-size)';
 
   @action set(amount: string): void {
     this.value = amount;
