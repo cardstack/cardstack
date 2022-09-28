@@ -58,7 +58,6 @@
         "addon/components/boxel/dropdown-button/**/*",
         "addon/components/boxel/field/**/*",
         "addon/components/boxel/icon-button/**/*",
-        "addon/components/boxel/input/token-amount/**/*",
         "addon/components/boxel/menu/**/*",
         "addon/components/boxel/select-button/**/*",
         "addon/components/boxel/sort-menu/**/*",
