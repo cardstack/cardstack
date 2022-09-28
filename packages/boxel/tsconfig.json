@@ -56,7 +56,6 @@
     "transform": {
       "exclude": [
         "addon/components/boxel/dropdown-button/**/*",
-        "addon/components/boxel/drop-target/**/*",
         "addon/components/boxel/field/**/*",
         "addon/components/boxel/icon-button/**/*",
         "addon/components/boxel/infobox/**/*",
