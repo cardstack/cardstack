@@ -1,5 +1,6 @@
 .boxel-input-selectable-token-amount {
-  --input-height: 3.75rem; /* 60px */
+  --boxel-input-selectable-token-amount-height: 3.75rem; /* 60px */
+  --boxel-input-selectable-token-amount-horizontal-padding: var(--boxel-sp);
   --input-icon-size: var(--boxel-icon-lg);
   --input-symbol-width: 10rem;
   --input-icon-space: var(--boxel-sp-xs);
@@ -13,10 +14,11 @@
   letter-spacing: var(--boxel-lsp-xs);
 }
 
-.boxel-input-selectable-token-amount__input {
-  height: var(--input-height);
-  padding-left: calc(var(--input-icon-size) + var(--input-icon-space) * 2);
-  padding-right: calc(var(--input-symbol-width) + var(--input-symbol-space) * 2);
+.boxel-input-selectable-token-amount .boxel-input-selectable-token-amount__input {
+  --boxel-input-height: var(--boxel-input-selectable-token-amount-height);
+
+  height: var(--boxel-input-selectable-token-amount-height);
+  padding-left: var(--boxel-input-selectable-token-amount-horizontal-padding);
   font: inherit;
   letter-spacing: inherit;
 }
@@ -35,13 +37,13 @@
 .boxel-input-selectable-token-amount__select {
   position: absolute;
   max-width: var(--input-symbol-width);
-  height: var(--input-height);
+  height: var(--boxel-input-selectable-token-amount-height);
   display: flex;
   align-items: center;
   top: 0;
   right: 0;
   user-select: none;
-  padding-right: var(--boxel-sp);
+  padding-right: var(--boxel-input-selectable-token-amount-horizontal-padding);
 }
 
 .boxel-input-selectable-token-amount__select .boxel-input-selectable-token-amount__dropdown-item.boxel-select__item,

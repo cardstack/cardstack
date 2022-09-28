@@ -4,6 +4,7 @@ import { action } from '@ember/object';
 import BoxelInputSelectableTokenAmount, { SelectableToken } from './index';
 import FreestyleUsage from 'ember-freestyle/components/freestyle/usage';
 import { fn } from '@ember/helper';
+import cssVar from '@cardstack/boxel/helpers/css-var';
 
 export default class BoxelSelectableInputTokenAmountUsage extends Component {
   tokens = [
@@ -21,6 +22,9 @@ export default class BoxelSelectableInputTokenAmountUsage extends Component {
   @tracked icon = 'card';
   @tracked symbol = 'CARD';
   @tracked token = this.tokens[0];
+
+  @tracked height = '3.75rem';
+  @tracked horizontalPadding = 'var(--boxel-sp)';
 
   @action set(amount: string): void {
     this.value = amount;
@@ -52,6 +56,10 @@ export default class BoxelSelectableInputTokenAmountUsage extends Component {
           @token={{this.token}}
           @tokens={{this.tokens}}
           @onChooseToken={{this.onChooseToken}}
+          style={{cssVar
+            boxel-input-selectable-token-amount-height=this.height
+            boxel-input-selectable-token-amount-horizontal-padding=this.horizontalPadding
+          }}
         />
       </:example>
       <:api as |Args|>
@@ -98,6 +106,21 @@ export default class BoxelSelectableInputTokenAmountUsage extends Component {
           @description="The value of the input"
           @value={{this.value}}
           @onInput={{fn (mut this.value)}}
+        />
+        {{!-- template-lint-disable no-unbound --}}
+        <Args.String
+          @name="--boxel-input-selectable-token-amount-height"
+          @description="height of the input field"
+          @defaultValue={{unbound this.height}}
+          @value={{this.height}}
+          @onInput={{fn (mut this.height)}}
+        />
+        <Args.String
+          @name="--boxel-input-selectable-token-amount-horizontal-padding"
+          @description="left padding on the input text and right padding on the select"
+          @defaultValue={{unbound this.horizontalPadding}}
+          @value={{this.horizontalPadding}}
+          @onInput={{fn (mut this.horizontalPadding)}}
         />
       </:api>
     </FreestyleUsage>
