@@ -25,6 +25,7 @@ export default class BoxelSelectableInputTokenAmountUsage extends Component {
 
   @tracked height = '3.75rem';
   @tracked horizontalPadding = 'var(--boxel-sp)';
+  @tracked inputFontSize = 'var(--boxel-font-size-lg)';
 
   @action set(amount: string): void {
     this.value = amount;
@@ -59,6 +60,7 @@ export default class BoxelSelectableInputTokenAmountUsage extends Component {
           style={{cssVar
             boxel-input-selectable-token-amount-height=this.height
             boxel-input-selectable-token-amount-horizontal-padding=this.horizontalPadding
+            boxel-input-selectable-token-amount-input-font-size=this.inputFontSize
           }}
         />
       </:example>
@@ -117,6 +119,13 @@ export default class BoxelSelectableInputTokenAmountUsage extends Component {
           @defaultValue={{unbound this.horizontalPadding}}
           @value={{this.horizontalPadding}}
           @onInput={{fn (mut this.horizontalPadding)}}
+        />
+        <Args.String
+          @name="--boxel-input-selectable-token-amount-input-font-size"
+          @description="font size for the input element"
+          @defaultValue={{unbound this.inputFontSize}}
+          @value={{this.inputFontSize}}
+          @onInput={{fn (mut this.inputFontSize)}}
         />
       </:api>
     </FreestyleUsage>

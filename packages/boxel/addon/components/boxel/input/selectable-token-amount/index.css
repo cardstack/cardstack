@@ -1,13 +1,12 @@
 .boxel-input-selectable-token-amount {
   --boxel-input-selectable-token-amount-height: 3.75rem; /* 60px */
   --boxel-input-selectable-token-amount-horizontal-padding: var(--boxel-sp);
+  --boxel-input-selectable-token-amount-input-font-size: var(--boxel-font-size-lg);
 
   position: relative;
   width: 100%;
   font-family: var(--boxel-font-family);
-  font-size: 1.25rem;
-  line-height: calc(27 / 20);
-  letter-spacing: var(--boxel-lsp-xs);
+  font-size: var(--boxel-input-selectable-token-amount-input-font-size);
 }
 
 .boxel-input-selectable-token-amount .boxel-input-selectable-token-amount__input {
