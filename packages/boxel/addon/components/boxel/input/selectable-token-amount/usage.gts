@@ -1,11 +1,17 @@
 import Component from '@glimmer/component';
 import { tracked } from '@glimmer/tracking';
 import { action } from '@ember/object';
-import BoxelInputSelectableTokenAmount from './index';
+import BoxelInputSelectableTokenAmount, { SelectableToken } from './index';
 import FreestyleUsage from 'ember-freestyle/components/freestyle/usage';
-import { array, fn } from '@ember/helper';
+import { fn } from '@ember/helper';
 
 export default class BoxelSelectableInputTokenAmountUsage extends Component {
+  tokens = [
+    { name: 'CARD', icon: 'card' },
+    { name: 'HI', icon: 'emoji' },
+    { name: 'WORLD', icon: 'world' },
+  ];
+
   @tracked id = 'boxel-input-selectable-token-amount-usage';
   @tracked value = '';
   @tracked helperText = 'Please enter an amount';
@@ -16,17 +22,15 @@ export default class BoxelSelectableInputTokenAmountUsage extends Component {
   @tracked symbol = 'CARD';
   @tracked token = this.tokens[0];
 
-  tokens = [
-    { name: 'CARD', icon: 'card' },
-    { name: 'HI', icon: 'emoji' },
-    { name: 'WORLD', icon: 'world' },
-  ];
-
   @action set(amount: string): void {
     this.value = amount;
   }
 
-  @action onChooseToken(token: Token) {
+  @action onBlur(): void {
+    console.log('input blurred');
+  }
+
+  @action onChooseToken(token: SelectableToken) {
     this.token = token;
     console.log(token);
   }
@@ -38,8 +42,6 @@ export default class BoxelSelectableInputTokenAmountUsage extends Component {
           Label
         </label>
         <BoxelInputSelectableTokenAmount
-          @icon={{this.icon}}
-          @symbol={{this.symbol}}
           @id={{this.id}}
           @disabled={{this.disabled}}
           @value={{this.value}}
@@ -81,7 +83,15 @@ export default class BoxelSelectableInputTokenAmountUsage extends Component {
         />
         <Args.Action
           @name="onInput"
-          @description="Action to call when the input value changes"
+          @description="Action called when the input value changes"
+        />
+        <Args.Action
+          @name="onBlur"
+          @description="Action called when the input field loses focus"
+        />
+        <Args.Action
+          @name="onChooseToken"
+          @description="Action called when an item is chosen from the token dropdown"
         />
         <Args.String
           @name="value"

@@ -9,23 +9,23 @@ import { fn } from '@ember/helper';
 interface Signature {
   Element: HTMLElement;
   Args: {
+    id: string;
     value?: string;
     disabled: boolean;
     helperText?: string;
     invalid: boolean;
     errorMessage: string;
-    onBlur: () => {};
-    onInput: () => {};
-    onChooseToken: () => {};
-    token: Token;
-    tokens: Token[];
+    onInput: (amount: string) => void;
+    onChooseToken: (token: SelectableToken) => void;
+    token: SelectableToken;
+    tokens: SelectableToken[];
   };
   Blocks: {
     'default': [],
   }
 }
 
-interface Token {
+export interface SelectableToken {
   name: string;
   icon: string;
 }
