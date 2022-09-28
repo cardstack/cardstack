@@ -60,7 +60,6 @@
         "addon/components/boxel/input/token-amount/**/*",
         "addon/components/boxel/menu/**/*",
         "addon/components/boxel/select-button/**/*",
-        "addon/components/boxel/wave-player/**/*",
         "app/components/**/*",
         "tests/dummy/app/components/apply-changes-toggle/**/*",
         "tests/dummy/app/components/boxel/**/*",

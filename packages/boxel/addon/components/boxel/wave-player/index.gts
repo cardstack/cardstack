@@ -1,19 +1,31 @@
 import Component from '@glimmer/component';
+import { type EmptyObject } from '@ember/component/helper';
+import BoxelIconButton from '../icon-button';
 import { action } from '@ember/object';
 import { tracked } from '@glimmer/tracking';
 import { dropTask } from 'ember-concurrency-decorators';
 import fetch from 'fetch';
 import { assert } from '@ember/debug';
+import { htmlSafe } from '@ember/template';
+import { on } from '@ember/modifier';
+import mediaDuration from '@cardstack/boxel/helpers/media-duration';
+import didInsert from '@ember/render-modifiers/modifiers/did-insert';
+import perform from 'ember-concurrency/helpers/perform';
+
 import '@cardstack/boxel/styles/global.css';
 import './index.css';
 
 const AudioContext = window.AudioContext || window.webkitAudioContext;
 
-interface WavePlayerArgs {
-  url: string;
-}
+interface Signature {
+ Element: HTMLDivElement;
+ Args: {
+    url: string;
+ };
+ Blocks: EmptyObject;
+};
 
-export default class WavePlayerComponent extends Component<WavePlayerArgs> {
+export default class WavePlayerComponent extends Component<Signature> {
   width = 600;
   height = 152;
   barWidth = 5;
@@ -31,6 +43,31 @@ export default class WavePlayerComponent extends Component<WavePlayerArgs> {
   @tracked currentTime = 0;
   @tracked isPlaying = false;
   @tracked duration = 0;
+
+  <template>
+    <div class="boxel-wave-player" ...attributes>
+      <BoxelIconButton
+        onclick={{perform this.playPause}}
+        class="boxel-wave-player__play {{if this.isPlaying "boxel-wave-player--is-playing"}}"
+        aria-label={{if this.isPlaying "Pause" "Play"}}
+        @icon={{if this.isPlaying "pause-btn" "play-btn"}}
+        @width="30px"
+        @height="30px"
+      />
+      <canvas
+        {{didInsert this.setupPlayer}}
+        role="button"
+        aria-label="Audio track"
+        width={{this.width}} height={{this.height}} style={{htmlSafe this.style}}
+        {{on 'click' this.canvasClick}}
+      >
+      </canvas>
+
+      <div class="boxel-wave-player__times">
+        {{mediaDuration this.currentTime}} / {{mediaDuration this.duration}}
+      </div>
+    </div>    
+  </template>
 
   get style(): string {
     return `
