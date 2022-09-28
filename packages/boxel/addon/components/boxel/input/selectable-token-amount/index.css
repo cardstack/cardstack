@@ -44,13 +44,19 @@
   padding-right: var(--boxel-sp);
 }
 
-.boxel-selectable-token-amount-input__select .boxel-selectable-token-amount-input-group__dropdown-item.boxel-select__item {
+.boxel-selectable-token-amount-input__select .boxel-selectable-token-amount-input-group__dropdown-item.boxel-select__item,
+.boxel-selectable-token-amount-input-group__dropdown .boxel-selectable-token-amount-input-group__dropdown-item.boxel-select__item {
   display: flex;
   align-items: center;
   column-gap: var(--boxel-sp-xxs);
   padding: var(--boxel-sp-xs) var(--boxel-sp-sm);
   font-size: var(--boxel-font-size-sm);
   font-weight: 600;
+}
+
+.boxel-selectable-token-amount-input-group__icon {
+  width: var(--boxel-icon-sm);
+  height: var(--boxel-icon-sm);
 }
 
 .boxel-selectable-token-amount-input__select[aria-disabled='true'] {
