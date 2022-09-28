@@ -19,10 +19,10 @@ export default class ProgressCircle extends Component {
       <:api as |Args|>
         <Args.Number
           @name="size"
-          @required={{true}}
           @min={{40}}
           @max={{200}}
           @description="the size of the circle, in px"
+          @defaultValue={{120}}
           @value={{this.size}}
           @onInput={{fn (mut this.size)}}
         />
