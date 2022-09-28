@@ -432,13 +432,15 @@ export default class ScheduledPaymentModule {
     tokenAddress: string,
     amount: string,
     payeeAddress: string,
-    fee: Fee,
+    feeFixedUSD: number,
+    feePercentage: number,
     executionGas: number,
     maxGasPrice: string,
     gasTokenAddress: string,
     salt: string,
-    payAtOrRecurringDayOfMonth: number,
+    payAt: number,
     gasPrice: string,
+    recurringDayOfMonth?: number,
     recurringUntil?: number,
     txnOptions?: TransactionOptions
   ): Promise<SuccessfulTransactionReceipt>;
@@ -447,13 +449,15 @@ export default class ScheduledPaymentModule {
     tokenAddress?: string,
     amount?: string,
     payeeAddress?: string,
-    fee?: Fee,
+    feeFixedUSD?: number,
+    feePercentage?: number,
     executionGas?: number,
     maxGasPrice?: string,
     gasTokenAddress?: string,
     salt?: string,
-    payAtOrRecurringDayOfMonth?: number,
+    payAt?: number,
     gasPrice?: string,
+    recurringDayOfMonth?: number,
     recurringUntil?: number,
     txnOptions?: TransactionOptions
   ): Promise<SuccessfulTransactionReceipt> {
@@ -465,36 +469,21 @@ export default class ScheduledPaymentModule {
       return await waitUntilTransactionMined(this.layer2Web3, txnHash);
     }
 
-    if (!tokenAddress) {
-      throw new Error('tokenAddress must be specified');
-    }
-    if (!amount) {
-      throw new Error('amount must be specified');
-    }
-    if (!payeeAddress) {
-      throw new Error('payeeAddress must be specified');
-    }
-    if (!fee) {
-      throw new Error('fee must be specified');
-    }
-    if (!executionGas) {
-      throw new Error('executionGas must be specified');
-    }
-    if (!maxGasPrice) {
-      throw new Error('maxGasPrice must be specified');
-    }
-    if (!gasTokenAddress) {
-      throw new Error('gasTokenAddress must be specified');
-    }
-    if (!salt) {
-      throw new Error('salt must be specified');
-    }
-    if (!gasPrice) {
-      throw new Error('gasPrice must be specified');
-    }
+    let moduleAddress = moduleAddressOrTxnHash;
+    if (!moduleAddress) throw new Error('moduleAddress must be provided');
+    if (!tokenAddress) throw new Error('tokenAddress must be provided ');
+    if (!amount) throw new Error('amount must be provided');
+    if (!payeeAddress) throw new Error('payeeAddress must be provided');
+    if (!feeFixedUSD) throw new Error('feeFixedUSD must be provided');
+    if (!feePercentage) throw new Error('feePercentage must be provided');
+    if (!executionGas) throw new Error('executionGas must be provided');
+    if (!maxGasPrice) throw new Error('maxGasPrice must be provided');
+    if (!gasTokenAddress) throw new Error('gasTokenAddress must be provided ');
+    if (!salt) throw new Error('salt must be provided');
+    if (payAt == null && recurringDayOfMonth == null && recurringUntil == null)
+      throw new Error('When payAt is null, recurringDayOfMonth and recurringUntil must have a value');
 
     let { onTxnHash } = txnOptions ?? {};
-    let moduleAddress = moduleAddressOrTxnHash;
     let module = new this.layer2Web3.eth.Contract(ScheduledPaymentABI as AbiItem[], moduleAddress);
     let executeScheduledPaymentData;
     if (recurringUntil) {
@@ -506,17 +495,17 @@ export default class ScheduledPaymentModule {
         payeeAddress,
         {
           fixedUSD: {
-            value: FEE_BASE.mul(new BN(fee.fixedUSD)).toString(),
+            value: FEE_BASE.mul(new BN(feeFixedUSD)).toString(),
           },
           percentage: {
-            value: FEE_BASE.mul(new BN(fee.percentage)).toString(),
+            value: FEE_BASE.mul(new BN(feePercentage)).toString(),
           },
         },
         executionGas,
         maxGasPrice,
         gasTokenAddress,
         salt,
-        payAtOrRecurringDayOfMonth,
+        recurringDayOfMonth,
         recurringUntil,
         gasPrice
       ).encodeABI();
@@ -529,17 +518,17 @@ export default class ScheduledPaymentModule {
         payeeAddress,
         {
           fixedUSD: {
-            value: FEE_BASE.mul(new BN(fee.fixedUSD)).toString(),
+            value: FEE_BASE.mul(new BN(feeFixedUSD)).toString(),
           },
           percentage: {
-            value: FEE_BASE.mul(new BN(fee.percentage)).toString(),
+            value: FEE_BASE.mul(new BN(feePercentage)).toString(),
           },
         },
         executionGas,
         maxGasPrice,
         gasTokenAddress,
         salt,
-        payAtOrRecurringDayOfMonth,
+        payAt,
         gasPrice
       ).encodeABI();
     }

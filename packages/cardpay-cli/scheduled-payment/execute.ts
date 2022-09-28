@@ -6,7 +6,7 @@ import { getConstant } from '@cardstack/cardpay-sdk';
 
 export default {
   command:
-    'execute <moduleAddress> <tokenAddress> <amount> <payeeAddress> <fixedUSDFee> <percentageFee> <executionGas> <maxGasPrice> <gasTokenAddress> <salt> <payAt> <gasPrice>',
+    'execute <moduleAddress> <tokenAddress> <amount> <payeeAddress> <fixedUSDFee> <feePercentage> <executionGas> <maxGasPrice> <gasTokenAddress> <salt> <payAt> <recurringDayOfMonth> <recurringUntil> <gasPrice>',
   describe: 'Execute a scheduled payment',
   builder(yargs: Argv) {
     return yargs
@@ -56,19 +56,22 @@ export default {
       })
       .positional('payAt', {
         type: 'number',
-        description: 'Time to execute scheduled payments (in seconds)',
+        description:
+          'Unix UTC time in seconds that represents the point in time when the payment should be executed. Used for one-time scheduled payments. Should be an empty string when recurringDayOfMonth and recurringUntil are set',
+      })
+      .positional('recurringDayOfMonth', {
+        type: 'number',
+        description:
+          'Day of the month on which the payment will be made recurringly (range: 1-31). Used for recurring scheduled payments. In case the month has less than days than the value provided, the payment will me made on the last day of the month. Should be an empty string when payAt is set.',
+      })
+      .positional('recurringUntil', {
+        type: 'number',
+        description:
+          'Unix UTC time in seconds that represents the point in time when the recurring payment should be stopped. Used for recurring scheduled payments. Should be an empty string when payAt is set',
       })
       .positional('gasPrice', {
         type: 'string',
         description: 'Gas price (in the smallest units of gas token)',
-      })
-      .option('recurringDayOfMonth', {
-        type: 'number',
-        description: 'Days of the month in the range of 1-28 to make recurring payments',
-      })
-      .option('recurringUntil', {
-        type: 'number',
-        description: 'End date of recurring payment',
       })
       .option('network', NETWORK_OPTION_ANY);
   },
@@ -103,31 +106,29 @@ export default {
       salt: string;
       payAt: number;
       gasPrice: string;
-      recurringDayOfMonth: number;
-      recurringUntil: number;
+      recurringDayOfMonth?: number | undefined;
+      recurringUntil?: number | undefined;
     };
     let { web3, signer } = await getEthereumClients(network, getConnectionType(args));
     let scheduledPaymentModule = await getSDK('ScheduledPaymentModule', web3, signer);
     let blockExplorer = await getConstant('blockExplorer', web3);
 
     console.log(`Execute a scheduled payment ...`);
-    let onTxnHash = (txnHash: string) =>
-      console.log(`Transaction hash: ${blockExplorer}/tx/${txnHash}/token-transfers`);
+    let onTxnHash = (txnHash: string) => console.log(`Transaction hash: ${blockExplorer}/tx/${txnHash}`);
     await scheduledPaymentModule.executeScheduledPayment(
       moduleAddress,
       tokenAddress,
       amount,
       payeeAddress,
-      {
-        fixedUSD: fixedUSDFee,
-        percentage: percentageFee,
-      },
+      fixedUSDFee,
+      percentageFee,
       executionGas,
       maxGasPrice,
       gasTokenAddress,
       salt,
-      recurringDayOfMonth ? recurringDayOfMonth : payAt,
+      payAt,
       gasPrice,
+      recurringDayOfMonth,
       recurringUntil,
       { onTxnHash }
     );
