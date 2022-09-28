@@ -1,8 +1,16 @@
 import dayjs from 'dayjs';
-import Helper from '@ember/component/helper';
+import { helper } from '@ember/component/helper';
 
 const DEFAULT_LOCALE = 'en';
 const DEFAULT_OUTPUT_FORMAT = 'D MMMM, YYYY';
+
+export interface Signature {
+  Args: {
+    Positional: Array<unknown>;
+    Named: { locale?: string };
+  };
+  Return: string;
+}
 
 export function dayjsFormat(
   date: dayjs.ConfigType,
@@ -17,7 +25,7 @@ export function dayjsFormat(
   }
 }
 
-export default Helper.helper(function computed(
+export default helper<Signature>(function computed(
   positional: unknown[],
   hash: { locale?: string }
 ) {
