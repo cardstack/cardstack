@@ -681,9 +681,9 @@ export default class ScheduledPaymentModule {
     safeAddress: string,
     moduleAddress: string,
     gasTokenAddress: string,
-    spHash: string
+    spHash: string,
+    txnParams: TransactionParams
   ) {
-    let txnParams = await this.generateSchedulePaymentTxParams(safeAddress, moduleAddress, gasTokenAddress, spHash);
     return new Promise<void>((resolve, reject) => {
       this.schedulePaymentOnChain(safeAddress, moduleAddress, gasTokenAddress, spHash, txnParams, {
         onTxnHash: async (txHash: string) => {
@@ -792,6 +792,8 @@ export default class ScheduledPaymentModule {
       );
     }
 
+    let txnParams = await this.generateSchedulePaymentTxParams(safeAddress, moduleAddress, gasTokenAddress, spHash);
+
     let account = (await this.web3.eth.getAccounts())[0];
     let scheduledPaymentResponse = await hubRequest(hubRootUrl, 'api/scheduled-payments', authToken, 'POST', {
       data: {
@@ -827,7 +829,8 @@ export default class ScheduledPaymentModule {
         safeAddress,
         moduleAddress,
         gasTokenAddress,
-        spHash
+        spHash,
+        txnParams
       );
     } catch (error) {
       console.log(
