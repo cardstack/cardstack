@@ -1,4 +1,3 @@
-/* stylelint-disable max-line-length */
 .boxel-card-picker {
   --boxel-card-picker-width: 24rem;
   --boxel-card-picker-dropdown-menu-height: 33rem;
@@ -9,34 +8,45 @@
 
 .boxel-card-picker--change-card {
   display: flex;
-  flex-wrap: wrap;
   justify-content: space-between;
 }
 
-.boxel-card-picker__dropdown {
+.boxel-card-picker__select {
   position: static;
-  width: var(--boxel-card-picker-width);
   max-width: 100%;
   color: var(--boxel-dark);
   font: var(--boxel-font);
   letter-spacing: var(--boxel-lsp-sm);
-  z-index: 1;
-  padding: var(--boxel-sp-xs) var(--boxel-sp-xxxl) var(--boxel-sp-xs) var(--boxel-sp);
-  background: url("/@cardstack/boxel/images/icons/caret-down.svg") right var(--boxel-sp) center/auto 0.5rem no-repeat;
+  padding: var(--boxel-sp-xs) var(--boxel-sp-xxxl) var(--boxel-sp-xs)
+    var(--boxel-sp);
+  background: url('/@cardstack/boxel/images/icons/caret-down.svg') right
+    var(--boxel-sp) center/auto 0.5rem no-repeat;
   background-color: var(--boxel-light);
   border: 1px solid var(--boxel-purple-300);
   border-radius: var(--boxel-border-radius);
   transition: border-color var(--boxel-transition);
 }
 
-.boxel-card-picker__dropdown + .ember-basic-dropdown-content-wormhole-origin {
+.boxel-card-picker__dropdown {
+  --boxel-select-current-color: var(--boxel-purple-100);
+  --boxel-select-selected-color: transparent;
+
+  background-color: var(--boxel-light);
+  border: 1px solid rgb(0 0 0 / 15%);
+  border-radius: var(--boxel-border-radius);
+  box-shadow: 0 15px 30px rgb(0 0 0 / 25%);
+  width: var(--boxel-card-picker-width);
   position: absolute;
-  width: 100%;
   top: 0;
   left: 0;
 }
 
-.boxel-card-picker__dropdown--selected {
+.boxel-card-picker--change-card .boxel-card-picker__dropdown {
+  top: -0.15rem;
+  left: -17rem;
+}
+
+.boxel-card-picker__select--selected {
   padding: var(--boxel-sp-xxxs) var(--boxel-sp);
   background-image: none;
   border-radius: 100px;
@@ -44,74 +54,62 @@
   letter-spacing: var(--boxel-lsp-lg);
 }
 
-.boxel-card-picker__dropdown:hover {
-  border-color: var(--boxel-dark);
-  cursor: pointer;
-}
-
-.boxel-card-picker__dropdown + .ember-basic-dropdown-content-wormhole-origin .ember-basic-dropdown-content {
-  position: relative;
-  width: 100%;
-  background-color: var(--boxel-light);
-  border: 1px solid rgb(0 0 0 / 15%);
-  border-radius: var(--boxel-border-radius);
-  box-shadow: 0 15px 30px rgb(0 0 0 / 25%);
-  z-index: 1;
-}
-
-.boxel-card-picker__dropdown + .ember-basic-dropdown-content-wormhole-origin .ember-basic-dropdown-content.ember-basic-dropdown--transitioning-in {
+.boxel-card-picker__dropdown.ember-basic-dropdown--transitioning-in {
   animation: drop-fade-below var(--boxel-transition);
 }
 
-.boxel-card-picker__dropdown + .ember-basic-dropdown-content-wormhole-origin .ember-basic-dropdown-content.ember-basic-dropdown--transitioning-out {
+.boxel-card-picker__dropdown.ember-basic-dropdown--transitioning-out {
   animation: drop-fade-below var(--boxel-transition) reverse;
 }
 
-.boxel-card-picker__dropdown + .ember-basic-dropdown-content-wormhole-origin .ember-power-select-options {
-  list-style: none;
+.boxel-card-picker__dropdown .ember-power-select-options {
   margin: 0;
   padding: 0;
-  height: 100%;
   border-radius: inherit;
   max-height: var(--boxel-card-picker-dropdown-menu-height);
   overflow-y: auto;
 }
 
-.boxel-card-picker__dropdown + .ember-basic-dropdown-content-wormhole-origin .ember-power-select-option {
+.boxel-card-picker__dropdown .ember-power-select-option {
   padding: var(--boxel-sp) var(--boxel-sp-xxxl);
-  background-image: url("/@cardstack/boxel/images/icons/icon-circle-light.svg");
+  background-image: url('/@cardstack/boxel/images/icons/icon-circle-light.svg');
   background-repeat: no-repeat;
   background-position: left var(--boxel-sp) center;
   background-size: var(--boxel-icon-sm) var(--boxel-icon-sm);
 }
 
-.boxel-card-picker__dropdown + .ember-basic-dropdown-content-wormhole-origin .ember-power-select-option + .ember-power-select-option {
+.boxel-card-picker__dropdown
+  .ember-power-select-option
+  + .ember-power-select-option {
   border-top: 1px solid var(--boxel-light-400);
 }
 
-.boxel-card-picker__dropdown + .ember-basic-dropdown-content-wormhole-origin .ember-power-select-option[aria-selected="true"] {
-  background-image: url("/@cardstack/boxel/images/icons/success-bordered.svg");
+.boxel-card-picker__dropdown .ember-power-select-option[aria-selected='true'] {
+  background-image: url('/@cardstack/boxel/images/icons/success-bordered.svg');
 }
 
-.boxel-card-picker__dropdown + .ember-basic-dropdown-content-wormhole-origin .ember-power-select-option:hover:not([aria-disabled="true"]):not(.ember-power-select-option--no-matches-message) {
+.boxel-card-picker__dropdown
+  .ember-power-select-option:hover:not([aria-disabled='true']):not(.ember-power-select-option--no-matches-message) {
+  background-color: var(--boxel-purple-100);
   cursor: pointer;
 }
 
-.boxel-card-picker__dropdown + .ember-basic-dropdown-content-wormhole-origin .ember-power-select-option[aria-current="true"] {
-  background-color: var(--boxel-purple-100);
-}
-
-.boxel-card-picker__dropdown + .ember-basic-dropdown-content-wormhole-origin .ember-power-select-option[aria-disabled="true"] {
+.boxel-card-picker__dropdown .ember-power-select-option[aria-disabled='true'] {
   opacity: 0.45;
   cursor: not-allowed;
 }
 
-.boxel-card-picker__dropdown + .ember-basic-dropdown-content-wormhole-origin .ember-power-select-option--no-matches-message {
+.boxel-card-picker__dropdown .ember-power-select-option--no-matches-message {
   background-image: none;
 }
 
+.boxel-card-picker .ember-basic-dropdown .boxel-card-picker__select--selected {
+  display: inline;
+}
+
 .boxel-card-picker__selected-card {
-  width: var(--boxel-xxs-container);
+  margin-right: var(--boxel-sp-xxs);
+  flex: 1;
 }
 
 @keyframes drop-fade-below {
