@@ -74,7 +74,7 @@
     >
       {{#if (eq @field.type "dropdown")}}
         <div class="field-renderer__dropdown">
-          <PowerSelect
+          <Boxel::Select
             @options={{@field.options}}
             @selected={{@field.value}}
             @onChange={{fn (mut @field.value)}}
@@ -82,7 +82,7 @@
             @verticalPosition="below"
           as |option|>
             {{option}}
-          </PowerSelect>
+          </Boxel::Select>
         </div>
       {{else if (eq @field.type "textarea")}}
         <Textarea @type={{@field.type}} class="field-renderer__input field-renderer__textarea" @value={{@field.value}} />
