@@ -67,6 +67,7 @@
         "../boxel/addon/components/boxel/org-title/**/*",
         "../boxel/addon/components/boxel/progress-icon/**/*",
         "../boxel/addon/components/boxel/progress-steps/**/*",
+        "../boxel/addon/components/boxel/radio-input/**/*",
         "../boxel/addon/components/boxel/sidebar/**/*",
         "../boxel/addon/components/boxel/styled-qr-code/**/*",
         "../boxel/addon/components/boxel/thread/**/*",
