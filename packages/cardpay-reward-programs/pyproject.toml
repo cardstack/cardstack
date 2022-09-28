@@ -53,3 +53,4 @@ inspect_results = "streamlit run streamlit/inspect_results.py --server.port 8501
 claim_info= "python scripts/claim_info.py"
 prepaid_cards_less_gas = "python scripts/prepaid_cards_less_gas.py"
 flat_drop = "python scripts/flat_drop.py"
+check_missing_roots = "python scripts/check_missing_roots.py"

@@ -88,7 +88,7 @@ module('Acceptance | create profile', function (hooks) {
   // eslint-disable-next-line qunit/require-expect
   test('initiating workflow without wallet connections', async function (assert) {
     await visit('/card-pay');
-    await click('[data-test-card-pay-header-tab][href="/card-pay/payments"]');
+    await click('[role="tab"][href="/card-pay/payments"]');
     assert.strictEqual(currentURL(), '/card-pay/payments');
 
     await click('[data-test-workflow-button="create-business"]');

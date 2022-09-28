@@ -1,6 +1,8 @@
 {{#let (unique-id) as |inputId|}}
-<div class="boxel-searchbox" ...attributes>
-    {{svg-jar "search" class="boxel-searchbox__search-icon"}}
+<div class={{cn "boxel-searchbox" boxel-searchbox--hide-icon=(or @hideIcon false)}} ...attributes>
+    {{#unless @hideIcon}}
+      {{svg-jar "search" class="boxel-searchbox__search-icon"}}
+    {{/unless}}
     {{#if @label}}
       <label for={{or @id inputId}} class="boxel-sr-only">{{@label}}</label>
     {{/if}}

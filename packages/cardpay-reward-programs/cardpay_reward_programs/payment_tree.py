@@ -1,4 +1,5 @@
 import itertools
+import json
 from collections import defaultdict
 from typing import List, TypedDict
 
@@ -27,8 +28,9 @@ def group_by(data_array, callback):
 
 
 class PaymentTree:
-    def __init__(self, payment_list: List[Payment]) -> None:
+    def __init__(self, payment_list: List[Payment], run_parameters={}) -> None:
         self.payment_nodes = payment_list
+        self.run_parameters = run_parameters
         self.data = list(map(self.encode_payment, self.payment_nodes))
         self.tree = MerkleTree(self.data, hashfunc)
         if len(self.data) != len(set(self.data)):
@@ -85,7 +87,8 @@ class PaymentTree:
                 pa.field("root", pa.string()),
                 pa.field("leaf", pa.string()),
                 pa.field("proof", pa.list_(pa.string())),
-            ]
+            ],
+            metadata={"run_parameters": json.dumps(self.run_parameters)},
         )
         # Arrow tables are constructed by column
         # so we need to flip the data

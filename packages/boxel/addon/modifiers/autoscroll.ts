@@ -5,6 +5,14 @@ interface AutoscrollOptions {
   lockThreshold?: number;
 }
 
+interface Signature {
+  Element: HTMLElement;
+  Args: {
+    Positional: [];
+    Named: AutoscrollOptions;
+  };
+}
+
 const DEFAULT_LOCK_THRESHOLD = 10;
 
 // The {{autoscroll}} modifer uses a MutationObserver to monitor the DOM within the modified element
@@ -14,7 +22,8 @@ const DEFAULT_LOCK_THRESHOLD = 10;
 
 function autoscroll(
   element: HTMLElement,
-  _optionsParams: unknown[] = [], // eslint-disable-line @typescript-eslint/no-unused-vars
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  _optionsParams: [] = [],
   optionsHash: AutoscrollOptions = {}
 ) {
   // if the 'enabled' property was provided and falsey (including null and undefined), we consider this disabled
@@ -67,4 +76,4 @@ function autoscroll(
   };
 }
 
-export default modifier(autoscroll, { eager: false });
+export default modifier<Signature>(autoscroll, { eager: false });

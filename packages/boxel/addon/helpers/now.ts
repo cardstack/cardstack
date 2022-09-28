@@ -1,6 +1,12 @@
 import dayjs from 'dayjs';
-import Helper from '@ember/component/helper';
+import { helper } from '@ember/component/helper';
 
-export default Helper.helper(function compute() {
+interface Signature {
+  Args: {
+    Positional: [];
+  };
+  Return: ReturnType<typeof dayjs>;
+}
+export default helper<Signature>(function compute() {
   return dayjs();
 });

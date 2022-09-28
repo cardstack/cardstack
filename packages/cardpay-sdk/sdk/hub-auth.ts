@@ -105,7 +105,7 @@ export default class HubAuth implements IHubAuth {
     return global.fetch(url, { headers });
   }
 
-  private async getHubUrl(network?: string): Promise<string> {
+  async getHubUrl(network?: string): Promise<string> {
     const netName = network || (await networkName(this.layer2Web3));
 
     return this.hubRootUrl || getConstantByNetwork('hubUrl', netName);

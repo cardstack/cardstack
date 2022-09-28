@@ -57,7 +57,7 @@ def run_reward_program(
     payment_list = rule.run(
         parameters["run"]["payment_cycle"], parameters["run"]["reward_program_id"]
     )
-    tree = PaymentTree(payment_list.to_dict("records"))
+    tree = PaymentTree(payment_list.to_dict("records"), run_parameters=parameters)
     table = tree.as_arrow()
     write_parquet_file(AnyPath(output_location), table)
 
