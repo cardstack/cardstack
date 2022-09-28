@@ -10,7 +10,7 @@ interface Signature {
   Element: HTMLElement;
   Args: {
     id: string;
-    value?: string;
+    value: string;
     disabled: boolean;
     helperText?: string;
     invalid: boolean;
