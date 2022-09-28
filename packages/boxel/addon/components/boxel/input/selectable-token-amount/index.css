@@ -20,7 +20,7 @@
 }
 
 .boxel-input-selectable-token-amount .ember-power-select-status-icon {
-  background: url('/@cardstack/boxel/images/icons/caret-down.svg') no-repeat;
+  background: url("/@cardstack/boxel/images/icons/caret-down.svg") no-repeat;
   width: 11px;
   height: 9px;
   display: inline-block;
@@ -56,10 +56,10 @@
   height: var(--boxel-icon-sm);
 }
 
-.boxel-input-selectable-token-amount__select[aria-disabled='true'] {
+.boxel-input-selectable-token-amount__select[aria-disabled="true"] {
   opacity: 0.5;
 }
 
-.boxel-input-selectable-token-amount__select[aria-disabled='true'] .ember-power-select-selected-item {
+.boxel-input-selectable-token-amount__select[aria-disabled="true"] .ember-power-select-selected-item {
   cursor: default;
 }
