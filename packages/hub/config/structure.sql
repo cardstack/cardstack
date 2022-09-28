@@ -1169,8 +1169,8 @@ CREATE TABLE public.scheduled_payments (
     payee_address text NOT NULL,
     execution_gas_estimation bigint NOT NULL,
     max_gas_price bigint NOT NULL,
-    fee_fixed_usd integer NOT NULL,
-    fee_percentage integer NOT NULL,
+    fee_fixed_usd numeric NOT NULL,
+    fee_percentage numeric NOT NULL,
     salt text NOT NULL,
     pay_at timestamp without time zone,
     recurring_day_of_month integer,
@@ -1184,7 +1184,9 @@ CREATE TABLE public.scheduled_payments (
     cancelation_block_number bigint,
     created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
     updated_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    canceled_at timestamp without time zone
+    canceled_at timestamp without time zone,
+    user_address text NOT NULL,
+    creation_transaction_error text
 );
 
 
@@ -1626,6 +1628,13 @@ CREATE INDEX scheduled_payments_recurring_until_index ON public.scheduled_paymen
 --
 
 CREATE INDEX scheduled_payments_sender_safe_address_index ON public.scheduled_payments USING btree (sender_safe_address);
+
+
+--
+-- Name: scheduled_payments_user_address_index; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX scheduled_payments_user_address_index ON public.scheduled_payments USING btree (user_address);
 
 
 --

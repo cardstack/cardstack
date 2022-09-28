@@ -44,6 +44,7 @@ describe('fetching scheduled payments that are due', function () {
         canceledAt: params.canceledAt,
         creationBlockNumber: 'creationBlockNumber' in params ? params.creationBlockNumber : 1,
         chainId: 1,
+        userAddress: '0x57022DA74ec3e6d8274918C732cf8864be7da833',
       },
     });
   };
