@@ -62,3 +62,7 @@
 .boxel-selectable-token-amount-input__select[aria-disabled='true'] {
   opacity: 0.5;
 }
+
+.boxel-selectable-token-amount-input__select[aria-disabled='true'] .ember-power-select-selected-item {
+  cursor: default;
+}
