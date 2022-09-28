@@ -6,7 +6,7 @@ import FreestyleUsage from 'ember-freestyle/components/freestyle/usage';
 import { array, fn } from '@ember/helper';
 
 export default class BoxelSelectableInputTokenAmountUsage extends Component {
-  @tracked id = 'boxel-selectable-token-amount-input-usage';
+  @tracked id = 'boxel-input-selectable-token-amount-usage';
   @tracked value = '';
   @tracked helperText = 'Please enter an amount';
   @tracked errorMessage = '';

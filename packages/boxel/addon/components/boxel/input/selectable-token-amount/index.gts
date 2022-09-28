@@ -32,9 +32,9 @@ interface Token {
 
 export default class SelectableTokenAmount extends Component<Signature> {
   <template>
-    <div class="boxel-selectable-token-amount-input-group" ...attributes>
+    <div class="boxel-input-selectable-token-amount" ...attributes>
       <BoxelInput
-        class="boxel-selectable-token-amount-input-group__input"
+        class="boxel-input-selectable-token-amount__input"
         @id={{@id}}
         @value={{@value}}
         @required={{unless @disabled true}}
@@ -49,18 +49,18 @@ export default class SelectableTokenAmount extends Component<Signature> {
         inputmode="decimal"
       />
       <BoxelSelect
-        class="boxel-selectable-token-amount-input__select"
+        class="boxel-input-selectable-token-amount__select"
         @options={{@tokens}}
         @selected={{@token}}
         @disabled={{@disabled}}
         @onChange={{@onChooseToken}}
-        @dropdownClass="boxel-selectable-token-amount-input-group__dropdown"
+        @dropdownClass="boxel-input-selectable-token-amount__dropdown"
         @verticalPosition="below" as |item itemCssClass|
       >
-        <div class="{{itemCssClass}} boxel-selectable-token-amount-input-group__dropdown-item">
+        <div class="{{itemCssClass}} boxel-input-selectable-token-amount__dropdown-item">
           {{svgJar
             item.icon
-            class="boxel-selectable-token-amount-input-group__icon"
+            class="boxel-input-selectable-token-amount__icon"
             role="presentation"
           }}
 

@@ -1,4 +1,4 @@
-.boxel-selectable-token-amount-input-group {
+.boxel-input-selectable-token-amount {
   --input-height: 3.75rem; /* 60px */
   --input-icon-size: var(--boxel-icon-lg);
   --input-symbol-width: 10rem;
@@ -13,7 +13,7 @@
   letter-spacing: var(--boxel-lsp-xs);
 }
 
-.boxel-selectable-token-amount-input-group__input {
+.boxel-input-selectable-token-amount__input {
   height: var(--input-height);
   padding-left: calc(var(--input-icon-size) + var(--input-icon-space) * 2);
   padding-right: calc(var(--input-symbol-width) + var(--input-symbol-space) * 2);
@@ -21,18 +21,18 @@
   letter-spacing: inherit;
 }
 
-.boxel-selectable-token-amount-input-group .ember-power-select-status-icon {
+.boxel-input-selectable-token-amount .ember-power-select-status-icon {
   background: url('/@cardstack/boxel/images/icons/caret-down.svg') no-repeat;
   width: 11px;
   height: 9px;
   display: inline-block;
 }
 
-.boxel-selectable-token-amount-input-group .ember-basic-dropdown {
+.boxel-input-selectable-token-amount .ember-basic-dropdown {
   display: contents;
 }
 
-.boxel-selectable-token-amount-input__select {
+.boxel-input-selectable-token-amount__select {
   position: absolute;
   max-width: var(--input-symbol-width);
   height: var(--input-height);
@@ -44,8 +44,8 @@
   padding-right: var(--boxel-sp);
 }
 
-.boxel-selectable-token-amount-input__select .boxel-selectable-token-amount-input-group__dropdown-item.boxel-select__item,
-.boxel-selectable-token-amount-input-group__dropdown .boxel-selectable-token-amount-input-group__dropdown-item.boxel-select__item {
+.boxel-input-selectable-token-amount__select .boxel-input-selectable-token-amount__dropdown-item.boxel-select__item,
+.boxel-input-selectable-token-amount__dropdown .boxel-input-selectable-token-amount__dropdown-item.boxel-select__item {
   display: flex;
   align-items: center;
   column-gap: var(--boxel-sp-xxs);
@@ -54,15 +54,15 @@
   font-weight: 600;
 }
 
-.boxel-selectable-token-amount-input-group__icon {
+.boxel-input-selectable-token-amount__icon {
   width: var(--boxel-icon-sm);
   height: var(--boxel-icon-sm);
 }
 
-.boxel-selectable-token-amount-input__select[aria-disabled='true'] {
+.boxel-input-selectable-token-amount__select[aria-disabled='true'] {
   opacity: 0.5;
 }
 
-.boxel-selectable-token-amount-input__select[aria-disabled='true'] .ember-power-select-selected-item {
+.boxel-input-selectable-token-amount__select[aria-disabled='true'] .ember-power-select-selected-item {
   cursor: default;
 }
