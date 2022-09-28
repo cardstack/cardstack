@@ -24,12 +24,14 @@ class BoxelDropdown extends Component<Signature> {
   <template>
     <BasicDropdown as |dd|>
       <dd.Trigger
+        data-test-boxel-dropdown-trigger
         ...attributes
         {{this.registerTriggerElement}}
       >
         {{yield to="trigger"}}
       </dd.Trigger>
       <dd.Content
+        data-test-boxel-dropdown-content
         class={{cn "boxel-dropdown__content" @contentClass}}
         {{focusTrap
           isActive=dd.isOpen
