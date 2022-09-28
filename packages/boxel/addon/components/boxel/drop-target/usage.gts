@@ -7,6 +7,7 @@ import { fn, array } from '@ember/helper';
 
 export default class DropUsage extends Component {
   @tracked state = 'rest';
+  
   <template>
     <FreestyleUsage @name="DropTarget" @description="Presentational drop target. Requires assembly for drop logic">
       <:example>
