@@ -68,7 +68,6 @@
         "addon/components/boxel/select-button/**/*",
         "addon/components/boxel/selection-control-group/**/*",
         "addon/components/boxel/sort-menu/**/*",
-        "addon/components/boxel/thread/**/*",
         "addon/components/boxel/wave-player/**/*",
         "app/components/**/*",
         "tests/dummy/app/components/apply-changes-toggle/**/*",
