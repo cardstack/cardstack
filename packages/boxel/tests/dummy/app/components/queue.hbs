@@ -13,7 +13,7 @@
 
     <div class="queue__filter-group">
       <div class="queue__filter-dropdown">
-        <PowerSelect
+        <Boxel::Select
           @options={{this.viewOptions}}
           @selected={{this.displayQueue}}
           @onChange={{this.filterQueue}}
@@ -21,7 +21,7 @@
           @verticalPosition="below"
         as |option|>
           {{option.name}}
-        </PowerSelect>
+        </Boxel::Select>
       </div>
       <Boxel::IconButton
         class="queue__search-btn"

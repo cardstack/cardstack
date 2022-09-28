@@ -82,6 +82,9 @@
 
 .queue__filter-dropdown .ember-power-select-trigger,
 .queue__filter-dropdown .ember-power-select-dropdown {
+  --boxel-select-current-color: transparent;
+  --boxel-select-selected-color: transparent;
+  
   width: 100%;
   min-height: 40px;
   padding: 10px 40px 10px 18px;
