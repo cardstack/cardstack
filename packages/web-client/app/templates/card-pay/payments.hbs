@@ -5,8 +5,11 @@
   role='tabpanel'
   aria-labelledby='card-pay.payments'
 >
-  <CardPay::DashboardPanel
-    @panel={{@model.panel}}
+  <Boxel::DashboardPanel
+    @title={{@model.panel.title}}
+    @description={{@model.panel.description}}
+    @heroImageUrl={{@model.panel.heroImageUrl}}
+    @summaryHeroImageUrl={{@model.panel.summaryHeroImageUrl}}
     @noCollapse={{
       or (not this.layer2Network.isConnected) (is-empty this.profileSafes)
     }}
@@ -67,7 +70,7 @@
         </div>
       </section>
     </:detail>
-  </CardPay::DashboardPanel>
+  </Boxel::DashboardPanel>
 
   {{#if this.layer2Network.isConnected}}
     <section data-test-profiles-section>

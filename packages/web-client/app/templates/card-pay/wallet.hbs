@@ -1,7 +1,14 @@
 {{page-title "Wallet"}}
 
 <section class="card-pay-dashboard__wallet" role="tabpanel" aria-labelledby="card-pay.wallet">
-  <CardPay::DashboardPanel @panel={{@model.panel}} @noBottomPadding={{true}} @noCollapse={{or (not this.layer2Network.isConnected) (is-empty this.prepaidCards)}}>
+  <Boxel::DashboardPanel
+    @title={{@model.panel.title}}
+    @description={{@model.panel.description}}
+    @heroImageUrl={{@model.panel.heroImageUrl}}
+    @summaryHeroImageUrl={{@model.panel.summaryHeroImageUrl}}
+    @noBottomPadding={{true}}
+    @noCollapse={{or (not this.layer2Network.isConnected) (is-empty this.prepaidCards)}}
+  >
     <:detail>
       {{#each @model.panel.sections as |section|}}
         <CardPay::DashboardPanel::Section @section={{section}} class="dashboard-panel-section-wallet">
@@ -62,7 +69,7 @@
         <a href="https://discord.gg/cardstack" target="_blank" rel="noopener noreferrer">Claim your invite &gt;</a>
       </div>
     </:footer>
-  </CardPay::DashboardPanel>
+  </Boxel::DashboardPanel>
 
   {{#if this.layer2Network.isConnected}}
     <section data-test-card-balances>
