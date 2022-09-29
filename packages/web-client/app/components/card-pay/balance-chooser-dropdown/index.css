@@ -1,5 +1,6 @@
 .balance-chooser-dropdown {
   --field-height: 3.75rem;
+  --boxel-select-selected-color: transparent;
 
   position: relative;
   min-height: var(--field-height);
@@ -28,11 +29,13 @@
   overflow: hidden;
 }
 
-.balance-chooser-dropdown .ember-basic-dropdown-content.ember-basic-dropdown--transitioning-in {
+.balance-chooser-dropdown
+  .ember-basic-dropdown-content.ember-basic-dropdown--transitioning-in {
   animation: drop-fade-below var(--boxel-transition);
 }
 
-.balance-chooser-dropdown .ember-basic-dropdown-content.ember-basic-dropdown--transitioning-out {
+.balance-chooser-dropdown
+  .ember-basic-dropdown-content.ember-basic-dropdown--transitioning-out {
   animation: drop-fade-below var(--boxel-transition) reverse;
 }
 
