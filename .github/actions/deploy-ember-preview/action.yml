@@ -27,7 +27,7 @@ runs:
           ${{ runner.os }}-node-modules-
     - name: Install dependencies
       shell: bash
-      run: yarn --prefer-offline
+      run: yarn --prefer-offline --frozen-lockfile
     - name: Set PR branch name
       shell: bash
       run: echo "RAW_PR_BRANCH_NAME=${{ github.head_ref }}" >> $GITHUB_ENV

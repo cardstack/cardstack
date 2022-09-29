@@ -39,7 +39,7 @@ jobs:
           key: ${{ runner.os }}-node-modules-${{ hashFiles('yarn.lock') }}
           restore-keys: |
             ${{ runner.os }}-node-modules-
-      - run: yarn --prefer-offline
+      - run: yarn --prefer-offline --frozen-lockfile
       # using yarn to install @percy/cli suddenly started causing V8 out of
       # memory errors. According to https://stackoverflow.com/a/56568741 likely
       # there is a dependency cycle that yarn can't see through. However, npm
