@@ -38,6 +38,7 @@ export function svgJar(
     style?: string | SafeString;
     'aria-label'?: string;
     'aria-hidden'?: boolean;
+    'data-test-boxel-menu-item-icon'?: boolean;
   }
 ): ContentValue {
   let svgArgs = Object.assign({}, svgAttrs);
