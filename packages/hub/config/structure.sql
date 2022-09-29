@@ -1185,8 +1185,10 @@ CREATE TABLE public.scheduled_payments (
     created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
     updated_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
     canceled_at timestamp without time zone,
+    cancelation_transaction_error text,
     user_address text NOT NULL,
-    creation_transaction_error text
+    creation_transaction_error text,
+    cancellation_transaction_error text
 );
 
 
