@@ -25,10 +25,6 @@
   display: inline-block;
 }
 
-.boxel-input-selectable-token-amount .ember-basic-dropdown {
-  display: contents;
-}
-
 .boxel-input-selectable-token-amount__select {
   position: absolute;
   height: var(--boxel-input-selectable-token-amount-height);
