@@ -16,7 +16,7 @@ describe('fetching scheduled payments that are due', function () {
   let { getPrisma, getContainer } = setupHub(this);
 
   this.beforeEach(async function () {
-    subject = await getContainer().lookup('scheduled-payments-fetcher');
+    subject = await getContainer().lookup('scheduled-payment-fetcher');
     now = convertDateToUTC(new Date());
     validForDays = subject.validForDays;
     prisma = await getPrisma();
@@ -44,6 +44,7 @@ describe('fetching scheduled payments that are due', function () {
         canceledAt: params.canceledAt,
         creationBlockNumber: 'creationBlockNumber' in params ? params.creationBlockNumber : 1,
         chainId: 1,
+        userAddress: '0x57022DA74ec3e6d8274918C732cf8864be7da833',
       },
     });
   };
@@ -182,6 +183,6 @@ describe('fetching scheduled payments that are due', function () {
 
 declare module '@cardstack/di' {
   interface KnownServices {
-    'scheduled-payments-fetcher': ScheduledPaymentsFetcherService;
+    'scheduled-payment-fetcher': ScheduledPaymentsFetcherService;
   }
 }

@@ -13,7 +13,7 @@ runs:
     - name: Install apt packages
       shell: bash
       run: |
-        sudo apt-get install awscli jq
+        sudo apt-get update && sudo apt-get install awscli jq --fix-missing
 
     - uses: volta-cli/action@v1
 
