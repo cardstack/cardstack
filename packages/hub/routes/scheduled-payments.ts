@@ -178,16 +178,14 @@ export default class ScheduledPaymentsRoute {
     let userAddress = ctx.state.userAddress;
     let scheduledPaymentId: string = ctx.params.scheduled_payment_id;
 
-    let scheduledPayment = await prisma.scheduledPayment.findFirstOrThrow({
+    let scheduledPayment = await prisma.scheduledPayment.findFirst({
       where: {
         id: scheduledPaymentId,
         userAddress,
       },
     });
 
-    if (scheduledPayment.userAddress !== userAddress) {
-      ctx.status = 404;
-    } else {
+    if (scheduledPayment) {
       await prisma.scheduledPayment.delete({
         where: {
           id: scheduledPaymentId,
@@ -195,6 +193,8 @@ export default class ScheduledPaymentsRoute {
       });
       ctx.status = 200;
       ctx.body = {};
+    } else {
+      ctx.status = 404;
     }
 
     ctx.type = 'application/vnd.api+json';
