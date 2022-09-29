@@ -1,0 +1,202 @@
+/* Details container styles */
+.boxel-dashboard-panel {
+  --spacing: calc(var(--boxel-sp-xxxl) * var(--boxel-ratio));
+  --border-color: #d3d3d3;
+
+  position: relative;
+  max-width: 100%;
+  margin: 0 auto;
+  color: var(--boxel-dark);
+  background-color: var(--boxel-light-400);
+  border-radius: var(--boxel-border-radius);
+  box-shadow: 0 1px 2px rgb(0 0 0 / 50%);
+  overflow: hidden;
+}
+
+.boxel-dashboard-panel__summary {
+  position: relative;
+  min-height: 5rem;
+}
+
+.boxel-dashboard-panel__summary::marker,
+.boxel-dashboard-panel__summary::-webkit-details-marker {
+  display: none;
+  content: "";
+}
+
+.boxel-dashboard-panel--no-collapse .boxel-dashboard-panel__summary {
+  display: none;
+}
+
+.boxel-dashboard-panel__marker::before {
+  display: block;
+  content: "Show details";
+}
+
+.boxel-dashboard-panel[open] .boxel-dashboard-panel__marker::before {
+  content: "Hide details";
+}
+
+.boxel-dashboard-panel[open] .boxel-dashboard-panel__summary {
+  position: initial;
+  height: 0;
+  min-height: 0;
+}
+
+.boxel-dashboard-panel__marker {
+  position: absolute;
+  padding: var(--boxel-sp-sm);
+  right: 0;
+  top: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font: var(--boxel-font-sm);
+  letter-spacing: var(--boxel-lsp-sm);
+  z-index: 1;
+  cursor: pointer;
+}
+
+.boxel-dashboard-panel[open].boxel-dashboard-panel--has-footer .boxel-dashboard-panel__marker path {
+  stroke: var(--boxel-light);
+}
+
+.boxel-dashboard-panel[open].boxel-dashboard-panel--has-footer .boxel-dashboard-panel__marker::before {
+  color: var(--boxel-light);
+}
+
+.boxel-dashboard-panel[open] .boxel-dashboard-panel__marker {
+  top: initial;
+  bottom: 0;
+}
+
+.boxel-dashboard-panel__marker-icon {
+  margin-left: var(--boxel-sp-xs);
+  transform: rotate(90deg);
+}
+
+.boxel-dashboard-panel[open] .boxel-dashboard-panel__marker-icon {
+  transform: rotate(-90deg);
+}
+
+/* Summary content */
+.boxel-dashboard-panel__summary-content {
+  height: 100%;
+  padding: var(--boxel-sp-sm) var(--boxel-sp-xl) var(--boxel-sp-sm) 11rem;
+  position: relative;
+}
+
+.boxel-dashboard-panel__summary-hero {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 10rem;
+  height: 100%;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  pointer-events: none;
+}
+
+.boxel-dashboard-panel__summary-title {
+  padding-right: 5rem;
+  font-size: 1.125rem;
+  font-weight: 600;
+  line-height: calc(24 / 18);
+}
+
+.boxel-dashboard-panel__summary-desc {
+  color: var(--boxel-purple-500);
+  font: var(--boxel-font);
+  letter-spacing: var(--boxel-lsp-xs);
+}
+
+.boxel-dashboard-panel__footer {
+  background: var(--boxel-dark);
+  color: var(--boxel-light);
+  height: var(--boxel-sp-xxxl);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.boxel-dashboard-panel__footer a {
+  color: var(--boxel-highlight);
+}
+
+.boxel-dashboard-panel[open] .boxel-dashboard-panel__summary-content,
+.boxel-dashboard-panel[open] .boxel-dashboard-panel__summary-footer {
+  display: none;
+}
+
+/* Panel styles */
+.boxel-dashboard-panel__main {
+  display: grid;
+  grid-template-columns: auto auto;
+  gap: var(--spacing) 0;
+  padding: var(--spacing);
+  border-top: 1.25rem solid var(--boxel-green);
+}
+
+.boxel-dashboard-panel--no-bottom-padding .boxel-dashboard-panel__main {
+  padding-bottom: 0;
+}
+
+.boxel-dashboard-panel__header {
+  grid-column: 1 / -1;
+  max-width: 30rem;
+}
+
+.boxel-dashboard-panel__header-title {
+  margin-bottom: var(--boxel-sp-xxs);
+  font-size: 3.125rem;
+  font-weight: 600;
+}
+
+.boxel-dashboard-panel__header-desc {
+  font-size: 1.25rem;
+  letter-spacing: var(--boxel-lsp-xs);
+}
+
+.boxel-dashboard-panel__hero {
+  /* this will use the relatively positioned details container */
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 100%;
+  height: 50rem;
+  background-position: top right;
+  background-repeat: no-repeat;
+  background-size: contain;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.boxel-dashboard-panel__main > *:not(.boxel-dashboard-panel__hero) {
+  z-index: 1;
+  cursor: pointer;
+}
+
+@media screen and (max-width: 1000px) {
+  .boxel-dashboard-panel__hero {
+    height: 30rem;
+  }
+}
+
+@media screen and (max-width: 800px) {
+  .boxel-dashboard-panel {
+    --spacing: var(--boxel-sp-xxl);
+  }
+
+  .boxel-dashboard-panel__main {
+    grid-template-columns: auto;
+  }
+
+  .boxel-dashboard-panel__header-title {
+    font-size: 2.5rem;
+  }
+
+  .boxel-dashboard-panel__hero {
+    display: none;
+  }
+}
