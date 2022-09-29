@@ -11,20 +11,20 @@ describe('ScheduledPaymentValidator', function () {
 
     let errors = await subject.validate(scheduledPayment);
     expect(errors).deep.equal({
-      senderSafeAddress: ['is required'],
-      tokenAddress: ['is required'],
-      moduleAddress: ['is required'],
-      amount: ['is required'],
-      payeeAddress: ['is required'],
-      executionGasEstimation: ['is required'],
-      maxGasPrice: ['is required'],
-      feeFixedUsd: ['is required'],
-      payAt: ['is required'],
-      feePercentage: ['is required'],
-      salt: ['is required'],
-      spHash: ['is required'],
-      chainId: ['is required'],
-      userAddress: ['is required'],
+      senderSafeAddress: ['sender safe address is required'],
+      tokenAddress: ['token address is required'],
+      moduleAddress: ['module address is required'],
+      amount: ['amount is required'],
+      payeeAddress: ['payee address is required'],
+      executionGasEstimation: ['execution gas estimation is required'],
+      maxGasPrice: ['max gas price is required'],
+      feeFixedUsd: ['fee fixed usd is required'],
+      payAt: ['pay at is required'],
+      feePercentage: ['fee percentage is required'],
+      salt: ['salt is required'],
+      spHash: ['sp hash is required'],
+      chainId: ['chain id is required'],
+      userAddress: ['user address is required'],
       recurringDayOfMonth: [],
       recurringUntil: [],
       validForDays: [],
@@ -43,9 +43,9 @@ describe('ScheduledPaymentValidator', function () {
 
     let errors = await subject.validate(scheduledPayment);
 
-    expect(errors.senderSafeAddress).deep.equal(['is not a valid address']);
-    expect(errors.moduleAddress).deep.equal(['is not a valid address']);
-    expect(errors.tokenAddress).deep.equal(['is not a valid address']);
-    expect(errors.payeeAddress).deep.equal(['is not a valid address']);
+    expect(errors.senderSafeAddress).deep.equal(['sender safe address is not a valid address']);
+    expect(errors.moduleAddress).deep.equal(['module address is not a valid address']);
+    expect(errors.tokenAddress).deep.equal(['token address is not a valid address']);
+    expect(errors.payeeAddress).deep.equal(['payee address is not a valid address']);
   });
 });

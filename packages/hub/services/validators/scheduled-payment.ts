@@ -1,4 +1,5 @@
 import { ScheduledPayment } from '@prisma/client';
+import { startCase } from 'lodash';
 import { isAddress } from 'web3-utils';
 
 type ScheduledPaymentAttribute =
@@ -63,7 +64,7 @@ export default class ScheduledPaymentValidator {
 
     for (let attribute of mandatoryAttributes) {
       if (scheduledPayment[attribute] == null) {
-        errors[attribute].push('is required');
+        errors[attribute].push(`${startCase(attribute).toLowerCase()} is required`);
       }
     }
 
@@ -76,7 +77,7 @@ export default class ScheduledPaymentValidator {
 
     for (let attribute of addressAttributes) {
       if (scheduledPayment[attribute] && !isAddress(scheduledPayment[attribute] as string)) {
-        errors[attribute].push('is not a valid address');
+        errors[attribute].push(`${startCase(attribute).toLowerCase()} is not a valid address`);
       }
     }
 

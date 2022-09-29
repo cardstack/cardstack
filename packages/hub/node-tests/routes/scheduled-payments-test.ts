@@ -56,7 +56,7 @@ describe('POST /api/scheduled-payments', async function () {
       .expect({
         errors: [
           {
-            detail: 'is required',
+            detail: 'sender safe address is required',
             source: {
               pointer: '/data/attributes/sender-safe-address',
             },
@@ -64,7 +64,7 @@ describe('POST /api/scheduled-payments', async function () {
             title: 'Invalid attribute',
           },
           {
-            detail: 'is required',
+            detail: 'module address is required',
             source: {
               pointer: '/data/attributes/module-address',
             },
@@ -72,7 +72,7 @@ describe('POST /api/scheduled-payments', async function () {
             title: 'Invalid attribute',
           },
           {
-            detail: 'is required',
+            detail: 'token address is required',
             source: {
               pointer: '/data/attributes/token-address',
             },
@@ -80,7 +80,7 @@ describe('POST /api/scheduled-payments', async function () {
             title: 'Invalid attribute',
           },
           {
-            detail: 'is required',
+            detail: 'amount is required',
             source: {
               pointer: '/data/attributes/amount',
             },
@@ -88,7 +88,7 @@ describe('POST /api/scheduled-payments', async function () {
             title: 'Invalid attribute',
           },
           {
-            detail: 'is required',
+            detail: 'payee address is required',
             source: {
               pointer: '/data/attributes/payee-address',
             },
@@ -96,7 +96,7 @@ describe('POST /api/scheduled-payments', async function () {
             title: 'Invalid attribute',
           },
           {
-            detail: 'is required',
+            detail: 'execution gas estimation is required',
             source: {
               pointer: '/data/attributes/execution-gas-estimation',
             },
@@ -104,7 +104,7 @@ describe('POST /api/scheduled-payments', async function () {
             title: 'Invalid attribute',
           },
           {
-            detail: 'is required',
+            detail: 'max gas price is required',
             source: {
               pointer: '/data/attributes/max-gas-price',
             },
@@ -112,7 +112,7 @@ describe('POST /api/scheduled-payments', async function () {
             title: 'Invalid attribute',
           },
           {
-            detail: 'is required',
+            detail: 'fee fixed usd is required',
             source: {
               pointer: '/data/attributes/fee-fixed-usd',
             },
@@ -120,7 +120,7 @@ describe('POST /api/scheduled-payments', async function () {
             title: 'Invalid attribute',
           },
           {
-            detail: 'is required',
+            detail: 'fee percentage is required',
             source: {
               pointer: '/data/attributes/fee-percentage',
             },
@@ -128,7 +128,7 @@ describe('POST /api/scheduled-payments', async function () {
             title: 'Invalid attribute',
           },
           {
-            detail: 'is required',
+            detail: 'salt is required',
             source: {
               pointer: '/data/attributes/salt',
             },
@@ -136,7 +136,7 @@ describe('POST /api/scheduled-payments', async function () {
             title: 'Invalid attribute',
           },
           {
-            detail: 'is required',
+            detail: 'pay at is required',
             source: {
               pointer: '/data/attributes/pay-at',
             },
@@ -144,7 +144,7 @@ describe('POST /api/scheduled-payments', async function () {
             title: 'Invalid attribute',
           },
           {
-            detail: 'is required',
+            detail: 'sp hash is required',
             source: {
               pointer: '/data/attributes/sp-hash',
             },
@@ -152,7 +152,7 @@ describe('POST /api/scheduled-payments', async function () {
             title: 'Invalid attribute',
           },
           {
-            detail: 'is required',
+            detail: 'chain id is required',
             source: {
               pointer: '/data/attributes/chain-id',
             },
