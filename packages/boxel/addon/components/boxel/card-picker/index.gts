@@ -1,7 +1,10 @@
 import Component from '@glimmer/component';
-import PowerSelect from 'ember-power-select/components/power-select';
+
+import BoxelSelect from '@cardstack/boxel/components/boxel/select';
+
 import cn from '@cardstack/boxel/helpers/cn';
 import SelectedItemComponent from './selected-item';
+
 import '@cardstack/boxel/styles/global.css';
 import './index.css';
 
@@ -41,6 +44,7 @@ export default class BoxelCardPicker extends Component<Signature> {
   get isSelected() {
     return !!this.args.selectedItem;
   }
+
   <template>
     <div class={{cn "boxel-card-picker" boxel-card-picker--change-card=this.isSelected}} data-test-boxel-card-picker ...attributes>
       {{#if this.selectedOption}}
@@ -48,20 +52,20 @@ export default class BoxelCardPicker extends Component<Signature> {
           {{yield this.selectedOption}}
         </div>
       {{/if}}
-      <PowerSelect
-        class={{cn "boxel-card-picker__dropdown" boxel-card-picker__dropdown--selected=this.isSelected}}
+      <BoxelSelect
+        class={{cn "boxel-card-picker__select" boxel-card-picker__select--selected=this.isSelected}}
         @options={{@items}}
         @selected={{this.selectedOption}}
         @selectedItemComponent={{component SelectedItemComponent}}
         @placeholder="Select Card"
         @onChange={{@chooseItem}}
+        @dropdownClass="boxel-card-picker__dropdown"
         @renderInPlace={{true}}
-        @eventType="click"
         @verticalPosition="below"
         data-test-boxel-card-picker-dropdown
       as |item|>
         {{yield item}}
-      </PowerSelect>
+      </BoxelSelect>
     </div>
   </template>
 }
