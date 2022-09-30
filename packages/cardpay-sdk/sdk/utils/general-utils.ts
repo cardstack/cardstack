@@ -9,6 +9,8 @@ import { query as gqlQuery } from './graphql';
 import { AbiItem } from 'web3-utils';
 import { Operation } from './safe-utils';
 import { v4 } from 'uuid';
+import { Interface } from 'ethers/lib/utils';
+import { Revert } from '../../providers/http-provider';
 
 const POLL_INTERVAL = 500;
 
@@ -310,6 +312,18 @@ export async function sendTransaction(web3: Web3, transaction: Transaction): Pro
   });
 
   return txHash;
+}
+
+export function extractSendTransactionError(revert: Revert, abiInterface: Interface) {
+  let error;
+  try {
+    let funcError = abiInterface.parseError(revert.data);
+    error = `${funcError.name} ${funcError.args.join(',')}`;
+  } catch (e) {
+    error = revert.reason ? revert.reason : revert.message;
+  }
+
+  return error;
 }
 
 export function generateSaltNonce(prefix: string) {

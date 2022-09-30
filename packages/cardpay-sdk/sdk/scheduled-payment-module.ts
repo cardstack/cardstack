@@ -11,6 +11,7 @@ import {
   getModuleProxyCreationEvent,
 } from './utils/module-utils';
 import {
+  extractSendTransactionError,
   generateSaltNonce,
   hubRequest,
   isTransactionHash,
@@ -39,6 +40,7 @@ import { SuccessfulTransactionReceipt } from './utils/successful-transaction-rec
 import { AddressZero } from '@ethersproject/constants';
 import { waitUntilSchedulePaymentTransactionMined } from './scheduled-payment/utils';
 import BN from 'bn.js';
+import { Interface } from 'ethers/lib/utils';
 
 export interface EnableModuleAndGuardResult {
   scheduledPaymentModuleAddress: string;
@@ -933,8 +935,8 @@ export default class ScheduledPaymentModule {
     salt: string,
     payAt: number,
     gasPrice: string,
-    recurringDayOfMonth?: number,
-    recurringUntil?: number,
+    recurringDayOfMonth?: number | null,
+    recurringUntil?: number | null,
     txnOptions?: TransactionOptions
   ): Promise<SuccessfulTransactionReceipt>;
   async executeScheduledPayment(
@@ -1032,10 +1034,15 @@ export default class ScheduledPaymentModule {
       data: executeScheduledPaymentData,
       operation: Operation.CALL,
     };
-    let txnHash = await sendTransaction(this.web3, executeScheduledPaymentTx);
-    if (typeof onTxnHash === 'function') {
-      await onTxnHash(txnHash);
+    let txnHash;
+    try {
+      txnHash = await sendTransaction(this.web3, executeScheduledPaymentTx);
+      if (typeof onTxnHash === 'function') {
+        await onTxnHash(txnHash);
+      }
+      return await waitUntilTransactionMined(this.web3, txnHash);
+    } catch (e: any) {
+      throw extractSendTransactionError(e, new Interface(ScheduledPaymentABI));
     }
-    return await waitUntilTransactionMined(this.web3, txnHash);
   }
 }

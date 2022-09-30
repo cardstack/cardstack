@@ -102,8 +102,8 @@ export default {
       salt: string;
       payAt: number;
       gasPrice: string;
-      recurringDayOfMonth?: number | undefined;
-      recurringUntil?: number | undefined;
+      recurringDayOfMonth?: number | null;
+      recurringUntil?: number | null;
     };
     let { web3, signer } = await getEthereumClients(network, getConnectionType(args));
     let scheduledPaymentModule = await getSDK('ScheduledPaymentModule', web3, signer);
