@@ -1,6 +1,5 @@
 .balance-chooser-dropdown {
   --field-height: 3.75rem;
-  --boxel-select-selected-color: transparent;
 
   position: relative;
   min-height: var(--field-height);
@@ -20,6 +19,9 @@
 }
 
 .balance-chooser-dropdown .ember-basic-dropdown-content {
+  --boxel-select-selected-color: transparent;
+  --boxel-select-current-color: var(--boxel-purple-100);
+
   position: absolute;
   z-index: 1;
   width: 100%;
@@ -44,12 +46,4 @@
 
 .ember-power-select-selected-item .balance-chooser-dropdown__option--selected {
   background-image: unset;
-}
-
-.balance-chooser-dropdown__option:hover {
-  cursor: pointer;
-}
-
-.ember-power-select-selected-item .balance-chooser-dropdown__option:hover {
-  background-color: initial;
 }

@@ -20,6 +20,7 @@
 
 .safe-chooser-dropdown .ember-basic-dropdown-content {
   --boxel-select-selected-color: transparent;
+  --boxel-select-current-color: var(--boxel-purple-100);
 
   max-height: calc(var(--field-height) * 4.5);
   overflow: auto;
@@ -45,16 +46,4 @@
 
 .ember-power-select-selected-item .safe-chooser-dropdown__option--selected {
   background-image: unset;
-}
-
-.safe-chooser-dropdown__option:hover {
-  cursor: pointer;
-}
-
-.safe-chooser-dropdown__option--selected:hover {
-  background-color: var(--boxel-select-current-color);
-}
-
-.ember-power-select-selected-item .safe-chooser-dropdown__option:hover {
-  background-color: initial;
 }

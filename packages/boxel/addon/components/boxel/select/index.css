@@ -17,12 +17,17 @@
   overflow: auto;
 }
 
+.boxel-select__dropdown .ember-power-select-option[aria-selected='true'] {
+  background-color: var(--boxel-select-selected-color);
+}
+
 .boxel-select__dropdown .ember-power-select-option[aria-current='true'] {
   background-color: var(--boxel-select-current-color);
 }
 
-.boxel-select__dropdown .ember-power-select-option[aria-selected='true'] {
-  background-color: var(--boxel-select-selected-color);
+.boxel-select__dropdown
+  .ember-power-select-option:hover:not([aria-disabled='true']):not(.ember-power-select-option--no-matches-message) {
+  cursor: pointer;
 }
 
 .boxel-select__item {
