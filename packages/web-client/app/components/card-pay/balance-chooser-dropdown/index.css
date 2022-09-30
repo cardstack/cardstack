@@ -29,16 +29,6 @@
   overflow: hidden;
 }
 
-.balance-chooser-dropdown
-  .ember-basic-dropdown-content.ember-basic-dropdown--transitioning-in {
-  animation: drop-fade-below var(--boxel-transition);
-}
-
-.balance-chooser-dropdown
-  .ember-basic-dropdown-content.ember-basic-dropdown--transitioning-out {
-  animation: drop-fade-below var(--boxel-transition) reverse;
-}
-
 .balance-chooser-dropdown__option {
   min-height: var(--field-height);
   padding-right: var(--boxel-sp-xxl);
