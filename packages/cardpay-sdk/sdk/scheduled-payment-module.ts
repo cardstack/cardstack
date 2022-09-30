@@ -11,6 +11,7 @@ import {
   getModuleProxyCreationEvent,
 } from './utils/module-utils';
 import {
+  extractSendTransactionError,
   generateSaltNonce,
   hubRequest,
   isTransactionHash,
@@ -39,6 +40,7 @@ import { SuccessfulTransactionReceipt } from './utils/successful-transaction-rec
 import { AddressZero } from '@ethersproject/constants';
 import { waitUntilSchedulePaymentTransactionMined } from './scheduled-payment/utils';
 import BN from 'bn.js';
+import { Interface } from 'ethers/lib/utils';
 
 export interface EnableModuleAndGuardResult {
   scheduledPaymentModuleAddress: string;
@@ -917,5 +919,138 @@ export default class ScheduledPaymentModule {
     }
 
     return await waitUntilTransactionMined(this.web3, txnHash);
+  }
+
+  async executeScheduledPayment(txnHash: string): Promise<SuccessfulTransactionReceipt>;
+  async executeScheduledPayment(
+    moduleAddressOrTxnHash: string,
+    tokenAddress: string,
+    amount: string,
+    payeeAddress: string,
+    feeFixedUSD: number,
+    feePercentage: number,
+    executionGas: number,
+    maxGasPrice: string,
+    gasTokenAddress: string,
+    salt: string,
+    payAt: number,
+    gasPrice: string,
+    recurringDayOfMonth?: number | null,
+    recurringUntil?: number | null,
+    txnOptions?: TransactionOptions
+  ): Promise<SuccessfulTransactionReceipt>;
+  async executeScheduledPayment(
+    moduleAddressOrTxnHash: string,
+    tokenAddress?: string,
+    amount?: string,
+    payeeAddress?: string,
+    feeFixedUSD?: number,
+    feePercentage?: number,
+    executionGas?: number,
+    maxGasPrice?: string,
+    gasTokenAddress?: string,
+    salt?: string,
+    payAt?: number | null,
+    gasPrice?: string,
+    recurringDayOfMonth?: number | null,
+    recurringUntil?: number | null,
+    txnOptions?: TransactionOptions
+  ): Promise<SuccessfulTransactionReceipt> {
+    if (!moduleAddressOrTxnHash) {
+      throw new Error('moduleAddressOrTxnHash must be specified');
+    }
+    if (isTransactionHash(moduleAddressOrTxnHash)) {
+      let txnHash = moduleAddressOrTxnHash;
+      return await waitUntilTransactionMined(this.web3, txnHash);
+    }
+
+    let moduleAddress = moduleAddressOrTxnHash;
+    if (!moduleAddress) throw new Error('moduleAddress must be provided');
+    if (!tokenAddress) throw new Error('tokenAddress must be provided ');
+    if (!amount) throw new Error('amount must be provided');
+    if (!payeeAddress) throw new Error('payeeAddress must be provided');
+    if (feeFixedUSD == undefined) throw new Error('feeFixedUSD must be provided');
+    if (feePercentage == undefined) throw new Error('feePercentage must be provided');
+    if (!executionGas) throw new Error('executionGas must be provided');
+    if (!maxGasPrice) throw new Error('maxGasPrice must be provided');
+    if (!gasTokenAddress) throw new Error('gasTokenAddress must be provided ');
+    if (!salt) throw new Error('salt must be provided');
+    if (payAt == null && recurringDayOfMonth == null && recurringUntil == null)
+      throw new Error('When payAt is null, recurringDayOfMonth and recurringUntil must have a value');
+
+    let { onTxnHash } = txnOptions ?? {};
+    let module = new this.web3.eth.Contract(ScheduledPaymentABI as AbiItem[], moduleAddress);
+    let executeScheduledPaymentData;
+    if (recurringUntil) {
+      executeScheduledPaymentData = module.methods[
+        'executeScheduledPayment(address,uint256,address,((uint256),(uint256)),uint256,uint256,address,string,uint256,uint256,uint256)'
+      ](
+        tokenAddress,
+        amount,
+        payeeAddress,
+        {
+          fixedUSD: {
+            value: FEE_BASE.mul(new BN(feeFixedUSD)).toString(),
+          },
+          percentage: {
+            value: FEE_BASE.mul(new BN(feePercentage)).toString(),
+          },
+        },
+        executionGas,
+        maxGasPrice,
+        gasTokenAddress,
+        salt,
+        recurringDayOfMonth,
+        recurringUntil,
+        gasPrice
+      ).encodeABI();
+    } else {
+      executeScheduledPaymentData = module.methods[
+        'executeScheduledPayment(address,uint256,address,((uint256),(uint256)),uint256,uint256,address,string,uint256,uint256)'
+      ](
+        tokenAddress,
+        amount,
+        payeeAddress,
+        {
+          fixedUSD: {
+            value: FEE_BASE.mul(new BN(feeFixedUSD)).toString(),
+          },
+          percentage: {
+            value: FEE_BASE.mul(new BN(feePercentage)).toString(),
+          },
+        },
+        executionGas,
+        maxGasPrice,
+        gasTokenAddress,
+        salt,
+        payAt,
+        gasPrice
+      ).encodeABI();
+    }
+
+    let executeScheduledPaymentTx = {
+      to: moduleAddress,
+      value: '0',
+      data: executeScheduledPaymentData,
+      operation: Operation.CALL,
+    };
+    let txnHash;
+    try {
+      txnHash = await sendTransaction(this.web3, executeScheduledPaymentTx);
+      if (typeof onTxnHash === 'function') {
+        await onTxnHash(txnHash);
+      }
+      return await waitUntilTransactionMined(this.web3, txnHash);
+    } catch (e: any) {
+      // UnknownHash: payment details generate unregistered spHash
+      // InvalidPeriod: one-time payment executed before payAt
+      // or recurring payment executed on the day before the recurringDayOfMonth
+      // or recurring payments executed before the next 28 days or more than the last recurring payment
+      // or ecurring payment executed after the recurringUntil
+      // ExceedMaxGasPrice: gasPrice must be lower than or equal maxGasPrice
+      // PaymentExecutionFailed: safe balance is not enough to make payments and pay fees
+      // OutOfGas: executionGas to low to execute scheduled payment
+      throw extractSendTransactionError(e, new Interface(ScheduledPaymentABI));
+    }
   }
 }
