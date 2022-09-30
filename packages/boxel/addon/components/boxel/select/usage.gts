@@ -124,6 +124,14 @@ export default class BoxelSelectUsage extends Component {
           @name="selectedItemComponent"
           @description="The component to render to customize just the selected item of the trigger"
         />
+        <Args.String
+          @name="--boxel-select-below-transitioning-in-animation"
+          @description='Animation for dropdown appearing below. On close animation is reversed'
+        />
+        <Args.String
+          @name="--boxel-select-above-transitioning-in-animation"
+          @description='Animation for dropdown appearing above. On close animation is reversed'
+        /> 
       </:api>
     </FreestyleUsage>
   </template>

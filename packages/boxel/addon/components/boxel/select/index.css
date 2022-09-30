@@ -1,8 +1,14 @@
 .boxel-select__dropdown {
-  box-shadow: var(--boxel-box-shadow);
-  border-radius: var(--boxel-border-radius);
   --boxel-select-current-color: var(--boxel-light-100);
   --boxel-select-selected-color: var(--boxel-highlight);
+
+  --boxel-select-below-transitioning-in-animation: drop-fade-below
+    var(--boxel-transition);
+  --boxel-select-above-transitioning-in-animation: drop-fade-above
+    var(--boxel-transition);
+
+  box-shadow: var(--boxel-box-shadow);
+  border-radius: var(--boxel-border-radius);
 }
 
 .boxel-select__dropdown ul {
@@ -29,4 +35,44 @@
 .boxel-select--selected .boxel-select__item {
   font-weight: bold;
   font-size: var(--boxel-font-size);
+}
+
+.boxel-select__dropdown.ember-basic-dropdown-content--below.ember-basic-dropdown--transitioning-in {
+  animation: var(--boxel-select-below-transitioning-in-animation);
+}
+
+.boxel-select__dropdown.ember-basic-dropdown-content--below.ember-basic-dropdown--transitioning-out {
+  animation: var(--boxel-select-below-transitioning-in-animation) reverse;
+}
+
+.boxel-select__dropdown.ember-basic-dropdown-content--above.ember-basic-dropdown--transitioning-in {
+  animation: var(--boxel-select-above-transitioning-in-animation);
+}
+
+.boxel-select__dropdown.ember-basic-dropdown-content--above.ember-basic-dropdown--transitioning-out {
+  animation: var(--boxel-select-above-transitioning-in-animation) reverse;
+}
+
+@keyframes drop-fade-below {
+  0% {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes drop-fade-above {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
