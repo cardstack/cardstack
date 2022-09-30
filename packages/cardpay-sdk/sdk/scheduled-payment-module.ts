@@ -1042,6 +1042,14 @@ export default class ScheduledPaymentModule {
       }
       return await waitUntilTransactionMined(this.web3, txnHash);
     } catch (e: any) {
+      // UnknownHash: payment details generate unregistered spHash
+      // InvalidPeriod: one-time payment executed before payAt
+      // or recurring payment executed on the day before the recurringDayOfMonth
+      // or recurring payments executed before the next 28 days or more than the last recurring payment
+      // or ecurring payment executed after the recurringUntil
+      // ExceedMaxGasPrice: gasPrice must be lower than or equal maxGasPrice
+      // PaymentExecutionFailed: safe balance is not enough to make payments and pay fees
+      // OutOfGas: executionGas to low to execute scheduled payment
       throw extractSendTransactionError(e, new Interface(ScheduledPaymentABI));
     }
   }
