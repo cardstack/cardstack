@@ -18,12 +18,13 @@
     "inlineSourceMap": true,
     "inlineSources": true,
     "skipLibCheck": true,
+    "traceResolution": false,
     "baseUrl": ".",
     "module": "es2020",
     "experimentalDecorators": true,
     "paths": {
-      "scheduled-payments-client/tests/*": ["tests/*"],
-      "scheduled-payments-client/*": ["app/*"],
+      "@cardstack/scheduled-payments-client/tests/*": ["tests/*"],
+      "@cardstack/scheduled-payments-client/*": ["app/*"],
       "*": ["types/*"]
     }
   },

@@ -2,7 +2,7 @@
 
 module.exports = function (environment) {
   let ENV = {
-    modulePrefix: 'scheduled-payments-client',
+    modulePrefix: '@cardstack/scheduled-payments-client',
     environment,
     rootURL: '/',
     locationType: 'history',
