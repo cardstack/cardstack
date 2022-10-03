@@ -136,7 +136,6 @@
   grid-template-columns: auto auto;
   gap: var(--spacing) 0;
   padding: var(--spacing);
-  border-top: 1.25rem solid var(--boxel-green);
 }
 
 .boxel-dashboard-panel--no-bottom-padding .boxel-dashboard-panel__main {
