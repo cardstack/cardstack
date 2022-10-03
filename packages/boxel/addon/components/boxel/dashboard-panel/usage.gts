@@ -14,6 +14,8 @@ export default class BoxelDashboardPanelUsage extends Component {
   @tracked noCollapse = false;
 
   @tracked summaryPadding = 'var(--boxel-sp-sm) var(--boxel-sp-xl)';
+  @tracked collapseText = "'Hide\ details'";
+  @tracked expandText = "'Show details'";
 
   <template>
     <FreestyleUsage @name="DashboardPanel">
@@ -24,6 +26,8 @@ export default class BoxelDashboardPanelUsage extends Component {
           @noCollapse={{this.noCollapse}}
           style={{cssVar
             boxel-dashboard-panel-summary-padding=this.summaryPadding
+            boxel-dashboard-panel-collapse-text=this.collapseText
+            boxel-dashboard-panel-expand-text=this.expandText
           }}
         >
           <:detail>
@@ -56,6 +60,18 @@ export default class BoxelDashboardPanelUsage extends Component {
           @defaultValue={{unbound this.summaryPadding}}
           @value={{this.summaryPadding}}
           @onInput={{fn (mut this.summaryPadding)}}
+        />
+        <Args.String
+          @name="--boxel-dashboard-panel-collapse-text"
+          @defaultValue={{unbound this.collapseText}}
+          @value={{this.collapseText}}
+          @onInput={{fn (mut this.collapseText)}}
+        />
+        <Args.String
+          @name="--boxel-dashboard-panel-expand-text"
+          @defaultValue={{unbound this.expandText}}
+          @value={{this.expandText}}
+          @onInput={{fn (mut this.expandText)}}
         />
       </:api>
     </FreestyleUsage>

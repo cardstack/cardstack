@@ -3,6 +3,8 @@
   --spacing: calc(var(--boxel-sp-xxxl) * var(--boxel-ratio));
   --border-color: #d3d3d3;
   --boxel-dashboard-panel-summary-padding: var(--boxel-sp-sm) var(--boxel-sp-xl);
+  --boxel-dashboard-panel-collapse-text: 'Hide details';
+  --boxel-dashboard-panel-expand-text: 'Show details';
 
   position: relative;
   max-width: 100%;
@@ -31,11 +33,11 @@
 
 .boxel-dashboard-panel__marker::before {
   display: block;
-  content: "Show details";
+  content: var(--boxel-dashboard-panel-expand-text);
 }
 
 .boxel-dashboard-panel[open] .boxel-dashboard-panel__marker::before {
-  content: "Hide details";
+  content: var(--boxel-dashboard-panel-collapse-text);
 }
 
 .boxel-dashboard-panel[open] .boxel-dashboard-panel__summary {
