@@ -12,6 +12,7 @@ export default class BoxelDashboardPanelUsage extends Component {
   @tracked title = 'A Dashboard Panel';
   @tracked description = 'It looks like this.'
   @tracked noCollapse = false;
+  @tracked hideCaret = false;
 
   @tracked summaryPadding = 'var(--boxel-sp-sm) var(--boxel-sp-xl)';
   @tracked collapseText = "'Hide\ details'";
@@ -24,6 +25,7 @@ export default class BoxelDashboardPanelUsage extends Component {
           @title={{this.title}}
           @description={{this.description}}
           @noCollapse={{this.noCollapse}}
+          @hideCaret={{this.hideCaret}}
           style={{cssVar
             boxel-dashboard-panel-summary-padding=this.summaryPadding
             boxel-dashboard-panel-collapse-text=this.collapseText
@@ -53,6 +55,12 @@ export default class BoxelDashboardPanelUsage extends Component {
           @description="xyz"
           @value={{this.noCollapse}}
           @onInput={{fn (mut this.noCollapse)}}
+        />
+        <Args.Bool
+          @name="hideCaret"
+          @description="Hide the caret in the expand/collapse buttons"
+          @value={{this.hideCaret}}
+          @onInput={{fn (mut this.hideCaret)}}
         />
         {{!-- template-lint-disable no-unbound --}}
         <Args.String

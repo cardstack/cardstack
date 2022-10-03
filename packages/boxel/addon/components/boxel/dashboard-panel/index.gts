@@ -10,6 +10,7 @@ interface Signature {
   Args: {
     noCollapse?: boolean;
     noBottomPadding?: boolean;
+    hideCaret?: boolean;
     title: string;
     description: string;
     heroImageUrl: string;
@@ -40,7 +41,9 @@ export default class CardPayDashboardPanel extends Component<Signature> {
           <p class="boxel-dashboard-panel__summary-desc">{{@description}}</p>
         </div>
         <div class="boxel-dashboard-panel__marker">
-          {{svgJar "caret" class="boxel-dashboard-panel__marker-icon" role="presentation"}}
+          {{#unless @hideCaret}}
+            {{svgJar "caret" class="boxel-dashboard-panel__marker-icon" role="presentation"}}
+          {{/unless}}
         </div>
         {{#if (has-block 'footer')}}
           <footer class="boxel-dashboard-panel__footer boxel-dashboard-panel__summary-footer" aria-label="closed-footer">
