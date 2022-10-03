@@ -40,7 +40,7 @@ export default class CardPayDashboardPanel extends Component<Signature> {
           <p class="boxel-dashboard-panel__summary-desc">{{@description}}</p>
         </div>
         <div class="boxel-dashboard-panel__marker">
-          {{svgJar "caret-right" class="boxel-dashboard-panel__marker-icon" role="presentation"}}
+          {{svgJar "caret" class="boxel-dashboard-panel__marker-icon" role="presentation"}}
         </div>
         {{#if (has-block 'footer')}}
           <footer class="boxel-dashboard-panel__footer boxel-dashboard-panel__summary-footer" aria-label="closed-footer">

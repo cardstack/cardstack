@@ -75,11 +75,11 @@
 
 .boxel-dashboard-panel__marker-icon {
   margin-left: var(--boxel-sp-xs);
-  transform: rotate(90deg);
+  transform: rotate(-90deg);
 }
 
 .boxel-dashboard-panel[open] .boxel-dashboard-panel__marker-icon {
-  transform: rotate(-90deg);
+  transform: rotate(90deg);
 }
 
 /* Summary content */
