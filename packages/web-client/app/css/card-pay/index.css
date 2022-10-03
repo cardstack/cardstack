@@ -8,3 +8,7 @@
 .card-pay__footer {
   margin-top: var(--boxel-sp-xxl);
 }
+
+.card-pay__dashboard-panel.boxel-dashboard-panel {
+  --boxel-dashboard-panel-summary-padding: var(--boxel-sp-sm) var(--boxel-sp-xl) var(--boxel-sp-sm) 11rem;
+}

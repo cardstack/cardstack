@@ -2,6 +2,7 @@
 .boxel-dashboard-panel {
   --spacing: calc(var(--boxel-sp-xxxl) * var(--boxel-ratio));
   --border-color: #d3d3d3;
+  --boxel-dashboard-panel-summary-padding: var(--boxel-sp-sm) var(--boxel-sp-xl);
 
   position: relative;
   max-width: 100%;
@@ -82,7 +83,7 @@
 /* Summary content */
 .boxel-dashboard-panel__summary-content {
   height: 100%;
-  padding: var(--boxel-sp-sm) var(--boxel-sp-xl) var(--boxel-sp-sm) 11rem;
+  padding: var(--boxel-dashboard-panel-summary-padding);
   position: relative;
 }
 
