@@ -18,7 +18,6 @@
     "inlineSourceMap": true,
     "inlineSources": true,
     "skipLibCheck": true,
-    "traceResolution": false,
     "baseUrl": ".",
     "module": "es2020",
     "experimentalDecorators": true,
