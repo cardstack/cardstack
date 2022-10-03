@@ -83,5 +83,23 @@ export default class BoxelDashboardPanelUsage extends Component {
         />
       </:api>
     </FreestyleUsage>
+
+    <FreestyleUsage @name="DashboardPanel with aside and footer">
+      <:example>
+        <BoxelDashboardPanel
+          @title={{this.title}}
+          @description={{this.description}}
+          @noCollapse={{this.noCollapse}}
+          @hideCaret={{this.hideCaret}}
+        >
+          <:detail>
+            detail!
+          </:detail>
+          <:footer>
+            footerfixme
+          </:footer>
+        </BoxelDashboardPanel>
+      </:example>
+    </FreestyleUsage>
   </template>
 }

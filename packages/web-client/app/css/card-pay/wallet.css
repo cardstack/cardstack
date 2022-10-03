@@ -5,7 +5,6 @@
 .card-pay-dashboard__wallet-panel-footer-content {
   font: var(--boxel-font-sm);
   line-height: var(--boxel-sp-lg);
-  padding-left: var(--boxel-sp);
 }
 
 .card-pay-dashboard__wallet-panel-footer-content svg {
