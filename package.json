@@ -51,6 +51,7 @@
     "lint:cardhost": "yarn --cwd packages/cardhost lint",
     "lint:ssr-web": "yarn --cwd packages/ssr-web lint",
     "lint:web-client": "yarn --cwd packages/web-client lint",
+    "lint:scheduled-payments-client": "yarn --cwd packages/scheduled-payments-client lint",
     "lint:deps": "node scripts/find-bad-deps.js",
     "lint:js": "eslint . --cache --ignore-path .gitignore --ext=js,ts",
     "lint:js:pkg": "sh -c 'eslint packages/${0} --cache --ignore-path .gitignore --ext=js,ts'",
