@@ -14692,13 +14692,6 @@ ember-try@^2.0.0:
     rimraf "^3.0.2"
     walk-sync "^2.2.0"
 
-ember-welcome-page@^6.2.0:
-  version "6.2.0"
-  resolved "https://registry.yarnpkg.com/ember-welcome-page/-/ember-welcome-page-6.2.0.tgz#8aac8d39a5097638572a62fc322d2ea74df16280"
-  integrity sha512-bDPgNgW0eRhLCHLaFK87p1mcP8hGwr0pXvPoskDeUGQzsOI3Pc3U/8WLpUSi2mNrmv0eNtfWqE+A1Wbx6F2l0Q==
-  dependencies:
-    "@embroider/addon-shim" "^1.5.0"
-
 ember-window-mock@^0.8.1:
   version "0.8.1"
   resolved "https://registry.yarnpkg.com/ember-window-mock/-/ember-window-mock-0.8.1.tgz#1fc5db20b3d9fc3592d4ef6f83d6b5a629c79174"

@@ -31,11 +31,13 @@
     "@glimmer/component": "^1.1.2",
     "@glimmer/tracking": "^1.1.2",
     "@glint/core": "^0.9.4",
+    "@glint/environment-ember-loose": "^0.9.4",
+    "@glint/environment-ember-template-imports": "^0.9.4",
     "@types/ember-qunit": "^5.0.0",
     "@types/ember-resolver": "^5.0.11",
     "@types/ember__application": "^4.0.2",
     "@types/ember__array": "^4.0.2",
-    "@types/ember__component": "^4.0.10",
+    "@types/ember__component": "^4.0.8",
     "@types/ember__controller": "^4.0.1",
     "@types/ember__debug": "^4.0.1",
     "@types/ember__engine": "^4.0.2",
@@ -73,7 +75,7 @@
     "ember-resolver": "^8.0.3",
     "ember-source": "~4.6.0",
     "ember-template-lint": "^4.10.1",
-    "ember-welcome-page": "^6.2.0",
+    "ember-template-imports": "^3.1.1",
     "eslint": "^7.32.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-ember": "^11.0.2",
@@ -98,10 +100,6 @@
   },
   "dependencies": {
     "@babel/core": "^7.17.8",
-    "@glint/config": "^0.9.4",
-    "@glint/core": "^0.9.4",
-    "@glint/environment-ember-loose": "^0.9.4",
-    "@glint/environment-ember-template-imports": "^0.9.4",
     "typescript": "^4.7.4"
   }
 }
