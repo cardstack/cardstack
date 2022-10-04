@@ -1,0 +1,41 @@
+name: CI [scheduled-payments-web]
+
+on:
+  pull_request:
+    paths:
+      - 'packages/scheduled-payments-client/**'
+      - 'packages/boxel/**'
+      - 'packages/eslint-config/**'
+      - '.github/workflows/scheduled-payments-web.yml'
+      - 'package.json'
+      - 'yarn.lock'
+
+permissions:
+  contents: read
+  issues: read
+  checks: write
+  pull-requests: write
+  id-token: write
+  statuses: write
+
+jobs:
+  test:
+    name: Build & Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: volta-cli/action@v1
+      - name: Set up node_modules cache
+        uses: actions/cache@v3
+        with:
+          path: |
+            node_modules
+            packages/*/node_modules
+            packages/firebase-functions/*/functions/node_modules
+          key: ${{ runner.os }}-node-modules-${{ hashFiles('yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-node-modules-
+      - name: Install dependencies
+        run: yarn --prefer-offline --frozen-lockfile
+      - name: Run tests
+        run: yarn test:scheduled-payments-client
