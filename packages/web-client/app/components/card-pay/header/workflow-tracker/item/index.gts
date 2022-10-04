@@ -33,8 +33,6 @@ const WORKFLOW_TITLE_TO_MILESTONES: Record<CardPayWorkflowName, string[]> = {
   WITHDRAWAL: WITHDRAWAL_MILESTONES,
 };
 
-debugger;
-
 interface Signature {
   Element: HTMLDivElement;
   Args: {
