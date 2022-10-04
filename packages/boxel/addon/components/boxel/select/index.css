@@ -2,10 +2,11 @@
   --boxel-select-current-color: var(--boxel-light-100);
   --boxel-select-selected-color: var(--boxel-highlight);
 
-  --boxel-select-below-transitioning-in-animation: drop-fade-below
-    var(--boxel-transition);
-  --boxel-select-above-transitioning-in-animation: drop-fade-above
-    var(--boxel-transition);
+  --boxel-select-below-transitioning-in-animation: drop-fade-below var(--boxel-transition);
+  --boxel-select-below-transitioning-out-animation: var(--boxel-select-below-transitioning-in-animation) reverse;
+
+  --boxel-select-above-transitioning-in-animation: drop-fade-above var(--boxel-transition);
+  --boxel-select-above-transitioning-out-animation: var(--boxel-select-above-transitioning-in-animation) reverse;
 
   box-shadow: var(--boxel-box-shadow);
   border-radius: var(--boxel-border-radius);
@@ -47,7 +48,7 @@
 }
 
 .boxel-select__dropdown.ember-basic-dropdown-content--below.ember-basic-dropdown--transitioning-out {
-  animation: var(--boxel-select-below-transitioning-in-animation) reverse;
+  animation: var(--boxel-select-below-transitioning-out-animation);
 }
 
 .boxel-select__dropdown.ember-basic-dropdown-content--above.ember-basic-dropdown--transitioning-in {
@@ -55,7 +56,7 @@
 }
 
 .boxel-select__dropdown.ember-basic-dropdown-content--above.ember-basic-dropdown--transitioning-out {
-  animation: var(--boxel-select-above-transitioning-in-animation) reverse;
+  animation: var(--boxel-select-above-transitioning-out-animation);
 }
 
 @keyframes drop-fade-below {
