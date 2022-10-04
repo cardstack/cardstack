@@ -65,9 +65,9 @@ export default class CardPayDashboardPanel extends Component<Signature> {
           {{yield to="detail"}}
         </div>
         {{#if (has-block 'aside')}}
-          <aside class="boxel-dashboard-panel__aside">
+          <section class="boxel-dashboard-panel__aside">
             {{yield to="aside"}}
-          </aside>
+          </section>
         {{/if}}
       </section>
       {{#if (has-block 'footer')}}
