@@ -54,10 +54,8 @@ def run_reward_program(
     for subclass in Rule.__subclasses__():
         if subclass.__name__ == rule_name:
             rule = subclass(parameters["core"], parameters["user_defined"])
-    payment_list = rule.run(
-        parameters["run"]["payment_cycle"], parameters["run"]["reward_program_id"]
-    )
-    tree = PaymentTree(payment_list.to_dict("records"))
+    payment_list = rule.get_payments(**parameters["run"]).to_dict("records")
+    tree = PaymentTree(payment_list)
     table = tree.as_arrow()
     write_parquet_file(AnyPath(output_location), table)
 
