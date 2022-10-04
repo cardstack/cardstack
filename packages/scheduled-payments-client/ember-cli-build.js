@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
 'use strict';
 
 process.env.EMBROIDER_REBUILD_ADDONS = '@cardstack/boxel';
