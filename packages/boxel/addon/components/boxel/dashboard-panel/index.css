@@ -139,6 +139,7 @@
     "detail";
   gap: var(--spacing) 0;
   padding: var(--spacing);
+  position: relative;
 }
 
 .boxel-dashboard-panel__main--has-aside {
@@ -187,10 +188,10 @@
   top: 0;
   right: 0;
   width: 100%;
-  height: 50rem;
+  height: 100%;
   background-position: top right;
   background-repeat: no-repeat;
-  background-size: contain;
+  background-size: cover;
   pointer-events: none;
   z-index: 0;
 }

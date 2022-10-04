@@ -16,3 +16,13 @@
 .card-pay__dashboard-panel .boxel-dashboard-panel__main {
   border-top: 1.25rem solid var(--boxel-green);
 }
+
+.card-pay__dashboard-panel .boxel-dashboard-panel__detail {
+  display: grid;
+  grid-template-columns: auto auto;
+}
+
+.card-pay__dashboard-panel .boxel-dashboard-panel__hero {
+  top: -1.25rem;
+  background-size: contain;
+}
