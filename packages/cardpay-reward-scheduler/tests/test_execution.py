@@ -58,18 +58,20 @@ def create_submission_dataset(payment_cycles=[]):
     )
 
 
-def create_rewards_latest(directory):
+def create_rewards_latest(directory, latest_block=5000):
     path = AnyPath(directory) / "rewards"
     path.mkdir(exist_ok=True)
     latest_location = path / "latest.yaml"
     with latest_location.open("w") as f:
-        f.write("""
+        f.write(
+            f"""
 subgraph: habdelra/cardpay-sokol
 subgraph_deployment: QmR4zkVGxHYVKi2TJoN8Xxni3RNgQ2Vs2Tw4booFgLUWdt
 updated: 2022-01-31 22:43:31.534100
 earliest_block: 0
-latest_block: 5000
-        """)
+latest_block: {latest_block}
+        """
+        )
     return path
 
 
@@ -138,3 +140,19 @@ def test_rollover_only_cycles_with_fulfilled_dependencies(
                 written_parameters["run"]["previous_output"]
                 == previous_output_location.as_uri()
             )
+
+
+@patch("reward_scheduler.reward_program.run_job")
+@patch(
+    "reward_scheduler.reward_program.get_table_dataset",
+    return_value=create_submission_dataset([1000, 1100]),
+)
+def test_rollover_cant_run_if_rewards_extracts_too_old(
+    dataset, mock_run_job, rollover_rule
+):
+    with TemporaryDirectory() as temp_dir:
+        rewards_root = create_rewards_latest(temp_dir, latest_block=900)
+        reward_program = RewardProgram("0x0", "0x0", "http://", temp_dir, rewards_root)
+        reward_program.run_rule(rollover_rule)
+
+        assert mock_run_job.call_count == 0
