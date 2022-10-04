@@ -12,7 +12,7 @@ interface Signature {
   Element: HTMLDivElement;
   Args: {
     percentComplete: number;
-    size: number;
+    size?: number;
   },
   Blocks: EmptyObject;
 }

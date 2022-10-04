@@ -23,6 +23,8 @@ class Config(BaseSettings):
     reward_root_submitter_address: str
     reward_root_submitter_private_key: str
     reward_root_submitter_sentry_dsn: str
+    reward_program_output: str
+    subgraph_url: str
     log_level: str = Field("INFO")
 
     @root_validator(pre=True)

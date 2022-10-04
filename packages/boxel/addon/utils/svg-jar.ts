@@ -29,8 +29,8 @@ function getInlineAsset(assetId: string) {
 export function svgJar(
   assetId: string,
   svgAttrs: {
-    width?: string;
-    height?: string;
+    width?: string | number;
+    height?: string | number;
     class?: string;
     role?: string;
     title?: string;
@@ -38,11 +38,18 @@ export function svgJar(
     style?: string | SafeString;
     'aria-label'?: string;
     'aria-hidden'?: boolean;
+    'data-test-boxel-menu-item-icon'?: boolean;
   }
 ): ContentValue {
   let svgArgs = Object.assign({}, svgAttrs);
   if (svgAttrs?.style?.toString) {
     svgArgs.style = svgAttrs.style?.toString();
+  }
+  if (svgAttrs?.height?.toString) {
+    svgArgs.height = svgAttrs.height?.toString();
+  }
+  if (svgAttrs?.width?.toString) {
+    svgArgs.width = svgAttrs.width?.toString();
   }
   return makeSVG(assetId, svgArgs, getInlineAsset);
 }

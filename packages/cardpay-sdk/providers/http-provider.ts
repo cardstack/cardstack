@@ -5,10 +5,12 @@ import Web3 from 'web3';
 
 export class Revert extends Error {
   data: string;
+  reason: string;
 
-  constructor(message: string, data: string) {
+  constructor(message: string, data: string, reason: string) {
     super(message);
     this.data = data;
+    this.reason = reason;
   }
 }
 
@@ -42,7 +44,8 @@ export default class HttpProvider {
           return end(
             new Revert(
               `error: ${response.error.message}, received from payload ${JSON.stringify(payload)}`,
-              response.error.data
+              response.error.data,
+              response.error.message
             )
           );
         }

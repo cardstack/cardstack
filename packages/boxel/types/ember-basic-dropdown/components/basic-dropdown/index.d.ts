@@ -11,15 +11,19 @@ import BasicDropdownContent from 'ember-basic-dropdown/addon/components/basic-dr
 
 import { ArgsFromComponent } from 'global';
 
+export type BasicDropdownArgs = ArgsFromComponent<EmberBasicDropdown>;
+
+export type BasicDropdownTriggerArgs = ArgsFromComponent<BasicDropdownTrigger>;
+
 export default class BasicDropdown extends Component<{
   Element: HTMLDivElement;
-  Args: ArgsFromComponent<EmberBasicDropdown>;
+  Args: BasicDropdownArgs;
   Blocks: {
     default: [
       {
         Trigger: ComponentLike<{
           Element: HTMLDivElement;
-          Args: Partial<ArgsFromComponent<BasicDropdownTrigger>>;
+          Args: Partial<BasicDropdownTriggerArgs>;
           Blocks: { default: [] };
         }>;
         Content: ComponentLike<{

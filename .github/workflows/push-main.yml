@@ -28,7 +28,7 @@ jobs:
           key: ${{ runner.os }}-node-modules-${{ hashFiles('yarn.lock') }}
           restore-keys: |
             ${{ runner.os }}-node-modules-
-      - run: yarn --prefer-offline
+      - run: yarn --prefer-offline --frozen-lockfile
 
   lint:
     name: Lint All
@@ -51,7 +51,7 @@ jobs:
           key: ${{ runner.os }}-node-modules-${{ hashFiles('yarn.lock') }}
           restore-keys: |
             ${{ runner.os }}-node-modules-
-      - run: yarn --prefer-offline
+      - run: yarn --prefer-offline --frozen-lockfile
       - run: yarn lint
 
   check_secrets:
@@ -71,7 +71,7 @@ jobs:
           key: ${{ runner.os }}-node-modules-${{ hashFiles('yarn.lock') }}
           restore-keys: |
             ${{ runner.os }}-node-modules-
-      - run: yarn --prefer-offline
+      - run: yarn --prefer-offline --frozen-lockfile
       - name: Configure staging AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
@@ -129,7 +129,7 @@ jobs:
           key: ${{ runner.os }}-node-modules-${{ hashFiles('yarn.lock') }}
           restore-keys: |
             ${{ runner.os }}-node-modules-
-      - run: yarn --prefer-offline
+      - run: yarn --prefer-offline --frozen-lockfile
       - run: yarn db:test-init
         working-directory: packages/hub
       - run: yarn run npm-run-all --aggregate-output --continue-on-error --parallel test:did-resolver test:hub
@@ -151,7 +151,7 @@ jobs:
           key: ${{ runner.os }}-node-modules-${{ hashFiles('yarn.lock') }}
           restore-keys: |
             ${{ runner.os }}-node-modules-
-      - run: yarn --prefer-offline
+      - run: yarn --prefer-offline --frozen-lockfile
       - name: Run boxel tests
         env:
           PERCY_TOKEN: ${{ secrets.PERCY_TOKEN_BOXEL }}
@@ -255,7 +255,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-node-modules-
       - name: Install dependencies
-        run: yarn --prefer-offline
+        run: yarn --prefer-offline --frozen-lockfile
       - name: Build
         run: yarn build
         working-directory: packages/hub
@@ -395,7 +395,7 @@ jobs:
           key: ${{ runner.os }}-node-modules-${{ hashFiles('yarn.lock') }}
           restore-keys: |
             ${{ runner.os }}-node-modules-
-      - run: yarn --prefer-offline
+      - run: yarn --prefer-offline --frozen-lockfile
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:

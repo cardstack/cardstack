@@ -1,5 +1,13 @@
-import Helper from '@ember/component/helper';
+import { helper } from '@ember/component/helper';
+import { type EmptyObject } from '@ember/component/helper';
 
+interface Signature {
+  Args: {
+    Positional: [];
+    Named: EmptyObject;
+  };
+  Return: MenuDivider;
+}
 export class MenuDivider {
   type: string;
   constructor() {
@@ -7,6 +15,6 @@ export class MenuDivider {
   }
 }
 
-export default Helper.helper(function (): MenuDivider {
+export default helper<Signature>(function (): MenuDivider {
   return new MenuDivider();
 });

@@ -3,7 +3,7 @@
 <button {{on 'click' (perform this.queryUsersTask)}}>Query Users</button>
 
 {{#if this.queryUsersTask.isRunning}}
-  {{!-- template-lint-disable no-obsolete-elements --}}
+  {{! template-lint-disable no-obsolete-elements }}
   <blink>Loading...</blink>
 {{/if}}
 
@@ -12,19 +12,3 @@
 {{else}}
   No Users....yet
 {{/each}}
-
-{{!--
-# NEEDS:
-- List to iterator over
-- If one is currently selected
-- onChange
-- Embeded card view
-
- --}}
-{{!-- <PowerSelect
-  @options={{this.countries}}
-  @selected={{this.destination}}
-  @onChange={{this.foo}} as |country|>
-  <img src={{country.flagUrl}} class="icon-flag" alt="Flag of {{country.name}}">
-  <strong>{{country.name}}</strong>
-</PowerSelect> --}}

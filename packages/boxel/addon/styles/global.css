@@ -55,7 +55,7 @@ a:focus:not(:focus-visible) {
 }
 
 button:hover:not(:disabled),
-[role="button"]:hover:not(:disabled) {
+[role="button"]:hover:not(:disabled, [aria-disabled="true"]) {
   cursor: pointer;
 }
 

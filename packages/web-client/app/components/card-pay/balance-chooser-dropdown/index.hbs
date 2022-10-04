@@ -1,5 +1,5 @@
 <div class="balance-chooser-dropdown">
-  <PowerSelect
+  <Boxel::Select
     @options={{@tokens}}
     @selected={{@selectedToken}}
     @onChange={{@chooseToken}}
@@ -18,5 +18,5 @@
       @balance={{format-wei-amount token.balance}}
       @symbol={{token.symbol}}
     />
-  </PowerSelect>
+  </Boxel::Select>
 </div>

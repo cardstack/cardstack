@@ -14,7 +14,7 @@ runs:
   steps:
     - uses: volta-cli/action@v1
 
-    - run: yarn --prefer-offline
+    - run: yarn --prefer-offline --frozen-lockfile
       shell: bash
 
     - name: Deploy
