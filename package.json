@@ -74,6 +74,7 @@
     "test:web-client": "cd packages/web-client && ember test",
     "test:web-client:percy": "cd packages/web-client && percy exec -- ember test",
     "test:web-client:serve": "cd packages/web-client && ember test --serve --no-launch",
+    "test:scheduled-payments-client": "cd packages/scheduled-payments-client && ember test",
     "deploy:boxel": "cd ./packages/boxel && ember deploy production --verbose",
     "deploy:boxel:preview": "cd ./packages/boxel && ember deploy s3-preview --verbose",
     "deploy:ssr-web:preview-staging": "cd ./packages/ssr-web && ember deploy s3-preview-staging --verbose",
