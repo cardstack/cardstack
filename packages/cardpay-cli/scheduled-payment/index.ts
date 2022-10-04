@@ -6,10 +6,19 @@ export const command = 'scheduled-payment <command>';
 export const desc = 'Commands to interact with the scheduled payment module';
 import enableModule from './enable-module';
 import estimateExecution from './estimate-execution';
+import execute from './execute';
 import schedulePayment from './schedule-payment';
 
 export const builder = function (yargs: Argv) {
-  return yargs.command([cancel, createSafe, createSpHash, enableModule, estimateExecution, schedulePayment] as any);
+  return yargs.command([
+    cancel,
+    createSafe,
+    createSpHash,
+    enableModule,
+    estimateExecution,
+    execute,
+    schedulePayment,
+  ] as any);
 };
 
 export function handler(/* argv: Argv */) {

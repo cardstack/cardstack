@@ -7,13 +7,13 @@ export type InputValidationState = 'valid' | 'invalid' | 'loading' | 'initial';
 
 interface ValidationStateInputArgs {
   state: InputValidationState;
-  disabled: boolean;
+  disabled?: boolean;
   errorMessage?: string;
   helperText?: string;
   id: string;
   value: string;
-  onInput: (val: string) => void;
-  onBlur: (ev: Event) => void;
+  onInput?: (val: string) => void;
+  onBlur?: (ev: Event) => void;
 }
 
 interface Signature {

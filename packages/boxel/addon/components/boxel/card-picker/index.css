@@ -54,14 +54,6 @@
   letter-spacing: var(--boxel-lsp-lg);
 }
 
-.boxel-card-picker__dropdown.ember-basic-dropdown--transitioning-in {
-  animation: drop-fade-below var(--boxel-transition);
-}
-
-.boxel-card-picker__dropdown.ember-basic-dropdown--transitioning-out {
-  animation: drop-fade-below var(--boxel-transition) reverse;
-}
-
 .boxel-card-picker__dropdown .ember-power-select-options {
   margin: 0;
   padding: 0;
@@ -110,28 +102,4 @@
 .boxel-card-picker__selected-card {
   margin-right: var(--boxel-sp-xxs);
   flex: 1;
-}
-
-@keyframes drop-fade-below {
-  0% {
-    opacity: 0;
-    transform: translateY(-20px);
-  }
-
-  100% {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes drop-fade-above {
-  0% {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-
-  100% {
-    opacity: 1;
-    transform: translateY(0);
-  }
 }

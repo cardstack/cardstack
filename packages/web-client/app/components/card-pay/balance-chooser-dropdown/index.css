@@ -19,6 +19,9 @@
 }
 
 .balance-chooser-dropdown .ember-basic-dropdown-content {
+  --boxel-select-selected-color: transparent;
+  --boxel-select-current-color: var(--boxel-purple-100);
+
   position: absolute;
   z-index: 1;
   width: 100%;
@@ -26,14 +29,6 @@
   border: 1px solid var(--boxel-purple-300);
   border-radius: var(--boxel-border-radius-sm);
   overflow: hidden;
-}
-
-.balance-chooser-dropdown .ember-basic-dropdown-content.ember-basic-dropdown--transitioning-in {
-  animation: drop-fade-below var(--boxel-transition);
-}
-
-.balance-chooser-dropdown .ember-basic-dropdown-content.ember-basic-dropdown--transitioning-out {
-  animation: drop-fade-below var(--boxel-transition) reverse;
 }
 
 .balance-chooser-dropdown__option {
@@ -51,12 +46,4 @@
 
 .ember-power-select-selected-item .balance-chooser-dropdown__option--selected {
   background-image: unset;
-}
-
-.balance-chooser-dropdown__option:hover {
-  cursor: pointer;
-}
-
-.ember-power-select-selected-item .balance-chooser-dropdown__option:hover {
-  background-color: initial;
 }
