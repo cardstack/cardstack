@@ -1,4 +1,3 @@
-/* Details container styles */
 .boxel-dashboard-panel {
   --spacing: calc(var(--boxel-sp-xxxl) * var(--boxel-ratio));
   --border-color: #d3d3d3;
@@ -133,7 +132,6 @@
   display: none;
 }
 
-/* Panel styles */
 .boxel-dashboard-panel__main {
   display: grid;
   grid-template-areas:
