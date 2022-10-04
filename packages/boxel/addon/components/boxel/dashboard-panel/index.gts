@@ -17,6 +17,7 @@ interface Signature {
     summaryHeroImageUrl: string;
   }
   Blocks: {
+    aside: []
     detail: []
     footer: []
   }
@@ -51,13 +52,23 @@ export default class CardPayDashboardPanel extends Component<Signature> {
           </footer>
         {{/if}}
       </summary>
-      <section class="boxel-dashboard-panel__main">
+      <section class={{cn
+        "boxel-dashboard-panel__main"
+        boxel-dashboard-panel__main--has-aside=(has-block "aside")
+      }}>
         <header class="boxel-dashboard-panel__header">
           <h2 class="boxel-dashboard-panel__header-title">{{@title}}</h2>
           <p class="boxel-dashboard-panel__header-desc">{{@description}}</p>
         </header>
         <div class="boxel-dashboard-panel__hero" style={{cssUrl "background-image" @heroImageUrl}} />
-        {{yield to="detail"}}
+        <div class="boxel-dashboard-panel__detail">
+          {{yield to="detail"}}
+        </div>
+        {{#if (has-block 'aside')}}
+          <aside class="boxel-dashboard-panel__aside">
+            {{yield to="aside"}}
+          </aside>
+        {{/if}}
       </section>
       {{#if (has-block 'footer')}}
         <footer class="boxel-dashboard-panel__footer boxel-dashboard-panel__detail-footer" aria-label="open-footer">

@@ -136,9 +136,18 @@
 /* Panel styles */
 .boxel-dashboard-panel__main {
   display: grid;
-  grid-template-columns: auto auto;
+  grid-template-areas:
+    "header"
+    "detail";
   gap: var(--spacing) 0;
   padding: var(--spacing);
+}
+
+.boxel-dashboard-panel__main--has-aside {
+  grid-template-areas:
+    "header aside"
+    "detail aside";
+  padding: 0;
 }
 
 .boxel-dashboard-panel--no-bottom-padding .boxel-dashboard-panel__main {
@@ -146,7 +155,7 @@
 }
 
 .boxel-dashboard-panel__header {
-  grid-column: 1 / -1;
+  grid-area: header;
   max-width: 30rem;
 }
 
@@ -159,6 +168,19 @@
 .boxel-dashboard-panel__header-desc {
   font-size: 1.25rem;
   letter-spacing: var(--boxel-lsp-xs);
+}
+
+.boxel-dashboard-panel__aside {
+  grid-area: aside;
+  padding: var(--spacing);
+}
+
+.boxel-dashboard-panel__detail {
+  grid-area: detail;
+}
+
+.boxel-dashboard-panel__main--has-aside .boxel-dashboard-panel__detail {
+  padding: var(--spacing);
 }
 
 .boxel-dashboard-panel__hero {

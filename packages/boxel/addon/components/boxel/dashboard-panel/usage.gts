@@ -91,10 +91,14 @@ export default class BoxelDashboardPanelUsage extends Component {
           @description={{this.description}}
           @noCollapse={{this.noCollapse}}
           @hideCaret={{this.hideCaret}}
+          @heroImageUrl="/images/media-registry/covers/Autumn-Leaves.jpg"
         >
           <:detail>
             detail!
           </:detail>
+          <:aside>
+            an aside
+          </:aside>
           <:footer>
             footerfixme
           </:footer>
