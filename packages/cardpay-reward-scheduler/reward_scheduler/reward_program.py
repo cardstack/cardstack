@@ -96,8 +96,13 @@ class RewardProgram:
         Get the latest block that has data for this program
         based on the subgraph exports
         """
+        data_dependencies = list(rule["subgraph_config_locations"].values())
+        # In the case of rollover, we also need to check the claims submissions
+        # data is up to date
+        if rule["rollover"]:
+            data_dependencies.append(self.subgraph_extract_location)
         latest_block = None
-        for subgraph_config in rule["subgraph_config_locations"].values():
+        for subgraph_config in data_dependencies:
             latest_data = get_latest_details(subgraph_config)
             if latest_block is None:
                 latest_block = latest_data["latest_block"]
@@ -181,7 +186,7 @@ class RewardProgram:
                     "previous_output": self.reward_program_output_location.joinpath(
                         f"paymentCycle={previous_cycle}", "results.parquet"
                     ).as_uri(),
-                    "rewards_subgraph_location": self.subgraph_extract_location,
+                    "rewards_subgraph_location": str(self.subgraph_extract_location),
                 }
             )
 

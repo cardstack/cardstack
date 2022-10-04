@@ -58,6 +58,21 @@ def create_submission_dataset(payment_cycles=[]):
     )
 
 
+def create_rewards_latest(directory):
+    path = AnyPath(directory) / "rewards"
+    path.mkdir(exist_ok=True)
+    latest_location = path / "latest.yaml"
+    with latest_location.open("w") as f:
+        f.write("""
+subgraph: habdelra/cardpay-sokol
+subgraph_deployment: QmR4zkVGxHYVKi2TJoN8Xxni3RNgQ2Vs2Tw4booFgLUWdt
+updated: 2022-01-31 22:43:31.534100
+earliest_block: 0
+latest_block: 5000
+        """)
+    return path
+
+
 @patch("reward_scheduler.reward_program.run_job")
 @patch(
     "reward_scheduler.reward_program.get_table_dataset",
@@ -65,7 +80,8 @@ def create_submission_dataset(payment_cycles=[]):
 )
 def test_executes_all_cycles(dataset, mock_run_job, non_rollover_rule):
     with TemporaryDirectory() as temp_dir:
-        reward_program = RewardProgram("0x0", "0x0", "http://", temp_dir, "")
+        rewards_root = create_rewards_latest(temp_dir)
+        reward_program = RewardProgram("0x0", "0x0", "http://", temp_dir, rewards_root)
         # Set processed cycles
         reward_program.processed_cycles = set()
         reward_program.run_rule(non_rollover_rule)
@@ -81,7 +97,8 @@ def test_rollover_only_runs_first_payment_cycle_when_none_processed(
     dataset, mock_run_job, rollover_rule
 ):
     with TemporaryDirectory() as temp_dir:
-        reward_program = RewardProgram("0x0", "0x0", "http://", temp_dir, "")
+        rewards_root = create_rewards_latest(temp_dir)
+        reward_program = RewardProgram("0x0", "0x0", "http://", temp_dir, rewards_root)
         # Set processed cycles
         reward_program.processed_cycles = set()
         reward_program.run_rule(rollover_rule)
@@ -102,7 +119,8 @@ def test_rollover_only_cycles_with_fulfilled_dependencies(
     dataset, mock_run_job, rollover_rule
 ):
     with TemporaryDirectory() as temp_dir:
-        reward_program = RewardProgram("0x0", "0x0", "http://", temp_dir, "")
+        rewards_root = create_rewards_latest(temp_dir)
+        reward_program = RewardProgram("0x0", "0x0", "http://", temp_dir, rewards_root)
         reward_program.run_rule(rollover_rule)
         output_location = AnyPath(temp_dir).joinpath(
             "rewardProgramID=0x0", "paymentCycle=1200", "parameters.json"
