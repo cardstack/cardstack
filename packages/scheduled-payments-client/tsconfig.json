@@ -24,7 +24,14 @@
     "paths": {
       "@cardstack/scheduled-payments-client/tests/*": ["tests/*"],
       "@cardstack/scheduled-payments-client/*": ["app/*"],
-      "*": ["types/*"]
+      "@cardstack/boxel/*": ["../boxel/addon/*"],
+      "*": ["types/*", "../boxel/types/*"]
+    }
+  },
+  "glint": {
+    "environment": ["ember-loose", "ember-template-imports"],
+    "transform": {
+      "include": ["../boxel/addon/components/boxel/**/*", "app/components/**/*"]
     }
   },
   "include": ["app/**/*", "tests/**/*", "types/**/*"]

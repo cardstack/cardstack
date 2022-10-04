@@ -16,7 +16,7 @@
     "lint:fix": "npm-run-all --aggregate-output --continue-on-error --parallel lint:*:fix",
     "lint:hbs": "ember-template-lint .",
     "lint:hbs:fix": "ember-template-lint . --fix",
-    "lint:js": "eslint . --cache",
+    "lint:js": "eslint . --cache --ext .js,.ts",
     "lint:js:fix": "eslint . --fix",
     "start": "ember serve",
     "test": "npm-run-all lint test:*",
@@ -30,12 +30,13 @@
     "@embroider/webpack": "^1.8.3",
     "@glimmer/component": "^1.1.2",
     "@glimmer/tracking": "^1.1.2",
+    "@glint/core": "^0.9.4",
     "@types/ember-data": "^4.4.4",
     "@types/ember-data__adapter": "^4.0.0",
     "@types/ember-data__model": "^4.0.0",
     "@types/ember-data__serializer": "^4.0.0",
     "@types/ember-data__store": "^4.0.1",
-    "@types/ember-qunit": "^5.0.2",
+    "@types/ember-qunit": "^5.0.0",
     "@types/ember-resolver": "^5.0.11",
     "@types/ember__application": "^4.0.2",
     "@types/ember__array": "^4.0.2",
@@ -46,7 +47,7 @@
     "@types/ember__error": "^4.0.0",
     "@types/ember__object": "^4.0.4",
     "@types/ember__polyfills": "^4.0.0",
-    "@types/ember__routing": "^4.0.11",
+    "@types/ember__routing": "^4.0.10",
     "@types/ember__runloop": "^4.0.1",
     "@types/ember__service": "^4.0.0",
     "@types/ember__string": "^3.0.9",
@@ -98,7 +99,15 @@
   "ember": {
     "edition": "octane"
   },
+  "volta": {
+    "extends": "../../package.json"
+  },
   "dependencies": {
-    "typescript": "^4.8.4"
+    "@babel/core": "^7.17.8",
+    "@glint/config": "^0.9.4",
+    "@glint/core": "^0.9.4",
+    "@glint/environment-ember-loose": "^0.9.4",
+    "@glint/environment-ember-template-imports": "^0.9.4",
+    "typescript": "^4.7.4"
   }
 }

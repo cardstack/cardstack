@@ -6386,16 +6386,6 @@
     "@types/ember__test-helpers" "*"
     "@types/qunit" "*"
 
-"@types/ember-qunit@^5.0.2":
-  version "5.0.2"
-  resolved "https://registry.yarnpkg.com/@types/ember-qunit/-/ember-qunit-5.0.2.tgz#ea8b3959724c0b190213b748937e4e9ae11165a8"
-  integrity sha512-LXp0Ew4wPhaCMuw49cNDHWs/bROn+Msb4ypMG1t60EMBx0UaEoX0tZlkf5bQJfdD249WZTu5cCtKvl47xbQzxA==
-  dependencies:
-    "@types/ember-resolver" "*"
-    "@types/ember__test" "*"
-    "@types/ember__test-helpers" "*"
-    "@types/qunit" "*"
-
 "@types/ember-resolver@*", "@types/ember-resolver@^5.0.11":
   version "5.0.11"
   resolved "https://registry.yarnpkg.com/@types/ember-resolver/-/ember-resolver-5.0.11.tgz#db931fb5c2d6bda4e29adea132fb48c7ed17aa62"
@@ -6573,17 +6563,6 @@
   version "4.0.10"
   resolved "https://registry.yarnpkg.com/@types/ember__routing/-/ember__routing-4.0.10.tgz#dc8fb1a6024170a1fe7b7ad1a1c061ef73e09789"
   integrity sha512-/1k6fqFIV3RZAU64pYXx3nVlHnpqorvQjyq5V4A//kTI/WRcfwCjShgH2jCLrwwpnWo6Pb/y8aOnxyg3ePGy2Q==
-  dependencies:
-    "@types/ember" "*"
-    "@types/ember__controller" "*"
-    "@types/ember__object" "*"
-    "@types/ember__routing" "*"
-    "@types/ember__service" "*"
-
-"@types/ember__routing@^4.0.11":
-  version "4.0.11"
-  resolved "https://registry.yarnpkg.com/@types/ember__routing/-/ember__routing-4.0.11.tgz#2b76531aaa3ac3ea6c2e256b58d951640498a55c"
-  integrity sha512-GNFbCn5Tpqulks6FHzLHilE1W1pp7PKkypXPXx9J9LAmNSPhI/UJU4lIasf+BlInHd/dp/CLUMNrWT3dTogSTQ==
   dependencies:
     "@types/ember" "*"
     "@types/ember__controller" "*"
@@ -29485,11 +29464,6 @@ typescript@^4.1.5, typescript@^4.2.4, typescript@^4.7.4:
   version "4.7.4"
   resolved "https://registry.yarnpkg.com/typescript/-/typescript-4.7.4.tgz#1a88596d1cf47d59507a1bcdfb5b9dfe4d488235"
   integrity sha512-C0WQT0gezHuw6AdY1M2jxUO83Rjf0HP7Sk1DtXj6j1EwkQNZrHAg2XPWlq62oqEhYvONq5pkC2Y9oPljWToLmQ==
-
-typescript@^4.8.4:
-  version "4.8.4"
-  resolved "https://registry.yarnpkg.com/typescript/-/typescript-4.8.4.tgz#c464abca159669597be5f96b8943500b238e60e6"
-  integrity sha512-QCh+85mCy+h0IGff8r5XWzOVSbBO+KfeYrMQh7NJ58QujwcE22u+NUSmUxqF+un70P9GXKxa2HCNiTTMJknyjQ==
 
 ua-parser-js@^0.7.28:
   version "0.7.28"

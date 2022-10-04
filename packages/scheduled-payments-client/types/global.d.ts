@@ -1,6 +1,6 @@
-// Types for compiled templates
-declare module '@cardstack/scheduled-payments-client/templates/*' {
-  import { TemplateFactory } from 'htmlbars-inline-precompile';
-  const tmpl: TemplateFactory;
-  export default tmpl;
+import '@glint/environment-ember-loose';
+import '@cardstack/boxel/glint';
+
+declare module '@glint/environment-ember-loose/registry' {
+  export default interface Registry {}
 }
