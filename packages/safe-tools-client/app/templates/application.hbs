@@ -24,6 +24,16 @@
   </:header>
 
   <:body>
+    <Boxel::ControlPanel as |cp|>
+      {{! FIXME update with true icons }}
+      <cp.Item @title='Wallet' @icon='gear' @isActive={{true}}>
+        <Boxel::Button @kind='primary'>
+          Connect
+        </Boxel::Button>
+      </cp.Item>
+      <cp.Item @title='Network' @icon='pin' />
+      <cp.Item @title='Safe' @icon='lock' />
+    </Boxel::ControlPanel>
     {{outlet}}
   </:body>
 </Boxel::Dashboard>
