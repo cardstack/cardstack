@@ -8,11 +8,7 @@ from cloudpathlib import AnyPath
 from did_resolver import Resolver
 from python_did_resolver import get_resolver
 
-from .utils import (
-    get_table_dataset,
-    run_job,
-    get_latest_written_block,
-)
+from .utils import get_latest_written_block, get_table_dataset, run_job
 
 
 class RewardProgram:
