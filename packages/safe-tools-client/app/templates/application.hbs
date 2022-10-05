@@ -1,8 +1,17 @@
 {{page-title 'Cardstack Safe Tools'}}
 
-<Boxel::Dashboard @darkTheme={{true}} class='card-pay'>
+<Boxel::Dashboard @darkTheme={{true}}>
   <:header>
-    header
+    {{! FIXME needs subtitle }}
+    <Boxel::OrgHeader
+      @title='Cardstack'
+      @iconURL='/dashboard/cardstack-logo.svg'
+      style={{css-var boxel-org-header-background-color='var(--boxel-dark)'}}
+    >
+      <Boxel::Button @kind='primary'>
+        Connect Wallet
+      </Boxel::Button>
+    </Boxel::OrgHeader>
     <Boxel::TabBar
       @items={{
         array
