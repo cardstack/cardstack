@@ -4,7 +4,7 @@
 }
 
 .usage-button-dark-mode-background {
-  background-color: #413e4e;
+  background-color: var(--boxel-purple-600);
   padding: 4px;
 }
 
