@@ -38,7 +38,7 @@ interface IconButtonAccessorySignature {
 
 export const IconButtonAccessory: TemplateOnlyComponent<IconButtonAccessorySignature> = <template>
   <BoxelIconButton
-    class="boxel-input-group__accessory boxel-input-group__button-accessory"
+    class="boxel-input-group__accessory boxel-input-group__icon-button-accessory"
     @icon={{@icon}}
     data-test-boxel-input-group-icon-button-accessory
     ...attributes

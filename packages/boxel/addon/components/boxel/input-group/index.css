@@ -1,12 +1,13 @@
 .boxel-input-group {
   --boxel-input-group-padding-x: var(--boxel-sp-sm);
   --boxel-input-group-padding-y: var(--boxel-sp-xxs);
+  --boxel-input-group-border-color: var(--boxel-purple-300);
+  --boxel-input-group-border-radius: var(--boxel-border-radius-sm);
+  --boxel-input-group-interior-border-width: 0;
   --boxel-input-group-height:
     calc(
       (var(--boxel-ratio) * var(--boxel-font-size)) + (2 * var(--boxel-input-group-padding-y)) + 2px
     );
-  --boxel-input-group-border-color: var(--boxel-purple-300);
-  --boxel-input-group-border-radius: var(--boxel-border-radius-sm);
 
   font-family: var(--boxel-font-family);
   font-size: var(--boxel-font-size);
@@ -24,10 +25,32 @@
   --boxel-button-min-height: var(--boxel-input-group-height);
 }
 
+.boxel-input-group__form-control {
+  -moz-appearance: none;
+  -webkit-appearance: none;
+  appearance: none;
+  background-clip: padding-box;
+  background-color: var(--boxel-light);
+  color: var(--boxel-text-dark);
+  display: block;
+  flex: 1 1 auto;
+  font-size: var(--boxel-font-size);
+  font-weight: 400;
+  line-height: var(--boxel-ratio);
+  margin: 0;
+  min-width: 0;
+  padding: var(--boxel-input-group-padding-y) var(--boxel-input-group-padding-x);
+  position: relative;
+  width: 1%;
+}
+
+.boxel-input-group__form-control,
 .boxel-input-group__accessory {
   border: 1px solid var(--boxel-input-group-border-color);
   border-radius: var(--boxel-input-group-border-radius);
   transition: border-color var(--boxel-transition);
+  min-height: var(--boxel-input-group-height);
+  outline-offset: 0;
 }
 
 .boxel-input-group__text-accessory {
@@ -43,8 +66,8 @@
 }
 
 .boxel-input-group__button-accessory,
+.boxel-input-group__icon-button-accessory,
 .boxel-input-group__select-accessory {
-  min-height: var(--boxel-input-group-height);
   z-index: 2;
 }
 
@@ -81,39 +104,32 @@
   z-index: 5;
 }
 
+.boxel-input-group--disabled .boxel-input-group__form-control,
+.boxel-input-group--disabled .boxel-input-group__text-accessory,
+.boxel-input-group--disabled .boxel-input-group__icon-button-accessory,
+.boxel-input-group--disabled .boxel-input-group__button-accessory {
+  border-color: var(--boxel-input-group-border-color);
+  color: rgb(0 0 0 / 50%);
+  opacity: 0.5;
+}
+
+.boxel-input-group--invalid .boxel-input-group__form-control,
+.boxel-input-group--invalid .boxel-input-group__text-accessory,
+.boxel-input-group--invalid .boxel-input-group__button-accessory {
+  border-color: var(--boxel-error-100);
+}
+
 .boxel-input-group > :not(:first-child) {
   margin-left: -1px;
   border-top-left-radius: 0;
   border-bottom-left-radius: 0;
-  border-left-width: 0;
+  border-left-width: var(--boxel-input-group-interior-border-width);
 }
 
 .boxel-input-group > :not(:last-child) {
   border-top-right-radius: 0;
   border-bottom-right-radius: 0;
-  border-right-width: 0;
-}
-
-.boxel-input-group__form-control {
-  position: relative;
-  flex: 1 1 auto;
-  width: 1%;
-  min-width: 0;
-  min-height: var(--boxel-input-group-height);
-  display: block;
-  padding: var(--boxel-input-group-padding-y) var(--boxel-input-group-padding-x);
-  font-size: var(--boxel-font-size);
-  font-weight: 400;
-  line-height: var(--boxel-ratio);
-  color: var(--boxel-text-dark);
-  background-color: var(--boxel-light);
-  background-clip: padding-box;
-  border: 1px solid var(--boxel-input-group-border-color);
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  appearance: none;
-  border-radius: var(--boxel-input-group-border-radius);
-  transition: border-color var(--boxel-transition);
+  border-right-width: var(--boxel-input-group-interior-border-width);
 }
 
 .boxel-input-group__form-control:disabled {
@@ -137,20 +153,6 @@
   color: var(--boxel-error-100);
   font: var(--boxel-font-sm);
   letter-spacing: var(--boxel-lsp);
-}
-
-.boxel-input-group--disabled .boxel-input-group__form-control,
-.boxel-input-group--disabled .boxel-input-group__text-accessory,
-.boxel-input-group--disabled .boxel-input-group__button-accessory {
-  border-color: var(--boxel-input-group-border-color);
-  color: rgb(0 0 0 / 50%);
-  opacity: 0.5;
-}
-
-.boxel-input-group--invalid .boxel-input-group__form-control,
-.boxel-input-group--invalid .boxel-input-group__text-accessory,
-.boxel-input-group--invalid .boxel-input-group__button-accessory {
-  border-color: var(--boxel-error-100);
 }
 
 .boxel-input-group--invalid:focus-within .boxel-input-group__form-control {
