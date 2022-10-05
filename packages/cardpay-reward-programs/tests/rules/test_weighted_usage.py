@@ -23,6 +23,7 @@ def rule(request):
         "start_block": 20000000,
         "end_block": 26000000,
         "payment_cycle_length": payment_cycle_length,
+        "duration": 43200,
         "subgraph_config_locations": {
             "prepaid_card_payment": "s3://partitioned-graph-data/data/staging_rewards/0.0.1/"
         },
@@ -32,7 +33,6 @@ def rule(request):
         "transaction_factor": transaction_factor,
         "spend_factor": spend_factor,
         "token": config["staging"]["tokens"]["card"],
-        "duration": 43200,
     }
     return WeightedUsage(core_config, user_config)
 

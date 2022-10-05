@@ -17,6 +17,7 @@ def rollover_rule(request):
         "start_block": 100,
         "end_block": 1000,
         "payment_cycle_length": 100,
+        "duration": 100,
         "subgraph_config_locations": {
             "prepaid_card_payment": "s3://partitioned-graph-data/data/staging_rewards/0.0.1/"
         },
@@ -25,7 +26,6 @@ def rollover_rule(request):
     user_config = {
         "reward_per_user": 1000,
         "token": config["staging"]["tokens"]["card"],
-        "duration": 100,
         "accounts": ["0x12AE66CDc592e10B60f9097a7b0D3C59fce29876"],
     }
     return FlatPayment(core_config, user_config)

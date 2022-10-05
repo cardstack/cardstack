@@ -18,14 +18,12 @@ class RetroAirdrop(Rule):
         self,
         total_reward,
         token,
-        duration,
         start_snapshot_block,
         end_snapshot_block,
         test_accounts,
         test_reward,
     ):
         self.token = token
-        self.duration = duration
         self.total_reward = total_reward
         self.start_snapshot_block = start_snapshot_block
         self.end_snapshot_block = end_snapshot_block

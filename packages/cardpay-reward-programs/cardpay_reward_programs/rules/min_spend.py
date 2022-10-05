@@ -8,11 +8,10 @@ class MinSpend(Rule):
     def __init__(self, core_parameters, user_defined_parameters):
         super(MinSpend, self).__init__(core_parameters, user_defined_parameters)
 
-    def set_user_defined_parameters(self, min_spend, base_reward, token, duration):
+    def set_user_defined_parameters(self, min_spend, base_reward, token):
         self.min_spend = min_spend
         self.base_reward = base_reward
         self.token = token
-        self.duration = duration
 
     def sql(self, table_query, aux_table_query=None):
         return f"""

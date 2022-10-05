@@ -14,13 +14,11 @@ class SafeOwnership(Rule):
         self,
         reward_per_safe,
         token,
-        duration,
         start_analysis_block,
         safe_type,
         max_rewards,
     ):
         self.token = token
-        self.duration = duration
         self.reward_per_safe = int(reward_per_safe)
         self.start_analysis_block = start_analysis_block
         self.safe_type = safe_type
