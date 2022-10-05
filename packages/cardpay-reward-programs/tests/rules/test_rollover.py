@@ -31,6 +31,30 @@ def rollover_rule(request):
     return FlatPayment(core_config, user_config)
 
 
+@pytest.fixture
+def rollover_rule_multiple(request):
+    core_config = {
+        "start_block": 100,
+        "end_block": 1000,
+        "payment_cycle_length": 100,
+        "duration": 100,
+        "subgraph_config_locations": {
+            "prepaid_card_payment": "s3://partitioned-graph-data/data/staging_rewards/0.0.1/"
+        },
+        "rollover": True,
+    }
+    user_config = {
+        "reward_per_user": 1000,
+        "token": config["staging"]["tokens"]["card"],
+        "accounts": [
+            "0x12AE66CDc592e10B60f9097a7b0D3C59fce29876",
+            "0x999999cf1046e68e36E1aA2E0E07105eDDD1f08E",
+            "0xc0ffee254729296a45a3885639AC7E10F9d54979",
+        ],
+    }
+    return FlatPayment(core_config, user_config)
+
+
 def claims_table(claims=[]):
     """Construct an arrow table for a set of claims
 
@@ -117,3 +141,49 @@ def test_claimed_rewards_dont_rollover(get_table_dataset, rollover_rule):
         assert (
             payment_list[0]["amount"] == 1000
         )  # And no extra payments as the value has not rolled over
+
+
+@patch("cardpay_reward_programs.utils.get_table_dataset")
+def test_multiple_claims_with_multiple_people(
+    get_table_dataset, rollover_rule_multiple
+):
+
+    with TemporaryDirectory() as tempdir:
+        tempdir = AnyPath(tempdir)
+
+        # Generate the first output
+        first_cycle_output = tempdir / "first_cycle_output"
+        run_parameters = {
+            "reward_program_id": "0x0885ce31D73b63b0Fcb1158bf37eCeaD8Ff0fC72",
+            "payment_cycle": 100,
+        }
+        payment_list = rollover_rule_multiple.get_payments(**run_parameters).to_dict(
+            "records"
+        )
+        tree = PaymentTree(payment_list)
+        table = tree.as_arrow()
+        write_parquet_file(first_cycle_output, table)
+        assert (first_cycle_output / "results.parquet").exists()
+
+        # Create claims table
+        first_leaf = table.to_pydict()["leaf"][0]
+        second_leaf = table.to_pydict()["leaf"][1]
+        get_table_dataset.return_value = claims_table(
+            [(first_leaf, 101), (second_leaf, 103)]
+        )
+
+        # The second run should account for the previous one
+        run_parameters = {
+            "reward_program_id": "0x0885ce31D73b63b0Fcb1158bf37eCeaD8Ff0fC72",
+            "payment_cycle": 200,
+            "previous_output": first_cycle_output / "results.parquet",
+            "rewards_subgraph_location": "s3://partitioned-graph-data/data/staging_rewards/0.0.1/",
+        }
+        payment_list = rollover_rule_multiple.get_payments(**run_parameters).to_dict(
+            "records"
+        )
+        tree = PaymentTree(payment_list)
+        assert len(payment_list) == 3  # All payees
+        assert payment_list[0]["amount"] == 1000
+        assert payment_list[1]["amount"] == 1000
+        assert payment_list[2]["amount"] == 2000
