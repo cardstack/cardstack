@@ -22,8 +22,8 @@
     "module": "es2020",
     "experimentalDecorators": true,
     "paths": {
-      "@cardstack/scheduled-payments-client/tests/*": ["tests/*"],
-      "@cardstack/scheduled-payments-client/*": ["app/*"],
+      "@cardstack/safe-tools-client/tests/*": ["tests/*"],
+      "@cardstack/safe-tools-client/*": ["app/*"],
       "@cardstack/boxel/*": ["../boxel/addon/*"],
       "*": ["types/*", "../boxel/types/*"]
     }
