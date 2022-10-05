@@ -271,7 +271,7 @@ export default class BoxelInputGroupUsage extends Component {
           </:after>
         </BoxelInputGroup>
 
-        <label class="boxel-sr-only">Example showing an icon button with copy to clipboard functionality after the input<br />
+        <label>Example showing an icon button with copy to clipboard functionality after the input<br />
           <BoxelInputGroup @value="Copyable text" @readonly={{true}}>
             <:after as |Accessories inputGroup|>
               {{#if this.isShowingCopiedConfirmation}}

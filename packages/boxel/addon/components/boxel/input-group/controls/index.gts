@@ -25,7 +25,8 @@ export const InputControl: TemplateOnlyComponent<InputControlSignature> = <templ
     class="boxel-input-group__form-control"
     placeholder={{@placeholder}}
     value={{@value}}
-    disabled={{or @readonly @disabled}}
+    disabled={{@disabled}}
+    readonly={{@readonly}}
     required={{@required}}
     {{on "input" (pick "target.value" (optional @onInput))}}
     {{on "blur" (optional @onBlur)}}
