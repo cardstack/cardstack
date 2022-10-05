@@ -17,7 +17,7 @@ interface ButtonAccessorySignature {
 
 export const ButtonAccessory: TemplateOnlyComponent<ButtonAccessorySignature> = <template>
   <BoxelButton
-    class="boxel-input-group__button-accessory"
+    class="boxel-input-group__accessory boxel-input-group__button-accessory"
     @kind={{@kind}}
     data-test-boxel-input-group-button-accessory
     ...attributes
@@ -38,7 +38,7 @@ interface IconButtonAccessorySignature {
 
 export const IconButtonAccessory: TemplateOnlyComponent<IconButtonAccessorySignature> = <template>
   <BoxelIconButton
-    class="boxel-input-group__button-accessory"
+    class="boxel-input-group__accessory boxel-input-group__button-accessory"
     @icon={{@icon}}
     data-test-boxel-input-group-icon-button-accessory
     ...attributes
@@ -53,7 +53,7 @@ interface TextAccessorySignature {
 
 export const TextAccessory: TemplateOnlyComponent<TextAccessorySignature> = <template>
   <span
-    class="boxel-input-group__text-accessory"
+    class="boxel-input-group__accessory boxel-input-group__text-accessory"
     data-test-boxel-input-group-text-accessory
     ...attributes
   >{{yield}}</span>
@@ -68,7 +68,7 @@ interface SelectAccessorySignature<ItemT = any> {
 }
 
 export const SelectAccessory: TemplateOnlyComponent<SelectAccessorySignature> = <template>
-  <div class="boxel-input-group__select-accessory" data-test-boxel-input-group-select-accessory>
+  <div class="boxel-input-group__accessory boxel-input-group__select-accessory" data-test-boxel-input-group-select-accessory>
     <BoxelSelect
       @disabled={{@disabled}}
       @dropdownClass={{@dropdownClass}}

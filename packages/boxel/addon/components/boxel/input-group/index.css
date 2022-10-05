@@ -24,6 +24,12 @@
   --boxel-button-min-height: var(--boxel-input-group-height);
 }
 
+.boxel-input-group__accessory {
+  border: 1px solid var(--boxel-input-group-border-color);
+  border-radius: var(--boxel-input-group-border-radius);
+  transition: border-color var(--boxel-transition);
+}
+
 .boxel-input-group__text-accessory {
   display: flex;
   align-items: center;
@@ -34,14 +40,10 @@
   text-align: center;
   white-space: nowrap;
   background-color: var(--boxel-light-400);
-  border: 1px solid var(--boxel-input-group-border-color);
-  border-radius: var(--boxel-input-group-border-radius);
 }
 
 .boxel-input-group__button-accessory,
 .boxel-input-group__select-accessory {
-  border: 1px solid var(--boxel-input-group-border-color);
-  border-radius: var(--boxel-input-group-border-radius);
   min-height: var(--boxel-input-group-height);
   z-index: 2;
 }
