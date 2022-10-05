@@ -27,6 +27,30 @@ def get_table_dataset(config_location, table):
     return ds.parquet_dataset(path, filesystem=filesystem)
 
 
+def get_latest_written_block_for_single_extract(config_location):
+    # This gets the latest block that should have
+    # been written to a file for any table within this dataset
+    subgraph_latest_block = get_latest_details(config_location)["latest_block"]
+    latest_written_blocks = []
+    with open(AnyPath(config_location) / "config.yaml", "r") as stream:
+        subgraph_extract_config = yaml.safe_load(stream)
+        for table, table_details in subgraph_extract_config["tables"].items():
+            partitions = table_details["partition_sizes"]
+            smallest_partition = min(partitions)
+            latest_subgraph_block_written = (
+                subgraph_latest_block // smallest_partition
+            ) * smallest_partition
+            latest_written_blocks.append(latest_subgraph_block_written)
+    return min(latest_written_blocks)
+
+
+def get_latest_written_block(subgraph_extract_locations):
+    latest_written_blocks = map(
+        get_latest_written_block_for_single_extract, subgraph_extract_locations
+    )
+    return min(latest_written_blocks)
+
+
 def get_job_definition_for_image(image_name):
     """
     Find a job definition on AWS which is configured to use this image.

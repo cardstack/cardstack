@@ -72,6 +72,22 @@ earliest_block: 0
 latest_block: {latest_block}
         """
         )
+    config_location = path / "config.yaml"
+    with config_location.open("w") as f:
+        f.write(
+            """
+name: rewards
+subgraph: habdelra/cardpay-sokol
+tables:
+  merkle_root_submission:
+    partition_sizes:
+    - 524288
+    - 131072
+    - 16384
+    - 1024
+    - 2
+"""
+        )
     return path
 
 

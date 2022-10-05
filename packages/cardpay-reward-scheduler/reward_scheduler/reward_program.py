@@ -8,7 +8,11 @@ from cloudpathlib import AnyPath
 from did_resolver import Resolver
 from python_did_resolver import get_resolver
 
-from .utils import get_latest_details, get_table_dataset, run_job
+from .utils import (
+    get_table_dataset,
+    run_job,
+    get_latest_written_block,
+)
 
 
 class RewardProgram:
@@ -101,14 +105,10 @@ class RewardProgram:
         # data is up to date
         if rule["rollover"]:
             data_dependencies.append(self.subgraph_extract_location)
-        latest_block = None
-        for subgraph_config in data_dependencies:
-            latest_data = get_latest_details(subgraph_config)
-            if latest_block is None:
-                latest_block = latest_data["latest_block"]
-            else:
-                latest_block = min(latest_block, latest_data["latest_block"])
-        return latest_block
+        if len(data_dependencies) > 0:
+            return get_latest_written_block(data_dependencies)
+        else:
+            return None
 
     def is_locked(self):
         return self.reward_manager.caller.rewardProgramLocked(self.reward_program_id)
