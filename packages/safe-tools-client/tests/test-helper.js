@@ -1,5 +1,5 @@
-import Application from '@cardstack/scheduled-payments-client/app';
-import config from '@cardstack/scheduled-payments-client/config/environment';
+import Application from '@cardstack/safe-tools-client/app';
+import config from '@cardstack/safe-tools-client/config/environment';
 import * as QUnit from 'qunit';
 import { setApplication } from '@ember/test-helpers';
 import { setup } from 'qunit-dom';

@@ -1,12 +1,12 @@
-name: CI [scheduled-payments-web]
+name: CI [safe-tools-client]
 
 on:
   pull_request:
     paths:
-      - 'packages/scheduled-payments-client/**'
+      - 'packages/safe-tools-client/**'
       - 'packages/boxel/**'
       - 'packages/eslint-config/**'
-      - '.github/workflows/scheduled-payments-web.yml'
+      - '.github/workflows/safe-tools-client.yml'
       - 'package.json'
       - 'yarn.lock'
 
@@ -38,4 +38,4 @@ jobs:
       - name: Install dependencies
         run: yarn --prefer-offline --frozen-lockfile
       - name: Run tests
-        run: yarn test:scheduled-payments-client
+        run: yarn test:safe-tools-client

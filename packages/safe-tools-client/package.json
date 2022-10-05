@@ -1,8 +1,8 @@
 {
-  "name": "@cardstack/scheduled-payments-client",
+  "name": "@cardstack/safe-tools-client",
   "version": "0.0.0",
   "private": true,
-  "description": "The cardstack scheduled payments front-end app",
+  "description": "The front-end app for cardstack safe tools",
   "repository": "",
   "license": "MIT",
   "author": "",
