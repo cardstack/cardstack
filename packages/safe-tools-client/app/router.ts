@@ -7,5 +7,7 @@ export default class Router extends EmberRouter {
 }
 
 Router.map(function () {
-  // TDB routes
+  this.route('pay');
+  this.route('schedule');
+  this.route('split');
 });

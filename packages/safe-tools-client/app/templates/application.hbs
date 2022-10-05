@@ -1,7 +1,29 @@
-{{page-title 'ScheduledPaymentsClient'}}
+{{page-title 'Cardstack Safe Tools'}}
 
-<div class="Application--safe-tools-dashboard">
+<Boxel::Dashboard @darkTheme={{true}} class='card-pay'>
+  <:header>
+    header
+    <Boxel::TabBar
+      @items={{
+        array
+        (menu-item 'Schedule' (link route='schedule') icon='calendar')
+        (menu-item 'Pay' (link route='pay') icon='tab-icon-split' inactive=true)
+        (menu-item
+          'Split' (link route='split') icon='tab-icon-split' inactive=true
+        )
+      }}
+      @spread={{true}}
+      style={{
+        css-var
+        boxel-tab-bar-background-color='var(--boxel-dark)'
+        boxel-tab-bar-border-bottom='0px'
+        boxel-tab-bar-color-active='var(--boxel-cyan)'
+        boxel-tab-bar-font='600 var(--boxel-font-sm)'
+      }}
+    />
+  </:header>
 
-</div>
-
-{{outlet}}
+  <:body>
+    {{outlet}}
+  </:body>
+</Boxel::Dashboard>
