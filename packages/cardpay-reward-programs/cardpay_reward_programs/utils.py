@@ -164,7 +164,7 @@ def get_unclaimed_rewards(previous_output_location, claims_data_root, block):
     con.register(
         "rewardee_claims", get_table_dataset(claims_data_root, "rewardee_claim")
     )
-    # Load the previous output, filtering on only claims that have expired
+    # Load the previous output, filtering on only rewards that have expired
     rewards = con.execute(
         f"select * from '{get_local_file(AnyPath(previous_output_location))}' where validTo <= ?",
         [block],
