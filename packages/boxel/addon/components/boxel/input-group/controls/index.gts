@@ -4,7 +4,6 @@ import { ComponentLike } from '@glint/template';
 import pick from 'ember-composable-helpers/helpers/pick';
 import { on } from '@ember/modifier';
 import optional from 'ember-composable-helpers/helpers/optional';
-import or from 'ember-truth-helpers/helpers/or';
 
 interface InputControlSignature {
   Element: HTMLSpanElement;
