@@ -3,14 +3,17 @@
 <Boxel::Dashboard @darkTheme={{true}}>
   <:header>
     <Boxel::OrgHeader
+      class='safe-tools-header'
       @title='CARDSTACK'
       @subtitle='Safe Tools'
       @iconURL='/dashboard/cardstack-logo.svg'
       style={{
         css-var
         boxel-org-header-background-color='var(--boxel-dark)'
-        boxel-org-title-title-font='300 var(--boxel-font-size-lg)'
-        boxel-org-title-subtitle-font='300 var(--boxel-font-size-xs)'
+        boxel-org-header-logo-size='var(--boxel-sp-xl)'
+        boxel-org-header-logo-position='right'
+        boxel-org-title-title-font='300 var(--boxel-font-size-lg) var(--boxel-font-family)'
+        boxel-org-title-subtitle-font='300 var(--boxel-font-size-xs) var(--boxel-font-family)'
         boxel-org-title-letter-spacing='var(--boxel-lsp-sm)'
         boxel-org-title-text-transform='none'
       }}
