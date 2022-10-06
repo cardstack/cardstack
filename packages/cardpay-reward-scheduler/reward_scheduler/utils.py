@@ -1,28 +1,11 @@
 import os
-from pathlib import PosixPath
 
 import boto3
+import pyarrow.dataset as ds
 import yaml
 from cachetools import TTLCache, cached
-from cloudpathlib import AnyPath, CloudPath
-
-
-def get_local_file(file_location):
-    """
-    Download files if not local & return their local path
-    """
-    if isinstance(file_location, PosixPath):
-        return file_location.as_posix()
-    elif isinstance(file_location, CloudPath):
-        if file_location._local.exists():
-            # Our files are immutable so if the local cache exists
-            # we can just return that
-            return file_location._local.as_posix()
-        else:
-            # Otherwise this downloads the file and returns the local path
-            return file_location.fspath
-    else:
-        raise Exception("Unsupported path type")
+from cloudpathlib import AnyPath
+from pyarrow import fs
 
 
 @cached(TTLCache(maxsize=1000, ttl=60))
@@ -31,61 +14,41 @@ def get_latest_details(config_location):
         return yaml.safe_load(stream)
 
 
-def get_partition_iterator(min_partition, max_partition, partition_sizes):
-    for partition_size in sorted(partition_sizes, reverse=True):
-        start_partition_allowed = (min_partition // partition_size) * partition_size
-        end_partition_allowed = (max_partition // partition_size) * partition_size
-        last_max_partition = None
-        for start_partition in range(
-            start_partition_allowed, end_partition_allowed, partition_size
-        ):
-            last_max_partition = start_partition + partition_size
-            yield partition_size, start_partition, start_partition + partition_size
-        if last_max_partition is not None:
-            min_partition = last_max_partition
-
-
-def get_partition_files(config_location, table, min_partition=None, max_partition=None):
-    """
-    Given the location of extracted subgraph data & a block range,
-    get a set of non-overlapping files that cover the block range.
-    """
-    # Get config
-    with open(get_local_file(config_location / "config.yaml"), "r") as stream:
-        config = yaml.safe_load(stream)
+def get_table_dataset(config_location, table):
+    config_location = AnyPath(config_location)
     latest = get_latest_details(config_location)
-    latest_block = latest.get("latest_block")
-    if max_partition is None:
-        max_partition = latest_block
-    if min_partition is None:
-        min_partition = latest.get("earliest_block")
-    # Get table
-    table_config = config["tables"][table]
-    partition_sizes = sorted(table_config["partition_sizes"], reverse=True)
-    table_dir = config_location.joinpath(
-        "data", f"subgraph={latest['subgraph_deployment']}", f"table={table}"
+    table_metadata = config_location.joinpath(
+        "data",
+        f"subgraph={latest['subgraph_deployment']}",
+        f"table={table}",
+        "_metadata",
     )
-    files = []
-    for partition_size, start_partition, end_partition in get_partition_iterator(
-        min_partition, latest_block, partition_sizes
-    ):
-        if start_partition < max_partition:
-            files.append(
-                table_dir.joinpath(
-                    f"partition_size={partition_size}",
-                    f"start_partition={start_partition}",
-                    f"end_partition={end_partition}",
-                    "data.parquet",
-                )
-            )
-    return files
+    filesystem, path = fs.FileSystem.from_uri(str(table_metadata))
+    return ds.parquet_dataset(path, filesystem=filesystem)
 
 
-def get_files(config_location, table, min_partition=None, max_partition=None):
-    file_list = get_partition_files(
-        AnyPath(config_location), table, min_partition, max_partition
+def get_latest_written_block_for_single_extract(config_location):
+    # This gets the latest block that should have
+    # been written to a file for any table within this dataset
+    subgraph_latest_block = get_latest_details(config_location)["latest_block"]
+    latest_written_blocks = []
+    with open(AnyPath(config_location) / "config.yaml", "r") as stream:
+        subgraph_extract_config = yaml.safe_load(stream)
+        for table, table_details in subgraph_extract_config["tables"].items():
+            partitions = table_details["partition_sizes"]
+            smallest_partition = min(partitions)
+            latest_subgraph_block_written = (
+                subgraph_latest_block // smallest_partition
+            ) * smallest_partition
+            latest_written_blocks.append(latest_subgraph_block_written)
+    return min(latest_written_blocks)
+
+
+def get_latest_written_block(subgraph_extract_locations):
+    latest_written_blocks = map(
+        get_latest_written_block_for_single_extract, subgraph_extract_locations
     )
-    return list(map(get_local_file, file_list))
+    return min(latest_written_blocks)
 
 
 def get_job_definition_for_image(image_name):

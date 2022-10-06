@@ -8,18 +8,12 @@ class WeightedUsage(Rule):
         super(WeightedUsage, self).__init__(core_parameters, user_defined_parameters)
 
     def set_user_defined_parameters(
-        self,
-        base_reward: int,
-        transaction_factor: int,
-        spend_factor: int,
-        token: str,
-        duration: int,
+        self, base_reward: int, transaction_factor: int, spend_factor: int, token: str
     ):
         self.base_reward = base_reward
         self.transaction_factor = transaction_factor
         self.spend_factor = spend_factor
         self.token = token
-        self.duration = duration
 
     def sql(self, table_query):
         return f"""

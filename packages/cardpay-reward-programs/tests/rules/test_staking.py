@@ -54,6 +54,7 @@ def create_rule(
 ):
     core_config = {
         "payment_cycle_length": CYCLE_LENGTH,
+        "duration": 30,
         "start_block": 0,
         "end_block": END_BLOCK,
         "subgraph_config_locations": {
@@ -64,7 +65,7 @@ def create_rule(
     }
 
     core_config.update(core_config_overrides)
-    user_config = {"token": "card-0", "duration": 30, "interest_rate_monthly": 0.06}
+    user_config = {"token": "card-0", "interest_rate_monthly": 0.06}
 
     user_config.update(user_config_overrides)
     con = duckdb.connect(database=":memory:", read_only=False)

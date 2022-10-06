@@ -22,6 +22,7 @@ def rule(request):
     core_config = {
         "start_block": 20000000,
         "end_block": 26000000,
+        "duration": 43200,
         "payment_cycle_length": payment_cycle_length,
         "subgraph_config_locations": {
             "prepaid_card_payment": "s3://partitioned-graph-data/data/staging_rewards/0.0.1/"
@@ -31,7 +32,6 @@ def rule(request):
         "base_reward": 10,
         "min_other_merchants": min_other_merchants,
         "token": config["staging"]["tokens"]["card"],
-        "duration": 43200,
     }
     return MinOtherMerchantsPaid(core_config, user_config)
 

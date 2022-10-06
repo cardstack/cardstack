@@ -10,7 +10,12 @@ from web3 import Web3
 
 from .reward_program import RewardProgram
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(
+    format="%(asctime)s %(levelname)-8s %(message)s",
+    level=logging.INFO,
+    datefmt="%Y-%m-%d %H:%M:%S",
+)
+
 load_dotenv()
 
 SENTRY_DSN = os.environ.get("SENTRY_DSN")
@@ -34,6 +39,7 @@ for expected_env in [
     "REWARD_MANAGER_ADDRESS",
     "REWARDS_BUCKET",
     "REWARD_SCHEDULER_APPROVED_PROGRAMS",
+    "REWARDS_SUBGRAPH_EXTRACTION",
     "SUBGRAPH_URL",
 ]:
     if expected_env not in os.environ:
@@ -54,7 +60,7 @@ REWARD_SCHEDULER_UPDATE_FREQUENCY = int(
 
 def safe_run(reward_program):
     try:
-        reward_program.run_all_payment_cycles()
+        reward_program.run_all_rules()
     except Exception as e:
         logging.error(
             f"Error running reward program {reward_program.reward_program_id}, {e}"

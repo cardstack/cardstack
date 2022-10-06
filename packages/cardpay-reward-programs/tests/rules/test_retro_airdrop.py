@@ -27,6 +27,7 @@ def rule(request):
         "start_block": 23592960,
         "end_block": 24859648,
         "payment_cycle_length": payment_cycle_length,
+        "duration": 43200,
         "subgraph_config_locations": {
             "prepaid_card_payment": "s3://partitioned-graph-data/data/staging_rewards/0.0.1/"
         },
@@ -34,7 +35,6 @@ def rule(request):
     user_config = {
         "total_reward": total_reward,
         "token": config["staging"]["tokens"]["card"],
-        "duration": 43200,
         "start_snapshot_block": 23592960,
         "end_snapshot_block": 24859648,
         "test_accounts": test_accounts,
@@ -178,6 +178,7 @@ class TestRetroAirdropSingle:
             "start_block": 23592960,
             "end_block": 24859648,
             "payment_cycle_length": 1024**2,
+            "duration": 43200,
             "subgraph_config_locations": {
                 "prepaid_card_payment": "s3://partitioned-graph-data/data/staging_rewards/0.0.1/"
             },
@@ -185,7 +186,6 @@ class TestRetroAirdropSingle:
         user_config = {
             "total_reward": 1_000_000_000_000,
             "token": config["staging"]["tokens"]["card"],
-            "duration": 43200,
             "start_snapshot_block": 23592960,
             "end_snapshot_block": 24859648,
             "test_accounts": test_accounts,
