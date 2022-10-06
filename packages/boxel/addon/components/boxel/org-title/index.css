@@ -34,7 +34,7 @@
 .boxel-org-title--has-logo.boxel-org-title--has-subtitle {
   grid-template-areas:
     "logo title"
-    "logo subtitle";
+    ". subtitle";
   grid-template-columns: auto 1fr;
 }
 
