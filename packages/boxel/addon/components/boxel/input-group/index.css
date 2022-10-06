@@ -49,20 +49,21 @@
   border: 1px solid var(--boxel-input-group-border-color);
   border-radius: var(--boxel-input-group-border-radius);
   transition: border-color var(--boxel-transition);
+  margin: 0;
   min-height: var(--boxel-input-group-height);
   outline-offset: 0;
 }
 
 .boxel-input-group__text-accessory {
-  display: flex;
   align-items: center;
-  padding: var(--boxel-input-group-padding-y) var(--boxel-input-group-padding-x);
+  background-color: var(--boxel-light-400);
+  color: var(--boxel-purple-900);
+  display: flex;
   font-size: var(--boxel-font-size-sm);
   line-height: var(--boxel-ratio);
-  color: var(--boxel-purple-900);
+  padding: var(--boxel-input-group-padding-y) var(--boxel-input-group-padding-x);
   text-align: center;
   white-space: nowrap;
-  background-color: var(--boxel-light-400);
 }
 
 .boxel-input-group__button-accessory,
