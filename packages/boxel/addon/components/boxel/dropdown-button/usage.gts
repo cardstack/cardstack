@@ -9,8 +9,8 @@ import menuItem from '@cardstack/boxel/helpers/menu-item'
 import menuDivider from '@cardstack/boxel/helpers/menu-divider'
 
 export default class DropdownButtonUsageComponent extends Component {
-  @tracked button = 'gear';
-  @tracked icon: string | undefined;
+  @tracked label = 'Label';
+  @tracked icon: string = 'gear';
   @tracked size = 30;
   @tracked iconSize = 16;
 
@@ -23,7 +23,8 @@ export default class DropdownButtonUsageComponent extends Component {
     <FreestyleUsage @name="DropdownButton">
       <:example>
         <BoxelDropdownButton
-          @button={{this.button}}
+          @label={{this.label}}
+          @icon={{this.icon}}
           @size={{this.size}}
           @iconSize={{this.iconSize}}
           as |ddb|
@@ -44,15 +45,15 @@ export default class DropdownButtonUsageComponent extends Component {
         <Args.String
           @name="button"
           @description="the name to use as the aria-label and added on the trigger element as a css class. If @icon is not specified, this value is also used to specify an svg to use."
-          @value={{this.button}}
+          @value={{this.label}}
           @required={{true}}
-          @onInput={{fn (mut this.button)}}
+          @onInput={{fn (mut this.label)}}
         />
         <Args.String
           @name="icon"
           @description="the name of the svg to show"
           @value={{this.icon}}
-          @defaultValue="falls back to the value of @button"
+          @required={{true}}
           @onInput={{fn (mut this.icon)}}
         />
         <Args.Number
@@ -77,6 +78,6 @@ export default class DropdownButtonUsageComponent extends Component {
           @description="The provided block is rendered when the button is triggered. Yields a 'Menu' component (instance of Boxel::Menu that is preconfigured with @closeMenu defined) and the 'dropdown' object documented in Boxel::Dropdown"
         />
       </:api>
-    </FreestyleUsage>    
+    </FreestyleUsage>
   </template>
 }
