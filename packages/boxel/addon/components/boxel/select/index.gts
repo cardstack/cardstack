@@ -17,13 +17,13 @@ type BasePowerSelectArgs = Pick<
   | 'disabled'
 >;
 
-interface Args<ItemT> extends BasePowerSelectArgs { 
+export interface BoxelSelectArgs<ItemT> extends BasePowerSelectArgs { 
   options: ItemT[];
 }
 
 interface Signature<ItemT = any> {
   Element: HTMLDivElement;
-  Args: Args<ItemT>,
+  Args: BoxelSelectArgs<ItemT>,
   Blocks: {
     default: [ItemT, string];
   };
