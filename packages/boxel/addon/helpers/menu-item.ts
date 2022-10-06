@@ -1,7 +1,8 @@
 import { helper } from '@ember/component/helper';
 import { type Link } from 'ember-link';
 
-type ActionType = Link | (() => void);
+// eslint-disable-next-line @typescript-eslint/ban-types
+type ActionType = Link | Function;
 
 interface MenuItemOptions {
   action: ActionType;

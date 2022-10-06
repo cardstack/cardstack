@@ -292,36 +292,41 @@ model ScheduledPaymentAttempt {
 }
 
 model ScheduledPayment {
-  id                         String                    @id @db.Uuid
-  senderSafeAddress          String                    @map("sender_safe_address")
-  moduleAddress              String                    @map("module_address")
-  tokenAddress               String                    @map("token_address")
-  amount                     BigInt
-  payeeAddress               String                    @map("payee_address")
-  executionGasEstimation     BigInt                    @map("execution_gas_estimation")
-  maxGasPrice                BigInt                    @map("max_gas_price")
-  feeFixedUsd                Int                       @map("fee_fixed_usd")
-  feePercentage              Int                       @map("fee_percentage")
-  salt                       String
-  payAt                      DateTime?                 @map("pay_at") @db.Timestamp(6)
-  recurringDayOfMonth        Int?                      @map("recurring_day_of_month")
-  recurringUntil             DateTime?                 @map("recurring_until") @db.Timestamp(6)
-  validForDays               Int?                      @default(3) @map("valid_for_days")
-  spHash                     String                    @unique @map("sp_hash")
-  chainId                    Int                       @map("chain_id")
-  creationTransactionHash    String?                   @map("creation_transaction_hash")
-  creationBlockNumber        BigInt?                   @map("creation_block_number")
-  cancelationTransactionHash String?                   @map("cancelation_transaction_hash")
-  cancelationBlockNumber     BigInt?                   @map("cancelation_block_number")
-  createdAt                  DateTime                  @default(now()) @map("created_at") @db.Timestamp(6)
-  updatedAt                  DateTime                  @default(now()) @map("updated_at") @db.Timestamp(6)
-  canceledAt                 DateTime?                 @map("canceled_at") @db.Timestamp(6)
-  scheduledPaymentAttempts   ScheduledPaymentAttempt[]
+  id                           String                    @id @db.Uuid
+  senderSafeAddress            String                    @map("sender_safe_address")
+  moduleAddress                String                    @map("module_address")
+  tokenAddress                 String                    @map("token_address")
+  amount                       BigInt
+  payeeAddress                 String                    @map("payee_address")
+  executionGasEstimation       BigInt                    @map("execution_gas_estimation")
+  maxGasPrice                  BigInt                    @map("max_gas_price")
+  feeFixedUsd                  Decimal                   @map("fee_fixed_usd") @db.Decimal
+  feePercentage                Decimal                   @map("fee_percentage") @db.Decimal
+  salt                         String
+  payAt                        DateTime?                 @map("pay_at") @db.Timestamp(6)
+  recurringDayOfMonth          Int?                      @map("recurring_day_of_month")
+  recurringUntil               DateTime?                 @map("recurring_until") @db.Timestamp(6)
+  validForDays                 Int?                      @default(3) @map("valid_for_days")
+  spHash                       String                    @unique @map("sp_hash")
+  chainId                      Int                       @map("chain_id")
+  creationTransactionHash      String?                   @map("creation_transaction_hash")
+  creationBlockNumber          BigInt?                   @map("creation_block_number")
+  cancelationTransactionHash   String?                   @map("cancelation_transaction_hash")
+  cancelationBlockNumber       BigInt?                   @map("cancelation_block_number")
+  createdAt                    DateTime                  @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt                    DateTime                  @default(now()) @map("updated_at") @db.Timestamp(6)
+  canceledAt                   DateTime?                 @map("canceled_at") @db.Timestamp(6)
+  cancelationTransactionError  String?                   @map("cancelation_transaction_error")
+  userAddress                  String                    @map("user_address")
+  creationTransactionError     String?                   @map("creation_transaction_error")
+  cancellationTransactionError String?                   @map("cancellation_transaction_error")
+  scheduledPaymentAttempts     ScheduledPaymentAttempt[]
 
   @@index([senderSafeAddress], map: "scheduled_payments_sender_safe_address_index")
   @@index([canceledAt, payAt, creationBlockNumber], map: "scheduled_payments_canceled_at_pay_at_creation_block_number_ind")
   @@index([recurringDayOfMonth], map: "scheduled_payments_recurring_day_of_month_index")
   @@index([recurringUntil], map: "scheduled_payments_recurring_until_index")
+  @@index([userAddress], map: "scheduled_payments_user_address_index")
   @@map("scheduled_payments")
 }
 

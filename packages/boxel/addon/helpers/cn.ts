@@ -9,7 +9,7 @@ export default helper(
    */
   function classNames(
     params: (string | undefined)[],
-    hash: Record<string, string | boolean | undefined>
+    hash: Record<string, string | boolean | number | undefined>
   ): string {
     // Change NamedArgsProxy -> Javascript object for compatibility with classnames@2.3.x
     const entries = Object.entries(hash);

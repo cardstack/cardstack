@@ -5,7 +5,7 @@ inputs:
   waypoint_config_file:
     description: Waypoint config file to check
     required: false
-    default: 'waypoint.hcl'
+    default: "waypoint.hcl"
 
 runs:
   using: composite
@@ -13,11 +13,11 @@ runs:
     - name: Install apt packages
       shell: bash
       run: |
-        sudo apt-get install awscli jq
+        sudo apt-get update && sudo apt-get install awscli jq --fix-missing
 
     - uses: volta-cli/action@v1
 
-    - run: yarn --prefer-offline
+    - run: yarn --prefer-offline --frozen-lockfile
       shell: bash
 
     - name: Check access to secrets specified in ${{ inputs.waypoint_config_file }}

@@ -33,7 +33,7 @@ jobs:
 
       - name: Prepare dependencies
         run: |
-          yarn --prefer-offline
+          yarn --prefer-offline --frozen-lockfile
           echo '//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}' > $HOME/.npmrc
           git config user.name "${{ github.actor }}"
           git config user.email "${{ github.actor }}@users.noreply.github.com"

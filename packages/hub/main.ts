@@ -93,6 +93,9 @@ import Email from './services/email';
 import Mailchimp from './services/mailchimp';
 import PrismaManager from './services/prisma-manager';
 import ScheduledPaymentsFetcherService from './services/scheduled-payments/fetcher';
+import ScheduledPaymentSerializer from './services/serializers/scheduled-payment-serializer';
+import ScheduledPaymentValidator from './services/validators/scheduled-payment';
+import ScheduledPaymentsRoute from './routes/scheduled-payments';
 
 //@ts-ignore polyfilling fetch
 global.fetch = fetch;
@@ -172,7 +175,10 @@ export function createRegistry(): Registry {
   registry.register('pagerduty-incidents-webhook-route', PagerdutyIncidentsWebhookRoute);
   registry.register('email-card-drop-router', EmailCardDropRouter);
   registry.register('prisma-manager', PrismaManager);
-  registry.register('scheduled-payments-fetcher', ScheduledPaymentsFetcherService);
+  registry.register('scheduled-payment-fetcher', ScheduledPaymentsFetcherService);
+  registry.register('scheduled-payment-serializer', ScheduledPaymentSerializer);
+  registry.register('scheduled-payment-validator', ScheduledPaymentValidator);
+  registry.register('scheduled-payments-route', ScheduledPaymentsRoute);
 
   if (process.env.COMPILER) {
     registry.register(

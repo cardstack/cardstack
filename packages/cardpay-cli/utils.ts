@@ -97,7 +97,7 @@ export async function getEthereumClients(
       bridge = 'https://bridge.walletconnect.org';
       break;
   }
-  
+
   switch (opts.connectionType) {
     case 'wallet-connect': {
       let walletConnectProvider = new WalletConnectProvider({

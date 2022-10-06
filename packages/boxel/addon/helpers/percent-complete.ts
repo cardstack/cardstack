@@ -4,6 +4,15 @@ interface PercentCompleteOptions {
   total: number;
   completed: number;
 }
+
+interface Signature {
+  Args: {
+    Positional: [];
+    Named: PercentCompleteOptions;
+  };
+  Return: number;
+}
+
 export function percentComplete(
   _params: never,
   { total, completed }: PercentCompleteOptions
@@ -15,6 +24,9 @@ export function percentComplete(
   return result;
 }
 
-export default helper(function (params: never, hash: PercentCompleteOptions) {
+export default helper<Signature>(function (
+  params: never,
+  hash: PercentCompleteOptions
+) {
   return percentComplete(params, hash);
 });

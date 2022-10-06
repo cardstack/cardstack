@@ -2,7 +2,7 @@ import { action } from '@ember/object';
 import Component from '@glimmer/component';
 import { tracked } from '@glimmer/tracking';
 import { type EmptyObject } from '@ember/component/helper';
-import PowerSelect from 'ember-power-select/components/power-select';
+import BoxelSelect from '@cardstack/boxel/components/boxel/select';
 import cn from '@cardstack/boxel/helpers/cn';
 import or from 'ember-truth-helpers/helpers/or';
 import './index.css';
@@ -41,7 +41,7 @@ export default class BoxelInputRangedNumberPicker extends Component<Signature> {
   }
 
   <template>
-    <PowerSelect
+    <BoxelSelect
       class={{cn
         "boxel-ranged-number-picker"
         boxel-ranged-number-picker--selected=this.selectedNumber
@@ -54,10 +54,12 @@ export default class BoxelInputRangedNumberPicker extends Component<Signature> {
       @renderInPlace={{true}}
       @dropdownClass="boxel-ranged-number-picker__dropdown"
       @triggerComponent={{@triggerComponent}}
-      as |item|
+      as |item itemCssClass|
     >
-      <div class="boxel-ranged-number-picker__item">{{item}}</div>
-    </PowerSelect>
+      <div class={{cn itemCssClass "boxel-ranged-number-picker__item"}}>
+        {{item}}
+      </div>
+    </BoxelSelect>
   </template>
 }
 

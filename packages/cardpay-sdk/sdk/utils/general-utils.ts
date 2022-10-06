@@ -10,6 +10,8 @@ import { AbiItem } from 'web3-utils';
 import { Operation } from './safe-utils';
 import { v4 } from 'uuid';
 import JsonRpcProvider from '../../providers/json-rpc-provider';
+import { Revert } from '../../providers/http-provider';
+import { Interface } from 'ethers/lib/utils';
 
 const POLL_INTERVAL = 500;
 
@@ -55,7 +57,7 @@ export async function safeContractCall(
 }
 
 export function waitUntilTransactionMined(
-  web3OrProvider: Web3 | JsonRpcProvider,
+  web3OrEthersProvider: Web3 | JsonRpcProvider,
   txnHash: string,
   duration = 60 * 10 * 1000
 ): Promise<SuccessfulTransactionReceipt> {
@@ -73,10 +75,10 @@ export function waitUntilTransactionMined(
 
     try {
       let receipt;
-      if (web3OrProvider instanceof JsonRpcProvider) {
-        receipt = await web3OrProvider.getTransactionReceipt(txnHash);
+      if (web3OrEthersProvider instanceof JsonRpcProvider) {
+        receipt = await web3OrEthersProvider.getTransactionReceipt(txnHash);
       } else {
-        receipt = await web3OrProvider.eth.getTransactionReceipt(txnHash);
+        receipt = await web3OrEthersProvider.eth.getTransactionReceipt(txnHash);
       }
 
       if (receipt?.status) {
@@ -322,8 +324,60 @@ export async function sendTransaction(web3: Web3, transaction: Transaction): Pro
   return txHash;
 }
 
+export function extractSendTransactionError(revert: Revert, abiInterface: Interface) {
+  let error;
+  try {
+    let funcError = abiInterface.parseError(revert.data);
+    error = `${funcError.name} ${funcError.args.join(',')}`;
+  } catch (e) {
+    error = revert.reason ? revert.reason : revert.message;
+  }
+
+  return error;
+}
+
 export function generateSaltNonce(prefix: string) {
   let uuid = prefix + '-' + v4();
   let result = [...uuid].reduce((result, char) => result + String(char.charCodeAt(0)), '');
   return result.substring(0, 77);
+}
+
+export async function hubRequest(
+  hubUrl: string,
+  path: string,
+  authToken: string,
+  method: 'GET' | 'POST' | 'PATCH' | 'DELETE',
+  body = {}
+) {
+  let url = `${hubUrl}/${path}`;
+  let options = {
+    method,
+    headers: {
+      'Content-Type': 'application/vnd.api+json',
+      Authorization: `Bearer ${authToken}`,
+      Accept: 'application/json',
+    },
+    body: Object.keys(body).length === 0 ? null : JSON.stringify(body),
+  };
+
+  let response = await global.fetch(url, options);
+  if (!response?.ok) {
+    throw new Error(await response.text());
+  }
+  return response.json();
+}
+
+export async function poll(fn: () => Promise<unknown>, fnCondition: (arg: unknown) => boolean, ms: number) {
+  let result = await fn();
+  while (!fnCondition(result)) {
+    await wait(ms);
+    result = await fn();
+  }
+  return result;
+}
+
+export async function wait(ms = 1000) {
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms);
+  });
 }
