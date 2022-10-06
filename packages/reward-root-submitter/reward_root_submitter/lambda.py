@@ -27,7 +27,7 @@ def handler(event, _context):
         unsubmitted_roots = get_all_unsubmitted_roots(config)
         for index, row in unsubmitted_roots.iterrows():
             process_file(row["file"], config)
-    elif event["Records"][0]["eventSource"] == "aws.s3":
+    elif event["Records"][0]["eventSource"] == "aws:s3":
         bucket = event["Records"][0]["s3"]["bucket"]["name"]
         key = urllib.parse.unquote_plus(
             event["Records"][0]["s3"]["object"]["key"], encoding="utf-8"
