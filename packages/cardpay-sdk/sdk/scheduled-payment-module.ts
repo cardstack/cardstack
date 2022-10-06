@@ -376,7 +376,7 @@ export default class ScheduledPaymentModule {
         requiredGas = decodedError.args[0].toNumber();
       } else {
         let messages = e.message.split(' ');
-        let decodedError = _interface.parseError(messages[2].replace(',', ''));
+        let decodedError = _interface.parseError(messages[1].replace(',', ''));
         requiredGas = decodedError.args[0].toNumber();
       }
       return requiredGas;
