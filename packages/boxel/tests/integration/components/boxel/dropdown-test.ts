@@ -3,21 +3,27 @@ import { module, test } from 'qunit';
 import { setupRenderingTest } from 'ember-qunit';
 import { click, render, focus, triggerKeyEvent } from '@ember/test-helpers';
 import { hbs } from 'ember-cli-htmlbars';
+import Ember from 'ember';
 
 module('Integration | Component | Dropdown', function (hooks) {
   setupRenderingTest(hooks);
-  const TRIGGER = '[data-test-boxel-dropdown-trigger]';
   const DROPDOWN_CONTENT = '[data-test-boxel-dropdown-content]';
+  const TRIGGER = '[data-test-dropdown-trigger]';
   const CLOSE_BUTTON = '[data-test-close-button]';
   const LINK_OUTSIDE = '[data-test-link-outside]';
   const LINK_INSIDE = '[data-test-link-inside]';
+  let onerror: typeof Ember['onerror'];
 
   hooks.beforeEach(async function (this) {
+    onerror = Ember.onerror;
+
     await render(hbs`
       <a data-test-link-outside href="#">Control</a>
       <Boxel::Dropdown>
-        <:trigger>
-          Trigger
+        <:trigger as |bindings|>
+          <button data-test-dropdown-trigger {{bindings}}>
+            Trigger
+          </button>
         </:trigger>
         <:content as |dd|>
           <a data-test-link-inside href="#">
@@ -27,6 +33,38 @@ module('Integration | Component | Dropdown', function (hooks) {
         </:content>
       </Boxel::Dropdown>
     `);
+  });
+
+  hooks.afterEach(function () {
+    // reset Ember.onerror
+    Ember.onerror = onerror;
+  });
+
+  // This test is important because event handlers are assigned assuming default HTML button behaviour
+  // In particular this includes "free" click events generated from spacebar and enter keys and also touch events
+  test('it errors if it receives a non-button element', async function (assert) {
+    let lastError: Error;
+    Ember.onerror = (e: Error) => {
+      lastError = e;
+    };
+
+    await render(hbs`
+      <Boxel::Dropdown>
+        <:trigger as |bindings|>
+          <div data-test-dropdown-trigger {{bindings}}>
+            Trigger
+          </div>
+        </:trigger>
+        <:content as |dd|>
+          <button {{on "click" dd.close}}>Close</button>
+        </:content>
+      </Boxel::Dropdown>
+    `);
+
+    assert.strictEqual(
+      lastError!.message,
+      'Only buttons should be used with the dropdown modifier'
+    );
   });
 
   test('it renders dropdown trigger, but not dropdown content at initialization', async function (assert) {
@@ -44,29 +82,29 @@ module('Integration | Component | Dropdown', function (hooks) {
     assert.dom(DROPDOWN_CONTENT).doesNotExist();
   });
 
-  test('it can open and close on space', async function (assert) {
-    await focus(TRIGGER);
-    // https://w3c.github.io/uievents/#fixed-virtual-key-codes
-    await triggerKeyEvent(TRIGGER, 'keydown', 32);
+  // https://github.com/emberjs/ember-test-helpers/issues/1054
+  // no click event is generated with synthetic keydown
+  // eslint-disable-next-line qunit/no-commented-tests
+  // test('it can open and close on space', async function (assert) {
+  //   await focus(TRIGGER);
+  //   // https://w3c.github.io/uievents/#fixed-virtual-key-codes
+  //   await triggerKeyEvent(TRIGGER, 'keydown', 32);
+  //   assert.dom(DROPDOWN_CONTENT).isVisible();
+  //   await triggerKeyEvent(TRIGGER, 'keydown', 32);
+  //   assert.dom(DROPDOWN_CONTENT).doesNotExist();
+  // });
 
-    assert.dom(DROPDOWN_CONTENT).isVisible();
-
-    await triggerKeyEvent(TRIGGER, 'keydown', 32);
-
-    assert.dom(DROPDOWN_CONTENT).doesNotExist();
-  });
-
-  test('it can open and close on enter', async function (assert) {
-    await focus(TRIGGER);
-    // https://w3c.github.io/uievents/#fixed-virtual-key-codes
-    await triggerKeyEvent(TRIGGER, 'keydown', 13);
-
-    assert.dom(DROPDOWN_CONTENT).isVisible();
-
-    await triggerKeyEvent(TRIGGER, 'keydown', 13);
-
-    assert.dom(DROPDOWN_CONTENT).doesNotExist();
-  });
+  // https://github.com/emberjs/ember-test-helpers/issues/1054
+  // no click event is generated with synthetic keydown
+  // eslint-disable-next-line qunit/no-commented-tests
+  // test('it can open and close on enter', async function (assert) {
+  //   await focus(TRIGGER);
+  //   // https://w3c.github.io/uievents/#fixed-virtual-key-codes
+  //   await triggerKeyEvent(TRIGGER, 'keydown', 13);
+  //   assert.dom(DROPDOWN_CONTENT).isVisible();
+  //   await triggerKeyEvent(TRIGGER, 'keydown', 13);
+  //   assert.dom(DROPDOWN_CONTENT).doesNotExist();
+  // });
 
   test('it assigns focus to the trigger when opened', async function (assert) {
     await click(TRIGGER);

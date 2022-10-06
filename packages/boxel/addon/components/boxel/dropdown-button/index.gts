@@ -14,7 +14,7 @@ import '@cardstack/boxel/styles/global.css';
 import './index.css';
 
 interface Signature {
-  Element: HTMLDivElement;
+  Element: HTMLButtonElement;
   Args: {
     button?: string;
     class?: string;
@@ -34,28 +34,29 @@ interface Signature {
 }
 
 const DropdownButton: TemplateOnlyComponent<Signature> = <template>
-  <div
-    class={{cn
-      "boxel-dropdown-button"
-      @class
-      boxel-dropdown-button--no-hover=@noHoverStyle
-    }}
-    style={{cssVar dropdown-button-size=(concat (or @size 40) "px")}}
-    data-test-boxel-dropdown-button
-    ...attributes
-  >
-    <BoxelDropdown
-      class="boxel-dropdown-button__trigger {{@button}}"
-      aria-label={{or @icon @button}}
-    >
-      <:trigger>
-        {{#if (or @icon @button)}}
-          {{svgJar
-            (or @icon @button)
-            width=(or @iconSize 16)
-            height=(or @iconSize 16)
+    <BoxelDropdown>
+      <:trigger as |bindings|>
+        <button
+          {{bindings}}
+          class={{cn
+            "boxel-dropdown-button"
+            "boxel-dropdown-button__reset"
+            "boxel-dropdown-button__trigger"
+            @class
           }}
-        {{/if}}
+          style={{cssVar dropdown-button-size=(concat (or @size 40) "px")}}
+          aria-label={{or @icon @button}}
+          data-test-boxel-dropdown-button
+          ...attributes
+        >
+          {{#if (or @icon @button)}}
+            {{svgJar
+              (or @icon @button)
+              width=(or @iconSize 16)
+              height=(or @iconSize 16)
+            }}
+          {{/if}}
+        </button>
       </:trigger>
       <:content as |dd|>
         {{yield
@@ -63,8 +64,6 @@ const DropdownButton: TemplateOnlyComponent<Signature> = <template>
         }}
       </:content>
     </BoxelDropdown>
-
-  </div>
 </template>
 
 export default DropdownButton;
