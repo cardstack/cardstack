@@ -2,11 +2,18 @@
 
 <Boxel::Dashboard @darkTheme={{true}}>
   <:header>
-    {{! FIXME needs subtitle }}
     <Boxel::OrgHeader
-      @title='Cardstack'
+      @title='CARDSTACK'
+      @subtitle='Safe Tools'
       @iconURL='/dashboard/cardstack-logo.svg'
-      style={{css-var boxel-org-header-background-color='var(--boxel-dark)'}}
+      style={{
+        css-var
+        boxel-org-header-background-color='var(--boxel-dark)'
+        boxel-org-title-title-font='300 var(--boxel-font-size-lg)'
+        boxel-org-title-subtitle-font='300 var(--boxel-font-size-xs)'
+        boxel-org-title-letter-spacing='var(--boxel-lsp-sm)'
+        boxel-org-title-text-transform='none'
+      }}
     >
       <Boxel::Button @kind='primary'>
         Connect Wallet

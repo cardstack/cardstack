@@ -6,28 +6,34 @@ import '@cardstack/boxel/styles/global.css';
 import './index.css';
 
 interface Signature {
-  Element: HTMLHeadingElement;
+  Element: HTMLElement;
   Args: {
     iconURL?: string;
     title: string;
+    subtitle?: string;
   };
   Blocks: EmptyObject
 }
 
 export default class BoxelOrgTitle extends Component<Signature> {
   <template>
-    <h1
-      class={{cn
-        "boxel-org-title"
-        boxel-org-title--has-logo=@iconURL
-      }}
-      ...attributes
-    >
+    <header class={{cn
+      "boxel-org-title"
+      boxel-org-title--has-logo=@iconURL
+      boxel-org-title--has-subtitle=@subtitle
+    }} ...attributes>
       {{#if @iconURL}}
         <span class="boxel-org-title__logo" style={{cssUrl "background-image" @iconURL}} />
       {{/if}}
-      {{@title}}
-    </h1>
+      <h1 class="boxel-org-title__title">
+        {{@title}}
+      </h1>
+      {{#if @subtitle}}
+        <h2 class="boxel-org-title__subtitle">
+          {{@subtitle}}
+        </h2>
+      {{/if}}
+    </header>
   </template>
 }
 
