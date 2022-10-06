@@ -339,8 +339,10 @@ export default class ScheduledPaymentModule {
     maxGasPrice: string,
     gasTokenAddress: string,
     salt: string,
-    payAt: number,
-    gasPrice: string
+    gasPrice: string,
+    payAt: number | null,
+    recurringDayOfMonth: number | null,
+    recurringUntil: number | null
   ): Promise<number>;
   async estimateExecutionGas(
     moduleAddress: string,
@@ -351,22 +353,10 @@ export default class ScheduledPaymentModule {
     maxGasPrice: string,
     gasTokenAddress: string,
     salt: string,
-    recurringDayOfMonth: number,
     gasPrice: string,
-    recurringUntil: number
-  ): Promise<number>;
-  async estimateExecutionGas(
-    moduleAddress: string,
-    tokenAddress: string,
-    amount: string,
-    payeeAddress: string,
-    fee: Fee,
-    maxGasPrice: string,
-    gasTokenAddress: string,
-    salt: string,
-    payAtOrRecurringDayOfMonth: number,
-    gasPrice: string,
-    recurringUntil?: number
+    payAt: number | null,
+    recurringDayOfMonth: number | null,
+    recurringUntil: number | null
   ): Promise<number> {
     let getRequiredGasFromRevertMessage = function (e: any): number {
       let requiredGas;
@@ -376,7 +366,7 @@ export default class ScheduledPaymentModule {
         requiredGas = decodedError.args[0].toNumber();
       } else {
         let messages = e.message.split(' ');
-        let decodedError = _interface.parseError(messages[2].replace(',', ''));
+        let decodedError = _interface.parseError(messages[1].replace(',', ''));
         requiredGas = decodedError.args[0].toNumber();
       }
       return requiredGas;
@@ -385,8 +375,7 @@ export default class ScheduledPaymentModule {
     let requiredGas = 0;
     try {
       let module = new Contract(moduleAddress, ScheduledPaymentABI, this.ethersProvider);
-      if (recurringUntil) {
-        let recurringDayOfMonth = payAtOrRecurringDayOfMonth;
+      if (recurringDayOfMonth) {
         await module.estimateGas[
           'estimateExecutionGas(address,uint256,address,((uint256),(uint256)),uint256,address,string,uint256,uint256,uint256)'
         ](
@@ -409,7 +398,6 @@ export default class ScheduledPaymentModule {
           gasPrice
         );
       } else {
-        let payAt = payAtOrRecurringDayOfMonth;
         await module.estimateGas[
           'estimateExecutionGas(address,uint256,address,((uint256),(uint256)),uint256,address,string,uint256,uint256)'
         ](
