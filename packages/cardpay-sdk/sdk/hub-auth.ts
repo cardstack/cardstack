@@ -4,6 +4,7 @@ import { networkName } from './utils/general-utils';
 import { getConstantByNetwork, networkIds } from './constants';
 import { ContractOptions } from 'web3-eth-contract';
 import { Signer } from 'ethers';
+import JsonRpcProvider from '../providers/json-rpc-provider';
 
 export interface IHubAuth {
   getNonce(): Promise<NonceResponse>;
@@ -16,7 +17,11 @@ interface NonceResponse {
 }
 
 export default class HubAuth implements IHubAuth {
-  constructor(private layer2Web3: Web3, private hubRootUrl?: string, private layer2Signer?: Signer) {}
+  constructor(
+    private web3OrEthersProvider: Web3 | JsonRpcProvider,
+    private hubRootUrl?: string,
+    private layer2Signer?: Signer
+  ) {}
 
   async checkValidAuth(authToken: string): Promise<boolean> {
     let response = await this.httpGetSession(authToken);
@@ -34,10 +39,14 @@ export default class HubAuth implements IHubAuth {
   }
 
   async authenticate(contractOptions?: ContractOptions): Promise<string> {
-    let ownerAddress = contractOptions?.from ?? (await this.layer2Web3.eth.getAccounts())[0];
+    let ownerAddress = contractOptions?.from
+      ? contractOptions?.from
+      : this.web3OrEthersProvider instanceof JsonRpcProvider
+      ? await this.web3OrEthersProvider.getSigner().getAddress()
+      : (await this.web3OrEthersProvider.eth.getAccounts())[0];
     let { nonce, version } = await this.getNonce();
 
-    const netName = await networkName(this.layer2Web3);
+    const netName = await networkName(this.web3OrEthersProvider);
     const chainId = networkIds[netName];
 
     const hubUrl = await this.getHubUrl(netName);
@@ -65,7 +74,7 @@ export default class HubAuth implements IHubAuth {
         nonce,
       },
     };
-    let signature = await signTypedData(this.layer2Signer ?? this.layer2Web3, ownerAddress, typedData);
+    let signature = await signTypedData(this.layer2Signer ?? this.web3OrEthersProvider, ownerAddress, typedData);
     let postBody = JSON.stringify({
       data: {
         attributes: {
@@ -106,7 +115,7 @@ export default class HubAuth implements IHubAuth {
   }
 
   async getHubUrl(network?: string): Promise<string> {
-    const netName = network || (await networkName(this.layer2Web3));
+    const netName = network || (await networkName(this.web3OrEthersProvider));
 
     return this.hubRootUrl || getConstantByNetwork('hubUrl', netName);
   }

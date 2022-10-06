@@ -10,12 +10,13 @@ import PrepaidCardManagerABI from '../../contracts/abi/v0.9.0/prepaid-card-manag
 import { AbiItem } from 'web3-utils';
 import { getAddress } from '../../contracts/addresses';
 import GnosisSafeProxyFactoryABI from '../../contracts/abi/gnosis-safe-proxy-factory';
-import { Contract } from 'web3-eth-contract';
 import GnosisSafeABI from '../../contracts/abi/gnosis-safe';
 import { Transaction } from './general-utils';
 /* eslint-disable node/no-extraneous-import */
+import { Contract, ethers, utils } from 'ethers';
 import { AddressZero } from '@ethersproject/constants';
-import { ethers } from 'ethers';
+import { Interface, LogDescription } from 'ethers/lib/utils';
+import JsonRpcProvider from '../../providers/json-rpc-provider';
 
 export interface EventABI {
   topic: string;
@@ -123,7 +124,7 @@ export async function createSafe(
 }
 
 export async function gasEstimate(
-  web3: Web3,
+  web3OrEthersProvider: Web3 | JsonRpcProvider,
   from: string,
   to: string,
   value: string,
@@ -131,7 +132,7 @@ export async function gasEstimate(
   operation: Operation,
   gasToken: string
 ): Promise<Estimate> {
-  let relayServiceURL = await getConstant('relayServiceURL', web3);
+  let relayServiceURL = await getConstant('relayServiceURL', web3OrEthersProvider);
   let url = `${relayServiceURL}/v2/safes/${from}/transactions/estimate/`;
   let options = {
     method: 'POST',
@@ -220,7 +221,7 @@ export async function getSendPayload(
 }
 
 export async function executeTransaction(
-  web3: Web3,
+  web3OrEthersProvider: Web3 | JsonRpcProvider,
   from: string,
   to: string,
   data: any,
@@ -230,7 +231,7 @@ export async function executeTransaction(
   signatures: any,
   eip1271Data?: string
 ): Promise<GnosisExecTx> {
-  let relayServiceURL = await getConstant('relayServiceURL', web3);
+  let relayServiceURL = await getConstant('relayServiceURL', web3OrEthersProvider);
   const url = `${relayServiceURL}/v1/safes/${from}/transactions/`;
   const options = {
     method: 'POST',
@@ -300,7 +301,7 @@ export async function executeSend(
 }
 
 export async function generateCreate2SafeTx(
-  web3: Web3,
+  ethersProvider: JsonRpcProvider,
   owners: string[],
   treshold: number,
   to: string,
@@ -311,30 +312,41 @@ export async function generateCreate2SafeTx(
   paymentReceiver: string,
   saltNonce: string
 ) {
-  let gnosisSafeProxyFactory = new web3.eth.Contract(
-    GnosisSafeProxyFactoryABI as AbiItem[],
-    await getAddress('gnosisProxyFactory_v1_3', web3)
+  let gnosisSafeProxyFactory = new Contract(
+    await getAddress('gnosisProxyFactory_v1_3', ethersProvider),
+    GnosisSafeProxyFactoryABI,
+    ethersProvider
   );
-  let gnosisSafeMasterCopy = new web3.eth.Contract(
-    GnosisSafeABI as AbiItem[],
-    await getAddress('gnosisSafeMasterCopy', web3)
+  let gnosisSafeMasterCopy = new Contract(
+    await getAddress('gnosisSafeMasterCopy', ethersProvider),
+    GnosisSafeABI,
+    ethersProvider
   );
 
-  let initializer = gnosisSafeMasterCopy.methods
-    .setup(owners, treshold, to, data, fallbackHandler, paymentToken, payment, paymentReceiver)
-    .encodeABI();
+  let initializer = gnosisSafeMasterCopy.interface.encodeFunctionData('setup', [
+    owners,
+    treshold,
+    to,
+    data,
+    fallbackHandler,
+    paymentToken,
+    payment,
+    paymentReceiver,
+  ]);
   let expectedSafeAddress = await calculateCreateProxyWithNonceAddress(
     gnosisSafeProxyFactory,
-    gnosisSafeMasterCopy.options.address,
+    gnosisSafeMasterCopy.address,
     initializer,
     saltNonce
   );
 
-  let create2SafeData = gnosisSafeProxyFactory.methods
-    .createProxyWithNonce(gnosisSafeMasterCopy.options.address, initializer, saltNonce)
-    .encodeABI();
+  let create2SafeData = gnosisSafeProxyFactory.interface.encodeFunctionData('createProxyWithNonce', [
+    gnosisSafeMasterCopy.address,
+    initializer,
+    saltNonce,
+  ]);
   let create2SafeTx: Transaction = {
-    to: gnosisSafeProxyFactory.options.address,
+    to: gnosisSafeProxyFactory.address,
     value: '0',
     data: create2SafeData,
     operation: Operation.CALL,
@@ -351,9 +363,11 @@ async function calculateCreateProxyWithNonceAddress(
 ) {
   let expectedSafeAddress = AddressZero;
   try {
-    await gnosisSafeProxyFactory.methods
-      .calculateCreateProxyWithNonceAddress(masterCopyAddress, initializer, saltNonce)
-      .estimateGas();
+    await gnosisSafeProxyFactory.estimateGas.calculateCreateProxyWithNonceAddress(
+      masterCopyAddress,
+      initializer,
+      saltNonce
+    );
   } catch (e: any) {
     expectedSafeAddress = getSafeAddressFromRevertMessage(e);
   }
@@ -372,6 +386,46 @@ function getSafeAddressFromRevertMessage(e: any): string {
   return safeAddress;
 }
 
+export async function getSafeVersion(
+  web3OrEthersProvider: Web3 | JsonRpcProvider,
+  gnosisSafeAddress: string
+): Promise<string> {
+  let safeVersion;
+  if (web3OrEthersProvider instanceof JsonRpcProvider) {
+    safeVersion = getSafeVersionWithEthers(web3OrEthersProvider, gnosisSafeAddress);
+  } else {
+    safeVersion = getSafeVersionWithWeb3(web3OrEthersProvider, gnosisSafeAddress);
+  }
+
+  return safeVersion;
+}
+
+async function getSafeVersionWithWeb3(web3: Web3, gnosisSafeAddress: string): Promise<string> {
+  let safeVersion;
+  let safe = new web3.eth.Contract(GnosisSafeABI as AbiItem[], gnosisSafeAddress);
+  try {
+    safeVersion = await safe.methods.VERSION().call();
+  } catch (e) {
+    safe = new web3.eth.Contract(GnosisSafeABI as AbiItem[], await getAddress('gnosisSafeMasterCopy', web3));
+    safeVersion = await safe.methods.VERSION().call();
+  }
+
+  return safeVersion;
+}
+
+async function getSafeVersionWithEthers(ethersProvider: JsonRpcProvider, gnosisSafeAddress: string): Promise<string> {
+  let safeVersion;
+  let safe = new Contract(gnosisSafeAddress, GnosisSafeABI, ethersProvider);
+  try {
+    safeVersion = await safe.callStatic.VERSION();
+  } catch (e) {
+    safe = new Contract(await getAddress('gnosisSafeMasterCopy', ethersProvider), GnosisSafeABI, ethersProvider);
+    safeVersion = await safe.callStatic.VERSION();
+  }
+
+  return safeVersion;
+}
+
 // allow TransactionReceipt as argument
 // eslint-disable-next-line @typescript-eslint/ban-types
 export function getParamsFromEvent(web3: Web3, txnReceipt: TransactionReceipt, eventAbi: EventABI, address: string) {
@@ -379,6 +433,22 @@ export function getParamsFromEvent(web3: Web3, txnReceipt: TransactionReceipt, e
     .filter((log) => isEventMatch(log, eventAbi.topic, address))
     .map((log) => web3.eth.abi.decodeLog(eventAbi.abis, log.data, log.topics.slice(1)));
   return eventParams;
+}
+
+export async function getSafeProxyCreationEvent(
+  ethersProvider: JsonRpcProvider,
+  logs: Log[]
+): Promise<LogDescription[]> {
+  let _interface = new utils.Interface(GnosisSafeProxyFactoryABI);
+  let gnosisProxyFactoryAddress = await getAddress('gnosisProxyFactory_v1_3', ethersProvider);
+  let events = logs
+    .filter((log) => isSafeProxyCreationEvent(gnosisProxyFactoryAddress, _interface, log))
+    .map((log) => _interface.parseLog(log));
+  return events;
+}
+
+function isSafeProxyCreationEvent(gnosisProxyFactoryAddress: string, _interface: Interface, log: Log): boolean {
+  return log.address === gnosisProxyFactoryAddress && log.topics[0] === _interface.getEventTopic('ProxyCreation');
 }
 
 export function getNextNonceFromEstimate(estimate: Estimate | SendPayload): BN {

@@ -105,9 +105,9 @@ export default {
       recurringDayOfMonth?: number | null;
       recurringUntil?: number | null;
     };
-    let { web3, signer } = await getEthereumClients(network, getConnectionType(args));
-    let scheduledPaymentModule = await getSDK('ScheduledPaymentModule', web3, signer);
-    let blockExplorer = await getConstant('blockExplorer', web3);
+    let { ethersProvider, signer } = await getEthereumClients(network, getConnectionType(args));
+    let scheduledPaymentModule = await getSDK('ScheduledPaymentModule', ethersProvider, signer);
+    let blockExplorer = await getConstant('blockExplorer', ethersProvider);
 
     console.log(`Execute a scheduled payment ...`);
     let onTxnHash = (txnHash: string) => console.log(`Transaction hash: ${blockExplorer}/tx/${txnHash}`);
