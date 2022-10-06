@@ -99,7 +99,7 @@ class RewardProgram:
         data_dependencies = list(rule["subgraph_config_locations"].values())
         # In the case of rollover, we also need to check the claims submissions
         # data is up to date
-        if rule["rollover"]:
+        if rule.get("rollover"):
             data_dependencies.append(self.subgraph_extract_location)
         if len(data_dependencies) > 0:
             return get_latest_written_block(data_dependencies)
