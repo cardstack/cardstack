@@ -47,7 +47,7 @@ module('Integration | Component | Dropdown', function (hooks) {
     // In particular this includes "free" click events generated from spacebar and enter keys and also touch events
     // Click events from enter and space are not tested because synthetic keydown events don't generate a click event
     // https://github.com/emberjs/ember-test-helpers/issues/1054
-    test('it errors if it receives a non-button element', async function (assert) {
+    test('it errors if bindings modifier receives a non-button element', async function (assert) {
       let lastError: Error;
       setupOnerror((e: Error) => {
         lastError = e;
