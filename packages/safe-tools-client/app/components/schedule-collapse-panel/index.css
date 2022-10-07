@@ -1,0 +1,43 @@
+.collapse-panel {
+  --collapse-panel-border-radius: 20px;
+
+  background-color: white;
+  border-radius: var(--collapse-panel-border-radius);
+}
+
+.collapse-panel__summary {
+  display: flex;
+  flex: 1;
+  height: 80px;
+  padding: 0 var(--boxel-sp-xl);
+  border-radius: var(--collapse-panel-border-radius);
+  font-size: var(--boxel-font-size);
+}
+
+.collapse-panel__summary-collapsed {
+  display: inherit;
+  flex: inherit;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Hide collapsed banner info */
+.collapse-panel[open] .collapse-panel__summary-collapsed {
+  display: none;
+}
+
+/* Use same style for "btns" and replace content once its open */
+.collapse-panel__summary-panel-button,
+.collapse-panel[open] .collapse-panel__summary::after {
+  font-weight: bold;
+  font-size: var(--boxel-font-size-sm);
+  content: 'Hide this';
+}
+
+/* Remove bottom border and align "Hide this" to end */
+.collapse-panel[open] .collapse-panel__summary {
+  border-bottom-left-radius: unset;
+  border-bottom-right-radius: unset;
+  align-items: center;
+  justify-content: flex-end;
+}
