@@ -20,7 +20,7 @@ export interface Signature {
   Args: {
     errorMessage?: string;
     helperText?: string;
-    id: string;
+    id?: string;
     disabled?: boolean;
     invalid?: boolean;
     multiline?: boolean;
@@ -35,7 +35,10 @@ export interface Signature {
 
 export default class BoxelInput extends Component<Signature> {
   helperId = guidFor(this);
-
+  get id() {
+    return this.args.id || this.helperId;
+  }
+  
   <template>
     {{#if (and (not @required) @optional)}}
       <div class="boxel-input__optional">Optional</div>
@@ -45,7 +48,7 @@ export default class BoxelInput extends Component<Signature> {
         {{!-- @glint-expect-error stumped on how to type this --}}
         <InputTag
           class={{cn "boxel-input" boxel-input--invalid=@invalid}}
-          id={{@id}}
+          id={{this.id}}
           value={{@value}}
           required={{@required}}
           disabled={{@disabled}}

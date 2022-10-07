@@ -11,9 +11,9 @@ import { SelectableToken } from '../selectable-token';
 interface Signature {
   Element: HTMLDivElement;
   Args: {
-    id: string;
+    id?: string;
     value: string;
-    disabled: boolean;
+    disabled?: boolean;
     helperText?: string;
     invalid: boolean;
     errorMessage: string;
@@ -64,7 +64,6 @@ export default class SelectableTokenAmount extends Component<Signature> {
               class="boxel-input-selectable-token-amount__icon"
               role="presentation"
             }}
-
             {{item.name}}
           </div>
         </Accessories.Select>
