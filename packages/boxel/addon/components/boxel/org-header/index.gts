@@ -18,7 +18,7 @@ interface Signature {
 
 export default class BoxelOrgHeader extends Component<Signature> {
   <template>
-    <header class="boxel-org-header" ...attributes>
+    <section class="boxel-org-header" ...attributes>
       <BoxelOrgTitle
         @iconURL={{@iconURL}}
         @title={{@title}}
@@ -31,7 +31,7 @@ export default class BoxelOrgHeader extends Component<Signature> {
       />
 
       {{yield}}
-    </header>
+    </section>
   </template>
 }
 
