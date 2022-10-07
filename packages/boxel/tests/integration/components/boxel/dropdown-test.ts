@@ -42,6 +42,8 @@ module('Integration | Component | Dropdown', function (hooks) {
 
   // This test is important because event handlers are assigned assuming default HTML button behaviour
   // In particular this includes "free" click events generated from spacebar and enter keys and also touch events
+  // Click events from enter and space are not tested because synthetic keydown events don't generate a click event
+  // https://github.com/emberjs/ember-test-helpers/issues/1054
   test('it errors if it receives a non-button element', async function (assert) {
     let lastError: Error;
     Ember.onerror = (e: Error) => {
@@ -81,30 +83,6 @@ module('Integration | Component | Dropdown', function (hooks) {
 
     assert.dom(DROPDOWN_CONTENT).doesNotExist();
   });
-
-  // https://github.com/emberjs/ember-test-helpers/issues/1054
-  // no click event is generated with synthetic keydown
-  // eslint-disable-next-line qunit/no-commented-tests
-  // test('it can open and close on space', async function (assert) {
-  //   await focus(TRIGGER);
-  //   // https://w3c.github.io/uievents/#fixed-virtual-key-codes
-  //   await triggerKeyEvent(TRIGGER, 'keydown', 32);
-  //   assert.dom(DROPDOWN_CONTENT).isVisible();
-  //   await triggerKeyEvent(TRIGGER, 'keydown', 32);
-  //   assert.dom(DROPDOWN_CONTENT).doesNotExist();
-  // });
-
-  // https://github.com/emberjs/ember-test-helpers/issues/1054
-  // no click event is generated with synthetic keydown
-  // eslint-disable-next-line qunit/no-commented-tests
-  // test('it can open and close on enter', async function (assert) {
-  //   await focus(TRIGGER);
-  //   // https://w3c.github.io/uievents/#fixed-virtual-key-codes
-  //   await triggerKeyEvent(TRIGGER, 'keydown', 13);
-  //   assert.dom(DROPDOWN_CONTENT).isVisible();
-  //   await triggerKeyEvent(TRIGGER, 'keydown', 13);
-  //   assert.dom(DROPDOWN_CONTENT).doesNotExist();
-  // });
 
   test('it assigns focus to the trigger when opened', async function (assert) {
     await click(TRIGGER);
