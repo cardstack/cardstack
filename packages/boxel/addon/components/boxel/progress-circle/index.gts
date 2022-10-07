@@ -18,44 +18,6 @@ interface Signature {
 }
 
 export default class ProgressCircle extends Component<Signature> {
-
-  <template>
-    <div
-      class="boxel-progress-circle"
-      style={{htmlSafe (concat "width:" this.size "px;height:" this.size "px;")}}
-      ...attributes
-    >
-      <div
-        class="boxel-progress-circle__pie"
-      >
-        <svg xmlns="http://www.w3.org/2000/svg" width={{this.size}} height={{this.size}} viewBox="0 0 {{this.outerCircleDiameter}} {{this.outerCircleDiameter}}">
-          <g stroke-width="{{this.progressArcThickness}}">
-            <circle 
-              cx={{this.outerCircleRadius}} 
-              cy={{this.outerCircleRadius}}  
-              r={{this.strokeCircleRadius}} 
-              class="boxel-progress-circle__background-circle"
-            />
-            <circle 
-              cx={{this.outerCircleRadius}} 
-              cy={{this.outerCircleRadius}}  
-              r={{this.strokeCircleRadius}} 
-              class="boxel-progress-circle__indicator-circle"
-              style={{this.pieStyle}}
-            />
-          </g>
-        </svg>
-      </div>
-      <div
-        class="boxel-progress-circle__pct-label"
-        style={{htmlSafe (concat "font-size:" this.fontSize "px;width:" this.percentLabelDiameter "px; height:" this.percentLabelDiameter "px;")}}
-      >
-        {{this.humanPercentComplete}}%
-      </div>
-    </div>
-
-  </template>
-  
   progressArcThickness = 12;
   outerCircleRadius = 60;
   innerCircleRadius = this.outerCircleRadius - this.progressArcThickness;
@@ -88,6 +50,43 @@ export default class ProgressCircle extends Component<Signature> {
     }
     return 0;
   }
+
+  <template>
+    <div
+      class="boxel-progress-circle"
+      style={{htmlSafe (concat "width:" this.size "px;height:" this.size "px;")}}
+      ...attributes
+    >
+      <div
+        class="boxel-progress-circle__pie"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" width={{this.size}} height={{this.size}} viewBox="0 0 {{this.outerCircleDiameter}} {{this.outerCircleDiameter}}">
+          <g stroke-width="{{this.progressArcThickness}}">
+            <circle
+              cx={{this.outerCircleRadius}}
+              cy={{this.outerCircleRadius}}
+              r={{this.strokeCircleRadius}}
+              class="boxel-progress-circle__background-circle"
+            />
+            <circle
+              cx={{this.outerCircleRadius}}
+              cy={{this.outerCircleRadius}}
+              r={{this.strokeCircleRadius}}
+              class="boxel-progress-circle__indicator-circle"
+              style={{this.pieStyle}}
+            />
+          </g>
+        </svg>
+      </div>
+      <div
+        class="boxel-progress-circle__pct-label"
+        style={{htmlSafe (concat "font-size:" this.fontSize "px;width:" this.percentLabelDiameter "px; height:" this.percentLabelDiameter "px;")}}
+      >
+        {{this.humanPercentComplete}}%
+      </div>
+    </div>
+
+  </template>
 }
 
 declare module '@glint/environment-ember-loose/registry' {
