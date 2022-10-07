@@ -1,12 +1,26 @@
 import Component from '@glimmer/component';
 //@ts-expect-error glint does not think hash is consume but it is
-import { hash } from '@ember/helper';
+import { hash, modifier, concat } from '@ember/helper';
+import { type EmptyObject } from '@ember/component/helper';
 import cn from '@cardstack/boxel/helpers/cn';
 import focusTrap from 'ember-focus-trap/modifiers/focus-trap';
-import { modifier } from "ember-modifier";
-import BasicDropdown from 'ember-basic-dropdown/components/basic-dropdown'
+import { modifier as createModifier, FunctionBasedModifier } from "ember-modifier";
+import BasicDropdown,{ Dropdown } from 'ember-basic-dropdown/components/basic-dropdown'
 
 import './index.css';
+
+interface DropdownTriggerSignature {
+  Element: HTMLButtonElement;
+  Args: {
+    Named: {
+      dropdown: Dropdown;
+      eventType?: 'click' | 'mousedown';
+      stopPropagation?: boolean;
+      [named: string]: unknown;
+    };
+    Positional: unknown[];
+  };
+}
 
 interface Signature {
   Element: HTMLDivElement;
@@ -14,7 +28,13 @@ interface Signature {
     contentClass?: string;
   };
   Blocks: {
-    trigger: [];
+    trigger: [FunctionBasedModifier<{
+      Element: HTMLButtonElement;
+      Args: {
+        Named: EmptyObject;
+        Positional: unknown[];
+      };
+    }>];
     content: [{ close: () => void }];
   };
 }
@@ -22,21 +42,25 @@ interface Signature {
 // Needs to be class, BasicDropdown doesn't work with const
 class BoxelDropdown extends Component<Signature> {
   <template>
+    {{!--
+      Note:
+      ...attributes will only apply to BasicDropdown if @renderInPlace={{true}}
+      because otherwise it does not render any HTML elements of its own, only its yielded content
+    --}}
     <BasicDropdown as |dd|>
-      <dd.Trigger
-        data-test-boxel-dropdown-trigger
-        ...attributes
-        {{this.registerTriggerElement}}
-      >
-        {{yield to="trigger"}}
-      </dd.Trigger>
+      {{yield (modifier
+        this.dropdownModifier
+        dropdown=dd
+        eventType="click"
+        stopPropagation=false
+      ) to="trigger"}}
       <dd.Content
         data-test-boxel-dropdown-content
         class={{cn "boxel-dropdown__content" @contentClass}}
         {{focusTrap
           isActive=dd.isOpen
           focusTrapOptions=(hash
-            initialFocus=this.triggerElement
+            initialFocus=(concat "[aria-controls='ember-basic-dropdown-content-" dd.uniqueId "']")
             onDeactivate=dd.actions.close
             allowOutsideClick=true
           )
@@ -47,9 +71,61 @@ class BoxelDropdown extends Component<Signature> {
     </BasicDropdown>
   </template>
 
-  triggerElement!: HTMLElement;
-  registerTriggerElement = modifier(element => {
-    this.triggerElement = element as HTMLElement;
+  dropdownModifier = createModifier<DropdownTriggerSignature>(function(element, _positional, named){
+    const { dropdown, eventType: desiredEventType, stopPropagation } = named;
+
+    if (element.tagName.toUpperCase() !== 'BUTTON') {
+      throw new Error('Only buttons should be used with the dropdown modifier');
+    }
+
+    function updateAria(){
+      element.setAttribute('aria-expanded', dropdown.isOpen ? 'true' : 'false');
+      element.setAttribute('aria-disabled', dropdown.disabled ? 'true' : 'false');
+    }
+
+    function handleMouseEvent(e: MouseEvent){
+      if (typeof document === 'undefined') return;
+
+      if (!dropdown || dropdown.disabled) return;
+
+      const eventType = e.type;
+      const notLeftClick = e.button !== 0;
+      if (eventType !== desiredEventType || notLeftClick) return;
+
+      if (stopPropagation) e.stopPropagation();
+
+      dropdown.actions.toggle(e);
+      updateAria();
+    }
+
+    function handleKeyDown(e: KeyboardEvent): void {
+      const { disabled, actions } = dropdown;
+
+      if (disabled) return;
+      if (e.keyCode === 27) {
+        actions.close(e);
+      }
+      updateAria();
+    }
+
+    element.addEventListener('click', handleMouseEvent);
+    element.addEventListener('keydown', handleKeyDown);
+
+    element.setAttribute('data-ebd-id', `${dropdown.uniqueId}-trigger`);
+    element.setAttribute(
+      'aria-owns',
+      `ember-basic-dropdown-content-${dropdown.uniqueId}`
+    );
+    element.setAttribute(
+      'aria-controls',
+      `ember-basic-dropdown-content-${dropdown.uniqueId}`
+    );
+    updateAria();
+
+    return function cleanup() {
+      element.removeEventListener('click', handleMouseEvent);
+      element.removeEventListener('keydown', handleKeyDown);
+    }
   }, { eager: false });
 }
 
