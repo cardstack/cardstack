@@ -730,7 +730,7 @@ export default class ScheduledPaymentModule {
     recurringUntil?: number | null,
     onScheduledPaymentCreate?: (scheduledPaymentId: string) => unknown
   ) {
-    let hubAuth = await getSDK('HubAuth', this.ethersProvider);
+    let hubAuth = await getSDK('HubAuth', this.ethersProvider, undefined, this.signer);
     let hubRootUrl = await hubAuth.getHubUrl();
     let authToken = await hubAuth.authenticate();
 
