@@ -60,7 +60,7 @@ export default class SelectionControlGroup extends Component<Signature> {
           selected
           {{#if @menuComponent}}
             <BoxelDropdownButton
-              @button="more-actions"
+              @label="more actions"
               @icon="more-actions"
               class="boxel-selection-control-group__menu-trigger"
               as |ddb|

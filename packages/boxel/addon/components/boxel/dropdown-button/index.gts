@@ -16,7 +16,7 @@ import './index.css';
 interface Signature {
   Element: HTMLButtonElement;
   Args: {
-    button?: string;
+    label?: string;
     class?: string;
     noHoverStyle?: boolean;
     size?: number;
@@ -45,17 +45,15 @@ const DropdownButton: TemplateOnlyComponent<Signature> = <template>
             @class
           }}
           style={{cssVar dropdown-button-size=(concat (or @size 40) "px")}}
-          aria-label={{or @icon @button}}
+          aria-label={{@label}}
           data-test-boxel-dropdown-button
           ...attributes
         >
-          {{#if (or @icon @button)}}
-            {{svgJar
-              (or @icon @button)
-              width=(or @iconSize 16)
-              height=(or @iconSize 16)
-            }}
-          {{/if}}
+          {{svgJar
+            @icon
+            width=(or @iconSize 16)
+            height=(or @iconSize 16)
+          }}
         </button>
       </:trigger>
       <:content as |dd|>
