@@ -44,31 +44,6 @@ export default class WavePlayerComponent extends Component<Signature> {
   @tracked isPlaying = false;
   @tracked duration = 0;
 
-  <template>
-    <div class="boxel-wave-player" ...attributes>
-      <BoxelIconButton
-        onclick={{perform this.playPause}}
-        class="boxel-wave-player__play {{if this.isPlaying "boxel-wave-player--is-playing"}}"
-        aria-label={{if this.isPlaying "Pause" "Play"}}
-        @icon={{if this.isPlaying "pause-btn" "play-btn"}}
-        @width="30px"
-        @height="30px"
-      />
-      <canvas
-        {{didInsert this.setupPlayer}}
-        role="button"
-        aria-label="Audio track"
-        width={{this.width}} height={{this.height}} style={{htmlSafe this.style}}
-        {{on 'click' this.canvasClick}}
-      >
-      </canvas>
-
-      <div class="boxel-wave-player__times">
-        {{mediaDuration this.currentTime}} / {{mediaDuration this.duration}}
-      </div>
-    </div>    
-  </template>
-
   get style(): string {
     return `
     width: ${this.width / 2}px;
@@ -190,6 +165,31 @@ export default class WavePlayerComponent extends Component<Signature> {
     assert('audio is present', !!this.audio);
     this.audio.currentTime = clickFraction * this.audio.duration;
   }
+
+  <template>
+    <div class="boxel-wave-player" ...attributes>
+      <BoxelIconButton
+        onclick={{perform this.playPause}}
+        class="boxel-wave-player__play {{if this.isPlaying "boxel-wave-player--is-playing"}}"
+        aria-label={{if this.isPlaying "Pause" "Play"}}
+        @icon={{if this.isPlaying "pause-btn" "play-btn"}}
+        @width="30px"
+        @height="30px"
+      />
+      <canvas
+        {{didInsert this.setupPlayer}}
+        role="button"
+        aria-label="Audio track"
+        width={{this.width}} height={{this.height}} style={{htmlSafe this.style}}
+        {{on 'click' this.canvasClick}}
+      >
+      </canvas>
+
+      <div class="boxel-wave-player__times">
+        {{mediaDuration this.currentTime}} / {{mediaDuration this.duration}}
+      </div>
+    </div>
+  </template>
 }
 
 function range(n: number) {
