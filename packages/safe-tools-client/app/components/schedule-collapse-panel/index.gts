@@ -27,6 +27,20 @@ const ScheduleCollapsePanel: TemplateOnlyComponent<Signature> = <template>
       </div>
       <div class='collapse-panel__details-overlay'>
         <h3>Start using this payment scheduler dApp:</h3>
+        <ol type='1'>
+          <li>
+            <h4>Set up your payment account</h4>
+            <p>Connect your wallet, choose a blockchain, set up your safe</p>
+          </li>
+          <li>
+            <h4>Schedule your payments</h4>
+            <p>Specify the date & time for upcoming & recurring transactions</p>
+          </li>
+          <li>
+            <h4>Set up your payment account</h4>
+            <p>See details of your past & future crypto payments at a glance</p>
+          </li>
+        </ol>
       </div>
     </div>
   </details>
