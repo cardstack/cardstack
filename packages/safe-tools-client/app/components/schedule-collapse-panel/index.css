@@ -1,14 +1,16 @@
 .collapse-panel {
   --collapse-panel-border-radius: 20px;
+  --collapse-panel-summary-height: 80px;
 
-  background-color: white;
+  background: url('/images/backgrounds/schedule-panel.svg') no-repeat
+    bottom/cover white;
   border-radius: var(--collapse-panel-border-radius);
 }
 
 .collapse-panel__summary {
   display: flex;
   flex: 1;
-  height: 80px;
+  height: var(--collapse-panel-summary-height);
   padding: 0 var(--boxel-sp-xl);
   border-radius: var(--collapse-panel-border-radius);
   font-size: var(--boxel-font-size);
@@ -32,6 +34,8 @@
   font-weight: bold;
   font-size: var(--boxel-font-size-sm);
   content: 'Hide this';
+  cursor: pointer;
+  z-index: 1;
 }
 
 /* Remove bottom border and align "Hide this" to end */
@@ -40,4 +44,38 @@
   border-bottom-right-radius: unset;
   align-items: center;
   justify-content: flex-end;
+}
+
+.collapse-panel__details {
+  display: flex;
+  flex-direction: row;
+  padding-left: var(--boxel-sp-xl);
+}
+
+.collapse-panel__details h2 {
+  margin-top: 0;
+  text-align: left;
+  font-size: 2.9rem;
+  font-weight: 300;
+}
+
+.collapse-panel__details-content {
+  flex: 2;
+  padding-right: 150px;
+  padding-bottom: var(--boxel-sp-xl);
+}
+
+.collapse-panel__details-overlay {
+  flex: 1;
+  margin-top: calc(var(--collapse-panel-summary-height) * -1);
+  border-radius: 0 var(--collapse-panel-border-radius)
+    var(--collapse-panel-border-radius) 0;
+  background-color: var(--boxel-light-100);
+  opacity: 0.95;
+  padding: var(--boxel-sp-xxxl) var(--boxel-sp-xxxl) 0;
+}
+
+.collapse-panel__details-overlay h3 {
+  font-size: var(--boxel-font-size-lg);
+  text-align: left;
 }

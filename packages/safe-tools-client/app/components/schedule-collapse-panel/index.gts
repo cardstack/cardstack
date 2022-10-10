@@ -21,7 +21,14 @@ const ScheduleCollapsePanel: TemplateOnlyComponent<Signature> = <template>
         <span class='collapse-panel__summary-panel-button'>Expand</span>
       </div>
     </summary>
-    {{! TODO: add detail info}}
+    <div class='collapse-panel__details'>
+      <div class='collapse-panel__details-content'>
+        <h2>{{panelTitle}}</h2>
+      </div>
+      <div class='collapse-panel__details-overlay'>
+        <h3>Start using this payment scheduler dApp:</h3>
+      </div>
+    </div>
   </details>
 </template>
 
