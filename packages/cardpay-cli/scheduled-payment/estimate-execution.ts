@@ -5,7 +5,7 @@ import { Arguments, CommandModule } from 'yargs';
 
 export default {
   command:
-    'estimate-execution <moduleAddress> <tokenAddress> <amount> <payeeAddress> <fixedUSDFee> <percentageFee> <maxGasPrice> <gasTokenAddress> <salt> <payAt> <gasPrice>',
+    'estimate-execution <moduleAddress> <tokenAddress> <amount> <payeeAddress> <fixedUSDFee> <percentageFee> <maxGasPrice> <gasTokenAddress> <salt> <payAt> <recurringDayOfMonth> <recurringUntil> <gasPrice>',
   describe: 'Enable scheduled payment module on the safe',
   builder(yargs: Argv) {
     return yargs
@@ -33,10 +33,6 @@ export default {
         type: 'number',
         description: 'Percentage fee (e.g. 5%, 0.05)',
       })
-      .positional('percentageFee', {
-        type: 'number',
-        description: 'Percentage fee (e.g. 5%, 0.05)',
-      })
       .positional('maxGasPrice', {
         type: 'string',
         description: 'Maximum gas price (in the smallest units of gas token)',
@@ -53,17 +49,19 @@ export default {
         type: 'number',
         description: 'Time to execute scheduled payments (in seconds)',
       })
+      .positional('recurringDayOfMonth', {
+        type: 'number',
+        description:
+          'Day of the month on which the payment will be made recurringly (range: 1-31). Used for recurring scheduled payments. In case the month has less than days than the value provided, the payment will me made on the last day of the month. Should be an empty string when payAt is set.',
+      })
+      .positional('recurringUntil', {
+        type: 'number',
+        description:
+          'Unix UTC time in seconds that represents the point in time when the recurring payment should be stopped. Used for recurring scheduled payments. Should be an empty string when payAt is set',
+      })
       .positional('gasPrice', {
         type: 'string',
         description: 'Gas price (in the smallest units of gas token)',
-      })
-      .option('recurringDayOfMonth', {
-        type: 'number',
-        description: 'Days of the month in the range of 1-28 to make recurring payments',
-      })
-      .option('recurringUntil', {
-        type: 'number',
-        description: 'End date of recurring payment',
       })
       .option('network', NETWORK_OPTION_ANY);
   },
@@ -96,8 +94,8 @@ export default {
       salt: string;
       payAt: number;
       gasPrice: string;
-      recurringDayOfMonth: number;
-      recurringUntil: number;
+      recurringDayOfMonth?: number | null;
+      recurringUntil?: number | null;
     };
     let { ethersProvider, signer } = await getEthereumClients(network, getConnectionType(args));
     let scheduledPaymentModule = await getSDK('ScheduledPaymentModule', ethersProvider, signer);
@@ -116,8 +114,9 @@ export default {
       maxGasPrice,
       gasTokenAddress,
       salt,
-      recurringDayOfMonth ? recurringDayOfMonth : payAt,
       gasPrice,
+      payAt,
+      recurringDayOfMonth,
       recurringUntil
     );
 

@@ -340,34 +340,10 @@ export default class ScheduledPaymentModule {
     maxGasPrice: string,
     gasTokenAddress: string,
     salt: string,
-    payAt: number,
-    gasPrice: string
-  ): Promise<number>;
-  async estimateExecutionGas(
-    moduleAddress: string,
-    tokenAddress: string,
-    amount: string,
-    payeeAddress: string,
-    fee: Fee,
-    maxGasPrice: string,
-    gasTokenAddress: string,
-    salt: string,
-    recurringDayOfMonth: number,
     gasPrice: string,
-    recurringUntil: number
-  ): Promise<number>;
-  async estimateExecutionGas(
-    moduleAddress: string,
-    tokenAddress: string,
-    amount: string,
-    payeeAddress: string,
-    fee: Fee,
-    maxGasPrice: string,
-    gasTokenAddress: string,
-    salt: string,
-    payAtOrRecurringDayOfMonth: number,
-    gasPrice: string,
-    recurringUntil?: number
+    payAt?: number | null,
+    recurringDayOfMonth?: number | null,
+    recurringUntil?: number | null
   ): Promise<number> {
     let getRequiredGasFromRevertMessage = function (e: any): number {
       let _interface = new utils.Interface(['error GasEstimation(uint256 gas)']);
@@ -380,7 +356,6 @@ export default class ScheduledPaymentModule {
     try {
       let module = new Contract(moduleAddress, ScheduledPaymentABI, this.ethersProvider);
       if (recurringUntil) {
-        let recurringDayOfMonth = payAtOrRecurringDayOfMonth;
         await module.estimateGas[
           'estimateExecutionGas(address,uint256,address,((uint256),(uint256)),uint256,address,string,uint256,uint256,uint256)'
         ](
@@ -403,7 +378,6 @@ export default class ScheduledPaymentModule {
           gasPrice
         );
       } else {
-        let payAt = payAtOrRecurringDayOfMonth;
         await module.estimateGas[
           'estimateExecutionGas(address,uint256,address,((uint256),(uint256)),uint256,address,string,uint256,uint256)'
         ](
@@ -543,38 +517,13 @@ export default class ScheduledPaymentModule {
     maxGasPrice: string,
     gasTokenAddress: string,
     salt: string,
-    payAt: number
-  ): Promise<string>;
-  async createSpHash(
-    moduleAddress: string,
-    tokenAddress: string,
-    amount: string,
-    payeeAddress: string,
-    fee: Fee,
-    executionGas: number,
-    maxGasPrice: string,
-    gasTokenAddress: string,
-    salt: string,
-    recurringDayOfMonth: number,
-    recurringUntil: number
-  ): Promise<string>;
-  async createSpHash(
-    moduleAddress: string,
-    tokenAddress: string,
-    amount: string,
-    payeeAddress: string,
-    fee: Fee,
-    executionGas: number,
-    maxGasPrice: string,
-    gasTokenAddress: string,
-    salt: string,
-    payAtOrRecurringDayOfMonth: number,
-    recurringUntil?: number
+    payAt?: number | null,
+    recurringDayOfMonth?: number | null,
+    recurringUntil?: number | null
   ): Promise<string> {
     let spHash;
     let module = new Contract(moduleAddress, ScheduledPaymentABI, this.ethersProvider);
     if (recurringUntil) {
-      let recurringDayOfMonth = payAtOrRecurringDayOfMonth;
       spHash = await module.callStatic[
         'createSpHash(address,uint256,address,((uint256),(uint256)),uint256,uint256,address,string,uint256,uint256)'
       ](
@@ -597,7 +546,6 @@ export default class ScheduledPaymentModule {
         recurringUntil
       );
     } else {
-      let payAt = payAtOrRecurringDayOfMonth;
       spHash = await module.callStatic[
         'createSpHash(address,uint256,address,((uint256),(uint256)),uint256,uint256,address,string,uint256)'
       ](
@@ -702,7 +650,7 @@ export default class ScheduledPaymentModule {
     maxGasPrice: string,
     gasTokenAddress: string,
     salt: string,
-    payAt: number | null,
+    payAt?: number | null,
     recurringDayOfMonth?: number | null,
     recurringUntil?: number | null,
     onScheduledPaymentCreate?: (scheduledPaymentId: string) => unknown
@@ -751,35 +699,20 @@ export default class ScheduledPaymentModule {
     if (payAt == null && recurringDayOfMonth == null && recurringUntil == null)
       throw new Error('When payAt is null, recurringDayOfMonth and recurringUntil must have a value');
 
-    let spHash: string;
-    if (recurringDayOfMonth && recurringUntil) {
-      spHash = await this.createSpHash(
-        moduleAddress,
-        tokenAddress,
-        amount,
-        payeeAddress,
-        { fixedUSD: feeFixedUSD, percentage: feePercentage },
-        executionGas,
-        maxGasPrice,
-        gasTokenAddress,
-        salt,
-        recurringDayOfMonth,
-        recurringUntil
-      );
-    } else {
-      spHash = await this.createSpHash(
-        moduleAddress,
-        tokenAddress,
-        amount,
-        payeeAddress,
-        { fixedUSD: feeFixedUSD, percentage: feePercentage },
-        executionGas,
-        maxGasPrice,
-        gasTokenAddress,
-        salt,
-        payAt!
-      );
-    }
+    let spHash: string = await this.createSpHash(
+      moduleAddress,
+      tokenAddress,
+      amount,
+      payeeAddress,
+      { fixedUSD: feeFixedUSD, percentage: feePercentage },
+      executionGas,
+      maxGasPrice,
+      gasTokenAddress,
+      salt,
+      payAt,
+      recurringDayOfMonth,
+      recurringUntil
+    );
 
     let txnParams = await this.generateSchedulePaymentTxParams(safeAddress, moduleAddress, gasTokenAddress, spHash);
 
@@ -921,8 +854,8 @@ export default class ScheduledPaymentModule {
     maxGasPrice: string,
     gasTokenAddress: string,
     salt: string,
-    payAt: number,
     gasPrice: string,
+    payAt?: number | null,
     recurringDayOfMonth?: number | null,
     recurringUntil?: number | null,
     txnOptions?: TransactionOptions
@@ -938,8 +871,8 @@ export default class ScheduledPaymentModule {
     maxGasPrice?: string,
     gasTokenAddress?: string,
     salt?: string,
-    payAt?: number | null,
     gasPrice?: string,
+    payAt?: number | null,
     recurringDayOfMonth?: number | null,
     recurringUntil?: number | null,
     txnOptions?: TransactionOptions
