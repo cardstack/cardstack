@@ -10,6 +10,7 @@ import CRDLogo from '@cardstack/boxel/usage-support/images/orgs/crd-icon.svg';
 
 export default class OrgHeaderUsage extends Component {
   @tracked title = 'CRD Records';
+  @tracked subtitle = 'Since 1919';
   @tracked iconURL = CRDLogo;
   @tracked backgroundColor = 'var(--boxel-blue)';
   @tracked color = 'var(--boxel-light)';
@@ -29,6 +30,7 @@ export default class OrgHeaderUsage extends Component {
       <:example>
         <BoxelOrgHeader
           @title={{this.title}}
+          @subtitle={{this.subtitle}}
           @iconURL={{this.iconURL}}
           style={{cssVar
             boxel-org-header-background-color=this.backgroundColor
@@ -42,11 +44,16 @@ export default class OrgHeaderUsage extends Component {
         </BoxelOrgHeader>
       </:example>
       <:api as |Args|>
-        <Args.String
+      <Args.String
           @name="title"
           @value={{this.title}}
           @required={{true}}
           @onInput={{fn (mut this.title)}}
+        />
+        <Args.String
+          @name="subtitle"
+          @value={{this.subtitle}}
+          @onInput={{fn (mut this.subtitle)}}
         />
         <Args.String
           @name="iconURL"
@@ -93,6 +100,6 @@ export default class OrgHeaderUsage extends Component {
           @description="Other header content"
         />
       </:api>
-    </FreestyleUsage>    
+    </FreestyleUsage>
   </template>
 }

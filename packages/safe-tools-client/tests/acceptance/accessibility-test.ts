@@ -8,7 +8,7 @@ module('Acceptance | accessibility', function (hooks) {
 
   test('accessibility check', async function (assert) {
     await visit('/');
-    assert.strictEqual(currentURL(), '/');
+    assert.strictEqual(currentURL(), '/schedule');
     await a11yAudit();
     assert.ok(true, 'no a11y errors found on app home page');
   });

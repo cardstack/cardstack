@@ -4,16 +4,43 @@
   gap: 0 var(--boxel-sp-xs);
   min-height: 3.125rem;
   color: var(--boxel-org-title-color, inherit);
-  font: var(--boxel-org-title-font, 900 1.125rem/1.333 var(--boxel-font-family));
   letter-spacing: var(--boxel-org-title-letter-spacing, var(--boxel-lsp-xxl));
   text-transform: var(--boxel-org-title-text-transform, uppercase);
 }
 
+.boxel-org-title__title {
+  grid-area: title;
+  margin: 0;
+  font: var(--boxel-org-title-title-font, 900 1.125rem/1.333 var(--boxel-font-family));
+}
+
+.boxel-org-title__subtitle {
+  grid-area: subtitle;
+  margin: 0;
+  font: var(--boxel-org-title-subtitle-font, 900 0.8125rem/1.333 var(--boxel-font-family));
+  margin-top: calc(-1 * var(--boxel-sp-xs));
+}
+
+.boxel-org-title--has-subtitle {
+  grid-template-areas:
+    "title"
+    "subtitle";
+}
+
 .boxel-org-title--has-logo {
+  grid-template-areas: "logo title";
+  grid-template-columns: auto 1fr;
+}
+
+.boxel-org-title--has-logo.boxel-org-title--has-subtitle {
+  grid-template-areas:
+    "logo title"
+    ". subtitle";
   grid-template-columns: auto 1fr;
 }
 
 .boxel-org-title__logo {
+  grid-area: logo;
   width: 3.125rem;
   height: 3.125rem;
   background-position: var(--boxel-org-title-logo-position, center);

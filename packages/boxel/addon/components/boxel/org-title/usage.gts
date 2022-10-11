@@ -10,9 +10,11 @@ import CRDLogo from '@cardstack/boxel/usage-support/images/orgs/crd-icon.svg';
 
 export default class OrgTitleUsage extends Component {
   @tracked title = 'CRD Records';
+  @tracked subtitle = 'Since 1919';
   @tracked iconURL = CRDLogo;
   @tracked color = '#ffffff';
-  @tracked font = '900 1.125rem/1.333 var(--boxel-font-family)';
+  @tracked titleFont = '900 1.125rem/1.333 var(--boxel-font-family)';
+  @tracked subtitleFont = '900 0.8125rem/1.333 var(--boxel-font-family)';
   @tracked letterSpacing = 'var(--boxel-lsp-xxl)';
   @tracked logoSize = 'auto 2rem';
   @tracked logoPosition = 'center';
@@ -34,10 +36,12 @@ export default class OrgTitleUsage extends Component {
       >
         <BoxelOrgTitle
           @title={{this.title}}
+          @subtitle={{this.subtitle}}
           @iconURL={{this.iconURL}}
           style={{cssVar
             boxel-org-title-color=this.color
-            boxel-org-title-font=this.font
+            boxel-org-title-title-font=this.titleFont
+            boxel-org-title-subtitle-font=this.subtitleFont
             boxel-org-title-letter-spacing=this.letterSpacing
             boxel-org-title-logo-size=this.logoSize
             boxel-org-title-logo-position=this.logoPosition
@@ -54,6 +58,11 @@ export default class OrgTitleUsage extends Component {
           @onInput={{fn (mut this.title)}}
         />
         <Args.String
+          @name="subtitle"
+          @value={{this.subtitle}}
+          @onInput={{fn (mut this.subtitle)}}
+        />
+        <Args.String
           @name="iconURL"
           @value={{this.iconURL}}
           @onInput={{fn (mut this.iconURL)}}
@@ -67,11 +76,18 @@ export default class OrgTitleUsage extends Component {
         />
         {{!-- template-lint-disable no-unbound --}}
         <Args.String
-          @name="--boxel-org-title-font"
+          @name="--boxel-org-title-title-font"
           @description="font override for title"
-          @defaultValue={{unbound this.font}}
-          @value={{this.font}}
-          @onInput={{fn (mut this.font)}}
+          @defaultValue={{unbound this.titleFont}}
+          @value={{this.titleFont}}
+          @onInput={{fn (mut this.titleFont)}}
+        />
+        <Args.String
+          @name="--boxel-org-title-subtitle-font"
+          @description="font override for title"
+          @defaultValue={{unbound this.subtitleFont}}
+          @value={{this.subtitleFont}}
+          @onInput={{fn (mut this.subtitleFont)}}
         />
         <Args.String
           @name="--boxel-org-letter-spacing"
@@ -102,6 +118,28 @@ export default class OrgTitleUsage extends Component {
           @onInput={{fn (mut this.textTransform)}}
         />
       </:api>
-    </FreestyleUsage>    
+    </FreestyleUsage>
+
+    <FreestyleUsage @name="Boxel:OrgTitle with no subtitle">
+      <:example>
+      <div
+        {{!-- template-lint-disable no-inline-styles --}}
+        style="background-color: var(--boxel-purple)"
+      >
+        <BoxelOrgTitle
+          @title={{this.title}}
+          @iconURL={{this.iconURL}}
+          style={{cssVar
+            boxel-org-title-color=this.color
+            boxel-org-title-title-font=this.titleFont
+            boxel-org-title-letter-spacing=this.letterSpacing
+            boxel-org-title-logo-size=this.logoSize
+            boxel-org-title-logo-position=this.logoPosition
+            boxel-org-title-text-transform=this.textTransform
+          }}
+        />
+      </div>
+      </:example>
+    </FreestyleUsage>
   </template>
 }

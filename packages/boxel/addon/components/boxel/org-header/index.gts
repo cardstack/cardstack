@@ -9,6 +9,7 @@ interface Signature {
   Args: {
     iconURL?: string;
     title: string;
+    subtitle?: string;
   };
   Blocks: {
     default: [];
@@ -17,10 +18,11 @@ interface Signature {
 
 export default class BoxelOrgHeader extends Component<Signature> {
   <template>
-    <header class="boxel-org-header" ...attributes>
+    <section class="boxel-org-header" ...attributes>
       <BoxelOrgTitle
         @iconURL={{@iconURL}}
         @title={{@title}}
+        @subtitle={{@subtitle}}
         style={{cssVar
           boxel-org-title-text-color="var(--boxel-org-header-color)"
           boxel-org-title-logo-position="var(--boxel-org-header-logo-position)"
@@ -29,7 +31,7 @@ export default class BoxelOrgHeader extends Component<Signature> {
       />
 
       {{yield}}
-    </header>
+    </section>
   </template>
 }
 
