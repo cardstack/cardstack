@@ -18,6 +18,7 @@
   grid-area: subtitle;
   margin: 0;
   font: var(--boxel-org-title-subtitle-font, 900 0.8125rem/1.333 var(--boxel-font-family));
+  margin-top: calc(-1 * var(--boxel-sp-xs));
 }
 
 .boxel-org-title--has-subtitle {
