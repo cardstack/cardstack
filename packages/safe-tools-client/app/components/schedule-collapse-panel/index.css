@@ -3,6 +3,7 @@
   --collapse-panel-summary-height: 80px;
   --collapse-panel-summary-anim-bottom-margin: 8px;
 
+  color:black;
   background: url('/images/backgrounds/schedule-panel.svg') no-repeat bottom/cover white;
   border-radius: var(--collapse-panel-border-radius);
   overflow: hidden;
