@@ -16,6 +16,11 @@
   border-radius: var(--collapse-panel-border-radius);
   font-size: var(--boxel-font-size);
   transition: margin-bottom var(--boxel-transition);
+  list-style: none;
+}
+
+.collapse-panel__summary::-webkit-details-marker {
+  display: none;
 }
 
 /* Adds margin to fake animation */
@@ -23,9 +28,10 @@
   margin-bottom: var(--collapse-panel-summary-anim-bottom-margin);
 }
 
+/* Can't use inherit bc of safari's bug */
 .collapse-panel__summary-collapsed {
-  display: inherit;
-  flex: inherit;
+  display: flex;
+  flex: 1;
   justify-content: space-between;
   align-items: center;
 }
@@ -121,16 +127,17 @@
 
 /* Style ol numbers */
 .collapse-panel__details-overlay ol li:before {
+  position: absolute;
   content: counter(item);
   color: var(--boxel-teal);
-  padding-right: var(--boxel-sp);
   font-weight: 800;
 }
 
-.collapse-panel__details-overlay ol li h4 {
-  display: inline;
+.collapse-panel__details-overlay-list-title {
+  margin: 0;
 }
 
-.collapse-panel__details-overlay ol li p {
+.collapse-panel__details-overlay-list-title,
+.collapse-panel__details-overlay-list-description {
   padding-left: var(--boxel-sp-xl);
 }

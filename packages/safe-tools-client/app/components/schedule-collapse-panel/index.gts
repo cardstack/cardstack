@@ -76,8 +76,8 @@ const ScheduleCollapsePanel: TemplateOnlyComponent<Signature> = <template>
         <ol>
           {{#each schedulerSteps as |step|}}
             <li>
-              <h4>{{step.title}}</h4>
-              <p>{{step.description}}</p>
+              <h4 class='collapse-panel__details-overlay-list-title'>{{step.title}}</h4>
+              <p class='collapse-panel__details-overlay-list-description'>{{step.description}}</p>
             </li>
           {{/each}}
         </ol>
