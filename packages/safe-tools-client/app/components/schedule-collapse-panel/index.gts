@@ -1,7 +1,48 @@
 import type { TemplateOnlyComponent } from '@ember/component/template-only';
 import { type EmptyObject } from '@ember/component/helper';
+import { svgJar } from '@cardstack/boxel/utils/svg-jar';
 
 import './index.css';
+
+type Info = { 
+  title: string; description: string;
+}
+
+const panelTitle = 'Scheduled crypto payments for your convenience';
+
+const schedulerSteps: Array<Info> = [
+  {
+    title: 'Set up your payment account',
+    description: 'Connect your wallet, choose a blockchain, set up your safe',
+  },
+  {
+    title: 'Schedule your payments',
+    description: 'Specify the date & time for upcoming & recurring transactions',
+  },
+  {
+    title: 'Set up your payment account',
+    description: 'See details of your past & future crypto payments at a glance',
+  },
+];
+
+
+const schedulerFeatures: Array<Info & { iconName: string; }> = [
+  {
+    title: 'Non-Custodial',
+    description: 'Retain full control of your tokens',
+    iconName: 'non-custodial'
+  },
+  {
+    title: 'Reliable',
+    description: 'Be sure that your payments go through',
+       iconName: 'checked'
+  },
+  {
+    title: 'Punctual',
+    description: 'Never miss a payment again',
+       iconName: 'punctual'
+  },
+];
 
 interface Signature {
   Element: HTMLElement;
@@ -10,8 +51,6 @@ interface Signature {
     };
   Blocks: EmptyObject;
 }
-
-const panelTitle = 'Scheduled crypto payments for your convenience';
 
 const ScheduleCollapsePanel: TemplateOnlyComponent<Signature> = <template>
   <details class='collapse-panel' ...attributes open={{@noCollapse}}>
@@ -24,22 +63,25 @@ const ScheduleCollapsePanel: TemplateOnlyComponent<Signature> = <template>
     <div class='collapse-panel__details'>
       <div class='collapse-panel__details-content'>
         <h2>{{panelTitle}}</h2>
+        <ul>
+          {{#each schedulerFeatures as |feature|}}
+            <li>
+              {{svgJar feature.iconName role='listitem'}}
+              <h4>{{feature.title}}</h4>
+              <p>{{feature.description}}</p>
+            </li>
+          {{/each}}
+        </ul>
       </div>
       <div class='collapse-panel__details-overlay'>
         <h3>Start using this payment scheduler dApp:</h3>
         <ol type='1'>
-          <li>
-            <h4>Set up your payment account</h4>
-            <p>Connect your wallet, choose a blockchain, set up your safe</p>
-          </li>
-          <li>
-            <h4>Schedule your payments</h4>
-            <p>Specify the date & time for upcoming & recurring transactions</p>
-          </li>
-          <li>
-            <h4>Set up your payment account</h4>
-            <p>See details of your past & future crypto payments at a glance</p>
-          </li>
+          {{#each schedulerSteps as |step|}}
+            <li>
+              <h4>{{step.title}}</h4>
+              <p>{{step.description}}</p>
+            </li>
+          {{/each}}
         </ol>
       </div>
     </div>
