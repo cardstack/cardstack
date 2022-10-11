@@ -404,11 +404,11 @@ export default class ScheduledPaymentModule {
     }
 
     // Costs to route through the proxy and nested calls
-    const PROXY_GAS = 1000
+    const PROXY_GAS = 1000;
     // https://github.com/ethereum/solidity/blob/dfe3193c7382c80f1814247a162663a97c3f5e67/libsolidity/codegen/ExpressionCompiler.cpp#L1764
     // This was `false` before solc 0.4.21 -> `m_context.evmVersion().canOverchargeGasForCall()`
     // So gas needed by caller will be around 35k
-    const OLD_CALL_GAS = 35000
+    const OLD_CALL_GAS = 35000;
     return requiredGas + PROXY_GAS + OLD_CALL_GAS;
   }
 
