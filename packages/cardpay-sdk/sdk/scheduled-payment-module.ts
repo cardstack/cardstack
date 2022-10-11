@@ -730,6 +730,7 @@ export default class ScheduledPaymentModule {
           'sender-safe-address': safeAddress,
           'module-address': moduleAddress,
           'token-address': tokenAddress,
+          'gas-token-address': gasTokenAddress,
           amount,
           'payee-address': payeeAddress,
           'execution-gas-estimation': executionGas,

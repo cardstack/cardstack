@@ -20,7 +20,8 @@ type ScheduledPaymentAttribute =
   | 'validForDays'
   | 'spHash'
   | 'chainId'
-  | 'userAddress';
+  | 'userAddress'
+  | 'gasTokenAddress';
 
 type ScheduledPaymentErrors = Record<ScheduledPaymentAttribute, string[]>;
 
@@ -44,6 +45,7 @@ export default class ScheduledPaymentValidator {
       spHash: [],
       userAddress: [],
       chainId: [],
+      gasTokenAddress: [],
     };
 
     let mandatoryAttributes: ScheduledPaymentAttribute[] = [
@@ -61,6 +63,7 @@ export default class ScheduledPaymentValidator {
       'spHash',
       'chainId',
       'userAddress',
+      'gasTokenAddress',
     ];
 
     for (let attribute of mandatoryAttributes) {
