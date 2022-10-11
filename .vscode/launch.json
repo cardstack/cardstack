@@ -1288,6 +1288,27 @@
     {
       "type": "node",
       "request": "launch",
+      "name": "Rewards: Get Explainer",
+      "cwd": "${workspaceFolder}/packages/cardpay-cli",
+      "console": "integratedTerminal",
+      "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
+      "env": {},
+      "args": [
+        "index.ts",
+        "rewards",
+        "get-explanation",
+        "${config:cardCli.network.l2.rewardProgramId}",
+        "--explanationId",
+        "claim.flat_drop",
+        "--network",
+        "${config:cardCli.network.l2.name}",
+        "--mnemonic",
+        "${config:cardCli.mnemonic}"
+      ]
+    },
+    {
+      "type": "node",
+      "request": "launch",
       "name": "DID Resolver: Resolve DID",
       "cwd": "${workspaceFolder}/packages/cardpay-cli",
       "console": "integratedTerminal",
