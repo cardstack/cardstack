@@ -5,12 +5,14 @@ from pydantic import BaseSettings
 config = {
     "staging": {
         "reward_pool": "0xcF8852D1aD746077aa4C31B423FdaE5494dbb57A",
+        "reward_manager": "0xC29EfEa853fb7c781488c70aF9135c853d809147",
         "tokens": {
             "card": "0xB0427e9F03Eb448D030bE3EBC96F423857ceEb2f",
         },
     },
     "production": {
         "reward_pool": "0x340EB99eB9aC7DB3a3eb68dB76c6F62738DB656a",
+        "reward_manager": "0xDbAe2bC81bFa4e46df43a34403aAcde5FFdB2A9D",
         "tokens": {
             "card": "0x52031d287Bb58E26A379A7Fec2c84acB54f54fe3",
         },

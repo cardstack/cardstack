@@ -3,9 +3,12 @@ import logging
 import os
 from typing import List
 
+import requests
 import sentry_sdk
 import uvicorn
+from did_resolver import Resolver
 from fastapi import Depends, FastAPI
+from python_did_resolver import get_resolver
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session, sessionmaker
 from web3 import Web3
@@ -41,6 +44,15 @@ def get_reward_pool(w3=Depends(get_w3)):
         contract = json.load(contract_file)
     reward_contract = w3.eth.contract(
         address=config[settings.ENVIRONMENT]["reward_pool"], abi=contract["abi"]
+    )
+    yield reward_contract
+
+
+def get_reward_manager(w3=Depends(get_w3)):
+    with open("abis/RewardManager.json") as contract_file:
+        contract = json.load(contract_file)
+    reward_contract = w3.eth.contract(
+        address=config[settings.ENVIRONMENT]["reward_manager"], abi=contract["abi"]
     )
     yield reward_contract
 
@@ -98,6 +110,48 @@ def read_reward_pool_balance(
         "token": token,
         "balanceInEth": Web3.fromWei(balance_in_wei, "ether"),
     }
+
+
+S3_STORAGE_LOCATION = "s3://"
+
+
+@app.get("/rule/{rewardProgramId}")
+def read_rule(
+    rewardProgramId: str,
+    reward_manager=Depends(get_reward_manager),
+):
+
+    json_object = get_rule(reward_manager, rewardProgramId)
+    return json_object
+
+
+def resolve_rule(did: str):
+    url = Resolver(get_resolver()).resolve(did)["didDocument"]["alsoKnownAs"][0]
+    return requests.get(url).json()
+
+
+def get_rule(reward_manager, reward_program_id):
+    # stub
+    did = "did:cardstack:1rkdiBistMpm4fThbFLCixx5798f022dbb7697ce"
+    rule = resolve_rule(did)
+    return rule
+    blob = reward_manager.caller.rule(reward_program_id)
+    if blob and blob != b"":
+        try:
+            did = blob.decode("utf-8")  # new blob format: hex encodes a did string
+            did = "did:cardstack:1rkdiBistMpm4fThbFLCixx5798f022dbb7697ce"
+            rules = resolve_rule(did)
+        except Exception:
+            # old blob format: our rule blobs were hex encoded json
+            # try..except maintains backward compatibality with our old blob format
+            # TODO: remove code once all reward programs have the old rule /blob removed
+            rules = json.loads(blob)
+        if type(rules) == list:
+            return rules
+        else:
+            return [rules]
+    else:
+        return []
 
 
 if __name__ == "__main__":
