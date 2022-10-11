@@ -1,20 +1,17 @@
-.boxel-dropdown-button {
+/* Remove all default user-agent styles while keeping specificity low */
+:where(.boxel-dropdown-button__reset) {
+  all: unset;
+}
+
+.boxel-dropdown-button__trigger {
   --dropdown-button-size: 40px;
 
   width: var(--dropdown-button-size);
   height: var(--dropdown-button-size);
 }
 
-.boxel-dropdown-button__trigger {
-  height: 100%;
-}
-
-.boxel-dropdown-button__trigger:hover {
+.boxel-dropdown-button__trigger:hover:not(.boxel-dropdown-button--no-hover) {
   --icon-color: var(--boxel-highlight);
-}
-
-.boxel-dropdown-button--no-hover .boxel-dropdown-button__trigger:hover {
-  --icon-color: inherit;
 }
 
 .boxel-dropdown-button__trigger > svg {

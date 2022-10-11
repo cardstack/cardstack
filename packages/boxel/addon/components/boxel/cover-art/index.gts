@@ -43,6 +43,18 @@ export default class CoverArt extends Component<Signature> {
     return this.args.covers.length;
   }
 
+  get coverArtSpacing(): number {
+    let {
+      maxWidth,
+      args: { covers },
+    } = this;
+    let naturalWidth =
+      this.coverArtSize(covers.length) + this.coverArtLeft(covers.length, 1.0); // approx
+    let spacingRatio = maxWidth / naturalWidth;
+
+    return Math.min(1, spacingRatio);
+  }
+
   <template>
     <div
       class="boxel-cover-art"
@@ -68,16 +80,4 @@ export default class CoverArt extends Component<Signature> {
       {{/each}}
     </div>
   </template>
-
-  get coverArtSpacing(): number {
-    let {
-      maxWidth,
-      args: { covers },
-    } = this;
-    let naturalWidth =
-      this.coverArtSize(covers.length) + this.coverArtLeft(covers.length, 1.0); // approx
-    let spacingRatio = maxWidth / naturalWidth;
-
-    return Math.min(1, spacingRatio);
-  }
 }

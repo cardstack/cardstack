@@ -10,9 +10,8 @@ class Staking(Rule):
     def __init__(self, core_parameters, user_defined_parameters):
         super(Staking, self).__init__(core_parameters, user_defined_parameters)
 
-    def set_user_defined_parameters(self, token, duration, interest_rate_monthly):
+    def set_user_defined_parameters(self, token, interest_rate_monthly):
         self.token = token
-        self.duration = duration
         self.interest_rate_monthly = interest_rate_monthly
 
     def sql(self, table_query, aux_table_query):

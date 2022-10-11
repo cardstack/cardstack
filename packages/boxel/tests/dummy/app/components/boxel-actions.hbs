@@ -8,7 +8,7 @@
 {{else if @displayHighlightActions}}
   <div class="boxel-actions {{@class}}" data-test-boxel-actions ...attributes>
     {{#if (eq @btnLeft "more-actions")}}
-      <Boxel::DropdownButton @button={{@btnLeft}} @icon={{@btnLeftIcon}} @noHoverStyle={{true}} as |ddb|>
+      <Boxel::DropdownButton @label={{@btnLeft}} @icon={{@btnLeftIcon}} @noHoverStyle={{true}} as |ddb|>
         <ddb.Menu
           @items={{array
             (menu-item "Duplicate" (noop))
@@ -21,7 +21,7 @@
     {{/if}}
 
     {{#if (eq @btnRight "settings")}}
-      <Boxel::DropdownButton @button="gear" @icon="gear" @noHoverStyle={{true}} as |ddb|>
+      <Boxel::DropdownButton @label="gear" @icon="gear" @noHoverStyle={{true}} as |ddb|>
         <ddb.Menu
           @items={{array
             (menu-item "Duplicate" (noop))

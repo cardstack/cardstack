@@ -49,7 +49,7 @@
       <div class="media-collection__btn-group">
         <div class="media-collection__btn-trio media-collection__filters">
           {{#if this.sortColumns.length}}
-            <Boxel::DropdownButton class="media-collection__btn" @button="sort" @icon="sort" @size={{30}}>
+            <Boxel::DropdownButton class="media-collection__btn" @label="sort" @icon="sort" @size={{30}}>
               <Boxel::SortMenu
                 @sortableColumns={{this.sortColumns}}
                 @sortedColumn={{this.sortColumn}}
@@ -58,11 +58,11 @@
               />
             </Boxel::DropdownButton>
           {{/if}}
-          <Boxel::DropdownButton class="media-collection__btn media-collection__filter" @button="filter" @icon="filter" @size={{30}}>
+          <Boxel::DropdownButton class="media-collection__btn media-collection__filter" @label="filter" @icon="filter" @size={{30}}>
           </Boxel::DropdownButton>
 
           {{#if @search}}
-            <Boxel::DropdownButton class="media-collection__btn media-collection__search" @button="search" @icon="search" @size={{30}}>
+            <Boxel::DropdownButton class="media-collection__btn media-collection__search" @label="search" @icon="search" @size={{30}}>
               <Boxel::Input type="search" class="field-renderer__input media-collection__search-input"
                 {{on "input" this.search}}
               />

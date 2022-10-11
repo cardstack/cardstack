@@ -341,9 +341,9 @@ export default class ScheduledPaymentModule {
     gasTokenAddress: string,
     salt: string,
     gasPrice: string,
-    payAt?: number | null,
-    recurringDayOfMonth?: number | null,
-    recurringUntil?: number | null
+    payAt: number | null,
+    recurringDayOfMonth: number | null,
+    recurringUntil: number | null
   ): Promise<number> {
     let getRequiredGasFromRevertMessage = function (e: any): number {
       let _interface = new utils.Interface(['error GasEstimation(uint256 gas)']);
@@ -355,7 +355,7 @@ export default class ScheduledPaymentModule {
     let requiredGas = 0;
     try {
       let module = new Contract(moduleAddress, ScheduledPaymentABI, this.ethersProvider);
-      if (recurringUntil) {
+      if (recurringDayOfMonth) {
         await module.estimateGas[
           'estimateExecutionGas(address,uint256,address,((uint256),(uint256)),uint256,address,string,uint256,uint256,uint256)'
         ](

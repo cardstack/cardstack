@@ -5,7 +5,7 @@ import { Arguments, CommandModule } from 'yargs';
 
 export default {
   command:
-    'estimate-execution <moduleAddress> <tokenAddress> <amount> <payeeAddress> <fixedUSDFee> <percentageFee> <maxGasPrice> <gasTokenAddress> <salt> <payAt> <recurringDayOfMonth> <recurringUntil> <gasPrice>',
+    'estimate-execution <moduleAddress> <tokenAddress> <amount> <payeeAddress> <fixedUSDFee> <percentageFee> <maxGasPrice> <gasTokenAddress> <salt> <payAt> <recurringDayOfMonth> <recurringUntil>',
   describe: 'Enable scheduled payment module on the safe',
   builder(yargs: Argv) {
     return yargs
@@ -51,17 +51,11 @@ export default {
       })
       .positional('recurringDayOfMonth', {
         type: 'number',
-        description:
-          'Day of the month on which the payment will be made recurringly (range: 1-31). Used for recurring scheduled payments. In case the month has less than days than the value provided, the payment will me made on the last day of the month. Should be an empty string when payAt is set.',
+        description: 'Days of the month in the range of 1-28 to make recurring payments',
       })
       .positional('recurringUntil', {
         type: 'number',
-        description:
-          'Unix UTC time in seconds that represents the point in time when the recurring payment should be stopped. Used for recurring scheduled payments. Should be an empty string when payAt is set',
-      })
-      .positional('gasPrice', {
-        type: 'string',
-        description: 'Gas price (in the smallest units of gas token)',
+        description: 'End date of recurring payment',
       })
       .option('network', NETWORK_OPTION_ANY);
   },
@@ -78,7 +72,6 @@ export default {
       gasTokenAddress,
       salt,
       payAt,
-      gasPrice,
       recurringDayOfMonth,
       recurringUntil,
     } = args as unknown as {
@@ -92,11 +85,16 @@ export default {
       maxGasPrice: string;
       gasTokenAddress: string;
       salt: string;
-      payAt: number;
-      gasPrice: string;
-      recurringDayOfMonth?: number | null;
-      recurringUntil?: number | null;
+      payAt: number | null;
+      recurringDayOfMonth: number | null;
+      recurringUntil: number | null;
     };
+
+    // Empty strings are converted to 0 by yargs. We want to convert them to null
+    if (payAt === 0) payAt = null;
+    if (recurringDayOfMonth === 0) recurringDayOfMonth = null;
+    if (recurringUntil === 0) recurringUntil = null;
+
     let { ethersProvider, signer } = await getEthereumClients(network, getConnectionType(args));
     let scheduledPaymentModule = await getSDK('ScheduledPaymentModule', ethersProvider, signer);
 
@@ -114,7 +112,7 @@ export default {
       maxGasPrice,
       gasTokenAddress,
       salt,
-      gasPrice,
+      maxGasPrice,
       payAt,
       recurringDayOfMonth,
       recurringUntil

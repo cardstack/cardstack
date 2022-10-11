@@ -17,13 +17,13 @@ export default class BoxelDropdownUsage extends Component {
    @action log(string: string): void {
     console.log(string);
   }
-  
+
   <template>
     <FreestyleUsage @name="Dropdown">
       <:example>
         <BoxelDropdown>
-          <:trigger>
-            <BoxelButton>
+          <:trigger as |bindings|>
+            <BoxelButton {{bindings}}>
               Trigger
             </BoxelButton>
           </:trigger>
@@ -44,7 +44,7 @@ export default class BoxelDropdownUsage extends Component {
       <:api as |Args|>
         <Args.Yield
           @name="trigger"
-          @description="Content to be used as trigger for basic dropdown"
+          @description="Content to be used as trigger for basic dropdown. Yields a bindings modifier which applies aria- attributes and event handling."
         />
         <Args.Yield
           @name="content"

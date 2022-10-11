@@ -6,6 +6,7 @@ import EmberBasicDropdown, {
   DropdownActions,
   Dropdown,
 } from 'ember-basic-dropdown/addon/components/basic-dropdown';
+export type { Dropdown } from 'ember-basic-dropdown/addon/components/basic-dropdown';
 import BasicDropdownTrigger from 'ember-basic-dropdown/addon/components/basic-dropdown-trigger';
 import BasicDropdownContent from 'ember-basic-dropdown/addon/components/basic-dropdown-content';
 

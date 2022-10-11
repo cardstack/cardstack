@@ -10,6 +10,7 @@ def create_rule(
         "start_block": 0,
         "end_block": 10000,
         "payment_cycle_length": 1000,
+        "duration": 43200,
         "subgraph_config_locations": {
             "safe_owner": "s3://partitioned-graph-data/data/safe_owner/0.0.1/"
         },
@@ -18,7 +19,6 @@ def create_rule(
     user_config = {
         "reward_per_safe": 1,
         "token": "0x0000000000000000000000000000000000000000",
-        "duration": 43200,
         "start_analysis_block": 0,
         "safe_type": "type_a",
         "max_rewards": 10,
