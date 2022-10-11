@@ -96,6 +96,7 @@ import ScheduledPaymentsFetcherService from './services/scheduled-payments/fetch
 import ScheduledPaymentSerializer from './services/serializers/scheduled-payment-serializer';
 import ScheduledPaymentValidator from './services/validators/scheduled-payment';
 import ScheduledPaymentsRoute from './routes/scheduled-payments';
+import ScheduledPaymentsExecutorService from './services/scheduled-payments/executor';
 
 //@ts-ignore polyfilling fetch
 global.fetch = fetch;
@@ -176,6 +177,7 @@ export function createRegistry(): Registry {
   registry.register('email-card-drop-router', EmailCardDropRouter);
   registry.register('prisma-manager', PrismaManager);
   registry.register('scheduled-payment-fetcher', ScheduledPaymentsFetcherService);
+  registry.register('scheduled-payment-executor', ScheduledPaymentsExecutorService);
   registry.register('scheduled-payment-serializer', ScheduledPaymentSerializer);
   registry.register('scheduled-payment-validator', ScheduledPaymentValidator);
   registry.register('scheduled-payments-route', ScheduledPaymentsRoute);
