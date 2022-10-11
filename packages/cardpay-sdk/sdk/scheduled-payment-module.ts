@@ -10,6 +10,7 @@ import {
   getModuleProxyCreationEvent,
 } from './utils/module-utils';
 import {
+  extractBytesLikeFromError,
   extractSendTransactionError,
   generateSaltNonce,
   hubRequest,
@@ -369,17 +370,10 @@ export default class ScheduledPaymentModule {
     recurringUntil?: number
   ): Promise<number> {
     let getRequiredGasFromRevertMessage = function (e: any): number {
-      let requiredGas;
       let _interface = new utils.Interface(['error GasEstimation(uint256 gas)']);
-      if (e.data) {
-        let decodedError = _interface.parseError(e.data);
-        requiredGas = decodedError.args[0].toNumber();
-      } else {
-        let messages = e.message.split(' ');
-        let decodedError = _interface.parseError(messages[2].replace(',', ''));
-        requiredGas = decodedError.args[0].toNumber();
-      }
-      return requiredGas;
+      let hex = extractBytesLikeFromError(e);
+      let decodedError = _interface.parseError(hex ?? '0x');
+      return decodedError.args[0].toNumber();
     };
 
     let requiredGas = 0;
