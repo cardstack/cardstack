@@ -102,7 +102,7 @@ export default class RewardPool {
         'Content-Type': 'application/json',
       },
     };
-    const response = await fetch(`${tallyServiceURL}/merkle-proofs/${rewardProgramId}`, options);
+    const response = await fetch(`${tallyServiceURL}/rule/${rewardProgramId}`, options);
     const json = await response.json();
     if (!response?.ok) {
       throw new Error(await response.text());
@@ -111,11 +111,11 @@ export default class RewardPool {
   }
 
   async getProgramExplainer(rule: any) {
-    return get(rule, 'en.program', {});
+    return get(rule, 'explanation.en.program', undefined);
   }
 
   async getClaimExplainer(rule: any, explanationId: string) {
-    return get(rule, 'en.claim' + explanationId, {});
+    return get(rule, 'en.claim' + explanationId, undefined);
   }
 
   async getProofs(
