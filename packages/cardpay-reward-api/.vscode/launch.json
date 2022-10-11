@@ -1,0 +1,13 @@
+{
+  "configurations": [
+    {
+      "name": "Start dev server",
+      "type": "python",
+      "request": "launch",
+      "module": "uvicorn",
+      "args": ["cardpay_reward_api.main:app", "--reload"],
+      "justMyCode": true,
+      "env": {}
+    }
+  ]
+}
