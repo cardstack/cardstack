@@ -246,6 +246,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "fastapi-cache2"
+version = "0.1.9"
+requires_python = ">=3.7,<4.0"
+summary = "Cache for FastAPI"
+dependencies = [
+    "fastapi",
+    "pendulum",
+    "uvicorn",
+]
+
+[[package]]
 name = "fastapi"
 version = "0.78.0"
 extras = ["all"]
@@ -430,6 +441,16 @@ requires_python = "!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*,>=2.7"
 summary = "Utility library for gitignore style pattern matching of file paths."
 
 [[package]]
+name = "pendulum"
+version = "2.1.2"
+requires_python = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
+summary = "Python datetimes made easy"
+dependencies = [
+    "python-dateutil<3.0,>=2.6",
+    "pytzdata>=2020.1",
+]
+
+[[package]]
 name = "platformdirs"
 version = "2.5.2"
 requires_python = ">=3.7"
@@ -515,6 +536,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "python-dateutil"
+version = "2.8.2"
+requires_python = "!=3.0.*,!=3.1.*,!=3.2.*,>=2.7"
+summary = "Extensions to the standard Python datetime module"
+dependencies = [
+    "six>=1.5",
+]
+
+[[package]]
 name = "python-did-resolver"
 version = "0.0.3"
 requires_python = ">=3.9"
@@ -539,6 +569,12 @@ summary = "A streaming multipart parser for Python"
 dependencies = [
     "six>=1.4.0",
 ]
+
+[[package]]
+name = "pytzdata"
+version = "2020.1"
+requires_python = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
+summary = "The Olson timezone database for Python."
 
 [[package]]
 name = "pywin32"
@@ -733,7 +769,7 @@ dependencies = [
 
 [metadata]
 lock_version = "4.0"
-content_hash = "sha256:7791c1bbdc38a787672d08932d611fdda23ef5873d05b51b32c96d56b83fbbca"
+content_hash = "sha256:f21b1d6dc511052e5312ea20ae59aa60fdd7400bfa7698cedf8afdf3adb34b74"
 
 [metadata.files]
 "aiohttp 3.8.1" = [
@@ -1003,6 +1039,10 @@ content_hash = "sha256:7791c1bbdc38a787672d08932d611fdda23ef5873d05b51b32c96d56b
 "fastapi 0.78.0" = [
     {url = "https://files.pythonhosted.org/packages/61/0f/427f0af121b226e62237e430f5bf4485e0ae1565b3f5b782613b59f30abc/fastapi-0.78.0-py3-none-any.whl", hash = "sha256:15fcabd5c78c266fa7ae7d8de9b384bfc2375ee0503463a6febbe3bab69d6f65"},
     {url = "https://files.pythonhosted.org/packages/b7/2a/4676736c3b1864ca483265db43cad9710b83a95c2530aa6bfe671b83fd46/fastapi-0.78.0.tar.gz", hash = "sha256:3233d4a789ba018578658e2af1a4bb5e38bdd122ff722b313666a9b2c6786a83"},
+]
+"fastapi-cache2 0.1.9" = [
+    {url = "https://files.pythonhosted.org/packages/25/b4/405105e1287f7b1c7a56f319baaa4290385de6a867c03a5c87d137104adb/fastapi-cache2-0.1.9.tar.gz", hash = "sha256:816612f7b29b4ea4ed3b4e03c55b7f96b4e4d6dffce6a95e2cf5cf36a980eaaa"},
+    {url = "https://files.pythonhosted.org/packages/90/48/43d8698c836737c5d1c0ddb6253180d498b51034991e7677033a4ed837b1/fastapi_cache2-0.1.9-py3-none-any.whl", hash = "sha256:5b6f32bc8e786d9fffe4f3ef343861cab276acc64fb5d8d09077524743ad3702"},
 ]
 "flake8 4.0.1" = [
     {url = "https://files.pythonhosted.org/packages/34/39/cde2c8a227abb4f9ce62fe55586b920f438f1d2903a1a22514d0b982c333/flake8-4.0.1-py2.py3-none-any.whl", hash = "sha256:479b1304f72536a55948cb40a32dce8bb0ffe3501e26eaf292c7e60eb5e0428d"},
@@ -1352,6 +1392,29 @@ content_hash = "sha256:7791c1bbdc38a787672d08932d611fdda23ef5873d05b51b32c96d56b
     {url = "https://files.pythonhosted.org/packages/42/ba/a9d64c7bcbc7e3e8e5f93a52721b377e994c22d16196e2b0f1236774353a/pathspec-0.9.0-py2.py3-none-any.whl", hash = "sha256:7d15c4ddb0b5c802d161efc417ec1a2558ea2653c2e8ad9c19098201dc1c993a"},
     {url = "https://files.pythonhosted.org/packages/f6/33/436c5cb94e9f8902e59d1d544eb298b83c84b9ec37b5b769c5a0ad6edb19/pathspec-0.9.0.tar.gz", hash = "sha256:e564499435a2673d586f6b2130bb5b95f04a3ba06f81b8f895b651a3c76aabb1"},
 ]
+"pendulum 2.1.2" = [
+    {url = "https://files.pythonhosted.org/packages/2e/fb/32f72dfc7124fa311493607cd5d37438b0f0013bd40b27a44cd5606b35f6/pendulum-2.1.2-cp38-cp38-win_amd64.whl", hash = "sha256:33fb61601083f3eb1d15edeb45274f73c63b3c44a8524703dc143f4212bf3269"},
+    {url = "https://files.pythonhosted.org/packages/2f/df/dc70182a5857819210711d17b343391dd2db84d0a8d756797972364608d1/pendulum-2.1.2-cp27-cp27m-win_amd64.whl", hash = "sha256:318f72f62e8e23cd6660dbafe1e346950281a9aed144b5c596b2ddabc1d19739"},
+    {url = "https://files.pythonhosted.org/packages/3e/40/bcf73cf69ffc4d68b80b68b5ce4e5f9d8185170e9fac65a73e247e948ff3/pendulum-2.1.2-cp37-cp37m-manylinux1_x86_64.whl", hash = "sha256:1245cd0075a3c6d889f581f6325dd8404aca5884dea7223a5566c38aab94642b"},
+    {url = "https://files.pythonhosted.org/packages/3e/f8/f7a2d67c65c6bfd53fbb1abd856c395c22cf991b92ea77a35af88f7e96b2/pendulum-2.1.2-cp38-cp38-macosx_10_15_x86_64.whl", hash = "sha256:f5e236e7730cab1644e1b87aca3d2ff3e375a608542e90fe25685dae46310116"},
+    {url = "https://files.pythonhosted.org/packages/48/1c/dbca87b468531618c215bb5c5f438fa98ad9213f50f76bbb14836a7c0d4e/pendulum-2.1.2-cp36-cp36m-manylinux1_i686.whl", hash = "sha256:c807a578a532eeb226150d5006f156632df2cc8c5693d778324b43ff8c515dd0"},
+    {url = "https://files.pythonhosted.org/packages/5d/d0/75835105fb4951b5195bbaa3b9797c258bbf9aa211c6f26b26a68ebf6cee/pendulum-2.1.2-cp38-cp38-manylinux1_x86_64.whl", hash = "sha256:7c5ec650cb4bec4c63a89a0242cc8c3cebcec92fcfe937c417ba18277d8560be"},
+    {url = "https://files.pythonhosted.org/packages/64/c9/96ebff288bba66c049398404491a3d1abe9446e5501e78aa5473589ebb5e/pendulum-2.1.2-cp37-cp37m-manylinux1_i686.whl", hash = "sha256:4c9c689747f39d0d02a9f94fcee737b34a5773803a64a5fdb046ee9cac7442c5"},
+    {url = "https://files.pythonhosted.org/packages/6f/d0/3b9ebd15ae3d4e079d6174ee49b19c113189558d3c5e1e641d03bc4560d2/pendulum-2.1.2-cp36-cp36m-manylinux1_x86_64.whl", hash = "sha256:2d1619a721df661e506eff8db8614016f0720ac171fe80dda1333ee44e684087"},
+    {url = "https://files.pythonhosted.org/packages/7d/09/47ce955fbd41b2930430a78c744c903b79e552c54fb38a3283d7640454fd/pendulum-2.1.2-cp36-cp36m-macosx_10_15_x86_64.whl", hash = "sha256:c501749fdd3d6f9e726086bf0cd4437281ed47e7bca132ddb522f86a1645d360"},
+    {url = "https://files.pythonhosted.org/packages/8e/4b/b2042f5122a4b3508c736304e38e8b41e2feed9f3d8c08a03d1de10a2a2b/pendulum-2.1.2-cp39-cp39-manylinux1_x86_64.whl", hash = "sha256:94b1fc947bfe38579b28e1cccb36f7e28a15e841f30384b5ad6c5e31055c85d7"},
+    {url = "https://files.pythonhosted.org/packages/95/13/e7598039a7c2be1c74538125c035f866189897291f12da029a2a1008dc3e/pendulum-2.1.2-cp27-cp27m-macosx_10_15_x86_64.whl", hash = "sha256:b6c352f4bd32dff1ea7066bd31ad0f71f8d8100b9ff709fb343f3b86cee43efe"},
+    {url = "https://files.pythonhosted.org/packages/a2/90/3020eeb52dd3c6c01eb5009304c6947dfb08daf46eb29c3a33a5ea5fbccd/pendulum-2.1.2-cp38-cp38-manylinux1_i686.whl", hash = "sha256:de42ea3e2943171a9e95141f2eecf972480636e8e484ccffaf1e833929e9e052"},
+    {url = "https://files.pythonhosted.org/packages/bd/c9/e8ca81966ba87f977ca5fba8822be2e96848d079e5afcc38e538234301a0/pendulum-2.1.2-cp35-cp35m-macosx_10_15_x86_64.whl", hash = "sha256:0731f0c661a3cb779d398803655494893c9f581f6488048b3fb629c2342b5394"},
+    {url = "https://files.pythonhosted.org/packages/c0/09/8e7c65e347e71baf8dfd799f03983f22eeb4d591e10e90da026037ddad64/pendulum-2.1.2-cp36-cp36m-win_amd64.whl", hash = "sha256:f888f2d2909a414680a29ae74d0592758f2b9fcdee3549887779cd4055e975db"},
+    {url = "https://files.pythonhosted.org/packages/cd/15/3ee08d358a88f9a871b2ef8b25896f9bc6b6fe4d05fb5587c5c9e29950dc/pendulum-2.1.2-cp35-cp35m-win_amd64.whl", hash = "sha256:fb53ffa0085002ddd43b6ca61a7b34f2d4d7c3ed66f931fe599e1a531b42af9b"},
+    {url = "https://files.pythonhosted.org/packages/d0/21/284171c69ef27d1173e8997ec73c5551f9491459b48003b64d191a0c7082/pendulum-2.1.2-cp37-cp37m-macosx_10_15_x86_64.whl", hash = "sha256:e95d329384717c7bf627bf27e204bc3b15c8238fa8d9d9781d93712776c14002"},
+    {url = "https://files.pythonhosted.org/packages/d4/75/f1faafe184d6fa15a7f983165b2fa495a721ff04a92c08199a9f5399b4d4/pendulum-2.1.2-cp35-cp35m-manylinux1_i686.whl", hash = "sha256:3481fad1dc3f6f6738bd575a951d3c15d4b4ce7c82dce37cf8ac1483fde6e8b0"},
+    {url = "https://files.pythonhosted.org/packages/db/15/6e89ae7cde7907118769ed3d2481566d05b5fd362724025198bb95faf599/pendulum-2.1.2.tar.gz", hash = "sha256:b06a0ca1bfe41c990bbf0c029f0b6501a7f2ec4e38bfec730712015e8860f207"},
+    {url = "https://files.pythonhosted.org/packages/e2/d9/909cab9450467aeae5aea140ac108624b1aa1d40446050e96f394a95e0ab/pendulum-2.1.2-cp35-cp35m-manylinux1_x86_64.whl", hash = "sha256:9702069c694306297ed362ce7e3c1ef8404ac8ede39f9b28b7c1a7ad8c3959e3"},
+    {url = "https://files.pythonhosted.org/packages/e3/30/e695237aa47fda242a1ca7b3bcb75ae0cd9588a2cf94737eb5b0dc4caa8f/pendulum-2.1.2-cp39-cp39-manylinux1_i686.whl", hash = "sha256:29c40a6f2942376185728c9a0347d7c0f07905638c83007e1d262781f1e6953a"},
+    {url = "https://files.pythonhosted.org/packages/f6/fa/fcddef6138ced8b676e50f1f7d66ea9081b647810b86d52b29e1a653b9a1/pendulum-2.1.2-cp37-cp37m-win_amd64.whl", hash = "sha256:db0a40d8bcd27b4fb46676e8eb3c732c67a5a5e6bfab8927028224fbced0b40b"},
+]
 "platformdirs 2.5.2" = [
     {url = "https://files.pythonhosted.org/packages/ed/22/967181c94c3a4063fe64e15331b4cb366bdd7dfbf46fcb8ad89650026fec/platformdirs-2.5.2-py3-none-any.whl", hash = "sha256:027d8e83a2d7de06bbac4e5ef7e023c02b863d7ea5d079477e722bb41ab25788"},
     {url = "https://files.pythonhosted.org/packages/ff/7b/3613df51e6afbf2306fc2465671c03390229b55e3ef3ab9dd3f846a53be6/platformdirs-2.5.2.tar.gz", hash = "sha256:58c8abb07dcb441e6ee4b11d8df0ac856038f944ab98b7be6b27b2a3c7feef19"},
@@ -1511,6 +1574,10 @@ content_hash = "sha256:7791c1bbdc38a787672d08932d611fdda23ef5873d05b51b32c96d56b
     {url = "https://files.pythonhosted.org/packages/4e/1f/34657c6ac56f3c58df650ba41f8ffb2620281ead8e11bcdc7db63cf72a78/pytest-7.1.2.tar.gz", hash = "sha256:a06a0425453864a270bc45e71f783330a7428defb4230fb5e6a731fde06ecd45"},
     {url = "https://files.pythonhosted.org/packages/fb/d0/bae533985f2338c5d02184b4a7083b819f6b3fc101da792e0d96e6e5299d/pytest-7.1.2-py3-none-any.whl", hash = "sha256:13d0e3ccfc2b6e26be000cb6568c832ba67ba32e719443bfe725814d3c42433c"},
 ]
+"python-dateutil 2.8.2" = [
+    {url = "https://files.pythonhosted.org/packages/36/7a/87837f39d0296e723bb9b62bbb257d0355c7f6128853c78955f57342a56d/python_dateutil-2.8.2-py2.py3-none-any.whl", hash = "sha256:961d03dc3453ebbc59dbdea9e4e11c5651520a876d0f4db161e8674aae935da9"},
+    {url = "https://files.pythonhosted.org/packages/4c/c4/13b4776ea2d76c115c1d1b84579f3764ee6d57204f6be27119f13a61d0a9/python-dateutil-2.8.2.tar.gz", hash = "sha256:0123cacc1627ae19ddf3c27a5de5bd67ee4586fbdd6440d9748f8abb483d3e86"},
+]
 "python-did-resolver 0.0.3" = [
     {url = "https://files.pythonhosted.org/packages/98/31/5108df514fdd163cb2c2998f2161915a15644d4cbe6993993fc7964ddc7e/python-did-resolver-0.0.3.tar.gz", hash = "sha256:6e01b7f3ceaa8fa9a3a5a03e9b2189c235b02368292081f803505b27c32b6cc1"},
     {url = "https://files.pythonhosted.org/packages/a6/ff/711eca9b8bcea50a631ad52fd1e093b21147863dea2a9cb4d569776e215b/python_did_resolver-0.0.3-py3-none-any.whl", hash = "sha256:572f0e81447af18cd78b2a026631e7b1ceccc0fa4a32712cd2d38db179b54b26"},
@@ -1521,6 +1588,10 @@ content_hash = "sha256:7791c1bbdc38a787672d08932d611fdda23ef5873d05b51b32c96d56b
 ]
 "python-multipart 0.0.5" = [
     {url = "https://files.pythonhosted.org/packages/46/40/a933ac570bf7aad12a298fc53458115cc74053474a72fbb8201d7dc06d3d/python-multipart-0.0.5.tar.gz", hash = "sha256:f7bb5f611fc600d15fa47b3974c8aa16e93724513b49b5f95c81e6624c83fa43"},
+]
+"pytzdata 2020.1" = [
+    {url = "https://files.pythonhosted.org/packages/67/62/4c25435a7c2f9c7aef6800862d6c227fc4cd81e9f0beebc5549a49c8ed53/pytzdata-2020.1.tar.gz", hash = "sha256:3efa13b335a00a8de1d345ae41ec78dd11c9f8807f522d39850f2dd828681540"},
+    {url = "https://files.pythonhosted.org/packages/e0/4f/4474bda990ee740a020cbc3eb271925ef7daa7c8444240d34ff62c8442a3/pytzdata-2020.1-py2.py3-none-any.whl", hash = "sha256:e1e14750bcf95016381e4d472bad004eef710f2d6417240904070b3d6654485f"},
 ]
 "pywin32 304" = [
     {url = "https://files.pythonhosted.org/packages/05/6b/9f8421a9a2ab5f33cbb9fd2f282ac971e584f6a83d44f6672bd17f1d68b2/pywin32-304-cp310-cp310-win32.whl", hash = "sha256:3c7bacf5e24298c86314f03fa20e16558a4e4138fc34615d7de4070c23e65af3"},

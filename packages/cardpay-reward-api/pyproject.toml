@@ -15,6 +15,7 @@ dependencies = [
     "sentry-sdk>=1.5.12",
     "web3>=5.29.2",
     "python-did-resolver>=0.0.3",
+    "fastapi-cache2>=0.1.9",
 ]
 requires-python = ">=3.9"
 

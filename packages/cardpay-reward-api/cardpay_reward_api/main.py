@@ -8,12 +8,16 @@ import sentry_sdk
 import uvicorn
 from did_resolver import Resolver
 from fastapi import Depends, FastAPI
+from fastapi_cache import FastAPICache
+from fastapi_cache.backends.inmemory import InMemoryBackend
+from fastapi_cache.decorator import cache
 from python_did_resolver import get_resolver
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session, sessionmaker
 from web3 import Web3
 
 from . import crud, schemas
+from .cache import my_key_builder
 from .config import config, get_settings
 
 LOGLEVEL = os.environ.get("LOGLEVEL", "INFO").upper()
@@ -113,13 +117,12 @@ def read_reward_pool_balance(
 
 
 @app.get("/rule/{rewardProgramId}")
-def read_rule(
+@cache(namespace="rule", expire=60)
+async def read_rule(
     rewardProgramId: str,
     reward_manager=Depends(get_reward_manager),
 ):
-
-    json_object = get_rule(reward_manager, rewardProgramId)
-    return json_object
+    return await get_rule(rewardProgramId, reward_manager)
 
 
 def resolve_rule(did: str):
@@ -127,7 +130,8 @@ def resolve_rule(did: str):
     return requests.get(url).json()
 
 
-def get_rule(reward_manager, reward_program_id):
+async def get_rule(reward_program_id: str, reward_manager=Depends(get_reward_manager)):
+
     blob = reward_manager.caller.rule(reward_program_id)
     if blob and blob != b"":
         try:
@@ -144,6 +148,11 @@ def get_rule(reward_manager, reward_program_id):
             return [rules]
     else:
         return []
+
+
+@app.on_event("startup")
+async def startup():
+    FastAPICache.init(InMemoryBackend(), key_builder=my_key_builder)
 
 
 if __name__ == "__main__":
