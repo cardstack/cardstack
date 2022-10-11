@@ -1,9 +1,9 @@
 .collapse-panel {
   --collapse-panel-border-radius: 20px;
   --collapse-panel-summary-height: 80px;
+  --collapse-panel-summary-anim-bottom-margin: 8px;
 
-  background: url('/images/backgrounds/schedule-panel.svg') no-repeat
-    bottom/cover white;
+  background: url('/images/backgrounds/schedule-panel.svg') no-repeat bottom/cover white;
   border-radius: var(--collapse-panel-border-radius);
   overflow: hidden;
 }
@@ -15,6 +15,12 @@
   padding: 0 var(--boxel-sp-xl);
   border-radius: var(--collapse-panel-border-radius);
   font-size: var(--boxel-font-size);
+  transition: margin-bottom var(--boxel-transition);
+}
+
+/* Adds margin to fake animation */
+.collapse-panel[open] .collapse-panel__summary {
+  margin-bottom: var(--collapse-panel-summary-anim-bottom-margin);
 }
 
 .collapse-panel__summary-collapsed {
@@ -22,10 +28,6 @@
   flex: inherit;
   justify-content: space-between;
   align-items: center;
-}
-
-.collapse-panel[open] .collapse-panel__summary ~ * {
-  animation: expand 0.4s ease;
 }
 
 /* Hide collapsed banner info */
@@ -91,9 +93,9 @@
 
 .collapse-panel__details-overlay {
   flex: 1;
-  margin-top: calc(var(--collapse-panel-summary-height) * -1);
-  border-radius: 0 var(--collapse-panel-border-radius)
-    var(--collapse-panel-border-radius) 0;
+  /* Adds negative margin based on summary height minus the animation margin */
+  margin-top: calc((var(--collapse-panel-summary-height) + var(--collapse-panel-summary-anim-bottom-margin)) * -1);
+  border-radius: 0 var(--collapse-panel-border-radius) var(--collapse-panel-border-radius) 0;
   background-color: var(--boxel-light-100);
   opacity: 0.95;
   padding: var(--boxel-sp-xxxl) var(--boxel-sp-xxl);
@@ -131,15 +133,4 @@
 
 .collapse-panel__details-overlay ol li p {
   padding-left: var(--boxel-sp-xl);
-}
-
-@keyframes expand {
-  0% {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0);
-  }
 }
