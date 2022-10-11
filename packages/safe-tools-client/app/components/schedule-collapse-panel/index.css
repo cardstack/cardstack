@@ -5,6 +5,7 @@
   background: url('/images/backgrounds/schedule-panel.svg') no-repeat
     bottom/cover white;
   border-radius: var(--collapse-panel-border-radius);
+  overflow: hidden;
 }
 
 .collapse-panel__summary {
@@ -21,6 +22,10 @@
   flex: inherit;
   justify-content: space-between;
   align-items: center;
+}
+
+.collapse-panel[open] .collapse-panel__summary ~ * {
+  animation: expand 0.4s ease;
 }
 
 /* Hide collapsed banner info */
@@ -126,4 +131,15 @@
 
 .collapse-panel__details-overlay ol li p {
   padding-left: var(--boxel-sp-xl);
+}
+
+@keyframes expand {
+  0% {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
