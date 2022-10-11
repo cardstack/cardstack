@@ -1026,6 +1026,7 @@
         "rewards",
         "claim-all",
         "0xD01C583D24200f11b7ce1b6f94D39Ed08cDa0b85",
+        "${config:cardCli.network.l2.rewardProgramId}",
         "--network",
         "${config:cardCli.network.l2.name}",
         "--mnemonic",
