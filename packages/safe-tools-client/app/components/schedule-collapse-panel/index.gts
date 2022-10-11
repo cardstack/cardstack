@@ -1,5 +1,4 @@
 import type { TemplateOnlyComponent } from '@ember/component/template-only';
-import { type EmptyObject } from '@ember/component/helper';
 import { svgJar } from '@cardstack/boxel/utils/svg-jar';
 
 import './index.css';
@@ -20,7 +19,7 @@ const schedulerSteps: Array<Info> = [
     description: 'Specify the date & time for upcoming & recurring transactions',
   },
   {
-    title: 'Set up your payment account',
+    title: 'Track your transactions',
     description: 'See details of your past & future crypto payments at a glance',
   },
 ];
@@ -47,13 +46,12 @@ const schedulerFeatures: Array<Info & { iconName: string; }> = [
 interface Signature {
   Element: HTMLElement;
   Args: { 
-    noCollapse?: boolean
-    };
-  Blocks: EmptyObject;
+    open?: boolean 
+  };
 }
 
 const ScheduleCollapsePanel: TemplateOnlyComponent<Signature> = <template>
-  <details class='collapse-panel' ...attributes open={{@noCollapse}}>
+  <details class='collapse-panel' ...attributes open={{@open}}>
     <summary class='collapse-panel__summary'>
       <div class='collapse-panel__summary-collapsed'>
         <span>{{panelTitle}}</span>
@@ -75,7 +73,7 @@ const ScheduleCollapsePanel: TemplateOnlyComponent<Signature> = <template>
       </div>
       <div class='collapse-panel__details-overlay'>
         <h3>Start using this payment scheduler dApp:</h3>
-        <ol type='1'>
+        <ol>
           {{#each schedulerSteps as |step|}}
             <li>
               <h4>{{step.title}}</h4>
