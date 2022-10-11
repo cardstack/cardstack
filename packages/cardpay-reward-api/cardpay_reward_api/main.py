@@ -112,9 +112,6 @@ def read_reward_pool_balance(
     }
 
 
-S3_STORAGE_LOCATION = "s3://"
-
-
 @app.get("/rule/{rewardProgramId}")
 def read_rule(
     rewardProgramId: str,
