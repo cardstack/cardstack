@@ -128,15 +128,10 @@ def resolve_rule(did: str):
 
 
 def get_rule(reward_manager, reward_program_id):
-    # stub
-    did = "did:cardstack:1rkdiBistMpm4fThbFLCixx5798f022dbb7697ce"
-    rule = resolve_rule(did)
-    return rule
     blob = reward_manager.caller.rule(reward_program_id)
     if blob and blob != b"":
         try:
             did = blob.decode("utf-8")  # new blob format: hex encodes a did string
-            did = "did:cardstack:1rkdiBistMpm4fThbFLCixx5798f022dbb7697ce"
             rules = resolve_rule(did)
         except Exception:
             # old blob format: our rule blobs were hex encoded json
