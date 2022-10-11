@@ -1,4 +1,3 @@
-import duckdb
 import pandas as pd
 from cardpay_reward_programs.rules import safe_ownership
 
@@ -24,20 +23,13 @@ def create_rule(
         "max_rewards": 10,
     }
     user_config.update(user_config_overrides)
-    con = duckdb.connect(database=":memory:", read_only=False)
-    con.execute("create table TEST_TABLE as select * from fake_data")
 
-    def table_query(
-        self, config_name, table_name, min_partition: int, max_partition: int
-    ):
-        return "TEST_TABLE"
+    def register_tables(self):
+        self.connection.register("safe_owner", fake_data)
 
-    def run_query(self, table_query, vars, aux_table_query):
-        con.execute(self.sql("TEST_TABLE"), vars)
-        return con.fetchdf()
-
-    monkeypatch.setattr(safe_ownership.SafeOwnership, "_get_table_query", table_query)
-    monkeypatch.setattr(safe_ownership.SafeOwnership, "run_query", run_query)
+    monkeypatch.setattr(
+        safe_ownership.SafeOwnership, "register_tables", register_tables
+    )
 
     rule = safe_ownership.SafeOwnership(core_config, user_config)
     return rule

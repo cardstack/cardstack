@@ -1,6 +1,7 @@
 import pandas as pd
 from cardpay_reward_programs.rule import Rule
 from eth_utils import is_checksum_address
+from cardpay_reward_programs.utils import get_table_dataset
 
 
 class RetroAirdrop(Rule):
@@ -33,12 +34,19 @@ class RetroAirdrop(Rule):
         self.test_accounts = test_accounts
         self.test_reward = test_reward
 
-    def sql(self, table_query, aux_table_query=None):
-        return f"""
+    def register_tables(self):
+        prepaid_card_payment = get_table_dataset(
+            self.subgraph_config_locations["prepaid_card_payment"],
+            "prepaid_card_payment",
+        )
+        self.connection.register("prepaid_card_payment", prepaid_card_payment)
+
+    def sql(self):
+        return """
         select
             prepaid_card_owner as payee,
             count(*) as transactions
-        from {table_query}
+        from prepaid_card_payment
         where block_number_uint64 > $1::integer and block_number_uint64 <= $2::integer
         group by prepaid_card_owner
         """
@@ -81,17 +89,10 @@ class RetroAirdrop(Rule):
         )
 
     def run(self, payment_cycle: int, reward_program_id: str):
+        self.register_tables()
         vars = [self.start_snapshot_block, self.end_snapshot_block]
-        table_query = self._get_table_query(
-            "prepaid_card_payment",
-            "prepaid_card_payment",
-            self.start_snapshot_block,
-            self.end_snapshot_block,
-        )
-        if table_query == "parquet_scan([])":
-            base_df = pd.DataFrame(columns=["payee", "transactions"])
-        else:
-            base_df = self.run_query(table_query, vars, None)
+
+        base_df = self.connection.execute(self.sql(), vars, None).fetch_df()
         airdrop_payments = self.calculate_airdrop_reward_amounts(
             base_df, payment_cycle, reward_program_id
         )
