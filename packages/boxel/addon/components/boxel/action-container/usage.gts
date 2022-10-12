@@ -8,7 +8,6 @@ import not from 'ember-truth-helpers/helpers/not';
 export default class extends Component {
   @tracked isComplete = false;
   @tracked header = 'Card Header';
-  @tracked prompt = 'With optional prompt';
   @tracked incompleteActionLabel = 'Save';
   @tracked completeActionLabel = 'Edit value';
   <template>
@@ -19,14 +18,15 @@ export default class extends Component {
       <:example>
         <BoxelActionContainer
           @header={{this.header}}
-          @prompt={{this.prompt}}
           @incompleteActionLabel={{this.incompleteActionLabel}}
           @completeActionLabel={{this.completeActionLabel}}
           @isComplete={{this.isComplete}}
           @onClickButton={{fn (mut this.isComplete) (not this.isComplete)}}
-        >
+        as |Section|>
           {{!-- Sample block yield --}}
-            <div>Action Card here</div>
+            <Section @title="A Section Title">
+              <div>And some more content...</div>
+            </Section>
           {{!-- End of sample block yield --}}
         </BoxelActionContainer>
       </:example>
@@ -34,16 +34,8 @@ export default class extends Component {
         <Args.String
           @name="header"
           @description="action card header/label"
-          @required={{true}}
           @onInput={{fn (mut this.header)}}
           @value={{this.header}}
-        />
-        <Args.String
-          @name="prompt"
-          @optional={{true}}
-          @description="Optional main prompt with styling"
-          @onInput={{fn (mut this.prompt)}}
-          @value={{this.prompt}}
         />
         <Args.String
           @name="incompleteActionLabel"
@@ -73,7 +65,7 @@ export default class extends Component {
         />
         <Args.Yield
           @optional={{true}}
-          @description="Unstyled area for custom card content and fields"
+          @description="Unstyled area for custom card content and fields; yields a Section component that takes an optional title and applies an appropriate inset"
         />
       </:api>
     </FreestyleUsage>

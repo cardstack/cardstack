@@ -29,16 +29,6 @@
   color: var(--boxel-dark);
 }
 
-/* Optional prompt */
-.boxel-action-container__prompt {
-  margin: 0;
-  font-size: 1.125rem; /* 18px */
-  font-weight: 700;
-  line-height: 1.33;
-  letter-spacing: 0;
-  padding: var(--boxel-sp) var(--boxel-sp-lg);
-}
-
 /* Card Chin */
 .boxel-action-container__footer {
   border-bottom-right-radius: inherit;
