@@ -9,6 +9,7 @@ export default class ToggleButtonGroupUsage extends Component {
   @tracked name = 'example-toggle-button-group-usage';
   @tracked groupDescription = 'Select one';
   @tracked disabled = false;
+  @tracked value: string | undefined;
 
   @action logValue(value: string): void {
     console.log(value);
@@ -24,7 +25,8 @@ export default class ToggleButtonGroupUsage extends Component {
           @groupDescription={{this.groupDescription}}
           @name={{this.name}}
           @disabled={{this.disabled}}
-          @onChange={{this.logValue}} as |group|
+          @value={{this.value}}
+          @onChange={{fn (mut this.value)}} as |group|
         >
           <group.Button @value="19">
             <strong>
@@ -77,6 +79,12 @@ export default class ToggleButtonGroupUsage extends Component {
           @name="onChange"
           @description="Callback that receives the chosen value"
           @required={{true}}
+        />
+        <Args.String
+          @name="value"
+          @description="The current value of the component"
+          @value={{this.value}}
+          @onInput={{fn (mut this.value)}}
         />
         <Args.Yield
           @description="Yields { Button } which must be invoked with @value."

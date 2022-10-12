@@ -2,7 +2,6 @@ import Component from '@glimmer/component';
 import '@cardstack/boxel/styles/global.css';
 import './index.css';
 import cn from '@cardstack/boxel/helpers/cn';
-import { tracked } from '@glimmer/tracking';
 
 //@ts-expect-error glint does not think this is consumed-but it is consumed in the template https://github.com/typed-ember/glint/issues/374
 import { hash } from '@ember/helper';
@@ -17,10 +16,11 @@ import type { TemplateOnlyComponent } from '@ember/component/template-only';
 interface Signature {
   Element: HTMLFieldSetElement;
   Args: {
-    disabled: boolean;
+    disabled?: boolean;
     groupDescription: string;
     name: string;
     onChange: ((value: string) => void);
+    value?: string;
   };
   Blocks: {
     'default': [{ Button: WithBoundArgs<typeof Button, 'disabled'|'chosenValue'|'name'|'onChange'> }],
@@ -71,11 +71,9 @@ const Button: TemplateOnlyComponent<ButtonSignature> =
 </template>;
 
 export default class ToggleButtonGroupComponent extends Component<Signature> {
-  @tracked value?: string;
-
   @action changeValue(e: Event) {
-    this.value = (e.target as HTMLInputElement).value;
-    this.args.onChange?.(this.value);
+    let value = (e.target as HTMLInputElement).value;
+    this.args.onChange?.(value);
   }
 
   <template>
@@ -93,7 +91,7 @@ export default class ToggleButtonGroupComponent extends Component<Signature> {
                 disabled=@disabled
                 name=@name
                 onChange=this.changeValue
-                chosenValue=this.value
+                chosenValue=@value
               )
             )
         }}
