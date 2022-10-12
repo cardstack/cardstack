@@ -32,13 +32,21 @@ import { ZERO_ADDRESS } from '../constants';
 import { WithSymbol, RewardTokenBalance } from '@cardstack/cardpay-sdk';
 import { query } from '../utils/graphql';
 import { Signer } from 'ethers';
+import { get } from 'lodash';
+import { getResolver } from '@cardstack/did-resolver';
+import { Resolver } from 'did-resolver';
 
 export interface RewardProgramInfo {
   rewardProgramId: string;
   rewardProgramAdmin: string;
   locked: boolean;
-  rule: string;
+  blob: string;
   tokenBalances: WithSymbol<RewardTokenBalance>[];
+}
+
+export interface RuleJson {
+  explanation: any;
+  rules: any[];
 }
 
 const rewardProgramQuery = `
@@ -969,7 +977,7 @@ The owner of reward safe ${safeAddress} is ${rewardSafeOwner}, but the signer is
     }
     const locked = await this.isLocked(rewardProgramId);
     const rewardProgramAdmin = await this.getRewardProgramAdmin(rewardProgramId);
-    const rule = await this.getRewardRule(rewardProgramId);
+    const blob = await this.getBlob(rewardProgramId);
 
     let rewardPool = await getSDK('RewardPool', this.layer2Web3);
     const tokenBalances = await rewardPool.rewardProgramBalances(rewardProgramId);
@@ -977,7 +985,7 @@ The owner of reward safe ${safeAddress} is ${rewardSafeOwner}, but the signer is
       rewardProgramId,
       rewardProgramAdmin,
       locked,
-      rule,
+      blob,
       tokenBalances,
     };
   }
@@ -1055,9 +1063,34 @@ The owner of reward safe ${safeAddress} is ${rewardSafeOwner}, but the signer is
   async getGovernanceAdmin(): Promise<string> {
     return await (await this.getRewardManager()).methods.governanceAdmin().call();
   }
-  async getRewardRule(rewardProgramId: string): Promise<string> {
+  async getBlob(rewardProgramId: string): Promise<string> {
     return await (await this.getRewardManager()).methods.rule(rewardProgramId).call();
   }
+  async getRuleDid(rewardProgramId: string): Promise<string> {
+    const blob = await this.getBlob(rewardProgramId);
+    return Buffer.from(blob.replace('0x', ''), 'hex').toString('utf-8');
+  }
+
+  async getRuleJson(rewardProgramId: string): Promise<RuleJson> {
+    const did = await this.getRuleDid(rewardProgramId);
+    let didResolver = new Resolver(getResolver());
+    let didResult = await didResolver.resolve(did);
+    if (!didResult.didDocument?.alsoKnownAs) {
+      throw new Error('No alsoKnownAs found for DID');
+    }
+    let urlResponse = await fetch(didResult.didDocument?.alsoKnownAs[0]);
+    let content = await urlResponse.json();
+    return content;
+  }
+
+  async getProgramExplainer(rule: RuleJson) {
+    return get(rule, 'explanation.en.program', undefined);
+  }
+
+  async getClaimExplainer(rule: RuleJson, explanationId: string) {
+    return get(rule, 'explanation.en.claim.' + explanationId, undefined);
+  }
+
   async getRewardSafeDelegateAddress(): Promise<string> {
     return await (await this.getRewardManager()).methods.safeDelegateImplementation().call();
   }

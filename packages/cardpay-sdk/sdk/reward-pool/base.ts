@@ -24,7 +24,6 @@ import type { SuccessfulTransactionReceipt } from '../utils/successful-transacti
 import GnosisSafeABI from '../../contracts/abi/gnosis-safe';
 import { Signer } from 'ethers';
 import { query } from '../utils/graphql';
-import { get } from 'lodash';
 
 export interface Proof {
   rootHash: string;
@@ -94,30 +93,6 @@ export default class RewardPool {
     return await tokenContract.methods.balanceOf(rewardPoolAddress).call();
   }
 
-  async getRule(rewardProgramId: string) {
-    let tallyServiceURL = await getConstant('tallyServiceURL', this.layer2Web3);
-    let options = {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    };
-    const response = await fetch(`${tallyServiceURL}/rule/${rewardProgramId}`, options);
-    const json = await response.json();
-    if (!response?.ok) {
-      throw new Error(await response.text());
-    }
-    return json;
-  }
-
-  async getProgramExplainer(rule: any) {
-    return get(rule, 'explanation.en.program', undefined);
-  }
-
-  async getClaimExplainer(rule: any, explanationId: string) {
-    return get(rule, 'en.claim' + explanationId, undefined);
-  }
-
   async getProofs(
     address: string,
     rewardProgramId: string,
@@ -173,14 +148,15 @@ export default class RewardPool {
     if (!knownClaimed) {
       claimedLeafs = await this.getClaimedLeafs(address, rewardProgramId);
     }
-    const rule = this.getRule(rewardProgramId);
+    let rewardManager = await getSDK('RewardManager', this.layer2Web3);
+    const rule = await rewardManager.getRuleJson(rewardProgramId);
     json.map((o: any) => {
       let { validFrom, validTo }: FullLeaf = this.decodeLeaf(o.leaf) as FullLeaf;
       const isValid = validFrom <= currentBlock && validTo > currentBlock;
       // filters for known reward tokens
       if (rewardTokens.includes(o.tokenAddress)) {
         // filters for proofs has not been claimed
-        const claimExplainer = this.getClaimExplainer(rule, o.explanationId);
+        const claimExplainer = rewardManager.getClaimExplainer(rule, o.explanationId);
         if (!knownClaimed && !claimedLeafs.includes(o.leaf)) {
           res.push({
             ...o,
