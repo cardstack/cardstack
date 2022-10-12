@@ -1,4 +1,5 @@
 import itertools
+from pathlib import Path
 
 import pytest
 from cardpay_reward_programs.config import config
@@ -29,7 +30,9 @@ def rule(request):
         "payment_cycle_length": payment_cycle_length,
         "duration": 43200,
         "subgraph_config_locations": {
-            "prepaid_card_payment": "s3://partitioned-graph-data/data/staging_rewards/0.0.1/"
+            "prepaid_card_payment": Path(
+                "./tests/resources/partitioned-graph-data/data/staging_rewards/0.0.1/"
+            ).absolute()
         },
     }
     user_config = {
