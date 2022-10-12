@@ -1,9 +1,9 @@
 import itertools
+from pathlib import Path
 
 import pytest
 from cardpay_reward_programs.config import config
 from cardpay_reward_programs.rules import RetroAirdrop
-from pathlib import Path
 
 AIRDROP_AMOUNT = 6_000_000 * 1_000_000_000_000_000_000
 TEST_AMOUNT = 100 * 1_000_000_000_000_000_000

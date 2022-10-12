@@ -1,7 +1,7 @@
 import pandas as pd
 from cardpay_reward_programs.rule import Rule
-from eth_utils import is_checksum_address
 from cardpay_reward_programs.utils import get_table_dataset
+from eth_utils import is_checksum_address
 
 
 class RetroAirdrop(Rule):
