@@ -14,8 +14,6 @@ const MAIN_ACTION_AREA_SELECTOR =
 const MAIN_ACTION_AREA_ICON_SELECTOR =
   '[data-test-boxel-action-chin-action-status-area] .boxel-action-chin__action-status-area-icon';
 const INFO_AREA_SELECTOR = '[data-test-boxel-action-chin-info-area]';
-const DEFAULT_PRIVATE_NOTICE_SELECTOR =
-  '[data-test-boxel-action-chin-private-notice]';
 
 const STEP_DATA_TEST_ATTRIBUTE = 'data-test-boxel-action-chin-step';
 
@@ -265,36 +263,6 @@ module('Integration | Component | ActionChin', function (hooks) {
       </Boxel::ActionChin>
     `);
     assert.dom(MAIN_ACTION_AREA_ICON_SELECTOR).doesNotExist();
-  });
-
-  test('It renders the private notice regardless of InfoArea component use for the default, in-progress, and memorialized states', async function (assert) {
-    this.set('state', 'default');
-    await render(hbs`
-      <Boxel::ActionChin
-        @state={{this.state}}
-      >
-      <:default as |a|>
-        <a.InfoArea>
-          Info area that visually replaces the private notice
-        </a.InfoArea>
-      </:default>
-      <:inProgress as |i|>
-        <i.InfoArea>
-          Info area that visually replaces the private notice
-        </i.InfoArea>
-      </:inProgress>
-      <:memorialized as |m|>
-        <m.InfoArea>
-          Info area that visually replaces the private notice
-        </m.InfoArea>
-      </:memorialized>
-      </Boxel::ActionChin>
-    `);
-    assert.dom(DEFAULT_PRIVATE_NOTICE_SELECTOR).exists();
-    this.set('state', 'in-progress');
-    assert.dom(DEFAULT_PRIVATE_NOTICE_SELECTOR).exists();
-    this.set('state', 'memorialized');
-    assert.dom(DEFAULT_PRIVATE_NOTICE_SELECTOR).exists();
   });
 
   test('It renders disabled buttons for disabled states', async function (assert) {
