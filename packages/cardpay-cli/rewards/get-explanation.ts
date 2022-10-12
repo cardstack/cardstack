@@ -25,8 +25,8 @@ export default {
       explanationId?: string;
     };
     const { web3 } = await getEthereumClients(network, getConnectionType(args));
-    const rewardPool = await getSDK('RewardPool', web3);
-    const rule = await rewardPool.getRule(rewardProgramId);
+    const rewardPool = await getSDK('RewardManager', web3);
+    const rule = await rewardPool.getRuleJson(rewardProgramId);
     const programExplainer = await rewardPool.getProgramExplainer(rule);
     console.log(
       `

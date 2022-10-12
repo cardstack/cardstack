@@ -1299,7 +1299,7 @@
         "get-explanation",
         "${config:cardCli.network.l2.rewardProgramId}",
         "--explanationId",
-        "claim.flat_drop",
+        "flat_drop",
         "--network",
         "${config:cardCli.network.l2.name}",
         "--mnemonic",
