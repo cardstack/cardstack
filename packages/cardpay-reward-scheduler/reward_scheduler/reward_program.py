@@ -131,7 +131,12 @@ class RewardProgram:
         if blob and blob != b"":
             try:
                 did = blob.decode("utf-8")  # new blob format: hex encodes a did string
-                rules = resolve_rule(did)
+                doc = resolve_did(did)
+                rules = doc.get("tasks", None)
+                if rules is None:
+                    raise Exception("No rules specified")
+                else:
+                    return rules
             except Exception:
                 # old blob format: our rule blobs were hex encoded json
                 # try..except maintains backward compatibality with our old blob format
@@ -253,6 +258,6 @@ class RewardProgram:
         logging.info(f"All new payment cycles triggered for {self.reward_program_id}")
 
 
-def resolve_rule(did: str):
+def resolve_did(did: str):
     url = Resolver(get_resolver()).resolve(did)["didDocument"]["alsoKnownAs"][0]
     return requests.get(url).json()
