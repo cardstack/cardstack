@@ -1,9 +1,14 @@
-<Boxel::ControlPanel as |cp|>
-  <cp.Item @title='Wallet' @icon='wallet' @isActive={{true}}>
-    <Boxel::Button @kind='primary'>
-      Connect
-    </Boxel::Button>
-  </cp.Item>
-  <cp.Item @title='Network' @icon='network' />
-  <cp.Item @title='Safe' @icon='safe' />
-</Boxel::ControlPanel>
+<section class='safe-tools__dashboard-schedule'>
+  <Boxel::ControlPanel as |cp|>
+    <cp.Item @title='Wallet' @icon='wallet' @isActive={{true}}>
+      <Boxel::Button @kind='primary'>
+        Connect
+      </Boxel::Button>
+    </cp.Item>
+    <cp.Item @title='Network' @icon='network' />
+    <cp.Item @title='Safe' @icon='safe' />
+  </Boxel::ControlPanel>
+  <section class='safe-tools__dashboard-schedule-content'>
+    <ScheduleCollapsePanel @open={{true}} />
+  </section>
+</section>

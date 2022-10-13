@@ -64,7 +64,7 @@ const ScheduleCollapsePanel: TemplateOnlyComponent<Signature> = <template>
         <ul>
           {{#each schedulerFeatures as |feature|}}
             <li>
-              {{svgJar feature.iconName role='listitem'}}
+              {{svgJar feature.iconName role='presentation'}}
               <h4>{{feature.title}}</h4>
               <p>{{feature.description}}</p>
             </li>
