@@ -35,25 +35,16 @@ runs:
     - run: yarn --prefer-offline --frozen-lockfile
       shell: bash
 
-    - name: Build
+    - name: Deploy
       shell: bash
       working-directory: packages/safe-tools-client
-      run: yarn build:safe-tools-client --environment ${{ inputs.environment }}
+      run: yarn deploy:safe-tools-client ${{ inputs.environment }} --verbose
 
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v1
       with:
         role-to-assume: ${{ env.AWS_ROLE_ARN }}
         aws-region: us-east-1
-
-    - name: Sync content to S3
-      shell: bash
-      working-directory: packages/safe-tools-client/dist
-      run: aws s3 sync . s3://$S3_BUCKET --delete
-
-    - name: Invalidate cloudfront
-      shell: bash
-      run: aws cloudfront create-invalidation --distribution-id $CLOUDFRONT_DISTRIBUTION --paths "/*"
 
     - name: Send notification to Discord
       if: ${{ always() }}
