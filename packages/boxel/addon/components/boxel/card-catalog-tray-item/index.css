@@ -85,6 +85,8 @@
 }
 
 .boxel-card-catalog-tray-item__used-icon {
+  --icon-color: var(--boxel-cyan);
+
   position: absolute;
   width: 1rem;
   height: 1rem;
