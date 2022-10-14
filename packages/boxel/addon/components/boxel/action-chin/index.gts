@@ -33,12 +33,13 @@ interface InProgressBlockArgs {
   InfoArea: ComponentLike<InfoAreaSignature>;
 }
 
-interface Signature {
+export interface Signature {
   Element: HTMLDivElement;
   Args: {
     stepNumber?: number;
     state: ActionChinState;
     disabled?: boolean;
+    class?: string
   };
   Blocks: {
     'default': [DefaultBlockArgs],
@@ -63,6 +64,7 @@ export default class ActionChin extends Component<Signature> {
         (if @state (concat "boxel-action-chin--" @state))
         (if @disabled "boxel-action-chin--disabled")
         (if @stepNumber (concat "boxel-action-chin--has-step"))
+        @class
       }}
       ...attributes
       data-test-boxel-action-chin

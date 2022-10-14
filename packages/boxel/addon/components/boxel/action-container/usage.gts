@@ -51,32 +51,32 @@ export default class extends Component {
         <Args.String
           @name="incompleteActionLabel"
           @description="CTA button label for blocking action. It means the action is incomplete"
-          @required={{true}}
           @onInput={{fn (mut this.incompleteActionLabel)}}
           @value={{this.incompleteActionLabel}}
         />
         <Args.String
           @name="completeActionLabel"
           @description="CTA button label for non-blocking action"
-          @required={{true}}
           @onInput={{fn (mut this.completeActionLabel)}}
           @value={{this.completeActionLabel}}
         />
         <Args.Action
           @name="onClickButton"
           @description="Function for the CTA button action"
-          @required={{true}}
         />
         <Args.Bool
           @name="isComplete"
           @description="Condition for action's completeness (Boolean)"
-          @required={{true}}
           @defaultValue={{false}}
           @onInput={{fn (mut this.isComplete)}}
         />
         <Args.Yield
           @optional={{true}}
           @description="Unstyled area for custom card content and fields; yields a Section component that takes an optional title and applies an appropriate inset"
+        />
+        <Args.Yield
+          @optional={{true}}
+          @description="Yields an ActionChin component to be used instead of complete/incomplete labels if customization is required "
         />
       </:api>
     </FreestyleUsage>

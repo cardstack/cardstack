@@ -1,12 +1,13 @@
 import type { TemplateOnlyComponent } from '@ember/component/template-only';
 import BoxelCardContainer from '@cardstack/boxel/components/boxel/card-container';
 import BoxelHeader from '../header';
-import BoxelActionChin from '../action-chin';
+import BoxelActionChin, { type Signature as ActionChinSignature } from '../action-chin';
 import cn from '@cardstack/boxel/helpers/cn';
 import { on } from '@ember/modifier';
 import optional from 'ember-composable-helpers/helpers/optional';
 import { ComponentLike } from '@glint/template';
 import ActionContainerSection, { type Signature as SectionSignature } from './section';
+import or from 'ember-truth-helpers/helpers/or';
 
 import '@cardstack/boxel/styles/global.css';
 import './index.css';
@@ -20,11 +21,11 @@ interface Signature {
     header?: string;
     prompt?: string;
     onClickButton?: () => void;
-    completeActionLabel: string;
-    incompleteActionLabel: string;
+    completeActionLabel?: string;
+    incompleteActionLabel?: string;
   };
   Blocks: {
-    'default': [ComponentLike<SectionSignature>],
+    'default': [ComponentLike<SectionSignature>, ComponentLike<ActionChinSignature>],
   }
 }
 
@@ -46,24 +47,27 @@ const ActionContainer: TemplateOnlyComponent<Signature> = <template>
       />
     {{/if}}
 
-    {{yield (component ActionContainerSection)}}
+    {{yield (component ActionContainerSection) (component BoxelActionChin class='boxel-action-container__footer')}}
 
-    <BoxelActionChin
-      class="boxel-action-container__footer"
-      @state={{if @isComplete "memorialized" "default"}}
-      data-test-boxel-action-footer
-    >
-      <:memorialized as |m|>
-        <m.ActionButton @disabled={{@disabled}} {{on "click" (optional @onClickButton)}}>
-          {{@completeActionLabel}}
-        </m.ActionButton>
-      </:memorialized>
-      <:default as |a|>
-        <a.ActionButton @disabled={{@disabled}} {{on "click" (optional @onClickButton)}}>
-          {{@incompleteActionLabel}}
-        </a.ActionButton>
-      </:default>
-    </BoxelActionChin>
+    {{#if (or @completeActionLabel  @incompleteActionLabel)}}
+      <BoxelActionChin
+        class="boxel-action-container__footer"
+        @state={{if @isComplete "memorialized" "default"}}
+        data-test-boxel-action-footer
+      >
+        <:memorialized as |m|>
+          <m.ActionButton @disabled={{@disabled}} {{on "click" (optional @onClickButton)}}>
+            {{@completeActionLabel}}
+          </m.ActionButton>
+        </:memorialized>
+        <:default as |a|>
+          <a.ActionButton @disabled={{@disabled}} {{on "click" (optional @onClickButton)}}>
+            {{@incompleteActionLabel}}
+          </a.ActionButton>
+        </:default>
+      </BoxelActionChin>
+    {{/if}}
+          
   </BoxelCardContainer>
 </template>
 
