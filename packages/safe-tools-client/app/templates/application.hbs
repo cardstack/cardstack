@@ -18,9 +18,7 @@
         boxel-org-title-text-transform='none'
       }}
     >
-      <Boxel::Button @kind='primary'>
-        Connect Wallet
-      </Boxel::Button>
+      <ConnectionButton @onConnect={{set this 'isShowingConnectModal' true}} />
     </Boxel::OrgHeader>
     <Boxel::TabBar
       @items={{
@@ -46,3 +44,10 @@
     {{outlet}}
   </:body>
 </Boxel::Dashboard>
+
+<NetworkConnectModal
+  @name='layer1'
+  @isOpen={{this.isShowingConnectModal}}
+  @onClose={{set this 'isShowingConnectModal' false}}
+  @isLayerConnected={{false}}
+/>
