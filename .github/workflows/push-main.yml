@@ -475,7 +475,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-node-modules-
 
-      - name: Deploy web-client
+      - name: Deploy safe-tools-client
         uses: ./.github/actions/deploy-safe-tools-client
         with:
           environment: staging
