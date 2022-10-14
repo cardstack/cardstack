@@ -11,7 +11,7 @@
         <p class='safe-tools__dashboard-schedule-control-panel-safe-info'>
           You need to have a safe which contains funds that would be deducted
           automatically when schedule payments are due.</p>
-        <Boxel::Button @kind='primary'>
+        <Boxel::Button @kind='primary' {{on 'click' this.openSetupSafeModal}}>
           Create Safe
         </Boxel::Button>
       </div>
@@ -21,3 +21,8 @@
     <ScheduleCollapsePanel @open={{true}} />
   </section>
 </section>
+
+<SetupSafeModal
+  @isOpen={{this.isSetupSafeModalOpen}}
+  @onClose={{this.closeSetupSafeModal}}
+/>
