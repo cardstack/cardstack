@@ -199,6 +199,8 @@ class CardPayLayerConnectModalComponent extends Component<CardPayLayerConnectMod
             {{svgJar 'close' width='100%' height='100%' aria-hidden=true}}
           </button>
 
+          <header class="layer-connect-modal__title">Connect your wallet</header>
+
             <BoxelRadioInput
               @groupDescription='Select a wallet to connect to'
               @items={{this.walletProviders}}
