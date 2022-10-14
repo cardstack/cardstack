@@ -36,7 +36,6 @@ module('Integration | Component | ActionContainer', function (hooks) {
     await render(hbs`
         <Boxel::ActionContainer
         @header="Action Card"
-        @prompt="Please enter name"
         @incompleteActionLabel="Save"
       >
         <div>Card</div>
@@ -44,7 +43,6 @@ module('Integration | Component | ActionContainer', function (hooks) {
     `);
 
     assert.dom('[data-test-boxel-action-container]').exists();
-    assert.dom('[data-test-boxel-action-prompt]').hasText('Please enter name');
 
     await a11yAudit();
     assert.ok(true, 'no a11y errors found!');

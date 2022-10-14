@@ -13,10 +13,7 @@ on:
         required: true
         options:
           - FlatPayment
-          - MinSpend
           - RetroAirdrop
-          - WeightedUsage
-          - MinOtherMerchantsPaid
           - SafeOwnership
           - Staking
 

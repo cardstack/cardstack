@@ -1,5 +1,5 @@
-import pandas as pd
 from cardpay_reward_programs.rule import Rule
+from cardpay_reward_programs.utils import get_table_dataset
 
 
 class Staking(Rule):
@@ -10,22 +10,29 @@ class Staking(Rule):
     def __init__(self, core_parameters, user_defined_parameters):
         super(Staking, self).__init__(core_parameters, user_defined_parameters)
 
-    def set_user_defined_parameters(self, token, duration, interest_rate_monthly):
+    def set_user_defined_parameters(self, token, interest_rate_monthly):
         self.token = token
-        self.duration = duration
         self.interest_rate_monthly = interest_rate_monthly
 
-    def sql(self, table_query, aux_table_query):
-        token_holder_table = table_query
-        safe_owner_table = aux_table_query
-        return f"""
+    def register_tables(self):
+        safe_owner = get_table_dataset(
+            self.subgraph_config_locations["safe_owner"], "safe_owner"
+        )
+        self.connection.register("safe_owner", safe_owner)
+        token_holder = get_table_dataset(
+            self.subgraph_config_locations["token_holder"], "token_holder"
+        )
+        self.connection.register("token_holder", token_holder)
+
+    def sql(self):
+        return """
             -- Select only the safes we are rewarding, and their owner at the end of the cycle
             with filtered_safes AS (
                 SELECT safe, max(owner) as owner
-                FROM {safe_owner_table} a
+                FROM safe_owner a
                 WHERE _block_number = (
                     SELECT MAX(_block_number)
-                    FROM {safe_owner_table} b
+                    FROM safe_owner b
                     WHERE a.safe = b.safe
                     AND _block_number::integer < $2::integer
                 )
@@ -36,7 +43,7 @@ class Staking(Rule):
             -- joining to get the owner
             filtered_balances AS (
                 SELECT tht.safe, sot.owner, tht.balance_downscale_e9_uint64::int64 AS balance_int64, tht._block_number
-                FROM {token_holder_table} AS tht
+                FROM token_holder AS tht
                 LEFT JOIN filtered_safes AS sot ON (tht.safe = sot.safe)
                 WHERE token = $3::text
                 AND sot.safe IS NOT NULL
@@ -88,6 +95,7 @@ class Staking(Rule):
         """
 
     def run(self, payment_cycle: int, reward_program_id: str):
+        self.register_tables()
         start_block, end_block = (
             payment_cycle - self.payment_cycle_length,
             payment_cycle,
@@ -100,18 +108,7 @@ class Staking(Rule):
             self.interest_rate_monthly,  # $5 -> float
         ]
 
-        table_query = self._get_table_query(
-            "token_holder", "token_holder", None, payment_cycle
-        )
-
-        aux_table_query = self._get_table_query(
-            "safe_owner", "safe_owner", None, payment_cycle
-        )
-
-        if table_query == "parquet_scan([])" or aux_table_query == "parquet_scan([])":
-            df = pd.DataFrame(columns=["payee", "rewards"])
-        else:
-            df = self.run_query(table_query, vars, aux_table_query)
+        df = self.connection.execute(self.sql(), vars).fetch_df()
         df["rewardProgramID"] = reward_program_id
         df["paymentCycle"] = payment_cycle
         df["validFrom"] = payment_cycle

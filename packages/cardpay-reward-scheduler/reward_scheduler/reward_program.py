@@ -8,7 +8,7 @@ from cloudpathlib import AnyPath
 from did_resolver import Resolver
 from python_did_resolver import get_resolver
 
-from .utils import get_files, get_latest_details, run_job
+from .utils import get_latest_written_block, get_table_dataset, run_job
 
 
 class RewardProgram:
@@ -22,7 +22,7 @@ class RewardProgram:
         reward_manager,
         subgraph_url,
         result_file_root,
-        subgraph_extract_location=None,
+        subgraph_extract_location,
     ) -> None:
         self.reward_manager = reward_manager
         self.reward_program_id = reward_program_id
@@ -30,28 +30,26 @@ class RewardProgram:
         self.reward_program_output_location = AnyPath(result_file_root).joinpath(
             f"rewardProgramID={reward_program_id}"
         )
-        if subgraph_extract_location is not None:
-            self.load_submitted_from_subgraph_extraction(subgraph_extract_location)
-        self.update_processed()
+        self.subgraph_extract_location = subgraph_extract_location
+        self.load_submitted_from_subgraph_extraction()
 
-    def load_submitted_from_subgraph_extraction(self, subgraph_extract_location):
+    def load_submitted_from_subgraph_extraction(self):
         logging.info(
-            f"Loading processed payment cycles for {self.reward_program_id} from {subgraph_extract_location}"
+            f"Loading processed payment cycles for {self.reward_program_id} from {self.subgraph_extract_location}"
         )
-        subgraph_export_files = get_files(
-            subgraph_extract_location, "merkle_root_submission"
+        submission_dataset = get_table_dataset(
+            self.subgraph_extract_location, "merkle_root_submission"
         )
         con = duckdb.connect(database=":memory:", read_only=False)
+        con.register("submissions", submission_dataset)
         con.execute(
-            f"""
-        select distinct payment_cycle_uint64 from parquet_scan({subgraph_export_files})
-        """
+            "select distinct payment_cycle_uint64 from submissions where reward_program = $1",
+            [self.reward_program_id],
         )
         self.processed_cycles.update(r[0] for r in con.fetchall())
-        con.execute(
-            f"select max(_block_number), count(*) from parquet_scan({subgraph_export_files})"
-        )
+        con.execute("select max(_block_number), count(*) from submissions")  # 27310514
         last_update_block, total_payment_cycles = con.fetchall()[0]
+        logging.info(f"Last update block in parquet files {last_update_block}")
         if total_payment_cycles == 0:
             # There are no payment cycles in the parquet files
             self.last_update_block = 0
@@ -98,14 +96,15 @@ class RewardProgram:
         Get the latest block that has data for this program
         based on the subgraph exports
         """
-        latest_block = None
-        for subgraph_config in rule["subgraph_config_locations"].values():
-            latest_data = get_latest_details(subgraph_config)
-            if latest_block is None:
-                latest_block = latest_data["latest_block"]
-            else:
-                latest_block = min(latest_block, latest_data["latest_block"])
-        return latest_block
+        data_dependencies = list(rule["subgraph_config_locations"].values())
+        # In the case of rollover, we also need to check the claims submissions
+        # data is up to date
+        if rule.get("rollover"):
+            data_dependencies.append(self.subgraph_extract_location)
+        if len(data_dependencies) > 0:
+            return get_latest_written_block(data_dependencies)
+        else:
+            return None
 
     def is_locked(self):
         return self.reward_manager.caller.rewardProgramLocked(self.reward_program_id)
@@ -116,7 +115,6 @@ class RewardProgram:
         where the data is available
         """
         core_config = rule["core"]
-        self.update_processed()
         start_block = core_config["start_block"]
         latest_data_block = self.get_latest_data_block(core_config)
         # If there is no dependency on data then all cycles from the start
@@ -166,7 +164,7 @@ class RewardProgram:
                 )
             current_cycles.update(rule_cycles)
 
-    def run(self, payment_cycle, rule):
+    def run_payment_cycle(self, payment_cycle, rule, previous_cycle=None):
         """
         Trigger a job in AWS batch for a single payment cycle and single rule
         """
@@ -177,6 +175,17 @@ class RewardProgram:
             "reward_program_id": self.reward_program_id,
             "payment_cycle": payment_cycle,
         }
+
+        if previous_cycle:
+            submission_data["run"].update(
+                {
+                    "previous_output": self.reward_program_output_location.joinpath(
+                        f"paymentCycle={previous_cycle}", "results.parquet"
+                    ).as_uri(),
+                    "rewards_subgraph_location": str(self.subgraph_extract_location),
+                }
+            )
+
         payment_cycle_output = self.reward_program_output_location.joinpath(
             f"paymentCycle={payment_cycle}"
         )
@@ -190,9 +199,9 @@ class RewardProgram:
         # We can't pass much data directly in AWS batch, so write the
         # parameters we want to use to S3 and pass the location into the task
         parameters_location = payment_cycle_output.joinpath("parameters.json")
+        payment_cycle_output.mkdir(parents=True, exist_ok=True)
         with parameters_location.open("w") as params_out:
             json.dump(submission_data, params_out)
-
         job = run_job(
             docker_image,
             parameters_location.as_uri(),
@@ -204,7 +213,28 @@ class RewardProgram:
         )
         return job
 
-    def run_all_payment_cycles(self) -> None:
+    def run_rule(self, rule) -> None:
+        processable_payment_cycles = (
+            self.get_all_payment_cycles(rule) - self.processed_cycles
+        )
+        for payment_cycle in sorted(processable_payment_cycles):
+            if rule["core"].get("rollover"):
+                previous_cycle = payment_cycle - rule["core"]["payment_cycle_length"]
+                if payment_cycle == rule["core"]["start_block"]:
+                    # There can't be any previous ones for the first cycle
+                    self.run_payment_cycle(payment_cycle, rule)
+                elif previous_cycle in self.processed_cycles:
+                    # Only run if the previous cycle has been processed
+                    # because the output of the previous cycle is needed
+                    self.run_payment_cycle(payment_cycle, rule, previous_cycle)
+                else:
+                    # There's nothing to do here as the previous cycle hasn't been processed
+                    pass
+
+            else:
+                self.run_payment_cycle(payment_cycle, rule)
+
+    def run_all_rules(self) -> None:
         """
         Run all rules for all payment cycles that can be processed at this time
         """
@@ -212,14 +242,14 @@ class RewardProgram:
         if self.is_locked():
             logging.info(f"Reward program {self.reward_program_id} is locked, skipping")
             return
+
+        self.update_processed()
         rules = self.get_rules()
+        logging.info(f"Reward program {self.reward_program_id} has {len(rules)} rules")
         self.raise_on_payment_cycle_overlap(rules)
         for rule in rules:
-            processable_payment_cycles = (
-                self.get_all_payment_cycles(rule) - self.processed_cycles
-            )
-            for payment_cycle in sorted(processable_payment_cycles):
-                self.run(payment_cycle, rule)
+            self.run_rule(rule)
+
         logging.info(f"All new payment cycles triggered for {self.reward_program_id}")
 
 

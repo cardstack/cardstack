@@ -5,6 +5,8 @@ import BoxelActionChin from '../action-chin';
 import cn from '@cardstack/boxel/helpers/cn';
 import { on } from '@ember/modifier';
 import optional from 'ember-composable-helpers/helpers/optional';
+import { ComponentLike } from '@glint/template';
+import ActionContainerSection, { type Signature as SectionSignature } from './section';
 
 import '@cardstack/boxel/styles/global.css';
 import './index.css';
@@ -15,14 +17,14 @@ interface Signature {
   Args: {
     isComplete?: boolean;
     disabled?: boolean;
-    header: string;
+    header?: string;
     prompt?: string;
     onClickButton?: () => void;
     completeActionLabel: string;
     incompleteActionLabel: string;
   };
   Blocks: {
-    'default': [],
+    'default': [ComponentLike<SectionSignature>],
   }
 }
 
@@ -36,19 +38,15 @@ const ActionContainer: TemplateOnlyComponent<Signature> = <template>
     data-test-boxel-action-container-is-complete={{@isComplete}}
     ...attributes
   >
-    <BoxelHeader
-      class="boxel-action-container__header"
-      @header={{@header}}
-      data-test-boxel-action-header
-    />
-
-    {{#if @prompt}}
-      <p class="boxel-action-container__prompt" data-test-boxel-action-prompt>
-        {{@prompt}}
-      </p>
+    {{#if @header}}
+      <BoxelHeader
+        class="boxel-action-container__header"
+        @header={{@header}}
+        data-test-boxel-action-header
+      />
     {{/if}}
 
-    {{yield}}
+    {{yield (component ActionContainerSection)}}
 
     <BoxelActionChin
       class="boxel-action-container__footer"

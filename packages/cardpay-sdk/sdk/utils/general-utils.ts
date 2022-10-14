@@ -9,12 +9,18 @@ import { query as gqlQuery } from './graphql';
 import { AbiItem } from 'web3-utils';
 import { Operation } from './safe-utils';
 import { v4 } from 'uuid';
-import { Interface } from 'ethers/lib/utils';
-import { Revert } from '../../providers/http-provider';
+import JsonRpcProvider from '../../providers/json-rpc-provider';
+import { BytesLike, Interface } from 'ethers/lib/utils';
+import { utils } from 'ethers';
 
 const POLL_INTERVAL = 500;
 
 const receiptCache = new Map<string, SuccessfulTransactionReceipt>();
+
+const BuiltinErrors: { [name: string]: ErrorFragment } = {
+  '0x08c379a0': { signature: 'Error(string)', name: 'Error', inputs: ['string'] },
+  '0x4e487b71': { signature: 'Panic(uint256)', name: 'Panic', inputs: ['uint256'] },
+};
 
 export interface Transaction {
   to: string;
@@ -28,8 +34,23 @@ export interface TransactionOptions {
   onTxnHash?: (txnHash: string) => unknown;
 }
 
-export async function networkName(web3: Web3): Promise<string> {
-  let id = await web3.eth.net.getId();
+export interface RevertError extends Error {
+  data: string;
+  reason: string;
+  error: any | undefined;
+}
+
+export interface ErrorFragment {
+  signature: string;
+  name: string;
+  inputs: string[];
+}
+
+export async function networkName(web3OrEthersProvider: Web3 | JsonRpcProvider): Promise<string> {
+  let id =
+    web3OrEthersProvider instanceof JsonRpcProvider
+      ? (await web3OrEthersProvider.getNetwork()).chainId
+      : await web3OrEthersProvider.eth.net.getId();
   let name = networks[id];
   if (!name) {
     throw new Error(`Don't know what name the network id ${id} is`);
@@ -53,7 +74,7 @@ export async function safeContractCall(
 }
 
 export function waitUntilTransactionMined(
-  web3: Web3,
+  web3OrEthersProvider: Web3 | JsonRpcProvider,
   txnHash: string,
   duration = 60 * 10 * 1000
 ): Promise<SuccessfulTransactionReceipt> {
@@ -70,7 +91,13 @@ export function waitUntilTransactionMined(
     }
 
     try {
-      let receipt = await web3.eth.getTransactionReceipt(txnHash);
+      let receipt;
+      if (web3OrEthersProvider instanceof JsonRpcProvider) {
+        receipt = await web3OrEthersProvider.getTransactionReceipt(txnHash);
+      } else {
+        receipt = await web3OrEthersProvider.eth.getTransactionReceipt(txnHash);
+      }
+
       if (receipt?.status) {
         let successfulReceipt = receipt as SuccessfulTransactionReceipt;
         receiptCache.set(txnHash, successfulReceipt);
@@ -314,15 +341,62 @@ export async function sendTransaction(web3: Web3, transaction: Transaction): Pro
   return txHash;
 }
 
-export function extractSendTransactionError(revert: Revert, abiInterface: Interface) {
+export function extractSendTransactionError(revert: RevertError, abiInterface: Interface) {
   let error;
-  try {
-    let funcError = abiInterface.parseError(revert.data);
-    error = `${funcError.name} ${funcError.args.join(',')}`;
-  } catch (e) {
+  let bytes = extractBytesLikeFromError(revert);
+  if (bytes) {
+    error = extractErrorMessageFromBytesLike(bytes, abiInterface);
+    if (!error) {
+      error = utils.toUtf8String(bytes);
+    }
+  } else {
     error = revert.reason ? revert.reason : revert.message;
   }
 
+  return error;
+}
+
+export function extractBytesLikeFromError(revert: RevertError) {
+  let bytes;
+  if (revert.data) {
+    bytes = revert.data;
+  } else if (revert.error && revert.error.data) {
+    bytes = revert.error.data;
+  } else {
+    let messages = revert.error ? revert.error.message.split(' ') : revert.message.split(' ');
+    bytes = messages.find((message: string) => message.match(/^0x.+$/));
+    bytes = bytes?.replace(/[!@#$%^&*(),.?":{}|<>]/, '');
+  }
+
+  return bytes;
+}
+
+function extractErrorMessageFromBytesLike(bytesLike: BytesLike, abiInterface: Interface) {
+  let bytes = utils.arrayify(bytesLike);
+  let selector = utils.hexlify(bytes.slice(0, 4));
+  let interfaceErrors: { [name: string]: ErrorFragment } = Object.keys(abiInterface.errors).reduce(
+    (obj: { [name: string]: ErrorFragment }, key) => {
+      const error = abiInterface.errors[key];
+      const sigHash = abiInterface.getSighash(error);
+      const errorFragment: ErrorFragment = {
+        name: error.name,
+        signature: key,
+        inputs: error.inputs.map((input) => input.type),
+      };
+      obj[sigHash] = errorFragment;
+      return obj;
+    },
+    {}
+  );
+  let errors = {
+    ...BuiltinErrors,
+    ...interfaceErrors,
+  };
+  let funcError = errors[selector];
+  let error;
+  if (funcError) {
+    error = `${funcError.name} ${utils.defaultAbiCoder.decode(funcError.inputs, bytes.slice(4)).join(',')}`;
+  }
   return error;
 }
 

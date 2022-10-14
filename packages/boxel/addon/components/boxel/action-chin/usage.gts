@@ -151,8 +151,8 @@ export default class ActionChinUsage extends Component<Signature> {
                 </td>
                 {{!-- template-lint-disable no-whitespace-for-layout --}}
                 <td>
-                  An area used for any relevant information to the action (eg for status updates)
-                  If provided, it replaces the text:  "Actions only visible to you".
+                  An area used for any relevant information to the action (eg for status updates),
+                  on the right end of the chin.
                 </td>
                 <td>
                   <ul>

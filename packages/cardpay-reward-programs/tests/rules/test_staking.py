@@ -1,4 +1,3 @@
-import duckdb
 import hypothesis.strategies as st
 import pandas as pd
 import pytest
@@ -54,6 +53,7 @@ def create_rule(
 ):
     core_config = {
         "payment_cycle_length": CYCLE_LENGTH,
+        "duration": 30,
         "start_block": 0,
         "end_block": END_BLOCK,
         "subgraph_config_locations": {
@@ -64,34 +64,15 @@ def create_rule(
     }
 
     core_config.update(core_config_overrides)
-    user_config = {"token": "card-0", "duration": 30, "interest_rate_monthly": 0.06}
+    user_config = {"token": "card-0", "interest_rate_monthly": 0.06}
 
     user_config.update(user_config_overrides)
-    con = duckdb.connect(database=":memory:", read_only=False)
-    con.execute(
-        f"""create table {token_holder_table} as select * from fake_data_token_holder"""
-    )
-    con.execute(
-        f"""create table {safe_ownership_table} as select * from fake_data_safe_owner"""
-    )
 
-    def table_query(
-        self, config_name, table_name, min_partition: int, max_partition: int
-    ):
+    def register_tables(self):
+        self.connection.register("token_holder", fake_data_token_holder)
+        self.connection.register("safe_owner", fake_data_safe_owner)
 
-        if table_name == "token_holder":
-            return token_holder_table
-        elif table_name == "safe_owner":
-            return safe_ownership_table
-        else:
-            raise NameError
-
-    def run_query(self, table_query, vars, aux_table_query):
-        con.execute(self.sql(token_holder_table, safe_ownership_table), vars)
-        return con.fetchdf()
-
-    monkeypatch.setattr(staking.Staking, "_get_table_query", table_query)
-    monkeypatch.setattr(staking.Staking, "run_query", run_query)
+    monkeypatch.setattr(staking.Staking, "register_tables", register_tables)
 
     rule = staking.Staking(core_config, user_config)
     return rule
@@ -542,59 +523,3 @@ def test_rewards_identically_if_balance_never_changes(blocks):
         result_multiple_balance = rule_multiple_balance.run(30, "0x0")
         assert pytest.approx(sum(result_single_balance["amount"])) == 10e9
         assert pytest.approx(sum(result_multiple_balance["amount"])) == 10e9
-
-
-def test_staking_does_not_use_start_and_end_blocks(monkeypatch):
-    """
-    The start & end blocks are variables for the *scheduler* not the rule.
-
-    It should not affect the data read to calculate ownership of safes or the balances.
-
-    When querying for the partitions, the min partition here should be None
-    which signifies that data from the earliest block is required
-    and the max partition should be the payment cycle as that's the latest
-    data that is required.
-    """
-    payment_cycle = 35
-    fake_data_token_holder = pd.DataFrame(
-        [
-            {
-                "_block_number": 0,
-                "token": "card-0",
-                "safe": "safe1",
-                "balance_downscale_e9_uint64": 1000,
-            },
-        ]
-    )
-
-    fake_data_safe_owner = pd.DataFrame(
-        [
-            {"safe": "safe1", "owner": "owner1", "type": "depot", "_block_number": 0},
-        ]
-    )
-
-    rule = create_rule(
-        monkeypatch,
-        fake_data_token_holder,
-        fake_data_safe_owner,
-        core_config_overrides={"start_block": 30},
-    )
-
-    def table_query(
-        self, config_name, table_name, min_partition: int, max_partition: int
-    ):
-        assert min_partition is None
-        assert max_partition == payment_cycle
-
-        if table_name == "token_holder":
-            return token_holder_table
-        elif table_name == "safe_owner":
-            return safe_ownership_table
-        else:
-            raise NameError
-
-    monkeypatch.setattr(staking.Staking, "_get_table_query", table_query)
-
-    result = rule.run(payment_cycle, "0x0")
-
-    assert pytest.approx(get_amount(result, "owner1")) == 60e9

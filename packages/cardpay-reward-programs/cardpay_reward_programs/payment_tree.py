@@ -1,11 +1,10 @@
-import itertools
 import json
 from collections import defaultdict
-from typing import List, TypedDict
+from typing import List, TypedDict, Union
 
 import pyarrow as pa
 import sha3
-from eth_abi import encode_abi
+from eth_abi import decode_abi, encode_abi
 from eth_typing import ChecksumAddress
 from eth_utils import add_0x_prefix
 from merklelib import MerkleTree, beautify
@@ -21,46 +20,71 @@ class Payment(TypedDict):
     amount: int  # python should auto-detect big numbers
 
 
-def group_by(data_array, callback):
-    # remember: itertools.groupby requires that keys are sorted; it only groups common keys which are next to each other
-    sorted_data = sorted(data_array, key=callback)
-    return itertools.groupby(sorted_data, callback)
+def encode_payment(payment: Payment) -> bytes:
+    rewardProgramID: ChecksumAddress = payment["rewardProgramID"]
+    paymentCycle: int = payment["paymentCycle"]
+    validFrom: int = payment["validFrom"]
+    validTo: int = payment["validTo"]
+    tokenType: int = 1
+    payee: ChecksumAddress = payment["payee"]
+    token: ChecksumAddress = payment["token"]
+    amount: int = int(payment["amount"])
+    transferData: bytes = encode_abi(["address", "uint256"], [token, amount])
+    return encode_abi(
+        ["address", "uint256", "uint256", "uint256", "uint256", "address", "bytes"],
+        [
+            rewardProgramID,
+            paymentCycle,
+            validFrom,
+            validTo,
+            tokenType,
+            payee,
+            transferData,
+        ],
+    )
+
+
+def decode_payment(encoded_payment: Union[bytes, str]) -> Payment:
+    if type(encoded_payment) == str:
+        encoded_payment = bytes.fromhex(encoded_payment)
+    (
+        rewardProgramID,
+        paymentCycle,
+        validFrom,
+        validTo,
+        tokenType,
+        payee,
+        transferData,
+    ) = decode_abi(
+        ["address", "uint256", "uint256", "uint256", "uint256", "address", "bytes"],
+        encoded_payment,
+    )
+    (token, amount) = decode_abi(["address", "uint256"], transferData)
+    return Payment(
+        {
+            "rewardProgramID": rewardProgramID,
+            "paymentCycle": paymentCycle,
+            "validFrom": validFrom,
+            "validTo": validTo,
+            "tokenType": tokenType,
+            "payee": payee,
+            "token": token,
+            "amount": amount,
+        }
+    )
 
 
 class PaymentTree:
     def __init__(self, payment_list: List[Payment], run_parameters={}) -> None:
         self.payment_nodes = payment_list
         self.run_parameters = run_parameters
-        self.data = list(map(self.encode_payment, self.payment_nodes))
+        self.data = list(map(encode_payment, self.payment_nodes))
+
         self.tree = MerkleTree(self.data, hashfunc)
         if len(self.data) != len(set(self.data)):
             raise Exception(
                 "There are duplicate leafs. Check if you are rewarding the same address twice."
             )
-
-    @staticmethod
-    def encode_payment(payment: Payment) -> bytes:
-        rewardProgramID: ChecksumAddress = payment["rewardProgramID"]
-        paymentCycle: int = payment["paymentCycle"]
-        validFrom: int = payment["validFrom"]
-        validTo: int = payment["validTo"]
-        tokenType: int = 1
-        payee: ChecksumAddress = payment["payee"]
-        token: ChecksumAddress = payment["token"]
-        amount: int = int(payment["amount"])
-        transferData: bytes = encode_abi(["address", "uint256"], [token, amount])
-        return encode_abi(
-            ["address", "uint256", "uint256", "uint256", "uint256", "address", "bytes"],
-            [
-                rewardProgramID,
-                paymentCycle,
-                validFrom,
-                validTo,
-                tokenType,
-                payee,
-                transferData,
-            ],
-        )
 
     def get_hex_root(self):
         return add_0x_prefix(self.tree.merkle_root)

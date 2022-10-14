@@ -1,0 +1,9 @@
+.safe-tools__dashboard-schedule {
+  display: flex;
+  flex-direction: row;
+}
+
+.safe-tools__dashboard-schedule-content {
+  flex: 1;
+  padding: var(--boxel-sp-xxl) var(--boxel-sp-lg) 0;
+}
