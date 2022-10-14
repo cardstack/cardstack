@@ -7,3 +7,17 @@
   flex: 1;
   padding: var(--boxel-sp-xxl) var(--boxel-sp-lg) 0;
 }
+
+.safe-tools__dashboard-schedule-control-panel-safe {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.safe-tools__dashboard-schedule-control-panel-safe-info {
+  margin-top: calc(var(--boxel-sp-xxs) * -1);
+  inline-size: 200px;
+  text-align: left;
+  font-weight: normal;
+  font-size: var(--boxel-font-size-sm);
+}

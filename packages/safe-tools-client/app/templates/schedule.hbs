@@ -6,7 +6,16 @@
       </Boxel::Button>
     </cp.Item>
     <cp.Item @title='Network' @icon='network' />
-    <cp.Item @title='Safe' @icon='safe' />
+    <cp.Item @title='Safe' @icon='safe'>
+      <div class='safe-tools__dashboard-schedule-control-panel-safe'>
+        <p class='safe-tools__dashboard-schedule-control-panel-safe-info'>
+          You need to have a safe which contains funds that would be deducted
+          automatically when schedule payments are due.</p>
+        <Boxel::Button @kind='primary'>
+          Create Safe
+        </Boxel::Button>
+      </div>
+    </cp.Item>
   </Boxel::ControlPanel>
   <section class='safe-tools__dashboard-schedule-content'>
     <ScheduleCollapsePanel @open={{true}} />
