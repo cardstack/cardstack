@@ -22,6 +22,7 @@ dependencies = [
     "future-fstrings>=1.2.0",
     "sentry-sdk>=1.5.12",
     "duckdb>=0.4.0",
+    "protobuf>=3.20.3",
 ]
 requires-python = ">=3.9"
 license = {text = "MIT"}
