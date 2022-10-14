@@ -100,7 +100,7 @@ export default {
       maxGasPrice: string;
       gasTokenAddress: string;
       salt: string;
-      payAt: number;
+      payAt?: number | null;
       gasPrice: string;
       recurringDayOfMonth?: number | null;
       recurringUntil?: number | null;
@@ -122,8 +122,8 @@ export default {
       maxGasPrice,
       gasTokenAddress,
       salt,
-      payAt,
       gasPrice,
+      payAt,
       recurringDayOfMonth,
       recurringUntil,
       { onTxnHash }

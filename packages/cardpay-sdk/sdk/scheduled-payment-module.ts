@@ -10,6 +10,7 @@ import {
   getModuleProxyCreationEvent,
 } from './utils/module-utils';
 import {
+  extractBytesLikeFromError,
   extractSendTransactionError,
   generateSaltNonce,
   hubRequest,
@@ -343,33 +344,12 @@ export default class ScheduledPaymentModule {
     payAt: number | null,
     recurringDayOfMonth: number | null,
     recurringUntil: number | null
-  ): Promise<number>;
-  async estimateExecutionGas(
-    moduleAddress: string,
-    tokenAddress: string,
-    amount: string,
-    payeeAddress: string,
-    fee: Fee,
-    maxGasPrice: string,
-    gasTokenAddress: string,
-    salt: string,
-    gasPrice: string,
-    payAt: number | null,
-    recurringDayOfMonth: number | null,
-    recurringUntil: number | null
   ): Promise<number> {
     let getRequiredGasFromRevertMessage = function (e: any): number {
-      let requiredGas;
       let _interface = new utils.Interface(['error GasEstimation(uint256 gas)']);
-      if (e.data) {
-        let decodedError = _interface.parseError(e.data);
-        requiredGas = decodedError.args[0].toNumber();
-      } else {
-        let messages = e.message.split(' ');
-        let decodedError = _interface.parseError(messages[1].replace(',', ''));
-        requiredGas = decodedError.args[0].toNumber();
-      }
-      return requiredGas;
+      let hex = extractBytesLikeFromError(e);
+      let decodedError = _interface.parseError(hex ?? '0x');
+      return decodedError.args[0].toNumber();
     };
 
     let requiredGas = 0;
@@ -423,7 +403,13 @@ export default class ScheduledPaymentModule {
       requiredGas = getRequiredGasFromRevertMessage(e);
     }
 
-    return requiredGas;
+    // Costs to route through the proxy and nested calls
+    const PROXY_GAS = 1000;
+    // https://github.com/ethereum/solidity/blob/dfe3193c7382c80f1814247a162663a97c3f5e67/libsolidity/codegen/ExpressionCompiler.cpp#L1764
+    // This was `false` before solc 0.4.21 -> `m_context.evmVersion().canOverchargeGasForCall()`
+    // So gas needed by caller will be around 35k
+    const OLD_CALL_GAS = 35000;
+    return requiredGas + PROXY_GAS + OLD_CALL_GAS;
   }
 
   async cancelScheduledPayment(txnHash: string): Promise<SuccessfulTransactionReceipt>;
@@ -537,38 +523,13 @@ export default class ScheduledPaymentModule {
     maxGasPrice: string,
     gasTokenAddress: string,
     salt: string,
-    payAt: number
-  ): Promise<string>;
-  async createSpHash(
-    moduleAddress: string,
-    tokenAddress: string,
-    amount: string,
-    payeeAddress: string,
-    fee: Fee,
-    executionGas: number,
-    maxGasPrice: string,
-    gasTokenAddress: string,
-    salt: string,
-    recurringDayOfMonth: number,
-    recurringUntil: number
-  ): Promise<string>;
-  async createSpHash(
-    moduleAddress: string,
-    tokenAddress: string,
-    amount: string,
-    payeeAddress: string,
-    fee: Fee,
-    executionGas: number,
-    maxGasPrice: string,
-    gasTokenAddress: string,
-    salt: string,
-    payAtOrRecurringDayOfMonth: number,
-    recurringUntil?: number
+    payAt?: number | null,
+    recurringDayOfMonth?: number | null,
+    recurringUntil?: number | null
   ): Promise<string> {
     let spHash;
     let module = new Contract(moduleAddress, ScheduledPaymentABI, this.ethersProvider);
     if (recurringUntil) {
-      let recurringDayOfMonth = payAtOrRecurringDayOfMonth;
       spHash = await module.callStatic[
         'createSpHash(address,uint256,address,((uint256),(uint256)),uint256,uint256,address,string,uint256,uint256)'
       ](
@@ -591,7 +552,6 @@ export default class ScheduledPaymentModule {
         recurringUntil
       );
     } else {
-      let payAt = payAtOrRecurringDayOfMonth;
       spHash = await module.callStatic[
         'createSpHash(address,uint256,address,((uint256),(uint256)),uint256,uint256,address,string,uint256)'
       ](
@@ -696,7 +656,7 @@ export default class ScheduledPaymentModule {
     maxGasPrice: string,
     gasTokenAddress: string,
     salt: string,
-    payAt: number | null,
+    payAt?: number | null,
     recurringDayOfMonth?: number | null,
     recurringUntil?: number | null,
     onScheduledPaymentCreate?: (scheduledPaymentId: string) => unknown
@@ -718,7 +678,7 @@ export default class ScheduledPaymentModule {
     recurringUntil?: number | null,
     onScheduledPaymentCreate?: (scheduledPaymentId: string) => unknown
   ) {
-    let hubAuth = await getSDK('HubAuth', this.ethersProvider);
+    let hubAuth = await getSDK('HubAuth', this.ethersProvider, undefined, this.signer);
     let hubRootUrl = await hubAuth.getHubUrl();
     let authToken = await hubAuth.authenticate();
 
@@ -745,35 +705,20 @@ export default class ScheduledPaymentModule {
     if (payAt == null && recurringDayOfMonth == null && recurringUntil == null)
       throw new Error('When payAt is null, recurringDayOfMonth and recurringUntil must have a value');
 
-    let spHash: string;
-    if (recurringDayOfMonth && recurringUntil) {
-      spHash = await this.createSpHash(
-        moduleAddress,
-        tokenAddress,
-        amount,
-        payeeAddress,
-        { fixedUSD: feeFixedUSD, percentage: feePercentage },
-        executionGas,
-        maxGasPrice,
-        gasTokenAddress,
-        salt,
-        recurringDayOfMonth,
-        recurringUntil
-      );
-    } else {
-      spHash = await this.createSpHash(
-        moduleAddress,
-        tokenAddress,
-        amount,
-        payeeAddress,
-        { fixedUSD: feeFixedUSD, percentage: feePercentage },
-        executionGas,
-        maxGasPrice,
-        gasTokenAddress,
-        salt,
-        payAt!
-      );
-    }
+    let spHash: string = await this.createSpHash(
+      moduleAddress,
+      tokenAddress,
+      amount,
+      payeeAddress,
+      { fixedUSD: feeFixedUSD, percentage: feePercentage },
+      executionGas,
+      maxGasPrice,
+      gasTokenAddress,
+      salt,
+      payAt,
+      recurringDayOfMonth,
+      recurringUntil
+    );
 
     let txnParams = await this.generateSchedulePaymentTxParams(safeAddress, moduleAddress, gasTokenAddress, spHash);
 
@@ -915,8 +860,8 @@ export default class ScheduledPaymentModule {
     maxGasPrice: string,
     gasTokenAddress: string,
     salt: string,
-    payAt: number,
     gasPrice: string,
+    payAt?: number | null,
     recurringDayOfMonth?: number | null,
     recurringUntil?: number | null,
     txnOptions?: TransactionOptions
@@ -932,8 +877,8 @@ export default class ScheduledPaymentModule {
     maxGasPrice?: string,
     gasTokenAddress?: string,
     salt?: string,
-    payAt?: number | null,
     gasPrice?: string,
+    payAt?: number | null,
     recurringDayOfMonth?: number | null,
     recurringUntil?: number | null,
     txnOptions?: TransactionOptions
