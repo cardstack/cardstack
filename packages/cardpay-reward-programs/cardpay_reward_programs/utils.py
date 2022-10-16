@@ -84,19 +84,6 @@ def write_parquet_file(file_location, table):
         pq.write_table(table, file_location / "results.parquet")
 
 
-def write_parameters_file(file_location, o):
-    if isinstance(file_location, CloudPath):
-        with tempfile.TemporaryDirectory() as temp_dir:
-            parameters_file_location = AnyPath(temp_dir) / "parameters.json"
-            with open(parameters_file_location, "w") as f:
-                f.write(json.dumps(o))
-            file_location.joinpath("parameters.json").upload_from(
-                parameters_file_location
-            )
-    else:
-        raise Exception("Should only write to s3 bucket")
-
-
 def get_unclaimed_rewards(previous_output_location, claims_data_root, block):
     """Get, as Payments, the unclaimed rewards from the previous output
 
