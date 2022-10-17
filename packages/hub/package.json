@@ -58,6 +58,7 @@
     "@sentry/integrations": "^7.10.0",
     "@sentry/node": "^7.8.0",
     "assert-never": "^1.2.1",
+    "atob": "^2.1.2",
     "auto-bind": "^4.0.0",
     "bn.js": "^5.2.0",
     "config": "^3.3.6",

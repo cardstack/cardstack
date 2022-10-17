@@ -59,3 +59,4 @@ export { default as JsonRpcProvider } from './providers/json-rpc-provider';
 export { default as Web3Provider } from './providers/web3-provider';
 export { MIN_PAYMENT_AMOUNT_IN_SPEND as MIN_PAYMENT_AMOUNT_IN_SPEND__PREFER_ON_CHAIN_WHEN_POSSIBLE } from './sdk/do-not-use-on-chain-constants';
 export { protocolVersions } from './contracts/addresses';
+export { gasPriceInToken } from './sdk/utils/conversions';

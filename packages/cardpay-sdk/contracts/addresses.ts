@@ -100,6 +100,7 @@ const GOERLI = {
   multiSendCallOnly: '0x40A2aCCbd92BCA938b02010E17A5b8929b49130D',
   moduleProxyFactory: '0x00000000000DC7F163742Eb4aBEf650037b1f588',
   metaGuard: '0xe2847462a574bfd43014d1c7BB6De5769C294691',
+  wrappedNativeToken: '0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6', // WETH
 };
 const MUMBAI = {
   gnosisSafeMasterCopy: '0xd9Db270c1B5E3Bd161E8c8503c55cEABeE709552',
@@ -112,6 +113,7 @@ const MUMBAI = {
   multiSendCallOnly: '0x40A2aCCbd92BCA938b02010E17A5b8929b49130D',
   moduleProxyFactory: '0x00000000000DC7F163742Eb4aBEf650037b1f588',
   metaGuard: '0xe2847462a574bfd43014d1c7BB6De5769C294691',
+  wrappedNativeToken: '0x9c3C9283D3e44854697Cd22D3Faa240Cfb032889', // WMATIC
 };
 
 const MAINNET = {
@@ -123,6 +125,7 @@ const MAINNET = {
   scheduledPaymentConfig: '',
   scheduledPaymentExchange: '',
   scheduledPaymentModule: '',
+  wrappedNativeToken: '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2', // WETH
 };
 const GNOSIS = {
   gnosisProxyFactory_v1_2: '0x76E2cFc1F5Fa8F6a5b3fC4c8F4788F0116861F9B',
@@ -181,7 +184,13 @@ const addresses: {
   xdai: GNOSIS,
 });
 
-export type AddressKeys = keyof typeof SOKOL | keyof typeof KOVAN | keyof typeof MAINNET | keyof typeof GNOSIS;
+export type AddressKeys =
+  | keyof typeof SOKOL
+  | keyof typeof KOVAN
+  | keyof typeof MAINNET
+  | keyof typeof GNOSIS
+  | keyof typeof GOERLI
+  | keyof typeof MUMBAI;
 
 export default addresses;
 
