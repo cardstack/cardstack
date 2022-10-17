@@ -61,7 +61,7 @@ export default class SetupSafeModal extends Component<Signature> {
           {{/if}}
           {{! TODO: What's the behavior for not having enough gas ? }}
         </Section>
-        <ActionChin @state={{'default'}}>
+        <ActionChin @state='default'>
           <:default as |a|>
             {{! TODO: Provisioning should be handled on this component or be a param to be handled on a diff controller ? }}
             <a.ActionButton @loading={{@loading}}>
