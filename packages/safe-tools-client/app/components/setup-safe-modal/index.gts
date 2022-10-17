@@ -1,5 +1,6 @@
 import Component from '@glimmer/component';
 import { on } from '@ember/modifier';
+import not from 'ember-truth-helpers/helpers/not';
 
 import { svgJar } from '@cardstack/boxel/utils/svg-jar';
 import BoxelModal from '@cardstack/boxel/components/boxel/modal';
@@ -39,7 +40,7 @@ export default class SetupSafeModal extends Component<Signature> {
             <li>You are the owner of the safe. Only the safe owner can schedule
               payments.
             </li>
-            <li>Once you have scheduled payments, the module (source code here)
+            <li>Once you have scheduled payments, the module (source code here)  {{! TODO: Add link }}
               triggers the payments at the appointed time.
             </li>
             <li>Creating the safe and enabling the module requires a one-time gas
@@ -67,9 +68,11 @@ export default class SetupSafeModal extends Component<Signature> {
             <a.ActionButton @loading={{@loading}}>
               Provision
             </a.ActionButton>
-            <a.CancelButton {{on 'click' @onClose}} @disabled={{@loading}}>
-              Cancel
-            </a.CancelButton>
+            {{#if (not @loading)}}
+              <a.CancelButton {{on 'click' @onClose}}>
+                Cancel
+              </a.CancelButton>
+            {{/if}}
           </:default>
         </ActionChin>
       </BoxelActionContainer>
