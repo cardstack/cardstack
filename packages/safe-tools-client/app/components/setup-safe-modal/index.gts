@@ -27,7 +27,6 @@ export default class SetupSafeModal extends Component<Signature> {
       @size='medium'
       @isOpen={{@isOpen}}
       @onClose={{@onClose}}
-      aria-labelledby='boxel-modal-setup-safe'
     >
       <BoxelActionContainer as |Section ActionChin|>
         <Section @title='Set up a Payment Safe' class='setup-safe-modal__section'>
