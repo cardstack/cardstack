@@ -27,7 +27,7 @@ jobs:
     name: Build & Test
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: volta-cli/action@v4
       - name: Set up node_modules cache
         uses: actions/cache@v3
@@ -63,7 +63,7 @@ jobs:
     outputs:
       web-client-files-changed: ${{ steps.web-client-files-that-changed.outputs.any_changed }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Get web client files that changed
         id: web-client-files-that-changed
         uses: tj-actions/changed-files@v1.1.2
@@ -79,7 +79,7 @@ jobs:
     if: github.event.pull_request.head.repo.full_name == github.repository && github.head_ref && needs.check-if-requires-preview.outputs.web-client-files-changed == 'true'
     needs: check-if-requires-preview
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
@@ -104,7 +104,7 @@ jobs:
     if: github.event.pull_request.head.repo.full_name == github.repository && github.head_ref && needs.check-if-requires-preview.outputs.web-client-files-changed == 'true'
     needs: check-if-requires-preview
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:

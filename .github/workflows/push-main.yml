@@ -16,7 +16,7 @@ jobs:
     name: Update node_modules cache
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: volta-cli/action@v4
       - name: Set up node_modules cache
         uses: actions/cache@v3
@@ -39,7 +39,7 @@ jobs:
       # increasing the heap size to 8GB
       NODE_OPTIONS: --max-old-space-size=8192
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: volta-cli/action@v4
       - name: Set up node_modules cache
         uses: actions/cache@v3
@@ -59,7 +59,7 @@ jobs:
     needs: update-cache
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: volta-cli/action@v4
       - name: Set up node_modules cache
         uses: actions/cache@v3
@@ -117,7 +117,7 @@ jobs:
     steps:
       - name: Create database
         run: sudo -u postgres createdb hub_test
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: volta-cli/action@v4
       - name: Set up node_modules cache
         uses: actions/cache@v3
@@ -139,7 +139,7 @@ jobs:
     needs: lint
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: volta-cli/action@v4
       - name: Set up node_modules cache
         uses: actions/cache@v3
@@ -194,7 +194,7 @@ jobs:
       cardie: ${{ steps.filter.outputs.cardie }}
       ssr_web: ${{ steps.filter.outputs.ssr_web }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: dorny/paths-filter@v2
         id: filter
         with:
@@ -242,7 +242,7 @@ jobs:
     if: ${{ needs.change_check.outputs.hub == 'true' }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: volta-cli/action@v4
       - name: Set up node_modules cache
         uses: actions/cache@v3
@@ -279,7 +279,7 @@ jobs:
           - retain: "1"
             app: hub
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Set up node_modules cache
         uses: actions/cache@v3
         with:
@@ -317,7 +317,7 @@ jobs:
     if: ${{ needs.change_check.outputs.web_client == 'true' }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Set up node_modules cache
         uses: actions/cache@v3
         with:
@@ -349,7 +349,7 @@ jobs:
     if: ${{ needs.change_check.outputs.ssr_web == 'true' }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: volta-cli/action@v4
       - name: Set up node_modules cache
         uses: actions/cache@v3
@@ -383,7 +383,7 @@ jobs:
     if: ${{ needs.change_check.outputs.boxel == 'true' }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: volta-cli/action@v4
       - name: Set up node_modules cache
         uses: actions/cache@v3
@@ -423,7 +423,7 @@ jobs:
     if: ${{ needs.change_check.outputs.cardie == 'true' }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: volta-cli/action@v4
       - name: Set up node_modules cache
         uses: actions/cache@v3

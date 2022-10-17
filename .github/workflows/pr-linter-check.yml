@@ -16,7 +16,7 @@ jobs:
       # increasing the heap size to 8GB
       NODE_OPTIONS: --max-old-space-size=8192
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: volta-cli/action@v4
 
       - name: Set up node_modules cache
