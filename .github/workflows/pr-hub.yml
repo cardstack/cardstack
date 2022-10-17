@@ -45,7 +45,7 @@ jobs:
         run: sudo -u postgres createdb hub_test
 
       - uses: actions/checkout@v2
-      - uses: volta-cli/action@v1
+      - uses: volta-cli/action@v4
 
       - name: Set up node_modules cache
         uses: actions/cache@v3

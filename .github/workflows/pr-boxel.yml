@@ -21,7 +21,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: volta-cli/action@v1
+      - uses: volta-cli/action@v4
       - name: Set up node_modules cache
         uses: actions/cache@v3
         with:
@@ -65,7 +65,7 @@ jobs:
       S3_PREVIEW_REGION: us-east-1
     steps:
       - uses: actions/checkout@v2
-      - uses: volta-cli/action@v1
+      - uses: volta-cli/action@v4
       - name: Set up node_modules cache
         uses: actions/cache@v3
         with:
@@ -103,7 +103,7 @@ jobs:
       S3_PREVIEW_WEBSITE_URL: https://boxel.stack.cards
     steps:
       - uses: actions/checkout@v2
-      - uses: volta-cli/action@v1
+      - uses: volta-cli/action@v4
       - name: Set up node_modules cache
         uses: actions/cache@v3
         with:

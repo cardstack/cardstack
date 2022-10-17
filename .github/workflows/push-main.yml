@@ -17,7 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: volta-cli/action@v1
+      - uses: volta-cli/action@v4
       - name: Set up node_modules cache
         uses: actions/cache@v3
         with:
@@ -40,7 +40,7 @@ jobs:
       NODE_OPTIONS: --max-old-space-size=8192
     steps:
       - uses: actions/checkout@v2
-      - uses: volta-cli/action@v1
+      - uses: volta-cli/action@v4
       - name: Set up node_modules cache
         uses: actions/cache@v3
         with:
@@ -60,7 +60,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: volta-cli/action@v1
+      - uses: volta-cli/action@v4
       - name: Set up node_modules cache
         uses: actions/cache@v3
         with:
@@ -118,7 +118,7 @@ jobs:
       - name: Create database
         run: sudo -u postgres createdb hub_test
       - uses: actions/checkout@v2
-      - uses: volta-cli/action@v1
+      - uses: volta-cli/action@v4
       - name: Set up node_modules cache
         uses: actions/cache@v3
         with:
@@ -140,7 +140,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: volta-cli/action@v1
+      - uses: volta-cli/action@v4
       - name: Set up node_modules cache
         uses: actions/cache@v3
         with:
@@ -243,7 +243,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: volta-cli/action@v1
+      - uses: volta-cli/action@v4
       - name: Set up node_modules cache
         uses: actions/cache@v3
         with:
@@ -350,7 +350,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: volta-cli/action@v1
+      - uses: volta-cli/action@v4
       - name: Set up node_modules cache
         uses: actions/cache@v3
         with:
@@ -384,7 +384,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: volta-cli/action@v1
+      - uses: volta-cli/action@v4
       - name: Set up node_modules cache
         uses: actions/cache@v3
         with:
@@ -424,7 +424,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: volta-cli/action@v1
+      - uses: volta-cli/action@v4
       - name: Set up node_modules cache
         uses: actions/cache@v3
         with:
