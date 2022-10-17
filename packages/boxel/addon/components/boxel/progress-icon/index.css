@@ -19,6 +19,8 @@
 }
 
 .boxel-progress-icon.boxel-progress-icon--complete {
+  --icon-color: var(--boxel-highlight);
+
   background-image: url("/@cardstack/boxel/images/icons/icon-check-circle-ht.svg");
 }
 

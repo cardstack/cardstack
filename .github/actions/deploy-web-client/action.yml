@@ -12,7 +12,7 @@ inputs:
 runs:
   using: composite
   steps:
-    - uses: volta-cli/action@v1
+    - uses: volta-cli/action@v4
 
     - run: yarn --prefer-offline --frozen-lockfile
       shell: bash
