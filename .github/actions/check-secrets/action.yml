@@ -15,7 +15,7 @@ runs:
       run: |
         sudo apt-get update && sudo apt-get install awscli jq --fix-missing
 
-    - uses: volta-cli/action@v1
+    - uses: volta-cli/action@v4
 
     - run: yarn --prefer-offline --frozen-lockfile
       shell: bash
