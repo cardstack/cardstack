@@ -3,7 +3,6 @@ import { tracked } from '@glimmer/tracking';
 import BoxelActionContainer from './index';
 import FreestyleUsage from 'ember-freestyle/components/freestyle/usage';
 import { fn } from '@ember/helper';
-import not from 'ember-truth-helpers/helpers/not';
 
 
 export default class extends Component {
@@ -24,20 +23,26 @@ export default class extends Component {
   <template>
     <FreestyleUsage @name="ActionContainer">
       <:description>
-        Preconfigured CardContainer for an action card
+        Preconfigured CardContainer for an action card, yields Section and ActionChin.
       </:description>
       <:example>
         <BoxelActionContainer
           @header={{this.header}}
-          @incompleteActionLabel={{this.incompleteActionLabel}}
-          @completeActionLabel={{this.completeActionLabel}}
-          @isComplete={{this.isComplete}}
-          @onClickButton={{fn (mut this.isComplete) (not this.isComplete)}}
-        as |Section|>
+          as |Section ActionChin|>
           {{!-- Sample block yield --}}
             <Section @title="A Section Title">
               <div>And some more content...</div>
             </Section>
+            <ActionChin @state='default'>
+              <:default as |a|>
+                <a.ActionButton>
+                  Default
+                </a.ActionButton>
+                <a.CancelButton>
+                  Cancel
+                </a.CancelButton>
+              </:default>
+            </ActionChin>
           {{!-- End of sample block yield --}}
         </BoxelActionContainer>
       </:example>
@@ -48,35 +53,13 @@ export default class extends Component {
           @onInput={{fn (mut this.header)}}
           @value={{this.header}}
         />
-        <Args.String
-          @name="incompleteActionLabel"
-          @description="CTA button label for blocking action. It means the action is incomplete"
-          @onInput={{fn (mut this.incompleteActionLabel)}}
-          @value={{this.incompleteActionLabel}}
-        />
-        <Args.String
-          @name="completeActionLabel"
-          @description="CTA button label for non-blocking action"
-          @onInput={{fn (mut this.completeActionLabel)}}
-          @value={{this.completeActionLabel}}
-        />
-        <Args.Action
-          @name="onClickButton"
-          @description="Function for the CTA button action"
-        />
-        <Args.Bool
-          @name="isComplete"
-          @description="Condition for action's completeness (Boolean)"
-          @defaultValue={{false}}
-          @onInput={{fn (mut this.isComplete)}}
-        />
         <Args.Yield
           @optional={{true}}
           @description="Unstyled area for custom card content and fields; yields a Section component that takes an optional title and applies an appropriate inset"
         />
         <Args.Yield
           @optional={{true}}
-          @description="Yields an ActionChin component to be used instead of complete/incomplete labels if customization is required "
+          @description="Boxel::ActionChin"
         />
       </:api>
     </FreestyleUsage>
@@ -88,11 +71,7 @@ export default class extends Component {
       <:example>
         <BoxelActionContainer
           @header="Card Header"
-          @incompleteActionLabel="Go for it"
-          @completeActionLabel="Way to go"
-          @isComplete={{false}}
-          @onClickButton={{fn this.log 'onClickButton'}}
-        as |Section|>
+          as |Section|>
           {{!-- Sample block yield --}}
             <Section
               @title={{this.sectionTitle}}
