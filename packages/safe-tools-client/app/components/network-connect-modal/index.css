@@ -11,11 +11,6 @@
   outline-style: solid;
 }
 
-.network-connect-modal__title {
-  font: 700 1.125rem/calc(24 / 18) var(--boxel-font-family);
-  letter-spacing: 0;
-}
-
 .network-connect-modal__close-button {
   position: absolute;
   right: 0;
@@ -30,20 +25,6 @@
   cursor: pointer;
 
   --icon-color: var(--boxel-dark);
-}
-
-.network-connect-modal__wrapped-card {
-  box-shadow: none;
-}
-
-.network-connect-modal__body {
-  padding: var(--boxel-sp-lg);
-}
-
-.network-connect-modal__disclaimer {
-  font: var(--boxel-font-xs);
-  color: var(--boxel-purple-400);
-  letter-spacing: var(--boxel-lsp-lg);
 }
 
 .network-connect-modal__in-progress-logo > svg:nth-child(1) {
@@ -104,8 +85,4 @@
   font: var(--boxel-font-sm);
   color: var(--boxel-purple-400);
   text-align: center;
-}
-
-.network-connect-modal__wallet-cta {
-  width: 100%;
 }
