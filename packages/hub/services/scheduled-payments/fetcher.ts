@@ -60,3 +60,9 @@ export default class ScheduledPaymentsFetcherService {
     });
   }
 }
+
+declare module '@cardstack/di' {
+  interface KnownServices {
+    'scheduled-payment-fetcher': ScheduledPaymentsFetcherService;
+  }
+}

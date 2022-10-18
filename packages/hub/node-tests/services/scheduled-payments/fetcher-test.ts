@@ -181,9 +181,3 @@ describe('fetching scheduled payments that are due', function () {
     });
   });
 });
-
-declare module '@cardstack/di' {
-  interface KnownServices {
-    'scheduled-payment-fetcher': ScheduledPaymentsFetcherService;
-  }
-}
