@@ -37,7 +37,7 @@ class NetworkConnectModal extends Component<Signature> {
     w.id === 'metamask'
       ? {
           ...w,
-          //@ts-expect-error
+          //@ts-expect-error This and the below can be removed when this is imported: https://github.com/cardstack/cardstack/blob/c2ddb8ab7b8bc577c8211527f3c5193d5f6accde/packages/web-client/app/utils/web3-strategies/layer-1-connection-manager.ts#L1
           enabled: !!window.ethereum?.isMetaMask,
           //@ts-expect-error
           explanation: window.ethereum?.isMetaMask
