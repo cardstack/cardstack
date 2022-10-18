@@ -1,6 +1,4 @@
-// import shortUUID from 'short-uuid';
 import { registry, setupHub } from '../../helpers/server';
-// import crypto from 'crypto';
 import { nowUtc } from '../../../utils/dates';
 import { ExtendedPrismaClient } from '../../../services/prisma-manager';
 import ScheduledPaymentsExecutorService from '../../../services/scheduled-payments/executor';
