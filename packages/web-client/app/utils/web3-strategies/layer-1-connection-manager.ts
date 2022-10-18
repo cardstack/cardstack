@@ -16,7 +16,7 @@ import { MockLocalStorage } from '../browser-mocks';
 
 const GET_PROVIDER_STORAGE_KEY = (chainId: number) =>
   `cardstack-chain-${chainId}-provider`;
-const WALLET_CONNECT_BRIDGE = 'https://safe-walletconnect.gnosis.io/';
+const WALLET_CONNECT_BRIDGE = 'https://bridge.walletconnect.org';
 
 interface ConnectionManagerOptions {
   chainId: number;
