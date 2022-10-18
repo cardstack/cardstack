@@ -3,6 +3,7 @@ import { on } from '@ember/modifier';
 import not from 'ember-truth-helpers/helpers/not';
 
 import { svgJar } from '@cardstack/boxel/utils/svg-jar';
+import cssVar from '@cardstack/boxel/helpers/css-var';
 import BoxelModal from '@cardstack/boxel/components/boxel/modal';
 import BoxelActionContainer from '@cardstack/boxel/components/boxel/action-container'
 
@@ -17,11 +18,11 @@ interface Signature {
   };
 }
 
-//TODO: replace with correct flags and logic
-const gasCost = `0.001899365 ETH (USD$3.01)`;
-const hasEnoughGas = true;
-
 export default class SetupSafeModal extends Component<Signature> {
+//TODO: replace with correct flags and logic
+  gasCost = `0.001899365 ETH (USD$3.01)`;
+  notEnoughGas = false;
+
   <template>
     <BoxelModal
       @size='medium'
@@ -40,7 +41,11 @@ export default class SetupSafeModal extends Component<Signature> {
               payments.
             </li>
             <li>Once you have scheduled payments, the module 
-              <a href="https://github.com/cardstack/cardstack-module-scheduled-payment" target="_blank" rel="external" >
+              <a
+                href='https://github.com/cardstack/cardstack-module-scheduled-payment'
+                target='_blank'
+                rel='external'
+              >
                 (source code here) 
               </a>
               triggers the payments at the appointed time.
@@ -49,20 +54,19 @@ export default class SetupSafeModal extends Component<Signature> {
               fee.
             </li>
           </ul>
-          {{! TODO: Gas cost should be handled on this component or be a param ? }}
-          <b>Estimated gas cost: {{gasCost}}</b>
-          {{#if hasEnoughGas}}
+          <b>Estimated gas cost: {{this.gasCost}}</b>
             <div class='safe-setup-modal__section-wallet-info'>
               {{svgJar
-                'icon-check-circle-ht'
+              (if this.notEnoughGas 'icon-x-circle-ht' 'icon-check-circle-ht' )
                 class='safe-setup-modal__section-icon'
+              style=(cssVar
+                icon-color=(if this.notEnoughGas 'var(--boxel-red)' 'var(--boxel-green)')
+              )
               }}
               <p>
-                Your wallet has sufficient funds to cover the estimated gas cost.
+              Your wallet has {{if this.notEnoughGas 'in'}}sufficient funds to cover the estimated gas cost.
               </p>
             </div>
-          {{/if}}
-          {{! TODO: What's the behavior for not having enough gas ? }}
         </Section>
         <ActionChin @state='default'>
           <:default as |ac|>
