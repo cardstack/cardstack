@@ -20,7 +20,7 @@ import BoxelRadioInput from '@cardstack/boxel/components/boxel/radio-input';
 
 import './index.css';
 
-interface CardPayLayerConnectModalComponentArgs {
+interface Signature {
   name: string | null;
   isOpen: boolean;
   isConnecting: boolean;
@@ -31,7 +31,7 @@ interface CardPayLayerConnectModalComponentArgs {
   onDisconnect: (() => void) | undefined;
 }
 
-class CardPayLayerConnectModalComponent extends Component<CardPayLayerConnectModalComponentArgs> {
+class NetworkConnectModal extends Component<Signature> {
   walletProviders = walletProviders.map((w) =>
     w.id === 'metamask'
       ? {
@@ -193,4 +193,4 @@ class CardPayLayerConnectModalComponent extends Component<CardPayLayerConnectMod
   </template>
 }
 
-export default CardPayLayerConnectModalComponent;
+export default NetworkConnectModal;
