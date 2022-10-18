@@ -238,6 +238,9 @@ describe('POST /api/scheduled-payments', async function () {
 
   it('persists a recurring scheduled payment', async function () {
     let calculatedPayAt = calculateNextPayAt(new Date(), 1);
+
+    let responsePayAt: string;
+
     await request()
       .post('/api/scheduled-payments')
       .send({
@@ -255,7 +258,7 @@ describe('POST /api/scheduled-payments', async function () {
             'fee-fixed-usd': 0,
             'fee-percentage': 0,
             salt: '54lt',
-            'pay-at': '2021-01-01T00:00:00.000Z',
+            'pay-at': null,
             'recurring-day-of-month': 1,
             'recurring-until': '2022-12-31T00:00:00.000Z',
             'sp-hash': '0x123',
@@ -270,6 +273,8 @@ describe('POST /api/scheduled-payments', async function () {
       .expect(201)
       .expect(function (res) {
         res.body.data.id = 'id';
+        responsePayAt = res.body.data.attributes['pay-at'];
+        res.body.data.attributes['pay-at'] = null; // pay_at from the response could be a off by at least a second due to async nature of the test, so we check for the acceptable delta later in then()
       })
       .expect({
         data: {
@@ -287,7 +292,7 @@ describe('POST /api/scheduled-payments', async function () {
             'fee-fixed-usd': '0',
             'fee-percentage': '0',
             salt: '54lt',
-            'pay-at': calculatedPayAt.toISOString(),
+            'pay-at': null, // manipulated in response - we check it in then()
             'sp-hash': '0x123',
             'chain-id': 1,
             'user-address': stubUserAddress,
@@ -301,7 +306,12 @@ describe('POST /api/scheduled-payments', async function () {
           },
         },
       })
-      .expect('Content-Type', 'application/vnd.api+json');
+      .expect('Content-Type', 'application/vnd.api+json')
+      .then(() => {
+        let payAt = new Date(responsePayAt);
+        let delta = Math.abs(payAt.getTime() - calculatedPayAt.getTime());
+        expect(delta).to.be.lessThan(2000);
+      });
   });
 });
 
