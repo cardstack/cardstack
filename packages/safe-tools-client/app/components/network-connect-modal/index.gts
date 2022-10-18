@@ -36,23 +36,6 @@ interface CardPayLayerConnectModalComponentArgs {
 }
 
 class CardPayLayerConnectModalComponent extends Component<CardPayLayerConnectModalComponentArgs> {
-  // @service declare layer1Network: Layer1Network;
-  // @service declare layer2Network: Layer2Network;
-  constructor(owner: unknown, args: CardPayLayerConnectModalComponentArgs) {
-    super(owner, args);
-    taskFor(this.closeOnConnectedTask).perform();
-  }
-  @task *closeOnConnectedTask() {
-    // if (this.args.name === 'layer1') {
-    //   yield this.layer1Network.waitForAccount;
-    // } else {
-    //   yield this.layer2Network.waitForAccount;
-    // }
-    this.args.onClose();
-  }
-
-  // cardstackLogo = cardstackLogo;
-  // connectionSymbol = connectionSymbol;
   walletProviders = walletProviders.map((w) =>
     w.id === 'metamask'
       ? {
@@ -64,52 +47,8 @@ class CardPayLayerConnectModalComponent extends Component<CardPayLayerConnectMod
         }
       : { ...w, enabled: true, explanation: '' }
   );
-  // FIXME sortby
-  // .sortBy('enabled:desc');
 
   isConnected = false;
-  // @service declare layer1Network: Layer1Network;
-  // @reads('layer1Network.isConnected') declare isConnected: boolean;
-  @tracked isWaitingForConnection = false;
-  /*
-     Set a starting wallet provider for the focus trap library in the modal
-     - focus trapping requires checking what the next tabbable element is
-     - radios with their roving tabindex confuse tabbable, so they cannot be the last focusable element
-       , otherwise focus leaves the page
-     - selecting a radio makes the connect button enabled and focusable.
-   */
-  @tracked radioWalletProviderId: WalletProvider['id'] = 'wallet-connect';
-
-  get connectedWalletProvider(): WalletProvider | undefined {
-    if (!this.isConnected) return undefined;
-    else
-      return this.walletProviders.find(
-        (walletProvider) =>
-          walletProvider.id === this.layer1Network.strategy.currentProviderId
-      );
-  }
-  get connectedWalletLogo(): string {
-    if (this.connectedWalletProvider) return this.connectedWalletProvider.logo;
-    else return '';
-  }
-
-  get cardState(): string {
-    if (this.isConnected) {
-      return 'memorialized';
-    } else if (this.isWaitingForConnection) {
-      return 'in-progress';
-    } else {
-      return 'default';
-    }
-  }
-
-  get showActions(): boolean {
-    return this.isConnected;
-  }
-
-  @action changeWalletProvider(id: WalletProvider['id']): void {
-    this.radioWalletProviderId = id;
-  }
 
   @action connect() {
     if (!this.isConnected) {
@@ -117,33 +56,9 @@ class CardPayLayerConnectModalComponent extends Component<CardPayLayerConnectMod
     }
   }
 
-  @action cancelConnection() {
-    // given the way users connect, I don't think we need to do anything else here
-    // since most of the other actions are delegated to the user + browser plugins
-    // so we can't control it anyway. The situation where the corresponding button is visible is
-    // usually when the user decides not to complete the connection by closing connection
-    // prompt ui without taking action.
-    this.isWaitingForConnection = false;
-  }
-
-  @action disconnect() {
-    // FIXME
-    // this.layer1Network.disconnect();
-  }
-
-  @action onDisconnect() {
-    this.args.onDisconnect?.();
-  }
-
   @task *connectWalletTask() {
-    this.isWaitingForConnection = true;
-
-    // FIXME
+    // TODO
     console.log('Would connect…');
-    // yield this.layer1Network.connect({
-    //   id: this.radioWalletProviderId,
-    // } as WalletProvider);
-    this.isWaitingForConnection = false;
     yield timeout(500); // allow time for strategy to verify connected chain -- it might not accept the connection
     if (this.isConnected) {
       this.args.onConnect?.();
