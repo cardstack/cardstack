@@ -1,6 +1,10 @@
 import Component from '@glimmer/component';
 import { on } from '@ember/modifier';
 import not from 'ember-truth-helpers/helpers/not';
+import { tracked } from '@glimmer/tracking';
+import { action } from '@ember/object';
+import noop from 'ember-composable-helpers/helpers/noop';
+
 
 import { svgJar } from '@cardstack/boxel/utils/svg-jar';
 import cssVar from '@cardstack/boxel/helpers/css-var';
@@ -13,22 +17,32 @@ interface Signature {
   Element: HTMLElement;
   Args: { 
     isOpen: boolean 
-    loading?: boolean;
     onClose: () => void;
   };
 }
 
 export default class SetupSafeModal extends Component<Signature> {
-//TODO: replace with correct flags and logic
+  //TODO: replace with correct flags and logic
   gasCost = `0.001899365 ETH (USD$3.01)`;
   notEnoughGas = false;
 
+  @tracked provisioning = false;
+
+  @action async createSafe(): Promise<void> { 
+     //TODO: use sdk method createSafeWithModuleAndGuard
+    this.provisioning = true;
+    setTimeout(() => {
+      console.log('Create safe')
+      this.provisioning = false;
+      this.args.onClose();
+    }, 2000); 
+  }
+
   <template>
-    <BoxelModal
+    <BoxelModal 
       @size='medium'
-      @isOpen={{@isOpen}}
-      @onClose={{@onClose}}
-    >
+      @isOpen={{@isOpen}} 
+      @onClose={{if this.provisioning (noop) @onClose}}>
       <BoxelActionContainer as |Section ActionChin|>
         <Section @title='Set up a Payment Safe' class='setup-safe-modal__section'>
           <p>In this step, you create a safe equipped with a module to schedule
@@ -40,41 +54,44 @@ export default class SetupSafeModal extends Component<Signature> {
             <li>You are the owner of the safe. Only the safe owner can schedule
               payments.
             </li>
-            <li>Once you have scheduled payments, the module 
+            <li>Once you have scheduled payments, the module
               <a
                 href='https://github.com/cardstack/cardstack-module-scheduled-payment'
                 target='_blank'
                 rel='external'
               >
-                (source code here) 
+                (source code here)
               </a>
               triggers the payments at the appointed time.
             </li>
             <li>Creating the safe and enabling the module requires a one-time gas
-              fee.
+               fee.
             </li>
           </ul>
           <b>Estimated gas cost: {{this.gasCost}}</b>
-            <div class='safe-setup-modal__section-wallet-info'>
-              {{svgJar
-              (if this.notEnoughGas 'icon-x-circle-ht' 'icon-check-circle-ht' )
-                class='safe-setup-modal__section-icon'
+          <div class='safe-setup-modal__section-wallet-info'>
+            {{svgJar
+              (if this.notEnoughGas 'icon-x-circle-ht' 'icon-check-circle-ht')
+              class='safe-setup-modal__section-icon'
               style=(cssVar
                 icon-color=(if this.notEnoughGas 'var(--boxel-red)' 'var(--boxel-green)')
               )
-              }}
-              <p>
+            }}
+            <p>
               Your wallet has {{if this.notEnoughGas 'in'}}sufficient funds to cover the estimated gas cost.
-              </p>
-            </div>
+            </p>
+          </div>
         </Section>
         <ActionChin @state='default'>
           <:default as |ac|>
-            {{! TODO: Provisioning should be handled on this component or be a param to be handled on a diff controller ? }}
-            <ac.ActionButton @loading={{@loading}}>
-              Provision
+            <ac.ActionButton
+              @loading={{this.provisioning}}
+              disabled={{this.notEnoughGas}}
+              {{on 'click' this.createSafe}}
+            >
+              Provision{{if this.provisioning 'ing'}}
             </ac.ActionButton>
-            {{#if (not @loading)}}
+            {{#if (not this.provisioning)}}
               <ac.CancelButton {{on 'click' @onClose}}>
                 Cancel
               </ac.CancelButton>
@@ -85,5 +102,3 @@ export default class SetupSafeModal extends Component<Signature> {
     </BoxelModal>
   </template>
 }
-
-
