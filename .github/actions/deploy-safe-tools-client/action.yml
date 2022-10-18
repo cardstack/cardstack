@@ -20,11 +20,11 @@ runs:
         if [ "$INPUT_ENVIRONMENT" = "production" ]; then
           echo "AWS_ROLE_ARN=arn:aws:iam::120317779495:role/safe-tools-client" >> $GITHUB_ENV
           echo "AWS_S3_BUCKET=cardstack-safe-tools-client-production" >> $GITHUB_ENV
-          echo "AWS_CLOUDFRONT_DISTRIBUTION=PLACEHOLDER" >> $GITHUB_ENV
+          echo "AWS_CLOUDFRONT_DISTRIBUTION=E2DKGK0IA0DNFT" >> $GITHUB_ENV
         elif [ "$INPUT_ENVIRONMENT" = "staging" ]; then
           echo "AWS_ROLE_ARN=arn:aws:iam::680542703984:role/safe-tools-client" >> $GITHUB_ENV
           echo "AWS_S3_BUCKET=cardstack-safe-tools-client-staging" >> $GITHUB_ENV
-          echo "AWS_CLOUDFRONT_DISTRIBUTION=PLACEHOLDER" >> $GITHUB_ENV
+          echo "AWS_CLOUDFRONT_DISTRIBUTION=E8OCN7TYF3CBC" >> $GITHUB_ENV
         else
           echo "unrecognized environment"
           exit 1;
