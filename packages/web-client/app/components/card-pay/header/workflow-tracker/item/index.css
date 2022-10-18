@@ -66,6 +66,8 @@
 }
 
 .workflow-tracker-item__icon {
+  --icon-color: var(--boxel-highlight);
+
   grid-area: icon;
   justify-self: flex-end;
   align-self: center;
