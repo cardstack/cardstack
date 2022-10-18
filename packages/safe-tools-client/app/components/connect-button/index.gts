@@ -18,20 +18,20 @@ interface Signature {
   Blocks: EmptyObject
 }
 
-export default class CardPayHeaderConnectionButton extends Component<Signature> {
+export default class ConnectButton extends Component<Signature> {
   <template>
-    <div class="card-pay-header-connection-button__label">
+    <div class="connect-button__label">
       {{@chainName}}
     </div>
     <BoxelButton
       @kind={{if (or @isConnected @isInitializing) "secondary-dark" "primary"}}
       @loading={{@isInitializing}}
       class={{cn
-        "card-pay-header-connection-button__button"
-        card-pay-header-connection-button__button--connected=(or @isConnected @isInitializing)
+        "connect-button__button"
+        connect-button__button--connected=(or @isConnected @isInitializing)
       }}
       {{on "click" @onConnect}}
-      data-test-card-pay-connect-button
+      data-test-connect-button
     >
       {{#if @isInitializing}}
         {{!-- just show the spinner --}}

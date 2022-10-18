@@ -1,11 +1,11 @@
-.card-pay-header-connection-button__label {
+.connect-button__label {
   color: var(--boxel-purple-300);
   font: 600 var(--boxel-font-xs);
   letter-spacing: 0.075em;
   text-transform: uppercase;
 }
 
-.card-pay-header-connection-button__button.card-pay-header-connection-button__button--connected {
+.connect-button__button.connect-button__button--connected {
   min-width: 15.6rem; /* ~250px */
   padding: var(--boxel-sp-sm);
   border-color: var(--boxel-purple-700);
@@ -15,7 +15,7 @@
 }
 
 @media screen and (min-width: 50rem) /* 800px */ {
-  .card-pay-header-connection-button__label {
+  .connect-button__label {
     max-width: 4rem;
   }
 }
