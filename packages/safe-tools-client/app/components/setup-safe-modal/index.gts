@@ -39,7 +39,10 @@ export default class SetupSafeModal extends Component<Signature> {
             <li>You are the owner of the safe. Only the safe owner can schedule
               payments.
             </li>
-            <li>Once you have scheduled payments, the module (source code here)  {{! TODO: Add link }}
+            <li>Once you have scheduled payments, the module 
+              <a href="https://github.com/cardstack/cardstack-module-scheduled-payment" target="_blank" rel="external" >
+                (source code here) 
+              </a>
               triggers the payments at the appointed time.
             </li>
             <li>Creating the safe and enabling the module requires a one-time gas
@@ -62,15 +65,15 @@ export default class SetupSafeModal extends Component<Signature> {
           {{! TODO: What's the behavior for not having enough gas ? }}
         </Section>
         <ActionChin @state='default'>
-          <:default as |a|>
+          <:default as |ac|>
             {{! TODO: Provisioning should be handled on this component or be a param to be handled on a diff controller ? }}
-            <a.ActionButton @loading={{@loading}}>
+            <ac.ActionButton @loading={{@loading}}>
               Provision
-            </a.ActionButton>
+            </ac.ActionButton>
             {{#if (not @loading)}}
-              <a.CancelButton {{on 'click' @onClose}}>
+              <ac.CancelButton {{on 'click' @onClose}}>
                 Cancel
-              </a.CancelButton>
+              </ac.CancelButton>
             {{/if}}
           </:default>
         </ActionChin>
