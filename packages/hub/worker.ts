@@ -25,6 +25,7 @@ import WyreTransferTask from './tasks/wyre-transfer';
 import PrintQueuedJobsTask from './tasks/print-queued-jobs';
 import ScheduledPaymentOnChainCreationWaiter from './tasks/scheduled-payment-on-chain-creation-waiter';
 import ScheduledPaymentOnChainExecutionWaiter from './tasks/scheduled-payment-on-chain-execution-waiter';
+import ExecuteScheduledPayments from './tasks/execute-scheduled-payments';
 
 let dbConfig = config.get('db') as Record<string, any>;
 const log = logger('hub/worker');
@@ -85,12 +86,17 @@ export class HubWorker {
         's3-put-json': s3PutJson,
         'scheduled-payment-on-chain-creation-waiter': this.instantiateTask(ScheduledPaymentOnChainCreationWaiter),
         'scheduled-payment-on-chain-execution-waiter': this.instantiateTask(ScheduledPaymentOnChainExecutionWaiter),
+        'execute-scheduled-payments': this.instantiateTask(ExecuteScheduledPayments),
       },
       // https://github.com/graphile/worker#recurring-tasks-crontab
       // remove old notifications at midnight every day
       // 5am in utc equivalent to midnight in ny
       // 0 mins, 5 hours, any day (of month), any month, any day (of week), task
-      crontab: ['0 5 * * * remove-old-sent-notifications ?max=5', '*/5 * * * * print-queued-jobs'].join('\n'),
+      crontab: [
+        '0 5 * * * remove-old-sent-notifications ?max=5',
+        '*/5 * * * * print-queued-jobs',
+        '*/5 * * * * execute-scheduled-payments',
+      ].join('\n'),
     });
 
     runner.events.on('job:error', ({ error, job }) => {
