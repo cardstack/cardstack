@@ -260,15 +260,7 @@ class CardPayLayerConnectModalComponent extends Component<CardPayLayerConnectMod
                   </i.CancelButton>
                 </div>
               </i.ActionStatusArea>
-              <i.InfoArea>
-                Only visible to you
-              </i.InfoArea>
             </:inProgress>
-            <:memorialized as |m|>
-              <m.ActionButton {{on "click" this.disconnect}} data-test-mainnet-disconnect-button>
-                Disconnect Wallet
-              </m.ActionButton>
-            </:memorialized>
           </ActionChin>
 
         </BoxelActionContainer>
