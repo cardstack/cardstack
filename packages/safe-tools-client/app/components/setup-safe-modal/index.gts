@@ -24,7 +24,7 @@ interface Signature {
 export default class SetupSafeModal extends Component<Signature> {
   //TODO: replace with correct flags and logic
   gasCost = `0.001899365 ETH (USD$3.01)`;
-  notEnoughGas = false;
+  notEnoughBalance = false;
 
   @tracked provisioning = false;
 
@@ -71,14 +71,14 @@ export default class SetupSafeModal extends Component<Signature> {
           <b>Estimated gas cost: {{this.gasCost}}</b>
           <div class='safe-setup-modal__section-wallet-info'>
             {{svgJar
-              (if this.notEnoughGas 'icon-x-circle-ht' 'icon-check-circle-ht')
+              (if this.notEnoughBalance 'icon-x-circle-ht' 'icon-check-circle-ht')
               class='safe-setup-modal__section-icon'
               style=(cssVar
-                icon-color=(if this.notEnoughGas 'var(--boxel-red)' 'var(--boxel-green)')
+                icon-color=(if this.notEnoughBalance 'var(--boxel-red)' 'var(--boxel-green)')
               )
             }}
             <p>
-              Your wallet has {{if this.notEnoughGas 'in'}}sufficient funds to cover the estimated gas cost.
+              Your wallet has {{if this.notEnoughBalance 'in'}}sufficient funds to cover the estimated gas cost.
             </p>
           </div>
         </Section>
@@ -86,7 +86,7 @@ export default class SetupSafeModal extends Component<Signature> {
           <:default as |ac|>
             <ac.ActionButton
               @loading={{this.provisioning}}
-              disabled={{this.notEnoughGas}}
+              disabled={{this.notEnoughBalance}}
               {{on 'click' this.createSafe}}
             >
               Provision{{if this.provisioning 'ing'}}
