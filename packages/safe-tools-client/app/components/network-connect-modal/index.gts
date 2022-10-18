@@ -23,6 +23,7 @@ import './index.css';
 interface Signature {
   name: string | null;
   isOpen: boolean;
+  isConnected: boolean;
   isConnecting: boolean;
   currentWalletProviderId: WalletProvider['id'];
   changeWalletProvider: () => void;
