@@ -201,7 +201,6 @@ class CardPayLayerConnectModalComponent extends Component<CardPayLayerConnectMod
           </button>
 
           <Section @title="Connect your wallet">
-
             <BoxelRadioInput
               @groupDescription='Select a wallet to connect to'
               @items={{this.walletProviders}}
@@ -244,33 +243,33 @@ class CardPayLayerConnectModalComponent extends Component<CardPayLayerConnectMod
             </BoxelRadioInput>
           </Section>
 
-            <ActionChin @state={{this.cardState}} @disabled={{@frozen}}>
-      <:default as |a|>
-        <a.ActionButton {{on "click" this.connect}} data-test-mainnet-connect-button>
-          Connect Wallet
-        </a.ActionButton>
-      </:default>
-      <:inProgress as |i|>
-        <i.ActionStatusArea class="layer-one-connect-card__in-progress-logo" @icon={{concat
-          this.radioWalletProviderId "-logo" }} style={{cssVar status-icon-size="2.5rem" }}>
-          <BoxelLoadingIndicator class="layer-one-connect-card__loading-indicator" @color="var(--boxel-light)" />
-          <div class="layer-one-connect-card__waiting-status">
-            Waiting for you to connect Card Pay with your {{!-- network-display-info "layer1" "conversationalName" --}} wallet...
-            <i.CancelButton class="layer-one-connect-card__cancel-button" {{on "click" this.cancelConnection}}>
-              Cancel
-            </i.CancelButton>
-          </div>
-        </i.ActionStatusArea>
-        <i.InfoArea>
-          Only visible to you
-        </i.InfoArea>
-      </:inProgress>
-      <:memorialized as |m|>
-        <m.ActionButton {{on "click" this.disconnect}} data-test-mainnet-disconnect-button>
-          Disconnect Wallet
-        </m.ActionButton>
-      </:memorialized>
-    </ActionChin>
+          <ActionChin @state={{this.cardState}} @disabled={{@frozen}}>
+            <:default as |a|>
+              <a.ActionButton {{on "click" this.connect}} data-test-mainnet-connect-button>
+                Connect Wallet
+              </a.ActionButton>
+            </:default>
+            <:inProgress as |i|>
+              <i.ActionStatusArea class="layer-one-connect-card__in-progress-logo" @icon={{concat
+                this.radioWalletProviderId "-logo" }} style={{cssVar status-icon-size="2.5rem" }}>
+                <BoxelLoadingIndicator class="layer-one-connect-card__loading-indicator" @color="var(--boxel-light)" />
+                <div class="layer-one-connect-card__waiting-status">
+                  Waiting for you to connect Card Pay with your {{!-- network-display-info "layer1" "conversationalName" --}} wallet...
+                  <i.CancelButton class="layer-one-connect-card__cancel-button" {{on "click" this.cancelConnection}}>
+                    Cancel
+                  </i.CancelButton>
+                </div>
+              </i.ActionStatusArea>
+              <i.InfoArea>
+                Only visible to you
+              </i.InfoArea>
+            </:inProgress>
+            <:memorialized as |m|>
+              <m.ActionButton {{on "click" this.disconnect}} data-test-mainnet-disconnect-button>
+                Disconnect Wallet
+              </m.ActionButton>
+            </:memorialized>
+          </ActionChin>
 
         </BoxelActionContainer>
       </div>
