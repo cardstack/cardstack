@@ -73,7 +73,11 @@ export default class ScheduledPaymentsExecutorService {
         orderBy: { endedAt: 'desc' },
       });
 
-      let minDaysBetweenPayments = 28 - this.scheduledPaymentFetcher.validForDays * 2;
+      // minDaysBetweenPayments is a very rough validation to prevent accidental duplicated execution of recurring payments
+      // 28 days is the max number of days in a month, and validForDays is the retry period for failed payments.
+      // For more accurate validation we rely on the scheduled payment module contract, which will revert with
+      // InvalidPeriod if the payment is executed at the wrong time
+      let minDaysBetweenPayments = 28 - this.scheduledPaymentFetcher.validForDays;
       if (
         lastSuccessfulPaymentAttempt &&
         !isBefore(lastSuccessfulPaymentAttempt.startedAt!, subDays(nowUtc(), minDaysBetweenPayments))
