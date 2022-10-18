@@ -1,3 +1,22 @@
+.boxel-modal {
+  --boxel-modal-offset-top: 0;
+  --boxel-modal-offset-left: 0;
+  --boxel-modal-offset-right: 0;
+
+  position: fixed;
+  width: 100%;
+  height: calc(100vh - var(--boxel-modal-offset-top));
+  top: var(--boxel-modal-offset-top);
+  left: var(--boxel-modal-offset-left);
+  right: var(--boxel-modal-offset-right);
+  padding: 0 var(--boxel-sp);
+  background: none;
+  border: none;
+  overflow: hidden;
+  z-index: var(--boxel-modal-z-index);
+  pointer-events: none;
+}
+
 .boxel-modal-overlay {
   position: fixed;
   top: 0;
@@ -10,21 +29,6 @@
   background-color: rgb(0 0 0 / 75%);
   text-align: left;
   z-index: calc(var(--boxel-modal-z-index) - 1);
-}
-
-.boxel-modal {
-  position: fixed;
-  width: 100%;
-  height: calc(100vh - var(--boxel-modal-offset-top, 0px));
-  top: var(--boxel-modal-offset-top, 0);
-  left: var(--boxel-modal-offset-left, 0);
-  right: var(--boxel-modal-offset-right, 0);
-  padding: 0 var(--boxel-sp);
-  background: none;
-  border: none;
-  overflow: hidden;
-  z-index: var(--boxel-modal-z-index);
-  pointer-events: none;
 }
 
 .boxel-modal--small {

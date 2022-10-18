@@ -28,7 +28,7 @@
 .boxel-control-panel__item-heading--is-active::before {
   content: "";
   position: absolute;
-  background-image: url('/@cardstack/boxel/images/icons/active-item.svg');
+  background-image: url("/@cardstack/boxel/images/icons/active-item.svg");
   background-repeat: no-repeat;
   background-position: top left;
   top: var(--boxel-sp-sm);

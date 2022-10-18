@@ -7,6 +7,7 @@ import { fn, array, hash } from '@ember/helper';
 
 import { tracked } from '@glimmer/tracking';
 import { action } from '@ember/object';
+import { cssVariable, CSSVariableInfo } from 'ember-freestyle/decorators/css-variable';
 
 export default class RadioInputUsage extends Component {
   @tracked items = [
@@ -32,8 +33,9 @@ export default class RadioInputUsage extends Component {
   @tracked spacing = '';
   @tracked orientation = 'horizontal';
 
-  @tracked optionPadding = 'var(--boxel-sp)';
-  @tracked optionGap = 'var(--boxel-sp-sm)';
+  cssClassName = 'boxel-radio-input';
+  @cssVariable declare boxelRadioInputOptionPadding: CSSVariableInfo;
+  @cssVariable declare boxelRadioInputOptionGap: CSSVariableInfo;
 
   @action onChange(id: string): void {
     this.checkedId = id;
@@ -52,8 +54,8 @@ export default class RadioInputUsage extends Component {
           @orientation={{this.orientation}}
           @spacing={{this.spacing}}
           style={{cssVar
-            boxel-radio-option-padding=this.optionPadding
-            boxel-radio-option-gap=this.optionGap
+            boxel-radio-input-option-padding=this.boxelRadioInputOptionPadding.value
+            boxel-radio-input-option-gap=this.boxelRadioInputOptionGap.value
           }}
         as |item|>
           <item.component @onChange={{fn this.onChange item.data.id}}>
@@ -121,25 +123,28 @@ export default class RadioInputUsage extends Component {
           @onInput={{fn (mut this.orientation)}}
           @value={{this.orientation}}
         />
-        {{!-- template-lint-disable no-unbound --}}
-        <Args.String
-          @name="--boxel-radio-option-padding"
-          @description="padding for each option"
-          @defaultValue={{unbound this.optionPadding}}
-          @value={{this.optionPadding}}
-          @onInput={{fn (mut this.optionPadding)}}
-        />
-        <Args.String
-          @name="--boxel-radio-option-gap"
-          @description="gap between circle and label"
-          @defaultValue={{unbound this.optionGap}}
-          @value={{this.optionGap}}
-          @onInput={{fn (mut this.optionGap)}}
-        />
         <Args.Yield
           @description="Yields an object with the default component to use (RadioInput::Item), the data for the item passed in, and whether that item is selected"
         />
       </:api>
+      <:cssVars as |Css|>
+        <Css.Basic
+          @name="boxel-radio-input-option-padding"
+          @type="dimension"
+          @description="padding for each option"
+          @defaultValue={{this.boxelRadioInputOptionPadding.defaults}}
+          @value={{this.boxelRadioInputOptionPadding.value}}
+          @onInput={{this.boxelRadioInputOptionPadding.update}}
+        />
+        <Css.Basic
+          @name="boxel-radio-input-option-gap"
+          @type="dimension"
+          @description="gap between circle and label"
+          @defaultValue={{this.boxelRadioInputOptionGap.defaults}}
+          @value={{this.boxelRadioInputOptionGap.value}}
+          @onInput={{this.boxelRadioInputOptionGap.update}}
+        />
+      </:cssVars>
     </FreestyleUsage>  
   </template>
 }

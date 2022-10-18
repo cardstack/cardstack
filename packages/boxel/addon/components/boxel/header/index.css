@@ -32,10 +32,10 @@
 }
 
 .boxel-header__content button {
-  --icon-button-width: var(--boxel-header-min-height, 1.875rem);
-  --icon-button-height: var(--boxel-header-min-height, 1.875rem);
+  --boxel-icon-button-width: var(--boxel-header-min-height, 1.875rem);
+  --boxel-icon-button-height: var(--boxel-header-min-height, 1.875rem);
 
-  min-height: var(--icon-button-height);
+  min-height: var(--boxel-icon-button-height);
   padding: 0 var(--boxel-sp-xxxs);
   background: none;
   border: none;

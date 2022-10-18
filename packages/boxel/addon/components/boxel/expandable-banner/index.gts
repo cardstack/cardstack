@@ -15,7 +15,7 @@ export interface Signature {
 }
 
 const ExpandableBanner: TemplateOnlyComponent<Signature> = <template>
-  <details class="boxel-expandable-banner__details" ...attributes>
+  <details class="boxel-expandable-banner" ...attributes>
     <summary class="boxel-expandable-banner__summary">
       <div class="boxel-expandable-banner__summary-layout">
       {{svgJar @icon class="boxel-expandable-banner__summary-icon"}}
@@ -27,7 +27,7 @@ const ExpandableBanner: TemplateOnlyComponent<Signature> = <template>
       </div>
       </div>
     </summary>
-    <div class="boxel-expandable-banner__details-content">
+    <div class="boxel-expandable-banner__content">
       {{yield}}
     </div>
   </details>

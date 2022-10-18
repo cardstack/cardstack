@@ -1,6 +1,9 @@
 .boxel-icon-button {
-  width: var(--icon-button-width, 40px);
-  height: var(--icon-button-height, 40px);
+  --boxel-icon-button-width: 40px;
+  --boxel-icon-button-height: 40px;
+
+  width: var(--boxel-icon-button-width);
+  height: var(--boxel-icon-button-height);
   padding: 0;
   background: none;
   border: none;

@@ -8,13 +8,15 @@ import { fn, array, hash } from '@ember/helper';
 import menuItem from '@cardstack/boxel/helpers/menu-item';
 import link from 'ember-link/helpers/link';
 import cssVar from '@cardstack/boxel/helpers/css-var';
+import { cssVariable, CSSVariableInfo } from 'ember-freestyle/decorators/css-variable';
 
 export default class TabBarUsage extends Component {
-  @tracked backgroundColor = 'inherit';
-  @tracked borderBottom = '1px solid var(--boxel-light-500)';
-  @tracked colorActive = 'inherit';
-  @tracked font = 'inherit';
-  @tracked fontWeightHover = '600';
+  cssClassName = 'boxel-tab-bar';
+  @cssVariable declare boxelTabBarBackgroundColor: CSSVariableInfo;
+  @cssVariable declare boxelTabBarBorderBottom: CSSVariableInfo;
+  @cssVariable declare boxelTabBarColorActive: CSSVariableInfo;
+  @cssVariable declare boxelTabBarFont: CSSVariableInfo;
+  @cssVariable declare boxelTabBarFontWeightHover: CSSVariableInfo;
 
   @tracked spread = false;
 
@@ -49,11 +51,11 @@ export default class TabBarUsage extends Component {
           }}
           @spread={{this.spread}}
           style={{cssVar
-            boxel-tab-bar-background-color=this.backgroundColor
-            boxel-tab-bar-border-bottom=this.borderBottom
-            boxel-tab-bar-color-active=this.colorActive
-            boxel-tab-bar-font=this.font
-            boxel-tab-bar-font-weight-hover=this.fontWeightHover
+            boxel-tab-bar-background-color=this.boxelTabBarBackgroundColor.value
+            boxel-tab-bar-border-bottom=this.boxelTabBarBorderBottom.value
+            boxel-tab-bar-color-active=this.boxelTabBarColorActive.value
+            boxel-tab-bar-font=this.boxelTabBarFont.value
+            boxel-tab-bar-font-weight-hover=this.boxelTabBarFontWeightHover.value
           }}
         />
       </:example>
@@ -69,38 +71,44 @@ export default class TabBarUsage extends Component {
           @onInput={{fn (mut this.spread)}}
           @value={{this.spread}}
         />
-        {{!-- template-lint-disable no-unbound --}}
-        <Args.String
-          @name="--boxel-tab-bar-background-color"
-          @defaultValue={{unbound this.backgroundColor}}
-          @value={{this.backgroundColor}}
-          @onInput={{fn (mut this.backgroundColor)}}
-        />
-        <Args.String
-          @name="--boxel-tab-bar-color-active"
-          @defaultValue={{unbound this.colorActive}}
-          @value={{this.colorActive}}
-          @onInput={{fn (mut this.colorActive)}}
-        />
-        <Args.String
-          @name="--boxel-tab-bar-border-bottom"
-          @defaultValue={{unbound this.borderBottom}}
-          @value={{this.borderBottom}}
-          @onInput={{fn (mut this.borderBottom)}}
-        />
-        <Args.String
-          @name="--boxel-tab-bar-font"
-          @defaultValue={{unbound this.font}}
-          @value={{this.font}}
-          @onInput={{fn (mut this.font)}}
-        />
-        <Args.String
-          @name="--boxel-tab-bar-font-weight-hover"
-          @defaultValue={{unbound this.fontWeightHover}}
-          @value={{this.fontWeightHover}}
-          @onInput={{fn (mut this.fontWeightHover)}}
-        />
       </:api>
+      <:cssVars as |Css|>
+        <Css.Basic
+          @name="boxel-tab-bar-background-color"
+          @type="color"
+          @defaultValue={{this.boxelTabBarBackgroundColor.defaults}}
+          @value={{this.boxelTabBarBackgroundColor.value}}
+          @onInput={{this.boxelTabBarBackgroundColor.update}}
+        />
+        <Css.Basic
+          @name="boxel-tab-bar-color-active"
+          @type="color"
+          @defaultValue={{this.boxelTabBarColorActive.defaults}}
+          @value={{this.boxelTabBarColorActive.value}}
+          @onInput={{this.boxelTabBarColorActive.update}}
+        />
+        <Css.Basic
+          @name="boxel-tab-bar-border-bottom"
+          @type="border"
+          @defaultValue={{this.boxelTabBarBorderBottom.defaults}}
+          @value={{this.boxelTabBarBorderBottom.value}}
+          @onInput={{this.boxelTabBarBorderBottom.update}}
+        />
+        <Css.Basic
+          @name="boxel-tab-bar-font"
+          @type="font"
+          @defaultValue={{this.boxelTabBarFont.defaults}}
+          @value={{this.boxelTabBarFont.value}}
+          @onInput={{this.boxelTabBarFont.update}}
+        />
+        <Css.Basic
+          @name="boxel-tab-bar-font-weight-hover"
+          @type="font-weight"
+          @defaultValue={{this.boxelTabBarFontWeightHover.defaults}}
+          @value={{this.boxelTabBarFontWeightHover.value}}
+          @onInput={{this.boxelTabBarFontWeightHover.update}}
+        />
+      </:cssVars>
     </FreestyleUsage>
 
     <FreestyleUsage @name="TabBar with ids and icons">
