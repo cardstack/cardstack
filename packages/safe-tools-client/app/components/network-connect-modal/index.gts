@@ -15,8 +15,7 @@ import walletProviders from '@cardstack/safe-tools-client/utils/wallet-providers
 
 import cssVar from '@cardstack/boxel/helpers/css-var';
 import { svgJar } from '@cardstack/boxel/utils/svg-jar';
-import BoxelActionChin from '@cardstack/boxel/components/boxel/action-chin';
-import BoxelCardContainer from '@cardstack/boxel/components/boxel/card-container';
+import BoxelActionContainer from '@cardstack/boxel/components/boxel/action-container';
 import BoxelLoadingIndicator from '@cardstack/boxel/components/boxel/loading-indicator';
 import BoxelModal from '@cardstack/boxel/components/boxel/modal';
 import BoxelRadioInput from '@cardstack/boxel/components/boxel/radio-input';
@@ -160,7 +159,7 @@ class CardPayLayerConnectModalComponent extends Component<CardPayLayerConnectMod
       data-test-layer-connect-modal={{@name}}
     >
       <div class='layer-connect-modal__scroll-wrapper'>
-        <BoxelCardContainer
+        <BoxelActionContainer
           class='layer-connect-modal__card'
           tabindex='-1'
           {{focusTrap
@@ -189,6 +188,8 @@ class CardPayLayerConnectModalComponent extends Component<CardPayLayerConnectMod
             - https://github.com/WICG/focus-visible/issues/88
             - https://github.com/w3c/csswg-drafts/issues/5885
           }}
+
+          as |Section ActionChin|
         >
           <button
             class='layer-connect-modal__close-button'
@@ -199,7 +200,7 @@ class CardPayLayerConnectModalComponent extends Component<CardPayLayerConnectMod
             {{svgJar 'close' width='100%' height='100%' aria-hidden=true}}
           </button>
 
-          <header class="layer-connect-modal__title">Connect your wallet</header>
+          <Section @title="Connect your wallet">
 
             <BoxelRadioInput
               @groupDescription='Select a wallet to connect to'
@@ -241,8 +242,9 @@ class CardPayLayerConnectModalComponent extends Component<CardPayLayerConnectMod
                 </option.component>
               {{/let}}
             </BoxelRadioInput>
+          </Section>
 
-            <BoxelActionChin @state={{this.cardState}} @disabled={{@frozen}}>
+            <ActionChin @state={{this.cardState}} @disabled={{@frozen}}>
       <:default as |a|>
         <a.ActionButton {{on "click" this.connect}} data-test-mainnet-connect-button>
           Connect Wallet
@@ -268,9 +270,9 @@ class CardPayLayerConnectModalComponent extends Component<CardPayLayerConnectMod
           Disconnect Wallet
         </m.ActionButton>
       </:memorialized>
-    </BoxelActionChin>
+    </ActionChin>
 
-        </BoxelCardContainer>
+        </BoxelActionContainer>
       </div>
     </BoxelModal>
   </template>

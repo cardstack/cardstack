@@ -7,7 +7,6 @@
 
 .layer-connect-modal__card {
   position: relative;
-  padding-top: calc(var(--boxel-sp-sm) + 0.75rem);
   outline-color: transparent;
   outline-style: solid;
 }
