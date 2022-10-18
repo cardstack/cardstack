@@ -1,9 +1,7 @@
 import Component from '@glimmer/component';
-// import { inject as service } from '@ember/service';
 import { taskFor } from 'ember-concurrency-ts';
 import { task } from 'ember-concurrency-decorators';
 import { action } from '@ember/object';
-import { tracked } from '@glimmer/tracking';
 import { timeout } from 'ember-concurrency';
 //@ts-expect-error glint does not think this is consumed-but it is consumed in the template https://github.com/typed-ember/glint/issues/374
 import { concat, fn, hash } from '@ember/helper';
@@ -21,11 +19,6 @@ import BoxelModal from '@cardstack/boxel/components/boxel/modal';
 import BoxelRadioInput from '@cardstack/boxel/components/boxel/radio-input';
 
 import './index.css';
-
-// import cardstackLogo from '@cardstack/safe-tools-client/images/icons/cardstack-logo-navy-rounded.svg';
-// import connectionSymbol from '@cardstack/safe-tools-client/images/icons/connection-symbol.svg';
-import { WalletProvider } from '@cardstack/safe-tools-client/utils/wallet-providers';
-// import { WorkflowCardComponentArgs } from '@cardstack/safe-tools-client/models/workflow';
 
 interface CardPayLayerConnectModalComponentArgs {
   name: string | null;
