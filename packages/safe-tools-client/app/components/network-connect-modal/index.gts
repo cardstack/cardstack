@@ -9,7 +9,7 @@ import { on } from '@ember/modifier';
 import optional from 'ember-composable-helpers/helpers/optional';
 import focusTrap from 'ember-focus-trap/modifiers/focus-trap';
 import not from 'ember-truth-helpers/helpers/not';
-import walletProviders from '@cardstack/safe-tools-client/utils/wallet-providers';
+import walletProviders, { WalletProvider } from '@cardstack/safe-tools-client/utils/wallet-providers';
 
 import cssVar from '@cardstack/boxel/helpers/css-var';
 import { svgJar } from '@cardstack/boxel/utils/svg-jar';
@@ -23,6 +23,9 @@ import './index.css';
 interface CardPayLayerConnectModalComponentArgs {
   name: string | null;
   isOpen: boolean;
+  isConnecting: boolean;
+  currentWalletProviderId: WalletProvider['id'];
+  changeWalletProvider: () => void;
   onClose: () => void;
   onConnect: (() => void) | undefined;
   onDisconnect: (() => void) | undefined;
@@ -33,7 +36,9 @@ class CardPayLayerConnectModalComponent extends Component<CardPayLayerConnectMod
     w.id === 'metamask'
       ? {
           ...w,
+          //@ts-expect-error
           enabled: !!window.ethereum?.isMetaMask,
+          //@ts-expect-error
           explanation: window.ethereum?.isMetaMask
             ? ''
             : 'MetaMask extension not detected',
@@ -56,6 +61,15 @@ class CardPayLayerConnectModalComponent extends Component<CardPayLayerConnectMod
     if (this.isConnected) {
       this.args.onConnect?.();
     }
+  }
+
+  get radioWalletProviderId() {
+    // TODO
+    return this.walletProviders[0].id;
+  }
+
+  @action cancelConnection() {
+    // TODO
   }
 
   <template>
@@ -110,13 +124,15 @@ class CardPayLayerConnectModalComponent extends Component<CardPayLayerConnectMod
 
           <Section @title="Connect your wallet">
             <BoxelRadioInput
+              @name="wallet-provider"
+              @orientation="horizontal"
+              @spacing="default"
               @groupDescription='Select a wallet to connect to'
               @items={{this.walletProviders}}
               @disabled={{@isConnecting}}
               @checkedId={{@currentWalletProviderId}}
               @hideRadio={{true}}
               class='network-connect-modal__wallet-group'
-              ...attributes
               data-test-wallet-selection as |option|
             >
               {{#let option.data as |item|}}
@@ -151,7 +167,7 @@ class CardPayLayerConnectModalComponent extends Component<CardPayLayerConnectMod
             </BoxelRadioInput>
           </Section>
 
-          <ActionChin @state={{this.cardState}} @disabled={{@frozen}}>
+          <ActionChin @state='default'>
             <:default as |a|>
               <a.ActionButton {{on "click" this.connect}} data-test-mainnet-connect-button>
                 Connect Wallet
@@ -162,7 +178,7 @@ class CardPayLayerConnectModalComponent extends Component<CardPayLayerConnectMod
                 this.radioWalletProviderId "-logo" }} style={{cssVar status-icon-size="2.5rem" }}>
                 <BoxelLoadingIndicator class="network-connect-modal__loading-indicator" @color="var(--boxel-light)" />
                 <div class="network-connect-modal__waiting-status">
-                  Waiting for you to connect Card Pay with your {{!-- network-display-info "layer1" "conversationalName" --}} wallet...
+                  Waiting for you to connect your {{!-- network-display-info "layer1" "conversationalName" --}} wallet...
                   <i.CancelButton class="network-connect-modal__cancel-button" {{on "click" this.cancelConnection}}>
                     Cancel
                   </i.CancelButton>
