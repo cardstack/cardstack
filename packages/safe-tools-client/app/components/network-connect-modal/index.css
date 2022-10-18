@@ -1,22 +1,22 @@
-.layer-connect-modal__scroll-wrapper {
+.network-connect-modal__scroll-wrapper {
   width: 100%;
   max-height: 100%;
   padding: var(--boxel-sp-lg) 0;
   overflow-y: auto;
 }
 
-.layer-connect-modal__card {
+.network-connect-modal__card {
   position: relative;
   outline-color: transparent;
   outline-style: solid;
 }
 
-.layer-connect-modal__title {
+.network-connect-modal__title {
   font: 700 1.125rem/calc(24 / 18) var(--boxel-font-family);
   letter-spacing: 0;
 }
 
-.layer-connect-modal__close-button {
+.network-connect-modal__close-button {
   position: absolute;
   right: 0;
   top: 0;
@@ -32,28 +32,28 @@
   --icon-color: var(--boxel-dark);
 }
 
-.layer-connect-modal__wrapped-card {
+.network-connect-modal__wrapped-card {
   box-shadow: none;
 }
 
-.layer-one-connect-card__body {
+.network-connect-modal__body {
   padding: var(--boxel-sp-lg);
 }
 
-.layer-one-connect-card__disclaimer {
+.network-connect-modal__disclaimer {
   font: var(--boxel-font-xs);
   color: var(--boxel-purple-400);
   letter-spacing: var(--boxel-lsp-lg);
 }
 
-.layer-one-connect-card__in-progress-logo > svg:nth-child(1) {
+.network-connect-modal__in-progress-logo > svg:nth-child(1) {
   margin-right: var(--boxel-sp-sm);
   padding: 5px;
   background-color: var(--boxel-light);
   border-radius: var(--boxel-border-radius);
 }
 
-.layer-one-connect-card__loading-indicator {
+.network-connect-modal__loading-indicator {
   --icon-color: var(--boxel-light);
 
   margin-right: var(--boxel-sp-sm);
@@ -61,11 +61,11 @@
   flex-shrink: 0;
 }
 
-.layer-one-connect-card__waiting-status {
+.network-connect-modal__waiting-status {
   max-width: 19rem;
 }
 
-.layer-one-connect-card .layer-one-connect-card__cancel-button {
+.network-connect-modal .network-connect-modal__cancel-button {
   min-height: 1.25rem;
   min-width: unset;
   padding: 0 var(--boxel-sp-xxxs);
@@ -75,13 +75,13 @@
   color: var(--boxel-highlight);
 }
 
-.card-pay-layer-one-wallet-provider-selection__group .boxel-radio-option--disabled {
+.network-connect-modal__wallet-group .boxel-radio-option--disabled {
   background: var(--boxel-purple-100);
   filter: grayscale(0.8);
   cursor: not-allowed;
 }
 
-.card-pay-layer-one-wallet-provider-selection__item {
+.network-connect-modal__wallet-item {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -89,23 +89,23 @@
   padding: var(--boxel-sp);
 }
 
-.card-pay-layer-one-wallet-provider-selection__item-image {
+.network-connect-modal__wallet-item-image {
   width: 2.5rem;
   height: 2.5rem;
   object-fit: contain;
   margin-bottom: var(--boxel-sp-xs);
 }
 
-.card-pay-layer-one-wallet-provider-selection__item-name {
+.network-connect-modal__wallet-item-name {
   font: 600 var(--boxel-font);
 }
 
-.card-pay-layer-one-wallet-provider-selection__item-description {
+.network-connect-modal__wallet-item-description {
   font: var(--boxel-font-sm);
   color: var(--boxel-purple-400);
   text-align: center;
 }
 
-.card-pay-layer-one-wallet-provider-selection__cta {
+.network-connect-modal__wallet-cta {
   width: 100%;
 }

@@ -67,22 +67,22 @@ class CardPayLayerConnectModalComponent extends Component<CardPayLayerConnectMod
 
   <template>
     <BoxelModal
-      class='layer-connect-modal'
+      class='network-connect-modal'
       @size='medium'
       @isOpen={{@isOpen}}
       @onClose={{@onClose}}
-      data-test-layer-connect-modal={{@name}}
+      data-test-network-connect-modal={{@name}}
     >
-      <div class='layer-connect-modal__scroll-wrapper'>
+      <div class='network-connect-modal__scroll-wrapper'>
         <BoxelActionContainer
-          class='layer-connect-modal__card'
+          class='network-connect-modal__card'
           tabindex='-1'
           {{focusTrap
             isActive=@isOpen
             focusTrapOptions=(hash
               allowOutsideClick=true
               clickOutsideDeactivates=true
-              initialFocus='.layer-connect-modal__card'
+              initialFocus='.network-connect-modal__card'
             )
           }}
           {{!
@@ -107,7 +107,7 @@ class CardPayLayerConnectModalComponent extends Component<CardPayLayerConnectMod
           as |Section ActionChin|
         >
           <button
-            class='layer-connect-modal__close-button'
+            class='network-connect-modal__close-button'
             type='button'
             aria-label='Close'
             {{on 'click' @onClose}}
@@ -122,7 +122,7 @@ class CardPayLayerConnectModalComponent extends Component<CardPayLayerConnectMod
               @disabled={{@isConnecting}}
               @checkedId={{@currentWalletProviderId}}
               @hideRadio={{true}}
-              class='card-pay-layer-one-wallet-provider-selection__group'
+              class='network-connect-modal__wallet-group'
               ...attributes
               data-test-wallet-selection as |option|
             >
@@ -133,21 +133,21 @@ class CardPayLayerConnectModalComponent extends Component<CardPayLayerConnectMod
                   @disabled={{not item.enabled}}
                   data-test-wallet-option={{item.id}}
                 >
-                  <div class='card-pay-layer-one-wallet-provider-selection__item'>
+                  <div class='network-connect-modal__wallet-item'>
                     <img
                       src={{item.logo}}
                       alt=''
                       role='presentation'
-                      class='card-pay-layer-one-wallet-provider-selection__item-image'
+                      class='network-connect-modal__wallet-item-image'
                     />
                     <span
-                      class='card-pay-layer-one-wallet-provider-selection__item-name'
+                      class='network-connect-modal__wallet-item-name'
                     >
                       {{item.name}}
                     </span>
                     {{#if item.explanation}}
                       <span
-                        class='card-pay-layer-one-wallet-provider-selection__item-description'
+                        class='network-connect-modal__wallet-item-description'
                       >
                         {{item.explanation}}
                       </span>
@@ -165,12 +165,12 @@ class CardPayLayerConnectModalComponent extends Component<CardPayLayerConnectMod
               </a.ActionButton>
             </:default>
             <:inProgress as |i|>
-              <i.ActionStatusArea class="layer-one-connect-card__in-progress-logo" @icon={{concat
+              <i.ActionStatusArea class="network-connect-modal__in-progress-logo" @icon={{concat
                 this.radioWalletProviderId "-logo" }} style={{cssVar status-icon-size="2.5rem" }}>
-                <BoxelLoadingIndicator class="layer-one-connect-card__loading-indicator" @color="var(--boxel-light)" />
-                <div class="layer-one-connect-card__waiting-status">
+                <BoxelLoadingIndicator class="network-connect-modal__loading-indicator" @color="var(--boxel-light)" />
+                <div class="network-connect-modal__waiting-status">
                   Waiting for you to connect Card Pay with your {{!-- network-display-info "layer1" "conversationalName" --}} wallet...
-                  <i.CancelButton class="layer-one-connect-card__cancel-button" {{on "click" this.cancelConnection}}>
+                  <i.CancelButton class="network-connect-modal__cancel-button" {{on "click" this.cancelConnection}}>
                     Cancel
                   </i.CancelButton>
                 </div>
