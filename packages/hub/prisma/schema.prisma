@@ -316,9 +316,9 @@ model ScheduledPayment {
   createdAt                   DateTime                  @default(now()) @map("created_at") @db.Timestamp(6)
   updatedAt                   DateTime                  @default(now()) @map("updated_at") @db.Timestamp(6)
   canceledAt                  DateTime?                 @map("canceled_at") @db.Timestamp(6)
-  cancelationTransactionError String?                   @map("cancelation_transaction_error")
   userAddress                 String                    @map("user_address")
   creationTransactionError    String?                   @map("creation_transaction_error")
+  cancelationTransactionError String?                   @map("cancelation_transaction_error")
   gasTokenAddress             String                    @map("gas_token_address")
   scheduledPaymentAttempts    ScheduledPaymentAttempt[]
 

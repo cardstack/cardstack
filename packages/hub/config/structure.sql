@@ -1187,12 +1187,8 @@ CREATE TABLE public.scheduled_payments (
     canceled_at timestamp without time zone,
     user_address text NOT NULL,
     creation_transaction_error text,
-<<<<<<< HEAD
-    cancelation_transaction_error text
-=======
-    cancellation_transaction_error text,
+    cancelation_transaction_error text,
     gas_token_address text NOT NULL
->>>>>>> b3ffb789c (Add gas token address field, change from bigint because that doesn't work with Prisma)
 );
 
 
