@@ -5,38 +5,38 @@ import shortUUID from 'short-uuid';
 import { nowUtc } from '../../utils/dates';
 import config from 'config';
 import { Wallet } from 'ethers';
-import { JsonRpcProvider } from '@cardstack/cardpay-sdk';
+import { JsonRpcProvider, gasPriceInToken } from '@cardstack/cardpay-sdk';
 
 export let supportedChains = [
   {
     id: 1,
     name: 'ethereum',
-    rpcUrl: 'https://eth-mainnet.public.blastapi.io',
+    rpcUrl: config.get('web3.ethereum.rpcNodeHttpsUrl'),
   },
   {
     id: 5,
     name: 'goerli',
-    rpcUrl: 'https://eth-goerli.public.blastapi.io',
+    rpcUrl: config.get('web3.ethereum.rpcNodeHttpsUrl'),
   },
   {
     id: 100,
     name: 'gnosis',
-    rpcUrl: 'https://rpc.gnosischain.com',
+    rpcUrl: config.get('web3.gnosis.rpcNodeHttpsUrl'),
   },
   {
     id: 77,
     name: 'sokol',
-    rpcUrl: 'https://sokol.poa.network',
+    rpcUrl: config.get('web3.gnosis.rpcNodeHttpsUrl'),
   },
   {
     id: 137,
     name: 'polygon',
-    rpcUrl: 'https://polygon-rpc.com',
+    rpcUrl: config.get('web3.polygon.rpcNodeHttpsUrl'),
   },
   {
     id: 80001,
     name: 'mumbai',
-    rpcUrl: 'https://polygon-testnet.public.blastapi.io',
+    rpcUrl: config.get('web3.polygon.rpcNodeHttpsUrl'),
   },
 ];
 
@@ -47,8 +47,13 @@ export default class ScheduledPaymentsExecutorService {
   web3 = inject('web3-http', { as: 'web3' });
   workerClient = inject('worker-client', { as: 'workerClient' });
 
+  async getCurrentGasPrice(provider: JsonRpcProvider, gasTokenAddress: string) {
+    // Wrapped in a method so that can be mocked in the tests
+    return gasPriceInToken(provider, gasTokenAddress);
+  }
+
   async executePayment(scheduledPayment: ScheduledPayment) {
-    let rpcUrl = supportedChains.find((chain) => chain.id === scheduledPayment.chainId)?.rpcUrl;
+    let rpcUrl = supportedChains.find((chain) => chain.id === scheduledPayment.chainId)?.rpcUrl as string;
     let provider = new JsonRpcProvider(rpcUrl, scheduledPayment.chainId);
     let signer = new Wallet(config.get('hubPrivateKey'));
     let scheduledPaymentModule = await this.cardpay.getSDK('ScheduledPaymentModule', provider, signer);
@@ -105,6 +110,8 @@ export default class ScheduledPaymentsExecutorService {
       recurringUntil,
     } = scheduledPayment;
 
+    let currentGasPrice = await this.getCurrentGasPrice(provider, gasTokenAddress);
+
     return new Promise<void>((resolve, reject) => {
       scheduledPaymentModule
         .executeScheduledPayment(
@@ -118,8 +125,8 @@ export default class ScheduledPaymentsExecutorService {
           String(maxGasPrice),
           gasTokenAddress,
           salt,
-          payAt!.getTime() / 1000,
-          String(maxGasPrice), // TODO: this should be the real gas price in gas token - we need to convert that to native token
+          String(currentGasPrice), // Contract will revert if this is larger than maxGasPrice
+          payAt!.getTime() / 1000, // getTime returns milliseconds, but we want seconds, thus divide by 1000
           recurringDayOfMonth,
           recurringUntil ? recurringUntil.getTime() / 1000 : null,
           {

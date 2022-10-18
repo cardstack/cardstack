@@ -5,6 +5,7 @@ import { nowUtc } from '../../../utils/dates';
 import { ExtendedPrismaClient } from '../../../services/prisma-manager';
 import ScheduledPaymentsExecutorService from '../../../services/scheduled-payments/executor';
 import { setupStubWorkerClient } from '../../helpers/stub-worker-client';
+import BN from 'bn.js';
 
 let sdkError: Error | null = null;
 
@@ -56,6 +57,7 @@ describe('executing scheduled payments', function () {
 
   this.beforeEach(async function () {
     subject = (await getContainer().lookup('scheduled-payment-executor')) as ScheduledPaymentsExecutorService;
+    subject.getCurrentGasPrice = async () => new BN('1000000000');
     prisma = await getPrisma();
   });
 
