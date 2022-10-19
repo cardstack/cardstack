@@ -161,7 +161,7 @@
     "websocket": "^1.0.34"
   },
   "engines": {
-    "node": "^14.0",
+    "node": "^16.0.0",
     "yarn": "^1.0"
   },
   "volta": {

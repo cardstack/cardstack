@@ -44,7 +44,7 @@
     "autotest": "mocha -r ts-node/register -r @cardstack/test-support/prepare-node-tests -w --reporter=min 'node-tests/**/*-test.ts' --timeout 60000"
   },
   "engines": {
-    "node": "^14.0",
+    "node": "^16.0.0",
     "yarn": "^1.0"
   },
   "volta": {
