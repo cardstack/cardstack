@@ -1,4 +1,6 @@
 .boxel-field {
+  --boxel-field-label-align: normal;
+
   display: grid;
   gap: var(--boxel-sp-xs) 0;
 }
@@ -29,6 +31,8 @@
   font: 600 var(--boxel-font-xs);
   letter-spacing: var(--boxel-lsp-xl);
   text-transform: uppercase;
+  display: flex;
+  align-items: var(--boxel-field-label-align);
 }
 
 .boxel-field--with-icon {
