@@ -22,7 +22,7 @@ export default class ModalUsage extends Component {
   @tracked layer = 'default';
   @tracked isDefaultOpen = false;
   @tracked isUrgentOpen = false;
-  @tracked disableOverlayDismiss = false;
+  @tracked isOverlayDismissalDisabled = false;
 
   get sizeAsString(): ModalSize | '<undefined>' {
     return this.size ?? '<undefined>';
@@ -64,7 +64,7 @@ export default class ModalUsage extends Component {
           @onClose={{this.onClose}}
           @isOpen={{this.isOpen}}
           aria-labelledby="boxel-modal-usage-example-id"
-          @disableOverlayDismiss={{this.disableOverlayDismiss}}
+          @isOverlayDismissalDisabled={{this.isOverlayDismissalDisabled}}
           style={{cssVar
             boxel-modal-offset-top=this.offsetTop
             boxel-modal-offset-left=this.offsetLeft
@@ -108,11 +108,11 @@ export default class ModalUsage extends Component {
           @required={{true}}
         />
         <Args.Bool
-          @name="disableOverlayDismiss"
+          @name="isOverlayDismissalDisabled"
           @description="Disables overlay interaction to avoid modal dismissal"
-          @value={{this.disableOverlayDismiss}}
+          @value={{this.isOverlayDismissalDisabled}}
           @defaultValue={{false}}
-          @onInput={{fn (mut this.disableOverlayDismiss)}}
+          @onInput={{fn (mut this.isOverlayDismissalDisabled)}}
         />
         <Args.Yield @description="The content of the modal. This visually sits directly on the overlay - there is no 'container' rendered by default." />
       </:api>

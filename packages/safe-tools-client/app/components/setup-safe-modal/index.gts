@@ -42,7 +42,7 @@ export default class SetupSafeModal extends Component<Signature> {
       @size='medium'
       @isOpen={{@isOpen}} 
       @onClose={{@onClose}}
-      @disableOverlayDismiss={{this.provisioning}}>
+      @isOverlayDismissalDisabled={{this.provisioning}}>
       <BoxelActionContainer as |Section ActionChin|>
         <Section @title='Set up a Payment Safe' class='setup-safe-modal__section'>
           <p>In this step, you create a safe equipped with a module to schedule
