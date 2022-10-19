@@ -116,7 +116,8 @@
 
 .boxel-input-group--invalid .boxel-input-group__form-control,
 .boxel-input-group--invalid .boxel-input-group__text-accessory,
-.boxel-input-group--invalid .boxel-input-group__button-accessory {
+.boxel-input-group--invalid .boxel-input-group__button-accessory,
+.boxel-input-group--invalid .boxel-input-group__select-accessory {
   border-color: var(--boxel-error-100);
 }
 
