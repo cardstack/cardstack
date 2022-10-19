@@ -9,7 +9,7 @@ const svgoUniqueId = require('svgo-unique-id');
 process.env.EMBROIDER_REBUILD_ADDONS = '@cardstack/boxel';
 
 module.exports = function (defaults) {
-  let app = new EmberApp(defaults, {
+  const app = new EmberApp(defaults, {
     'ember-power-select': { theme: false },
     svgJar: {
       strategy: 'inline',

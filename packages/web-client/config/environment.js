@@ -31,7 +31,7 @@ module.exports = function (environment) {
 
   const deployTargetClassIsProduction = deployTargetClass === 'production';
 
-  let ENV = {
+  const ENV = {
     modulePrefix: '@cardstack/web-client',
     environment,
     rootURL: '/',
