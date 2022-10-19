@@ -5,7 +5,7 @@ import { Arguments } from 'yargs';
 
 export default {
   command:
-    'schedule-payment <safeAddress> <moduleAddress> <tokenAddress> <amount> <payeeAddress> <fixedUSDFee> <feePercentage> <executionGas> <maxGasPrice> <gasTokenAddress> <salt> <payAt> <recurringDayOfMonth> <recurringUntil>',
+    'schedule-payment <safeAddress> <moduleAddress> <tokenAddress> <amount> <payeeAddress> <fixedUSDFee> <feePercentage> <executionGas> <maxGasPrice> <gasTokenAddress> <salt>',
   describe:
     "Schedules a one-time or a recurring payment. This creates a record in the crank (hub) and stores the scheduled payment hash in the safe's scheduled payment module contract. The crank is responsible for executing the payment at the scheduled time.",
   builder(yargs: Argv) {
@@ -54,17 +54,17 @@ export default {
         type: 'string',
         description: 'Arbitrary string to make SP unique',
       })
-      .positional('payAt', {
+      .option('payAt', {
         type: 'number',
         description:
           'Unix UTC time in seconds that represents the point in time when the payment should be executed. Used for one-time scheduled payments. Should be an empty string when recurringDayOfMonth and recurringUntil are set',
       })
-      .positional('recurringDayOfMonth', {
+      .option('recurringDayOfMonth', {
         type: 'number',
         description:
           'Day of the month on which the payment will be made recurringly (range: 1-31). Used for recurring scheduled payments. In case the month has less than days than the value provided, the payment will me made on the last day of the month. Should be an empty string when payAt is set.',
       })
-      .positional('recurringUntil', {
+      .option('recurringUntil', {
         type: 'number',
         description:
           'Unix UTC time in seconds that represents the point in time when the recurring payment should be stopped. Used for recurring scheduled payments. Should be an empty string when payAt is set',
@@ -101,7 +101,7 @@ export default {
       maxGasPrice: string;
       gasTokenAddress: string;
       salt: string;
-      payAt: number | null;
+      payAt?: number | null;
       recurringDayOfMonth?: number | null;
       recurringUntil?: number | null;
     };

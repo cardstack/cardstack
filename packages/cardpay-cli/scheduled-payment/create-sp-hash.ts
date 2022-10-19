@@ -5,7 +5,7 @@ import { Arguments, CommandModule } from 'yargs';
 
 export default {
   command:
-    'create-sp-hash <moduleAddress> <tokenAddress> <amount> <payeeAddress> <fixedUSDFee> <percentageFee> <executionGas> <maxGasPrice> <gasTokenAddress> <salt> <payAt> <recurringDayOfMonth> <recurringUntil>',
+    'create-sp-hash <moduleAddress> <tokenAddress> <amount> <payeeAddress> <fixedUSDFee> <percentageFee> <executionGas> <maxGasPrice> <gasTokenAddress> <salt>',
   describe:
     'Generates a scheduled payment hash which is calculated from the given arguments. The hash serves as a unique identifier used for scheduling, executing, and canceling scheduled payments',
   builder(yargs: Argv) {
@@ -50,16 +50,16 @@ export default {
         type: 'string',
         description: 'Arbitrary string to make SP unique',
       })
-      .positional('payAt', {
+      .option('payAt', {
         type: 'number',
         description: 'The unix UTC time in seconds from scheduled payment execution time',
       })
-      .positional('recurringDayOfMonth', {
+      .option('recurringDayOfMonth', {
         type: 'number',
         description:
           'Day of the month on which the payment will be made recurringly (range: 1-31). Used for recurring scheduled payments. In case the month has less than days than the value provided, the payment will me made on the last day of the month. Should be an empty string when payAt is set.',
       })
-      .positional('recurringUntil', {
+      .option('recurringUntil', {
         type: 'number',
         description:
           'Unix UTC time in seconds that represents the point in time when the recurring payment should be stopped. Used for recurring scheduled payments. Should be an empty string when payAt is set',
