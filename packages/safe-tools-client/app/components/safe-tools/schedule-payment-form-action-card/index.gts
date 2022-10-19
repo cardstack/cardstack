@@ -9,6 +9,8 @@ import BoxelToggleButtonGroup from '@cardstack/boxel/components/boxel/toggle-but
 import { action } from '@ember/object';
 import { tracked } from '@glimmer/tracking';
 import { fn } from '@ember/helper';
+import cssVar from '@cardstack/boxel/helpers/css-var';
+import { on } from '@ember/modifier';
 import './index.css';
 
 interface Signature {
@@ -71,10 +73,6 @@ export default class SafeToolsSchedulePaymentFormActionCard extends Component<Si
 
   <template>
     <BoxelActionContainer
-      @completeActionLabel="Schedule Payment"
-      @incompleteActionLabel="Schedule Payment"
-      @onClickButton={{this.schedulePayment}}
-      @hideLock={{true}}
       class="schedule-payment-form-action-card"
       ...attributes
     as |Section ActionChin|>
@@ -85,6 +83,9 @@ export default class SafeToolsSchedulePaymentFormActionCard extends Component<Si
             @name="payment-type"
             @items={{this.paymentTypeOptions}}
             @checkedId={{this.selectedPaymentType}}
+            style={{cssVar
+              boxel-radio-input-option-padding="var(boxel-sp-lg)"
+            }}
           as |item|>
             <item.component @onChange={{fn this.onSelectPaymentType item.data.id}}>
               {{item.data.text}}
@@ -159,6 +160,15 @@ export default class SafeToolsSchedulePaymentFormActionCard extends Component<Si
           </div>
         </BoxelField>
       </Section>
+        <ActionChin @state='default'>
+          <:default as |ac|>
+            <ac.ActionButton
+              {{on 'click' this.schedulePayment}}
+            >
+              Schedule Payment
+            </ac.ActionButton>
+          </:default>
+        </ActionChin>
     </BoxelActionContainer>
   </template>
 }
