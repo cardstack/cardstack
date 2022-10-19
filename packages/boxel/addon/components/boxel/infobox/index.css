@@ -1,5 +1,7 @@
 .boxel-infobox {
   --boxel-infobox-text-width: calc(21.25rem + var(--boxel-sp-xxl) + var(--boxel-sp-xxl));
+  --boxel-infobox-image-position: right -2.25rem bottom -2.25rem;
+  --boxel-infobox-image-size: auto 100%;
 
   position: relative;
   display: flex;

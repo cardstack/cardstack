@@ -17,9 +17,11 @@
   color: var(--boxel-dark);
   font: var(--boxel-font);
   letter-spacing: var(--boxel-lsp-sm);
-  padding: var(--boxel-sp-xs) var(--boxel-sp-xxxl) var(--boxel-sp-xs)
+  padding:
+    var(--boxel-sp-xs) var(--boxel-sp-xxxl) var(--boxel-sp-xs)
     var(--boxel-sp);
-  background: url('/@cardstack/boxel/images/icons/caret-down.svg') right
+  background:
+    url("/@cardstack/boxel/images/icons/caret-down.svg") right
     var(--boxel-sp) center/auto 0.5rem no-repeat;
   background-color: var(--boxel-light);
   border: 1px solid var(--boxel-purple-300);
@@ -64,29 +66,27 @@
 
 .boxel-card-picker__dropdown .ember-power-select-option {
   padding: var(--boxel-sp) var(--boxel-sp-xxxl);
-  background-image: url('/@cardstack/boxel/images/icons/icon-circle-light.svg');
+  background-image: url("/@cardstack/boxel/images/icons/icon-circle-light.svg");
   background-repeat: no-repeat;
   background-position: left var(--boxel-sp) center;
   background-size: var(--boxel-icon-sm) var(--boxel-icon-sm);
 }
 
-.boxel-card-picker__dropdown
-  .ember-power-select-option
-  + .ember-power-select-option {
+.boxel-card-picker__dropdown .ember-power-select-option + .ember-power-select-option {
   border-top: 1px solid var(--boxel-light-400);
 }
 
-.boxel-card-picker__dropdown .ember-power-select-option[aria-selected='true'] {
-  background-image: url('/@cardstack/boxel/images/icons/success-bordered.svg');
+.boxel-card-picker__dropdown .ember-power-select-option[aria-selected="true"] {
+  background-image: url("/@cardstack/boxel/images/icons/success-bordered.svg");
 }
 
-.boxel-card-picker__dropdown
-  .ember-power-select-option:hover:not([aria-disabled='true']):not(.ember-power-select-option--no-matches-message) {
+/* stylelint-disable-next-line max-line-length */
+.boxel-card-picker__dropdown .ember-power-select-option:hover:not([aria-disabled="true"]):not(.ember-power-select-option--no-matches-message) {
   background-color: var(--boxel-purple-100);
   cursor: pointer;
 }
 
-.boxel-card-picker__dropdown .ember-power-select-option[aria-disabled='true'] {
+.boxel-card-picker__dropdown .ember-power-select-option[aria-disabled="true"] {
   opacity: 0.45;
   cursor: not-allowed;
 }

@@ -16,17 +16,16 @@
   margin: var(--boxel-sp-xxs) 0;
 }
 
-.safe-setup-modal__section-icon {
-  --icon-color: var(--boxel-green);
-  --icon-stroke: var(--boxel-light);
-  margin-right: var(--boxel-sp-xxs);
-}
-
 .safe-setup-modal__section-wallet-info {
   display: flex;
   flex-direction: row;
   align-items: center;
   margin-top: 0;
+  gap: var(--boxel-sp-xxs);
+}
+
+.safe-setup-modal__section-icon {
+  --icon-stroke: var(--boxel-light);
 }
 
 .setup-safe-modal__section b {

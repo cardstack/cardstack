@@ -11,7 +11,10 @@
         You need to have a safe which contains funds that would be deducted
         automatically when schedule payments are due.
       </p>
-      <Boxel::Button @kind='primary' {{on 'click' this.openSetupSafeModal}}>
+      <Boxel::Button
+        @kind='primary'
+        {{on 'click' (set this 'isSetupSafeModalOpen' true)}}
+      >
         Create Safe
       </Boxel::Button>
     </cp.Item>
@@ -23,5 +26,5 @@
 
 <SetupSafeModal
   @isOpen={{this.isSetupSafeModalOpen}}
-  @onClose={{this.closeSetupSafeModal}}
+  @onClose={{set this 'isSetupSafeModalOpen' false}}
 />

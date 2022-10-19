@@ -3,6 +3,7 @@ import FreestyleUsage from 'ember-freestyle/components/freestyle/usage';
 import BoxelOrgHeader from './index';
 import { LinkTo } from '@ember/routing';
 import cssVar from '@cardstack/boxel/helpers/css-var';
+import { cssVariable, CSSVariableInfo } from 'ember-freestyle/decorators/css-variable';
 //@ts-expect-error glint does not think this is consumed-but it is consumed in the template https://github.com/typed-ember/glint/issues/374
 import { fn, hash } from '@ember/helper';
 import { tracked } from '@glimmer/tracking';
@@ -12,11 +13,13 @@ export default class OrgHeaderUsage extends Component {
   @tracked title = 'CRD Records';
   @tracked subtitle = 'Since 1919';
   @tracked iconURL = CRDLogo;
-  @tracked backgroundColor = 'var(--boxel-blue)';
-  @tracked color = 'var(--boxel-light)';
-  @tracked logoSize = 'auto 2rem';
-  @tracked logoPosition = 'center';
-  @tracked padding = 'var(--boxel-sp-lg)';
+  
+  cssClassName = 'boxel-org-header';
+  @cssVariable declare boxelOrgHeaderBackgroundColor: CSSVariableInfo;
+  @cssVariable declare boxelOrgHeaderColor: CSSVariableInfo;
+  @cssVariable declare boxelOrgHeaderLogoSize: CSSVariableInfo;
+  @cssVariable declare boxelOrgHeaderLogoPosition: CSSVariableInfo;
+  @cssVariable declare boxelOrgHeaderPadding: CSSVariableInfo;
 
   <template>
     <FreestyleUsage @name="Boxel:OrgHeader">
@@ -33,11 +36,11 @@ export default class OrgHeaderUsage extends Component {
           @subtitle={{this.subtitle}}
           @iconURL={{this.iconURL}}
           style={{cssVar
-            boxel-org-header-background-color=this.backgroundColor
-            boxel-org-header-color=this.color
-            boxel-org-header-logo-size=this.logoSize
-            boxel-org-header-logo-position=this.logoPosition
-            boxel-org-header-padding=this.padding
+            boxel-org-header-background-color=this.boxelOrgHeaderBackgroundColor.value
+            boxel-org-header-color=this.boxelOrgHeaderColor.value
+            boxel-org-header-logo-size=this.boxelOrgHeaderLogoSize.value
+            boxel-org-header-logo-position=this.boxelOrgHeaderLogoPosition.value
+            boxel-org-header-padding=this.boxelOrgHeaderPadding.value
           }}
         >
           More Stuff Here
@@ -60,46 +63,52 @@ export default class OrgHeaderUsage extends Component {
           @value={{this.iconURL}}
           @onInput={{fn (mut this.iconURL)}}
         />
-        <Args.String
-          @name="--boxel-org-header-background-color"
-          @description="background-color CSS style"
-          @defaultValue="inherit"
-          @value={{this.backgroundColor}}
-          @onInput={{fn (mut this.backgroundColor)}}
-        />
-        <Args.String
-          @name="--boxel-org-header-color"
-          @description="color CSS style"
-          @defaultValue="inherit"
-          @value={{this.color}}
-          @onInput={{fn (mut this.color)}}
-        />
-        <Args.String
-          @name="--boxel-org-header-logo-size"
-          @description="background-size CSS style for the icon"
-          @defaultValue="auto 2rem"
-          @value={{this.logoSize}}
-          @onInput={{fn (mut this.logoSize)}}
-        />
-        <Args.String
-          @name="--boxel-org-header-logo-position"
-          @description="background-position CSS style for the icon"
-          @defaultValue="center"
-          @value={{this.logoPosition}}
-          @onInput={{fn (mut this.logoPosition)}}
-        />
-        {{!-- template-lint-disable no-unbound --}}
-        <Args.String
-          @name="--boxel-org-header-padding"
-          @description="padding CSS style for the icon"
-          @defaultValue={{unbound this.padding}}
-          @value={{this.padding}}
-          @onInput={{fn (mut this.padding)}}
-        />
         <Args.Yield
           @description="Other header content"
         />
       </:api>
+      <:cssVars as |Css|>
+        <Css.Basic
+          @name="boxel-org-header-background-color"
+          @type="color"
+          @description="background-color CSS style"
+          @defaultValue={{this.boxelOrgHeaderBackgroundColor.defaults}}
+          @value={{this.boxelOrgHeaderBackgroundColor.value}}
+          @onInput={{this.boxelOrgHeaderBackgroundColor.update}}
+        />
+        <Css.Basic
+          @name="boxel-org-header-color"
+          @type="color"
+          @description="color CSS style"
+          @defaultValue={{this.boxelOrgHeaderColor.defaults}}
+          @value={{this.boxelOrgHeaderColor.value}}
+          @onInput={{this.boxelOrgHeaderColor.update}}
+        />
+        <Css.Basic
+          @name="boxel-org-header-logo-size"
+          @type="bg-size"
+          @description="background-size CSS style for the icon"
+          @defaultValue={{this.boxelOrgHeaderLogoSize.defaults}}
+          @value={{this.boxelOrgHeaderLogoSize.value}}
+          @onInput={{this.boxelOrgHeaderLogoSize.update}}
+        />
+        <Css.Basic
+          @name="boxel-org-header-logo-position"
+          @type="position"
+          @description="background-position CSS style for the icon"
+          @defaultValue={{this.boxelOrgHeaderLogoPosition.defaults}}
+          @value={{this.boxelOrgHeaderLogoPosition.value}}
+          @onInput={{this.boxelOrgHeaderLogoPosition.update}}
+        />
+        <Css.Basic
+          @name="boxel-org-header-padding"
+          @type="dimension"
+          @description="padding CSS style for the icon"
+          @defaultValue={{this.boxelOrgHeaderPadding.defaults}}
+          @value={{this.boxelOrgHeaderPadding.value}}
+          @onInput={{this.boxelOrgHeaderPadding.update}}
+        />
+      </:cssVars>
     </FreestyleUsage>
   </template>
 }
