@@ -16,6 +16,7 @@ interface Signature {
     size?: 'small' | 'medium' | 'large';
     layer?: 'urgent';
     isOpen?: boolean;
+    disableOverlayDismiss?: boolean;
     onClose: () => void;
   };
   Blocks: {
@@ -34,6 +35,7 @@ export default class Modal extends Component<Signature> {
         }}
       >
         <button
+          disabled={{@disableOverlayDismiss}}
           type="button"
           {{on "click" @onClose}}
           class="boxel-modal-overlay"
