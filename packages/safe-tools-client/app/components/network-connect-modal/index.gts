@@ -179,7 +179,7 @@ class NetworkConnectModal extends Component<Signature> {
                 this.radioWalletProviderId "-logo" }} style={{cssVar status-icon-size="2.5rem" }}>
                 <BoxelLoadingIndicator class="network-connect-modal__loading-indicator" @color="var(--boxel-light)" />
                 <div class="network-connect-modal__waiting-status">
-                  Waiting for you to connect your {{!-- network-display-info "layer1" "conversationalName" --}} wallet...
+                  Waiting for you to connect your {{!-- network-display-info "conversationalName" --}} wallet...
                   <i.CancelButton class="network-connect-modal__cancel-button" {{on "click" this.cancelConnection}}>
                     Cancel
                   </i.CancelButton>
