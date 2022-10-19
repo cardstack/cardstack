@@ -1,15 +1,16 @@
 <section class='safe-tools__dashboard-schedule'>
   <Boxel::ControlPanel as |cp|>
     <cp.Item @title='Wallet' @icon='wallet' @isActive={{true}}>
-      <Boxel::Button @kind='primary'>
-        Connect
-      </Boxel::Button>
+      <ConnectButton
+        @onConnect={{set this.application 'isShowingConnectModal' true}}
+      />
     </cp.Item>
     <cp.Item @title='Network' @icon='network' />
     <cp.Item @title='Safe' @icon='safe'>
       <p class='safe-tools__dashboard-schedule-control-panel-safe-info'>
         You need to have a safe which contains funds that would be deducted
-        automatically when schedule payments are due.</p>
+        automatically when schedule payments are due.
+      </p>
       <Boxel::Button @kind='primary' {{on 'click' this.openSetupSafeModal}}>
         Create Safe
       </Boxel::Button>
