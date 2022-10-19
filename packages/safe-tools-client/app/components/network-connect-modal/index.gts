@@ -47,6 +47,8 @@ class NetworkConnectModal extends Component<Signature> {
       : { ...w, enabled: true, explanation: '' }
   );
 
+  walletProviderId: string | undefined;
+
   isConnected = false;
 
   @action connect() {
@@ -131,7 +133,7 @@ class NetworkConnectModal extends Component<Signature> {
               @groupDescription='Select a wallet to connect to'
               @items={{this.walletProviders}}
               @disabled={{@isConnecting}}
-              @checkedId={{@currentWalletProviderId}}
+              @checkedId={{this.walletProviderId}}
               @hideRadio={{true}}
               class='network-connect-modal__wallet-group'
               data-test-wallet-selection as |option|
@@ -139,7 +141,7 @@ class NetworkConnectModal extends Component<Signature> {
               {{#let option.data as |item|}}
                 <option.component
                   @name='wallet-provider-selection'
-                  @onChange={{fn (optional @changeWalletProvider) item.id}}
+                  @onChange={{fn (mut this.walletProviderId) item.id}}
                   @disabled={{not item.enabled}}
                   data-test-wallet-option={{item.id}}
                 >
