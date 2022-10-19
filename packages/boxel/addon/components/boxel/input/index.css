@@ -1,5 +1,5 @@
 .boxel-input {
-  --boxel-input-height: 2.5rem; /* 40px */
+  --boxel-input-height: var(--boxel-form-control-height);
 
   width: 100%;
   min-height: var(--boxel-input-height);

@@ -25,8 +25,6 @@ export default class BoxelSelectableInputTokenAmountUsage extends Component {
   @tracked token = this.tokens[0];
 
   cssClassName = 'boxel-input-selectable-token-amount';
-  @cssVariable declare boxelInputSelectableTokenAmountHeight: CSSVariableInfo;
-  @cssVariable declare boxelInputSelectableTokenAmountHorizontalPadding: CSSVariableInfo;
   @cssVariable declare boxelInputSelectableTokenAmountInputFontSize: CSSVariableInfo;
 
   @action set(amount: string): void {
@@ -60,8 +58,6 @@ export default class BoxelSelectableInputTokenAmountUsage extends Component {
           @tokens={{this.tokens}}
           @onChooseToken={{this.onChooseToken}}
           style={{cssVar
-            boxel-input-selectable-token-amount-height=this.boxelInputSelectableTokenAmountHeight.value
-            boxel-input-selectable-token-amount-horizontal-padding=this.boxelInputSelectableTokenAmountHorizontalPadding.value
             boxel-input-selectable-token-amount-input-font-size=this.boxelInputSelectableTokenAmountInputFontSize.value
           }}
         />
@@ -109,22 +105,6 @@ export default class BoxelSelectableInputTokenAmountUsage extends Component {
         />
       </:api>
       <:cssVars as |Css|>
-        <Css.Basic
-          @name="boxel-input-selectable-token-amount-height"
-          @type="dimension"
-          @description="height of the input field"
-          @defaultValue={{this.boxelInputSelectableTokenAmountHeight.defaults}}
-          @value={{this.boxelInputSelectableTokenAmountHeight.value}}
-          @onInput={{this.boxelInputSelectableTokenAmountHeight.update}}
-        />
-        <Css.Basic
-          @name="boxel-input-selectable-token-amount-horizontal-padding"
-          @type="dimension"
-          @description="left padding on the input text and right padding on the select"
-          @defaultValue={{this.boxelInputSelectableTokenAmountHorizontalPadding.defaults}}
-          @value={{this.boxelInputSelectableTokenAmountHorizontalPadding.value}}
-          @onInput={{this.boxelInputSelectableTokenAmountHorizontalPadding.update}}
-        />
         <Css.Basic
           @name="boxel-input-selectable-token-amount-input-font-size"
           @type="dimension"
