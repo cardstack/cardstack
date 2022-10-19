@@ -7,15 +7,24 @@
     </cp.Item>
     <cp.Item @title='Network' @icon='network' />
     <cp.Item @title='Safe' @icon='safe'>
-      <p class='safe-tools__dashboard-schedule-control-panel-safe-info'>
-        You need to have a safe which contains funds that would be deducted
-        automatically when schedule payments are due.
-      </p>
+      {{#if this.safe}}
+        <span class='safe-tools__dashboard-schedule-control-panel-safe-info-address'>
+          {{this.safe.token.address}}:{{this.safe.address}}
+        </span>
+        <span class='safe-tools__dashboard-schedule-control-panel-safe-info-balance'>
+          {{this.safe.token.balance}} {{this.safe.token.symbol}}
+        </span>
+      {{else}}
+        <p class='safe-tools__dashboard-schedule-control-panel-safe-info-create'>
+          You need to have a safe which contains funds that would be deducted
+          automatically when schedule payments are due.
+        </p>
+      {{/if}}
       <Boxel::Button
         @kind='primary'
-        {{on 'click' (set this 'isSetupSafeModalOpen' true)}}
+        {{on 'click' (set this this.safeButton.modalFlag true)}}
       >
-        Create Safe
+        {{this.safeButton.label}}
       </Boxel::Button>
     </cp.Item>
   </Boxel::ControlPanel>
