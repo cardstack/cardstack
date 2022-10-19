@@ -2,6 +2,10 @@
   min-width: 50rem;
 }
 
+.schedule-payment-form-action-card .boxel-field {
+  --boxel-field-label-align: center;
+}
+
 .schedule-payment-form-action-card--max-gas-fee-name {
   font-weight: bold;
 }
