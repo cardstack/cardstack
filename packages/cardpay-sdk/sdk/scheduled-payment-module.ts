@@ -345,8 +345,10 @@ export default class ScheduledPaymentModule {
     recurringDayOfMonth?: number | null,
     recurringUntil?: number | null
   ): Promise<number> {
-    if (payAt == null && recurringDayOfMonth == null && recurringUntil == null)
+    if (payAt == null && (recurringDayOfMonth == null || recurringUntil == null))
       throw new Error('When payAt is null, recurringDayOfMonth and recurringUntil must have a value');
+    if (payAt != null && (recurringDayOfMonth != null || recurringUntil != null))
+      throw new Error('When payAt is not null, recurringDayOfMonth and recurringUntil must be null');
 
     let getRequiredGasFromRevertMessage = function (e: any): number {
       let _interface = new utils.Interface(['error GasEstimation(uint256 gas)']);
@@ -530,8 +532,10 @@ export default class ScheduledPaymentModule {
     recurringDayOfMonth?: number | null,
     recurringUntil?: number | null
   ): Promise<string> {
-    if (payAt == null && recurringDayOfMonth == null && recurringUntil == null)
+    if (payAt == null && (recurringDayOfMonth == null || recurringUntil == null))
       throw new Error('When payAt is null, recurringDayOfMonth and recurringUntil must have a value');
+    if (payAt != null && (recurringDayOfMonth != null || recurringUntil != null))
+      throw new Error('When payAt is not null, recurringDayOfMonth and recurringUntil must be null');
 
     let spHash;
     let module = new Contract(moduleAddress, ScheduledPaymentABI, this.ethersProvider);
@@ -906,8 +910,10 @@ export default class ScheduledPaymentModule {
     if (!maxGasPrice) throw new Error('maxGasPrice must be provided');
     if (!gasTokenAddress) throw new Error('gasTokenAddress must be provided ');
     if (!salt) throw new Error('salt must be provided');
-    if (payAt == null && recurringDayOfMonth == null && recurringUntil == null)
+    if (payAt == null && (recurringDayOfMonth == null || recurringUntil == null))
       throw new Error('When payAt is null, recurringDayOfMonth and recurringUntil must have a value');
+    if (payAt != null && (recurringDayOfMonth != null || recurringUntil != null))
+      throw new Error('When payAt is not null, recurringDayOfMonth and recurringUntil must be null');
 
     let { onTxnHash } = txnOptions ?? {};
     let module = new Contract(moduleAddress, ScheduledPaymentABI, this.ethersProvider);
