@@ -3,7 +3,6 @@ import { on } from '@ember/modifier';
 import not from 'ember-truth-helpers/helpers/not';
 import { tracked } from '@glimmer/tracking';
 import { action } from '@ember/object';
-import noop from 'ember-composable-helpers/helpers/noop';
 
 
 import { svgJar } from '@cardstack/boxel/utils/svg-jar';
@@ -42,7 +41,8 @@ export default class SetupSafeModal extends Component<Signature> {
     <BoxelModal 
       @size='medium'
       @isOpen={{@isOpen}} 
-      @onClose={{if this.provisioning (noop) @onClose}}>
+      @onClose={{@onClose}}
+      @disableOverlayDismiss={{this.provisioning}}>
       <BoxelActionContainer as |Section ActionChin|>
         <Section @title='Set up a Payment Safe' class='setup-safe-modal__section'>
           <p>In this step, you create a safe equipped with a module to schedule
