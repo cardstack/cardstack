@@ -8782,6 +8782,22 @@ aws-sdk@^2.458.0, aws-sdk@^2.667.0, aws-sdk@^2.798.0:
     uuid "3.3.2"
     xml2js "0.4.19"
 
+aws-sdk@^2.860.0:
+  version "2.1231.0"
+  resolved "https://registry.yarnpkg.com/aws-sdk/-/aws-sdk-2.1231.0.tgz#c02e83b095211d9f6dfb540fd47fa69190af9c0d"
+  integrity sha512-ONBuRsOxsu0zL8u/Vmz49tPWi9D4ls2pjb6szdfSx9VQef7bOnWe9gJpWoA94OTzcjOWsvjsG7UgjvQJkIuPBg==
+  dependencies:
+    buffer "4.9.2"
+    events "1.1.1"
+    ieee754 "1.1.13"
+    jmespath "0.16.0"
+    querystring "0.2.0"
+    sax "1.2.1"
+    url "0.10.3"
+    util "^0.12.4"
+    uuid "8.0.0"
+    xml2js "0.4.19"
+
 aws-sign2@~0.7.0:
   version "0.7.0"
   resolved "https://registry.yarnpkg.com/aws-sign2/-/aws-sign2-0.7.0.tgz#b46e890934a9591f2d2f6f86d7e6a9f1b3fe76a8"
@@ -13590,6 +13606,17 @@ ember-cli-deploy-cloudfront@^3.1.0:
     rsvp "^4.8.3"
     uuid "^8.0.0"
 
+ember-cli-deploy-cloudfront@^5.0.0:
+  version "5.0.0"
+  resolved "https://registry.yarnpkg.com/ember-cli-deploy-cloudfront/-/ember-cli-deploy-cloudfront-5.0.0.tgz#ad092e10dc2da760ca6a13d40e0b27011cfa9527"
+  integrity sha512-6M1r9Au0sWCwHONyzLqgJzTRCpAskqJptN/HKJFzORZ917iflEl3Z4g1r22UVJau8Iwoc6hdB6TKZ2Ake5b51g==
+  dependencies:
+    aws-sdk "^2.458.0"
+    core-object "^3.1.5"
+    ember-cli-deploy-plugin "~0.2.9"
+    rsvp "^4.8.3"
+    uuid "^8.0.0"
+
 ember-cli-deploy-compress@^0.3.2:
   version "0.3.2"
   resolved "https://registry.yarnpkg.com/ember-cli-deploy-compress/-/ember-cli-deploy-compress-0.3.2.tgz#dd1416602e1d27755c14da9f258f612bf45f7dac"
@@ -13675,6 +13702,21 @@ ember-cli-deploy-s3@^3.0.0:
     mime "^2.4.6"
     minimatch "^3.0.3"
     proxy-agent "^4.0.0"
+    rsvp "^4.8.5"
+
+ember-cli-deploy-s3@^3.1.0:
+  version "3.1.0"
+  resolved "https://registry.yarnpkg.com/ember-cli-deploy-s3/-/ember-cli-deploy-s3-3.1.0.tgz#5ee0027f1bb62855debaf101d702d6c7581f8dfc"
+  integrity sha512-c4+RdSjTntBAWoMA3E453mP2nrujSZRLI8tQCih8adRMJ0PP4/hqthsnRo8V73JJIhad9BJleW4o25bOZNGVdg==
+  dependencies:
+    aws-sdk "^2.860.0"
+    chalk "^4.1.0"
+    core-object "^3.1.5"
+    ember-cli-deploy-plugin "^0.2.2"
+    lodash "^4.17.21"
+    mime "^2.5.2"
+    minimatch "^3.0.3"
+    proxy-agent "^5.0.0"
     rsvp "^4.8.5"
 
 ember-cli-deploy@^1.0.2:
@@ -20368,6 +20410,11 @@ jmespath@0.15.0:
   version "0.15.0"
   resolved "https://registry.yarnpkg.com/jmespath/-/jmespath-0.15.0.tgz#a3f222a9aae9f966f5d27c796510e28091764217"
   integrity sha1-o/Iiqarp+Wb10nx5ZRDigJF2Qhc=
+
+jmespath@0.16.0:
+  version "0.16.0"
+  resolved "https://registry.yarnpkg.com/jmespath/-/jmespath-0.16.0.tgz#b15b0a85dfd4d930d43e69ed605943c802785076"
+  integrity sha512-9FzQjJ7MATs1tSpnco1K6ayiYE3figslrXA72G2HQ/n76RzvYlofyi5QM+iX4YRs/pu3yzxlVQSST23+dMDknw==
 
 joi@^17.3.0:
   version "17.4.0"
@@ -29844,7 +29891,7 @@ util@^0.11.0:
   dependencies:
     inherits "2.0.3"
 
-util@^0.12.0, util@^0.12.3:
+util@^0.12.0, util@^0.12.3, util@^0.12.4:
   version "0.12.4"
   resolved "https://registry.yarnpkg.com/util/-/util-0.12.4.tgz#66121a31420df8f01ca0c464be15dfa1d1850253"
   integrity sha512-bxZ9qtSlGUWSOy9Qa9Xgk11kSslpuZwaxCg4sNIDj6FLucDab2JxnHwyNTCpHMtK1MjoQiWQ6DiUMZYbSrO+Sw==
@@ -29865,6 +29912,11 @@ uuid@3.3.2:
   version "3.3.2"
   resolved "https://registry.yarnpkg.com/uuid/-/uuid-3.3.2.tgz#1b4af4955eb3077c501c23872fc6513811587131"
   integrity sha512-yXJmeNaw3DnnKAOKJE51sL/ZaYfWJRl1pK9dr19YFCu0ObS231AB1/LbqTKRAQ5kw8A90rA6fr4riOUpTZvQZA==
+
+uuid@8.0.0:
+  version "8.0.0"
+  resolved "https://registry.yarnpkg.com/uuid/-/uuid-8.0.0.tgz#bc6ccf91b5ff0ac07bbcdbf1c7c4e150db4dbb6c"
+  integrity sha512-jOXGuXZAWdsTH7eZLtyXMqUb9EcWMGZNbL9YcGBJl4MH4nrxHmZJhEHvyLFrkxo+28uLb/NYRcStH48fnD0Vzw==
 
 uuid@^3.0.0, uuid@^3.3.2, uuid@^3.4.0:
   version "3.4.0"
