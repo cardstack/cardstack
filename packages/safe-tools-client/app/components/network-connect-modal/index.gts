@@ -6,7 +6,6 @@ import { timeout } from 'ember-concurrency';
 //@ts-expect-error glint does not think this is consumed-but it is consumed in the template https://github.com/typed-ember/glint/issues/374
 import { concat, fn, hash } from '@ember/helper';
 import { on } from '@ember/modifier';
-import optional from 'ember-composable-helpers/helpers/optional';
 import focusTrap from 'ember-focus-trap/modifiers/focus-trap';
 import not from 'ember-truth-helpers/helpers/not';
 import walletProviders, { WalletProvider } from '@cardstack/safe-tools-client/utils/wallet-providers';
