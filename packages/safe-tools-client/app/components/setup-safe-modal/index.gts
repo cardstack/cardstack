@@ -1,8 +1,13 @@
 import Component from '@glimmer/component';
 import { on } from '@ember/modifier';
 import not from 'ember-truth-helpers/helpers/not';
+import { tracked } from '@glimmer/tracking';
+import { action } from '@ember/object';
+import noop from 'ember-composable-helpers/helpers/noop';
+
 
 import { svgJar } from '@cardstack/boxel/utils/svg-jar';
+import cssVar from '@cardstack/boxel/helpers/css-var';
 import BoxelModal from '@cardstack/boxel/components/boxel/modal';
 import BoxelActionContainer from '@cardstack/boxel/components/boxel/action-container'
 
@@ -12,22 +17,32 @@ interface Signature {
   Element: HTMLElement;
   Args: { 
     isOpen: boolean 
-    loading?: boolean;
     onClose: () => void;
   };
 }
 
-//TODO: replace with correct flags and logic
-const gasCost = `0.001899365 ETH (USD$3.01)`;
-const hasEnoughGas = true;
-
 export default class SetupSafeModal extends Component<Signature> {
+  //TODO: replace with correct flags and logic
+  gasCost = `0.001899365 ETH (USD$3.01)`;
+  notEnoughBalance = false;
+
+  @tracked provisioning = false;
+
+  @action async createSafe(): Promise<void> { 
+     //TODO: use sdk method createSafeWithModuleAndGuard
+    this.provisioning = true;
+    setTimeout(() => {
+      console.log('Create safe')
+      this.provisioning = false;
+      this.args.onClose();
+    }, 2000); 
+  }
+
   <template>
-    <BoxelModal
+    <BoxelModal 
       @size='medium'
-      @isOpen={{@isOpen}}
-      @onClose={{@onClose}}
-    >
+      @isOpen={{@isOpen}} 
+      @onClose={{if this.provisioning (noop) @onClose}}>
       <BoxelActionContainer as |Section ActionChin|>
         <Section @title='Set up a Payment Safe' class='setup-safe-modal__section'>
           <p>In this step, you create a safe equipped with a module to schedule
@@ -39,38 +54,47 @@ export default class SetupSafeModal extends Component<Signature> {
             <li>You are the owner of the safe. Only the safe owner can schedule
               payments.
             </li>
-            <li>Once you have scheduled payments, the module (source code here)  {{! TODO: Add link }}
+            <li>Once you have scheduled payments, the module
+              <a
+                href='https://github.com/cardstack/cardstack-module-scheduled-payment'
+                target='_blank'
+                rel='external'
+              >
+                (source code here)
+              </a>
               triggers the payments at the appointed time.
             </li>
             <li>Creating the safe and enabling the module requires a one-time gas
-              fee.
+               fee.
             </li>
           </ul>
-          {{! TODO: Gas cost should be handled on this component or be a param ? }}
-          <b>Estimated gas cost: {{gasCost}}</b>
-          {{#if hasEnoughGas}}
-            <div class='safe-setup-modal__section-wallet-info'>
-              {{svgJar
-                'icon-check-circle-ht'
-                class='safe-setup-modal__section-icon'
-              }}
-              <p>
-                Your wallet has sufficient funds to cover the estimated gas cost.
-              </p>
-            </div>
-          {{/if}}
-          {{! TODO: What's the behavior for not having enough gas ? }}
+          <b>Estimated gas cost: {{this.gasCost}}</b>
+          <div class='safe-setup-modal__section-wallet-info'>
+            {{svgJar
+              (if this.notEnoughBalance 'icon-x-circle-ht' 'icon-check-circle-ht')
+              class='safe-setup-modal__section-icon'
+              style=(cssVar
+                icon-color=(if this.notEnoughBalance 'var(--boxel-red)' 'var(--boxel-green)')
+              )
+            }}
+            <p>
+              Your wallet has {{if this.notEnoughBalance 'in'}}sufficient funds to cover the estimated gas cost.
+            </p>
+          </div>
         </Section>
         <ActionChin @state='default'>
-          <:default as |a|>
-            {{! TODO: Provisioning should be handled on this component or be a param to be handled on a diff controller ? }}
-            <a.ActionButton @loading={{@loading}}>
-              Provision
-            </a.ActionButton>
-            {{#if (not @loading)}}
-              <a.CancelButton {{on 'click' @onClose}}>
+          <:default as |ac|>
+            <ac.ActionButton
+              @loading={{this.provisioning}}
+              disabled={{this.notEnoughBalance}}
+              {{on 'click' this.createSafe}}
+            >
+              Provision{{if this.provisioning 'ing'}}
+            </ac.ActionButton>
+            {{#if (not this.provisioning)}}
+              <ac.CancelButton {{on 'click' @onClose}}>
                 Cancel
-              </a.CancelButton>
+              </ac.CancelButton>
             {{/if}}
           </:default>
         </ActionChin>
@@ -78,5 +102,3 @@ export default class SetupSafeModal extends Component<Signature> {
     </BoxelModal>
   </template>
 }
-
-
