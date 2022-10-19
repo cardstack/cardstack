@@ -10,6 +10,7 @@ import copyToClipboard from '@cardstack/boxel/helpers/copy-to-clipboard';
 import { later } from '@ember/runloop';
 import { A } from '@ember/array';
 import cssVar from '@cardstack/boxel/helpers/css-var';
+import { cssVariable, CSSVariableInfo } from 'ember-freestyle/decorators/css-variable';
 
 interface Token {
   name: string;
@@ -25,11 +26,13 @@ export default class BoxelInputGroupUsage extends Component {
   @tracked disabled = false;
   @tracked invalid = false;
   @tracked isShowingCopiedConfirmation = false;
-  @tracked paddingX = "var(--boxel-sp-sm)";
-  @tracked paddingY = "var(--boxel-sp-xxs)";
-  @tracked borderColor = "var(--boxel-purple-300)";
-  @tracked borderRadius = "var(--boxel-border-radius-sm)";
-  @tracked interiorBorderWidth = "0";
+
+  cssClassName = 'boxel-input-group';
+  @cssVariable declare boxelInputGroupPaddingX: CSSVariableInfo;
+  @cssVariable declare boxelInputGroupPaddingY: CSSVariableInfo;
+  @cssVariable declare boxelInputGroupBorderColor: CSSVariableInfo;
+  @cssVariable declare boxelInputGroupBorderRadius: CSSVariableInfo;
+  @cssVariable declare boxelInputGroupInteriorBorderWidth: CSSVariableInfo;
 
   tokens = [
     { name: 'CARD', icon: 'card' },
@@ -85,11 +88,11 @@ export default class BoxelInputGroupUsage extends Component {
           @errorMessage={{this.errorMessage}}
           @helperText={{this.helperText}}
           style={{cssVar
-            boxel-input-group-padding-x=this.paddingX
-            boxel-input-group-padding-y=this.paddingY
-            boxel-input-group-border-color=this.borderColor
-            boxel-input-group-border-radius=this.borderRadius
-            boxel-input-group-interior-border-width=this.interiorBorderWidth
+            boxel-input-group-padding-x=this.boxelInputGroupPaddingX.value
+            boxel-input-group-padding-y=this.boxelInputGroupPaddingY.value
+            boxel-input-group-border-color=this.boxelInputGroupBorderColor.value
+            boxel-input-group-border-radius=this.boxelInputGroupBorderRadius.value
+            boxel-input-group-interior-border-width=this.boxelInputGroupInteriorBorderWidth.value
           }}
         >
           <:before as |Accessories|>
@@ -150,42 +153,49 @@ export default class BoxelInputGroupUsage extends Component {
           @name="onBlur"
           @description="Action to call when the input value loses focus"
         />
-        <Args.String
-          @name="--boxel-input-group-padding-x"
-          @description="Horizontal padding (CSS Variable)"
-          @value={{this.paddingX}}
-          @defaultValue={{unbound this.paddingX}}
-          @onInput={{fn (mut this.paddingX)}}
-        />
-        <Args.String
-          @name="--boxel-input-group-padding-y"
-          @description="Vertical padding (CSS Variable)"
-          @value={{this.paddingY}}
-          @defaultValue={{unbound this.paddingY}}
-          @onInput={{fn (mut this.paddingY)}}
-        />
-        <Args.String
-          @name="--boxel-input-group-border-color"
-          @description="Border color (CSS Variable)"
-          @value={{this.borderColor}}
-          @defaultValue={{unbound this.borderColor}}
-          @onInput={{fn (mut this.borderColor)}}
-        />
-        <Args.String
-          @name="--boxel-input-group-border-radius"
-          @description="Border radius (CSS Variable)"
-          @value={{this.borderRadius}}
-          @defaultValue={{unbound this.borderRadius}}
-          @onInput={{fn (mut this.borderRadius)}}
-        />
-        <Args.String
-          @name="--boxel-input-group-interior-border-width"
-          @description="Interior border width (CSS Variable). Set to zero for no interior borders"
-          @value={{this.interiorBorderWidth}}
-          @defaultValue={{unbound this.interiorBorderWidth}}
-          @onInput={{fn (mut this.interiorBorderWidth)}}
-        />
       </:api>
+      <:cssVars as |Css|>
+        <Css.Basic
+          @name="boxel-input-group-padding-x"
+          @type="dimension"
+          @description="Horizontal padding"
+          @defaultValue={{this.boxelInputGroupPaddingX.defaults}}
+          @value={{this.boxelInputGroupPaddingX.value}}
+          @onInput={{this.boxelInputGroupPaddingX.update}}
+        />
+        <Css.Basic
+          @name="boxel-input-group-padding-y"
+          @type="dimension"
+          @description="Vertical padding"
+          @defaultValue={{this.boxelInputGroupPaddingY.defaults}}
+          @value={{this.boxelInputGroupPaddingY.value}}
+          @onInput={{this.boxelInputGroupPaddingY.update}}
+        />
+        <Css.Basic
+          @name="boxel-input-group-border-color"
+          @type="color"
+          @description="Border color"
+          @defaultValue={{this.boxelInputGroupBorderColor.defaults}}
+          @value={{this.boxelInputGroupBorderColor.value}}
+          @onInput={{this.boxelInputGroupBorderColor.update}}
+        />
+        <Css.Basic
+          @name="boxel-input-group-border-radius"
+          @type="dimension"
+          @description="Border radius"
+          @defaultValue={{this.boxelInputGroupBorderRadius.defaults}}
+          @value={{this.boxelInputGroupBorderRadius.value}}
+          @onInput={{this.boxelInputGroupBorderRadius.update}}
+        />
+        <Css.Basic
+          @name="boxel-input-group-interior-border-width"
+          @type="dimension"
+          @description="Interior border width (CSS Variable). Set to zero for no interior borders"
+          @defaultValue={{this.boxelInputGroupInteriorBorderWidth.defaults}}
+          @value={{this.boxelInputGroupInteriorBorderWidth.value}}
+          @onInput={{this.boxelInputGroupInteriorBorderWidth.update}}
+        />
+      </:cssVars>
     </FreestyleUsage>
     <style>
       .boxel-input-usage-examples .boxel-input-group {

@@ -6,6 +6,7 @@ import { action } from '@ember/object';
 import { fn } from '@ember/helper';
 import { on } from '@ember/modifier';
 import cssVar from '@cardstack/boxel/helpers/css-var';
+import { cssVariable, CSSVariableInfo } from 'ember-freestyle/decorators/css-variable';
 
 export default class InputUsage extends Component {
   @tracked id = 'sample-input';
@@ -18,7 +19,7 @@ export default class InputUsage extends Component {
   @tracked errorMessage = '';
   @tracked helperText = '';
 
-  @tracked height = '2.5rem';
+  @cssVariable({ cssClassName: 'boxel-input' }) declare boxelInputHeight: CSSVariableInfo;
 
   @action set(ev: Event): void {
     let target = ev.target as HTMLInputElement;
@@ -61,7 +62,7 @@ export default class InputUsage extends Component {
           @errorMessage={{this.errorMessage}}
           @helperText={{this.helperText}}
           style={{cssVar
-            boxel-input-height=this.height
+            boxel-input-height=this.boxelInputHeight.value
           }}
           {{on "blur" this.validate}}
           {{on "input" this.set}}
@@ -115,18 +116,21 @@ export default class InputUsage extends Component {
           @value={{this.helperText}}
           @onInput={{fn (mut this.helperText)}}
         />
-        {{!-- template-lint-disable no-unbound --}}
-        <Args.String
-          @name="--boxel-input-height"
-          @defaultValue={{unbound this.height}}
-          @value={{this.height}}
-          @onInput={{fn (mut this.height)}}
-        />
         <Args.Action
           @name="onInput"
           @description="Function to update the passed in value. This receives the changed value as a string."
         />
       </:api>
+      <:cssVars as |Css|>
+        <Css.Basic
+          @name="boxel-input-height"
+          @type="dimension"
+          @description="Used to set the height of the field"
+          @defaultValue={{this.boxelInputHeight.defaults}}
+          @value={{this.boxelInputHeight.value}}
+          @onInput={{this.boxelInputHeight.update}}
+        />
+      </:cssVars>
     </FreestyleUsage>
 
     <FreestyleUsage class="remove-in-percy" @name="Configure a multiline input using textarea attributes">

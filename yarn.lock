@@ -14352,10 +14352,10 @@ ember-focus-trap@^1.0.1:
     "@embroider/addon-shim" "^1.0.0"
     focus-trap "^6.7.1"
 
-ember-freestyle@0.16.0-beta.0:
-  version "0.16.0-beta.0"
-  resolved "https://registry.yarnpkg.com/ember-freestyle/-/ember-freestyle-0.16.0-beta.0.tgz#308301e8ccd15ba8308b8761fccf72db74d9b4b1"
-  integrity sha512-brVJ42HmbRjD0p7DRH/RE+7AFXO1uO/AlKJmb4H2OzcfPOYD/t5Xc3+K28bf3uwQH9W99R2oK7G60pUkpGFDTA==
+ember-freestyle@^0.17.0:
+  version "0.17.0"
+  resolved "https://registry.yarnpkg.com/ember-freestyle/-/ember-freestyle-0.17.0.tgz#c7e924991a58795a25cd3cb65c26831183a9ac7b"
+  integrity sha512-3ycaOLHu5ZwMBJH3TU2SSMOR9PqyixygdcVGA6CRZ7C96Gzuypst2eM54HrjsQ9uK7UYSTw6NvDoyE4POBb3Bw==
   dependencies:
     "@ember/render-modifiers" "^2.0.4"
     "@glimmer/component" "^1.1.2"

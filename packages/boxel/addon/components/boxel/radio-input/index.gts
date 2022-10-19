@@ -37,6 +37,7 @@ const RadioInput: TemplateOnlyComponent<Signature> = <template>
     @disabled={{@disabled}}
     @spacing={{@spacing}}
     @orientation={{or @orientation "horizontal"}}
+    class="boxel-radio-input"
     ...attributes
   >
     {{#each @items as |item i|}}
