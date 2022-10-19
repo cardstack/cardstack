@@ -1,6 +1,5 @@
 import binascii
 import itertools
-import json
 import tempfile
 from pathlib import PosixPath
 
