@@ -67,6 +67,8 @@ def create_rule(
     user_config = {"token": "card-0", "interest_rate_monthly": 0.06}
 
     user_config.update(user_config_overrides)
+    explanation = {}
+    metadata = {"explanation_id": "staking"}
 
     def register_tables(self):
         self.connection.register("token_holder", fake_data_token_holder)
@@ -74,7 +76,7 @@ def create_rule(
 
     monkeypatch.setattr(staking.Staking, "register_tables", register_tables)
 
-    rule = staking.Staking(core_config, user_config)
+    rule = staking.Staking(core_config, user_config, explanation, metadata)
     return rule
 
 

@@ -7,8 +7,16 @@ class Staking(Rule):
     This rule rewards users with CARD.cpxd held in a depot in a monthly basis
     """
 
-    def __init__(self, core_parameters, user_defined_parameters):
-        super(Staking, self).__init__(core_parameters, user_defined_parameters)
+    def __init__(
+        self,
+        core_parameters,
+        user_defined_parameters,
+        explanation_block={},
+        metadata={},
+    ):
+        super(Staking, self).__init__(
+            core_parameters, user_defined_parameters, explanation_block, metadata
+        )
 
     def set_user_defined_parameters(self, token, interest_rate_monthly):
         self.token = token
@@ -117,3 +125,9 @@ class Staking(Rule):
         df["amount"] = df["rewards"] * 1_000_000_000
         df.drop(["rewards"], axis=1)
         return df
+
+    def get_explanation_data_arr(self, payment_list):
+        explanation_data_arr = []
+        for _ in payment_list:
+            explanation_data_arr.append({})
+        return explanation_data_arr
