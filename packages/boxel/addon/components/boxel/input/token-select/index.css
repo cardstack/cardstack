@@ -16,9 +16,9 @@
 }
 
 .boxel-input-token-select .ember-power-select-placeholder {
-  color: rgb(var(--boxel-dark) / 50%);
   font: var(--boxel-button-font, var(--boxel-font-sm));
   font-size: var(--boxel-font-size);
+  color: var(--boxel-form-control-placeholder-color);
   padding: var(--boxel-sp-xxs) var(--boxel-sp-sm);
 }
 

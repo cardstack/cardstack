@@ -164,6 +164,7 @@
 
   /* Form control appearance */
   --boxel-form-control-height: 2.5rem;  /* 40px */
+  --boxel-form-control-placeholder-color: var(--boxel-purple-400);
   --boxel-form-control-border-color: var(--boxel-purple-300);
   --boxel-form-control-border-radius: var(--boxel-border-radius-sm);
 }
