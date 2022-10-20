@@ -19,7 +19,7 @@ interface Signature {
   Element: HTMLElement;
 }
 
-export default class SafeToolsSchedulePaymentFormActionCard extends Component<Signature> {
+export default class SchedulePaymentFormActionCard extends Component<Signature> {
 
   get paymentTypeOptions() {
     return [
@@ -175,6 +175,6 @@ export default class SafeToolsSchedulePaymentFormActionCard extends Component<Si
 
 declare module '@glint/environment-ember-loose/registry' {
   export default interface Registry {
-    'SafeTools::SchedulePaymentFormActionCard': typeof SafeToolsSchedulePaymentFormActionCard;
+    'SchedulePaymentFormActionCard': typeof SchedulePaymentFormActionCard;
   }
 }
