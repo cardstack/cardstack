@@ -327,24 +327,18 @@ export function isTransactionHash(candidate: string): boolean {
 }
 
 export async function sendTransaction(web3: Web3, transaction: Transaction): Promise<string> {
-  let from = (await web3.eth.getAccounts())[0];
-  return await new Promise((resolve, reject) => {
+  /* eslint-disable no-async-promise-executor */
+  let txHash: string = await new Promise(async (resolve, reject) => {
     web3.eth
-      .sendTransaction(
-        {
-          ...transaction,
-          from,
-        },
-        (err, hash) => {
-          if (err) {
-            reject(err);
-          } else {
-            resolve(hash);
-          }
-        }
-      )
-      .catch(reject);
+      .sendTransaction({
+        ...transaction,
+        from: (await web3.eth.getAccounts())[0],
+      })
+      .once('transactionHash', (transactionHash) => resolve(transactionHash))
+      .catch((err) => reject(err));
   });
+
+  return txHash;
 }
 
 export function extractSendTransactionError(revert: RevertError, abiInterface: Interface) {
