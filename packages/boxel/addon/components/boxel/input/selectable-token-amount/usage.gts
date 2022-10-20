@@ -1,7 +1,8 @@
 import Component from '@glimmer/component';
 import { tracked } from '@glimmer/tracking';
 import { action } from '@ember/object';
-import BoxelInputSelectableTokenAmount, { SelectableToken } from './index';
+import BoxelInputSelectableTokenAmount from './index';
+import { SelectableToken } from '../selectable-token';
 import FreestyleUsage from 'ember-freestyle/components/freestyle/usage';
 import { fn } from '@ember/helper';
 import cssVar from '@cardstack/boxel/helpers/css-var';
