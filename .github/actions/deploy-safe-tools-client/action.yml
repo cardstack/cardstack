@@ -37,15 +37,15 @@ runs:
     - run: yarn --prefer-offline --frozen-lockfile
       shell: bash
 
-    - name: Deploy
-      shell: bash
-      run: yarn deploy:safe-tools-client ${{ inputs.environment }} --verbose
-
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v1-node16
       with:
         role-to-assume: ${{ env.AWS_ROLE_ARN }}
         aws-region: us-east-1
+
+    - name: Deploy
+      shell: bash
+      run: yarn deploy:safe-tools-client ${{ inputs.environment }} --verbose
 
     - name: Send notification to Discord
       if: ${{ always() }}
