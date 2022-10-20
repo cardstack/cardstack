@@ -32,3 +32,9 @@
   color: var(--boxel-highlight);
   margin-bottom: var(--boxel-sp-sm);
 }
+
+.temporary-form-container {
+  display:flex;
+  justify-content:center;
+  margin-top:var(--boxel-sp-xl);
+}
