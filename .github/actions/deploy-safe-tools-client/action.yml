@@ -37,7 +37,6 @@ runs:
 
     - name: Deploy
       shell: bash
-      working-directory: packages/safe-tools-client
       run: yarn deploy:safe-tools-client ${{ inputs.environment }} --verbose
 
     - name: Configure AWS credentials
