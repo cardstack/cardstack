@@ -3,8 +3,9 @@ import BoxelActionContainer from '@cardstack/boxel/components/boxel/action-conta
 import BoxelField from '@cardstack/boxel/components/boxel/field';
 import BoxelInput from '@cardstack/boxel/components/boxel/input';
 import BoxelRadioInput from '@cardstack/boxel/components/boxel/radio-input';
-import BoxelInputSelectableTokenAmount, { SelectableToken } from '@cardstack/boxel/components/boxel/input/selectable-token-amount';
-import BoxelSelect from '@cardstack/boxel/components/boxel/select';
+import BoxelInputSelectableTokenAmount from '@cardstack/boxel/components/boxel/input/selectable-token-amount';
+import { SelectableToken } from '@cardstack/boxel/components/boxel/input/selectable-token';
+import BoxelTokenSelect from '@cardstack/boxel/components/boxel/input/token-select';
 import BoxelToggleButtonGroup from '@cardstack/boxel/components/boxel/toggle-button-group';
 import { action } from '@ember/object';
 import { tracked } from '@glimmer/tracking';
@@ -112,15 +113,12 @@ export default class SafeToolsSchedulePaymentFormActionCard extends Component<Si
           />
         </BoxelField>
         <BoxelField @label="Gas">
-          <BoxelSelect
+          <BoxelTokenSelect
             @placeholder="Choose a Gas Token"
-            @selected={{this.selectedGasToken}}
-            @onChange={{this.onSelectGasToken}}
-            @options={{this.gasTokens}}
-            as |item itemCssClass|
-          >
-            <div class={{itemCssClass}}>{{item.name}}</div>
-          </BoxelSelect>
+            @value={{this.selectedGasToken}}
+            @onChooseToken={{this.onSelectGasToken}}
+            @tokens={{this.gasTokens}}
+          />
         </BoxelField>
         <BoxelField @label="Max Gas Fee">
           <BoxelToggleButtonGroup
