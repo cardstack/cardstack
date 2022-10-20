@@ -30,7 +30,9 @@ def rule(request):
         "token": config["staging"]["tokens"]["card"],
         "accounts": accounts,
     }
-    return FlatPayment(core_config, user_config)
+    explanation = {}
+    metadata = {"explanation_id": "flat_payment"}
+    return FlatPayment(core_config, user_config, explanation, metadata)
 
 
 class TestFlatPayment:
