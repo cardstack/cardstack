@@ -7,8 +7,16 @@ class SafeOwnership(Rule):
     This rule rewards the ownwership of a specific safe type with a fixed reward per safe, with a cap.
     """
 
-    def __init__(self, core_parameters, user_defined_parameters):
-        super(SafeOwnership, self).__init__(core_parameters, user_defined_parameters)
+    def __init__(
+        self,
+        core_parameters,
+        user_defined_parameters,
+        explanation_block={},
+        metadata={},
+    ):
+        super(SafeOwnership, self).__init__(
+            core_parameters, user_defined_parameters, explanation_block, metadata
+        )
 
     def set_user_defined_parameters(
         self,
@@ -74,3 +82,9 @@ class SafeOwnership(Rule):
         df["amount"] = df["payable_safes"] * self.reward_per_safe
         df = df.drop(["payable_safes"], axis=1)
         return df
+
+    def get_explanation_data_arr(self, payment_list):
+        explanation_data_arr = []
+        for _ in payment_list:
+            explanation_data_arr.append({})
+        return explanation_data_arr

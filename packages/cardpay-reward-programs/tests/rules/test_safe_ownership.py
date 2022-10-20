@@ -30,8 +30,10 @@ def create_rule(
     monkeypatch.setattr(
         safe_ownership.SafeOwnership, "register_tables", register_tables
     )
+    explanation = {}
+    metadata = {"explanation_id": "safe_ownership"}
 
-    rule = safe_ownership.SafeOwnership(core_config, user_config)
+    rule = safe_ownership.SafeOwnership(core_config, user_config, explanation, metadata)
     return rule
 
 
