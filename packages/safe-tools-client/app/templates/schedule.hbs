@@ -1,9 +1,13 @@
 <section class='safe-tools__dashboard-schedule'>
   <Boxel::ControlPanel as |cp|>
     <cp.Item @title='Wallet' @icon='wallet' @isActive={{true}}>
-      <ConnectButton
-        @onConnect={{set this.application 'isShowingConnectModal' true}}
-      />
+      {{#if this.wallet.isConnected}}
+        Connected {{truncate-middle this.wallet.address}}
+      {{else}}
+        <ConnectButton
+          @onConnect={{set this.application 'isShowingConnectModal' true}}
+        />
+      {{/if}}
     </cp.Item>
     <cp.Item @title='Network' @icon='network' />
     <cp.Item @title='Safe' @icon='safe'>

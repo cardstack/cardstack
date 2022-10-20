@@ -15,8 +15,10 @@ import { timeout } from 'ember-concurrency';
 export default class Wallet extends Service {
   @tracked isConnected = false;
   @tracked providerId: WalletProviderId | undefined;
+  @tracked address: string | undefined;
 
   chainConnectionManager = new ChainConnectionManager('mainnet'); // FIXME generalise
+
   walletProviders = walletProviders.map((w) =>
     w.id === 'metamask'
       ? {
@@ -29,10 +31,16 @@ export default class Wallet extends Service {
       : { ...w, enabled: true, explanation: '' }
   );
 
-  @action connect() {
+  constructor() {
+    super(...arguments);
+
     this.chainConnectionManager.on('connected', (accounts: string[]) => {
-      console.log('connected', accounts);
+      this.isConnected = true;
+      this.address = accounts[0];
     });
+  }
+
+  @action connect() {
     if (!this.isConnected) {
       taskFor(this.connectWalletTask).perform();
     }
