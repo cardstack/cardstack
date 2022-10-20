@@ -7,7 +7,6 @@ import { fn } from '@ember/helper';
 
 export default class extends Component {
   @tracked isComplete = false;
-  @tracked hideLock = false;
   @tracked header = 'Card Header';
   @tracked incompleteActionLabel = 'Save';
   @tracked completeActionLabel = 'Edit value';
@@ -57,13 +56,6 @@ export default class extends Component {
         <Args.Yield
           @optional={{true}}
           @description="Unstyled area for custom card content and fields; yields a Section component that takes an optional title and applies an appropriate inset"
-        />
-        <Args.Bool
-          @name="hideLock"
-          @description="When true, suppress the 'Actions only visible to you' message and lock icon in the chin."
-          @defaultValue={{false}}
-          @value={{this.hideLock}}
-          @onInput={{fn (mut this.hideLock)}}
         />
         <Args.Yield
           @optional={{true}}

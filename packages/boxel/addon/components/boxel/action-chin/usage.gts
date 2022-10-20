@@ -26,7 +26,6 @@ export default class ActionChinUsage extends Component<Signature> {
   @tracked stepNumber = 0;
   @tracked state: ActionChinState = 'default';
   @tracked disabled = false;
-  @tracked hideLock = false;
   @tracked isComplete = false;
   @tracked unlockState: ActionChinState = 'default';
   @tracked depositState: ActionChinState = 'disabled';
