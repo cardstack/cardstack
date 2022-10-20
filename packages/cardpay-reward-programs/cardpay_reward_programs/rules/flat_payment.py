@@ -30,7 +30,7 @@ class FlatPayment(Rule):
     def run(self, payment_cycle: int, reward_program_id: str):
         if len(self.accounts) == 0:
             return default_payment_list
-        o = pd.DataFrame.from_records(
+        return pd.DataFrame.from_records(
             {
                 "payee": account,
                 "rewardProgramID": reward_program_id,
@@ -42,7 +42,6 @@ class FlatPayment(Rule):
             }
             for account in self.accounts
         )
-        return o
 
     def get_explanation_data_arr(self, payment_list):
         explanation_data_arr = []
