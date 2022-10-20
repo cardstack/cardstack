@@ -1,16 +1,11 @@
 import Component from '@glimmer/component';
-import { taskFor } from 'ember-concurrency-ts';
-import { task } from 'ember-concurrency-decorators';
-import { action } from '@ember/object';
-import { timeout } from 'ember-concurrency';
+import { inject as service} from '@ember/service';
 //@ts-expect-error glint does not think this is consumed-but it is consumed in the template https://github.com/typed-ember/glint/issues/374
 import { concat, fn, hash } from '@ember/helper';
 import { on } from '@ember/modifier';
 import focusTrap from 'ember-focus-trap/modifiers/focus-trap';
 import not from 'ember-truth-helpers/helpers/not';
-import walletProviders, { WalletProvider, WalletProviderId } from '@cardstack/safe-tools-client/utils/wallet-providers';
-import { ChainConnectionManager } from '@cardstack/safe-tools-client/utils/chain-connection-manager';
-import Web3 from 'web3';
+import WalletService from '@cardstack/safe-tools-client/services/wallet';
 
 import cssVar from '@cardstack/boxel/helpers/css-var';
 import { svgJar } from '@cardstack/boxel/utils/svg-jar';
@@ -33,49 +28,7 @@ interface Signature {
 }
 
 class NetworkConnectModal extends Component<Signature> {
-  chainConnectionManager = new ChainConnectionManager('mainnet');
-  walletProviders = walletProviders.map((w) =>
-    w.id === 'metamask'
-      ? {
-          ...w,
-          enabled: !!window.ethereum?.isMetaMask,
-          explanation: window.ethereum?.isMetaMask
-            ? ''
-            : 'MetaMask extension not detected',
-        }
-      : { ...w, enabled: true, explanation: '' }
-  );
-
-  walletProviderId: WalletProviderId | undefined;
-
-  isConnected = false;
-
-  @action connect() {
-    this.chainConnectionManager.on('connected', (accounts: string[]) => {
-      console.log('connected', accounts);
-    });
-    if (!this.isConnected) {
-      taskFor(this.connectWalletTask).perform();
-    }
-  }
-
-  @task *connectWalletTask() {
-    let web3 = new Web3();
-    yield this.chainConnectionManager.connect(web3, this.walletProviderId!);
-    yield timeout(500); // allow time for strategy to verify connected chain -- it might not accept the connection
-    if (this.isConnected) {
-      this.args.onConnect?.();
-    }
-  }
-
-  get radioWalletProviderId() {
-    // TODO
-    return this.walletProviders[0].id;
-  }
-
-  @action cancelConnection() {
-    // TODO
-  }
+  @service declare wallet: WalletService;
 
   <template>
     <BoxelModal
@@ -133,9 +86,9 @@ class NetworkConnectModal extends Component<Signature> {
               @orientation="horizontal"
               @spacing="default"
               @groupDescription='Select a wallet to connect to'
-              @items={{this.walletProviders}}
-              @disabled={{@isConnecting}}
-              @checkedId={{this.walletProviderId}}
+              @items={{this.wallet.walletProviders}}
+              @disabled={{this.wallet.isConnecting}}
+              @checkedId={{this.wallet.providerId}}
               @hideRadio={{true}}
               class='network-connect-modal__wallet-group'
               data-test-wallet-selection as |option|
@@ -143,7 +96,7 @@ class NetworkConnectModal extends Component<Signature> {
               {{#let option.data as |item|}}
                 <option.component
                   @name='wallet-provider-selection'
-                  @onChange={{fn (mut this.walletProviderId) item.id}}
+                  @onChange={{fn (mut this.wallet.providerId) item.id}}
                   @disabled={{not item.enabled}}
                   data-test-wallet-option={{item.id}}
                 >
@@ -174,13 +127,13 @@ class NetworkConnectModal extends Component<Signature> {
 
           <ActionChin @state='default'>
             <:default as |a|>
-              <a.ActionButton {{on "click" this.connect}} data-test-mainnet-connect-button>
+              <a.ActionButton {{on "click" this.wallet.connect}} data-test-mainnet-connect-button>
                 Connect Wallet
               </a.ActionButton>
             </:default>
             <:inProgress as |i|>
               <i.ActionStatusArea class="network-connect-modal__in-progress-logo" @icon={{concat
-                this.radioWalletProviderId "-logo" }} style={{cssVar status-icon-size="2.5rem" }}>
+                this.wallet.providerId "-logo" }} style={{cssVar status-icon-size="2.5rem" }}>
                 <BoxelLoadingIndicator class="network-connect-modal__loading-indicator" @color="var(--boxel-light)" />
                 <div class="network-connect-modal__waiting-status">
                   Waiting for you to connect your {{!-- network-display-info "conversationalName" --}} wallet...
