@@ -28,7 +28,9 @@ def rollover_rule(request):
         "token": config["staging"]["tokens"]["card"],
         "accounts": ["0x12AE66CDc592e10B60f9097a7b0D3C59fce29876"],
     }
-    return FlatPayment(core_config, user_config)
+    explanation = {}
+    metadata = {"explanation_id": "flat_payment"}
+    return FlatPayment(core_config, user_config, explanation, metadata)
 
 
 @pytest.fixture
@@ -52,7 +54,9 @@ def rollover_rule_multiple(request):
             "0xc0ffee254729296a45a3885639AC7E10F9d54979",
         ],
     }
-    return FlatPayment(core_config, user_config)
+    explanation = {}
+    metadata = {"explanation_id": "flat_payment"}
+    return FlatPayment(core_config, user_config, explanation, metadata)
 
 
 def claims_table(claims=[]):
@@ -86,8 +90,12 @@ def test_unclaimed_rewards_allow_rollover(get_table_dataset, rollover_rule):
             "payment_cycle": 100,
         }
         payment_list = rollover_rule.get_payments(**run_parameters).to_dict("records")
+        explanation_data_arr = rollover_rule.get_explanation_data_arr(payment_list)
         tree = PaymentTree(payment_list)
-        table = tree.as_arrow()
+        table = tree.as_arrow(
+            rollover_rule.explanation_id,
+            explanation_data_arr,
+        )
         write_parquet_file(first_cycle_output, table)
         assert (first_cycle_output / "results.parquet").exists()
 
@@ -119,8 +127,12 @@ def test_claimed_rewards_dont_rollover(get_table_dataset, rollover_rule):
             "payment_cycle": 100,
         }
         payment_list = rollover_rule.get_payments(**run_parameters).to_dict("records")
+        explanation_data_arr = rollover_rule.get_explanation_data_arr(payment_list)
         tree = PaymentTree(payment_list)
-        table = tree.as_arrow()
+        table = tree.as_arrow(
+            rollover_rule.explanation_id,
+            explanation_data_arr,
+        )
         write_parquet_file(first_cycle_output, table)
         assert (first_cycle_output / "results.parquet").exists()
 
@@ -160,8 +172,14 @@ def test_multiple_claims_with_multiple_people(
         payment_list = rollover_rule_multiple.get_payments(**run_parameters).to_dict(
             "records"
         )
+        explanation_data_arr = rollover_rule_multiple.get_explanation_data_arr(
+            payment_list
+        )
         tree = PaymentTree(payment_list)
-        table = tree.as_arrow()
+        table = tree.as_arrow(
+            rollover_rule_multiple.explanation_id,
+            explanation_data_arr,
+        )
         write_parquet_file(first_cycle_output, table)
         assert (first_cycle_output / "results.parquet").exists()
 
