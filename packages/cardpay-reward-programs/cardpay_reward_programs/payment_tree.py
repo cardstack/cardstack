@@ -75,9 +75,9 @@ def decode_payment(encoded_payment: Union[bytes, str]) -> Payment:
 
 
 class PaymentTree:
-    def __init__(self, payment_list: List[Payment], run_parameters={}) -> None:
+    def __init__(self, payment_list: List[Payment], parameters={}) -> None:
         self.payment_nodes = payment_list
-        self.run_parameters = run_parameters
+        self.parameters = parameters
         self.data = list(map(encode_payment, self.payment_nodes))
 
         self.tree = MerkleTree(self.data, hashfunc)
@@ -98,7 +98,7 @@ class PaymentTree:
     def verify_inclusion(self, leaf):
         return self.tree.verify_leaf_inclusion(leaf, self.tree.get_proof(leaf))
 
-    def as_arrow(self):
+    def as_arrow(self, explanation_id, explanation_data_arr):
         # Auto-detection of schemas risks invalid columns, so define manually
         schema = pa.schema(
             [
@@ -111,8 +111,12 @@ class PaymentTree:
                 pa.field("root", pa.string()),
                 pa.field("leaf", pa.string()),
                 pa.field("proof", pa.list_(pa.string())),
+                pa.field("explanation_id", pa.string()),
+                pa.field("explanation_data", pa.map_(pa.string(), pa.string())),
             ],
-            metadata={"run_parameters": json.dumps(self.run_parameters)},
+            metadata={
+                "parameters": json.dumps(self.parameters, default=lambda o: o.__dict__)
+            },
         )
         # Arrow tables are constructed by column
         # so we need to flip the data
@@ -127,13 +131,17 @@ class PaymentTree:
                 "validTo",
                 "payee",
             ]
-            for payment, leaf in zip(self.payment_nodes, self.data):
+            for i, (payment, leaf) in enumerate(zip(self.payment_nodes, self.data)):
                 for field in extract_fields:
                     columns[field].append(payment[field])
                 columns["tokenType"].append(1)
                 columns["root"].append(root)
                 columns["leaf"].append(leaf.hex())
                 columns["proof"].append(self.get_hex_proof(leaf))
+                columns["explanation_id"].append(explanation_id)
+                columns["explanation_data"].append(
+                    [(k, str(v)) for k, v in explanation_data_arr[i].items()]
+                )
         return pa.table(data=columns, schema=schema)
 
 
