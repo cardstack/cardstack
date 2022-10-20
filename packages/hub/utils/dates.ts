@@ -9,3 +9,7 @@ export function convertDateToUTC(date: Date) {
     date.getUTCSeconds()
   );
 }
+
+export function nowUtc() {
+  return convertDateToUTC(new Date());
+}

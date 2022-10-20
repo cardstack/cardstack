@@ -1,19 +1,22 @@
+import { JsonRpcProvider } from '@cardstack/cardpay-sdk';
 import { inject } from '@cardstack/di';
 import * as Sentry from '@sentry/node';
 import { isBefore, subDays } from 'date-fns';
+import { supportedChains } from '../services/scheduled-payments/executor';
 
 export default class ScheduledPaymentOnChainCreationWaiter {
   prismaManager = inject('prisma-manager', { as: 'prismaManager' });
-  web3 = inject('web3-http', { as: 'web3' });
   cardpay = inject('cardpay');
 
   async perform(payload: { scheduledPaymentId: string }) {
     let prisma = await this.prismaManager.getClient();
-
-    let scheduledPaymentModule = await this.cardpay.getSDK('ScheduledPaymentModule', this.web3.getInstance());
     let scheduledPayment = await prisma.scheduledPayment.findFirstOrThrow({
       where: { id: payload.scheduledPaymentId },
     });
+
+    let rpcUrl = supportedChains.find((chain) => chain.id === scheduledPayment.chainId)?.rpcUrl as string;
+    let provider = new JsonRpcProvider(rpcUrl, scheduledPayment.chainId);
+    let scheduledPaymentModule = await this.cardpay.getSDK('ScheduledPaymentModule', provider);
 
     if (scheduledPayment.creationBlockNumber) {
       // Did we somehow spawn this task after it already updated creationBlockNumber previously?

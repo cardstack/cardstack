@@ -1,14 +1,6 @@
 import { ScheduledPayment } from '@prisma/client';
 import { JSONAPIDocument } from '../../utils/jsonapi-document';
 
-function transformToString(value: BigInt | null): string | null {
-  if (value == null) {
-    return null;
-  } else {
-    return String(value);
-  }
-}
-
 export default class ScheduledPaymentSerializer {
   serialize(model: ScheduledPayment): JSONAPIDocument {
     const result = {
@@ -20,10 +12,11 @@ export default class ScheduledPaymentSerializer {
           'sender-safe-address': model.senderSafeAddress,
           'module-address': model.moduleAddress,
           'token-address': model.tokenAddress,
-          amount: transformToString(model.amount),
+          'gas-token-address': model.gasTokenAddress,
+          amount: model.amount,
           'payee-address': model.payeeAddress,
-          'execution-gas-estimation': transformToString(model.executionGasEstimation),
-          'max-gas-price': transformToString(model.maxGasPrice),
+          'execution-gas-estimation': model.executionGasEstimation,
+          'max-gas-price': model.maxGasPrice,
           'fee-fixed-usd': model.feeFixedUsd,
           'fee-percentage': model.feePercentage,
           salt: model.salt,
@@ -33,10 +26,10 @@ export default class ScheduledPaymentSerializer {
           'recurring-day-of-month': model.recurringDayOfMonth,
           'recurring-until': model.recurringUntil,
           'creation-transaction-hash': model.creationTransactionHash,
-          'creation-block-number': transformToString(model.creationBlockNumber),
+          'creation-block-number': model.creationBlockNumber,
           'creation-transaction-error': model.creationTransactionError,
           'cancelation-transaction-hash': model.cancelationTransactionHash,
-          'cancelation-block-number': transformToString(model.cancelationBlockNumber),
+          'cancelation-block-number': model.cancelationBlockNumber,
         },
       },
     };
