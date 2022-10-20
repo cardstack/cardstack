@@ -1,39 +1,42 @@
 {
-    "explanation": {
-        "en": {
-            "program": "Reward Program managed by Cardstack Foundation",
-            "claim": {
-                "flat_payment": "Be more expressive:Earned {amount} {token} for a one-time aidrop"
-            }
-        }
-    },
-    "core": {
-        "payment_cycle_length": 32768,
-        "start_block": 23592960,
-        "end_block": 24859648,
-        "subgraph_config_locations": {
-            "prepaid_card_payment": "s3://cardpay-staging-partitioned-graph-data/data/prepaid_card_payments/0.0.3/" 
-        },
-        "duration": 43200,
-        "rollover": true
-    },
-    "run": {
-        "payment_cycle": 28089457,
-        "reward_program_id": "0x0885ce31D73b63b0Fcb1158bf37eCeaD8Ff0fC72",
-        "previous_output": "s3://cardpay-staging-reward-programs/rewardProgramID=0x0885ce31D73b63b0Fcb1158bf37eCeaD8Ff0fC72/paymentCycle=27494200/results.parquet",
-        "rewards_subgraph_location": "s3://cardpay-staging-partitioned-graph-data/data/rewards/0.0.2/"
-    },
-    "user_defined": {
-        "token": "0xB0427e9F03Eb448D030bE3EBC96F423857ceEb2f",
-        "reward_per_user": 5000000000000000000,
-        "accounts": [
-            "0x159ADe032073d930E85f95AbBAB9995110c43C71",
-            "0x797E1f626cB58f909F3c6a1e0783578BD4D0f32f", 
-            "0x53dc3204f2f294f6A5649a36AC295f74A0dB92e0", 
-            "0xA1e2421A68f0208B75ACb0014a69E89b1F7492ea"
-        ]
-    },
-    "metadata": {
-        "explanation_id": "flat_payment"
+  "explanation": {
+    "en": {
+      "program": "Reward Program managed by Cardstack Foundation",
+      "claim": {
+        "flat_payment": "Earned {amount} {token} for a one-time aidrop",
+        "retro_airdrop": "Earned {amount} {token} averaged over time period for payments within {start_snapshot_block} and {end_snapshot_block}",
+        "safe_ownership": "Earned {amount} {token} for owning a {safe_type}",
+        "staking": "Earned {amount} {token} for staking CARD monthly in your L2 depot between blocks {from_block} and {to_block}, {rollover_amount} tokens rolled over from unclaimed previous cycles",
+        "profile_creation": "Earned {amount} {token} for creating first profile by block {from_block}"
+      }
     }
+  },
+  "core": {
+    "payment_cycle_length": 32768,
+    "start_block": 23592960,
+    "end_block": 24859648,
+    "subgraph_config_locations": {
+      "prepaid_card_payment": "s3://cardpay-staging-partitioned-graph-data/data/prepaid_card_payments/0.0.3/"
+    },
+    "duration": 43200
+  },
+  "run": {
+    "payment_cycle": 28089457,
+    "reward_program_id": "0x0885ce31D73b63b0Fcb1158bf37eCeaD8Ff0fC72",
+    "previous_output": "s3://cardpay-staging-reward-programs/rewardProgramID=0x0885ce31D73b63b0Fcb1158bf37eCeaD8Ff0fC72/paymentCycle=27494200/results.parquet",
+    "rewards_subgraph_location": "s3://cardpay-staging-partitioned-graph-data/data/rewards/0.0.2/"
+  },
+  "user_defined": {
+    "token": "0xB0427e9F03Eb448D030bE3EBC96F423857ceEb2f",
+    "reward_per_user": 5000000000000000000,
+    "accounts": [
+      "0x159ADe032073d930E85f95AbBAB9995110c43C71",
+      "0x797E1f626cB58f909F3c6a1e0783578BD4D0f32f",
+      "0x53dc3204f2f294f6A5649a36AC295f74A0dB92e0",
+      "0xA1e2421A68f0208B75ACb0014a69E89b1F7492ea"
+    ]
+  },
+  "metadata": {
+    "explanation_id": "flat_payment"
+  }
 }
