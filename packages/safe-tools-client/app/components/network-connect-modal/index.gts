@@ -8,7 +8,9 @@ import { concat, fn, hash } from '@ember/helper';
 import { on } from '@ember/modifier';
 import focusTrap from 'ember-focus-trap/modifiers/focus-trap';
 import not from 'ember-truth-helpers/helpers/not';
-import walletProviders, { WalletProvider } from '@cardstack/safe-tools-client/utils/wallet-providers';
+import walletProviders, { WalletProvider, WalletProviderId } from '@cardstack/safe-tools-client/utils/wallet-providers';
+import { ChainConnectionManager } from '@cardstack/safe-tools-client/utils/chain-connection-manager';
+import Web3 from 'web3';
 
 import cssVar from '@cardstack/boxel/helpers/css-var';
 import { svgJar } from '@cardstack/boxel/utils/svg-jar';
@@ -24,7 +26,6 @@ interface Signature {
   isOpen: boolean;
   isConnected: boolean;
   isConnecting: boolean;
-  currentWalletProviderId: WalletProvider['id'];
   changeWalletProvider: () => void;
   onClose: () => void;
   onConnect: (() => void) | undefined;
@@ -32,13 +33,12 @@ interface Signature {
 }
 
 class NetworkConnectModal extends Component<Signature> {
+  chainConnectionManager = new ChainConnectionManager('mainnet');
   walletProviders = walletProviders.map((w) =>
     w.id === 'metamask'
       ? {
           ...w,
-          //@ts-expect-error This and the below can be removed when this is imported: https://github.com/cardstack/cardstack/blob/c2ddb8ab7b8bc577c8211527f3c5193d5f6accde/packages/web-client/app/utils/web3-strategies/layer-1-connection-manager.ts#L1
           enabled: !!window.ethereum?.isMetaMask,
-          //@ts-expect-error
           explanation: window.ethereum?.isMetaMask
             ? ''
             : 'MetaMask extension not detected',
@@ -46,19 +46,22 @@ class NetworkConnectModal extends Component<Signature> {
       : { ...w, enabled: true, explanation: '' }
   );
 
-  walletProviderId: string | undefined;
+  walletProviderId: WalletProviderId | undefined;
 
   isConnected = false;
 
   @action connect() {
+    this.chainConnectionManager.on('connected', (accounts: string[]) => {
+      console.log('connected', accounts);
+    });
     if (!this.isConnected) {
       taskFor(this.connectWalletTask).perform();
     }
   }
 
   @task *connectWalletTask() {
-    // TODO
-    console.log('Would connect…');
+    let web3 = new Web3();
+    yield this.chainConnectionManager.connect(web3, this.walletProviderId!);
     yield timeout(500); // allow time for strategy to verify connected chain -- it might not accept the connection
     if (this.isConnected) {
       this.args.onConnect?.();

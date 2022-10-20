@@ -7,6 +7,7 @@ const EmberApp = require('ember-cli/lib/broccoli/ember-app');
 const { Webpack } = require('@embroider/webpack');
 const { compatBuild } = require('@embroider/compat');
 const svgoUniqueId = require('svgo-unique-id');
+const webpack = require('webpack');
 
 module.exports = function (defaults) {
   let app = new EmberApp(defaults, {
@@ -36,6 +37,9 @@ module.exports = function (defaults) {
   return compatBuild(app, Webpack, {
     packagerOptions: {
       webpackConfig: {
+        node: {
+          global: true,
+        },
         output: {
           assetModuleFilename: '[path][name]-[contenthash][ext]',
         },
@@ -71,6 +75,24 @@ module.exports = function (defaults) {
               ],
             },
           ],
+        },
+        plugins: [
+          new webpack.ProvidePlugin({
+            Buffer: ['buffer', 'Buffer'],
+          }),
+          new webpack.ProvidePlugin({
+            process: 'process/browser',
+          }),
+        ],
+        resolve: {
+          fallback: {
+            stream: require.resolve('stream-browserify'),
+            http: false,
+            https: false,
+            os: false,
+            crypto: false,
+            vm: false,
+          },
         },
       },
     },
