@@ -12,7 +12,7 @@ interface Signature {
     disabled?: boolean;
     placeholder?: string;
     tokens: SelectableToken[];
-    value: SelectableToken;
+    value?: SelectableToken;
     onChooseToken: (token: SelectableToken) => void;
   };
 }

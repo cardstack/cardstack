@@ -1,5 +1,4 @@
 .boxel-input-token-select {
-  --boxel-input-token-select-font-size: var(--boxel-font-size);
   --boxel-input-token-select-border-color: var(--boxel-form-control-border-color);
   --boxel-input-token-select-border-radius: var(--boxel-form-control-border-radius);
 
@@ -8,11 +7,19 @@
   border: 1px solid var(--boxel-input-token-select-border-color);
   display: flex;
   font-family: var(--boxel-font-family);
-  font-size: var(--boxel-input-selectable-token-amount-input-font-size);
+  font-size: var(--boxel-font-size);
+  height: var(--boxel-form-control-height);
   justify-content: space-between;
   position: relative;
   transition: border-color var(--boxel-transition);
   width: 100%;
+}
+
+.boxel-input-token-select .ember-power-select-placeholder {
+  color: rgb(var(--boxel-dark) / 50%);
+  font: var(--boxel-button-font, var(--boxel-font-sm));
+  font-size: var(--boxel-font-size);
+  padding: var(--boxel-sp-xxs) var(--boxel-sp-sm);
 }
 
 .boxel-input-token-select--disabled {

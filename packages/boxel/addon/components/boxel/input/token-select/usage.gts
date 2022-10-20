@@ -4,7 +4,6 @@ import { action } from '@ember/object';
 import BoxelInputTokenSelect from './index';
 import FreestyleUsage from 'ember-freestyle/components/freestyle/usage';
 import { fn } from '@ember/helper';
-import cssVar from '@cardstack/boxel/helpers/css-var';
 import { cssVariable, CSSVariableInfo } from 'ember-freestyle/decorators/css-variable';
 import { SelectableToken } from '../selectable-token';
 
@@ -36,9 +35,6 @@ export default class BoxelInputTokenSelectUsage extends Component {
           @value={{this.value}}
           @tokens={{this.tokens}}
           @onChooseToken={{this.onChooseToken}}
-          style={{cssVar
-            boxel-input-token-select-font-size=this.boxelInputTokenSelectFontSize.value
-          }}
         />
       </:example>
       <:api as |Args|>
@@ -67,16 +63,17 @@ export default class BoxelInputTokenSelectUsage extends Component {
           @onInput={{fn (mut this.value)}}
         />
       </:api>
-      <:cssVars as |Css|>
-        <Css.Basic
-          @name="boxel-input-token-select-font-size"
-          @type="dimension"
-          @description="font size for the input element"
-          @defaultValue={{this.boxelInputTokenSelectFontSize.defaults}}
-          @value={{this.boxelInputTokenSelectFontSize.value}}
-          @onInput={{this.boxelInputTokenSelectFontSize.update}}
-        />
-      </:cssVars>
     </FreestyleUsage>
+    <FreestyleUsage @name="Input::TokenSelect showing placeholder">
+      <:example>
+        <BoxelInputTokenSelect
+          @disabled={{this.disabled}}
+          @placeholder="Choose a gas token"
+          @tokens={{this.tokens}}
+          @onChooseToken={{this.onChooseToken}}
+        />
+      </:example>
+    </FreestyleUsage>
+
   </template>
 }
