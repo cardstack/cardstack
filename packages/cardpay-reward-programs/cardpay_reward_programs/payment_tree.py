@@ -3,6 +3,7 @@ from collections import defaultdict
 from typing import List, TypedDict, Union
 
 import pyarrow as pa
+import pydash as py_
 import sha3
 from eth_abi import decode_abi, encode_abi
 from eth_typing import ChecksumAddress
@@ -139,9 +140,8 @@ class PaymentTree:
                 columns["leaf"].append(leaf.hex())
                 columns["proof"].append(self.get_hex_proof(leaf))
                 columns["explanation_id"].append(explanation_id)
-                columns["explanation_data"].append(
-                    [(k, str(v)) for k, v in explanation_data_arr[i].items()]
-                )
+                o = explanation_data_arr[i] if i < len(explanation_data_arr) else {}
+                columns["explanation_data"].append([(k, str(v)) for k, v in o.items()])
         return pa.table(data=columns, schema=schema)
 
 
