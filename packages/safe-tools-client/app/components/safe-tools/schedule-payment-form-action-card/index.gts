@@ -12,6 +12,7 @@ import { tracked } from '@glimmer/tracking';
 import { fn } from '@ember/helper';
 import cssVar from '@cardstack/boxel/helpers/css-var';
 import { on } from '@ember/modifier';
+import { svgJar } from '@cardstack/boxel/utils/svg-jar';
 import './index.css';
 
 interface Signature {
@@ -154,7 +155,8 @@ export default class SafeToolsSchedulePaymentFormActionCard extends Component<Si
           </BoxelToggleButtonGroup>
           <div><!-- empty --></div>
           <div class="schedule-payment-form-action-card--fee-details">
-            Cardstack charges $0.25 USD and 0.1% of the transaction as a fee for executing your scheduled payments.
+            {{svgJar "info" width="17px" height="17px" class="schedule-payment-form-action-card--fee-info-icon"}}
+            <span>Cardstack charges $0.25 USD and 0.1% of the transaction as a fee for executing your scheduled payments.</span>
           </div>
         </BoxelField>
       </Section>
