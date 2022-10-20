@@ -1,0 +1,13 @@
+.deposit-modal__section {
+  padding: 40px;
+}
+
+.deposit-modal__section header {
+  font-size: var(--boxel-font-size-lg);
+}
+
+.deposit-modal__section p {
+  font-weight: 600;
+  margin: var(--boxel-sp) 0;
+  font-size: var(--boxel-font-size-sm);
+}
