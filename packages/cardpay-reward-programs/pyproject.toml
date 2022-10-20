@@ -23,6 +23,7 @@ dependencies = [
     "sentry-sdk>=1.5.12",
     "duckdb>=0.4.0",
     "protobuf>=3.20.3",
+    "pydash>=5.1.1",
 ]
 requires-python = ">=3.9"
 license = {text = "MIT"}
