@@ -57,7 +57,7 @@ export default class SafeToolsSchedulePaymentFormActionCard extends Component<Si
     { name: 'HI', icon: 'emoji' },
     { name: 'WORLD', icon: 'world' },
   ];
-  @tracked selectedGasToken: SelectableToken = this.tokens[0];
+  @tracked selectedGasToken: SelectableToken | undefined;
   @action onSelectGasToken(val: SelectableToken) {
     this.selectedGasToken = val;
   }
