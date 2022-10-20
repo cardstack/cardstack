@@ -53,10 +53,17 @@ def run_reward_program(
         parameters = json.load(stream)
     for subclass in Rule.__subclasses__():
         if subclass.__name__ == rule_name:
-            rule = subclass(parameters["core"], parameters["user_defined"])
+            rule = subclass(
+                parameters["core"],
+                parameters["user_defined"],
+                parameters["explanation"],
+                parameters["metadata"],
+            )
     payment_list = rule.get_payments(**parameters["run"]).to_dict("records")
-    tree = PaymentTree(payment_list, run_parameters=parameters)
-    table = tree.as_arrow()
+    tree = PaymentTree(payment_list, parameters)
+    explanation_data_arr = rule.get_explanation_data_arr(payment_list)
+    explanation_id = rule.explanation_id
+    table = tree.as_arrow(explanation_id, explanation_data_arr)
     write_parquet_file(AnyPath(output_location), table)
 
 
