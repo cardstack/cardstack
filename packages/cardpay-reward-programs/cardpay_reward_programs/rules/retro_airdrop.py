@@ -12,8 +12,16 @@ class RetroAirdrop(Rule):
     Test accounts are not included in the reward calculation, but are given a nominal reward of `test_reward`
     """
 
-    def __init__(self, core_parameters, user_defined_parameters):
-        super(RetroAirdrop, self).__init__(core_parameters, user_defined_parameters)
+    def __init__(
+        self,
+        core_parameters,
+        user_defined_parameters,
+        explanation_block={},
+        metadata={},
+    ):
+        super(RetroAirdrop, self).__init__(
+            core_parameters, user_defined_parameters, explanation_block, metadata
+        )
 
     def set_user_defined_parameters(
         self,
@@ -103,3 +111,9 @@ class RetroAirdrop(Rule):
             return pd.concat([airdrop_payments, test_payments])
         else:
             return airdrop_payments
+
+    def get_explanation_data_arr(self, payment_list):
+        explanation_data_arr = []
+        for _ in payment_list:
+            explanation_data_arr.append({})
+        return explanation_data_arr
