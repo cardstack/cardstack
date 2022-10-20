@@ -16,6 +16,7 @@ export default class BoxelInputTokenSelectUsage extends Component {
   ];
 
   @tracked disabled = false;
+  @tracked placeholder: string | undefined;
   @tracked value = this.tokens[0];
 
   cssClassName = 'boxel-input-token-select';
@@ -47,6 +48,13 @@ export default class BoxelInputTokenSelectUsage extends Component {
           @defaultValue={{false}}
           @onInput={{fn (mut this.disabled)}}
           @value={{this.disabled}}
+        />
+        <Args.String
+          @name="placeholder"
+          @description="Placeholder text when no token is selected"
+          @defaultValue={{false}}
+          @onInput={{fn (mut this.placeholder)}}
+          @value={{this.placeholder}}
         />
         <Args.Action
           @name="onChooseToken"

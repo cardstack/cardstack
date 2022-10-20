@@ -10,6 +10,7 @@ interface Signature {
   Element: HTMLDivElement;
   Args: {
     disabled?: boolean;
+    placeholder?: string;
     tokens: SelectableToken[];
     value: SelectableToken;
     onChooseToken: (token: SelectableToken) => void;
@@ -17,9 +18,12 @@ interface Signature {
 }
 
 export default class TokenSelect extends Component<Signature> { 
+  get placeholder() {
+    return this.args.placeholder || 'Choose a token';
+  }
   <template>
     <BoxelSelect
-      @placeholder="0.00"
+      @placeholder={{this.placeholder}}
       @options={{@tokens}}
       @selected={{@value}}
       @disabled={{@disabled}}
