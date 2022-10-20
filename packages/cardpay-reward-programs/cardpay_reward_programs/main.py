@@ -35,7 +35,7 @@ if SENTRY_DSN is not None:
     )
 
 
-def run_reward_program(
+def run_task(
     parameters_file: str = typer.Argument(
         default="./input/safe_ownership/parameters.json",
         help="The parameters file to use",
@@ -68,4 +68,4 @@ def run_reward_program(
 
 
 if __name__ == "__main__":
-    typer.run(run_reward_program)
+    typer.run(run_task)
