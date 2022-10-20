@@ -53,6 +53,8 @@ export default class DepositModal extends Component<Signature> {
                 <Accessories.Text>Copied!</Accessories.Text>
               {{/if}}
               <Accessories.IconButton
+                @width='20px'
+                @height='20px'
                 @icon="copy"
                 aria-label="Copy to Clipboard"
                 {{on "click"
