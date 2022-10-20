@@ -22,9 +22,9 @@
       {{/if}}
       <Boxel::Button
         @kind='primary'
-        {{on 'click' (set this this.safeButton.modalFlag true)}}
+        {{on 'click' this.onSafeButtonClick}}
       >
-        {{this.safeButton.label}}
+        {{this.safeButtonLabel}}
       </Boxel::Button>
     </cp.Item>
   </Boxel::ControlPanel>

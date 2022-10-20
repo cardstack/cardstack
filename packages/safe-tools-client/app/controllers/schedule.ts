@@ -1,6 +1,8 @@
 import Controller, { inject as controller } from '@ember/controller';
-import ApplicationController from '@cardstack/safe-tools-client/controllers/application';
 import { tracked } from '@glimmer/tracking';
+import { action } from '@ember/object';
+
+import ApplicationController from '@cardstack/safe-tools-client/controllers/application';
 
 import '../css/schedule.css';
 
@@ -27,18 +29,16 @@ export default class Schedule extends Controller {
     };
   }
 
-  get safeButton() {
-    if (!this.safe) {
-      return {
-        label: 'Create Safe',
-        modalFlag: 'isSetupSafeModalOpen',
-      };
-    }
+  get safeButtonLabel() {
+    return this.safe ? 'Add Funds' : 'Create Safe';
+  }
 
-    return {
-      label: 'Add Funds',
-      modalFlag: 'isDepositModalOpen',
-    };
+  @action onSafeButtonClick() {
+    if (this.safe) {
+      this.isDepositModalOpen = true;
+    } else {
+      this.isSetupSafeModalOpen = true;
+    }
   }
 }
 
