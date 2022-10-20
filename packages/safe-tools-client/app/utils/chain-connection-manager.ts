@@ -8,7 +8,7 @@ import CustomStorageWalletConnect, {
 import { Emitter, SimpleEmitter } from './events';
 import { WalletProviderId } from './wallet-providers';
 import { action } from '@ember/object';
-import { networkIds } from '@cardstack/cardpay-sdk';
+import { networkIds, HubConfig } from '@cardstack/cardpay-sdk';
 import Web3 from 'web3';
 import { TypedChannel } from './typed-channel';
 import { MockLocalStorage } from './browser-mocks';
@@ -449,16 +449,20 @@ class WalletConnectConnectionStrategy extends ConnectionStrategy {
         qrcodeModal: WalletConnectQRCodeModal,
       };
     }
-    // const hubConfigApi = new HubConfig(config.hubURL);
-    // const hubConfigResponse = await hubConfigApi.getConfig();
+
+    const hubConfigApi = new HubConfig(config.hubUrl);
+    const hubConfigResponse = await hubConfigApi.getConfig();
+
     const provider = new WalletConnectProvider({
       chainId,
       infuraId: config.infuraId,
       rpc: {
-        [networkIds[this.networkSymbol]]: 'FIXME',
+        [networkIds[this.networkSymbol]]:
+          hubConfigResponse.web3.ethereum.rpcNodeHttpsUrl, // FIXME don’t hardcode ethereum
       },
       rpcWss: {
-        [networkIds[this.networkSymbol]]: 'FIXME',
+        [networkIds[this.networkSymbol]]:
+          hubConfigResponse.web3.ethereum.rpcNodeWssUrl,
       },
       // based on https://github.com/WalletConnect/walletconnect-monorepo/blob/7aa9a7213e15489fa939e2e020c7102c63efd9c4/packages/providers/web3-provider/src/index.ts#L47-L52
       connector: new CustomStorageWalletConnect(connectorOptions, chainId),

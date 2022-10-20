@@ -12,5 +12,6 @@ declare const config: {
   locationType: string;
   rootURL: string;
   APP: Record<string, unknown>;
+  hubUrl: string;
   infuraId: string;
 };
