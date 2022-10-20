@@ -44,7 +44,6 @@ export default class ScheduledPaymentsExecutorService {
   prismaManager = inject('prisma-manager', { as: 'prismaManager' });
   scheduledPaymentFetcher = inject('scheduled-payment-fetcher', { as: 'scheduledPaymentFetcher' });
   cardpay = inject('cardpay');
-  web3 = inject('web3-http', { as: 'web3' });
   workerClient = inject('worker-client', { as: 'workerClient' });
 
   async getCurrentGasPrice(provider: JsonRpcProvider, gasTokenAddress: string) {

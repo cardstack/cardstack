@@ -1,11 +1,12 @@
+import { JsonRpcProvider } from '@cardstack/cardpay-sdk';
 import { inject } from '@cardstack/di';
 import { isBefore, subDays } from 'date-fns';
+import { supportedChains } from '../services/scheduled-payments/executor';
 
 import { nowUtc } from '../utils/dates';
 
 export default class ScheduledPaymentOnChainExecutionWaiter {
   prismaManager = inject('prisma-manager', { as: 'prismaManager' });
-  web3 = inject('web3-http', { as: 'web3' });
   cardpay = inject('cardpay');
   workerClient = inject('worker-client', { as: 'workerClient' });
 
@@ -20,7 +21,12 @@ export default class ScheduledPaymentOnChainExecutionWaiter {
       return; // Such attempt should not be waited for
     }
 
-    let scheduledPaymentModule = await this.cardpay.getSDK('ScheduledPaymentModule', this.web3.getInstance());
+    let scheduledPayment = await prisma.scheduledPayment.findFirstOrThrow({
+      where: { id: paymentAttempt.scheduledPaymentId },
+    });
+    let rpcUrl = supportedChains.find((chain) => chain.id === scheduledPayment.chainId)?.rpcUrl as string;
+    let provider = new JsonRpcProvider(rpcUrl, scheduledPayment.chainId);
+    let scheduledPaymentModule = await this.cardpay.getSDK('ScheduledPaymentModule', provider);
 
     try {
       await scheduledPaymentModule.executeScheduledPayment(paymentAttempt.transactionHash); // Will wait until mined. If already mined, will return immediately
