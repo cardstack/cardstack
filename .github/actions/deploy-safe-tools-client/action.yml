@@ -30,7 +30,7 @@ runs:
           exit 1;
         fi
 
-    - uses: volta-cli/action@v1
+    - uses: volta-cli/action@v4
 
     - run: yarn --prefer-offline --frozen-lockfile
       shell: bash
@@ -41,7 +41,7 @@ runs:
       run: yarn deploy:safe-tools-client ${{ inputs.environment }} --verbose
 
     - name: Configure AWS credentials
-      uses: aws-actions/configure-aws-credentials@v1
+      uses: aws-actions/configure-aws-credentials@v1-node16
       with:
         role-to-assume: ${{ env.AWS_ROLE_ARN }}
         aws-region: us-east-1
