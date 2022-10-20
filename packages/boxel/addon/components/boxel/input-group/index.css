@@ -1,8 +1,8 @@
 .boxel-input-group {
   --boxel-input-group-padding-x: var(--boxel-sp-sm);
   --boxel-input-group-padding-y: var(--boxel-sp-xxs);
-  --boxel-input-group-border-color: var(--boxel-purple-300);
-  --boxel-input-group-border-radius: var(--boxel-border-radius-sm);
+  --boxel-input-group-border-color: var(--boxel-form-control-border-color);
+  --boxel-input-group-border-radius: var(--boxel-form-control-border-radius);
   --boxel-input-group-interior-border-width: 0;
   --boxel-input-group-height:
     calc(

@@ -6,6 +6,7 @@ import { svgJar } from '@cardstack/boxel/utils/svg-jar';
 import { fn } from '@ember/helper';
 import { guidFor } from '@ember/object/internals';
 import cn from '@cardstack/boxel/helpers/cn';
+import { SelectableToken } from '../selectable-token';
 
 interface Signature {
   Element: HTMLDivElement;
@@ -24,11 +25,6 @@ interface Signature {
   Blocks: {
     'default': [],
   }
-}
-
-export interface SelectableToken {
-  name: string;
-  icon: string;
 }
 
 export default class SelectableTokenAmount extends Component<Signature> {

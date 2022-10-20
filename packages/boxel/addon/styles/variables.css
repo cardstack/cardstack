@@ -55,7 +55,6 @@
   --boxel-box-shadow-hover: 0 3px 10px rgb(0 0 0 / 15%);
   --boxel-outline-color: var(--boxel-blue);
   --boxel-outline: 2px solid var(--boxel-outline-color);
-  --boxel-form-control-height: 2.5rem;  /* 40px */
 
   /* Container sizes */
   --boxel-xxs-container: 15.625rem; /* 250px */
@@ -162,4 +161,9 @@
     #7D7C93
     #84829B - multiple uses
   */
+
+  /* Form control appearance */
+  --boxel-form-control-height: 2.5rem;  /* 40px */
+  --boxel-form-control-border-color: var(--boxel-purple-300);
+  --boxel-form-control-border-radius: var(--boxel-border-radius-sm);
 }
