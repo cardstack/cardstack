@@ -3,7 +3,6 @@ from collections import defaultdict
 from typing import List, TypedDict, Union
 
 import pyarrow as pa
-import pydash as py_
 import sha3
 from eth_abi import decode_abi, encode_abi
 from eth_typing import ChecksumAddress
