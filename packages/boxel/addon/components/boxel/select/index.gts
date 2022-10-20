@@ -44,6 +44,7 @@ const BoxelSelect: TemplateOnlyComponent<Signature> =
     @dropdownClass={{cn "boxel-select__dropdown" @dropdownClass}}
     @triggerComponent={{@triggerComponent}}
     @disabled={{@disabled}}
+    @matchTriggerWidth={{false}}
     @eventType="click"
     ...attributes
     as |item|
