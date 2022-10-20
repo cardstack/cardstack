@@ -1,7 +1,8 @@
 .boxel-modal {
-  --boxel-modal-offset-top: 0;
-  --boxel-modal-offset-left: 0;
-  --boxel-modal-offset-right: 0;
+  /* Unit is required to be used on calc */
+  --boxel-modal-offset-top: 0px;
+  --boxel-modal-offset-left: 0px;
+  --boxel-modal-offset-right: 0px;
 
   position: fixed;
   width: 100%;
@@ -41,7 +42,7 @@
 
 .boxel-modal--large {
   --boxel-modal-offset-top: var(--boxel-sp-lg);
-  --boxel-modal-max-width: 65rem;   /* 1040px */
+  --boxel-modal-max-width: 65rem; /* 1040px */
 }
 
 .boxel-modal__inner {
