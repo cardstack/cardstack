@@ -32,8 +32,8 @@
 
 .boxel-radio-fieldset__container--compact {
   --boxel-radio-gap: var(--boxel-sp-xxs);
-  --boxel-radio-option-padding: var(--boxel-sp-xxxs);
-  --boxel-radio-option-gap: var(--boxel-sp-xxxs);
+  --boxel-radio-input-option-padding: var(--boxel-sp-xxxs);
+  --boxel-radio-input-option-gap: var(--boxel-sp-xxxs);
 }
 
 .boxel-radio-fieldset__container--horizontal > * {

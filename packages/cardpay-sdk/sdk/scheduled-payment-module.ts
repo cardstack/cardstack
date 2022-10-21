@@ -52,6 +52,13 @@ export interface CreateSafeWithModuleAndGuardResult {
   metaGuardAddress: string;
 }
 
+export interface CreateSafeWithModuleAndGuardTx {
+  multiSendCallOnlyTx: Transaction;
+  expectedSafeAddress: string;
+  expectedSPModuleAddress: string;
+  expectedMetaGuardAddress: string;
+}
+
 export interface Fee {
   fixedUSD: number;
   percentage: number;
@@ -164,26 +171,7 @@ export default class ScheduledPaymentModule {
     };
   }
 
-  async createSafeWithModuleAndGuard(
-    txnHash?: string,
-    txnOptions?: TransactionOptions,
-    contractOptions?: ContractOptions
-  ): Promise<CreateSafeWithModuleAndGuardResult> {
-    txnHash = txnHash ? txnHash : '';
-    if (isTransactionHash(txnHash)) {
-      let safeAddress = await this.getSafeAddressFromTxn(txnHash);
-      let { scheduledPaymentModuleAddress, metaGuardAddress } = await this.getModuleAndGuardAddressFromTxn(txnHash);
-      return {
-        safeAddress,
-        scheduledPaymentModuleAddress,
-        metaGuardAddress,
-      };
-    }
-
-    let { onTxnHash } = txnOptions ?? {};
-    let signer = this.signer ? this.signer : this.ethersProvider.getSigner();
-    let from = contractOptions?.from ?? (await signer.getAddress());
-
+  async createSafeWithModuleAndGuardTx(from: string): Promise<CreateSafeWithModuleAndGuardTx> {
     let { expectedSafeAddress, create2SafeTx } = await generateCreate2SafeTx(
       this.ethersProvider,
       [from],
@@ -247,6 +235,46 @@ export default class ScheduledPaymentModule {
       operation: Operation.CALL,
     };
     let multiSendCallOnlyTx = await encodeMultiSendCallOnly(this.ethersProvider, [create2SafeTx, safeTx]);
+    return {
+      multiSendCallOnlyTx,
+      expectedSafeAddress,
+      expectedSPModuleAddress: enableModuleTxs.expectedModuleAddress,
+      expectedMetaGuardAddress: setGuardTxs.expectedModuleAddress,
+    };
+  }
+
+  async createSafeWithModuleAndGuardEstimation(contractOptions?: ContractOptions): Promise<BigNumber> {
+    let signer = this.signer ? this.signer : this.ethersProvider.getSigner();
+    let from = contractOptions?.from ?? (await signer.getAddress());
+
+    let { multiSendCallOnlyTx } = await this.createSafeWithModuleAndGuardTx(from);
+    return await this.ethersProvider.estimateGas({
+      to: multiSendCallOnlyTx.to,
+      data: multiSendCallOnlyTx.data,
+    });
+  }
+
+  async createSafeWithModuleAndGuard(
+    txnHash?: string,
+    txnOptions?: TransactionOptions,
+    contractOptions?: ContractOptions
+  ): Promise<CreateSafeWithModuleAndGuardResult> {
+    if (txnHash && isTransactionHash(txnHash)) {
+      let safeAddress = await this.getSafeAddressFromTxn(txnHash);
+      let { scheduledPaymentModuleAddress, metaGuardAddress } = await this.getModuleAndGuardAddressFromTxn(txnHash);
+      return {
+        safeAddress,
+        scheduledPaymentModuleAddress,
+        metaGuardAddress,
+      };
+    }
+
+    let { onTxnHash } = txnOptions ?? {};
+    let signer = this.signer ? this.signer : this.ethersProvider.getSigner();
+    let from = contractOptions?.from ?? (await signer.getAddress());
+
+    let { multiSendCallOnlyTx, expectedSafeAddress, expectedSPModuleAddress, expectedMetaGuardAddress } =
+      await this.createSafeWithModuleAndGuardTx(from);
     let response = await signer.sendTransaction({
       to: multiSendCallOnlyTx.to,
       data: multiSendCallOnlyTx.data,
@@ -258,8 +286,8 @@ export default class ScheduledPaymentModule {
 
     return {
       safeAddress: expectedSafeAddress,
-      scheduledPaymentModuleAddress: enableModuleTxs.expectedModuleAddress,
-      metaGuardAddress: setGuardTxs.expectedModuleAddress,
+      scheduledPaymentModuleAddress: expectedSPModuleAddress,
+      metaGuardAddress: expectedMetaGuardAddress,
     };
   }
 
@@ -738,6 +766,7 @@ export default class ScheduledPaymentModule {
           'sender-safe-address': safeAddress,
           'module-address': moduleAddress,
           'token-address': tokenAddress,
+          'gas-token-address': gasTokenAddress,
           amount,
           'payee-address': payeeAddress,
           'execution-gas-estimation': executionGas,

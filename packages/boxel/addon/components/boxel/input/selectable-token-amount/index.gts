@@ -1,13 +1,15 @@
 import Component from '@glimmer/component';
 import '@cardstack/boxel/styles/global.css';
 import './index.css';
-import BoxelInput from '../index';
-import BoxelSelect from '../../select';
+import BoxelInputGroup from '../../input-group';
 import { svgJar } from '@cardstack/boxel/utils/svg-jar';
 import { fn } from '@ember/helper';
+import { guidFor } from '@ember/object/internals';
+import cn from '@cardstack/boxel/helpers/cn';
+import { SelectableToken } from '../selectable-token';
 
 interface Signature {
-  Element: HTMLElement;
+  Element: HTMLDivElement;
   Args: {
     id: string;
     value: string;
@@ -25,49 +27,49 @@ interface Signature {
   }
 }
 
-export interface SelectableToken {
-  name: string;
-  icon: string;
-}
-
 export default class SelectableTokenAmount extends Component<Signature> {
+  get id() {
+    return this.args.id || guidFor(this);
+  }
+  
   <template>
-    <div class="boxel-input-selectable-token-amount" ...attributes>
-      <BoxelInput
-        class="boxel-input-selectable-token-amount__input"
-        @id={{@id}}
-        @value={{@value}}
-        @required={{unless @disabled true}}
-        @onInput={{@onInput}}
-        @onBlur={{fn @onInput @value}}
-        @invalid={{unless @disabled @invalid}}
-        @errorMessage={{@errorMessage}}
-        @helperText={{@helperText}}
-        @disabled={{@disabled}}
-        placeholder="0.00"
-        autocomplete="off"
-        inputmode="decimal"
-      />
-      <BoxelSelect
-        class="boxel-input-selectable-token-amount__select"
-        @options={{@tokens}}
-        @selected={{@token}}
-        @disabled={{@disabled}}
-        @onChange={{@onChooseToken}}
-        @dropdownClass="boxel-input-selectable-token-amount__dropdown"
-        @verticalPosition="below" as |item itemCssClass|
-      >
-        <div class="{{itemCssClass}} boxel-input-selectable-token-amount__dropdown-item">
-          {{svgJar
-            item.icon
-            class="boxel-input-selectable-token-amount__icon"
-            role="presentation"
-          }}
+    <BoxelInputGroup
+      @id={{this.id}}
+      @placeholder="0.00"
+      @value={{@value}}
+      @invalid={{unless @disabled @invalid}}
+      @errorMessage={{@errorMessage}}
+      @helperText={{@helperText}}
+      @disabled={{@disabled}}
+      @onInput={{@onInput}}
+      @onBlur={{fn @onInput @value}}
+      @autocomplete="off"
+      @inputmode="decimal"
+      class="boxel-input-selectable-token-amount"
+      ...attributes
+    >
+      <:after as |Accessories|>
+        <Accessories.Select
+          class="boxel-input-selectable-token-amount__select"
+          @options={{@tokens}}
+          @selected={{@token}}
+          @disabled={{@disabled}}
+          @onChange={{@onChooseToken}}
+          @dropdownClass="boxel-input-selectable-token-amount__dropdown"
+          @verticalPosition="below" as |item itemCssClass|
+        >
+          <div class={{cn itemCssClass "boxel-input-selectable-token-amount__dropdown-item"}}>
+            {{svgJar
+              item.icon
+              class="boxel-input-selectable-token-amount__icon"
+              role="presentation"
+            }}
 
-          {{item.name}}
-        </div>
-      </BoxelSelect>
-    </div>
+            {{item.name}}
+          </div>
+        </Accessories.Select>
+      </:after>
+    </BoxelInputGroup>
   </template>
 }
 

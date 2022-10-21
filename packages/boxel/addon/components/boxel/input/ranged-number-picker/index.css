@@ -3,7 +3,7 @@
 }
 
 .boxel-ranged-number-picker .ember-power-select-status-icon {
-  background: url('/@cardstack/boxel/images/icons/caret-down.svg') no-repeat;
+  background: url("/@cardstack/boxel/images/icons/caret-down.svg") no-repeat;
   width: 11px;
   height: 9px;
   display: inline-block;

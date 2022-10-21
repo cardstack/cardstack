@@ -235,6 +235,12 @@ jobs:
               - '.github/actions/deploy-ssr-web/**'
               - 'yarn.lock'
               - 'waypoint.hcl'
+            safe-tools-client:
+              - 'packages/safe-tools-client/**'
+              - 'packages/boxel/**'
+              - '.github/workflows/push-main.yml'
+              - '.github/actions/deploy-safe-tools-client/**'
+              - 'yarn.lock'
 
   build-hub-staging:
     name: Build hub
@@ -450,3 +456,27 @@ jobs:
         env:
           WAYPOINT_SERVER_TOKEN: ${{ secrets.STAGING_WAYPOINT_SERVER_TOKEN }}
           WAYPOINT_SERVER_ADDR: ${{ secrets.STAGING_WAYPOINT_SERVER_ADDR }}
+
+  deploy-safe-tools-client:
+    needs: change_check
+    if: ${{ needs.change_check.outputs.safe-tools-client == 'true' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up node_modules cache
+        uses: actions/cache@v3
+        with:
+          path: |
+            node_modules
+            packages/*/node_modules
+            packages/firebase-functions/*/functions/node_modules
+          key: ${{ runner.os }}-node-modules-${{ hashFiles('yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-node-modules-
+
+      - name: Deploy safe-tools-client
+        uses: ./.github/actions/deploy-safe-tools-client
+        with:
+          environment: staging
+          discord_webhook: ${{ secrets.DISCORD_WEBHOOK }}

@@ -1165,10 +1165,10 @@ CREATE TABLE public.scheduled_payments (
     sender_safe_address text NOT NULL,
     module_address text NOT NULL,
     token_address text NOT NULL,
-    amount bigint NOT NULL,
+    amount text NOT NULL,
     payee_address text NOT NULL,
-    execution_gas_estimation bigint NOT NULL,
-    max_gas_price bigint NOT NULL,
+    execution_gas_estimation integer NOT NULL,
+    max_gas_price text NOT NULL,
     fee_fixed_usd numeric NOT NULL,
     fee_percentage numeric NOT NULL,
     salt text NOT NULL,
@@ -1179,15 +1179,16 @@ CREATE TABLE public.scheduled_payments (
     sp_hash text NOT NULL,
     chain_id integer NOT NULL,
     creation_transaction_hash text,
-    creation_block_number bigint,
+    creation_block_number integer,
     cancelation_transaction_hash text,
-    cancelation_block_number bigint,
+    cancelation_block_number integer,
     created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
     updated_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
     canceled_at timestamp without time zone,
     user_address text NOT NULL,
     creation_transaction_error text,
-    cancelation_transaction_error text
+    cancelation_transaction_error text,
+    gas_token_address text NOT NULL
 );
 
 

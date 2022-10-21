@@ -2,6 +2,7 @@ import Component from '@glimmer/component';
 import { action } from '@ember/object';
 import { tracked } from '@glimmer/tracking';
 import { assert } from '@ember/debug';
+import { cssVariable, CSSVariableInfo } from 'ember-freestyle';
 
 export default class SearchboxUsage extends Component {
   @tracked value = '';
@@ -10,7 +11,8 @@ export default class SearchboxUsage extends Component {
   @tracked placeholder = 'Search';
   @tracked hideIcon = false;
 
-  @tracked iconSize = '0.875rem';
+  @cssVariable({ cssClassName: 'boxel-searchbox' })
+  declare boxelSearchboxIconSize: CSSVariableInfo;
 
   @action onInput(e: InputEvent): void {
     let target = e.target;

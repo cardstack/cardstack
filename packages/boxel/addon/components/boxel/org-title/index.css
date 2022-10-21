@@ -1,23 +1,31 @@
 .boxel-org-title {
+  --boxel-org-title-color: inherit;
+  --boxel-org-title-letter-spacing: var(--boxel-lsp-xxl);
+  --boxel-org-title-text-transform: uppercase;
+  --boxel-org-title-title-font: 900 1.125rem/1.333 var(--boxel-font-family);
+  --boxel-org-title-subtitle-font: 900 0.8125rem/1.333 var(--boxel-font-family);
+  --boxel-org-title-logo-position: center;
+  --boxel-org-title-logo-size: 3.125rem 3.125rem;
+
   display: grid;
   align-items: center;
   gap: 0 var(--boxel-sp-xs);
   min-height: 3.125rem;
-  color: var(--boxel-org-title-color, inherit);
-  letter-spacing: var(--boxel-org-title-letter-spacing, var(--boxel-lsp-xxl));
-  text-transform: var(--boxel-org-title-text-transform, uppercase);
+  color: var(--boxel-org-title-color);
+  letter-spacing: var(--boxel-org-title-letter-spacing);
+  text-transform: var(--boxel-org-title-text-transform);
 }
 
 .boxel-org-title__title {
   grid-area: title;
   margin: 0;
-  font: var(--boxel-org-title-title-font, 900 1.125rem/1.333 var(--boxel-font-family));
+  font: var(--boxel-org-title-title-font);
 }
 
 .boxel-org-title__subtitle {
   grid-area: subtitle;
   margin: 0;
-  font: var(--boxel-org-title-subtitle-font, 900 0.8125rem/1.333 var(--boxel-font-family));
+  font: var(--boxel-org-title-subtitle-font);
   margin-top: calc(-1 * var(--boxel-sp-xs));
 }
 
@@ -43,9 +51,9 @@
   grid-area: logo;
   width: 3.125rem;
   height: 3.125rem;
-  background-position: var(--boxel-org-title-logo-position, center);
+  background-position: var(--boxel-org-title-logo-position);
   background-repeat: no-repeat;
-  background-size: var(--boxel-org-title-logo-size, 3.125rem 3.125rem);
+  background-size: var(--boxel-org-title-logo-size);
 }
 
 .boxel-org-title__logo svg {

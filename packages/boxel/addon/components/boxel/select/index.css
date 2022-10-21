@@ -1,10 +1,8 @@
 .boxel-select__dropdown {
   --boxel-select-current-color: var(--boxel-light-100);
   --boxel-select-selected-color: var(--boxel-highlight);
-
   --boxel-select-below-transitioning-in-animation: drop-fade-below var(--boxel-transition);
   --boxel-select-below-transitioning-out-animation: var(--boxel-select-below-transitioning-in-animation) reverse;
-
   --boxel-select-above-transitioning-in-animation: drop-fade-above var(--boxel-transition);
   --boxel-select-above-transitioning-out-animation: var(--boxel-select-above-transitioning-in-animation) reverse;
 
@@ -18,16 +16,16 @@
   overflow: auto;
 }
 
-.boxel-select__dropdown .ember-power-select-option[aria-selected='true'] {
+.boxel-select__dropdown .ember-power-select-option[aria-selected="true"] {
   background-color: var(--boxel-select-selected-color);
 }
 
-.boxel-select__dropdown .ember-power-select-option[aria-current='true'] {
+.boxel-select__dropdown .ember-power-select-option[aria-current="true"] {
   background-color: var(--boxel-select-current-color);
 }
 
-.boxel-select__dropdown
-  .ember-power-select-option:hover:not([aria-disabled='true']):not(.ember-power-select-option--no-matches-message) {
+/* stylelint-disable-next-line max-line-length */
+.boxel-select__dropdown .ember-power-select-option:hover:not([aria-disabled="true"]):not(.ember-power-select-option--no-matches-message) {
   cursor: pointer;
 }
 

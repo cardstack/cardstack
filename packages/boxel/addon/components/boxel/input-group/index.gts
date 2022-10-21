@@ -25,6 +25,8 @@ export interface Signature {
     required?: boolean;
     readonly?: boolean;
     invalid?: boolean;
+    autocomplete?: string;
+    inputmode?: string;
     placeholder?: string;
     value?: string;
     onInput?: (val: string) => void;
@@ -83,6 +85,8 @@ export default class InputGroup extends Component<Signature> {
             @value={{@value}}
             @onInput={{@onInput}}
             @onBlur={{@onBlur}}
+            autocomplete={{@autocomplete}}
+            inputmode={{@inputmode}}
             aria-describedby={{if @helperText (concat "helper-text-" this.elementId) false}}
             aria-invalid={{if @invalid "true"}}
             aria-errormessage={{if shouldShowErrorMessage (concat "error-message-" this.elementId) false}}

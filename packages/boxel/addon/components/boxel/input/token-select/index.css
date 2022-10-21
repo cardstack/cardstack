@@ -1,0 +1,50 @@
+.boxel-input-token-select {
+  --boxel-input-token-select-border-color: var(--boxel-form-control-border-color);
+  --boxel-input-token-select-border-radius: var(--boxel-form-control-border-radius);
+
+  align-items: center;
+  border-radius: var(--boxel-input-token-select-border-radius);
+  border: 1px solid var(--boxel-input-token-select-border-color);
+  display: flex;
+  font-family: var(--boxel-font-family);
+  font-size: var(--boxel-font-size);
+  height: var(--boxel-form-control-height);
+  justify-content: space-between;
+  position: relative;
+  transition: border-color var(--boxel-transition);
+  width: 100%;
+}
+
+.boxel-input-token-select .ember-power-select-placeholder {
+  font: var(--boxel-button-font, var(--boxel-font-sm));
+  font-size: var(--boxel-font-size);
+  color: var(--boxel-form-control-placeholder-color);
+  padding: var(--boxel-sp-xxs) var(--boxel-sp-sm);
+}
+
+.boxel-input-token-select--disabled {
+  opacity: 0.5;
+}
+
+.boxel-input-token-select .ember-power-select-status-icon {
+  background: url("/@cardstack/boxel/images/icons/caret-down.svg") no-repeat;
+  width: 11px;
+  height: 9px;
+  display: inline-block;
+  margin-right: var(--boxel-sp);
+}
+
+.boxel-input-token-select__icon {
+  margin-right: var(--boxel-sp-xxxs);
+  vertical-align: bottom;
+  width: var(--boxel-icon-sm);
+  height: var(--boxel-icon-sm);
+}
+
+.boxel-input-token-select__select[aria-disabled="true"] {
+  opacity: 0.5;
+}
+
+.boxel-input-token-select__dropdown-item {
+  white-space: nowrap;
+}

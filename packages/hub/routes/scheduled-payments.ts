@@ -72,24 +72,17 @@ export default class ScheduledPaymentsRoute {
       }
     };
 
-    let parseBigInt = (value: string) => {
-      if (value) {
-        return BigInt(value);
-      } else {
-        return null;
-      }
-    };
-
     let params = {
       id: shortUUID.uuid(),
       userAddress: ctx.state.userAddress,
       senderSafeAddress: attrs['sender-safe-address'],
       moduleAddress: attrs['module-address'],
       tokenAddress: attrs['token-address'],
-      amount: parseBigInt(attrs.amount),
+      gasTokenAddress: attrs['gas-token-address'],
+      amount: attrs.amount,
       payeeAddress: attrs['payee-address'],
-      executionGasEstimation: parseBigInt(attrs['execution-gas-estimation']),
-      maxGasPrice: parseBigInt(attrs['max-gas-price']),
+      executionGasEstimation: attrs['execution-gas-estimation'],
+      maxGasPrice: attrs['max-gas-price'],
       feeFixedUsd: attrs['fee-fixed-usd'],
       feePercentage: attrs['fee-percentage'],
       salt: attrs['salt'],

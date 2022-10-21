@@ -5,7 +5,7 @@ import { convertDateToUTC } from '../../utils/dates';
 
 export default class ScheduledPaymentsFetcherService {
   prismaManager = inject('prisma-manager', { as: 'prismaManager' });
-  validForDays = 10; // TODO: Keep this in sync with the value in the config contract
+  validForDays = 3;
 
   // This query fetches scheduled payments that are due to be executed now.
   // Payment scheduler will periodically try to fetch these payments at regular intervals and execute them if they are due.
