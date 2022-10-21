@@ -51,7 +51,7 @@ runs:
       if: ${{ always() }}
       uses: ./.github/actions/discord-notification-deploy
       with:
-        app: web-client
+        app: safe-tools-client
         status: ${{ github.action_status }}
         environment: ${{ inputs.environment }}
         webhook: ${{ inputs.discord_webhook }}
