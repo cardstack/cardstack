@@ -171,13 +171,13 @@ jobs:
           PERCY_TOKEN: ${{ secrets.PERCY_TOKEN_SSR_WEB }}
         run: yarn test:ssr-web:percy
       - name: Publish web-client test results
-        uses: EnricoMi/publish-unit-test-result-action@v1.28
+        uses: EnricoMi/publish-unit-test-result-action@v2
         if: always()
         with:
           check_name: "web-client test results"
           files: ci-xml-test-results/web-client.xml
       - name: Publish ssr-web test results
-        uses: EnricoMi/publish-unit-test-result-action@v1.28
+        uses: EnricoMi/publish-unit-test-result-action@v2
         if: always()
         with:
           check_name: "ssr-web test results"
