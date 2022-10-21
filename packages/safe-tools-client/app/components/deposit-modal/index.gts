@@ -8,20 +8,33 @@ import { svgJar } from '@cardstack/boxel/utils/svg-jar';
 import copyToClipboard from '@cardstack/boxel/helpers/copy-to-clipboard';
 import cssVar from '@cardstack/boxel/helpers/css-var';
 import BoxelModal from '@cardstack/boxel/components/boxel/modal';
-import BoxelActionContainer from '@cardstack/boxel/components/boxel/action-container'
-import BoxelInputGroup from '@cardstack/boxel/components/boxel/input-group'
+import BoxelActionContainer from '@cardstack/boxel/components/boxel/action-container';
+import BoxelInputGroup from '@cardstack/boxel/components/boxel/input-group';
 
 import './index.css';
 
+interface MonthlyTokensToCover {
+  tokens: Array<{ 
+    symbol: string; 
+    amountToCover: number; 
+  }>;
+  hasEnoughBalance: boolean;
+}
+
 interface Signature {
   Element: HTMLElement;
-  Args: { 
-    isOpen: boolean 
+  Args: {
+    isOpen: boolean;
     onClose: () => void;
     safeAddress: string;
     networkName: string;
+    tokensToCover?: {
+      nextMonth: MonthlyTokensToCover;
+      nextSixMonths: MonthlyTokensToCover;
+    };
   };
 }
+
 
 export default class DepositModal extends Component<Signature> {
   @tracked isShowingCopiedConfirmation = false;
@@ -67,17 +80,34 @@ export default class DepositModal extends Component<Signature> {
               />
             </:after>
           </BoxelInputGroup>
-          <div class="deposit-modal__section-funds-info">
-            {{svgJar "info" class="deposit-modal__section-funds-info-icon"}}
-            <div class="deposit-modal__section-funds-info-header">
-              How much should you transfer?
-              <p>
-                It is your choice how far in advance you fund your safe. As a convenience,
-                we have calculated this safe's funding needs for your currently scheduled
-                transactions:
-              </p>
+          {{#if @tokensToCover}}
+            <div class="deposit-modal__section-funds-info">
+              {{svgJar "info" class="deposit-modal__section-funds-info-icon"}}
+              <div class="deposit-modal__section-funds-info-header">
+                How much should you transfer?
+                <p>
+                  It is your choice how far in advance you fund your safe. As a convenience, 
+                  we have calculated this safe's funding needs for your currently scheduled
+                  transactions:
+                </p>
+                {{!-- TODO: Add reusable component to render balances info --}}
+                <p>
+                  ...to cover the next 4 weeks:
+                  {{#if @tokensToCover.nextMonth.hasEnoughBalance}}
+                    <span>Covered by current balances</span>
+                  {{else}}
+                  {{!-- TODO: Add tokens section --}}
+                  {{/if}}
+                </p>
+                <p>
+                  ...to cover the next 6 months:
+                  {{#if @tokensToCover.nextSixMonths.hasEnoughBalance}}
+                    <span>Covered by current balances</span>
+                  {{/if}}
+                </p>
+              </div>
             </div>
-          </div>
+           {{/if}} 
         </Section>
         <ActionChin @state="default">
           <:default as |a|>
@@ -90,7 +120,6 @@ export default class DepositModal extends Component<Signature> {
     </BoxelModal>
   </template>
 }
-
 
 declare module '@glint/environment-ember-loose/registry' {
   export default interface Registry {
