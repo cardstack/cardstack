@@ -4,6 +4,7 @@ import { tracked } from '@glimmer/tracking';
 import { action } from '@ember/object';
 import { later } from '@ember/runloop';
 
+import { svgJar } from '@cardstack/boxel/utils/svg-jar';
 import copyToClipboard from '@cardstack/boxel/helpers/copy-to-clipboard';
 import cssVar from '@cardstack/boxel/helpers/css-var';
 import BoxelModal from '@cardstack/boxel/components/boxel/modal';
@@ -66,6 +67,17 @@ export default class DepositModal extends Component<Signature> {
               />
             </:after>
           </BoxelInputGroup>
+          <div class="deposit-modal__section-funds-info">
+            {{svgJar "info" class="deposit-modal__section-funds-info-icon"}}
+            <div class="deposit-modal__section-funds-info-header">
+              How much should you transfer?
+              <p>
+                It is your choice how far in advance you fund your safe. As a convenience,
+                we have calculated this safe's funding needs for your currently scheduled
+                transactions:
+              </p>
+            </div>
+          </div>
         </Section>
         <ActionChin @state="default">
           <:default as |a|>
@@ -77,4 +89,11 @@ export default class DepositModal extends Component<Signature> {
       </BoxelActionContainer>
     </BoxelModal>
   </template>
+}
+
+
+declare module '@glint/environment-ember-loose/registry' {
+  export default interface Registry {
+    'DepositModal': typeof DepositModal;
+  }
 }
