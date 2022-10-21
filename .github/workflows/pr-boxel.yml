@@ -128,7 +128,7 @@ jobs:
           echo "COMMENT_TEXT=### :sparkles: Preview Boxel changes [here](${{ env.S3_PREVIEW_WEBSITE_URL }}/${{ github.head_ref }})" >> $GITHUB_ENV
       # finding a comment in given PR that contains the identifier string
       - name: Find comment that contains identifier
-        uses: peter-evans/find-comment@v1
+        uses: peter-evans/find-comment@v2
         id: fc
         with:
           body-includes: ${{ env.COMMENT_TEXT }}
