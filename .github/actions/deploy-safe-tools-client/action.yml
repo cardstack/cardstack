@@ -18,10 +18,12 @@ runs:
         INPUT_ENVIRONMENT: ${{ inputs.environment }}
       run: |
         if [ "$INPUT_ENVIRONMENT" = "production" ]; then
+          echo "AWS_REGION=us-east-1" >> $GITHUB_ENV
           echo "AWS_ROLE_ARN=arn:aws:iam::120317779495:role/safe-tools-client" >> $GITHUB_ENV
           echo "AWS_S3_BUCKET=cardstack-safe-tools-client-production" >> $GITHUB_ENV
           echo "AWS_CLOUDFRONT_DISTRIBUTION=E2DKGK0IA0DNFT" >> $GITHUB_ENV
         elif [ "$INPUT_ENVIRONMENT" = "staging" ]; then
+          echo "AWS_REGION=us-east-1" >> $GITHUB_ENV
           echo "AWS_ROLE_ARN=arn:aws:iam::680542703984:role/safe-tools-client" >> $GITHUB_ENV
           echo "AWS_S3_BUCKET=cardstack-safe-tools-client-staging" >> $GITHUB_ENV
           echo "AWS_CLOUDFRONT_DISTRIBUTION=E8OCN7TYF3CBC" >> $GITHUB_ENV
@@ -30,21 +32,20 @@ runs:
           exit 1;
         fi
 
-    - uses: volta-cli/action@v1
+    - uses: volta-cli/action@v4
 
     - run: yarn --prefer-offline --frozen-lockfile
       shell: bash
 
-    - name: Deploy
-      shell: bash
-      working-directory: packages/safe-tools-client
-      run: yarn deploy:safe-tools-client ${{ inputs.environment }} --verbose
-
     - name: Configure AWS credentials
-      uses: aws-actions/configure-aws-credentials@v1
+      uses: aws-actions/configure-aws-credentials@v1-node16
       with:
         role-to-assume: ${{ env.AWS_ROLE_ARN }}
         aws-region: us-east-1
+
+    - name: Deploy
+      shell: bash
+      run: yarn deploy:safe-tools-client ${{ inputs.environment }} --verbose
 
     - name: Send notification to Discord
       if: ${{ always() }}

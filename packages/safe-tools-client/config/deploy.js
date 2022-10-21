@@ -2,9 +2,12 @@
 
 module.exports = function (deployTarget) {
   let ENV = {
+    build: {},
     s3: {
       allowOverwrite: true,
       bucket: process.env.AWS_S3_BUCKET,
+      region: process.env.AWS_REGION,
+      filePattern: '**/*',
     },
     cloudfront: {
       objectPaths: ['/*'],
