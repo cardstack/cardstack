@@ -193,6 +193,7 @@ jobs:
       boxel: ${{ steps.filter.outputs.boxel }}
       cardie: ${{ steps.filter.outputs.cardie }}
       ssr_web: ${{ steps.filter.outputs.ssr_web }}
+      safe-tools-client: ${{ steps.filter.outputs.safe-tools-client }}
     steps:
       - uses: actions/checkout@v3
       - uses: dorny/paths-filter@v2
