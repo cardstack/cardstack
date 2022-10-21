@@ -40,6 +40,43 @@ export default class Schedule extends Controller {
       this.isSetupSafeModalOpen = true;
     }
   }
+
+  // TODO: add selected network
+  get network() {
+    return 'Ethereum';
+  }
+
+  get scheduledPaymentsTokensToCover() {
+    // TODO: Add helper functions to map amounts, use fromWei function
+    return {
+      nextMonth: {
+        tokens: [
+          {
+            symbol: 'ETH',
+            amountToCover: 0,
+          },
+          {
+            symbol: 'USDC',
+            amountToCover: 0,
+          },
+          {
+            symbol: 'USDT',
+            amountToCover: 0,
+          },
+        ],
+        hasEnoughBalance: true,
+      },
+      nextSixMonths: {
+        tokens: [
+          {
+            symbol: 'DAI',
+            amountToCover: 0,
+          },
+        ],
+        hasEnoughBalance: true,
+      },
+    };
+  }
 }
 
 declare module '@ember/controller' {
