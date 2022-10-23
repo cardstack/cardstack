@@ -120,9 +120,11 @@ class Rule(ABC):
                 # payments[0] and payments[1] will have the same general data, just differing amounts
                 # that need summing
                 payments = list(payments)
+                rollover_amount = sum(p["amount"] for p in payments)
                 new_payment = payments[0].copy()
                 new_payment["amount"] = sum([p["amount"] for p in payments])
                 new_payment["explanationData"] = self.get_explanation_data(new_payment)
+                new_payment["explanationData"]["rollover_amount"] = rollover_amount
                 new_payment_list.append(new_payment)
             return pd.DataFrame(new_payment_list)
 
