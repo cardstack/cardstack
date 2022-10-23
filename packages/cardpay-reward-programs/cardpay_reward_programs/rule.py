@@ -122,6 +122,7 @@ class Rule(ABC):
                 payments = list(payments)
                 new_payment = payments[0].copy()
                 new_payment["amount"] = sum([p["amount"] for p in payments])
+                new_payment["explanationData"] = self.get_explanation_data(new_payment)
                 new_payment_list.append(new_payment)
             return pd.DataFrame(new_payment_list)
 
@@ -133,5 +134,5 @@ class Rule(ABC):
         }
 
     @abstractmethod
-    def get_explanation_data_arr(self, payment_list, run_parameters):
+    def get_explanation_data(self, payment, run_parameters):
         raise NotImplementedError

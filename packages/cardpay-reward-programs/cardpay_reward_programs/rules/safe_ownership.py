@@ -80,11 +80,9 @@ class SafeOwnership(Rule):
         df["validTo"] = payment_cycle + self.duration
         df["token"] = self.token
         df["amount"] = df["payable_safes"] * self.reward_per_safe
+        df["explanationData"] = self.get_explanation_data()
         df = df.drop(["payable_safes"], axis=1)
         return df
 
-    def get_explanation_data_arr(self, payment_list):
-        explanation_data_arr = []
-        for _ in payment_list:
-            explanation_data_arr.append({})
-        return explanation_data_arr
+    def get_explanation_data(self):
+        return {}

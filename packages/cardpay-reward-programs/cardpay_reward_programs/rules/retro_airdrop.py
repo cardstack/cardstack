@@ -79,6 +79,7 @@ class RetroAirdrop(Rule):
         new_df["validTo"] = payment_cycle + self.duration
         new_df["token"] = self.token
         new_df["amount"] = new_df["transactions"] * reward_per_transaction
+        new_df["explanationData"] = self.get_explanation_data()
         new_df = new_df.drop(["transactions"], axis=1)
         return new_df
 
@@ -92,6 +93,7 @@ class RetroAirdrop(Rule):
                 "validTo": payment_cycle + self.duration,
                 "token": self.token,
                 "amount": self.test_reward,
+                "explanationData": self.get_explanation_data(),
             }
             for account in self.test_accounts
         )
@@ -112,8 +114,5 @@ class RetroAirdrop(Rule):
         else:
             return airdrop_payments
 
-    def get_explanation_data_arr(self, payment_list):
-        explanation_data_arr = []
-        for _ in payment_list:
-            explanation_data_arr.append({})
-        return explanation_data_arr
+    def get_explanation_data(self):
+        return {}

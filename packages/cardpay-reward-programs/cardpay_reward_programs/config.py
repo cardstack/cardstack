@@ -9,6 +9,7 @@ default_payment_list = pd.DataFrame(
         "validTo",
         "token",
         "amount",
+        "explanationData",
     ]
 )
 

@@ -41,13 +41,14 @@ def test_adds_metadata_to_payment_tree():
                 "payee": "0x0000000000000000000000000000000000000000",
                 "token": "0x0000000000000000000000000000000000000000",
                 "amount": 0,
+                "explanationData": {},
             }
         ],
         parameters=metadata,
     )
 
     with TemporaryDirectory() as path:
-        write_parquet_file(AnyPath(path), tree.as_arrow("min_other_merchantsd", []))
+        write_parquet_file(AnyPath(path), tree.as_arrow())
         table_on_disk = pq.read_table(AnyPath(path) / "results.parquet")
         written_metadata = table_on_disk.schema.metadata
         # Note - keys here are *bytes* not strings

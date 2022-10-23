@@ -90,11 +90,8 @@ def test_unclaimed_rewards_allow_rollover(get_table_dataset, rollover_rule):
             "payment_cycle": 100,
         }
         payment_list = rollover_rule.get_payments(**run_parameters).to_dict("records")
-        explanation_data_arr = rollover_rule.get_explanation_data_arr(payment_list)
         tree = PaymentTree(payment_list)
-        table = tree.as_arrow(
-            explanation_data_arr,
-        )
+        table = tree.as_arrow()
         write_parquet_file(first_cycle_output, table)
         assert (first_cycle_output / "results.parquet").exists()
 
@@ -126,11 +123,8 @@ def test_claimed_rewards_dont_rollover(get_table_dataset, rollover_rule):
             "payment_cycle": 100,
         }
         payment_list = rollover_rule.get_payments(**run_parameters).to_dict("records")
-        explanation_data_arr = rollover_rule.get_explanation_data_arr(payment_list)
         tree = PaymentTree(payment_list)
-        table = tree.as_arrow(
-            explanation_data_arr,
-        )
+        table = tree.as_arrow()
         write_parquet_file(first_cycle_output, table)
         assert (first_cycle_output / "results.parquet").exists()
 
@@ -170,13 +164,8 @@ def test_multiple_claims_with_multiple_people(
         payment_list = rollover_rule_multiple.get_payments(**run_parameters).to_dict(
             "records"
         )
-        explanation_data_arr = rollover_rule_multiple.get_explanation_data_arr(
-            payment_list
-        )
         tree = PaymentTree(payment_list)
-        table = tree.as_arrow(
-            explanation_data_arr,
-        )
+        table = tree.as_arrow()
         write_parquet_file(first_cycle_output, table)
         assert (first_cycle_output / "results.parquet").exists()
 

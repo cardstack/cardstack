@@ -1,6 +1,6 @@
 import json
 from collections import defaultdict
-from typing import List, TypedDict, Union
+from typing import Any, List, Mapping, TypedDict, Union
 
 import pyarrow as pa
 import pydash as py_
@@ -19,9 +19,11 @@ class Payment(TypedDict):
     validTo: int
     token: ChecksumAddress
     amount: int  # python should auto-detect big numbers
+    explanationData: Mapping[str, Any]
 
 
 def encode_payment(payment: Payment) -> bytes:
+    "Excludes explanationData in the encoding, therefore, merkle root will not change based upon explanationData"
     rewardProgramID: ChecksumAddress = payment["rewardProgramID"]
     paymentCycle: int = payment["paymentCycle"]
     validFrom: int = payment["validFrom"]
@@ -46,6 +48,7 @@ def encode_payment(payment: Payment) -> bytes:
 
 
 def decode_payment(encoded_payment: Union[bytes, str]) -> Payment:
+    "Does not decode for explanationData"
     if type(encoded_payment) == str:
         encoded_payment = bytes.fromhex(encoded_payment)
     (
@@ -99,7 +102,7 @@ class PaymentTree:
     def verify_inclusion(self, leaf):
         return self.tree.verify_leaf_inclusion(leaf, self.tree.get_proof(leaf))
 
-    def as_arrow(self, explanation_data_arr):
+    def as_arrow(self):
         # Auto-detection of schemas risks invalid columns, so define manually
         schema = pa.schema(
             [
@@ -112,8 +115,8 @@ class PaymentTree:
                 pa.field("root", pa.string()),
                 pa.field("leaf", pa.string()),
                 pa.field("proof", pa.list_(pa.string())),
-                pa.field("explanation_id", pa.string()),
-                pa.field("explanation_data", pa.map_(pa.string(), pa.string())),
+                pa.field("explanationId", pa.string()),
+                pa.field("explanationData", pa.map_(pa.string(), pa.string())),
             ],
             metadata={
                 "parameters": json.dumps(self.parameters, default=lambda o: o.__dict__)
@@ -133,16 +136,17 @@ class PaymentTree:
                 "validTo",
                 "payee",
             ]
-            for i, (payment, leaf) in enumerate(zip(self.payment_nodes, self.data)):
+            for payment, leaf in zip(self.payment_nodes, self.data):
                 for field in extract_fields:
                     columns[field].append(payment[field])
                 columns["tokenType"].append(1)
                 columns["root"].append(root)
                 columns["leaf"].append(leaf.hex())
                 columns["proof"].append(self.get_hex_proof(leaf))
-                columns["explanation_id"].append(explanation_id)
-                o = explanation_data_arr[i] if i < len(explanation_data_arr) else {}
-                columns["explanation_data"].append([(k, str(v)) for k, v in o.items()])
+                columns["explanationId"].append(explanation_id)
+                columns["explanationData"].append(
+                    [(k, str(v)) for k, v in payment["explanationData"].items()]
+                )
         return pa.table(data=columns, schema=schema)
 
 

@@ -123,11 +123,9 @@ class Staking(Rule):
         df["validTo"] = payment_cycle + self.duration
         df["token"] = self.token
         df["amount"] = df["rewards"] * 1_000_000_000
+        df["explanationData"] = self.get_explanation_data()
         df.drop(["rewards"], axis=1)
         return df
 
-    def get_explanation_data_arr(self, payment_list):
-        explanation_data_arr = []
-        for _ in payment_list:
-            explanation_data_arr.append({})
-        return explanation_data_arr
+    def get_explanation_data(self):
+        return {}
