@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 import duckdb
 import pandas as pd
 import pydash as py_
-from cardpay_reward_programs.utils import get_unclaimed_rewards, group_by
+from cardpay_reward_programs.utils import get_unclaimed_rewards
 
 
 class Rule(ABC):
