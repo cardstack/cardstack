@@ -62,8 +62,7 @@ def run_task(
     payment_list = rule.get_payments(**parameters["run"]).to_dict("records")
     tree = PaymentTree(payment_list, parameters)
     explanation_data_arr = rule.get_explanation_data_arr(payment_list)
-    explanation_id = rule.explanation_id
-    table = tree.as_arrow(explanation_id, explanation_data_arr)
+    table = tree.as_arrow(explanation_data_arr)
     write_parquet_file(AnyPath(output_location), table)
 
 

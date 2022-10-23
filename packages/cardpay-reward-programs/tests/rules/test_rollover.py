@@ -93,7 +93,6 @@ def test_unclaimed_rewards_allow_rollover(get_table_dataset, rollover_rule):
         explanation_data_arr = rollover_rule.get_explanation_data_arr(payment_list)
         tree = PaymentTree(payment_list)
         table = tree.as_arrow(
-            rollover_rule.explanation_id,
             explanation_data_arr,
         )
         write_parquet_file(first_cycle_output, table)
@@ -130,7 +129,6 @@ def test_claimed_rewards_dont_rollover(get_table_dataset, rollover_rule):
         explanation_data_arr = rollover_rule.get_explanation_data_arr(payment_list)
         tree = PaymentTree(payment_list)
         table = tree.as_arrow(
-            rollover_rule.explanation_id,
             explanation_data_arr,
         )
         write_parquet_file(first_cycle_output, table)
@@ -177,7 +175,6 @@ def test_multiple_claims_with_multiple_people(
         )
         tree = PaymentTree(payment_list)
         table = tree.as_arrow(
-            rollover_rule_multiple.explanation_id,
             explanation_data_arr,
         )
         write_parquet_file(first_cycle_output, table)

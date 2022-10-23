@@ -3,6 +3,7 @@ from collections import defaultdict
 from typing import List, TypedDict, Union
 
 import pyarrow as pa
+import pydash as py_
 import sha3
 from eth_abi import decode_abi, encode_abi
 from eth_typing import ChecksumAddress
@@ -98,7 +99,7 @@ class PaymentTree:
     def verify_inclusion(self, leaf):
         return self.tree.verify_leaf_inclusion(leaf, self.tree.get_proof(leaf))
 
-    def as_arrow(self, explanation_id, explanation_data_arr):
+    def as_arrow(self, explanation_data_arr):
         # Auto-detection of schemas risks invalid columns, so define manually
         schema = pa.schema(
             [
@@ -121,6 +122,7 @@ class PaymentTree:
         # Arrow tables are constructed by column
         # so we need to flip the data
 
+        explanation_id = py_.get(self.parameters, "metadata.explanation_id", "no_id")
         columns = defaultdict(list)
         if len(self.data) > 0:
             root = self.get_hex_root()
