@@ -43,9 +43,7 @@ def rule(request):
         "test_accounts": test_accounts,
         "test_reward": test_amount,
     }
-    explanation = {}
-    metadata = {"explanation_id": "retro_airdrop"}
-    return RetroAirdrop(core_config, user_config, explanation, metadata)
+    return RetroAirdrop(core_config, user_config)
 
 
 @pytest.mark.usefixtures("indexed_data")
@@ -196,11 +194,9 @@ class TestRetroAirdropSingle:
             "test_accounts": test_accounts,
             "test_reward": 1_000_000_000_000,
         }
-        explanation = {}
-        metadata = {"explanation_id": "retro_airdrop"}
 
         with pytest.raises(
             ValueError,
             match=r".* is not a valid checksum address",
         ):
-            RetroAirdrop(core_config, user_config, explanation, metadata)
+            RetroAirdrop(core_config, user_config)

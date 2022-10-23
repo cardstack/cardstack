@@ -11,12 +11,8 @@ class Staking(Rule):
         self,
         core_parameters,
         user_defined_parameters,
-        explanation_block={},
-        metadata={},
     ):
-        super(Staking, self).__init__(
-            core_parameters, user_defined_parameters, explanation_block, metadata
-        )
+        super(Staking, self).__init__(core_parameters, user_defined_parameters)
 
     def set_user_defined_parameters(self, token, interest_rate_monthly):
         self.token = token

@@ -56,8 +56,6 @@ def run_task(
             rule = subclass(
                 parameters["core"],
                 parameters["user_defined"],
-                parameters["explanation"],
-                parameters["metadata"],
             )
     payment_list = rule.get_payments(**parameters["run"]).to_dict("records")
     tree = PaymentTree(payment_list, parameters)

@@ -16,12 +16,8 @@ class RetroAirdrop(Rule):
         self,
         core_parameters,
         user_defined_parameters,
-        explanation_block={},
-        metadata={},
     ):
-        super(RetroAirdrop, self).__init__(
-            core_parameters, user_defined_parameters, explanation_block, metadata
-        )
+        super(RetroAirdrop, self).__init__(core_parameters, user_defined_parameters)
 
     def set_user_defined_parameters(
         self,

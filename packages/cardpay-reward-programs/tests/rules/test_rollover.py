@@ -28,9 +28,7 @@ def rollover_rule(request):
         "token": config["staging"]["tokens"]["card"],
         "accounts": ["0x12AE66CDc592e10B60f9097a7b0D3C59fce29876"],
     }
-    explanation = {}
-    metadata = {"explanation_id": "flat_payment"}
-    return FlatPayment(core_config, user_config, explanation, metadata)
+    return FlatPayment(core_config, user_config)
 
 
 @pytest.fixture
@@ -54,9 +52,7 @@ def rollover_rule_multiple(request):
             "0xc0ffee254729296a45a3885639AC7E10F9d54979",
         ],
     }
-    explanation = {}
-    metadata = {"explanation_id": "flat_payment"}
-    return FlatPayment(core_config, user_config, explanation, metadata)
+    return FlatPayment(core_config, user_config)
 
 
 def claims_table(claims=[]):
