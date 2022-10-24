@@ -36,7 +36,7 @@ export default class Wallet extends Service {
   );
 
   constructor() {
-    super(...arguments);
+    super();
 
     this.chainConnectionManager.on('connected', (accounts: string[]) => {
       this.isConnected = true;
