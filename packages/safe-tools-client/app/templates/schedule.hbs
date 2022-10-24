@@ -9,7 +9,7 @@
     <cp.Item @title='Safe' @icon='safe'>
       {{#if this.safe}}
         <span class='safe-tools__dashboard-schedule-control-panel-safe-info-address'>
-          {{this.safe.token.address}}:{{this.safe.address}}
+          {{this.safe.token.address}}:{{truncate-middle this.safe.address}}
         </span>
         <span class='safe-tools__dashboard-schedule-control-panel-safe-info-balance'>
           {{this.safe.token.balance}} {{this.safe.token.symbol}}
@@ -39,4 +39,12 @@
 <SetupSafeModal
   @isOpen={{this.isSetupSafeModalOpen}}
   @onClose={{set this 'isSetupSafeModalOpen' false}}
+/>
+
+<DepositModal
+  @isOpen={{this.isDepositModalOpen}}
+  @onClose={{set this 'isDepositModalOpen' false}}
+  @safeAddress={{this.safe.address}}
+  @networkName={{this.network}}
+  @tokensToCover={{this.scheduledPaymentsTokensToCover}}
 />
