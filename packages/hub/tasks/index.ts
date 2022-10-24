@@ -21,6 +21,7 @@ const ALL_KNOWN_TASKS: Record<keyof KnownTasks, true> = {
   'persist-off-chain-profile': true,
   'scheduled-payment-on-chain-creation-waiter': true,
   'scheduled-payment-on-chain-execution-waiter': true,
+  'execute-scheduled-payments': true,
   boom: true,
 };
 

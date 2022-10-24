@@ -23,10 +23,6 @@ async function tokenPairRate(provider: JsonRpcProvider, token1Address: string, t
 export async function gasPriceInToken(provider: JsonRpcProvider, tokenAddress: string): Promise<BN> {
   let network = await networkName(provider);
 
-  // We use the wrapped native token address because the native token doesn't have an address in Uniswap.
-  // The price of the wrapped native token, such as WETH, is the same as the price of the native token.
-  let rate = await tokenPairRate(provider, tokenAddress, getAddressByNetwork('wrappedNativeToken', network));
-
   // Gas station will return current gas price in native token in wei.
   let gasStationResponse = await fetch(`${getConstantByNetwork('relayServiceURL', network)}/v1/gas-station/`, {
     method: 'GET',
@@ -35,8 +31,15 @@ export async function gasPriceInToken(provider: JsonRpcProvider, tokenAddress: s
       Accept: 'application/json',
     },
   });
-
   let gasPriceInNativeTokenInWei = new BN((await gasStationResponse.json()).standard);
+
+  // We use the wrapped native token address because the native token doesn't have an address in Uniswap.
+  // The price of the wrapped native token, such as WETH, is the same as the price of the native token.
+  let wrappedNativeToken = getAddressByNetwork('wrappedNativeToken', network);
+  if (tokenAddress === wrappedNativeToken) {
+    return gasPriceInNativeTokenInWei;
+  }
+  let rate = await tokenPairRate(provider, tokenAddress, wrappedNativeToken);
 
   // Convert the current gas price which is in native token to the token we want to pay the gas with.
   return gasPriceInNativeTokenInWei

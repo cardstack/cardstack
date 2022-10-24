@@ -1,3 +1,4 @@
+import * as Sentry from '@sentry/node';
 import { inject } from '@cardstack/di';
 import { ScheduledPayment } from '@prisma/client';
 import { isBefore, subDays } from 'date-fns';
@@ -49,6 +50,25 @@ export default class ScheduledPaymentsExecutorService {
   async getCurrentGasPrice(provider: JsonRpcProvider, gasTokenAddress: string) {
     // Wrapped in a method so that can be mocked in the tests
     return gasPriceInToken(provider, gasTokenAddress);
+  }
+
+  async executeScheduledPayments() {
+    // TODO: take a only a few, can be 10, to not overwhelm this method
+    // TODO: randomize the order
+    let scheduledPayments = await this.scheduledPaymentFetcher.fetchScheduledPayments();
+
+    // Currently we do one by one, but we can do in parallel when we'll have a lot of scheduled payments
+    for (let scheduledPayment of scheduledPayments) {
+      try {
+        // If this succeeds, it means that the scheduled payment transaction was submitted
+        // and the ScheduledPaymentOnChainExecutionWaiter will wait for it to be mined in the background
+        await this.executePayment(scheduledPayment);
+      } catch (e) {
+        Sentry.captureException(e);
+        console.error(e);
+        // Don't throw, continue to the next scheduled payment
+      }
+    }
   }
 
   async executePayment(scheduledPayment: ScheduledPayment) {
@@ -163,5 +183,11 @@ export default class ScheduledPaymentsExecutorService {
           reject(error);
         });
     });
+  }
+}
+
+declare module '@cardstack/di' {
+  interface KnownServices {
+    'scheduled-payment-executor': ScheduledPaymentsExecutorService;
   }
 }
