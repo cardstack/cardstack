@@ -108,6 +108,7 @@
   "workspaces": {
     "packages": [
       "packages/*",
+      "packages/ember-helpers/*",
       "packages/firebase-functions/**"
     ],
     "nohoist": [
