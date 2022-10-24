@@ -28,7 +28,6 @@ jobs:
           python -m pip install --upgrade pdm
           pdm config python.use_venv false
           pdm install -d
-          pdm add setuptools
       - name: Test with pytest
         env:
           DB_STRING: "sqlite:///./test.db"
