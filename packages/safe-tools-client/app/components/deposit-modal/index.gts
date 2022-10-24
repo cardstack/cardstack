@@ -138,7 +138,7 @@ export const TokensToCoverByTime: TemplateOnlyComponent<TokensToCoverByTimeSigna
     </span>
     <div class="deposit-modal__section-funds-info-cover-balances">
       {{#if @monthlyTokens.hasEnoughBalance}}
-        Covered by current balances
+        <b>Covered by current balances</b>
       {{else}}
         <ul class="deposit-modal__section-funds-info-token-list">
           {{#each @monthlyTokens.tokens as |token|}}
