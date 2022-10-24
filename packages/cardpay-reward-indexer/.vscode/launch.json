@@ -1,0 +1,14 @@
+{
+  "configurations": [
+    {
+      "name": "Run Indexer",
+      "type": "python",
+      "request": "launch",
+      "module": "cardpay_reward_indexer.main",
+      "justMyCode": true,
+      "env": {
+        "DB_STRING": "postgresql://postgres:mysecretpassword@localhost:5432/postgres"
+      }
+    }
+  ]
+}
