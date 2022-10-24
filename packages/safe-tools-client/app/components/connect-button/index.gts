@@ -47,7 +47,7 @@ export default class ConnectButton extends Component<Signature> {
       >
         {{#if @isInitializing}}
           {{!-- just show the spinner --}}
-          <span class="boxel-sr-only">Reconnecting to {{@chainName}}</span>
+          <span class="boxel-sr-only">Reconnecting</span>
         {{else if @isConnected}}
           {{truncateMiddle @address}}
         {{else}}
