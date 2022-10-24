@@ -57,7 +57,7 @@ def flat_drop(
                 "accounts": default_accounts,
             },
             "run": {
-                "reward_program_id": "0xab20c80fcc025451a3fc73bB953aaE1b9f640949",
+                "reward_program_id": config[env]["reward_program"],
                 "payment_cycle": w3.eth.get_block_number(),
             },
             "metadata": {"explanation_id": "flat_payment"},
