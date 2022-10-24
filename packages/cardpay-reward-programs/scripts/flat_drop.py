@@ -7,7 +7,7 @@ from boto3.session import Session
 from cardpay_reward_programs.config import config
 from cardpay_reward_programs.payment_tree import PaymentTree
 from cardpay_reward_programs.rules import FlatPayment
-from cardpay_reward_programs.utils import write_parameters_file, write_parquet_file
+from cardpay_reward_programs.utils import write_parquet_file
 from cloudpathlib import AnyPath, S3Client
 from scripts.utils import EMPTY_MARKER_HEX, NULL_HEX, Environment
 from web3 import Web3
@@ -49,27 +49,28 @@ def flat_drop(
                 "start_block": 24000000,
                 "end_block": 26000000,
                 "subgraph_config_locations": {},
+                "duration": 777600,
             },
             "user_defined": {
                 "reward_per_user": reward_amount,
                 "token": config[env]["tokens"]["card"],
-                "duration": 777600,
                 "accounts": default_accounts,
             },
             "run": {
-                "reward_program_id": config[env]["reward_program"],
+                "reward_program_id": "0xab20c80fcc025451a3fc73bB953aaE1b9f640949",
                 "payment_cycle": w3.eth.get_block_number(),
             },
+            "metadata": {"explanation_id": "flat_payment"},
         }
 
     else:
         with open(parameters_file_path) as f:
             params = json.load(f)
     rule = FlatPayment(params["core"], params["user_defined"])
-    payment_list = rule.run(
+    payment_list = rule.get_payments(
         params["run"]["payment_cycle"], params["run"]["reward_program_id"]
     )
-    tree = PaymentTree(payment_list.to_dict("records"))
+    tree = PaymentTree(payment_list.to_dict("records"), params)
     table = tree.as_arrow()
     existing_root = reward_contract.caller.payeeRoots(
         params["run"]["reward_program_id"], params["run"]["payment_cycle"]
@@ -93,7 +94,6 @@ def flat_drop(
         raise Exception(f"{output_location} already exists")
     else:
         write_parquet_file(output_path, table)
-        write_parameters_file(output_path, params)
     print("Done")
 
 
