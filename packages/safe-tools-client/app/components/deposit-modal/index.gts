@@ -3,6 +3,7 @@ import { on } from '@ember/modifier';
 import { tracked } from '@glimmer/tracking';
 import { action } from '@ember/object';
 import { later } from '@ember/runloop';
+import gt from 'ember-truth-helpers/helpers/gt';
 
 import { svgJar } from '@cardstack/boxel/utils/svg-jar';
 import copyToClipboard from '@cardstack/boxel/helpers/copy-to-clipboard';
@@ -10,6 +11,7 @@ import cssVar from '@cardstack/boxel/helpers/css-var';
 import BoxelModal from '@cardstack/boxel/components/boxel/modal';
 import BoxelActionContainer from '@cardstack/boxel/components/boxel/action-container';
 import BoxelInputGroup from '@cardstack/boxel/components/boxel/input-group';
+import type { TemplateOnlyComponent } from '@ember/component/template-only';
 
 import './index.css';
 
@@ -67,8 +69,8 @@ export default class DepositModal extends Component<Signature> {
                 <Accessories.Text>Copied!</Accessories.Text>
               {{/if}}
               <Accessories.IconButton
-                @width='20px'
-                @height='20px'
+                @width="20px"
+                @height="20px"
                 @icon="copy"
                 aria-label="Copy to Clipboard"
                 {{on "click"
@@ -86,25 +88,18 @@ export default class DepositModal extends Component<Signature> {
               <div class="deposit-modal__section-funds-info-header">
                 How much should you transfer?
                 <p>
-                  It is your choice how far in advance you fund your safe. As a convenience, 
+                  It is your choice how far in advance you fund your safe. As a convenience,
                   we have calculated this safe’s funding needs for your currently scheduled
                   transactions:
                 </p>
-                {{!-- TODO: Add reusable component to render balances info --}}
-                <p>
-                  ...to cover the next 4 weeks:
-                  {{#if @tokensToCover.nextMonth.hasEnoughBalance}}
-                    <span>Covered by current balances</span>
-                  {{else}}
-                  {{!-- TODO: Add tokens section --}}
-                  {{/if}}
-                </p>
-                <p>
-                  ...to cover the next 6 months:
-                  {{#if @tokensToCover.nextSixMonths.hasEnoughBalance}}
-                    <span>Covered by current balances</span>
-                  {{/if}}
-                </p>
+                <TokensToCoverByTime
+                  @periodOfTime="4 weeks"
+                  @monthlyTokens={{@tokensToCover.nextMonth}}
+                />
+                <TokensToCoverByTime
+                  @periodOfTime="6 months"
+                  @monthlyTokens={{@tokensToCover.nextSixMonths}}
+                />
               </div>
             </div>
            {{/if}} 
@@ -126,3 +121,36 @@ declare module '@glint/environment-ember-loose/registry' {
     'DepositModal': typeof DepositModal;
   }
 }
+
+
+interface TokensToCoverByTimeSignature { 
+  Element: HTMLElement;
+  Args: {
+    periodOfTime: string;
+    monthlyTokens: MonthlyTokensToCover;
+  };
+}
+
+export const TokensToCoverByTime: TemplateOnlyComponent<TokensToCoverByTimeSignature> = <template>
+  <p class="deposit-modal__section-funds-info-balance">
+    <span class="deposit-modal__section-funds-info-cover">
+      ...to cover the next {{@periodOfTime}}:
+    </span>
+    <div class="deposit-modal__section-funds-info-cover-balances">
+      {{#if @monthlyTokens.hasEnoughBalance}}
+        Covered by current balances
+      {{else}}
+        <ul class="deposit-modal__section-funds-info-token-list">
+          {{#each @monthlyTokens.tokens as |token|}}
+            {{#if (gt token.amountToCover 0)}}
+              <li class="deposit-modal__section-funds-info-token">
+                {{!-- TOD0: Map token from symbol --}}
+                {{svgJar "card"}} {{token.amountToCover}} {{token.symbol}}
+              </li>
+            {{/if}}
+          {{/each}}
+        </ul>
+      {{/if}}
+    </div>
+  </p>
+</template>
