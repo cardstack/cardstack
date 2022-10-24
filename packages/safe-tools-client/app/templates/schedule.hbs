@@ -16,11 +16,11 @@
             class='safe-tools__dashboard-schedule-control-panel-connected-status-icon'
           }} Connected
         </div>
-      {{else}}
-        <ConnectButton
-          @onConnect={{set this.application 'isShowingConnectModal' true}}
-        />
       {{/if}}
+
+      <ConnectButton
+        @onConnect={{set this.application 'isShowingConnectModal' true}}
+      />
     </cp.Item>
     <cp.Item @title='Network' @icon='network' />
     <cp.Item @title='Safe' @icon='safe'>

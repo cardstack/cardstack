@@ -17,6 +17,7 @@
   gap: var(--boxel-sp-xxxs);
   font-size: var(--boxel-font-size-xs);
   margin-top: var(--boxel-sp-xxxs);
+  margin-bottom: var(--boxel-sp-sm);
 }
 
 .safe-tools__dashboard-schedule-control-panel-connected-status-icon {
