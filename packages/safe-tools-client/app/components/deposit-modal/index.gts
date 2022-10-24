@@ -51,7 +51,7 @@ export default class DepositModal extends Component<Signature> {
       <BoxelActionContainer as |Section ActionChin|>
         <Section @title="Deposit Instructions" class="deposit-modal__section">
           <p>
-            it is the user's responsibility to ensure that sufficient funds are
+            It is the user’s responsibility to ensure that sufficient funds are
             present in their wallet at the time of each transaction
           </p>
           <p>To deposit into your {{@networkName}} safe, transfer assets to:</p>
@@ -87,7 +87,7 @@ export default class DepositModal extends Component<Signature> {
                 How much should you transfer?
                 <p>
                   It is your choice how far in advance you fund your safe. As a convenience, 
-                  we have calculated this safe's funding needs for your currently scheduled
+                  we have calculated this safe’s funding needs for your currently scheduled
                   transactions:
                 </p>
                 {{!-- TODO: Add reusable component to render balances info --}}
