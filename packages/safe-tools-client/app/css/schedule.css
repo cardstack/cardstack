@@ -3,6 +3,26 @@
   flex-direction: row;
 }
 
+.safe-tools__dashboard-schedule-control-panel-wallet-address {
+  color: var(--boxel-purple-300);
+  font-family: var(--boxel-monospace-font-family);
+  font-size: var(--boxel-font-size-sm);
+}
+
+.safe-tools__dashboard-schedule-control-panel-connected-status {
+  --icon-fill-color: var(--boxel-green);
+  --icon-border: var(--boxel-green);
+
+  display: flex;
+  gap: var(--boxel-sp-xxxs);
+  font-size: var(--boxel-font-size-xs);
+  margin-top: var(--boxel-sp-xxxs);
+}
+
+.safe-tools__dashboard-schedule-control-panel-connected-status-icon {
+  padding-bottom: 1px;
+}
+
 .safe-tools__dashboard-schedule-content {
   flex: 1;
   padding: var(--boxel-sp-xxl) var(--boxel-sp-lg) 0;
