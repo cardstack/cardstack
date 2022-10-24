@@ -11,6 +11,25 @@ import eq from 'ember-truth-helpers/helpers/eq';
 import { on } from '@ember/modifier';
 import './usage.css';
 
+
+interface ButtonContainerSignature {
+  Element: HTMLButtonElement;
+  Args: {
+  }
+}
+
+class ButtonContainer extends Component<ButtonContainerSignature> {
+  <template>
+    <BoxelButton
+      @as="button"
+      @kind="secondary-dark"
+      ...attributes
+    >
+      Do Something
+    </BoxelButton>
+  </template>
+}
+
 export default class ButtonUsage extends Component {
   sizeVariants = ['extra-small', 'small', 'base', 'tall', 'touch'];
   kindVariants = {
@@ -218,6 +237,8 @@ export default class ButtonUsage extends Component {
             Button Text
           </BoxelButton>
         </div>
+
+        <ButtonContainer class="an-appended-class" />
       </:example>
     </FreestyleUsage>
   </template>
