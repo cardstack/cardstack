@@ -1,5 +1,4 @@
 import binascii
-import itertools
 import tempfile
 from pathlib import PosixPath
 
