@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import Any, List, Optional
 
 from hexbytes import HexBytes
 from pydantic import BaseModel, validator
@@ -15,6 +15,8 @@ class Proof(BaseModel):
     leaf: str
     validFrom: int
     validTo: int
+    explanationId: str
+    explanationData: Any
 
     @validator("leaf", pre=True)
     def leaf_as_hex_string(cls, v):

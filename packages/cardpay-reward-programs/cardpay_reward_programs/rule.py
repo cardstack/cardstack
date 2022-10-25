@@ -2,7 +2,8 @@ from abc import ABC, abstractmethod
 
 import duckdb
 import pandas as pd
-from cardpay_reward_programs.utils import get_unclaimed_rewards, group_by
+import pydash as py_
+from cardpay_reward_programs.utils import get_unclaimed_rewards
 
 
 class Rule(ABC):
@@ -96,7 +97,7 @@ class Rule(ABC):
                 payment["validFrom"] = payment_cycle
                 payment["validTo"] = payment_cycle + self.duration
             # Group payments of the same token and user together
-            combined_payments = group_by(
+            combined_payments = py_.group_by(
                 payment_list + unclaimed_payments,
                 lambda x: (
                     x["rewardProgramID"].lower(),
@@ -106,13 +107,15 @@ class Rule(ABC):
             )
             # Sum the amounts of the grouped payments
             new_payment_list = []
-            for _, payments in combined_payments:
+            for _, payments in combined_payments.items():
                 # payments[0] and payments[1] will have the same general data, just differing amounts
                 # that need summing
-                payments = list(payments)
+                payments = py_.sort_by(payments, "paymentCycle")
+                rollover_amount = sum(p["amount"] for p in payments[1:])
                 new_payment = payments[0].copy()
                 new_payment["amount"] = sum([p["amount"] for p in payments])
                 new_payment["explanationData"] = self.get_explanation_data(new_payment)
+                new_payment["explanationData"]["rollover_amount"] = rollover_amount
                 new_payment_list.append(new_payment)
             return pd.DataFrame(new_payment_list)
 

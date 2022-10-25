@@ -104,6 +104,7 @@ def test_unclaimed_rewards_allow_rollover(get_table_dataset, rollover_rule):
         tree = PaymentTree(payment_list)
         assert len(payment_list) == 1  # Still only one payee
         assert payment_list[0]["amount"] == 2000  # But with double the reward
+        assert payment_list[0]["explanationData"]["rollover_amount"] == 1000
 
 
 @patch("cardpay_reward_programs.utils.get_table_dataset")
@@ -141,6 +142,7 @@ def test_claimed_rewards_dont_rollover(get_table_dataset, rollover_rule):
         assert (
             payment_list[0]["amount"] == 1000
         )  # And no extra payments as the value has not rolled over
+        assert payment_list[0]["explanationData"]["rollover_amount"] == 0
 
 
 @patch("cardpay_reward_programs.utils.get_table_dataset")
@@ -187,3 +189,6 @@ def test_multiple_claims_with_multiple_people(
         assert payment_list[0]["amount"] == 1000
         assert payment_list[1]["amount"] == 1000
         assert payment_list[2]["amount"] == 2000
+        assert payment_list[0]["explanationData"]["rollover_amount"] == 0
+        assert payment_list[1]["explanationData"]["rollover_amount"] == 0
+        assert payment_list[2]["explanationData"]["rollover_amount"] == 1000
