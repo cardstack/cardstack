@@ -10,9 +10,17 @@ class Rule(ABC):
     A single image should run only a single rule
     """
 
-    def __init__(self, core_parameters, user_defined_parameters):
+    def __init__(
+        self,
+        core_parameters,
+        user_defined_parameters,
+        explanation_block={},
+        metadata={},
+    ):
         self.connection = duckdb.connect(":memory:")
         self.set_core_parameters(**core_parameters)
+        self.set_metadata_parameters(**metadata)
+        self.set_explanation_parameters(explanation_block)
         self.set_user_defined_parameters(**user_defined_parameters)
 
     def set_core_parameters(
@@ -22,7 +30,6 @@ class Rule(ABC):
         end_block,
         duration,
         subgraph_config_locations,
-        docker_image=None,
         rollover=False,
     ):
         self.payment_cycle_length = payment_cycle_length
@@ -31,6 +38,12 @@ class Rule(ABC):
         self.duration = duration
         self.subgraph_config_locations = subgraph_config_locations
         self.rollover = rollover
+
+    def set_metadata_parameters(self, explanation_id):
+        self.explanation_id = explanation_id
+
+    def set_explanation_parameters(self, explanation):
+        self.explanation_block = explanation
 
     @abstractmethod
     def set_user_defined_parameters(
@@ -118,3 +131,7 @@ class Rule(ABC):
             "total_reward": [payment_list["amount"].sum()],
             "unique_payee": [len(pd.unique(payment_list["payee"]))],
         }
+
+    @abstractmethod
+    def get_explanation_data_arr(self, payment_list, run_parameters):
+        raise NotImplementedError
