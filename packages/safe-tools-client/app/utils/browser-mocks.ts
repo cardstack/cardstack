@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-types */
 import { SimpleEmitter, UnbindEventListener } from './events';
 
 /**
@@ -5,7 +6,7 @@ import { SimpleEmitter, UnbindEventListener } from './events';
  *  Use `test__simulateMessageEvent` to simulate a message event with only the data property
  */
 export class MockBroadcastChannel {
-  postedMessages: Array<any> = [];
+  postedMessages: Array<unknown> = [];
   channelName: string;
   private simpleEmitter = new SimpleEmitter();
   private unbindMap: {
@@ -22,7 +23,7 @@ export class MockBroadcastChannel {
 
   addEventListener(
     event: keyof BroadcastChannelEventMap,
-    callback: (ev: any) => any
+    callback: (ev: unknown) => unknown
   ) {
     const unbind = this.simpleEmitter.on(event, callback);
     this.unbindMap[event].set(callback, unbind);
@@ -30,7 +31,7 @@ export class MockBroadcastChannel {
 
   removeEventListener(
     event: keyof BroadcastChannelEventMap,
-    callback: (ev: any) => any
+    callback: (ev: unknown) => unknown
   ) {
     const unbind = this.unbindMap[event].get(callback);
     if (unbind) {
@@ -39,17 +40,18 @@ export class MockBroadcastChannel {
     }
   }
 
-  postMessage(message: any) {
+  postMessage(message: unknown) {
     this.postedMessages.push(message);
   }
 
-  test__simulateMessageEvent(data: any) {
+  test__simulateMessageEvent(data: unknown) {
     const payload = {
       data,
     };
     this.simpleEmitter.emit('message', payload as MessageEvent);
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
   close() {}
 }
 

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-types */
 // based on https://github.com/ai/nanoevents/blob/main/index.js
 export type UnbindEventListener = () => void;
 
@@ -61,6 +62,7 @@ export interface Emitter<EmitterEvent = string> {
 export class SimpleEmitter {
   events: Record<string, Function[]> = {};
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   emit(event: string, ...args: any[]) {
     (this.events[event] || []).forEach((i) => i(...args));
   }

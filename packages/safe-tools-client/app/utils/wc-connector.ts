@@ -35,6 +35,7 @@ export default class CustomStorageWalletConnect extends Connector {
     });
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-empty-function, @typescript-eslint/no-explicit-any
   set clientMeta(_value: any) {}
 
   get clientMeta() {

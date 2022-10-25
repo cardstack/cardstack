@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/ban-types */
 import detectEthereumProvider from '@metamask/detect-provider';
 import WalletConnectProvider from '@cardstack/wc-provider';
 import WalletConnectQRCodeModal from '@walletconnect/qrcode-modal';
@@ -44,16 +46,16 @@ const BROADCAST_CHANNEL_MESSAGES = {
   CONNECTED: 'CONNECTED',
 } as const;
 
-interface Layer1ConnectEvent {
+interface ConnectEvent {
   type: typeof BROADCAST_CHANNEL_MESSAGES.CONNECTED;
   providerId: WalletProviderId;
-  session?: any;
+  session?: unknown;
 }
 
-interface Layer1DisconnectEvent {
+interface DisconnectEvent {
   type: typeof BROADCAST_CHANNEL_MESSAGES.DISCONNECTED;
 }
-type Layer1ConnectionEvent = Layer1ConnectEvent | Layer1DisconnectEvent;
+type ConnectionEvent = ConnectEvent | DisconnectEvent;
 
 export interface ConnectionManagerStrategyFactory {
   createStrategy(
@@ -86,7 +88,7 @@ export class ChainConnectionManager {
       ? new MockLocalStorage()
       : window.localStorage;
 
-  broadcastChannel: TypedChannel<Layer1ConnectionEvent>;
+  broadcastChannel: TypedChannel<ConnectionEvent>;
   strategy: ConnectionStrategy | undefined;
   chainId: number;
   networkSymbol: ChainName;
@@ -142,7 +144,7 @@ export class ChainConnectionManager {
     this.strategy = undefined;
   }
 
-  private async setup(providerId: WalletProviderId, session?: any) {
+  private async setup(providerId: WalletProviderId, session?: unknown) {
     this.strategy = this.strategyFactory.createStrategy(
       this.chainId,
       this.networkSymbol,
@@ -163,7 +165,7 @@ export class ChainConnectionManager {
     return await this.strategy.connect();
   }
 
-  async reconnect(web3: Web3, providerId: WalletProviderId, session?: any) {
+  async reconnect(web3: Web3, providerId: WalletProviderId, session?: unknown) {
     await this.setup(providerId, session);
     web3.setProvider(this.provider);
     await this.strategy?.reconnect();
@@ -177,12 +179,12 @@ export class ChainConnectionManager {
     return this.simpleEmitter.on(event, cb);
   }
 
-  emit(event: ConnectionManagerEvent, ...args: any[]) {
+  emit(event: ConnectionManagerEvent, ...args: unknown[]) {
     return this.simpleEmitter.emit(event, ...args);
   }
 
   @action
-  onBroadcastChannelMessage(event: MessageEvent<Layer1ConnectionEvent>) {
+  onBroadcastChannelMessage(event: MessageEvent<ConnectionEvent>) {
     if (event.data.type === BROADCAST_CHANNEL_MESSAGES.DISCONNECTED) {
       this.onDisconnect(false);
     } else if (
@@ -210,11 +212,14 @@ export class ChainConnectionManager {
       this.strategy.providerId
     );
     this.emit('connected', accounts);
-    this.broadcastChannel?.postMessage({
-      type: BROADCAST_CHANNEL_MESSAGES.CONNECTED,
-      providerId: this.providerId!,
-      session: this.strategy.getSession(),
-    });
+
+    if (this.providerId) {
+      this.broadcastChannel?.postMessage({
+        type: BROADCAST_CHANNEL_MESSAGES.CONNECTED,
+        providerId: this.providerId,
+        session: this.strategy.getSession(),
+      });
+    }
   }
 
   @action onChainChanged(chainId: number) {
@@ -255,7 +260,7 @@ export abstract class ConnectionStrategy
 
   // concrete classes will need to implement these
   abstract providerId: WalletProviderId;
-  abstract setup(session?: any): Promise<any>;
+  abstract setup(session?: unknown): Promise<unknown>;
   abstract reconnect(): Promise<void>;
   /**
    * Returns true if connect calls go through without errors/cancelation by user
@@ -264,8 +269,8 @@ export abstract class ConnectionStrategy
   abstract disconnect(): Promise<void>;
 
   // concrete classes may optionally implement these methods
-  getSession() {}
-  destroy() {}
+  abstract getSession(): any;
+  abstract destroy(): void;
 
   // networkSymbol and chainId are initialized in the constructor
   networkSymbol: ChainName;
@@ -414,10 +419,13 @@ class MetaMaskConnectionStrategy extends ConnectionStrategy {
 
   // eslint-disable-next-line ember/classic-decorator-hooks
   destroy() {
-    super.destroy();
     // remove all listeners that previous instances of metamask connections have added
     // otherwise disconnecting and reconnecting might cause "duplicate" event listeners
     this.provider?.removeAllListeners();
+  }
+
+  getSession() {
+    return null;
   }
 }
 
@@ -427,6 +435,9 @@ class WalletConnectConnectionStrategy extends ConnectionStrategy {
   getSession() {
     return this.provider.connector.session;
   }
+
+  // eslint-disable-next-line ember/classic-decorator-hooks, @typescript-eslint/no-empty-function
+  destroy() {}
 
   async setup(session?: any) {
     const { chainId } = this;

@@ -50,7 +50,7 @@ export default class Wallet extends Service {
     }
 
     this.providerId = providerId;
-    this.chainConnectionManager.reconnect(this.web3, this.providerId!);
+    this.chainConnectionManager.reconnect(this.web3, this.providerId);
   }
 
   @action connect() {
@@ -60,7 +60,11 @@ export default class Wallet extends Service {
   }
 
   @task *connectWalletTask() {
-    yield this.chainConnectionManager.connect(this.web3, this.providerId!);
+    if (!this.providerId) {
+      return;
+    }
+
+    yield this.chainConnectionManager.connect(this.web3, this.providerId);
     yield timeout(500); // allow time for strategy to verify connected chain -- it might not accept the connection
   }
 

@@ -1,4 +1,5 @@
 import Component from '@glimmer/component';
+import { action } from '@ember/object';
 import { inject as service} from '@ember/service';
 //@ts-expect-error glint does not think this is consumed-but it is consumed in the template https://github.com/typed-ember/glint/issues/374
 import { concat, fn, hash } from '@ember/helper';
@@ -29,6 +30,10 @@ interface Signature {
 
 class NetworkConnectModal extends Component<Signature> {
   @service declare wallet: WalletService;
+
+  @action async cancelConnection(): Promise<void> {
+    // TODO
+  }
 
   <template>
     <BoxelModal

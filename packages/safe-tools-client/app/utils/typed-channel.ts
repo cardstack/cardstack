@@ -1,7 +1,7 @@
 import config from '../config/environment';
 import { MockBroadcastChannel } from './browser-mocks';
 
-export class TypedChannel<MessageType = any> {
+export class TypedChannel<MessageType = unknown> {
   channelName: string;
   broadcastChannel: BroadcastChannel | MockBroadcastChannel;
 
@@ -16,14 +16,14 @@ export class TypedChannel<MessageType = any> {
 
   addEventListener(
     event: keyof BroadcastChannelEventMap,
-    callback: (ev: MessageEvent<MessageType>) => any
+    callback: (ev: MessageEvent<MessageType>) => unknown
   ) {
     this.broadcastChannel.addEventListener(event, callback);
   }
 
   removeEventListener(
     event: keyof BroadcastChannelEventMap,
-    callback: (ev: MessageEvent<MessageType>) => any
+    callback: (ev: MessageEvent<MessageType>) => unknown
   ) {
     this.broadcastChannel.removeEventListener(event, callback);
   }
@@ -36,7 +36,7 @@ export class TypedChannel<MessageType = any> {
     this.broadcastChannel.postMessage(message);
   }
 
-  test__simulateMessageEvent(data: any) {
+  test__simulateMessageEvent(data: unknown) {
     if (this.broadcastChannel instanceof MockBroadcastChannel)
       this.broadcastChannel.test__simulateMessageEvent(data);
   }
