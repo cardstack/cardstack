@@ -43,7 +43,7 @@ class RewardPool(Contract):
         with open("abis/reward-pool.json") as contract_file:
             contract_json = json.load(contract_file)
             self.contract = self.w3.eth.contract(
-                address=contract_address, abi=contract_json["abi"]
+                address=contract_address, abi=contract_json
             )
 
     def submit_merkle_root(
