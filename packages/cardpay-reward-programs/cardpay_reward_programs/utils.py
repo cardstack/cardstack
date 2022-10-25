@@ -14,12 +14,6 @@ from pyarrow import fs
 from .payment_tree import decode_payment
 
 
-def group_by(data_array, callback):
-    # remember: itertools.groupby requires that keys are sorted; it only groups common keys which are next to each other
-    sorted_data = sorted(data_array, key=callback)
-    return itertools.groupby(sorted_data, callback)
-
-
 def get_local_file(file_location):
     if isinstance(file_location, PosixPath):
         return file_location.as_posix()
