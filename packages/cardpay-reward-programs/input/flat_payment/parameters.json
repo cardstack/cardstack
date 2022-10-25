@@ -13,22 +13,22 @@
   },
   "core": {
     "payment_cycle_length": 32768,
-    "start_block": 23592960,
-    "end_block": 24859648,
+    "start_block": 27551564,
+    "end_block": 27551565,
     "subgraph_config_locations": {
       "prepaid_card_payment": "s3://cardpay-staging-partitioned-graph-data/data/prepaid_card_payments/0.0.3/"
     },
     "duration": 43200
   },
   "run": {
-    "payment_cycle": 28089457,
+    "payment_cycle": 27551564,
     "reward_program_id": "0x0885ce31D73b63b0Fcb1158bf37eCeaD8Ff0fC72",
     "previous_output": "s3://cardpay-staging-reward-programs/rewardProgramID=0x0885ce31D73b63b0Fcb1158bf37eCeaD8Ff0fC72/paymentCycle=27494200/results.parquet",
     "rewards_subgraph_location": "s3://cardpay-staging-partitioned-graph-data/data/rewards/0.0.2/"
   },
   "user_defined": {
     "token": "0xB0427e9F03Eb448D030bE3EBC96F423857ceEb2f",
-    "reward_per_user": 5000000000000000000,
+    "reward_per_user": 8800000000000000000,
     "accounts": [
       "0x159ADe032073d930E85f95AbBAB9995110c43C71",
       "0x797E1f626cB58f909F3c6a1e0783578BD4D0f32f",

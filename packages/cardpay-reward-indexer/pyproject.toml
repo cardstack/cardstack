@@ -1,6 +1,6 @@
 [project]
-name = ""
-version = ""
+name = "cardpay-reward-indexer"
+version = "0.1.0"
 description = ""
 authors = [
     {name = "tintinthong", email = "justin.thong@cardstack.com"},
