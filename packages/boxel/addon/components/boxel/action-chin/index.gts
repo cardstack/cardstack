@@ -39,7 +39,7 @@ export interface Signature {
     stepNumber?: number;
     state: ActionChinState;
     disabled?: boolean;
-    class?: string
+    class?: string;
   };
   Blocks: {
     'default': [DefaultBlockArgs],

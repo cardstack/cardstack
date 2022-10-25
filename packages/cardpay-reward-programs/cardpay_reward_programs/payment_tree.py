@@ -1,8 +1,9 @@
 import json
 from collections import defaultdict
-from typing import List, TypedDict, Union
+from typing import Any, List, Mapping, TypedDict, Union
 
 import pyarrow as pa
+import pydash as py_
 import sha3
 from eth_abi import decode_abi, encode_abi
 from eth_typing import ChecksumAddress
@@ -18,9 +19,11 @@ class Payment(TypedDict):
     validTo: int
     token: ChecksumAddress
     amount: int  # python should auto-detect big numbers
+    explanationData: Mapping[str, Any]
 
 
 def encode_payment(payment: Payment) -> bytes:
+    "Excludes explanationData in the encoding, therefore, merkle root will not change based upon explanationData"
     rewardProgramID: ChecksumAddress = payment["rewardProgramID"]
     paymentCycle: int = payment["paymentCycle"]
     validFrom: int = payment["validFrom"]
@@ -45,6 +48,7 @@ def encode_payment(payment: Payment) -> bytes:
 
 
 def decode_payment(encoded_payment: Union[bytes, str]) -> Payment:
+    "Does not decode for explanationData"
     if type(encoded_payment) == str:
         encoded_payment = bytes.fromhex(encoded_payment)
     (
@@ -75,9 +79,9 @@ def decode_payment(encoded_payment: Union[bytes, str]) -> Payment:
 
 
 class PaymentTree:
-    def __init__(self, payment_list: List[Payment], run_parameters={}) -> None:
+    def __init__(self, payment_list: List[Payment], parameters={}) -> None:
         self.payment_nodes = payment_list
-        self.run_parameters = run_parameters
+        self.parameters = parameters
         self.data = list(map(encode_payment, self.payment_nodes))
 
         self.tree = MerkleTree(self.data, hashfunc)
@@ -111,12 +115,17 @@ class PaymentTree:
                 pa.field("root", pa.string()),
                 pa.field("leaf", pa.string()),
                 pa.field("proof", pa.list_(pa.string())),
+                pa.field("explanationId", pa.string()),
+                pa.field("explanationData", pa.map_(pa.string(), pa.string())),
             ],
-            metadata={"run_parameters": json.dumps(self.run_parameters)},
+            metadata={
+                "parameters": json.dumps(self.parameters, default=lambda o: o.__dict__)
+            },
         )
         # Arrow tables are constructed by column
         # so we need to flip the data
 
+        explanation_id = py_.get(self.parameters, "metadata.explanation_id", "no_id")
         columns = defaultdict(list)
         if len(self.data) > 0:
             root = self.get_hex_root()
@@ -134,6 +143,10 @@ class PaymentTree:
                 columns["root"].append(root)
                 columns["leaf"].append(leaf.hex())
                 columns["proof"].append(self.get_hex_proof(leaf))
+                columns["explanationId"].append(explanation_id)
+                columns["explanationData"].append(
+                    [(k, str(v)) for k, v in payment["explanationData"].items()]
+                )
         return pa.table(data=columns, schema=schema)
 
 

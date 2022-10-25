@@ -102,3 +102,9 @@ export default class SetupSafeModal extends Component<Signature> {
     </BoxelModal>
   </template>
 }
+
+declare module '@glint/environment-ember-loose/registry' {
+  export default interface Registry {
+    'SetupSafeModal': typeof SetupSafeModal;
+  }
+}

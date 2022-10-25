@@ -11,6 +11,7 @@ const webpack = require('webpack');
 
 module.exports = function (defaults) {
   let app = new EmberApp(defaults, {
+    'ember-power-select': { theme: false },
     svgJar: {
       strategy: 'inline',
       sourceDirs: ['public'],

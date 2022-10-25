@@ -7,7 +7,11 @@ class Staking(Rule):
     This rule rewards users with CARD.cpxd held in a depot in a monthly basis
     """
 
-    def __init__(self, core_parameters, user_defined_parameters):
+    def __init__(
+        self,
+        core_parameters,
+        user_defined_parameters,
+    ):
         super(Staking, self).__init__(core_parameters, user_defined_parameters)
 
     def set_user_defined_parameters(self, token, interest_rate_monthly):
@@ -115,5 +119,30 @@ class Staking(Rule):
         df["validTo"] = payment_cycle + self.duration
         df["token"] = self.token
         df["amount"] = df["rewards"] * 1_000_000_000
+        df["explanationData"] = df.apply(
+            lambda row: self.get_explanation_data(
+                {
+                    "rewardProgramID": row.rewardProgramID,
+                    "payee": row.payee,
+                    "paymentCycle": row.paymentCycle,
+                    "validFrom": row.validFrom,
+                    "validTo": row.validTo,
+                    "amount": row.amount,
+                    "token": row.token,
+                }
+            ),
+            axis=1,
+        )
+
         df.drop(["rewards"], axis=1)
         return df
+
+    def get_explanation_data(self, payment):
+        return {
+            "amount": payment["amount"],
+            "token": self.token,
+            "rollover_amount": payment.get("rollover_amount", 0),
+            "interest_rate": self.interest_rate_monthly,
+            "from_block": self.start_block,
+            "end_block": self.end_block,
+        }

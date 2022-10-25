@@ -28,6 +28,8 @@ def test_adds_metadata_to_payment_tree():
             "token": "0x0000000000000000000000000000000000000000",
             "duration": 43200,
         },
+        "explanation": {},
+        "metadata": {"explanation_id": "min_other_merchants"},
     }
     tree = PaymentTree(
         [
@@ -39,9 +41,10 @@ def test_adds_metadata_to_payment_tree():
                 "payee": "0x0000000000000000000000000000000000000000",
                 "token": "0x0000000000000000000000000000000000000000",
                 "amount": 0,
+                "explanationData": {},
             }
         ],
-        run_parameters=metadata,
+        parameters=metadata,
     )
 
     with TemporaryDirectory() as path:
@@ -49,5 +52,5 @@ def test_adds_metadata_to_payment_tree():
         table_on_disk = pq.read_table(AnyPath(path) / "results.parquet")
         written_metadata = table_on_disk.schema.metadata
         # Note - keys here are *bytes* not strings
-        run_parameters = json.loads(written_metadata[b"run_parameters"])
-        assert run_parameters == metadata
+        parameters = json.loads(written_metadata[b"parameters"])
+        assert parameters == metadata

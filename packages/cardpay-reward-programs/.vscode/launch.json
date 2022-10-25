@@ -9,24 +9,17 @@
       "type": "python",
       "request": "launch",
       "module": "cardpay_reward_programs.main",
-      "args": [
-        "0xBb2B1638a16268b4ACFB4B38fbB9D6081F876BA1",
-        "1",
-        "--output-location",
-        "s3://tall-data-dev/local_test"
-      ]
+      "env": {
+        "RULE": "FlatPayment"
+      },
+      "args": ["./input/flat_payment/parameters.json"]
     },
     {
       "name": "Explore using Streamlit",
       "type": "python",
       "request": "launch",
       "module": "streamlit",
-      "args": [
-        "run",
-        "${workspaceFolder}/streamlit/explore.py",
-        "--server.port",
-        "8501"
-      ]
+      "args": ["run", "${workspaceFolder}/streamlit/explore.py", "--server.port", "8501"]
     }
   ]
 }

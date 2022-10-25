@@ -27,7 +27,7 @@
     <cp.Item @title='Safe' @icon='safe'>
       {{#if this.safe}}
         <span class='safe-tools__dashboard-schedule-control-panel-safe-info-address'>
-          {{this.safe.token.address}}:{{this.safe.address}}
+          {{this.safe.token.address}}:{{truncate-middle this.safe.address}}
         </span>
         <span class='safe-tools__dashboard-schedule-control-panel-safe-info-balance'>
           {{this.safe.token.balance}} {{this.safe.token.symbol}}
@@ -47,11 +47,22 @@
     </cp.Item>
   </Boxel::ControlPanel>
   <section class='safe-tools__dashboard-schedule-content'>
-    <ScheduleCollapsePanel @open={{true}} />
+    <ScheduleCollapsePanel @open={{not this.wallet.isConnected}} />
+    <div class="temporary-form-container">
+      <SchedulePaymentFormActionCard />
+    </div>
   </section>
 </section>
 
 <SetupSafeModal
   @isOpen={{this.isSetupSafeModalOpen}}
   @onClose={{set this 'isSetupSafeModalOpen' false}}
+/>
+
+<DepositModal
+  @isOpen={{this.isDepositModalOpen}}
+  @onClose={{set this 'isDepositModalOpen' false}}
+  @safeAddress={{this.safe.address}}
+  @networkName={{this.network}}
+  @tokensToCover={{this.scheduledPaymentsTokensToCover}}
 />

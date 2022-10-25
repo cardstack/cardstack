@@ -48,7 +48,7 @@
     "build:subgraph": "yarn --cwd packages/cardpay-subgraph build",
     "check:waypoint-secrets": "ts-node scripts/verify-waypoint-secrets.ts",
     "lint": "npm-run-all --aggregate-output --continue-on-error --parallel lint:*",
-    "lint:boxel": "yarn --cwd packages/boxel",
+    "lint:boxel": "yarn --cwd packages/boxel lint",
     "lint:cardhost": "yarn --cwd packages/cardhost lint",
     "lint:ssr-web": "yarn --cwd packages/ssr-web lint",
     "lint:web-client": "yarn --cwd packages/web-client lint",

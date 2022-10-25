@@ -35,7 +35,7 @@ if SENTRY_DSN is not None:
     )
 
 
-def run_reward_program(
+def run_task(
     parameters_file: str = typer.Argument(
         default="./input/safe_ownership/parameters.json",
         help="The parameters file to use",
@@ -53,12 +53,15 @@ def run_reward_program(
         parameters = json.load(stream)
     for subclass in Rule.__subclasses__():
         if subclass.__name__ == rule_name:
-            rule = subclass(parameters["core"], parameters["user_defined"])
+            rule = subclass(
+                parameters["core"],
+                parameters["user_defined"],
+            )
     payment_list = rule.get_payments(**parameters["run"]).to_dict("records")
-    tree = PaymentTree(payment_list, run_parameters=parameters)
+    tree = PaymentTree(payment_list, parameters)
     table = tree.as_arrow()
     write_parquet_file(AnyPath(output_location), table)
 
 
 if __name__ == "__main__":
-    typer.run(run_reward_program)
+    typer.run(run_task)
