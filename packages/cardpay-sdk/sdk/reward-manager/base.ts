@@ -5,7 +5,12 @@ import RewardManagerABI from '../../contracts/abi/v0.9.0/reward-manager';
 import { Contract, ContractOptions } from 'web3-eth-contract';
 import { getAddress } from '../../contracts/addresses';
 import { AbiItem, randomHex, toChecksumAddress, fromWei } from 'web3-utils';
-import { isTransactionHash, TransactionOptions, waitForTransactionConsistency } from '../utils/general-utils';
+import {
+  isTransactionHash,
+  TransactionOptions,
+  waitForTransactionConsistency,
+  resolveDoc,
+} from '../utils/general-utils';
 import { getSDK } from '../version-resolver';
 import type { SuccessfulTransactionReceipt } from '../utils/successful-transaction-receipt';
 import {
@@ -33,8 +38,6 @@ import { WithSymbol, RewardTokenBalance } from '@cardstack/cardpay-sdk';
 import { query } from '../utils/graphql';
 import { Signer } from 'ethers';
 import { get } from 'lodash';
-import { getResolver } from '@cardstack/did-resolver';
-import { Resolver } from 'did-resolver';
 
 export interface RewardProgramInfo {
   rewardProgramId: string;
@@ -1073,13 +1076,7 @@ The owner of reward safe ${safeAddress} is ${rewardSafeOwner}, but the signer is
 
   async getRuleJson(rewardProgramId: string): Promise<RuleJson> {
     const did = await this.getRuleDid(rewardProgramId);
-    let didResolver = new Resolver(getResolver());
-    let didResult = await didResolver.resolve(did);
-    if (!didResult.didDocument?.alsoKnownAs) {
-      throw new Error('No alsoKnownAs found for DID');
-    }
-    let urlResponse = await fetch(didResult.didDocument?.alsoKnownAs[0]);
-    let content = await urlResponse.json();
+    const content = await resolveDoc(did);
     return content;
   }
 

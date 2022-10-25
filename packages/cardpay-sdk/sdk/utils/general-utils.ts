@@ -12,6 +12,9 @@ import { v4 } from 'uuid';
 import JsonRpcProvider from '../../providers/json-rpc-provider';
 import { BytesLike, Interface } from 'ethers/lib/utils';
 import { utils } from 'ethers';
+import { Revert } from '../../providers/http-provider';
+import { getResolver } from '@cardstack/did-resolver';
+import { Resolver } from 'did-resolver';
 
 const POLL_INTERVAL = 500;
 
@@ -444,4 +447,15 @@ export async function wait(ms = 1000) {
   return new Promise((resolve) => {
     setTimeout(resolve, ms);
   });
+}
+
+export async function resolveDoc(did: string) {
+  let didResolver = new Resolver(getResolver());
+  let didResult = await didResolver.resolve(did);
+  if (!didResult.didDocument?.alsoKnownAs) {
+    throw new Error('No alsoKnownAs found for DID');
+  }
+  let urlResponse = await fetch(didResult.didDocument?.alsoKnownAs[0]);
+  let content = await urlResponse.json();
+  return content;
 }
