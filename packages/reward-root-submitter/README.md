@@ -85,9 +85,9 @@ Additionally, you can run the lambda function based off an uploaded private ECR 
 
 ## Updating ABIs
 
-To update the ABIs used, run the helper script `update_abis.sh` with the location of the locally checked out contracts repository.
+To update the ABIs used, run the helper script `update-python-package-abis.sh` from the root scripts folder with the location of the locally checked out contracts repository.
 
-    bash update_abis.sh ~/projects/card-pay-protocol
+    bash scripts/update-python-package-abis.sh ~/projects/card-pay-protocol
 
 This will switch to that repository, checkout the main branch and update, build the 
 
