@@ -9,6 +9,8 @@ import '../css/schedule.css';
 export default class Schedule extends Controller {
   @controller declare application: ApplicationController;
 
+  // TODO: replace with walletService
+  wallet = { isConnected: true };
   // modified with set helper
   @tracked isSetupSafeModalOpen = false;
   @tracked isDepositModalOpen = false;
