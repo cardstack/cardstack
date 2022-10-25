@@ -43,7 +43,7 @@
 }
 
 .deposit-modal__section-funds-info-token {
-  font-size: 14px;
+  font-size: var(--boxel-font-size-sm);
   padding-bottom: var(--boxel-sp-xxs);
   align-items: center;
   gap: var(--boxel-sp-xxxs);
