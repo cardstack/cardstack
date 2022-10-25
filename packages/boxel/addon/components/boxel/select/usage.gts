@@ -6,6 +6,7 @@ import { action } from '@ember/object';
 import { fn, array } from '@ember/helper';
 import { A } from '@ember/array';
 import FreestyleUsage from 'ember-freestyle/components/freestyle/usage';
+import { cssVariable, CSSVariableInfo } from 'ember-freestyle/decorators/css-variable';
 
 import BoxelSelect from './index';
 
@@ -19,22 +20,26 @@ export default class BoxelSelectUsage extends Component {
   @tracked renderInPlace = false;
   @tracked disabled = false;
 
-  @tracked currentColorCssValue: string = 'var(--boxel-light-100)';
-  @tracked selectedColorCssValue: string = 'var(--boxel-highlight)';
+  @cssVariable({ cssClassName: 'boxel-select__dropdown'}) declare boxelSelectCurrentColor: CSSVariableInfo;
+  @cssVariable({ cssClassName: 'boxel-select__dropdown'}) declare boxelSelectSelectedColor: CSSVariableInfo;
+  @cssVariable({ cssClassName: 'boxel-select__dropdown'}) declare boxelSelectBelowTransitioningInAnimation: CSSVariableInfo;
+  @cssVariable({ cssClassName: 'boxel-select__dropdown'}) declare boxelSelectAboveTransitioningInAnimation: CSSVariableInfo;
 
   @action onSelectItem(item: string| null): void {
     this.selectedItem = item;
   }
 
   <template>
-    <style>
-      .boxel-select-usage-dropdown {
-        --boxel-select-current-color: {{this.currentColorCssValue}};
-        --boxel-select-selected-color: {{this.selectedColorCssValue}};
-      }
-    </style>
     <FreestyleUsage @name="Select">
       <:example>
+        <style>
+          .boxel-select-usage-dropdown {
+            --boxel-select-current-color: {{this.boxelSelectCurrentColor.value}};
+            --boxel-select-selected-color: {{this.boxelSelectSelectedColor.value}};
+            --boxel-select-below-transitioning-in-animation: {{this.boxelSelectBelowTransitioningInAnimation.value}};
+            --boxel-select-above-transitioning-in-animation: {{this.boxelSelectAboveTransitioningInAnimation.value}};
+          }
+        </style>
         <BoxelSelect
           @placeholder={{this.placeholder}}
           @selected={{this.selectedItem}}
@@ -101,18 +106,6 @@ export default class BoxelSelectUsage extends Component {
           @description="When truthy the component cannot be interacted"
         />  
         <Args.String
-          @name="--boxel-select-current-color"
-          @defaultValue={{unbound this.currentColorCssValue}}
-          @value={{this.currentColorCssValue}}
-          @onInput={{fn (mut this.currentColorCssValue)}}
-        />
-        <Args.String
-          @name="--boxel-select-selected-color"
-          @defaultValue={{unbound this.selectedColorCssValue}}
-          @value={{this.selectedColorCssValue}}
-          @onInput={{fn (mut this.selectedColorCssValue)}}
-        />      
-        <Args.String
           @name="dropdownClass"
           @description="Class to be applied to the dropdown only"
         />
@@ -124,15 +117,39 @@ export default class BoxelSelectUsage extends Component {
           @name="selectedItemComponent"
           @description="The component to render to customize just the selected item of the trigger"
         />
-        <Args.String
-          @name="--boxel-select-below-transitioning-in-animation"
-          @description='Animation for dropdown appearing below. On close animation is reversed'
-        />
-        <Args.String
-          @name="--boxel-select-above-transitioning-in-animation"
-          @description='Animation for dropdown appearing above. On close animation is reversed'
-        /> 
       </:api>
+      <:cssVars as |Css|>
+        <Css.Basic
+          @name="boxel-select-current-color"
+          @type="color"
+          @defaultValue={{this.boxelSelectCurrentColor.defaults}}
+          @value={{this.boxelSelectCurrentColor.value}}
+          @onInput={{this.boxelSelectCurrentColor.update}}
+        />
+        <Css.Basic
+          @name="boxel-select-selected-color"
+          @type="color"
+          @defaultValue={{this.boxelSelectSelectedColor.defaults}}
+          @value={{this.boxelSelectSelectedColor.value}}
+          @onInput={{this.boxelSelectSelectedColor.update}}
+        />
+        <Css.Basic
+          @name="boxel-select-below-transitioning-in-animation"
+          @type="transition"
+          @description='Animation for dropdown appearing below. On close animation is reversed'
+          @defaultValue={{this.boxelSelectBelowTransitioningInAnimation.defaults}}
+          @value={{this.boxelSelectBelowTransitioningInAnimation.value}}
+          @onInput={{this.boxelSelectBelowTransitioningInAnimation.update}}
+        />
+        <Css.Basic
+          @name="boxel-select-above-transitioning-in-animation"
+          @type="transition"
+          @description='Animation for dropdown appearing above. On close animation is reversed'
+          @defaultValue={{this.boxelSelectAboveTransitioningInAnimation.defaults}}
+          @value={{this.boxelSelectAboveTransitioningInAnimation.value}}
+          @onInput={{this.boxelSelectAboveTransitioningInAnimation.update}}
+        /> 
+      </:cssVars>
     </FreestyleUsage>
   </template>
 }

@@ -8,6 +8,7 @@ import { action } from '@ember/object';
 //@ts-expect-error glint does not think this is consumed-but it is consumed in the template https://github.com/typed-ember/glint/issues/374
 import { array, fn } from '@ember/helper';
 import cssVar from '@cardstack/boxel/helpers/css-var';
+import { cssVariable, CSSVariableInfo } from 'ember-freestyle/decorators/css-variable';
 import { on } from '@ember/modifier';
 import './usage.css';
 
@@ -16,12 +17,16 @@ type ModalSize = 'small' | 'medium' | 'large' | undefined;
 export default class ModalUsage extends Component {
   @tracked isOpen = false;
   @tracked size: ModalSize = undefined;
-  @tracked offsetRight = '0px';
-  @tracked offsetLeft = '0px';
-  @tracked offsetTop = '0px';
+  
+  cssClassName = 'boxel-modal';
+  @cssVariable declare boxelModalOffsetRight: CSSVariableInfo;
+  @cssVariable declare boxelModalOffsetLeft: CSSVariableInfo;
+  @cssVariable declare boxelModalOffsetTop: CSSVariableInfo;
+
   @tracked layer = 'default';
   @tracked isDefaultOpen = false;
   @tracked isUrgentOpen = false;
+  @tracked isOverlayDismissalDisabled = false;
 
   get sizeAsString(): ModalSize | '<undefined>' {
     return this.size ?? '<undefined>';
@@ -63,10 +68,11 @@ export default class ModalUsage extends Component {
           @onClose={{this.onClose}}
           @isOpen={{this.isOpen}}
           aria-labelledby="boxel-modal-usage-example-id"
+          @isOverlayDismissalDisabled={{this.isOverlayDismissalDisabled}}
           style={{cssVar
-            boxel-modal-offset-top=this.offsetTop
-            boxel-modal-offset-left=this.offsetLeft
-            boxel-modal-offset-right=this.offsetRight
+            boxel-modal-offset-top=this.boxelModalOffsetTop.value
+            boxel-modal-offset-left=this.boxelModalOffsetLeft.value
+            boxel-modal-offset-right=this.boxelModalOffsetRight.value
           }}>
           <BoxelCardContainer class="boxel-modal-usage-container">
             <h2 id="boxel-modal-usage-example-id">Boxel Modal</h2>
@@ -79,9 +85,6 @@ export default class ModalUsage extends Component {
       </:example>
       <:api as |Args|>
         <Args.String @name="size" @description="Can be 'small', 'medium', 'large', or unspecified. Sets a predetermined max-width to inner modal." @value={{this.sizeAsString}} @options={{array "small" "medium" "large" "<undefined>"}} @onInput={{this.updateSize}} @defaultValue="<undefined>" />
-        <Args.String @name="--boxel-modal-offset-right" @description="Right offset for the inner modal" @value={{this.offsetRight}} @onInput={{fn (mut this.offsetRight)}} @optional={{true}} @defaultValue="0px" />
-        <Args.String @name="--boxel-modal-offset-left" @description="Left offset for the inner modal" @value={{this.offsetLeft}} @onInput={{fn (mut this.offsetLeft)}} @optional={{true}} @defaultValue="0px" />
-        <Args.String @name="--boxel-modal-offset-top" @description="Top offset for the inner modal" @value={{this.offsetTop}} @onInput={{fn (mut this.offsetTop)}} @optional={{true}} @defaultValue="0px" />
         <Args.Bool
           @name="isOpen"
           @description="Condition for opening the modal"
@@ -105,8 +108,41 @@ export default class ModalUsage extends Component {
           @value={{this.onClose}}
           @required={{true}}
         />
+        <Args.Bool
+          @name="isOverlayDismissalDisabled"
+          @description="Disables overlay interaction to avoid modal dismissal"
+          @value={{this.isOverlayDismissalDisabled}}
+          @defaultValue={{false}}
+          @onInput={{fn (mut this.isOverlayDismissalDisabled)}}
+        />
         <Args.Yield @description="The content of the modal. This visually sits directly on the overlay - there is no 'container' rendered by default." />
       </:api>
+      <:cssVars as |Css|>
+        <Css.Basic
+          @name="boxel-modal-offset-right"
+          @type="dimension"
+          @description="Right offset for the inner modal"
+          @value={{this.boxelModalOffsetRight.value}}
+          @onInput={{this.boxelModalOffsetRight.update}}
+          @defaultValue={{this.boxelModalOffsetRight.defaults}}
+          />
+        <Css.Basic
+          @name="boxel-modal-offset-left"
+          @type="dimension"
+          @description="Left offset for the inner modal"
+          @value={{this.boxelModalOffsetLeft.value}}
+          @onInput={{this.boxelModalOffsetLeft.update}}
+          @defaultValue={{this.boxelModalOffsetLeft.defaults}}
+          />
+        <Css.Basic
+          @name="boxel-modal-offset-top"
+          @type="dimension"
+          @description="Top offset for the inner modal"
+          @value={{this.boxelModalOffsetTop.value}}
+          @onInput={{this.boxelModalOffsetTop.update}}
+          @defaultValue={{this.boxelModalOffsetTop.defaults}}
+          />
+      </:cssVars>
     </FreestyleUsage>
 
     <FreestyleUsage

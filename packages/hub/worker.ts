@@ -24,6 +24,7 @@ import RemoveOldSentNotificationsTask from './tasks/remove-old-sent-notification
 import WyreTransferTask from './tasks/wyre-transfer';
 import PrintQueuedJobsTask from './tasks/print-queued-jobs';
 import ScheduledPaymentOnChainCreationWaiter from './tasks/scheduled-payment-on-chain-creation-waiter';
+import ScheduledPaymentOnChainExecutionWaiter from './tasks/scheduled-payment-on-chain-execution-waiter';
 
 let dbConfig = config.get('db') as Record<string, any>;
 const log = logger('hub/worker');
@@ -83,6 +84,7 @@ export class HubWorker {
         'wyre-transfer': this.instantiateTask(WyreTransferTask),
         's3-put-json': s3PutJson,
         'scheduled-payment-on-chain-creation-waiter': this.instantiateTask(ScheduledPaymentOnChainCreationWaiter),
+        'scheduled-payment-on-chain-execution-waiter': this.instantiateTask(ScheduledPaymentOnChainExecutionWaiter),
       },
       // https://github.com/graphile/worker#recurring-tasks-crontab
       // remove old notifications at midnight every day

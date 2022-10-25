@@ -1,0 +1,28 @@
+.schedule-payment-form-action-card {
+  min-width: 50rem;
+}
+
+.schedule-payment-form-action-card .boxel-field {
+  --boxel-field-label-align: center;
+}
+
+.schedule-payment-form-action-card--max-gas-fee-name {
+  font-weight: bold;
+}
+
+.schedule-payment-form-action-card--max-gas-fee-description {
+  font: var(--boxel-font-xs);
+  color: var(--boxel-purple-400);
+}
+
+.schedule-payment-form-action-card--fee-details {
+  padding-top: var(--boxel-sp);
+  padding-right: var(--boxel-sp);
+  font: var(--boxel-font-xs);
+  color: var(--boxel-purple-400);
+  display: flex;
+}
+
+.schedule-payment-form-action-card--fee-info-icon {
+  margin: 0 var(--boxel-sp-xxxs);
+}

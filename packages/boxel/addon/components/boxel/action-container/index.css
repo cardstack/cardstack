@@ -7,11 +7,6 @@
   box-shadow: 0 15px 30px rgb(0 0 0 / 15%);
 }
 
-.boxel-action-container--is-complete {
-  max-width: 36.6rem; /* 585px; */
-  box-shadow: 0 1px 3px rgb(0 0 0 / 15%);
-}
-
 /* Card Header */
 .boxel-action-container__header {
   --boxel-header-text-color: var(--boxel-purple-400);
@@ -27,16 +22,6 @@
 .boxel-action-container:hover .boxel-action-container__header {
   background-color: var(--boxel-purple-100);
   color: var(--boxel-dark);
-}
-
-/* Optional prompt */
-.boxel-action-container__prompt {
-  margin: 0;
-  font-size: 1.125rem; /* 18px */
-  font-weight: 700;
-  line-height: 1.33;
-  letter-spacing: 0;
-  padding: var(--boxel-sp) var(--boxel-sp-lg);
 }
 
 /* Card Chin */

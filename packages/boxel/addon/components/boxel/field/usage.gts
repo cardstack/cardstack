@@ -5,7 +5,8 @@ import BoxelInput from '../input';
 import BoxelInputValidationState from '../input/validation-state';
 
 import { tracked } from '@glimmer/tracking';
-import cssVar from '@cardstack/boxel/helpers/css-var';
+import cssVars from '@cardstack/boxel/helpers/css-var';
+import { cssVariable, CSSVariableInfo } from 'ember-freestyle/decorators/css-variable';
 
 //@ts-expect-error glint does not think this is consumed-but it is consumed in the template https://github.com/typed-ember/glint/issues/374
 import { fn, array } from '@ember/helper';
@@ -23,9 +24,8 @@ export default class FieldUsage extends Component {
   @tracked vertical2 = false;
   @tracked horizontalLabelSize2 = 'default';
   @tracked icon2 = '';
-
-  @tracked labelSize = 'minmax(4rem, 25%)';
-
+  @cssVariable({ cssClassName: 'boxel-field' }) declare boxelFieldLabelAlign: CSSVariableInfo;
+  
   <template>
     <FreestyleUsage @name="Field">
       <:example>
@@ -37,9 +37,7 @@ export default class FieldUsage extends Component {
           @horizontalLabelSize={{this.horizontalLabelSize}}
           @centeredDisplay={{this.centeredDisplay}}
           @icon={{this.icon}}
-          style={{cssVar
-            boxel-field-label-size=this.labelSize
-          }}
+          style={{cssVars boxel-field-label-align=this.boxelFieldLabelAlign.value}}
         >
           {{this.value}}
         </BoxelField>
@@ -93,18 +91,20 @@ export default class FieldUsage extends Component {
           @onInput={{fn (mut this.centeredDisplay)}}
           @value={{this.centeredDisplay}}
         />
-        {{!-- template-lint-disable no-unbound --}}
-        <Args.String
-          @name="--boxel-field-label-size"
-          @description="grid-template-columns CSS style"
-          @defaultValue={{unbound this.labelSize}}
-          @value={{this.labelSize}}
-          @onInput={{fn (mut this.labelSize)}}
-        />
         <Args.Yield
           @description="Yield value or form field"
         />
       </:api>
+      <:cssVars as |Css|>
+        <Css.Basic
+          @name="boxel-field-label-align"
+          @type="align-items"
+          @description="position of the label text within the label area"
+          @value={{this.boxelFieldLabelAlign.value}}
+          @defaultValue={{this.boxelFieldLabelAlign.defaults}}
+          @onInput={{this.boxelFieldLabelAlign.update}}
+        />
+      </:cssVars>
     </FreestyleUsage>
 
     <FreestyleUsage @name="Usage with Boxel::Input">

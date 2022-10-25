@@ -12,6 +12,7 @@ import { on } from '@ember/modifier';
 import cssVar from '@cardstack/boxel/helpers/css-var';
 //@ts-expect-error glint does not think array is consumed-but it is consumed in the template https://github.com/typed-ember/glint/issues/374
 import { array, fn } from '@ember/helper';
+import { cssVariable, CSSVariableInfo } from 'ember-freestyle/decorators/css-variable';
 
 let inProgressTimeout: number;
 
@@ -29,12 +30,12 @@ export default class ActionChinUsage extends Component<Signature> {
   @tracked unlockState: ActionChinState = 'default';
   @tracked depositState: ActionChinState = 'disabled';
 
-  @tracked paddingHorizontal = 'var(--boxel-sp-lg)';
-  @tracked paddingVertical = 'var(--boxel-sp-lg)';
-  @tracked backgroundColor = 'var(--boxel-purple-750)';
-  @tracked emphasisTextColor = 'var(--boxel-light)';
-  @tracked textColor = 'var(--boxel-purple-300)';
-  @tracked lockIconSize = '0.75rem';
+  cssClassName = 'boxel-action-chin';
+  @cssVariable declare boxelActionChinPaddingHorizontal: CSSVariableInfo;
+  @cssVariable declare boxelActionChinPaddingVertical: CSSVariableInfo;
+  @cssVariable declare boxelActionChinBackgroundColor: CSSVariableInfo;
+  @cssVariable declare boxelActionChinEmphasisTextColor: CSSVariableInfo;
+  @cssVariable declare boxelActionChinTextColor: CSSVariableInfo;
 
   get depositIsDisabled(): boolean {
     return (
@@ -151,8 +152,8 @@ export default class ActionChinUsage extends Component<Signature> {
                 </td>
                 {{!-- template-lint-disable no-whitespace-for-layout --}}
                 <td>
-                  An area used for any relevant information to the action (eg for status updates)
-                  If provided, it replaces the text:  "Actions only visible to you".
+                  An area used for any relevant information to the action (eg for status updates),
+                  on the right end of the chin.
                 </td>
                 <td>
                   <ul>
@@ -172,12 +173,11 @@ export default class ActionChinUsage extends Component<Signature> {
         @state={{this.state}}
         @disabled={{this.disabled}}
         style={{cssVar
-          boxel-action-chin-padding-horizontal=this.paddingHorizontal
-          boxel-action-chin-padding-vertical=this.paddingVertical
-          boxel-action-chin-background-color=this.backgroundColor
-          boxel-action-chin-emphasis-text-color=this.emphasisTextColor
-          boxel-action-chin-text-color=this.textColor
-          boxel-action-chin-lock-icon-size=this.lockIconSize
+          boxel-action-chin-padding-horizontal=this.boxelActionChinPaddingHorizontal.value
+          boxel-action-chin-padding-vertical=this.boxelActionChinPaddingVertical.value
+          boxel-action-chin-background-color=this.boxelActionChinBackgroundColor.value
+          boxel-action-chin-emphasis-text-color=this.boxelActionChinEmphasisTextColor.value
+          boxel-action-chin-text-color=this.boxelActionChinTextColor.value
         }}
       >
         <:default as |a|>
@@ -235,45 +235,6 @@ export default class ActionChinUsage extends Component<Signature> {
         @value={{this.stepNumber}}
         @onInput={{fn (mut this.stepNumber)}}
       />
-      {{!-- template-lint-disable no-unbound --}}
-      <Args.String
-        @name="--boxel-action-chin-padding-horizontal"
-        @defaultValue={{unbound this.paddingHorizontal}}
-        @value={{this.paddingHorizontal}}
-        @onInput={{fn (mut this.paddingHorizontal)}}
-      />
-      <Args.String
-        @name="--boxel-action-chin-padding-vertical"
-        @defaultValue={{unbound this.paddingVertical}}
-        @value={{this.paddingVertical}}
-        @onInput={{fn (mut this.paddingVertical)}}
-      />
-      <Args.String
-        @name="--boxel-action-chin-background-color"
-        @defaultValue={{unbound this.backgroundColor}}
-        @value={{this.backgroundColor}}
-        @onInput={{fn (mut this.backgroundColor)}}
-      />
-      <Args.String
-        @name="--boxel-action-chin-emphasis-text-color"
-        @description="text color in memorialized state"
-        @defaultValue={{unbound this.emphasisTextColor}}
-        @value={{this.emphasisTextColor}}
-        @onInput={{fn (mut this.emphasisTextColor)}}
-      />
-      <Args.String
-        @name="--boxel-action-chin-text-color"
-        @description="text color in info area"
-        @defaultValue={{unbound this.textColor}}
-        @value={{this.textColor}}
-        @onInput={{fn (mut this.textColor)}}
-      />
-      <Args.String
-        @name="--boxel-action-lock-icon-size"
-        @defaultValue="0.75rem"
-        @value={{this.lockIconSize}}
-        @onInput={{fn (mut this.lockIconSize)}}
-      />
       <Args.Yield
         @name="inProgress"
         @description="The block shown when @state is 'in-progress'. Yields { ActionButton, CancelButton, ActionStatusArea, InfoArea }"
@@ -287,6 +248,48 @@ export default class ActionChinUsage extends Component<Signature> {
         @description="The default block shown when @state is none of the states above. Yields { ActionButton, ActionStatusArea, InfoArea }"
       />
     </:api>
+    <:cssVars as |Css|>
+      <Css.Basic
+        @name="boxel-action-chin-padding-horizontal"
+        @type="dimension"
+        @description="Horizontal padding in the action chin"
+        @defaultValue={{this.boxelActionChinPaddingHorizontal.defaults}}
+        @value={{this.boxelActionChinPaddingHorizontal.value}}
+        @onInput={{this.boxelActionChinPaddingHorizontal.update}}
+      />
+     <Css.Basic
+        @name="boxel-action-chin-padding-vertical"
+        @type="dimension"
+        @description="Vertical padding in the action chin"
+        @defaultValue={{this.boxelActionChinPaddingVertical.defaults}}
+        @value={{this.boxelActionChinPaddingVertical.value}}
+        @onInput={{this.boxelActionChinPaddingVertical.update}}
+      />
+      <Css.Basic
+        @name="boxel-action-chin-background-color"
+        @type="color"
+        @description="Background color of the action chin"
+        @defaultValue={{this.boxelActionChinBackgroundColor.defaults}}
+        @value={{this.boxelActionChinBackgroundColor.value}}
+        @onInput={{this.boxelActionChinBackgroundColor.update}}
+      />
+      <Css.Basic
+        @name="boxel-action-chin-emphasis-text-color"
+        @type="color"
+        @description="Text color for the emphasized area of the action chin"
+        @defaultValue={{this.boxelActionChinEmphasisTextColor.defaults}}
+        @value={{this.boxelActionChinEmphasisTextColor.value}}
+        @onInput={{this.boxelActionChinEmphasisTextColor.update}}
+      />
+      <Css.Basic
+        @name="boxel-action-chin-text-color"
+        @type="color"
+        @description="Text color for the action chin"
+        @defaultValue={{this.boxelActionChinTextColor.defaults}}
+        @value={{this.boxelActionChinTextColor.value}}
+        @onInput={{this.boxelActionChinTextColor.update}}
+      />
+    </:cssVars>
   </FreestyleUsage>
 
   <FreestyleUsage @name="Usage with default and memorialized blocks only">

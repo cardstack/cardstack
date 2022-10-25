@@ -6,12 +6,19 @@ import { tracked } from '@glimmer/tracking';
 import { action } from '@ember/object';
 import { on } from '@ember/modifier';
 import { fn } from '@ember/helper';
+import cssVar from '@cardstack/boxel/helpers/css-var';
+import { cssVariable, CSSVariableInfo } from 'ember-freestyle/decorators/css-variable';
 
 export default class IconButtonUsageComponent extends Component {
   @tracked icon = 'expand';
   @tracked variant?: string;
   @tracked width = '16px';
   @tracked height = '16px';
+
+  cssClassName = "boxel-icon-button";
+  @cssVariable declare boxelIconButtonWidth: CSSVariableInfo;
+  @cssVariable declare boxelIconButtonHeight: CSSVariableInfo;
+
   @action log(message: string): void {
     // eslint-disable-next-line no-console
     console.log(message);
@@ -29,6 +36,10 @@ export default class IconButtonUsageComponent extends Component {
           @height={{this.height}}
           aria-label="Special Button"
           {{on "click" (fn this.log "Button clicked")}}
+          style={{cssVar
+            boxel-icon-button-width=this.boxelIconButtonWidth.value
+            boxel-icon-button-height=this.boxelIconButtonHeight.value
+          }}
         />
       </:example>
 
@@ -55,11 +66,25 @@ export default class IconButtonUsageComponent extends Component {
           @value={{this.height}}
           @onInput={{fn (mut this.height)}}
         />
-        <tr><td colspan="4">
-          To size the boundaries of the button, the <code>--icon-button-width</code> and <code>--icon-button-height</code> css variables
-          may be used. The default is 40px.
-        </td></tr>
       </:api>
+      <:cssVars as |Css|>
+        <Css.Basic
+          @name="boxel-icon-button-width"
+          @type="dimension"
+          @description="Used to size the boundaries of the button"
+          @defaultValue={{this.boxelIconButtonWidth.defaults}}
+          @value={{this.boxelIconButtonWidth.value}}
+          @onInput={{this.boxelIconButtonWidth.update}}
+        />
+        <Css.Basic
+          @name="boxel-icon-button-height"
+          @type="dimension"
+          @description="Used to size the boundaries of the button"
+          @defaultValue={{this.boxelIconButtonHeight.defaults}}
+          @value={{this.boxelIconButtonHeight.value}}
+          @onInput={{this.boxelIconButtonHeight.update}}
+        />
+      </:cssVars>
     </FreestyleUsage>
   </template>
 }

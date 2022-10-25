@@ -66,7 +66,7 @@ interface Layer2ConnectEvent {
   session?: any;
 }
 
-const BRIDGE = 'https://safe-walletconnect.gnosis.io/';
+const BRIDGE = 'https://bridge.walletconnect.org';
 
 export default abstract class Layer2ChainWeb3Strategy
   implements Layer2Web3Strategy, Emitter<Layer2ChainEvent>

@@ -5,7 +5,7 @@ description = ""
 authors = [
     {name = "tintinthong", email = "justin.thong@cardstack.com"},
 ]
-license-expression = "MIT"
+license = "MIT"
 dependencies = [
     "fastapi[all]>=0.75.1",
     "SQLAlchemy>=1.4.35",

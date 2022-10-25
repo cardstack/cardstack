@@ -82,6 +82,7 @@ const MAINNET = {
   name: 'Ethereum Mainnet',
   // check https://docs.tokenbridge.net/eth-xdai-amb-bridge/about-the-eth-xdai-amb for the finalization rate
   ambFinalizationRate: '20',
+  relayServiceURL: 'https://relay-ethereum.cardstack.com/api',
 };
 const GNOSIS = {
   apiBaseUrl: 'https://blockscout.com/xdai/mainnet/api',

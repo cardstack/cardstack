@@ -16,7 +16,7 @@ class FlatPayment(Rule):
         self.reward_per_user = reward_per_user
         self.accounts = accounts
 
-    def sql(self, table_query, aux_table_query=None):
+    def sql(self):
         return None
 
     def run(self, payment_cycle: int, reward_program_id: str):

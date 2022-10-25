@@ -9,7 +9,7 @@
       @onInput={{this.onInput}}
       @onChange={{this.onChange}}
       style={{css-var
-        boxel-searchbox-icon-size=this.iconSize
+        boxel-searchbox-icon-size=this.boxelSearchboxIconSize.value
       }}
     />
   </:example>
@@ -45,13 +45,6 @@
       @value={{this.value}}
       @onInput={{fn (mut this.value)}}
     />
-    {{!-- template-lint-disable no-unbound --}}
-    <Args.String
-      @name="--boxel-searchbox-icon-size"
-      @defaultValue={{unbound this.iconSize}}
-      @value={{this.iconSize}}
-      @onInput={{fn (mut this.iconSize)}}
-    />
     <Args.Action
       @name="onInput"
       @description="The action called when a user types in the searchbox. Receives the input event"
@@ -61,4 +54,14 @@
       @description="The action called when a user presses enter in the searchbox."
     />
   </:api>
+  <:cssVars as |Css|>
+    <Css.Basic
+      @name="boxel-searchbox-icon-size"
+      @type="dimension"
+      @description="The icon size"
+      @defaultValue={{this.boxelSearchboxIconSize.defaults}}
+      @value={{this.boxelSearchboxIconSize.value}}
+      @onInput={{this.boxelSearchboxIconSize.update}}
+    />
+  </:cssVars>
 </Freestyle::Usage>

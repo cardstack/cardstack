@@ -4,7 +4,9 @@ import cn from '@cardstack/boxel/helpers/cn';
 
 import './index.css';
 
-type BasePowerSelectArgs = Pick<
+type PartialBy<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>
+
+type BasePowerSelectArgs = PartialBy<Pick<
   PatchedPowerSelectArgs,
   | 'selected'
   | 'selectedItemComponent'
@@ -15,7 +17,7 @@ type BasePowerSelectArgs = Pick<
   | 'dropdownClass'
   | 'triggerComponent'
   | 'disabled'
->;
+>, 'disabled'|'renderInPlace'>;
 
 export interface BoxelSelectArgs<ItemT> extends BasePowerSelectArgs { 
   options: ItemT[];
@@ -44,6 +46,7 @@ const BoxelSelect: TemplateOnlyComponent<Signature> =
     @dropdownClass={{cn "boxel-select__dropdown" @dropdownClass}}
     @triggerComponent={{@triggerComponent}}
     @disabled={{@disabled}}
+    @matchTriggerWidth={{false}}
     @eventType="click"
     ...attributes
     as |item|
