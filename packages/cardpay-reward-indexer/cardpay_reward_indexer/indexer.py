@@ -85,7 +85,7 @@ class Indexer:
             i = models.Proof(
                 rootHash=payment["root"],
                 paymentCycle=payment["paymentCycle"],
-                tokenAddress=to_checksum_address(token),
+                tokenAddress=to_checksum_address(token) if token else "",
                 payee=payment["payee"],
                 proofArray=payment["proof"],
                 rewardProgramId=payment["rewardProgramID"],
@@ -113,7 +113,10 @@ class Indexer:
             ["address", "uint256", "uint256", "uint256", "uint256", "address", "bytes"],
             HexBytes(payment["leaf"]),
         )
-        return eth_abi.decode_abi(["address", "uint256"], transfer_data)
+        if token_type == 1:
+            return eth_abi.decode_abi(["address", "uint256"], transfer_data)
+        else:
+            return (None, None)
 
     def get_last_indexed_root_block_number(self, db: Session, reward_program_id: str):
         o = (
