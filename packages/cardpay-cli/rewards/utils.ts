@@ -17,12 +17,11 @@ export function displayRewardTokenBalance(tokenBalances: WithSymbol<RewardTokenB
 }
 
 export function displayRewardProgramInfo(rewardProgramInfo: RewardProgramInfo): void {
-  let { rewardProgramId, rewardProgramAdmin, locked, rule, tokenBalances } = rewardProgramInfo;
+  let { rewardProgramId, rewardProgramAdmin, locked, tokenBalances } = rewardProgramInfo;
   console.log(`
   rewardProgramId : ${rewardProgramId}
   rewardProgramAdmin : ${rewardProgramAdmin}
   locked : ${locked}
-  rule : ${rule ? rule : 'No rule'}
   ${tokenBalances.length > 0 ? 'balance:' : 'balance: No balance'}
   `);
   tokenBalances.map(({ tokenSymbol, balance }) => {

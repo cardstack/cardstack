@@ -454,7 +454,7 @@ export async function resolveDoc(did: string) {
   if (!didResult.didDocument?.alsoKnownAs) {
     throw new Error('No alsoKnownAs found for DID');
   }
-  let urlResponse = await fetch(didResult.didDocument?.alsoKnownAs[0]);
+  let urlResponse = await global.fetch(didResult.didDocument?.alsoKnownAs[0]);
   let content = await urlResponse.json();
   return content;
 }
