@@ -15,13 +15,9 @@ class Rule(ABC):
         self,
         core_parameters,
         user_defined_parameters,
-        explanation_block={},
-        metadata={},
     ):
         self.connection = duckdb.connect(":memory:")
         self.set_core_parameters(**core_parameters)
-        self.set_metadata_parameters(**metadata)
-        self.set_explanation_parameters(explanation_block)
         self.set_user_defined_parameters(**user_defined_parameters)
 
     def set_core_parameters(
@@ -39,12 +35,6 @@ class Rule(ABC):
         self.duration = duration
         self.subgraph_config_locations = subgraph_config_locations
         self.rollover = rollover
-
-    def set_metadata_parameters(self, explanation_id):
-        self.explanation_id = explanation_id
-
-    def set_explanation_parameters(self, explanation):
-        self.explanation_block = explanation
 
     @abstractmethod
     def set_user_defined_parameters(
@@ -137,5 +127,5 @@ class Rule(ABC):
         }
 
     @abstractmethod
-    def get_explanation_data_arr(self, payment_list, run_parameters):
+    def get_explanation_data(self, payment, run_parameters):
         raise NotImplementedError
