@@ -29,7 +29,7 @@
     </cp.Item>
   </Boxel::ControlPanel>
   <section class='safe-tools__dashboard-schedule-content'>
-    <ScheduleCollapsePanel @open={{true}} />
+    <ScheduleCollapsePanel @open={{not this.wallet.isConnected}} />
     <div class="temporary-form-container">
       <SchedulePaymentFormActionCard />
     </div>
