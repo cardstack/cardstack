@@ -31,6 +31,8 @@ export default class ConnectButton extends Component<Signature> {
         @kind="secondary-dark"
         {{on "click" this.disconnect}}
         data-test-disconnect-button
+        {{! @glint-ignore See notes here https://github.com/typed-ember/glint/pull/138#issue-852455350 }}
+        ...attributes
       >
         Disconnect
       </BoxelButton>
