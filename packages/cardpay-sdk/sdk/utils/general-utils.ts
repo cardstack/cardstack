@@ -12,7 +12,6 @@ import { v4 } from 'uuid';
 import JsonRpcProvider from '../../providers/json-rpc-provider';
 import { BytesLike, Interface } from 'ethers/lib/utils';
 import { utils } from 'ethers';
-import { Revert } from '../../providers/http-provider';
 import { getResolver } from '@cardstack/did-resolver';
 import { Resolver } from 'did-resolver';
 
