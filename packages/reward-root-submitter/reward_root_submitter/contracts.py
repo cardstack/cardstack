@@ -40,7 +40,7 @@ class RewardPool(Contract):
             raise Exception(f"Environment '{environment}' not recognised")
 
     def setup_from_address(self, contract_address):
-        with open("abis/RewardPool.json") as contract_file:
+        with open("abis/reward-pool.json") as contract_file:
             contract_json = json.load(contract_file)
             self.contract = self.w3.eth.contract(
                 address=contract_address, abi=contract_json["abi"]

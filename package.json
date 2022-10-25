@@ -42,6 +42,7 @@
     "cardpay": "yarn --cwd packages/cardpay-cli cardpay",
     "codegen:subgraph-sokol": "yarn --cwd packages/cardpay-subgraph codegen-sokol",
     "codegen:subgraph-xdai": "yarn --cwd packages/cardpay-subgraph codegen-xdai",
+    "codegen:python-package-abis": "node scripts/update-python-abis.js",
     "build:hub": "yarn --cwd packages/hub build",
     "build:ssr-web:staging": "cd packages/ssr-web && ember build --environment=production",
     "build:ssr-web:production": "cd packages/ssr-web && ember build --environment=production",

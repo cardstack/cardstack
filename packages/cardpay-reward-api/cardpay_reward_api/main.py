@@ -37,7 +37,7 @@ def get_w3():
 
 
 def get_reward_pool(w3=Depends(get_w3)):
-    with open("abis/RewardPool.json") as contract_file:
+    with open("abis/reward-pool.json") as contract_file:
         contract = json.load(contract_file)
     reward_contract = w3.eth.contract(
         address=config[settings.ENVIRONMENT]["reward_pool"], abi=contract["abi"]
