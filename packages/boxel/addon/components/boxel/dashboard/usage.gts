@@ -7,13 +7,15 @@ import { tracked } from '@glimmer/tracking';
 //@ts-expect-error glint does not think this is consumed-but it is consumed in the template https://github.com/typed-ember/glint/issues/374
 import { fn, hash } from '@ember/helper';
 import cssVar from '@cardstack/boxel/helpers/css-var';
+import { cssVariable, CSSVariableInfo } from 'ember-freestyle/decorators/css-variable';
 
 export default class DashboardUsage extends Component {
   @tracked displayLeftEdge = true;
   @tracked darkTheme = true;
 
-  @tracked backgroundColor = 'inherit';
-  @tracked color = 'inherit';
+  cssClassName = "boxel-dashboard";
+  @cssVariable declare boxelDashboardBackgroundColor: CSSVariableInfo;
+  @cssVariable declare boxelDashboardColor: CSSVariableInfo;
 
   <template>
     <FreestyleUsage @name="Dashboard">
@@ -22,8 +24,8 @@ export default class DashboardUsage extends Component {
           @displayLeftEdge={{this.displayLeftEdge}}
           @darkTheme={{this.darkTheme}}
           style={{cssVar
-            boxel-dashboard-background-color=this.backgroundColor
-            boxel-dashboard-color=this.color
+            boxel-dashboard-background-color=this.boxelDashboardBackgroundColor.value
+            boxel-dashboard-color=this.boxelDashboardColor.value
           }}
         >
           <:leftEdge>
@@ -55,21 +57,25 @@ export default class DashboardUsage extends Component {
           @value={{this.darkTheme}}
           @onInput={{fn (mut this.darkTheme)}}
         />
-        {{!-- template-lint-disable no-unbound --}}
-        <Args.String
-          @name="--boxel-dashboard-background-color"
-          @defaultValue={{unbound this.backgroundColor}}
-          @value={{this.backgroundColor}}
-          @onInput={{fn (mut this.backgroundColor)}}
-        />
-        <Args.String
-          @name="--boxel-dashboard-color"
-          @description="text color"
-          @defaultValue={{unbound this.color}}
-          @value={{this.color}}
-          @onInput={{fn (mut this.color)}}
-        />
       </:api>
+      <:cssVars as |CSS|>
+        <CSS.Basic
+          @name="boxel-dashboard-background-color"
+          @type="color"
+          @description="The background color"
+          @defaultValue={{this.boxelDashboardBackgroundColor.defaults}}
+          @value={{this.boxelDashboardBackgroundColor.value}}
+          @onInput={{this.boxelDashboardBackgroundColor.update}}
+        />
+        <CSS.Basic
+          @name="boxel-dashboard-color"
+          @type="color"
+          @description="The text color"
+          @defaultValue={{this.boxelDashboardColor.defaults}}
+          @value={{this.boxelDashboardColor.value}}
+          @onInput={{this.boxelDashboardColor.update}}
+        />
+      </:cssVars>
     </FreestyleUsage>
 
   </template>

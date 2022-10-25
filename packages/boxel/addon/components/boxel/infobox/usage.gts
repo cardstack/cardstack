@@ -5,18 +5,20 @@ import BoxelInfobox from './index';
 import { tracked } from '@glimmer/tracking';
 import cssVar from '@cardstack/boxel/helpers/css-var';
 import { fn } from '@ember/helper';
+import { cssVariable, CSSVariableInfo } from 'ember-freestyle/decorators/css-variable';
 
 import rightInfoboxImage from '@cardstack/boxel/usage-support/images/infobox-image.svg';
 
 export default class InfoboxUsage extends Component {
-  @tracked image = rightInfoboxImage;
-  @tracked imageSize = 'auto 100%';
-  @tracked imagePosition = 'right -2.25rem bottom -2.25rem';
   @tracked title = 'Add cards to your space';
   @tracked description =
     'You can drag and drop different types of cards from the Card Catalog into your space. Once you’ve added a card, you can configure its fields and edit the content.';
-  @tracked textWidth =
-    'calc(21.25rem + var(--boxel-sp-xxl) + var(--boxel-sp-xxl))';
+
+  cssClassName = 'boxel-infobox';
+  @cssVariable declare boxelInfoboxImagePosition: CSSVariableInfo;
+  @cssVariable declare boxelInfoboxImageSize: CSSVariableInfo;
+  @cssVariable declare boxelInfoboxTextWidth: CSSVariableInfo;
+  @tracked image = rightInfoboxImage;
 
   get imageUrl(): string {
     return `url(${this.image})`;
@@ -30,9 +32,9 @@ export default class InfoboxUsage extends Component {
           @description={{this.description}} 
           style={{cssVar 
             boxel-infobox-image=this.imageUrl
-            boxel-infobox-image-size=this.imageSize
-            boxel-infobox-image-position=this.imagePosition
-            boxel-infobox-text-width=this.textWidth
+            boxel-infobox-image-size=this.boxelInfoboxImageSize.value
+            boxel-infobox-image-position=this.boxelInfoboxImagePosition.value
+            boxel-infobox-text-width=this.boxelInfoboxTextWidth.value
           }}
         />
       </:example>
@@ -48,29 +50,40 @@ export default class InfoboxUsage extends Component {
           @value={{this.description}}
           @onInput={{fn (mut this.description)}}
         />
-        <Args.String
-          @name="--boxel-infobox-image"
+      </:api>
+      <:cssVars as |Css|>
+        <Css.Basic
+          @name="boxel-infobox-text-width"
+          @type="dimension"
+          @description="Used to set the width of the text portion"
+          @defaultValue={{this.boxelInfoboxTextWidth.defaults}}
+          @value={{this.boxelInfoboxTextWidth.value}}
+          @onInput={{this.boxelInfoboxTextWidth.update}}
+        />
+        <Css.Basic
+          @name="boxel-infobox-image"
+          @type="url"
+          @description="set as the background image of the infobox"
           @value={{this.image}}
           @onInput={{fn (mut this.image)}}
         />
-        <Args.String
-          @name="--boxel-infobox-image-position"
-          @value={{this.imagePosition}}
-          @onInput={{fn (mut this.imagePosition)}}
+        <Css.Basic
+          @name="boxel-infobox-image-position"
+          @type="position"
+          @description="Sets the position of the boxel-infobox-image"
+          @defaultValue={{this.boxelInfoboxImagePosition.defaults}}
+          @value={{this.boxelInfoboxImagePosition.value}}
+          @onInput={{this.boxelInfoboxImagePosition.update}}
         />
-        <Args.String
-          @name="--boxel-infobox-image-size"
-          @value={{this.imageSize}}
-          @onInput={{fn (mut this.imageSize)}}
+        <Css.Basic
+          @name="boxel-infobox-image-size"
+          @type="bg-size"
+          @description="Used to set the size of the boxel-infobox-image"
+          @defaultValue={{this.boxelInfoboxImageSize.defaults}}
+          @value={{this.boxelInfoboxImageSize.value}}
+          @onInput={{this.boxelInfoboxImageSize.update}}
         />
-        {{!-- template-lint-disable no-unbound --}}
-        <Args.String
-          @name="--boxel-infobox-text-width"
-          @default={{unbound this.textWidth}}
-          @value={{this.textWidth}}
-          @onInput={{fn (mut this.textWidth)}}
-        />
-      </:api>
+      </:cssVars>
     </FreestyleUsage>
   </template>
 }

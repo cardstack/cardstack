@@ -1,0 +1,34 @@
+.deposit-modal__section {
+  padding: 40px;
+}
+
+.deposit-modal__section header {
+  font-size: var(--boxel-font-size-lg);
+}
+
+.deposit-modal__section p {
+  font-weight: 600;
+  margin: var(--boxel-sp) 0;
+  font-size: var(--boxel-font-size-sm);
+}
+
+.deposit-modal__section-funds-info {
+  padding: var(--boxel-sp);
+  border-radius: var(--boxel-border-radius);
+  background-color: var(--boxel-yellow);
+  display: flex;
+  flex-direction: row;
+}
+
+.deposit-modal__section-funds-info-header {
+  font-weight: bold;
+  flex: 1;
+}
+
+.deposit-modal__section-funds-info-icon {
+  --icon-color: var(--boxel-dark);
+
+  flex: 0.1;
+  width: 24px;
+  height: 24px;
+}

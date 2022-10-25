@@ -1,7 +1,11 @@
 import { helper } from '@ember/component/helper';
 import { htmlSafe } from '@ember/template';
 
-type CSSValueOrFuncReturningCSSValue = string | number | (() => string);
+type CSSValueOrFuncReturningCSSValue =
+  | string
+  | number
+  | (() => string)
+  | undefined;
 
 function formatValue(value: CSSValueOrFuncReturningCSSValue) {
   if (typeof value === 'function') {
@@ -19,7 +23,9 @@ export function cssVar(
 ): string {
   let vars: string[] = [];
   Object.keys(values).forEach((name) => {
-    vars.push(`--${name}: ${formatValue(values[name])}`);
+    if (values[name] !== undefined) {
+      vars.push(`--${name}: ${formatValue(values[name])}`);
+    }
   });
 
   return vars.join('; ');

@@ -16,8 +16,8 @@ jobs:
     name: Update node_modules cache
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: volta-cli/action@v1
+      - uses: actions/checkout@v3
+      - uses: volta-cli/action@v4
       - name: Set up node_modules cache
         uses: actions/cache@v3
         with:
@@ -39,8 +39,8 @@ jobs:
       # increasing the heap size to 8GB
       NODE_OPTIONS: --max-old-space-size=8192
     steps:
-      - uses: actions/checkout@v2
-      - uses: volta-cli/action@v1
+      - uses: actions/checkout@v3
+      - uses: volta-cli/action@v4
       - name: Set up node_modules cache
         uses: actions/cache@v3
         with:
@@ -59,8 +59,8 @@ jobs:
     needs: update-cache
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: volta-cli/action@v1
+      - uses: actions/checkout@v3
+      - uses: volta-cli/action@v4
       - name: Set up node_modules cache
         uses: actions/cache@v3
         with:
@@ -117,8 +117,8 @@ jobs:
     steps:
       - name: Create database
         run: sudo -u postgres createdb hub_test
-      - uses: actions/checkout@v2
-      - uses: volta-cli/action@v1
+      - uses: actions/checkout@v3
+      - uses: volta-cli/action@v4
       - name: Set up node_modules cache
         uses: actions/cache@v3
         with:
@@ -139,8 +139,8 @@ jobs:
     needs: lint
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: volta-cli/action@v1
+      - uses: actions/checkout@v3
+      - uses: volta-cli/action@v4
       - name: Set up node_modules cache
         uses: actions/cache@v3
         with:
@@ -193,8 +193,9 @@ jobs:
       boxel: ${{ steps.filter.outputs.boxel }}
       cardie: ${{ steps.filter.outputs.cardie }}
       ssr_web: ${{ steps.filter.outputs.ssr_web }}
+      safe-tools-client: ${{ steps.filter.outputs.safe-tools-client }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: dorny/paths-filter@v2
         id: filter
         with:
@@ -235,6 +236,12 @@ jobs:
               - '.github/actions/deploy-ssr-web/**'
               - 'yarn.lock'
               - 'waypoint.hcl'
+            safe-tools-client:
+              - 'packages/safe-tools-client/**'
+              - 'packages/boxel/**'
+              - '.github/workflows/push-main.yml'
+              - '.github/actions/deploy-safe-tools-client/**'
+              - 'yarn.lock'
 
   build-hub-staging:
     name: Build hub
@@ -242,8 +249,8 @@ jobs:
     if: ${{ needs.change_check.outputs.hub == 'true' }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: volta-cli/action@v1
+      - uses: actions/checkout@v3
+      - uses: volta-cli/action@v4
       - name: Set up node_modules cache
         uses: actions/cache@v3
         with:
@@ -279,7 +286,7 @@ jobs:
           - retain: "1"
             app: hub
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Set up node_modules cache
         uses: actions/cache@v3
         with:
@@ -317,7 +324,7 @@ jobs:
     if: ${{ needs.change_check.outputs.web_client == 'true' }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Set up node_modules cache
         uses: actions/cache@v3
         with:
@@ -349,8 +356,8 @@ jobs:
     if: ${{ needs.change_check.outputs.ssr_web == 'true' }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: volta-cli/action@v1
+      - uses: actions/checkout@v3
+      - uses: volta-cli/action@v4
       - name: Set up node_modules cache
         uses: actions/cache@v3
         with:
@@ -383,8 +390,8 @@ jobs:
     if: ${{ needs.change_check.outputs.boxel == 'true' }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: volta-cli/action@v1
+      - uses: actions/checkout@v3
+      - uses: volta-cli/action@v4
       - name: Set up node_modules cache
         uses: actions/cache@v3
         with:
@@ -423,8 +430,8 @@ jobs:
     if: ${{ needs.change_check.outputs.cardie == 'true' }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: volta-cli/action@v1
+      - uses: actions/checkout@v3
+      - uses: volta-cli/action@v4
       - name: Set up node_modules cache
         uses: actions/cache@v3
         with:
@@ -450,3 +457,27 @@ jobs:
         env:
           WAYPOINT_SERVER_TOKEN: ${{ secrets.STAGING_WAYPOINT_SERVER_TOKEN }}
           WAYPOINT_SERVER_ADDR: ${{ secrets.STAGING_WAYPOINT_SERVER_ADDR }}
+
+  deploy-safe-tools-client:
+    needs: change_check
+    if: ${{ needs.change_check.outputs.safe-tools-client == 'true' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up node_modules cache
+        uses: actions/cache@v3
+        with:
+          path: |
+            node_modules
+            packages/*/node_modules
+            packages/firebase-functions/*/functions/node_modules
+          key: ${{ runner.os }}-node-modules-${{ hashFiles('yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-node-modules-
+
+      - name: Deploy safe-tools-client
+        uses: ./.github/actions/deploy-safe-tools-client
+        with:
+          environment: staging
+          discord_webhook: ${{ secrets.DISCORD_WEBHOOK }}

@@ -43,7 +43,7 @@ const BoxelField: TemplateOnlyComponent<Signature> = <template>
         ...attributes
       >
         <div class="boxel-field__label" data-test-boxel-field-label>
-          {{@label}}
+          <span>{{@label}}</span>
         </div>
 
         {{#if @icon}}

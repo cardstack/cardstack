@@ -1,5 +1,5 @@
-import pandas as pd
 from cardpay_reward_programs.rule import Rule
+from cardpay_reward_programs.utils import get_table_dataset
 
 
 class SafeOwnership(Rule):
@@ -24,21 +24,27 @@ class SafeOwnership(Rule):
         self.safe_type = safe_type
         self.max_rewards = max_rewards
 
-    def sql(self, table_query, aux_table_query=None):
-        return f"""
+    def register_tables(self):
+        safe_owner = get_table_dataset(
+            self.subgraph_config_locations["safe_owner"], "safe_owner"
+        )
+        self.connection.register("safe_owner", safe_owner)
+
+    def sql(self):
+        return """
         with total_safes as (select
                 owner as payee,
                 count(distinct safe) as total_safe_count
-                from {table_query}
-                where _block_number::integer > $1::integer and _block_number::integer <= $2::integer
+                from safe_owner
+                where _block_number > $1::integer and _block_number <= $2::integer
                 and type = $4::text
                 group by owner
                 ),
             new_safes as (select
                 owner as payee,
                 count(distinct safe) as new_safe_count
-                from {table_query}
-                where _block_number::integer > ($2::integer - $3::integer) and _block_number::integer <= $2::integer
+                from safe_owner
+                where _block_number > ($2 - $3) and _block_number <= $2::integer
                 and type = $4::text
                 group by owner
             )
@@ -51,22 +57,15 @@ class SafeOwnership(Rule):
         """
 
     def run(self, payment_cycle: int, reward_program_id: str):
+        self.register_tables()
         vars = [
             self.start_analysis_block,
-            int(payment_cycle),
+            payment_cycle,
             self.payment_cycle_length,
             self.safe_type,
             self.max_rewards,
         ]
-
-        table_query = self._get_table_query(
-            "safe_owner", "safe_owner", self.start_analysis_block, payment_cycle
-        )
-
-        if table_query == "parquet_scan([])":
-            df = pd.DataFrame(columns=["payee", "payable_safes"])
-        else:
-            df = self.run_query(table_query, vars, None)
+        df = self.connection.execute(self.sql(), vars).fetch_df()
         df["rewardProgramID"] = reward_program_id
         df["paymentCycle"] = payment_cycle
         df["validFrom"] = payment_cycle

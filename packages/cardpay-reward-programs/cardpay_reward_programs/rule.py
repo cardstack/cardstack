@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 
 import duckdb
 import pandas as pd
-from cardpay_reward_programs.utils import get_files, get_unclaimed_rewards, group_by
+from cardpay_reward_programs.utils import get_unclaimed_rewards, group_by
 
 
 class Rule(ABC):
@@ -11,6 +11,7 @@ class Rule(ABC):
     """
 
     def __init__(self, core_parameters, user_defined_parameters):
+        self.connection = duckdb.connect(":memory:")
         self.set_core_parameters(**core_parameters)
         self.set_user_defined_parameters(**user_defined_parameters)
 
@@ -40,15 +41,6 @@ class Rule(ABC):
     @abstractmethod
     def sql(self, table_query, aux_table_query=None):
         raise NotImplementedError
-
-    def _get_table_query(
-        self, config_name, table_name, min_partition: int, max_partition: int
-    ):
-        config_location = self.subgraph_config_locations[config_name]
-        local_files = get_files(
-            config_location, table_name, min_partition, max_partition
-        )
-        return f"parquet_scan({local_files})"
 
     def run_query(self, table_query, vars, aux_table_query=None):
         con = duckdb.connect(database=":memory:", read_only=False)

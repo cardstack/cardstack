@@ -1,6 +1,7 @@
 import Web3 from 'web3';
 import { ScheduledPayment } from '@prisma/client';
 import { startCase } from 'lodash';
+import { supportedChains } from '../scheduled-payments/executor';
 const { isAddress } = Web3.utils;
 
 type ScheduledPaymentAttribute =
@@ -20,7 +21,8 @@ type ScheduledPaymentAttribute =
   | 'validForDays'
   | 'spHash'
   | 'chainId'
-  | 'userAddress';
+  | 'userAddress'
+  | 'gasTokenAddress';
 
 type ScheduledPaymentErrors = Record<ScheduledPaymentAttribute, string[]>;
 
@@ -44,6 +46,7 @@ export default class ScheduledPaymentValidator {
       spHash: [],
       userAddress: [],
       chainId: [],
+      gasTokenAddress: [],
     };
 
     let mandatoryAttributes: ScheduledPaymentAttribute[] = [
@@ -61,6 +64,7 @@ export default class ScheduledPaymentValidator {
       'spHash',
       'chainId',
       'userAddress',
+      'gasTokenAddress',
     ];
 
     for (let attribute of mandatoryAttributes) {
@@ -80,6 +84,10 @@ export default class ScheduledPaymentValidator {
       if (scheduledPayment[attribute] && !isAddress(scheduledPayment[attribute] as string)) {
         errors[attribute].push(`${startCase(attribute).toLowerCase()} is not a valid address`);
       }
+    }
+
+    if (scheduledPayment.chainId && supportedChains.map((c) => c.id).indexOf(scheduledPayment.chainId) === -1) {
+      errors.chainId.push(`chain is not supported`);
     }
 
     return errors;

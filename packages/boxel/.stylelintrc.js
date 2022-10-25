@@ -20,5 +20,6 @@ module.exports = {
         ignoreValues: ['box'],
       },
     ],
+    'length-zero-no-unit': [true, { ignore: ['custom-properties'] }],
   },
 };

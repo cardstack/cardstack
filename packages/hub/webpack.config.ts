@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-require-imports,@typescript-eslint/no-var-requires */
-const { SourceMapDevToolPlugin } = require('webpack');
+const { SourceMapDevToolPlugin, ProvidePlugin } = require('webpack');
 const CopyPlugin = require('copy-webpack-plugin');
 const path = require('path');
 const { sync: glob } = require('glob');
@@ -23,6 +23,9 @@ module.exports = {
   devtool: false,
 
   plugins: [
+    new ProvidePlugin({
+      atob: 'atob', // For @ethersproject/base64 (used by @ethersproject/providers in the SDK)
+    }),
     // customize the sourcemap configuration so that sourcemaps point back to the
     // original sources.
     new SourceMapDevToolPlugin({

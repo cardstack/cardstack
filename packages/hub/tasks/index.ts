@@ -20,6 +20,7 @@ const ALL_KNOWN_TASKS: Record<keyof KnownTasks, true> = {
   'persist-off-chain-prepaid-card-customization': true,
   'persist-off-chain-profile': true,
   'scheduled-payment-on-chain-creation-waiter': true,
+  'scheduled-payment-on-chain-execution-waiter': true,
   boom: true,
 };
 

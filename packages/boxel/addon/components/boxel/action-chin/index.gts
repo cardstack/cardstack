@@ -10,7 +10,6 @@ import cn from '@cardstack/boxel/helpers/cn';
 //@ts-expect-error glint does not think this is consumed-but it is consumed in the template https://github.com/typed-ember/glint/issues/374
 import { concat, hash } from '@ember/helper';
 import and from 'ember-truth-helpers/helpers/and';
-import { svgJar } from '@cardstack/boxel/utils/svg-jar';
 import { ComponentLike, WithBoundArgs } from '@glint/template';
 import { type ActionChinState} from './state';
 
@@ -34,12 +33,13 @@ interface InProgressBlockArgs {
   InfoArea: ComponentLike<InfoAreaSignature>;
 }
 
-interface Signature {
+export interface Signature {
   Element: HTMLDivElement;
   Args: {
     stepNumber?: number;
     state: ActionChinState;
     disabled?: boolean;
+    class?: string;
   };
   Blocks: {
     'default': [DefaultBlockArgs],
@@ -64,6 +64,7 @@ export default class ActionChin extends Component<Signature> {
         (if @state (concat "boxel-action-chin--" @state))
         (if @disabled "boxel-action-chin--disabled")
         (if @stepNumber (concat "boxel-action-chin--has-step"))
+        @class
       }}
       ...attributes
       data-test-boxel-action-chin
@@ -149,12 +150,6 @@ export default class ActionChin extends Component<Signature> {
           )
         }}
       {{/if}}
-      {{!-- in any state except: disabled + has a step, we want the lock shown --}}
-      {{!-- template-lint-disable simple-unless --}}
-      {{#unless (and @disabled @stepNumber)}}
-        <span class="boxel-action-chin__private-notice" data-test-boxel-action-chin-private-notice>Actions only visible to you</span>
-        {{svgJar "lock" class="boxel-action-chin__lock-icon" role="presentation"}}
-      {{/unless}}
     </div>
   </template>
 }

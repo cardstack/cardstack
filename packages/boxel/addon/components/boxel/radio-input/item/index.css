@@ -2,7 +2,7 @@
   position: relative;
   display: block;
   max-width: 100%;
-  padding: var(--boxel-radio-option-padding, var(--boxel-sp));
+  padding: var(--boxel-radio-input-option-padding);
   border-radius: var(--boxel-border-radius);
   box-shadow: 0 0 0 1px var(--boxel-light-400);
   transition: box-shadow var(--boxel-transition);
@@ -16,7 +16,7 @@
   display: grid;
   grid-template-columns: auto 1fr;
   align-items: center;
-  gap: var(--boxel-radio-option-gap, var(--boxel-sp-sm));
+  gap: var(--boxel-radio-input-option-gap);
 }
 
 .boxel-radio-option:hover:not(.boxel-radio-option--disabled) {

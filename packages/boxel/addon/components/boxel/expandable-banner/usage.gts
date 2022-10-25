@@ -4,6 +4,7 @@ import BoxelExpandableBanner from './index';
 import { tracked } from '@glimmer/tracking';
 import cssVar from '@cardstack/boxel/helpers/css-var';
 import { fn } from '@ember/helper';
+import { cssVariable, CSSVariableInfo } from 'ember-freestyle/decorators/css-variable';
 
 import './usage.css';
 
@@ -11,12 +12,13 @@ export default class ExpandableBannerUsage extends Component {
   @tracked icon = 'payment';
   @tracked summary = 'Deposit funds to become a Supplier';
 
-  @tracked minHeight = '5rem';
-  @tracked minHeightOpen = '15rem';
-  @tracked textColor = 'var(--boxel-light)';
-  @tracked backgroundColor = 'var(--boxel-purple-400)';
-  @tracked verticalGap = 'var(--boxel-sp)';
-  @tracked horizontalGap = 'var(--boxel-sp-lg)';
+  cssClassName = 'boxel-expandable-banner';
+  @cssVariable declare boxelExpandableBannerMinHeight: CSSVariableInfo;
+  @cssVariable declare boxelExpandableBannerMinHeightOpen: CSSVariableInfo;
+  @cssVariable declare boxelExpandableBannerTextColor: CSSVariableInfo;
+  @cssVariable declare boxelExpandableBannerBackgroundColor: CSSVariableInfo;
+  @cssVariable declare boxelExpandableBannerVerticalGap: CSSVariableInfo;
+  @cssVariable declare boxelExpandableBannerHorizontalGap: CSSVariableInfo;
 
   <template>
     <FreestyleUsage @name="ExpandableBanner">
@@ -25,12 +27,12 @@ export default class ExpandableBannerUsage extends Component {
             @icon={{this.icon}}
             @summary={{this.summary}}
             style={{cssVar
-              boxel-expandable-banner-min-height=this.minHeight
-              boxel-expandable-banner-min-height-open=this.minHeightOpen
-              boxel-expandable-banner-text-color=this.textColor
-              boxel-expandable-banner-background-color=this.backgroundColor
-              boxel-expandable-banner-vertical-gap=this.verticalGap
-              boxel-expandable-banner-horizontal-gap=this.horizontalGap
+              boxel-expandable-banner-min-height=this.boxelExpandableBannerMinHeight.value
+              boxel-expandable-banner-min-height-open=this.boxelExpandableBannerMinHeightOpen.value
+              boxel-expandable-banner-text-color=this.boxelExpandableBannerTextColor.value
+              boxel-expandable-banner-background-color=this.boxelExpandableBannerBackgroundColor.value
+              boxel-expandable-banner-vertical-gap=this.boxelExpandableBannerVerticalGap.value
+              boxel-expandable-banner-horizontal-gap=this.boxelExpandableBannerHorizontalGap.value
             }}
           >
             <p class="expandable-banner-usage-paragraph">
@@ -57,47 +59,64 @@ export default class ExpandableBannerUsage extends Component {
       </:example>
 
       <:api as |Args|>
-        <Args.String @name="icon" @value={{this.icon}} @onInput={{fn (mut this.icon)}} @description="Name of the icon on the left of the summary text, passed to svg-jar."/>
-        <Args.String @name="summary" @value={{this.summary}} @onInput={{fn (mut this.summary)}} @description="The text of the summary element"/>
-        {{!-- template-lint-disable no-unbound --}}
         <Args.String
-          @name="--boxel-expandable-banner-min-height"
-          @defaultValue={{unbound this.minHeight}}
-          @value={{this.minHeight}}
-          @onInput={{fn (mut this.minHeight)}}
+          @name="icon"
+          @description="Name of the icon on the left of the summary text, passed to svg-jar."
+          @value={{this.icon}}
+          @onInput={{fn (mut this.icon)}}
         />
         <Args.String
-          @name="--boxel-expandable-banner-min-height-open"
-          @defaultValue={{unbound this.minHeightOpen}}
-          @value={{this.minHeightOpen}}
-          @onInput={{fn (mut this.minHeightOpen)}}
-        />
-        <Args.String
-          @name="--boxel-expandable-banner-text-color"
-          @defaultValue={{unbound this.textColor}}
-          @value={{this.textColor}}
-          @onInput={{fn (mut this.textColor)}}
-        />
-        <Args.String
-          @name="--boxel-expandable-banner-background-color"
-          @defaultValue={{unbound this.backgroundColor}}
-          @value={{this.backgroundColor}}
-          @onInput={{fn (mut this.backgroundColor)}}
-        />
-        <Args.String
-          @name="--boxel-expandable-banner-vertical-gap"
-          @defaultValue={{unbound this.verticalGap}}
-          @value={{this.verticalGap}}
-          @onInput={{fn (mut this.verticalGap)}}
-        />
-        <Args.String
-          @name="--boxel-expandable-banner-horizontal-gap"
-          @defaultValue={{unbound this.horizontalGap}}
-          @value={{this.horizontalGap}}
-          @onInput={{fn (mut this.horizontalGap)}}
+          @name="summary"
+          @description="The text of the summary element"
+          @value={{this.summary}}
+          @onInput={{fn (mut this.summary)}}
         />
         <Args.Yield @description="The content in the details element"/>
       </:api>
+      <:cssVars as |Css|>
+        <Css.Basic
+          @name="boxel-expandable-banner-min-height"
+          @type="dimension"
+          @defaultValue={{this.boxelExpandableBannerMinHeight.defaults}}
+          @value={{this.boxelExpandableBannerMinHeight.value}}
+          @onInput={{this.boxelExpandableBannerMinHeight.update}}
+        />
+        <Css.Basic
+          @name="boxel-expandable-banner-min-height-open"
+          @type="dimension"
+          @defaultValue={{this.boxelExpandableBannerMinHeightOpen.defaults}}
+          @value={{this.boxelExpandableBannerMinHeightOpen.value}}
+          @onInput={{this.boxelExpandableBannerMinHeightOpen.update}}
+        />
+        <Css.Basic
+          @name="boxel-expandable-banner-text-color"
+          @type="color"
+          @defaultValue={{this.boxelExpandableBannerTextColor.defaults}}
+          @value={{this.boxelExpandableBannerTextColor.value}}
+          @onInput={{this.boxelExpandableBannerTextColor.update}}
+        />
+        <Css.Basic
+          @name="boxel-expandable-banner-background-color"
+          @type="color"
+          @defaultValue={{this.boxelExpandableBannerBackgroundColor.defaults}}
+          @value={{this.boxelExpandableBannerBackgroundColor.value}}
+          @onInput={{this.boxelExpandableBannerBackgroundColor.update}}
+        />
+        <Css.Basic
+          @name="boxel-expandable-banner-vertical-gap"
+          @type="dimension"
+          @defaultValue={{this.boxelExpandableBannerVerticalGap.defaults}}
+          @value={{this.boxelExpandableBannerVerticalGap.value}}
+          @onInput={{this.boxelExpandableBannerVerticalGap.update}}
+        />
+        <Css.Basic
+          @name="boxel-expandable-banner-horizontal-gap"
+          @type="dimension"
+          @defaultValue={{this.boxelExpandableBannerHorizontalGap.defaults}}
+          @value={{this.boxelExpandableBannerHorizontalGap.value}}
+          @onInput={{this.boxelExpandableBannerHorizontalGap.update}}
+        />
+      </:cssVars>
     </FreestyleUsage>    
   </template>
 }

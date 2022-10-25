@@ -1,5 +1,5 @@
 import type { TemplateOnlyComponent } from '@ember/component/template-only';
-import BoxelIconButton from '../../icon-button';
+import BoxelIconButton, { Signature as BoxelIconButtonSignature }  from '../../icon-button';
 import BoxelButton from '../../button';
 import BoxelSelect, { BoxelSelectArgs } from '../../select';
 import { type EmptyObject } from '@ember/component/helper';
@@ -28,9 +28,7 @@ export const ButtonAccessory: TemplateOnlyComponent<ButtonAccessorySignature> = 
 
 interface IconButtonAccessorySignature {
   Element: HTMLButtonElement;
-  Args: {
-    icon: string;
-  };
+  Args: Pick<BoxelIconButtonSignature['Args'], 'icon' | 'width' | 'height'>;
   Blocks: {
     default: [];
   }
@@ -40,6 +38,8 @@ export const IconButtonAccessory: TemplateOnlyComponent<IconButtonAccessorySigna
   <BoxelIconButton
     class="boxel-input-group__accessory boxel-input-group__icon-button-accessory"
     @icon={{@icon}}
+    @height={{@height}}
+    @width={{@width}}
     data-test-boxel-input-group-icon-button-accessory
     ...attributes
   />

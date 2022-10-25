@@ -1,0 +1,19 @@
+.boxel-action-container-section {
+  --nested-section-padding: 0;
+
+  padding: var(--boxel-sp-xxl) var(--boxel-sp-lg);
+}
+
+.boxel-action-container-section > * + * {
+  margin-top: var(--boxel-sp-xxl);
+}
+
+.boxel-action-container-section > .boxel-action-container-section {
+  padding: var(--nested-section-padding);
+}
+
+.boxel-action-container-section + .boxel-action-container-section {
+  border-top: 1px solid var(--boxel-light-300);
+  margin-top: var(--boxel-sp-xl);
+  padding-top: var(--boxel-sp-xl);
+}

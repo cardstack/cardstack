@@ -1,0 +1,33 @@
+.setup-safe-modal__section {
+  padding: 50px 60px 50px 50px;
+}
+
+.setup-safe-modal__section header {
+  font-size: var(--boxel-font-size-lg);
+}
+
+.setup-safe-modal__section :is(p, ul) {
+  font-weight: 600;
+  margin: var(--boxel-sp) 0;
+  font-size: var(--boxel-font-size-sm);
+}
+
+.setup-safe-modal__section ul li {
+  margin: var(--boxel-sp-xxs) 0;
+}
+
+.safe-setup-modal__section-wallet-info {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin-top: 0;
+  gap: var(--boxel-sp-xxs);
+}
+
+.safe-setup-modal__section-icon {
+  --icon-stroke: var(--boxel-light);
+}
+
+.setup-safe-modal__section b {
+  font-size: var(--boxel-font-size-sm);
+}

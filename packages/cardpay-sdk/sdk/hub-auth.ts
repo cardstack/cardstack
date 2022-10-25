@@ -39,11 +39,16 @@ export default class HubAuth implements IHubAuth {
   }
 
   async authenticate(contractOptions?: ContractOptions): Promise<string> {
-    let ownerAddress = contractOptions?.from
-      ? contractOptions?.from
-      : this.web3OrEthersProvider instanceof JsonRpcProvider
-      ? await this.web3OrEthersProvider.getSigner().getAddress()
-      : (await this.web3OrEthersProvider.eth.getAccounts())[0];
+    let ownerAddress;
+    if (contractOptions && contractOptions.from) {
+      ownerAddress = contractOptions.from;
+    } else if (this.layer2Signer) {
+      ownerAddress = await this.layer2Signer.getAddress();
+    } else if (this.web3OrEthersProvider instanceof JsonRpcProvider) {
+      ownerAddress = await this.web3OrEthersProvider.getSigner().getAddress();
+    } else {
+      ownerAddress = (await this.web3OrEthersProvider.eth.getAccounts())[0];
+    }
     let { nonce, version } = await this.getNonce();
 
     const netName = await networkName(this.web3OrEthersProvider);

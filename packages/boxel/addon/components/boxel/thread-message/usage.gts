@@ -12,6 +12,7 @@ import cssVar from '@cardstack/boxel/helpers/css-var';
 import { fn } from '@ember/helper';
 import gt from 'ember-truth-helpers/helpers/gt';
 import { on } from '@ember/modifier';
+import { cssVariable, CSSVariableInfo } from 'ember-freestyle/decorators/css-variable';
 
 import './usage.css';
 
@@ -33,11 +34,11 @@ export default class ThreadMessageUsage extends Component {
   ]);
   @tracked fullWidth = false;
 
-  @tracked avatarSize = '2.5rem';
-  @tracked metaHeight = '1.25rem';
-  @tracked gap = 'var(--boxel-sp)';
-  @tracked marginLeft =
-    'calc(var(--boxel-thread-message-avatar-size) + var(--boxel-thread-message-gap))';
+  cssClassName = 'boxel-thread-message';
+  @cssVariable declare boxelThreadMessageAvatarSize: CSSVariableInfo;
+  @cssVariable declare boxelThreadMessageMetaHeight: CSSVariableInfo;
+  @cssVariable declare boxelThreadMessageGap: CSSVariableInfo;
+  @cssVariable declare boxelThreadMessageMarginLeft: CSSVariableInfo;
 
   @tracked layoutExampleFullWidth = false;
   @action toggleLayoutExampleFullWidth(): void {
@@ -60,10 +61,10 @@ export default class ThreadMessageUsage extends Component {
           @hideName={{this.hideName}}
           @fullWidth={{this.fullWidth}}
           style={{cssVar
-            boxel-thread-message-avatar-size=this.avatarSize
-            boxel-thread-message-meta-height=this.metaHeight
-            boxel-thread-message-gap=this.gap
-            boxel-thread-message-margin-left=this.marginLeft
+            boxel-thread-message-avatar-size=this.boxelThreadMessageAvatarSize.value
+            boxel-thread-message-meta-height=this.boxelThreadMessageMetaHeight.value
+            boxel-thread-message-gap=this.boxelThreadMessageGap.value
+            boxel-thread-message-margin-left=this.boxelThreadMessageMarginLeft.value
           }}
         >
           Hi Haley, Here’s your manuscript with all the edits I would recommend. Please review and let me know if you have any questions. I also added a couple tasks for you about things you should think about, as you figure out the rest of your story.
@@ -122,33 +123,38 @@ export default class ThreadMessageUsage extends Component {
           @defaultValue={{false}}
           @onInput={{fn (mut this.fullWidth)}}
         />
-        {{!-- template-lint-disable no-unbound --}}
-        <Args.String
-          @name="--boxel-thread-message-avatar-size"
-          @defaultValue={{unbound this.avatarSize}}
-          @value={{this.avatarSize}}
-          @onInput={{fn (mut this.avatarSize)}}
-        />
-        <Args.String
-          @name="--boxel-thread-message-meta-height"
-          @defaultValue={{unbound this.metaHeight}}
-          @value={{this.metaHeight}}
-          @onInput={{fn (mut this.metaHeight)}}
-        />
-        <Args.String
-          @name="--boxel-thread-message-gap"
-          @description="gap after avatar"
-          @defaultValue={{unbound this.gap}}
-          @value={{this.gap}}
-          @onInput={{fn (mut this.gap)}}
-        />
-        <Args.String
-          @name="--boxel-thread-message-margin-left"
-          @defaultValue={{unbound this.marginLeft}}
-          @value={{this.marginLeft}}
-          @onInput={{fn (mut this.marginLeft)}}
-        />
       </:api>
+      <:cssVars as |Css|>
+        <Css.Basic
+          @name="boxel-thread-message-avatar-size"
+          @type="dimension"
+          @defaultValue={{this.boxelThreadMessageAvatarSize.defaults}}
+          @value={{this.boxelThreadMessageAvatarSize.value}}
+          @onInput={{this.boxelThreadMessageAvatarSize.update}}
+        />
+        <Css.Basic
+          @name="boxel-thread-message-meta-height"
+          @type="dimension"
+          @defaultValue={{this.boxelThreadMessageMetaHeight.defaults}}
+          @value={{this.boxelThreadMessageMetaHeight.value}}
+          @onInput={{this.boxelThreadMessageMetaHeight.update}}
+        />
+        <Css.Basic
+          @name="boxel-thread-message-gap"
+          @type="dimension"
+          @description="gap after avatar"
+          @defaultValue={{this.boxelThreadMessageGap.defaults}}
+          @value={{this.boxelThreadMessageGap.value}}
+          @onInput={{this.boxelThreadMessageGap.update}}
+        />
+        <Css.Basic
+          @name="boxel-thread-message-margin-left"
+          @type="dimension"
+          @defaultValue={{this.boxelThreadMessageMarginLeft.defaults}}
+          @value={{this.boxelThreadMessageMarginLeft.value}}
+          @onInput={{this.boxelThreadMessageMarginLeft.update}}
+        />
+      </:cssVars>
     </FreestyleUsage>
 
     <FreestyleUsage

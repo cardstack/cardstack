@@ -42,57 +42,6 @@ def get_latest_details(config_location):
         return yaml.safe_load(stream)
 
 
-def get_partition_iterator(min_partition, max_partition, partition_sizes):
-    for partition_size in sorted(partition_sizes, reverse=True):
-        start_partition_allowed = (min_partition // partition_size) * partition_size
-        end_partition_allowed = (max_partition // partition_size) * partition_size
-        last_max_partition = None
-        for start_partition in range(
-            start_partition_allowed, end_partition_allowed, partition_size
-        ):
-            last_max_partition = start_partition + partition_size
-            yield partition_size, start_partition, start_partition + partition_size
-        if last_max_partition is not None:
-            min_partition = last_max_partition
-
-
-def get_partition_files(config_location, table, min_partition, max_partition):
-    # Get config
-    with open(get_local_file(config_location / "config.yaml"), "r") as stream:
-        config = yaml.safe_load(stream)
-    latest = get_latest_details(config_location)
-    latest_block = latest.get("latest_block")
-    if min_partition is None:
-        min_partition = latest.get("earliest_block")
-    # Get table
-    table_config = config["tables"][table]
-    partition_sizes = sorted(table_config["partition_sizes"], reverse=True)
-    table_dir = config_location.joinpath(
-        "data", f"subgraph={latest['subgraph_deployment']}", f"table={table}"
-    )
-    files = []
-    for partition_size, start_partition, end_partition in get_partition_iterator(
-        min_partition, latest_block, partition_sizes
-    ):
-        if start_partition < max_partition:
-            files.append(
-                table_dir.joinpath(
-                    f"partition_size={partition_size}",
-                    f"start_partition={start_partition}",
-                    f"end_partition={end_partition}",
-                    "data.parquet",
-                )
-            )
-    return files
-
-
-def get_files(config_location, table, min_partition, max_partition):
-    file_list = get_partition_files(
-        AnyPath(config_location), table, min_partition, max_partition
-    )
-    return list(map(get_local_file, file_list))
-
-
 def get_table_dataset(config_location, table):
     config_location = AnyPath(config_location)
     latest = get_latest_details(config_location)

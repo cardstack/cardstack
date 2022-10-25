@@ -21,6 +21,7 @@ describe('ScheduledPaymentValidator', function () {
       feeFixedUsd: ['fee fixed usd is required'],
       payAt: ['pay at is required'],
       feePercentage: ['fee percentage is required'],
+      gasTokenAddress: ['gas token address is required'],
       salt: ['salt is required'],
       spHash: ['sp hash is required'],
       chainId: ['chain id is required'],
@@ -47,5 +48,16 @@ describe('ScheduledPaymentValidator', function () {
     expect(errors.moduleAddress).deep.equal(['module address is not a valid address']);
     expect(errors.tokenAddress).deep.equal(['token address is not a valid address']);
     expect(errors.payeeAddress).deep.equal(['payee address is not a valid address']);
+  });
+
+  it('validates scheduled payment with invalid chain', async function () {
+    let subject = await getContainer().lookup('scheduled-payment-validator');
+
+    const scheduledPayment: Partial<ScheduledPayment> = {
+      chainId: 99,
+    };
+
+    let errors = await subject.validate(scheduledPayment);
+    expect(errors.chainId).deep.equal(['chain is not supported']);
   });
 });

@@ -19,8 +19,8 @@ export interface Signature {
     items: any[];
     groupDescription: string;
     name: string;
-    orientation: string;
-    spacing: string;
+    orientation?: string;
+    spacing?: string;
   };
   Blocks: {
     'default': [{
@@ -35,8 +35,9 @@ const RadioInput: TemplateOnlyComponent<Signature> = <template>
   <Container
     @groupDescription={{@groupDescription}}
     @disabled={{@disabled}}
-    @spacing={{@spacing}}
+    @spacing={{or @spacing 'default'}}
     @orientation={{or @orientation "horizontal"}}
+    class="boxel-radio-input"
     ...attributes
   >
     {{#each @items as |item i|}}
