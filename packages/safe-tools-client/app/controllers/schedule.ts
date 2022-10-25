@@ -16,18 +16,32 @@ export default class Schedule extends Controller {
   @tracked isDepositModalOpen = false;
 
   get safe() {
-    // Should we grab the network nativeToken info here, or expect the sdk method to return it within safeInfo?
-
-    //TODO: get safe info from sdk and format it
+    //TODO: get safe info from sdk and format it,
     return {
       address: '0x8a40AFffb53f4F953a204cAE087219A28771df9d',
-      token: {
-        address: 'eth',
-        name: 'Ethereum',
-        symbol: 'ETH',
-        decimals: 18,
-        balance: 0,
-      },
+      tokens: [
+        {
+          address: 'eth',
+          name: 'Ethereum',
+          symbol: 'ETH',
+          decimals: 18,
+          balance: 1, //in ETH
+        },
+        {
+          address: '0x6B...1d0F', // TODO: check when address is hex, to truncate on template
+          name: 'Dai',
+          symbol: 'DAI',
+          decimals: 18,
+          balance: 1,
+        },
+        {
+          address: 'usdc',
+          name: 'USDC',
+          symbol: 'USDC',
+          decimals: 6,
+          balance: 0,
+        },
+      ],
     };
   }
 
