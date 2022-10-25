@@ -151,7 +151,7 @@ export default class RewardPool {
       claimedLeafs = await this.getClaimedLeafs(address, rewardProgramId);
     }
     json.map((o: any) => {
-      let { validFrom, validTo, token, amount}: FullLeaf = this.decodeLeaf(o.leaf) as FullLeaf;
+      let { validFrom, validTo, token, amount }: FullLeaf = this.decodeLeaf(o.leaf) as FullLeaf;
       if (token && rewardTokens.includes(token)) {
         // filters for known reward tokens
         if (!knownClaimed) {
