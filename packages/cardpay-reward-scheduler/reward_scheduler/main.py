@@ -71,9 +71,7 @@ def main():
     w3 = Web3(Web3.HTTPProvider(EVM_FULL_NODE_URL))
     with open("abis/reward-manager.json") as contract_file:
         contract = json.load(contract_file)
-    reward_manager = w3.eth.contract(
-        address=REWARD_MANAGER_ADDRESS, abi=contract["abi"]
-    )
+    reward_manager = w3.eth.contract(address=REWARD_MANAGER_ADDRESS, abi=contract)
     for reward_program_id in REWARD_SCHEDULER_APPROVED_PROGRAMS.split(","):
         reward_program_id = reward_program_id.strip()
         reward_program = RewardProgram(
