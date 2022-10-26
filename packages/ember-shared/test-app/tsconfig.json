@@ -1,0 +1,34 @@
+{
+  "compilerOptions": {
+    "target": "es2020",
+    "allowJs": true,
+    "moduleResolution": "node",
+    "allowSyntheticDefaultImports": true,
+    "noImplicitAny": true,
+    "noImplicitThis": true,
+    "alwaysStrict": true,
+    "strictNullChecks": true,
+    "strictPropertyInitialization": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
+    "noEmitOnError": false,
+    "noEmit": true,
+    "inlineSourceMap": true,
+    "inlineSources": true,
+    "skipLibCheck": true,
+    "baseUrl": ".",
+    "module": "es2020",
+    "experimentalDecorators": true,
+    "paths": {
+      "@cardstack/ember-shared-test-app/tests/*": ["tests/*"],
+      "@cardstack/ember-shared-test-app/*": ["app/*"],
+      "*": ["types/*", "../addon/types/*"]
+    }
+  },
+  "glint": {
+    "environment": ["ember-loose", "ember-template-imports"]
+  },
+  "include": ["app/**/*", "tests/**/*", "types/**/*"]
+}

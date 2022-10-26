@@ -39,9 +39,9 @@
     "@embroider/webpack": "^1.8.3",
     "@glimmer/component": "^1.1.2",
     "@glimmer/tracking": "^1.1.2",
-    "@glint/core": "^0.9.5",
-    "@glint/environment-ember-loose": "^0.9.5",
-    "@glint/environment-ember-template-imports": "^0.9.5",
+    "@glint/core": "^0.9.7",
+    "@glint/environment-ember-loose": "^0.9.7",
+    "@glint/environment-ember-template-imports": "^0.9.7",
     "@hyperbola/svgo-loader": "0.1.2",
     "@metamask/detect-provider": "^1.2.0",
     "@percy/cli": "^1.0.0-beta.70",
@@ -161,6 +161,7 @@
     "extends": "../../package.json"
   },
   "dependencies": {
+    "@cardstack/ember-shared": "^1.0.13",
     "@ctrl/tinycolor": "^3.4.0",
     "@metamask/safe-event-emitter": "^2.0.0",
     "@walletconnect/client": "^1.6.0",
