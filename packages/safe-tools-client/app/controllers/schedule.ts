@@ -16,6 +16,9 @@ export default class Schedule extends Controller {
   @tracked isSetupSafeModalOpen = false;
   @tracked isDepositModalOpen = false;
 
+  // TODO: replace with network service
+  @tracked network = 'ETH Mainnet';
+
   get safe() {
     //TODO: get safe info from sdk and format it,
     return {
@@ -58,9 +61,20 @@ export default class Schedule extends Controller {
     }
   }
 
-  // TODO: add selected network
-  get network() {
-    return 'Ethereum';
+  // TODO: get available networks from sdk, and maybe share network info ?
+  get availableNetworks() {
+    const networks = ['ETH Mainnet', 'Gnosis Chain', 'Polygon'];
+
+    const networkstWithoutSelectedOne = networks.filter(
+      (network) => network !== this.network
+    );
+
+    return networkstWithoutSelectedOne;
+  }
+
+  @action onSelectNetwork(network: string) {
+    // TODO: trigger selection on service;
+    this.network = network;
   }
 
   get scheduledPaymentsTokensToCover() {
