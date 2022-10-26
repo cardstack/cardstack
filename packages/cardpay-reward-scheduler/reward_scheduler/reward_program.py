@@ -132,7 +132,7 @@ class RewardProgram:
             try:
                 did = blob.decode("utf-8")  # new blob format: hex encodes a did string
                 doc = resolve_did(did)
-                rules = doc.get("tasks", None)
+                rules = doc.get("tasks", [])
                 if rules is None:
                     raise Exception("No rules specified")
                 else:
@@ -148,6 +148,15 @@ class RewardProgram:
                 return [rules]
         else:
             return []
+
+    def get_explanation(self):
+        blob = self.reward_manager.caller.rule(self.reward_program_id)
+        if blob and blob != b"":
+            did = blob.decode("utf-8")  # new blob format: hex encodes a did string
+            doc = resolve_did(did)
+            return doc.get("explanation", {})
+        else: 
+            return {}
 
     def raise_on_payment_cycle_overlap(self, rules):
         """
@@ -259,12 +268,12 @@ class RewardProgram:
             return
 
         self.update_processed()
+        explanation = self.get_exxplanation()
         rules = self.get_rules()
-        explanation_block = rules.get("explanation", {})
         logging.info(f"Reward program {self.reward_program_id} has {len(rules)} rules")
         self.raise_on_payment_cycle_overlap(rules)
         for rule in rules:
-            self.run_rule(rule, explanation_block)
+            self.run_rule(rule, explanation)
 
         logging.info(f"All new payment cycles triggered for {self.reward_program_id}")
 
