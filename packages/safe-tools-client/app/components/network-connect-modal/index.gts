@@ -1,6 +1,7 @@
 import Component from '@glimmer/component';
 import { action } from '@ember/object';
 import { inject as service} from '@ember/service';
+import { tracked } from '@glimmer/tracking';
 //@ts-expect-error glint does not think this is consumed-but it is consumed in the template https://github.com/typed-ember/glint/issues/374
 import { concat, fn, hash } from '@ember/helper';
 import { on } from '@ember/modifier';
@@ -30,6 +31,8 @@ interface Signature {
 
 class NetworkConnectModal extends Component<Signature> {
   @service declare wallet: WalletService;
+
+  @tracked chosenProviderId: string | undefined;
 
   @action async cancelConnection(): Promise<void> {
     // TODO
@@ -93,7 +96,7 @@ class NetworkConnectModal extends Component<Signature> {
               @groupDescription='Select a wallet to connect to'
               @items={{this.wallet.walletProviders}}
               @disabled={{this.wallet.isConnecting}}
-              @checkedId={{this.wallet.providerId}}
+              @checkedId={{this.chosenProviderId}}
               @hideRadio={{true}}
               class='network-connect-modal__wallet-group'
               data-test-wallet-selection as |option|
@@ -101,7 +104,7 @@ class NetworkConnectModal extends Component<Signature> {
               {{#let option.data as |item|}}
                 <option.component
                   @name='wallet-provider-selection'
-                  @onChange={{fn (mut this.wallet.providerId) item.id}}
+                  @onChange={{fn (mut this.chosenProviderId) item.id}}
                   @disabled={{not item.enabled}}
                   data-test-wallet-option={{item.id}}
                 >
@@ -132,7 +135,7 @@ class NetworkConnectModal extends Component<Signature> {
 
           <ActionChin @state='default'>
             <:default as |a|>
-              <a.ActionButton {{on "click" this.wallet.connect}} data-test-mainnet-connect-button>
+              <a.ActionButton {{on "click" (fn this.wallet.connect this.chosenProviderId)}} data-test-mainnet-connect-button>
                 Connect Wallet
               </a.ActionButton>
             </:default>

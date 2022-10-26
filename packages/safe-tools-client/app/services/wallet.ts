@@ -53,7 +53,9 @@ export default class Wallet extends Service {
     this.chainConnectionManager.reconnect(this.web3, this.providerId);
   }
 
-  @action connect() {
+  @action connect(providerId: WalletProviderId) {
+    this.providerId = providerId;
+
     if (!this.isConnected) {
       taskFor(this.connectWalletTask).perform();
     }
