@@ -161,7 +161,7 @@
     "extends": "../../package.json"
   },
   "dependencies": {
-    "@cardstack/ember-helpers": "^1.0.13",
+    "@cardstack/ember-shared": "^1.0.13",
     "@ctrl/tinycolor": "^3.4.0",
     "@metamask/safe-event-emitter": "^2.0.0",
     "@walletconnect/client": "^1.6.0",

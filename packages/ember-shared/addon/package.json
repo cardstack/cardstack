@@ -1,5 +1,5 @@
 {
-  "name": "@cardstack/ember-helpers",
+  "name": "@cardstack/ember-shared",
   "version": "1.0.13",
   "description": "Ember.js helpers used across Cardstack ember apps.",
   "keywords": [

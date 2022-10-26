@@ -1,5 +1,5 @@
-import Application from '@cardstack/ember-helpers-test-app/app';
-import config from '@cardstack/ember-helpers-test-app/config/environment';
+import Application from '@cardstack/ember-shared-test-app/app';
+import config from '@cardstack/ember-shared-test-app/config/environment';
 import * as QUnit from 'qunit';
 import { setApplication } from '@ember/test-helpers';
 import { setup } from 'qunit-dom';

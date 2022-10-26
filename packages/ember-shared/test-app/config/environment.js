@@ -2,7 +2,7 @@
 
 module.exports = function (environment) {
   let ENV = {
-    modulePrefix: '@cardstack/ember-helpers-test-app',
+    modulePrefix: '@cardstack/ember-shared-test-app',
     environment,
     rootURL: '/',
     locationType: 'history',

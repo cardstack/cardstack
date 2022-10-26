@@ -21,7 +21,7 @@ runs:
         path: |
           node_modules
           packages/*/node_modules
-          packages/ember-helpers/*/node_modules
+          packages/ember-shared/*/node_modules
           packages/firebase-functions/*/functions/node_modules
         key: ${{ runner.os }}-node-modules-${{ hashFiles('yarn.lock') }}
         restore-keys: |

@@ -1,11 +1,11 @@
-name: CI [ember-helpers]
+name: CI [ember-shared]
 
 on:
   pull_request:
     paths:
-      - "packages/ember-helpers/**"
+      - "packages/ember-shared/**"
       - 'packages/eslint-config/**'
-      - ".github/workflows/pr-ember-helpers.yml"
+      - ".github/workflows/pr-ember-shared.yml"
       - "package.json"
       - "yarn.lock"
 
@@ -29,7 +29,7 @@ jobs:
           path: |
             node_modules
             packages/*/node_modules
-            packages/ember-helpers/*/node_modules
+            packages/ember-shared/*/node_modules
             packages/firebase-functions/*/functions/node_modules
           key: ${{ runner.os }}-node-modules-${{ hashFiles('yarn.lock') }}
           restore-keys: |
@@ -37,4 +37,4 @@ jobs:
       - name: Install dependencies
         run: yarn --prefer-offline --frozen-lockfile
       - name: Run tests
-        run: yarn test:ember-helpers
+        run: yarn test:ember-shared

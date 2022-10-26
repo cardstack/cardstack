@@ -22,8 +22,8 @@
     "module": "es2020",
     "experimentalDecorators": true,
     "paths": {
-      "@cardstack/ember-helpers-test-app/tests/*": ["tests/*"],
-      "@cardstack/ember-helpers-test-app/*": ["app/*"],
+      "@cardstack/ember-shared-test-app/tests/*": ["tests/*"],
+      "@cardstack/ember-shared-test-app/*": ["app/*"],
       "*": ["types/*", "../addon/types/*"]
     }
   },

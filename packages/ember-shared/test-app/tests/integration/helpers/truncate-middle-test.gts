@@ -1,7 +1,7 @@
 import { module, test } from 'qunit';
 import { setupRenderingTest } from 'ember-qunit';
 import { render } from '@ember/test-helpers';
-import truncateMiddle from '@cardstack/ember-helpers/helpers/truncate-middle';
+import truncateMiddle from '@cardstack/ember-shared/helpers/truncate-middle';
 
 module('Integration | Helper | truncate-middle', function (hooks) {
   setupRenderingTest(hooks);

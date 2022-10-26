@@ -1,4 +1,4 @@
 export {
   truncateMiddle,
   default,
-} from '@cardstack/ember-helpers/helpers/truncate-middle';
+} from '@cardstack/ember-shared/helpers/truncate-middle';
