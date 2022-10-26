@@ -148,6 +148,7 @@
     "eslint-plugin-prettier": "^4.2.1",
     "eslint-plugin-qunit": "^7.3.1",
     "loader.js": "^4.7.0",
+    "lodash": "^4.17.21",
     "node-sass": "^7.0.1",
     "npm-run-all": "^4.1.5",
     "prettier": "^2.7.1",

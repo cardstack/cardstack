@@ -42,6 +42,7 @@ module.exports = {
         './tests/dummy/config/**/*.js',
         './generate-thumbs.js',
         './lib/**/*.js',
+        './blueprints/*/index.js',
       ],
       parserOptions: {
         sourceType: 'script',
@@ -56,7 +57,7 @@ module.exports = {
         {},
         require('eslint-plugin-node').configs.recommended.rules,
         {
-          // add your custom rules and overrides for node files here
+          'node/no-unpublished-require': 'off',
         }
       ),
     },
