@@ -24,6 +24,7 @@ jobs:
           path: |
             node_modules
             packages/*/node_modules
+            packages/ember-helpers/*/node_modules
             packages/firebase-functions/*/functions/node_modules
           key: ${{ runner.os }}-node-modules-${{ hashFiles('yarn.lock') }}
           restore-keys: |
@@ -47,6 +48,7 @@ jobs:
           path: |
             node_modules
             packages/*/node_modules
+            packages/ember-helpers/*/node_modules
             packages/firebase-functions/*/functions/node_modules
           key: ${{ runner.os }}-node-modules-${{ hashFiles('yarn.lock') }}
           restore-keys: |
@@ -67,6 +69,7 @@ jobs:
           path: |
             node_modules
             packages/*/node_modules
+            packages/ember-helpers/*/node_modules
             packages/firebase-functions/*/functions/node_modules
           key: ${{ runner.os }}-node-modules-${{ hashFiles('yarn.lock') }}
           restore-keys: |
@@ -125,6 +128,7 @@ jobs:
           path: |
             node_modules
             packages/*/node_modules
+            packages/ember-helpers/*/node_modules
             packages/firebase-functions/*/functions/node_modules
           key: ${{ runner.os }}-node-modules-${{ hashFiles('yarn.lock') }}
           restore-keys: |
@@ -147,6 +151,7 @@ jobs:
           path: |
             node_modules
             packages/*/node_modules
+            packages/ember-helpers/*/node_modules
             packages/firebase-functions/*/functions/node_modules
           key: ${{ runner.os }}-node-modules-${{ hashFiles('yarn.lock') }}
           restore-keys: |
@@ -156,6 +161,8 @@ jobs:
         env:
           PERCY_TOKEN: ${{ secrets.PERCY_TOKEN_BOXEL }}
         run: yarn test:boxel:percy
+      - name: Run ember-helper tests
+        run: yarn test:ember-helpers
       # using yarn to install @percy/cli suddenly started causing V8 out of
       # memory errors. According to https://stackoverflow.com/a/56568741 likely
       # there is a dependency cycle that yarn can't see through. However, npm
@@ -191,6 +198,7 @@ jobs:
       hub: ${{ steps.filter.outputs.hub }}
       web_client: ${{ steps.filter.outputs.web_client }}
       boxel: ${{ steps.filter.outputs.boxel }}
+      ember-helpers: ${{ steps.filter.outputs.ember-helpers }}
       cardie: ${{ steps.filter.outputs.cardie }}
       ssr_web: ${{ steps.filter.outputs.ssr_web }}
       safe-tools-client: ${{ steps.filter.outputs.safe-tools-client }}
@@ -213,6 +221,7 @@ jobs:
             web_client:
               - 'packages/web-client/**'
               - 'packages/boxel/**'
+              - 'packages/ember-helpers/**'
               - 'packages/cardpay-sdk/**'
               - 'packages/did-resolver/**'
               - '.github/workflows/push-main.yml'
@@ -239,6 +248,7 @@ jobs:
             safe-tools-client:
               - 'packages/safe-tools-client/**'
               - 'packages/boxel/**'
+              - 'packages/ember-helpers/**'
               - '.github/workflows/push-main.yml'
               - '.github/actions/deploy-safe-tools-client/**'
               - 'yarn.lock'
@@ -257,6 +267,7 @@ jobs:
           path: |
             node_modules
             packages/*/node_modules
+            packages/ember-helpers/*/node_modules
             packages/firebase-functions/*/functions/node_modules
           key: ${{ runner.os }}-node-modules-${{ hashFiles('yarn.lock') }}
           restore-keys: |
@@ -293,6 +304,7 @@ jobs:
           path: |
             node_modules
             packages/*/node_modules
+            packages/ember-helpers/*/node_modules
             packages/firebase-functions/*/functions/node_modules
           key: ${{ runner.os }}-node-modules-${{ hashFiles('yarn.lock') }}
           restore-keys: |
@@ -331,6 +343,7 @@ jobs:
           path: |
             node_modules
             packages/*/node_modules
+            packages/ember-helpers/*/node_modules
             packages/firebase-functions/*/functions/node_modules
           key: ${{ runner.os }}-node-modules-${{ hashFiles('yarn.lock') }}
           restore-keys: |
@@ -364,6 +377,7 @@ jobs:
           path: |
             node_modules
             packages/*/node_modules
+            packages/ember-helpers/*/node_modules
             packages/firebase-functions/*/functions/node_modules
           key: ${{ runner.os }}-node-modules-${{ hashFiles('yarn.lock') }}
           restore-keys: |
@@ -398,6 +412,7 @@ jobs:
           path: |
             node_modules
             packages/*/node_modules
+            packages/ember-helpers/*/node_modules
             packages/firebase-functions/*/functions/node_modules
           key: ${{ runner.os }}-node-modules-${{ hashFiles('yarn.lock') }}
           restore-keys: |
@@ -438,6 +453,7 @@ jobs:
           path: |
             node_modules
             packages/*/node_modules
+            packages/ember-helpers/*/node_modules
             packages/firebase-functions/*/functions/node_modules
           key: ${{ runner.os }}-node-modules-${{ hashFiles('yarn.lock') }}
           restore-keys: |
@@ -471,6 +487,7 @@ jobs:
           path: |
             node_modules
             packages/*/node_modules
+            packages/ember-helpers/*/node_modules
             packages/firebase-functions/*/functions/node_modules
           key: ${{ runner.os }}-node-modules-${{ hashFiles('yarn.lock') }}
           restore-keys: |

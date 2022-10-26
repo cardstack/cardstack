@@ -1,14 +1,20 @@
-name: CI [discord-bot]
+name: CI [ember-helpers]
 
 on:
   pull_request:
     paths:
-      - "packages/discord-bot/**"
-      - "packages/test-support/**"
-      - "packages/eslint-config/**"
-      - ".github/workflows/pr-discord-bot.yml"
+      - "packages/ember-helpers/**"
+      - 'packages/eslint-config/**'
+      - ".github/workflows/pr-ember-helpers.yml"
       - "package.json"
       - "yarn.lock"
+
+permissions:
+  contents: read
+  issues: read
+  checks: write
+  pull-requests: write
+  id-token: write
 
 jobs:
   test:
@@ -17,7 +23,6 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: volta-cli/action@v4
-
       - name: Set up node_modules cache
         uses: actions/cache@v3
         with:
@@ -29,6 +34,7 @@ jobs:
           key: ${{ runner.os }}-node-modules-${{ hashFiles('yarn.lock') }}
           restore-keys: |
             ${{ runner.os }}-node-modules-
-
-      - run: yarn --prefer-offline --frozen-lockfile
-      - run: yarn test:discord-bot
+      - name: Install dependencies
+        run: yarn --prefer-offline --frozen-lockfile
+      - name: Run tests
+        run: yarn test:ember-helpers

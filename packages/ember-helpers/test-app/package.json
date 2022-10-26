@@ -2,7 +2,7 @@
   "name": "@cardstack/ember-helpers-test-app",
   "version": "0.0.1",
   "dependencies": {
-    "@cardstack/ember-helpers": "^0.0.1",
+    "@cardstack/ember-helpers": "^1.0.13",
     "ember-template-imports": "^3.1.2"
   },
   "devDependencies": {

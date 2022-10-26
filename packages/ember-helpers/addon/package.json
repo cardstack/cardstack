@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/ember-helpers",
-  "version": "0.0.1",
+  "version": "1.0.13",
   "description": "Ember.js helpers used across Cardstack ember apps.",
   "keywords": [
     "ember-addon"
@@ -14,6 +14,7 @@
   ],
   "scripts": {
     "build": "rollup --config",
+    "build_if_missing": "[ -d dist ] || yarn build",
     "lint": "concurrently 'npm:lint:*(!fix)' --names 'lint:'",
     "lint:fix": "concurrently 'npm:lint:*:fix' --names 'fix:'",
     "lint:hbs": "ember-template-lint . --no-error-on-unmatched-pattern",
