@@ -87,6 +87,8 @@
     "deploy:web-client:preview-production": "cd ./packages/web-client && ember deploy s3-preview-production --verbose",
     "deploy:web-client:production": "cd ./packages/web-client && ember deploy production --verbose",
     "deploy:safe-tools-client": "cd packages/safe-tools-client && ember deploy",
+    "deploy:safe-tools-client:preview-staging": "cd ./packages/safe-tools-client && ember deploy s3-preview-staging --verbose",
+    "deploy:safe-tools-client:preview-production": "cd ./packages/safe-tools-client && ember deploy s3-preview-production --verbose",
     "deploy:subgraph-local": "yarn --cwd packages/cardpay-subgraph deploy-local",
     "deploy:subgraph-sokol-green": "yarn --cwd packages/cardpay-subgraph deploy-sokol-green",
     "deploy:subgraph-sokol-blue": "yarn --cwd packages/cardpay-subgraph deploy-sokol-blue",
