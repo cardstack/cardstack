@@ -39,7 +39,7 @@
   },
   "scripts": {
     "clean": "git clean -x -f --exclude=packages/*/.env --exclude=cardstack.code-workspace && lerna run clean",
-    "postinstall": "yarn --cwd packages/cardpay-sdk codegen && patch-package",
+    "postinstall": "yarn --cwd packages/cardpay-sdk codegen && yarn --cwd packages/ember-shared/addon build",
     "cardpay": "yarn --cwd packages/cardpay-cli cardpay",
     "codegen:subgraph-sokol": "yarn --cwd packages/cardpay-subgraph codegen-sokol",
     "codegen:subgraph-xdai": "yarn --cwd packages/cardpay-subgraph codegen-xdai",
