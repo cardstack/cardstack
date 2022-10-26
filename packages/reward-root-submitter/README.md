@@ -85,14 +85,10 @@ Additionally, you can run the lambda function based off an uploaded private ECR 
 
 ## Updating ABIs
 
-To update the ABIs used, run the helper script `update_abis.sh` with the location of the locally checked out contracts repository.
+To update the ABIs used, run the helper script from the root folder.
+This will copy the latest ABIs from the SDK.
 
-    bash update_abis.sh ~/projects/card-pay-protocol
-
-This will switch to that repository, checkout the main branch and update, build the 
-
-If these steps do not work, each stage can be run manually to get the ABIs.
-You need to build and then copy from the subdirectory `artifacts` all of the non-debug jsons for the required contracts. 
+    yarn codegen:python-package-abis
 
 ## Releasing
 

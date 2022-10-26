@@ -32,7 +32,7 @@ def w3(tester_provider):
 
 
 def create_and_initialise(contract_name, w3, deploy_address):
-    with open(f"abis/{contract_name}.json") as contract_file:
+    with open(f"tests/resources/abis/{contract_name}.json") as contract_file:
         contract = json.load(contract_file)
 
     abi = contract["abi"]
@@ -93,17 +93,17 @@ def deploy_address(eth_tester, deploy_key):
 
 @pytest.fixture
 def reward_pool_address(w3, deploy_address, deploy_key):
-    token_manager = create_and_initialise("TokenManager", w3, deploy_address)
-    version_manager = create_and_initialise("VersionManager", w3, deploy_address)
-    reward_pool = create_and_initialise("RewardPool", w3, deploy_address)
+    token_manager = create_and_initialise("token-manager", w3, deploy_address)
+    version_manager = create_and_initialise("version-manager", w3, deploy_address)
+    reward_pool = create_and_initialise("reward-pool", w3, deploy_address)
 
-    action_dispatcher = create_and_initialise("ActionDispatcher", w3, deploy_address)
+    action_dispatcher = create_and_initialise("action-dispatcher", w3, deploy_address)
     tx_hash = action_dispatcher.functions.addHandler(
         deploy_address, "not_used"
     ).transact({"from": deploy_address})
     w3.eth.wait_for_transaction_receipt(tx_hash, 180)
 
-    reward_manager = create_and_initialise("RewardManager", w3, deploy_address)
+    reward_manager = create_and_initialise("reward-manager", w3, deploy_address)
     tx_hash = reward_manager.functions.setup(
         action_dispatcher.address,
         arbitrary_address(),
