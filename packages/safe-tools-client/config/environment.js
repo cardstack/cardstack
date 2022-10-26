@@ -18,6 +18,8 @@ module.exports = function (environment) {
       // Here you can pass flags/options to your application instance
       // when it is created
     },
+
+    hubUrl: process.env.HUB_URL,
   };
 
   if (environment === 'development') {
@@ -26,6 +28,8 @@ module.exports = function (environment) {
     // ENV.APP.LOG_TRANSITIONS = true;
     // ENV.APP.LOG_TRANSITIONS_INTERNAL = true;
     // ENV.APP.LOG_VIEW_LOOKUPS = true;
+
+    ENV.hubUrl = ENV.hubUrl ?? 'http://localhost:3000';
   }
 
   if (environment === 'test') {
