@@ -155,7 +155,7 @@ class RewardProgram:
             did = blob.decode("utf-8")  # new blob format: hex encodes a did string
             doc = resolve_did(did)
             return doc.get("explanation", {})
-        else: 
+        else:
             return {}
 
     def raise_on_payment_cycle_overlap(self, rules):
