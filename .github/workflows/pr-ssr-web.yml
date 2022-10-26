@@ -27,17 +27,9 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: volta-cli/action@v4
-      - name: Set up node_modules cache
-        uses: actions/cache@v3
+      - uses: ./.github/actions/setup-node-modules-cache
         with:
-          path: |
-            node_modules
-            packages/*/node_modules
-            packages/ember-shared/*/node_modules
-            packages/firebase-functions/*/functions/node_modules
-          key: ${{ runner.os }}-node-modules-${{ hashFiles('yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-node-modules-
+          yarn_lock_md5: ${{ hashFiles('yarn.lock') }}
       - run: yarn --prefer-offline --frozen-lockfile
       # using yarn to install @percy/cli suddenly started causing V8 out of
       # memory errors. According to https://stackoverflow.com/a/56568741 likely
