@@ -1,6 +1,10 @@
 module.exports = {
   extends: 'stylelint-config-standard',
-  ignoreFiles: ['dist/**/*.css', 'node_modules/**/*.css'],
+  ignoreFiles: [
+    'dist/**/*.css',
+    'node_modules/**/*.css',
+    'blueprints/**/*.css',
+  ],
   rules: {
     'property-no-vendor-prefix': null,
     'selector-class-pattern':
