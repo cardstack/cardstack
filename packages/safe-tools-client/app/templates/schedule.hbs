@@ -1,6 +1,6 @@
 <section class='safe-tools__dashboard-schedule'>
   <Boxel::ControlPanel as |cp|>
-    <cp.Item @title='Wallet' @icon='wallet' @isActive={{true}}>
+    <cp.Item @title='Wallet' @icon='wallet' @isActive={{not this.wallet.isConnected}}>
       {{#if this.wallet.isConnected}}
         <div
           class='safe-tools__dashboard-schedule-control-panel-wallet-address'
@@ -23,7 +23,17 @@
         @onConnect={{set this.application 'isShowingConnectModal' true}}
       />
     </cp.Item>
-    <cp.Item @title='Network' @icon='network' />
+    <cp.Item @title='Network' @icon='network'>
+        <Boxel::Select
+            class="safe-tools__dashboard-network-selector"
+            @selected={{this.network}}
+            @onChange={{this.onSelectNetwork}}
+            @options={{this.availableNetworks}}
+            as |network itemCssClass|
+          >
+          <div class={{itemCssClass}}>{{network}}</div>
+        </Boxel::Select>
+    </cp.Item>
     <cp.Item @title='Safe' @icon='safe'>
       {{#if this.safe}}
         {{#each this.safe.tokens as |token|}}
