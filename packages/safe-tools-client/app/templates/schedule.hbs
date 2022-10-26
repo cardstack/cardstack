@@ -8,12 +8,16 @@
     <cp.Item @title='Network' @icon='network' />
     <cp.Item @title='Safe' @icon='safe'>
       {{#if this.safe}}
-        <span class='safe-tools__dashboard-schedule-control-panel-safe-info-address'>
-          {{this.safe.token.address}}:{{truncate-middle this.safe.address}}
-        </span>
-        <span class='safe-tools__dashboard-schedule-control-panel-safe-info-balance'>
-          {{this.safe.token.balance}} {{this.safe.token.symbol}}
-        </span>
+        {{#each this.safe.tokens as |token|}}
+          {{#if (gt token.balance 0)}}
+            <span class='safe-tools__dashboard-schedule-control-panel-safe-info-address'>
+              {{token.address}}:{{truncate-middle this.safe.address}}
+            </span>
+            <span class='safe-tools__dashboard-schedule-control-panel-safe-info-balance'>
+              {{token.balance}} {{token.symbol}}
+            </span>
+          {{/if}}  
+        {{/each}}
       {{else}}
         <p class='safe-tools__dashboard-schedule-control-panel-safe-info-create'>
           You need to have a safe which contains funds that would be deducted
@@ -29,7 +33,7 @@
     </cp.Item>
   </Boxel::ControlPanel>
   <section class='safe-tools__dashboard-schedule-content'>
-    <ScheduleCollapsePanel @open={{true}} />
+    <ScheduleCollapsePanel @open={{not this.wallet.isConnected}} />
     <div class="temporary-form-container">
       <SchedulePaymentFormActionCard />
     </div>

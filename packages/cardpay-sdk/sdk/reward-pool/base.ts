@@ -151,22 +151,25 @@ export default class RewardPool {
       claimedLeafs = await this.getClaimedLeafs(address, rewardProgramId);
     }
     json.map((o: any) => {
-      if (rewardTokens.includes(o.tokenAddress)) {
+      let { validFrom, validTo, token, amount }: FullLeaf = this.decodeLeaf(o.leaf) as FullLeaf;
+      if (token && rewardTokens.includes(token)) {
         // filters for known reward tokens
         if (!knownClaimed) {
           // proofs not claimed yet
           if (!claimedLeafs.includes(o.leaf)) {
             // filters for proofs has not been claimed
-            let { validFrom, validTo }: FullLeaf = this.decodeLeaf(o.leaf) as FullLeaf;
             res.push({
               ...o,
+              tokenAddress: token,
+              amount: amount,
               isValid: validFrom <= currentBlock && validTo > currentBlock,
             });
           }
         } else {
-          let { validFrom, validTo }: FullLeaf = this.decodeLeaf(o.leaf) as FullLeaf;
           res.push({
             ...o,
+            tokenAddress: token,
+            amount: amount,
             isValid: validFrom <= currentBlock && validTo > currentBlock,
           });
         }

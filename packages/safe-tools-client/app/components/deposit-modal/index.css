@@ -12,17 +12,26 @@
   font-size: var(--boxel-font-size-sm);
 }
 
+.deposit-modal__section-funds-info,
+.deposit-modal__section-funds-info-balance,
+.deposit-modal__section-funds-info-token {
+  display: flex;
+  flex-direction: row;
+}
+
 .deposit-modal__section-funds-info {
   padding: var(--boxel-sp);
   border-radius: var(--boxel-border-radius);
   background-color: var(--boxel-yellow);
-  display: flex;
-  flex-direction: row;
 }
 
 .deposit-modal__section-funds-info-header {
   font-weight: bold;
   flex: 1;
+}
+
+.deposit-modal__section p.deposit-modal__section-funds-info-balance {
+  margin: var(--boxel-sp-xxs) 0;
 }
 
 .deposit-modal__section-funds-info-icon {
@@ -31,4 +40,21 @@
   flex: 0.1;
   width: 24px;
   height: 24px;
+}
+
+.deposit-modal__section-funds-info-token {
+  font-size: var(--boxel-font-size-sm);
+  padding-bottom: var(--boxel-sp-xxs);
+  align-items: center;
+  gap: var(--boxel-sp-xxxs);
+}
+
+.deposit-modal__section-funds-info-token-list {
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.deposit-modal__section-funds-info-cover {
+  width: 50%;
 }

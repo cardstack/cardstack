@@ -71,7 +71,7 @@ def run_all(output_location: str, max_block: int = 24589499):
                     print(
                         client.containers.run(
                             rule["core"]["docker_image"],
-                            "run_reward_program --parameters-file /input/parameters.json --output-location /output",
+                            "run_task --parameters-file /input/parameters.json --output-location /output",
                             mounts=[
                                 docker.types.Mount("/input/", tmpdir, type="bind"),
                                 docker.types.Mount("/output/", tmpdir, type="bind"),

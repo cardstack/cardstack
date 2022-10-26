@@ -17,6 +17,8 @@ class Proof(Base):
     leaf = Column(String, unique=True)
     validFrom = Column(Integer)
     validTo = Column(Integer)
+    explanationId = Column(String, default="no_id")
+    explanationData = Column(PickleType, default={})
 
 
 class Root(Base):
