@@ -268,7 +268,7 @@ class RewardProgram:
             return
 
         self.update_processed()
-        explanation = self.get_exxplanation()
+        explanation = self.get_explanation()
         rules = self.get_rules()
         logging.info(f"Reward program {self.reward_program_id} has {len(rules)} rules")
         self.raise_on_payment_cycle_overlap(rules)
