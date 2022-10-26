@@ -24,7 +24,8 @@
     "lint:types": "glint",
     "start": "rollup --config --watch",
     "test": "echo 'A v2 addon does not have tests, run tests in test-app'",
-    "prepack": "rollup --config"
+    "prepack": "yarn build",
+    "postinstall": "yarn build"
   },
   "dependencies": {
     "@embroider/addon-shim": "^1.0.0"
