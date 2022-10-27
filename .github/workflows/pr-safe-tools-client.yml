@@ -72,7 +72,7 @@ jobs:
         uses: ./.github/actions/deploy-ember-preview
         env:
           HUB_URL: https://hub-staging.stack.cards
-          S3_PREVIEW_BUCKET_NAME: cardstack-safe-tools-client-preview-staging
+          S3_PREVIEW_BUCKET_NAME: safe-tools-preview.stack.cards
           S3_PREVIEW_REGION: us-east-1
         with:
           package: safe-tools-client
@@ -96,7 +96,7 @@ jobs:
         uses: ./.github/actions/deploy-ember-preview
         env:
           HUB_URL: https://hub.cardstack.com
-          S3_PREVIEW_BUCKET_NAME: cardstack-safe-tools-client-preview-production
+          S3_PREVIEW_BUCKET_NAME: safe-tools-preview.cardstack.com
           S3_PREVIEW_REGION: us-east-1
         with:
           package: safe-tools-client
