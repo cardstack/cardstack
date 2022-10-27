@@ -129,6 +129,7 @@
 
   /* Status colors */
   --boxel-error-100: #f00;    /* alert - attention - error */
+  --boxel-error-200: #ed0000;
   --boxel-warning-100: var(--boxel-yellow); /* warning - notification */
   --boxel-success-100: var(--boxel-green);
   --boxel-success-200: var(--boxel-teal);
