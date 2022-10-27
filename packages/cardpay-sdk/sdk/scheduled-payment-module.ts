@@ -934,7 +934,7 @@ export default class ScheduledPaymentModule {
     if (payAt == null && recurringDayOfMonth == null && recurringUntil == null)
       throw new Error('When payAt is null, recurringDayOfMonth and recurringUntil must have a value');
 
-    let { onTxnHash } = txnOptions ?? {};
+    let { onTxnHash, nonce } = txnOptions ?? {};
     let module = new Contract(moduleAddress, ScheduledPaymentABI, this.ethersProvider);
     let executeScheduledPaymentData;
     if (recurringUntil) {
@@ -997,6 +997,7 @@ export default class ScheduledPaymentModule {
       let response = await signer.sendTransaction({
         to: executeScheduledPaymentTx.to,
         data: executeScheduledPaymentTx.data,
+        nonce: nonce ? BigNumber.from(nonce.toString()) : undefined,
       });
       if (typeof onTxnHash === 'function') {
         await onTxnHash(response.hash);

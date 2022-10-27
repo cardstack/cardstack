@@ -7,45 +7,15 @@ import { nowUtc } from '../../utils/dates';
 import config from 'config';
 import { Wallet } from 'ethers';
 import { JsonRpcProvider, gasPriceInToken } from '@cardstack/cardpay-sdk';
-
-export let supportedChains = [
-  {
-    id: 1,
-    name: 'ethereum',
-    rpcUrl: config.get('web3.ethereum.rpcNodeHttpsUrl'),
-  },
-  {
-    id: 5,
-    name: 'goerli',
-    rpcUrl: config.get('web3.ethereum.rpcNodeHttpsUrl'),
-  },
-  {
-    id: 100,
-    name: 'gnosis',
-    rpcUrl: config.get('web3.gnosis.rpcNodeHttpsUrl'),
-  },
-  {
-    id: 77,
-    name: 'sokol',
-    rpcUrl: config.get('web3.gnosis.rpcNodeHttpsUrl'),
-  },
-  {
-    id: 137,
-    name: 'polygon',
-    rpcUrl: config.get('web3.polygon.rpcNodeHttpsUrl'),
-  },
-  {
-    id: 80001,
-    name: 'mumbai',
-    rpcUrl: config.get('web3.polygon.rpcNodeHttpsUrl'),
-  },
-];
+import BN from 'bn.js';
 
 export default class ScheduledPaymentsExecutorService {
   prismaManager = inject('prisma-manager', { as: 'prismaManager' });
   scheduledPaymentFetcher = inject('scheduled-payment-fetcher', { as: 'scheduledPaymentFetcher' });
   cardpay = inject('cardpay');
   workerClient = inject('worker-client', { as: 'workerClient' });
+  nonceLock = inject('nonce-lock', { as: 'nonceLock' });
+  ethersProvider = inject('ethers-provider', { as: 'ethersProvider' });
 
   async getCurrentGasPrice(provider: JsonRpcProvider, gasTokenAddress: string) {
     // Wrapped in a method so that can be mocked in the tests
@@ -72,8 +42,7 @@ export default class ScheduledPaymentsExecutorService {
   }
 
   async executePayment(scheduledPayment: ScheduledPayment) {
-    let rpcUrl = supportedChains.find((chain) => chain.id === scheduledPayment.chainId)?.rpcUrl as string;
-    let provider = new JsonRpcProvider(rpcUrl, scheduledPayment.chainId);
+    let provider = this.ethersProvider.getInstance(scheduledPayment.chainId);
     let signer = new Wallet(config.get('hubPrivateKey'));
     let scheduledPaymentModule = await this.cardpay.getSDK('ScheduledPaymentModule', provider, signer);
 
@@ -134,55 +103,58 @@ export default class ScheduledPaymentsExecutorService {
     } = scheduledPayment;
 
     let currentGasPrice = await this.getCurrentGasPrice(provider, gasTokenAddress);
-
-    return new Promise<void>((resolve, reject) => {
-      scheduledPaymentModule
-        .executeScheduledPayment(
-          moduleAddress,
-          tokenAddress,
-          amount.toString(),
-          payeeAddress,
-          Number(feeFixedUsd),
-          Number(feePercentage),
-          Number(executionGasEstimation),
-          String(maxGasPrice),
-          gasTokenAddress,
-          salt,
-          String(currentGasPrice), // Contract will revert if this is larger than maxGasPrice
-          payAt!.getTime() / 1000, // getTime returns milliseconds, but we want seconds, thus divide by 1000
-          recurringDayOfMonth,
-          recurringUntil ? recurringUntil.getTime() / 1000 : null,
-          {
-            onTxnHash: async (txnHash: string) => {
-              await prisma.scheduledPaymentAttempt.update({
-                data: {
-                  transactionHash: txnHash,
-                },
-                where: {
-                  id: paymentAttempt.id,
-                },
-              });
-
-              await this.workerClient.addJob('scheduled-payment-on-chain-execution-waiter', {
-                scheduledPaymentAttemptId: paymentAttempt.id,
-              });
-
-              resolve();
-            },
-          }
-        )
-        .catch(async (error) => {
-          await prisma.scheduledPaymentAttempt.update({
-            where: { id: paymentAttempt.id },
-            data: {
-              status: 'failed',
-              endedAt: nowUtc(),
-              failureReason: error.message,
-            },
+    let executeScheduledPayment = (nonce: BN) => {
+      return new Promise<string>((resolve, reject) => {
+        scheduledPaymentModule
+          .executeScheduledPayment(
+            moduleAddress,
+            tokenAddress,
+            amount.toString(),
+            payeeAddress,
+            Number(feeFixedUsd),
+            Number(feePercentage),
+            Number(executionGasEstimation),
+            String(maxGasPrice),
+            gasTokenAddress,
+            salt,
+            String(currentGasPrice), // Contract will revert if this is larger than maxGasPrice
+            payAt!.getTime() / 1000, // getTime returns milliseconds, but we want seconds, thus divide by 1000
+            recurringDayOfMonth,
+            recurringUntil ? recurringUntil.getTime() / 1000 : null,
+            {
+              onTxnHash: async (txnHash: string) => resolve(txnHash),
+              nonce: nonce,
+            }
+          )
+          .catch(async (error) => {
+            reject(error);
           });
-          reject(error);
-        });
-    });
+      });
+    };
+    try {
+      let txnHash = await this.nonceLock.withNonce(signer.address, scheduledPayment.chainId, executeScheduledPayment);
+      await prisma.scheduledPaymentAttempt.update({
+        data: {
+          transactionHash: txnHash,
+        },
+        where: {
+          id: paymentAttempt.id,
+        },
+      });
+      await this.workerClient.addJob('scheduled-payment-on-chain-execution-waiter', {
+        scheduledPaymentAttemptId: paymentAttempt.id,
+      });
+    } catch (error: any) {
+      console.log(error);
+      await prisma.scheduledPaymentAttempt.update({
+        where: { id: paymentAttempt.id },
+        data: {
+          status: 'failed',
+          endedAt: nowUtc(),
+          failureReason: error.message,
+        },
+      });
+    }
   }
 }
 

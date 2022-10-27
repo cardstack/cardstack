@@ -1,7 +1,7 @@
 import Web3 from 'web3';
 import { ScheduledPayment } from '@prisma/client';
 import { startCase } from 'lodash';
-import { supportedChains } from '../scheduled-payments/executor';
+import { supportedChains } from '../ethers-provider';
 const { isAddress } = Web3.utils;
 
 type ScheduledPaymentAttribute =

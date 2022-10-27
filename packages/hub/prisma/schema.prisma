@@ -330,6 +330,18 @@ model ScheduledPayment {
   @@map("scheduled_payments")
 }
 
+model AccountNonce {
+  id             String   @id @db.Uuid
+  accountAddress String   @map("account_address")
+  chainId        Int      @map("chain_id")
+  nonce          BigInt
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt      DateTime @default(now()) @map("updated_at") @db.Timestamp(6)
+
+  @@unique([accountAddress, chainId], map: "account_nonces_account_address_chain_id_unique_index")
+  @@map("account_nonces")
+}
+
 enum DiscordBotsStatusEnum {
   connecting
   connected

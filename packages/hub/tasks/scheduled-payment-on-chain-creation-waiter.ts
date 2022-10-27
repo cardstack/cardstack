@@ -1,12 +1,11 @@
-import { JsonRpcProvider } from '@cardstack/cardpay-sdk';
 import { inject } from '@cardstack/di';
 import * as Sentry from '@sentry/node';
 import { isBefore, subDays } from 'date-fns';
-import { supportedChains } from '../services/scheduled-payments/executor';
 
 export default class ScheduledPaymentOnChainCreationWaiter {
   prismaManager = inject('prisma-manager', { as: 'prismaManager' });
   cardpay = inject('cardpay');
+  ethersProvider = inject('ethers-provider', { as: 'ethersProvider' });
 
   async perform(payload: { scheduledPaymentId: string }) {
     let prisma = await this.prismaManager.getClient();
@@ -14,8 +13,7 @@ export default class ScheduledPaymentOnChainCreationWaiter {
       where: { id: payload.scheduledPaymentId },
     });
 
-    let rpcUrl = supportedChains.find((chain) => chain.id === scheduledPayment.chainId)?.rpcUrl as string;
-    let provider = new JsonRpcProvider(rpcUrl, scheduledPayment.chainId);
+    let provider = this.ethersProvider.getInstance(scheduledPayment.chainId);
     let scheduledPaymentModule = await this.cardpay.getSDK('ScheduledPaymentModule', provider);
 
     if (scheduledPayment.creationBlockNumber) {
@@ -55,6 +53,7 @@ export default class ScheduledPaymentOnChainCreationWaiter {
 
     try {
       let receipt = await scheduledPaymentModule.schedulePaymentOnChain(scheduledPayment.creationTransactionHash);
+      console.log(receipt);
       return await prisma.scheduledPayment.update({
         data: {
           creationBlockNumber: receipt.blockNumber, // To let us know that the scheduled payment has been created on chain and that the process of scheduling the payment was completed
@@ -64,6 +63,7 @@ export default class ScheduledPaymentOnChainCreationWaiter {
         },
       });
     } catch (error: any) {
+      console.log(error);
       if (error.message.includes('revert')) {
         // Error message from the waitUntilTransactionMined in the SDK will be: Transaction with hash "${txnHash}" was reverted
         await prisma.scheduledPayment.update({
