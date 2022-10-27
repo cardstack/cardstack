@@ -11,6 +11,8 @@ from sqlalchemy.orm import Session
 
 from . import models
 
+MIN_INDEX_SIZE = 100
+
 
 class Indexer:
     def __init__(self, subgraph_url, archived_reward_programs):
@@ -39,8 +41,12 @@ class Indexer:
             new_roots = self.get_merkle_roots(
                 reward_program_id, last_submitted_root_block_number
             )
+            index_size = min(len(new_roots), MIN_INDEX_SIZE)
             if len(new_roots) > 0:
-                for root in sorted(new_roots, key=lambda x: x["blockNumber"]):
+                for root in sorted(
+                    new_roots,
+                    key=lambda x: x["blockNumber"],
+                )[:index_size]:
                     file_name = (
                         storage_location
                         + f"/rewardProgramID={reward_program_id}/paymentCycle={root['paymentCycle']}/results.parquet"
