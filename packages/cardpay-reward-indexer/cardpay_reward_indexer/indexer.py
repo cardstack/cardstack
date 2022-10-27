@@ -11,7 +11,7 @@ from sqlalchemy.orm import Session
 
 from . import models
 
-MIN_INDEX_SIZE = 100
+MAX_INDEX_SIZE = 100
 
 
 class Indexer:
@@ -41,7 +41,7 @@ class Indexer:
             new_roots = self.get_merkle_roots(
                 reward_program_id, last_submitted_root_block_number
             )
-            index_size = min(len(new_roots), MIN_INDEX_SIZE)
+            index_size = min(len(new_roots), MAX_INDEX_SIZE)
             if len(new_roots) > 0:
                 for root in sorted(
                     new_roots,
