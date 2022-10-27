@@ -42,7 +42,7 @@ jobs:
           PERCY_TOKEN: ${{ secrets.PERCY_TOKEN_SSR_WEB }}
         run: yarn test:ssr-web:percy
       - name: Publish test results
-        uses: EnricoMi/publish-unit-test-result-action@v1.28
+        uses: EnricoMi/publish-unit-test-result-action@v2
         if: always()
         with:
           check_name: "ssr-web test results"
