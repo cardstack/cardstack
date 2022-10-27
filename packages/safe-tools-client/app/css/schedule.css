@@ -1,4 +1,6 @@
 .safe-tools__dashboard-schedule {
+  background-color: var(--boxel-dashboard-background-color);
+
   display: flex;
   flex-direction: row;
 }
