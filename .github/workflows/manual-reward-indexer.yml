@@ -18,16 +18,9 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Set up node_modules cache
-        uses: actions/cache@v3
+      - uses: ./.github/actions/setup-node-modules-cache
         with:
-          path: |
-            node_modules
-            packages/*/node_modules
-            packages/firebase-functions/*/functions/node_modules
-          key: ${{ runner.os }}-node-modules-${{ hashFiles('yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-node-modules-
+          yarn_lock_md5: ${{ hashFiles('yarn.lock') }}
 
       - name: Set up env
         env:

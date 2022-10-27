@@ -58,6 +58,12 @@ yarn test
 
 Check `package.json` file for other testing and linting scripts.
 
+
+## Generator
+
+In addition to the normal suite of ember generators, Boxel has a 'boxel-component` blueprint allowing you to generate a new boxel component (index.gts), a
+CSS file, a usage.gts, and an intergration test. Run it using `ember generate boxel-component your-component-name`.
+
 #### Thumbnails
 
 Generating multiple image sizes / thumbs from

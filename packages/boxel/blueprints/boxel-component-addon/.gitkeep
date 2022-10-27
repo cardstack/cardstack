@@ -1,0 +1,1 @@
+This prevents ember CLI's generator from trying to reexport the boxel component created by the boxel-component blueprint
