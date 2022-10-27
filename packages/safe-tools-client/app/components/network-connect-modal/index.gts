@@ -1,5 +1,4 @@
 import Component from '@glimmer/component';
-import { action } from '@ember/object';
 import { inject as service} from '@ember/service';
 import { tracked } from '@glimmer/tracking';
 //@ts-expect-error glint does not think this is consumed-but it is consumed in the template https://github.com/typed-ember/glint/issues/374
@@ -34,10 +33,6 @@ class NetworkConnectModal extends Component<Signature> {
   @service declare wallet: WalletService;
 
   @tracked chosenProviderId: string | undefined;
-
-  @action async cancelConnection(): Promise<void> {
-    // TODO
-  }
 
   get connectionState(): ActionChinState {
     return this.wallet.isConnecting ? 'in-progress' : 'default';
@@ -150,7 +145,7 @@ class NetworkConnectModal extends Component<Signature> {
                 <BoxelLoadingIndicator class="network-connect-modal__loading-indicator" @color="var(--boxel-light)" />
                 <div class="network-connect-modal__waiting-status">
                   Waiting for you to connect your {{!-- network-display-info "conversationalName" --}} wallet...
-                  <i.CancelButton class="network-connect-modal__cancel-button" {{on "click" this.cancelConnection}}>
+                  <i.CancelButton class="network-connect-modal__cancel-button" {{on "click" this.wallet.cancelConnection}}>
                     Cancel
                   </i.CancelButton>
                 </div>

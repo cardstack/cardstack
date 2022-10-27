@@ -19,6 +19,7 @@ export default class Wallet extends Service {
   @tracked isConnected = false;
   @tracked providerId: WalletProviderId | undefined;
   @tracked address: string | undefined;
+  @tracked isConnecting = false;
 
   web3 = new Web3();
   chainConnectionManager = new ChainConnectionManager(CHAIN_NAME_FIXME);
@@ -61,6 +62,7 @@ export default class Wallet extends Service {
     this.providerId = providerId;
 
     if (!this.isConnected) {
+      this.isConnecting = true;
       taskFor(this.connectWalletTask)
         .perform()
         .then(() => {
@@ -81,14 +83,12 @@ export default class Wallet extends Service {
 
     yield this.chainConnectionManager.connect(this.web3, this.providerId);
     yield timeout(500); // allow time for strategy to verify connected chain -- it might not accept the connection
-  }
 
-  get isConnecting() {
-    return taskFor(this.connectWalletTask).isRunning;
+    this.isConnecting = false;
   }
 
   @action cancelConnection() {
-    // TODO
+    this.isConnecting = false;
   }
 
   @action disconnect() {
