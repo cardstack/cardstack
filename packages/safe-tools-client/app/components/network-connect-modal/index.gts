@@ -38,7 +38,7 @@ class NetworkConnectModal extends Component<Signature> {
   @action async cancelConnection(): Promise<void> {
     // TODO
   }
-  
+
   get connectionState(): ActionChinState {
     return this.wallet.isConnecting ? 'in-progress' : 'default';
   }
@@ -140,7 +140,7 @@ class NetworkConnectModal extends Component<Signature> {
 
           <ActionChin @state={{this.connectionState}}>
             <:default as |a|>
-              <a.ActionButton {{on "click" (fn this.wallet.connect this.chosenProviderId)}} data-test-mainnet-connect-button disabled={{not this.chosenProviderId}}>
+              <a.ActionButton {{on "click" (fn this.wallet.connect this.chosenProviderId @onClose)}} data-test-mainnet-connect-button disabled={{not this.chosenProviderId}}>
                 Connect Wallet
               </a.ActionButton>
             </:default>
