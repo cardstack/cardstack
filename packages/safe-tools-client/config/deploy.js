@@ -56,11 +56,11 @@ module.exports = function (deployTarget) {
   }
 
   if (deployTarget === 's3-preview-staging') {
-    ENV.cloudfront.distribution = 'E66H0MDT3X9YI';
+    ENV.cloudfront.distribution = 'E21LN3O969NVVW';
   }
 
   if (deployTarget === 's3-preview-production') {
-    ENV.cloudfront.distribution = 'E1JUY2L1CT49O';
+    ENV.cloudfront.distribution = 'E2RX1JI5H3FD5M';
   }
 
   return ENV;
