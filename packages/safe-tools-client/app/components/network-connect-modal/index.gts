@@ -15,6 +15,7 @@ import BoxelActionContainer from '@cardstack/boxel/components/boxel/action-conta
 import BoxelLoadingIndicator from '@cardstack/boxel/components/boxel/loading-indicator';
 import BoxelModal from '@cardstack/boxel/components/boxel/modal';
 import BoxelRadioInput from '@cardstack/boxel/components/boxel/radio-input';
+import { type ActionChinState } from '@cardstack/boxel/components/boxel/action-chin/state';
 
 import './index.css';
 
@@ -36,6 +37,10 @@ class NetworkConnectModal extends Component<Signature> {
 
   @action async cancelConnection(): Promise<void> {
     // TODO
+  }
+  
+  get connectionState(): ActionChinState {
+    return this.wallet.isConnecting ? 'in-progress' : 'default';
   }
 
   <template>
@@ -133,9 +138,9 @@ class NetworkConnectModal extends Component<Signature> {
             </BoxelRadioInput>
           </Section>
 
-          <ActionChin @state='default'>
+          <ActionChin @state={{this.connectionState}}>
             <:default as |a|>
-              <a.ActionButton {{on "click" (fn this.wallet.connect this.chosenProviderId)}} data-test-mainnet-connect-button>
+              <a.ActionButton {{on "click" (fn this.wallet.connect this.chosenProviderId)}} data-test-mainnet-connect-button disabled={{not this.chosenProviderId}}>
                 Connect Wallet
               </a.ActionButton>
             </:default>
