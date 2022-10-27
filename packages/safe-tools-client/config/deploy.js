@@ -62,5 +62,6 @@ module.exports = function (deployTarget) {
   if (deployTarget === 's3-preview-production') {
     ENV.cloudfront.distribution = 'E1JUY2L1CT49O';
   }
+
   return ENV;
 };
