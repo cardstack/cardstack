@@ -97,8 +97,8 @@ export default class RewardPool {
 
   async getProofs(
     address: string,
+    rewardProgramId: string,
     safeAddress: string,
-    rewardProgramId?: string,
     tokenAddress?: string,
     knownClaimed?: boolean,
     offset?: number,
@@ -106,8 +106,8 @@ export default class RewardPool {
   ): Promise<WithSymbol<ClaimableProof>[]>;
   async getProofs(
     address: string,
+    rewardProgramId: string,
     safeAddress: undefined,
-    rewardProgramId?: string,
     tokenAddress?: string,
     knownClaimed?: boolean,
     offset?: number,
@@ -115,8 +115,8 @@ export default class RewardPool {
   ): Promise<WithSymbol<Proof>[]>;
   async getProofs(
     address: string,
+    rewardProgramId: string,
     safeAddress?: string,
-    rewardProgramId?: string,
     tokenAddress?: string,
     knownClaimed?: boolean,
     offset?: number,
@@ -124,15 +124,13 @@ export default class RewardPool {
   ): Promise<WithSymbol<Proof | ClaimableProof>[]> {
     let tallyServiceURL = await getConstant('tallyServiceURL', this.layer2Web3);
     let url = new URL(`${tallyServiceURL}/merkle-proofs/${address}`);
-    if (rewardProgramId) {
-      url.searchParams.append('rewardProgramId', rewardProgramId);
-    }
     if (tokenAddress) {
       url.searchParams.append('token', tokenAddress);
     }
     if (offset) {
       url.searchParams.append('offset', offset.toString());
     }
+    url.searchParams.append('rewardProgramId', rewardProgramId);
     url.searchParams.append('limit', limit ? limit.toString() : DEFAULT_PAGE_SIZE.toString());
     let options = {
       method: 'GET',
@@ -204,20 +202,20 @@ export default class RewardPool {
 
   async getUnclaimedValidProofs(
     address: string,
-    rewardProgramId?: string,
+    rewardProgramId: string,
     tokenAddress?: string
   ): Promise<WithSymbol<Proof>[]> {
-    const proofs = await this.getProofs(address, undefined, rewardProgramId, tokenAddress, false);
+    const proofs = await this.getProofs(address, rewardProgramId, undefined, tokenAddress, false);
     return proofs.filter((o) => o.isValid);
   }
 
   async getUnclaimedValidProofsWithoutDust(
     address: string,
+    rewardProgramId: string,
     safeAddress: string,
-    rewardProgramId?: string,
     tokenAddress?: string
   ): Promise<WithSymbol<ClaimableProof>[]> {
-    const proofs = await this.getProofs(address, safeAddress, rewardProgramId, tokenAddress, false);
+    const proofs = await this.getProofs(address, rewardProgramId, safeAddress, tokenAddress, false);
     return proofs
       .filter((o) => o.isValid)
       .filter((o) => {
@@ -286,7 +284,7 @@ export default class RewardPool {
     return leafs;
   }
 
-  async rewardTokenBalances(address: string, rewardProgramId?: string): Promise<WithSymbol<RewardTokenBalance>[]> {
+  async rewardTokenBalances(address: string, rewardProgramId: string): Promise<WithSymbol<RewardTokenBalance>[]> {
     const unclaimedValidProofs = await this.getUnclaimedValidProofs(address, rewardProgramId);
     const tokenBalances = unclaimedValidProofs.map((o: Proof) => {
       return {
@@ -300,10 +298,10 @@ export default class RewardPool {
 
   async rewardTokenBalancesWithoutDust(
     address: string,
-    safeAddress: string,
-    rewardProgramId?: string
+    rewardProgramId: string,
+    safeAddress: string
   ): Promise<WithSymbol<RewardTokenBalance>[]> {
-    const unclaimedValidProofs = await this.getUnclaimedValidProofsWithoutDust(address, safeAddress, rewardProgramId);
+    const unclaimedValidProofs = await this.getUnclaimedValidProofsWithoutDust(address, rewardProgramId, safeAddress);
     const tokenBalances = unclaimedValidProofs.map((o: ClaimableProof) => {
       return {
         tokenAddress: o.tokenAddress,
@@ -571,7 +569,7 @@ The reward program ${rewardProgramId} has balance equals ${fromWei(
 
   async claimAll(
     safeAddress: string,
-    rewardProgramId?: string,
+    rewardProgramId: string,
     tokenAddress?: string,
     txnOptions?: TransactionOptions,
     contractOptions?: ContractOptions
@@ -580,8 +578,8 @@ The reward program ${rewardProgramId} has balance equals ${fromWei(
     let rewardSafeOwner = await rewardManager.getRewardSafeOwner(safeAddress);
     const unclaimedValidProofsWithoutDust = await this.getUnclaimedValidProofsWithoutDust(
       rewardSafeOwner,
-      safeAddress,
       rewardProgramId,
+      safeAddress,
       tokenAddress
     );
     console.log(`Claiming ${unclaimedValidProofsWithoutDust.length} proofs`);
@@ -652,17 +650,17 @@ The reward program ${rewardProgramId} has balance equals ${fromWei(
   }
 
   async claimAllGasEstimate(
+    rewardProgramId: string,
     rewardSafeAddress: string,
-    tokenAddress: string,
-    rewardProgramId?: string
+    tokenAddress: string
   ): Promise<GasEstimate> {
     let rewardManager = await getSDK('RewardManager', this.layer2Web3);
     let rewardSafeOwner = await rewardManager.getRewardSafeOwner(rewardSafeAddress);
 
     const unclaimedValidProofsWithoutDust = await this.getUnclaimedValidProofsWithoutDust(
       rewardSafeOwner,
-      rewardSafeAddress,
       rewardProgramId,
+      rewardSafeAddress,
       tokenAddress
     );
     const amount = unclaimedValidProofsWithoutDust.reduce((accum, proof) => {
