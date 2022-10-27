@@ -1,6 +1,5 @@
 import Component from '@glimmer/component';
 import { inject as service} from '@ember/service';
-import { action } from '@ember/object';
 import BoxelButton from '@cardstack/boxel/components/boxel/button';
 import cn from '@cardstack/boxel/helpers/cn';
 import or from 'ember-truth-helpers/helpers/or';
@@ -21,15 +20,11 @@ interface Signature {
 export default class ConnectButton extends Component<Signature> {
   @service declare wallet: WalletService;
 
-  @action async disconnect(): Promise<void> {
-    // TODO
-  }
-
   <template>
     {{#if this.wallet.isConnected}}
       <BoxelButton
         @kind="secondary-dark"
-        {{on "click" this.disconnect}}
+        {{on "click" this.wallet.disconnect}}
         data-test-disconnect-button
         {{! @glint-ignore See notes here https://github.com/typed-ember/glint/pull/138#issue-852455350 }}
         ...attributes

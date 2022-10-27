@@ -43,6 +43,10 @@ export default class Wallet extends Service {
       this.address = accounts[0];
     });
 
+    this.chainConnectionManager.on('disconnected', () => {
+      this.isConnected = false;
+    });
+
     const providerId =
       ChainConnectionManager.getProviderIdForChain(CHAIN_ID_FIXME);
     if (providerId !== 'wallet-connect' && providerId !== 'metamask') {
@@ -76,6 +80,10 @@ export default class Wallet extends Service {
 
   @action cancelConnection() {
     // TODO
+  }
+
+  @action disconnect() {
+    this.chainConnectionManager.disconnect();
   }
 }
 
