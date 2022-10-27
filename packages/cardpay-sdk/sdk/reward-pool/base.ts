@@ -35,6 +35,8 @@ export interface Proof {
   amount: BN;
   leaf: string;
   isValid: boolean;
+  explanationTemplate: string;
+  explanationData: any;
 }
 
 export interface ClaimableProof extends Proof {
@@ -150,27 +152,30 @@ export default class RewardPool {
     if (!knownClaimed) {
       claimedLeafs = await this.getClaimedLeafs(address, rewardProgramId);
     }
+    let rewardManager = await getSDK('RewardManager', this.layer2Web3);
+    const rule = await rewardManager.getRuleJson(rewardProgramId);
     json.map((o: any) => {
       let { validFrom, validTo, token, amount }: FullLeaf = this.decodeLeaf(o.leaf) as FullLeaf;
+      const isValid = validFrom <= currentBlock && validTo > currentBlock;
+      // filters for known reward tokens
       if (token && rewardTokens.includes(token)) {
-        // filters for known reward tokens
-        if (!knownClaimed) {
-          // proofs not claimed yet
-          if (!claimedLeafs.includes(o.leaf)) {
-            // filters for proofs has not been claimed
-            res.push({
-              ...o,
-              tokenAddress: token,
-              amount: amount,
-              isValid: validFrom <= currentBlock && validTo > currentBlock,
-            });
-          }
+        // filters for proofs has not been claimed
+        const explanationTemplate = rewardManager.getClaimExplainer(rule, o.explanationId);
+        if (!knownClaimed && !claimedLeafs.includes(o.leaf)) {
+          res.push({
+            ...o,
+            tokenAddress: token,
+            amount: amount,
+            isValid,
+            explanationTemplate,
+          });
         } else {
           res.push({
             ...o,
             tokenAddress: token,
             amount: amount,
-            isValid: validFrom <= currentBlock && validTo > currentBlock,
+            isValid,
+            explanationTemplate,
           });
         }
       }
