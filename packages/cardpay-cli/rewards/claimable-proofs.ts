@@ -88,6 +88,9 @@ function displayProof(o: WithSymbol<Proof> | WithSymbol<ClaimableProof>, rewardP
       gasFees: ${
         rewardPool.isClaimableProof(o) ? fromWei(o.gasEstimate.amount) + ' ' + o.tokenSymbol : 'No Gas Estimates'
       }
+      explanationTemplate: ${o.explanationTemplate ?? '**Not specified**'} 
+      explanationData: 
+         ${JSON.stringify(o.explanationData, null, 4) ?? '**Not specified**'} 
         `);
 }
 
