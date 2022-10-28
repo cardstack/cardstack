@@ -138,7 +138,7 @@ type Networks = keyof NetworksType | 'xdai';
 type ConstantKeys = NestedKeyOf<NetworksType>;
 
 // TODO: create types dynamically
-type NetworkConstants = NetworksType['sokol'] &
+type RequiredNetworkConstants = NetworksType['sokol'] &
   NetworksType['gnosis'] &
   NetworksType['goerli'] &
   NetworksType['polygon'] &
@@ -146,8 +146,10 @@ type NetworkConstants = NetworksType['sokol'] &
   NetworksType['kovan'] &
   NetworksType['mumbai'];
 
+type OptionalNetworkContants = Partial<RequiredNetworkConstants> & { chainId: number };
+
 // Order matters, if both have same chainId the last one is used.
-const constants: Record<Networks, Partial<NetworkConstants>> = {
+const constants: Record<Networks, OptionalNetworkContants> = {
   xdai: networksConstants['gnosis'],
   ...networksConstants,
 } as const;
