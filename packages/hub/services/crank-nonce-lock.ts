@@ -9,6 +9,7 @@ import { nowUtc } from '../utils/dates';
 export default class CrankNonceLock {
   prismaManager = inject('prisma-manager', { as: 'prismaManager' });
   ethersProvider = inject('ethers-provider', { as: 'ethersProvider' });
+  CRANK_LOCK_KEY = 1;
 
   private async getNonce(chainId: number, dbTransaction: Prisma.TransactionClient) {
     let crankNonce = await dbTransaction.crankNonce.findUnique({
@@ -40,13 +41,20 @@ export default class CrankNonceLock {
 
   async withNonce(chainId: number, cb: (nonce: BN) => Promise<any>) {
     let prisma = await this.prismaManager.getClient();
-    return await prisma.$transaction(
-      async (tx) => {
-        let nonce = await this.getNonce(chainId, tx);
-        return await cb(nonce);
-      },
-      { maxWait: 3000, timeout: 10000 }
-    );
+    await prisma.$executeRaw`SELECT pg_advisory_lock(${this.CRANK_LOCK_KEY})`;
+    //Make database transaction here
+    //because if the execution failed the nonce should be rollback
+    try {
+      return await prisma.$transaction(
+        async (tx) => {
+          let nonce = await this.getNonce(chainId, tx);
+          return await cb(nonce);
+        },
+        { maxWait: 3000, timeout: 10000 }
+      );
+    } finally {
+      await prisma.$executeRaw`SELECT pg_advisory_unlock(${this.CRANK_LOCK_KEY})`;
+    }
   }
 }
 
