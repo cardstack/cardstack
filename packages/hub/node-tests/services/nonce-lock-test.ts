@@ -165,7 +165,7 @@ describe('locking the nonce', function () {
     }
   });
 
-  it(`set nonce to zero if function execution throw an error`, async function () {
+  it(`rollback nonce if function execution throw an error`, async function () {
     let currentNonce = 2;
     await prisma.accountNonce.create({
       data: {
@@ -189,7 +189,7 @@ describe('locking the nonce', function () {
       });
       expect(e).equal('simulate error');
       expect(accountNonce).not.undefined;
-      expect(Number(accountNonce?.nonce ?? 0)).equal(0);
+      expect(Number(accountNonce?.nonce ?? 0)).equal(currentNonce);
     }
   });
 });
