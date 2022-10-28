@@ -15,8 +15,7 @@ export async function handler(/* argv: Argv */) {
     bot = await container.lookup('hubBot');
   } catch (err: any) {
     log.error('HubBot failed to start cleanly: %s', err.stack || err);
-    // eslint-disable-next-line no-process-exit
-    process.exit(-1);
+    throw err;
   }
 
   process.on('SIGTERM', bot.disconnect.bind(bot));
