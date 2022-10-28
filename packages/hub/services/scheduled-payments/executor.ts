@@ -14,7 +14,7 @@ export default class ScheduledPaymentsExecutorService {
   scheduledPaymentFetcher = inject('scheduled-payment-fetcher', { as: 'scheduledPaymentFetcher' });
   cardpay = inject('cardpay');
   workerClient = inject('worker-client', { as: 'workerClient' });
-  nonceLock = inject('nonce-lock', { as: 'nonceLock' });
+  crankNonceLock = inject('crank-nonce-lock', { as: 'crankNonceLock' });
   ethersProvider = inject('ethers-provider', { as: 'ethersProvider' });
 
   async getCurrentGasPrice(provider: JsonRpcProvider, gasTokenAddress: string) {
@@ -132,7 +132,7 @@ export default class ScheduledPaymentsExecutorService {
       });
     };
     try {
-      let txnHash = await this.nonceLock.withNonce(signer.address, scheduledPayment.chainId, executeScheduledPayment);
+      let txnHash = await this.crankNonceLock.withNonce(scheduledPayment.chainId, executeScheduledPayment);
       await prisma.scheduledPaymentAttempt.update({
         data: {
           transactionHash: txnHash,
@@ -145,7 +145,6 @@ export default class ScheduledPaymentsExecutorService {
         scheduledPaymentAttemptId: paymentAttempt.id,
       });
     } catch (error: any) {
-      console.log(error);
       await prisma.scheduledPaymentAttempt.update({
         where: { id: paymentAttempt.id },
         data: {
@@ -154,6 +153,7 @@ export default class ScheduledPaymentsExecutorService {
           failureReason: error.message,
         },
       });
+      throw error;
     }
   }
 }
