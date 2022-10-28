@@ -21,15 +21,16 @@ export async function handler(_argv: Argv & { _: string[]; checkOrder?: boolean 
   }
 
   if (direction! !== 'up' && direction! !== 'down') {
-    console.error(`Invalid migration direction: '${direction}'. Must be 'up' or 'down'`);
-    process.exit(1);
+    throw new Error(`Invalid migration direction: '${direction}'. Must be 'up' or 'down'`);
   }
+
   config.config();
   let container = createContainer();
   let dbManager = await container.lookup('database-manager');
   let dbClient = await dbManager.getClient();
   let dir = join('.', 'dist', 'db', 'migrations');
 
+  // Allow errors to bubble up so they're reported
   try {
     await migrate({
       direction,
@@ -40,9 +41,7 @@ export async function handler(_argv: Argv & { _: string[]; checkOrder?: boolean 
       checkOrder,
       verbose: true,
     });
+  } finally {
     container.teardown();
-  } catch (e) {
-    console.error(e);
-    process.exit(1);
   }
 }
