@@ -1,10 +1,11 @@
 import { MigrationBuilder } from 'node-pg-migrate';
+import { uuid } from 'short-uuid';
 
 const TABLE = 'account_nonces';
 
 export async function up(pgm: MigrationBuilder): Promise<void> {
   pgm.createTable(TABLE, {
-    id: { type: 'uuid', primaryKey: true },
+    id: { type: 'uuid', primaryKey: true, default: uuid() },
     account_address: { type: 'string', notNull: true },
     chain_id: { type: 'integer', notNull: true },
     nonce: { type: 'bigint', notNull: true },

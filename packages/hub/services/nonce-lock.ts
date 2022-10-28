@@ -2,7 +2,6 @@ import { inject } from '@cardstack/di';
 import BN from 'bn.js';
 import config from 'config';
 import { addSeconds } from 'date-fns';
-import shortUUID from 'short-uuid';
 import { nowUtc } from '../utils/dates';
 
 export default class NonceLock {
@@ -27,26 +26,17 @@ export default class NonceLock {
           nextNonce = new BN(await provider.getTransactionCount(accountAddress, 'latest'));
         }
 
-        if (accountNonce) {
-          await tx.accountNonce.update({
-            where: { id: accountNonce.id },
-            data: {
-              nonce: BigInt(nextNonce.toString()),
-              updatedAt: now,
-            },
-          });
-        } else {
-          await tx.accountNonce.create({
-            data: {
-              id: shortUUID.uuid(),
-              accountAddress,
-              chainId,
-              nonce: BigInt(nextNonce.toString()),
-              createdAt: now,
-              updatedAt: now,
-            },
-          });
-        }
+        await tx.accountNonce.upsert({
+          where: { accountAddress_chainId: { accountAddress, chainId }},
+          create: {
+            accountAddress,
+            chainId,
+            nonce: BigInt(nextNonce.toString()),
+          },
+          update: {
+            nonce: BigInt(nextNonce.toString()),
+          }
+        });
 
         return nextNonce;
       },
@@ -64,7 +54,6 @@ export default class NonceLock {
         where: { accountAddress_chainId: { accountAddress, chainId } },
         data: {
           nonce: 0,
-          updatedAt: nowUtc(),
         },
       });
       throw e;

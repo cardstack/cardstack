@@ -331,7 +331,7 @@ model ScheduledPayment {
 }
 
 model AccountNonce {
-  id             String   @id @db.Uuid
+  id             String   @id @default(dbgenerated("'98f1ebfe-d628-4e6f-8fea-09b9e8c1a4b7'::uuid")) @db.Uuid
   accountAddress String   @map("account_address")
   chainId        Int      @map("chain_id")
   nonce          BigInt
