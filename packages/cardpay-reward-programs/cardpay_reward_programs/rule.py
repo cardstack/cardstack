@@ -28,6 +28,7 @@ class Rule(ABC):
         duration,
         subgraph_config_locations,
         rollover=False,
+        docker_image=None,
     ):
         self.payment_cycle_length = payment_cycle_length
         self.start_block = start_block
