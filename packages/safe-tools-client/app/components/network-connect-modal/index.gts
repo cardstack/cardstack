@@ -1,5 +1,4 @@
 import Component from '@glimmer/component';
-import { action } from '@ember/object';
 import { inject as service} from '@ember/service';
 import { tracked } from '@glimmer/tracking';
 //@ts-expect-error glint does not think this is consumed-but it is consumed in the template https://github.com/typed-ember/glint/issues/374
@@ -15,6 +14,7 @@ import BoxelActionContainer from '@cardstack/boxel/components/boxel/action-conta
 import BoxelLoadingIndicator from '@cardstack/boxel/components/boxel/loading-indicator';
 import BoxelModal from '@cardstack/boxel/components/boxel/modal';
 import BoxelRadioInput from '@cardstack/boxel/components/boxel/radio-input';
+import { type ActionChinState } from '@cardstack/boxel/components/boxel/action-chin/state';
 
 import './index.css';
 
@@ -34,8 +34,8 @@ class NetworkConnectModal extends Component<Signature> {
 
   @tracked chosenProviderId: string | undefined;
 
-  @action async cancelConnection(): Promise<void> {
-    // TODO
+  get connectionState(): ActionChinState {
+    return this.wallet.isConnecting ? 'in-progress' : 'default';
   }
 
   <template>
@@ -133,9 +133,9 @@ class NetworkConnectModal extends Component<Signature> {
             </BoxelRadioInput>
           </Section>
 
-          <ActionChin @state='default'>
+          <ActionChin @state={{this.connectionState}}>
             <:default as |a|>
-              <a.ActionButton {{on "click" (fn this.wallet.connect this.chosenProviderId)}} data-test-mainnet-connect-button>
+              <a.ActionButton {{on "click" (fn this.wallet.connect this.chosenProviderId @onClose)}} data-test-mainnet-connect-button disabled={{not this.chosenProviderId}}>
                 Connect Wallet
               </a.ActionButton>
             </:default>
@@ -145,7 +145,7 @@ class NetworkConnectModal extends Component<Signature> {
                 <BoxelLoadingIndicator class="network-connect-modal__loading-indicator" @color="var(--boxel-light)" />
                 <div class="network-connect-modal__waiting-status">
                   Waiting for you to connect your {{!-- network-display-info "conversationalName" --}} wallet...
-                  <i.CancelButton class="network-connect-modal__cancel-button" {{on "click" this.cancelConnection}}>
+                  <i.CancelButton class="network-connect-modal__cancel-button" {{on "click" this.wallet.cancelConnection}}>
                     Cancel
                   </i.CancelButton>
                 </div>

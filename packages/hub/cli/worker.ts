@@ -16,8 +16,7 @@ export async function handler(/* argv: Argv */) {
     worker = await container.lookup('hubWorker');
   } catch (err: any) {
     log.error('Worker failed to start cleanly: %s', err.stack || err);
-    // eslint-disable-next-line no-process-exit
-    process.exit(-1);
+    throw err;
   }
 
   nodeCleanup((_exitCode, signal) => {

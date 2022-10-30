@@ -1,7 +1,4 @@
-/* eslint-disable no-process-exit */
-
 import { createContainer, runInitializers } from '../main';
-import * as Sentry from '@sentry/node';
 
 import logger from '@cardstack/logger';
 const log = logger('hub/event-listener');
@@ -19,9 +16,6 @@ export async function handler() {
     eventListener.setupContractEventSubscriptions();
   } catch (e: any) {
     log.error(`Unexpected error while running contracts event listener: ${e.message}`, e);
-    Sentry.withScope(function () {
-      Sentry.captureException(e);
-    });
-    process.exit(-1);
+    throw e;
   }
 }
