@@ -180,8 +180,6 @@ class Indexer:
                 self.subgraph_url,
                 json={"query": query},
             )
-            logging.info("hi testing")
-            logging.info(query)
             if r.ok:
                 json_data = r.json()
                 return json_data["data"]
