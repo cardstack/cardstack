@@ -23,7 +23,7 @@ export function displayRewardProgramInfo(rewardProgramInfo: RewardProgramInfo): 
   rewardProgramAdmin : ${rewardProgramAdmin}
   locked : ${locked}
   ruleBlob : ${blob ? blob : 'No rule blob'}
-  programExplainer : ${programExplainer ? programExplainer : 'No rule blob'}
+  programExplainer : ${programExplainer ? programExplainer : 'No program explainer'}
   ${tokenBalances.length > 0 ? 'balance:' : 'balance: No balance'}
   `);
   tokenBalances.map(({ tokenSymbol, balance }) => {
