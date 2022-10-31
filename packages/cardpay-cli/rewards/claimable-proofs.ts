@@ -73,12 +73,12 @@ function displayProofs(proofs: WithSymbol<Proof | ClaimableProof>[], rewardPool:
 ---------------------------------------------------------------------`);
     let p = groupedByRewardProgram[rewardProgramId];
     p.map((o) => {
-      displayProof(o, rewardPool);
+      logProof(o, rewardPool);
     });
   });
 }
 
-function displayProof(o: WithSymbol<Proof> | WithSymbol<ClaimableProof>, rewardPool: RewardPool) {
+function logProof(o: WithSymbol<Proof> | WithSymbol<ClaimableProof>, rewardPool: RewardPool) {
   console.log(`
       proof: ${fromProofArray(o.proofArray)}
       leaf: ${o.leaf}
