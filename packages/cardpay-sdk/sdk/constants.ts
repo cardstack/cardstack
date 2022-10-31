@@ -90,12 +90,9 @@ const networksConstants = {
   },
   mumbai: {
     ...testHubUrl,
+    ...polygonNativeTokens,
     apiBaseUrl: 'https://api-testnet.polygon.io/api',
     blockExplorer: 'https://mumbai.polygonscan.com',
-    nativeTokenAddress: 'matic',
-    nativeTokenCoingeckoId: 'polygon',
-    nativeTokenSymbol: 'MATIC',
-    nativeTokenName: 'Matic',
     name: 'Mumbai',
     relayServiceURL: 'https://relay-mumbai.staging.stack.cards/api',
     chainId: 80001,
