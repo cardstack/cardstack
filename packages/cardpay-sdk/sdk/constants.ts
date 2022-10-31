@@ -96,7 +96,7 @@ const networksConstants = {
     nativeTokenCoingeckoId: 'polygon',
     nativeTokenSymbol: 'MATIC',
     nativeTokenName: 'Matic',
-    name: 'Polygon',
+    name: 'Mumbai',
     relayServiceURL: 'https://relay-mumbai.staging.stack.cards/api',
     chainId: 80001,
   },
@@ -138,18 +138,26 @@ type Networks = keyof NetworksType | 'xdai';
 type ConstantKeys = NestedKeyOf<NetworksType>;
 
 // TODO: create types dynamically
-type RequiredNetworkConstants = NetworksType['sokol'] &
-  NetworksType['gnosis'] &
-  NetworksType['goerli'] &
-  NetworksType['polygon'] &
-  NetworksType['mainnet'] &
-  NetworksType['kovan'] &
-  NetworksType['mumbai'];
+type OptionalNetworkContants = Partial<
+  NetworksType['sokol'] &
+    NetworksType['gnosis'] &
+    NetworksType['goerli'] &
+    NetworksType['polygon'] &
+    NetworksType['mainnet'] &
+    NetworksType['kovan'] &
+    NetworksType['mumbai']
+>;
 
-type OptionalNetworkContants = Partial<RequiredNetworkConstants> & { chainId: number };
+interface RequiredNetworkConstants {
+  name: string;
+  chainId: number;
+  hubUrl: string;
+}
+
+type NetworkContants = OptionalNetworkContants & RequiredNetworkConstants;
 
 // Order matters, if both have same chainId the last one is used.
-const constants: Record<Networks, OptionalNetworkContants> = {
+const constants: Record<Networks, NetworkContants> = {
   xdai: networksConstants['gnosis'],
   ...networksConstants,
 } as const;
