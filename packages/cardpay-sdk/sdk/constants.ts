@@ -149,6 +149,7 @@ interface RequiredNetworkConstants {
   name: string;
   chainId: number;
   hubUrl: string;
+  nativeTokenSymbol: string;
 }
 
 type NetworkContants = OptionalNetworkContants & RequiredNetworkConstants;
