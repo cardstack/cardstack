@@ -7,6 +7,14 @@ on:
         description: Deployment environment
         required: false
         default: staging
+      node:
+        type: choice
+        description: Node
+        required: false
+        default: "reward-indexer"
+        options:
+          - reward-indexer
+          - reward-indexer-blue
 
 permissions:
   contents: read
@@ -49,7 +57,7 @@ jobs:
       - name: Deploy reward indexer
         uses: ./.github/actions/waypoint-deploy
         with:
-          app: reward-indexer
+          app: ${{ github.event.inputs.node }}
           retain: "0"
           environment: ${{ github.event.inputs.environment }}
           discord_webhook: ${{ secrets.DISCORD_WEBHOOK }}
