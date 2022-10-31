@@ -83,7 +83,7 @@ const networksConstants = {
   polygon: {
     ...hubUrl,
     ...polygonNativeTokens,
-    apiBaseUrl: 'https://api-testnet.polygon.io/api', // TODO: add oficial polygon api
+    apiBaseUrl: 'https://api-testnet.polygon.io/api', // TODO: add official polygon api
     blockExplorer: 'https://polygonscan.com',
     name: 'Polygon',
     chainId: 137,
