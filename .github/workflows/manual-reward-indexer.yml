@@ -10,7 +10,7 @@ on:
       node:
         type: choice
         description: Node
-        required: false
+        required: true
         default: "reward-indexer"
         options:
           - reward-indexer
