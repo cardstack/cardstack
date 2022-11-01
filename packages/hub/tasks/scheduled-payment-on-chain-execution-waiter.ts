@@ -1,7 +1,7 @@
 import { JsonRpcProvider } from '@cardstack/cardpay-sdk';
 import { inject } from '@cardstack/di';
 import { isBefore, subDays } from 'date-fns';
-import { supportedChains } from '../services/scheduled-payments/executor';
+import { getHttpRpcUrlByChain } from '../services/scheduled-payments/executor';
 
 import { nowUtc } from '../utils/dates';
 
@@ -24,7 +24,7 @@ export default class ScheduledPaymentOnChainExecutionWaiter {
     let scheduledPayment = await prisma.scheduledPayment.findFirstOrThrow({
       where: { id: paymentAttempt.scheduledPaymentId },
     });
-    let rpcUrl = supportedChains.find((chain) => chain.id === scheduledPayment.chainId)?.rpcUrl as string;
+    let rpcUrl = getHttpRpcUrlByChain(scheduledPayment.chainId);
     let provider = new JsonRpcProvider(rpcUrl, scheduledPayment.chainId);
     let scheduledPaymentModule = await this.cardpay.getSDK('ScheduledPaymentModule', provider);
 
