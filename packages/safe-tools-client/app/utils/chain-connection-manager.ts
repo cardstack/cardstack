@@ -10,15 +10,14 @@ import CustomStorageWalletConnect, {
 import { Emitter, SimpleEmitter } from './events';
 import { WalletProviderId } from './wallet-providers';
 import { action } from '@ember/object';
-import { networkIds, HubConfig } from '@cardstack/cardpay-sdk';
+import {
+  networkIds,
+  HubConfig,
+  getWeb3ConfigByNetwork,
+} from '@cardstack/cardpay-sdk';
 import Web3 from 'web3';
 import { TypedChannel } from './typed-channel';
 import { MockLocalStorage } from './browser-mocks';
-
-type ProductionChainName = 'mainnet' | 'gnosis' | 'polygon';
-type StagingChainName = 'goerli' | 'sokol' | 'mumbai';
-
-export type ChainName = ProductionChainName | StagingChainName;
 
 const GET_PROVIDER_STORAGE_KEY = (chainId: number) =>
   `cardstack-chain-${chainId}-provider`;
@@ -26,7 +25,7 @@ const WALLET_CONNECT_BRIDGE = 'https://bridge.walletconnect.org';
 
 interface ConnectionManagerOptions {
   chainId: number;
-  networkSymbol: ChainName;
+  networkSymbol: string;
 }
 
 type ConnectionManagerWalletEvent =
@@ -60,7 +59,7 @@ type ConnectionEvent = ConnectEvent | DisconnectEvent;
 export interface ConnectionManagerStrategyFactory {
   createStrategy(
     chainId: number,
-    networkSymbol: ChainName,
+    networkSymbol: string,
     providerId: WalletProviderId
   ): ConnectionStrategy;
 }
@@ -91,15 +90,16 @@ export class ChainConnectionManager {
   broadcastChannel: TypedChannel<ConnectionEvent>;
   strategy: ConnectionStrategy | undefined;
   chainId: number;
-  networkSymbol: ChainName;
+  networkSymbol: string;
   simpleEmitter = new SimpleEmitter();
 
   constructor(
-    networkSymbol: ChainName,
+    networkSymbol: string,
+    chainId: number,
     readonly strategyFactory = new ConcreteStrategyFactory()
   ) {
     this.networkSymbol = networkSymbol;
-    this.chainId = networkIds[networkSymbol];
+    this.chainId = chainId;
 
     // we want to ensure that users don't get confused by different tabs having
     // different wallets connected so we communicate connections and disconnections across tabs
@@ -234,7 +234,7 @@ export class ChainConnectionManager {
 class ConcreteStrategyFactory implements ConnectionManagerStrategyFactory {
   createStrategy(
     chainId: number,
-    networkSymbol: ChainName,
+    networkSymbol: string,
     providerId: WalletProviderId
   ) {
     if (providerId === 'metamask') {
@@ -273,7 +273,7 @@ export abstract class ConnectionStrategy
   abstract destroy(): void;
 
   // networkSymbol and chainId are initialized in the constructor
-  networkSymbol: ChainName;
+  networkSymbol: string;
   chainId: number;
 
   // this is initialized in the `setup` method of concrete classes
@@ -464,16 +464,19 @@ class WalletConnectConnectionStrategy extends ConnectionStrategy {
     const hubConfigApi = new HubConfig(config.hubUrl);
     const hubConfigResponse = await hubConfigApi.getConfig();
 
+    const { rpcNodeHttpsUrl, rpcNodeWssUrl } = getWeb3ConfigByNetwork(
+      hubConfigResponse,
+      this.networkSymbol
+    );
+
     const provider = new WalletConnectProvider({
       chainId,
       infuraId: config.infuraId,
       rpc: {
-        [networkIds[this.networkSymbol]]:
-          hubConfigResponse.web3.ethereum.rpcNodeHttpsUrl, // FIXME don’t hardcode ethereum
+        [chainId]: rpcNodeHttpsUrl,
       },
       rpcWss: {
-        [networkIds[this.networkSymbol]]:
-          hubConfigResponse.web3.ethereum.rpcNodeWssUrl,
+        [chainId]: rpcNodeWssUrl,
       },
       // based on https://github.com/WalletConnect/walletconnect-monorepo/blob/7aa9a7213e15489fa939e2e020c7102c63efd9c4/packages/providers/web3-provider/src/index.ts#L47-L52
       connector: new CustomStorageWalletConnect(connectorOptions, chainId),
@@ -486,6 +489,8 @@ class WalletConnectConnectionStrategy extends ConnectionStrategy {
 
     // Subscribe to chainId change
     provider.on('chainChanged', (changedChainId: number) => {
+      console.log({ changedChainId });
+
       this.onChainChanged(changedChainId);
     });
 

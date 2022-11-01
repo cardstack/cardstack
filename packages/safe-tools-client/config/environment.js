@@ -29,7 +29,7 @@ module.exports = function (environment) {
     // ENV.APP.LOG_TRANSITIONS_INTERNAL = true;
     // ENV.APP.LOG_VIEW_LOOKUPS = true;
 
-    ENV.hubUrl = ENV.hubUrl ?? 'http://localhost:3000';
+    ENV.hubUrl = 'https://hub-staging.stack.cards' ?? 'http://localhost:3000';
   }
 
   if (environment === 'test') {

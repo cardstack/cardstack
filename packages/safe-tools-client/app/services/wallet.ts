@@ -1,28 +1,30 @@
 import Service from '@ember/service';
 
+import { inject as service } from '@ember/service';
 import { action } from '@ember/object';
 import { tracked } from '@glimmer/tracking';
 import { task } from 'ember-concurrency-decorators';
 import { taskFor } from 'ember-concurrency-ts';
+import type { default as Owner } from '@ember/owner';
 
 import { ChainConnectionManager } from '@cardstack/safe-tools-client/utils/chain-connection-manager';
+import NetworkService from '@cardstack/safe-tools-client/services/network';
 import walletProviders, {
   WalletProviderId,
 } from '@cardstack/safe-tools-client/utils/wallet-providers';
 import Web3 from 'web3';
 import { timeout } from 'ember-concurrency';
 
-const CHAIN_NAME_FIXME = 'mainnet';
-const CHAIN_ID_FIXME = 1;
-
 export default class Wallet extends Service {
+  @service declare network: NetworkService;
+
   @tracked isConnected = false;
   @tracked providerId: WalletProviderId | undefined;
   @tracked address: string | undefined;
   @tracked isConnecting = false;
 
   web3 = new Web3();
-  chainConnectionManager = new ChainConnectionManager(CHAIN_NAME_FIXME);
+  chainConnectionManager: ChainConnectionManager;
 
   walletProviders = walletProviders.map((w) =>
     w.id === 'metamask'
@@ -36,8 +38,14 @@ export default class Wallet extends Service {
       : { ...w, enabled: true, explanation: '' }
   );
 
-  constructor() {
-    super();
+  constructor(owner?: Owner) {
+    super(owner);
+
+    console.log(this.network);
+    this.chainConnectionManager = new ChainConnectionManager(
+      this.network.symbol,
+      this.network.chainId
+    );
 
     this.chainConnectionManager.on('connected', (accounts: string[]) => {
       this.isConnected = true;
@@ -48,8 +56,13 @@ export default class Wallet extends Service {
       this.isConnected = false;
     });
 
-    const providerId =
-      ChainConnectionManager.getProviderIdForChain(CHAIN_ID_FIXME);
+    this.chainConnectionManager.on('chain-changed', (chainId: number) => {
+      this.network.onChainChanged(chainId);
+    });
+
+    const providerId = ChainConnectionManager.getProviderIdForChain(
+      this.network.chainId
+    );
     if (providerId !== 'wallet-connect' && providerId !== 'metamask') {
       return;
     }

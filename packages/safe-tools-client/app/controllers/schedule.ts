@@ -5,19 +5,18 @@ import { action } from '@ember/object';
 
 import ApplicationController from '@cardstack/safe-tools-client/controllers/application';
 import WalletService from '@cardstack/safe-tools-client/services/wallet';
+import NetworkService from '@cardstack/safe-tools-client/services/network';
 
 import '../css/schedule.css';
 
 export default class Schedule extends Controller {
   @controller declare application: ApplicationController;
   @service declare wallet: WalletService;
+  @service declare network: NetworkService;
 
   // modified with set helper
   @tracked isSetupSafeModalOpen = false;
   @tracked isDepositModalOpen = false;
-
-  // TODO: replace with network service
-  @tracked network = 'ETH Mainnet';
 
   get safe() {
     //TODO: get safe info from sdk and format it,
@@ -59,22 +58,6 @@ export default class Schedule extends Controller {
     } else {
       this.isSetupSafeModalOpen = true;
     }
-  }
-
-  // TODO: get available networks from sdk, and maybe share network info ?
-  get availableNetworks() {
-    const networks = ['ETH Mainnet', 'Gnosis Chain', 'Polygon'];
-
-    const networkstWithoutSelectedOne = networks.filter(
-      (network) => network !== this.network
-    );
-
-    return networkstWithoutSelectedOne;
-  }
-
-  @action onSelectNetwork(network: string) {
-    // TODO: trigger selection on service;
-    this.network = network;
   }
 
   get scheduledPaymentsTokensToCover() {
