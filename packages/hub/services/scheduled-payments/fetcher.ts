@@ -60,7 +60,7 @@ export default class ScheduledPaymentsFetcherService {
               )
             ) 
             OR (
-              "scheduled_payments"."recurring_day_of_month" > 28 
+              "scheduled_payments"."recurring_day_of_month" > 0 
               AND "scheduled_payments"."recurring_until" >= ${nowUtc}
               AND (
                 "scheduled_payments"."id"
