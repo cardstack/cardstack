@@ -278,6 +278,12 @@ export default [
         name: 'exchange',
         type: 'address',
       },
+      {
+        indexed: false,
+        internalType: 'address',
+        name: 'moduleAddress',
+        type: 'address',
+      },
     ],
     name: 'ScheduledPaymentModuleSetup',
     type: 'event',
@@ -897,6 +903,35 @@ export default [
         internalType: 'address',
         name: '_guard',
         type: 'address',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'bytes32',
+        name: 'spHash',
+        type: 'bytes32',
+      },
+      {
+        internalType: 'uint256',
+        name: 'recursDayOfMonth',
+        type: 'uint256',
+      },
+      {
+        internalType: 'uint256',
+        name: 'until',
+        type: 'uint256',
+      },
+    ],
+    name: 'getRecursDate',
+    outputs: [
+      {
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
       },
     ],
     stateMutability: 'view',
