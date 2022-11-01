@@ -159,14 +159,16 @@ export default class RewardPool {
       if (token && rewardTokens.includes(token)) {
         // filters for proofs has not been claimed
         const explanationTemplate = rewardManager.getClaimExplainer(rule, o.explanationId);
-        if (!knownClaimed && !claimedLeafs.includes(o.leaf)) {
-          res.push({
-            ...o,
-            tokenAddress: token,
-            amount: amount,
-            isValid,
-            explanationTemplate,
-          });
+        if (!knownClaimed) {
+          if (!claimedLeafs.includes(o.leaf)) {
+            res.push({
+              ...o,
+              tokenAddress: token,
+              amount: amount,
+              isValid,
+              explanationTemplate,
+            });
+          }
         } else {
           res.push({
             ...o,
