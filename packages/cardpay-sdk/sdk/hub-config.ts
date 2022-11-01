@@ -1,4 +1,4 @@
-interface HubConfigResponse {
+export interface HubConfigResponse {
   web3: Web3HubConfig;
 }
 interface Web3HubConfig {
