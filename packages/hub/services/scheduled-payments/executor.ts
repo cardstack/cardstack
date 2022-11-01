@@ -23,8 +23,6 @@ export default class ScheduledPaymentsExecutorService {
   }
 
   async executeScheduledPayments() {
-    // TODO: take a only a few, can be 10, to not overwhelm this method
-    // TODO: randomize the order
     let scheduledPayments = await this.scheduledPaymentFetcher.fetchScheduledPayments();
 
     // Currently we do one by one, but we can do in parallel when we'll have a lot of scheduled payments
