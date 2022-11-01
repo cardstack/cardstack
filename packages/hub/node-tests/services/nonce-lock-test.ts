@@ -3,7 +3,6 @@ import { supportedChains } from '../../services/ethers-provider';
 import { ExtendedPrismaClient } from '../../services/prisma-manager';
 import { nowUtc } from '../../utils/dates';
 import { registry, setupHub } from '../helpers/server';
-import config from 'config';
 import BN from 'bn.js';
 import CrankNonceLock from '../../services/crank-nonce-lock';
 
@@ -24,7 +23,7 @@ class StubEthersProvider {
   }
 }
 
-const nonceTTL = Number(config.get('nonceTTL'));
+const nonceTTL = 120; //2 minutes
 describe('locking the nonce', function () {
   let subject: CrankNonceLock;
   let prisma: ExtendedPrismaClient;
