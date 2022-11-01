@@ -5,11 +5,11 @@ import shortUUID from 'short-uuid';
 import { nowUtc } from '../../utils/dates';
 import config from 'config';
 import { Wallet } from 'ethers';
-import { JsonRpcProvider, gasPriceInToken, getConfigByNetwork, networks } from '@cardstack/cardpay-sdk';
+import { JsonRpcProvider, gasPriceInToken, getWeb3ConfigByNetwork, networks } from '@cardstack/cardpay-sdk';
 import { supportedChains } from '@cardstack/cardpay-sdk/sdk/constants';
 
 export const getHttpRpcUrlByChain = (chainId: number) =>
-  getConfigByNetwork(config.get('web3'), chainId)?.rpcNodeHttpsUrl;
+  getWeb3ConfigByNetwork(config.get('web3'), chainId)?.rpcNodeHttpsUrl;
 
 export const isSupportedChain = (chainId: number) => supportedChains.includes(networks[chainId]);
 
