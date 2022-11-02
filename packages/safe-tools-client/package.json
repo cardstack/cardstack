@@ -18,6 +18,7 @@
     "lint:hbs:fix": "ember-template-lint . --fix",
     "lint:js": "eslint . --cache --ext .js,.ts",
     "lint:js:fix": "eslint . --fix",
+    "lint:glint": "glint",
     "start": "ember serve",
     "test": "npm-run-all lint test:*",
     "test:ember": "ember test"
