@@ -6,22 +6,29 @@ import {
   MetaMaskProvider,
   WalletConnectProvider,
 } from 'eth-testing/lib/providers';
+import { TestingUtils } from 'eth-testing/lib/testing-utils';
 import { module, test } from 'qunit';
 
 const FAKE_ACCOUNT_1 = '0xf61B443A155b07D2b2cAeA2d99715dC84E839EEf';
 
 declare global {
   interface Window {
-    testWalletConnectProvider: WalletConnectProvider;
+    testWalletConnectProvider?: WalletConnectProvider;
   }
 }
 
 module('Acceptance | wallet connection', function (hooks) {
   setupApplicationTest(hooks);
+  let testingUtils: TestingUtils;
+  hooks.afterEach(function () {
+    testingUtils.clearAllMocks();
+    window.ethereum = undefined;
+    window.testWalletConnectProvider = undefined;
+  });
 
   module('With Metamask', function (hooks) {
     hooks.beforeEach(function () {
-      const testingUtils = generateTestingUtils({ providerType: 'MetaMask' });
+      testingUtils = generateTestingUtils({ providerType: 'MetaMask' });
       window.ethereum = testingUtils.getProvider() as MetaMaskProvider;
 
       testingUtils.mockNotConnectedWallet();
@@ -46,11 +53,10 @@ module('Acceptance | wallet connection', function (hooks) {
   });
 
   module('With Wallet Connect', function (hooks) {
-    const testingUtils = generateTestingUtils({
-      providerType: 'WalletConnect',
-    });
-
     hooks.beforeEach(function () {
+      testingUtils = generateTestingUtils({
+        providerType: 'WalletConnect',
+      });
       window.testWalletConnectProvider =
         testingUtils.getProvider() as WalletConnectProvider;
 
@@ -60,7 +66,6 @@ module('Acceptance | wallet connection', function (hooks) {
 
     test('connecting wallet', async function (assert) {
       await visit('/schedule');
-
       await click('.connect-button__button');
 
       await click('[data-test-wallet-option="wallet-connect"]');
