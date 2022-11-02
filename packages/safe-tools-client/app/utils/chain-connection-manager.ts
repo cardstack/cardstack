@@ -433,7 +433,7 @@ class WalletConnectConnectionStrategy extends ConnectionStrategy {
   providerId = 'wallet-connect' as WalletProviderId;
 
   getSession() {
-    return this.provider.connector.session;
+    return this.provider.connector?.session;
   }
 
   // eslint-disable-next-line ember/classic-decorator-hooks, @typescript-eslint/no-empty-function
@@ -461,23 +461,27 @@ class WalletConnectConnectionStrategy extends ConnectionStrategy {
       };
     }
 
-    const hubConfigApi = new HubConfig(config.hubUrl);
-    const hubConfigResponse = await hubConfigApi.getConfig();
-
-    const provider = new WalletConnectProvider({
-      chainId,
-      infuraId: config.infuraId,
-      rpc: {
-        [networkIds[this.networkSymbol]]:
-          hubConfigResponse.web3.ethereum.rpcNodeHttpsUrl, // FIXME don’t hardcode ethereum
-      },
-      rpcWss: {
-        [networkIds[this.networkSymbol]]:
-          hubConfigResponse.web3.ethereum.rpcNodeWssUrl,
-      },
-      // based on https://github.com/WalletConnect/walletconnect-monorepo/blob/7aa9a7213e15489fa939e2e020c7102c63efd9c4/packages/providers/web3-provider/src/index.ts#L47-L52
-      connector: new CustomStorageWalletConnect(connectorOptions, chainId),
-    });
+    let provider;
+    if (window.testWalletConnectProvider) {
+      provider = window.testWalletConnectProvider;
+    } else {
+      const hubConfigApi = new HubConfig(config.hubUrl);
+      const hubConfigResponse = await hubConfigApi.getConfig();
+      provider = new WalletConnectProvider({
+        chainId,
+        infuraId: config.infuraId,
+        rpc: {
+          [networkIds[this.networkSymbol]]:
+            hubConfigResponse.web3.ethereum.rpcNodeHttpsUrl, // FIXME don’t hardcode ethereum
+        },
+        rpcWss: {
+          [networkIds[this.networkSymbol]]:
+            hubConfigResponse.web3.ethereum.rpcNodeWssUrl,
+        },
+        // based on https://github.com/WalletConnect/walletconnect-monorepo/blob/7aa9a7213e15489fa939e2e020c7102c63efd9c4/packages/providers/web3-provider/src/index.ts#L47-L52
+        connector: new CustomStorageWalletConnect(connectorOptions, chainId),
+      });
+    }
 
     // Subscribe to accounts change
     provider.on('accountsChanged', (accounts: string[]) => {
