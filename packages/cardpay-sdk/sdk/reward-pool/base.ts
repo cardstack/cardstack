@@ -652,8 +652,8 @@ The reward program ${rewardProgramId} has balance equals ${fromWei(
   }
 
   async claimAllGasEstimate(
-    rewardProgramId: string,
     rewardSafeAddress: string,
+    rewardProgramId: string,
     tokenAddress: string
   ): Promise<GasEstimate> {
     let rewardManager = await getSDK('RewardManager', this.layer2Web3);
