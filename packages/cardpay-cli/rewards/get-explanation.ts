@@ -39,7 +39,7 @@ export default {
       console.log(
         `
         Claim Explainer template:
-            ${explanationTemplate ?? '  Not specified'}
+            ${explanationTemplate ?? 'Not specified'}
         `
       );
     }
