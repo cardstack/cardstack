@@ -44,7 +44,6 @@ module('Acceptance | wallet connection', function (hooks) {
         '.boxel-radio-option__input boxel-radio-option__input--hidden-radio boxel-radio-option__input--checked'
       );
       await click('[data-test-mainnet-connect-button]');
-      await click('.network-connect-modal__close-button'); // TODO: I don't think this click should be necessary
 
       assert
         .dom('.safe-tools__dashboard-schedule-control-panel-wallet-address')
@@ -78,7 +77,6 @@ module('Acceptance | wallet connection', function (hooks) {
       testingUtils.mockAccountsChanged([FAKE_ACCOUNT_1]);
 
       await click('.network-connect-modal__close-button'); // TODO: I don't think this click should be necessary
-
       assert
         .dom('.safe-tools__dashboard-schedule-control-panel-wallet-address')
         .hasText(truncateMiddle([FAKE_ACCOUNT_1]));
