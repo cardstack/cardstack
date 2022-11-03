@@ -6963,6 +6963,11 @@
   resolved "https://registry.yarnpkg.com/@types/ember__owner/-/ember__owner-4.0.0.tgz#2058a8fbf9636774dc79430abd355b07538c51d7"
   integrity sha512-7ZotJNCkZUvJpcGHYswQlQsHyRITQ3aNOoFPi86NFxmOXEIVAGVKPHB87w8ZlMmhssG2vitCuNzuQCeDwPaokQ==
 
+"@types/ember__owner@^4.0.1":
+  version "4.0.1"
+  resolved "https://registry.yarnpkg.com/@types/ember__owner/-/ember__owner-4.0.1.tgz#e7d3eebea11887c86ac1dc62c9a2fae840d945f1"
+  integrity sha512-m9a292TdRrG2iu4UgBq0Mf6YnOD2WcpieVtqM0DSFhqqDYlIvMVAfjkmSoJJaIjBtWerTcgV+dO06Av47Nkshg==
+
 "@types/ember__polyfills@*", "@types/ember__polyfills@^4.0.0":
   version "4.0.0"
   resolved "https://registry.yarnpkg.com/@types/ember__polyfills/-/ember__polyfills-4.0.0.tgz#d83ae94ff2890ad47798315426d9916f39ff4ae6"
