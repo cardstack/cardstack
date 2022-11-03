@@ -1,12 +1,19 @@
-import { ethereumNetworks, gnosisNetworks, networkIds, polygonNetworks } from './constants';
+import { supportedChains, Networks, networks } from './constants';
 import { HubConfigResponse } from './hub-config';
 
-export const getWeb3ConfigByNetwork = (config: HubConfigResponse, network: string | number) => {
-  const networkName = (typeof network === 'number' ? networkIds[network] : network) as string;
+type Networkish = string | number | Networks;
 
-  if (ethereumNetworks.includes(networkName)) return config.web3.ethereum;
-  if (gnosisNetworks.includes(networkName)) return config.web3.gnosis;
-  if (polygonNetworks.includes(networkName)) return config.web3.polygon;
+const convertChainIdToName = (network: Networkish) => (typeof network === 'number' ? networks[network] : network);
 
-  return { rpcNodeWssUrl: '', rpcNodeHttpsUrl: '' };
+export const getWeb3ConfigByNetwork = (config: HubConfigResponse, network: Networkish) => {
+  const networkName = convertChainIdToName(network);
+
+  if (supportedChains.ethereum.includes(networkName)) return config.web3.ethereum;
+  if (supportedChains.gnosis.includes(networkName)) return config.web3.gnosis;
+  if (supportedChains.polygon.includes(networkName)) return config.web3.polygon;
+
+  throw new Error(`Unsupported network: ${network}`);
 };
+
+export const isSupportedChain = (network: Networkish) =>
+  Object.values(supportedChains).flat().includes(convertChainIdToName(network));

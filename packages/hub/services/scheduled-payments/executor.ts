@@ -5,18 +5,10 @@ import shortUUID from 'short-uuid';
 import { nowUtc } from '../../utils/dates';
 import config from 'config';
 import { Wallet } from 'ethers';
-import {
-  JsonRpcProvider,
-  gasPriceInToken,
-  getWeb3ConfigByNetwork,
-  networks,
-  supportedChains,
-} from '@cardstack/cardpay-sdk';
+import { JsonRpcProvider, gasPriceInToken, getWeb3ConfigByNetwork } from '@cardstack/cardpay-sdk';
 
 export const getHttpRpcUrlByChain = (chainId: number) =>
   getWeb3ConfigByNetwork(config.get('web3'), chainId)?.rpcNodeHttpsUrl;
-
-export const isSupportedChain = (chainId: number) => supportedChains.includes(networks[chainId]);
 
 export default class ScheduledPaymentsExecutorService {
   prismaManager = inject('prisma-manager', { as: 'prismaManager' });

@@ -1,7 +1,7 @@
 import Web3 from 'web3';
 import { ScheduledPayment } from '@prisma/client';
 import { startCase } from 'lodash';
-import { isSupportedChain } from '../scheduled-payments/executor';
+import { isSupportedChain } from '@cardstack/cardpay-sdk';
 const { isAddress } = Web3.utils;
 
 type ScheduledPaymentAttribute =

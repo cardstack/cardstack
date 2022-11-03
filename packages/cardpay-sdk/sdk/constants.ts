@@ -2,7 +2,6 @@ import Web3 from 'web3';
 import invert from 'lodash/invert';
 import { networkName } from './utils/general-utils';
 import JsonRpcProvider from '../providers/json-rpc-provider';
-import { pullAll } from 'lodash';
 
 export const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000';
 
@@ -14,11 +13,11 @@ type NestedKeyOf<Obj extends object> = {
   [K in keyof Obj]: Obj[K] extends object ? NestedKeyOf<Obj[K]> : K;
 }[keyof Obj];
 
-export const ethereumNetworks = ['mainnet', 'goerli', 'kovan'];
-export const gnosisNetworks = ['gnosis', 'sokol', 'xdai'];
-export const polygonNetworks = ['polygon', 'mumbai'];
-
-export const deprecatedNetworks = ['kovan', 'xdai'];
+export const supportedChains = {
+  ethereum: ['mainnet', 'goerli'],
+  gnosis: ['gnosis', 'sokol'],
+  polygon: ['polygon', 'mumbai'],
+};
 
 const testHubUrl = {
   hubUrl: 'https://hub-staging.stack.cards',
@@ -137,7 +136,7 @@ const networksConstants = {
 
 type NetworksType = typeof networksConstants;
 
-type Networks = keyof NetworksType | 'xdai';
+export type Networks = keyof NetworksType | 'xdai';
 
 type ConstantKeys = NestedKeyOf<NetworksType>;
 
@@ -181,8 +180,6 @@ export const networkIds: Record<string, number> = Object.freeze(
 
 // invert the networkIds object, so { mainnet: 1, ... } becomes { '1': 'mainnet', ... }
 export const networks = invert(networkIds);
-
-export const supportedChains = pullAll(networkNames, deprecatedNetworks);
 
 export function getConstantByNetwork<K extends ConstantKeys>(name: K, network: Networks | string) {
   let value = constants[network as Networks][name];
