@@ -99,7 +99,7 @@ class Indexer:
                 leaf=payment["leaf"],
                 validFrom=payment["validFrom"],
                 validTo=payment["validTo"],
-                explanationId=payment.get("explanationId", "no_id"),
+                explanationId=payment.get("explanationId"),
                 explanationData=dict(payment.get("explanationData", {})),
             )
             proofs.append(i)
