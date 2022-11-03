@@ -14,7 +14,6 @@ module.exports = {
   hubEnvironment: 'test',
   authSecret: '2Lhrsi7xSDMv1agfW+hghvQkdkTRSqW/JGApSjLT0NA=',
   hubPrivateKey: 'dcff1d8c034057e5a44cbc7e360926432834b506276636688f5e793fd5464100',
-  nonceTTL: 120,
   cardDrop: {
     email: {
       rateLimit: {

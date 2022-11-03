@@ -331,7 +331,7 @@ model ScheduledPayment {
 }
 
 model CrankNonce {
-  id        String   @id @default(dbgenerated("'894820e7-e24f-48b3-826f-3239996626cb'::uuid")) @db.Uuid
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   chainId   Int      @unique @map("chain_id")
   nonce     BigInt
   createdAt DateTime @default(now()) @map("created_at") @db.Timestamp(6)

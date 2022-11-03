@@ -147,13 +147,9 @@ export default class ScheduledPaymentsRoute {
           },
         });
 
-        try {
-          await this.workerClient.addJob('scheduled-payment-on-chain-creation-waiter', {
-            scheduledPaymentId: scheduledPayment.id,
-          });
-        } catch (e) {
-          console.log(e);
-        }
+        await this.workerClient.addJob('scheduled-payment-on-chain-creation-waiter', {
+          scheduledPaymentId: scheduledPayment.id,
+        });
 
         ctx.body = this.scheduledPaymentSerializer.serialize(scheduledPayment);
         ctx.status = 200;

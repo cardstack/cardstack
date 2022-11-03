@@ -97,7 +97,7 @@ import ScheduledPaymentSerializer from './services/serializers/scheduled-payment
 import ScheduledPaymentValidator from './services/validators/scheduled-payment';
 import ScheduledPaymentsRoute from './routes/scheduled-payments';
 import ScheduledPaymentsExecutorService from './services/scheduled-payments/executor';
-import EthersProvideer from './services/ethers-provider';
+import EthersProvider from './services/ethers-provider';
 import CrankNonceLock from './services/crank-nonce-lock';
 
 //@ts-ignore polyfilling fetch
@@ -184,7 +184,7 @@ export function createRegistry(): Registry {
   registry.register('scheduled-payment-validator', ScheduledPaymentValidator);
   registry.register('scheduled-payments-route', ScheduledPaymentsRoute);
   registry.register('crank-nonce-lock', CrankNonceLock);
-  registry.register('ethers-provider', EthersProvideer);
+  registry.register('ethers-provider', EthersProvider);
 
   if (process.env.COMPILER) {
     registry.register(

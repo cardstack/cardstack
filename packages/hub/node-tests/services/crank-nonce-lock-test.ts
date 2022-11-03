@@ -5,7 +5,6 @@ import { nowUtc } from '../../utils/dates';
 import { registry, setupHub } from '../helpers/server';
 import BN from 'bn.js';
 import CrankNonceLock from '../../services/crank-nonce-lock';
-import config from 'config';
 
 class StubEthersProvider {
   getInstance(chainId: number) {
@@ -24,7 +23,6 @@ class StubEthersProvider {
   }
 }
 
-const nonceTTL = Number(config.get('nonceTTL'));
 describe('locking the nonce', function () {
   let subject: CrankNonceLock;
   let prisma: ExtendedPrismaClient;
@@ -76,8 +74,8 @@ describe('locking the nonce', function () {
       data: {
         chainId: chainId,
         nonce: currentNonce,
-        createdAt: subSeconds(nowUtc(), nonceTTL + 60),
-        updatedAt: subSeconds(nowUtc(), nonceTTL + 60),
+        createdAt: subSeconds(nowUtc(), subject.nonceTTL + 60),
+        updatedAt: subSeconds(nowUtc(), subject.nonceTTL + 60),
       },
     });
     let testFunc = async (nonce: BN) => {

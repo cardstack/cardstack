@@ -53,7 +53,6 @@ export default class ScheduledPaymentOnChainCreationWaiter {
 
     try {
       let receipt = await scheduledPaymentModule.schedulePaymentOnChain(scheduledPayment.creationTransactionHash);
-      console.log(receipt);
       return await prisma.scheduledPayment.update({
         data: {
           creationBlockNumber: receipt.blockNumber, // To let us know that the scheduled payment has been created on chain and that the process of scheduling the payment was completed
@@ -63,7 +62,6 @@ export default class ScheduledPaymentOnChainCreationWaiter {
         },
       });
     } catch (error: any) {
-      console.log(error);
       if (error.message.includes('revert')) {
         // Error message from the waitUntilTransactionMined in the SDK will be: Transaction with hash "${txnHash}" was reverted
         await prisma.scheduledPayment.update({

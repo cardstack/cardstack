@@ -17,70 +17,75 @@ export default class ScheduledPaymentsFetcherService {
   // It is also important to note that validForDays tells us for how many days the payment is still valid to retry in
   // case it is failing for some reason.
 
-  async fetchScheduledPayments(): Promise<ScheduledPayment[]> {
+  async fetchScheduledPayments(limit = 10): Promise<ScheduledPayment[]> {
     let prisma = await this.prismaManager.getClient();
     let nowUtc = convertDateToUTC(new Date());
 
     let results: [{ id: string; started_at: Date }] = await prisma.$queryRaw`SELECT 
-        "scheduled_payments"."id" AS "id",
-        "last_failed_payment_attempts"."started_at"
+        scheduled_payments.id AS id,
+        last_failed_payment_attempt.started_at
       FROM 
-        "scheduled_payments"
-      LEFT JOIN (SELECT "scheduled_payment_attempts"."scheduled_payment_id",
-                  MAX("scheduled_payment_attempts"."started_at") AS "started_at"
-            FROM "scheduled_payment_attempts"
-            WHERE "scheduled_payment_attempts"."status" = 'failed'
-            GROUP BY "scheduled_payment_id") AS "last_failed_payment_attempts"
-      ON "last_failed_payment_attempts"."scheduled_payment_id" = "scheduled_payments"."id"
+        scheduled_payments
+      LEFT JOIN (SELECT scheduled_payment_attempts.scheduled_payment_id,
+                  MAX(scheduled_payment_attempts.started_at) AS started_at
+            FROM scheduled_payment_attempts
+            WHERE scheduled_payment_attempts.status = 'failed'
+            GROUP BY scheduled_payment_id) AS last_failed_payment_attempt
+      ON last_failed_payment_attempt.scheduled_payment_id = scheduled_payments.id
       WHERE 
         (
-          "scheduled_payments"."canceled_at" IS NULL 
-          AND "scheduled_payments"."creation_block_number" > 0 
-          AND "scheduled_payments"."pay_at" > ${startOfDay(subDays(nowUtc, this.validForDays))}
-          AND "scheduled_payments"."pay_at" <= ${nowUtc}
+          scheduled_payments.canceled_at IS NULL 
+          AND scheduled_payments.creation_block_number > 0 
+          AND scheduled_payments.pay_at > ${startOfDay(subDays(nowUtc, this.validForDays))}
+          AND scheduled_payments.pay_at <= ${nowUtc}
           AND (
             (
-              "scheduled_payments"."recurring_day_of_month" IS NULL 
+              scheduled_payments.recurring_day_of_month IS NULL 
               AND (
-                "scheduled_payments"."id"
+                scheduled_payments.id
               ) NOT IN (
                 SELECT 
-                  "t0"."id" 
+                  scheduled_payments1.id 
                 FROM 
-                  "scheduled_payments" AS "t0" 
-                  INNER JOIN "scheduled_payment_attempts" AS "j0" ON ("j0"."scheduled_payment_id") = ("t0"."id") 
+                  scheduled_payments AS scheduled_payments1 
+                  INNER JOIN scheduled_payment_attempts AS scheduled_payment_attempts1 
+                  ON (scheduled_payment_attempts1.scheduled_payment_id) = (scheduled_payments1.id) 
                 WHERE 
                   (
                     (
-                      "j0"."status" = 'succeeded'
-                      OR "j0"."status" = 'in_progress'
+                      scheduled_payment_attempts1.status = 'succeeded'
+                      OR scheduled_payment_attempts1.status = 'in_progress'
                     ) 
-                    AND "t0"."id" IS NOT NULL
+                    AND scheduled_payments1.id IS NOT NULL
                   )
               )
             ) 
             OR (
-              "scheduled_payments"."recurring_day_of_month" > 0 
-              AND "scheduled_payments"."recurring_until" >= ${nowUtc}
+              scheduled_payments.recurring_day_of_month > 0 
+              AND scheduled_payments.recurring_until >= ${nowUtc}
               AND (
-                "scheduled_payments"."id"
+                scheduled_payments.id
               ) NOT IN (
                 SELECT 
-                  "t0"."id" 
+                  scheduled_payments1.id 
                 FROM 
-                  "scheduled_payments" AS "t0" 
-                  INNER JOIN "scheduled_payment_attempts" AS "j0" ON ("j0"."scheduled_payment_id") = ("t0"."id") 
+                  scheduled_payments AS scheduled_payments1 
+                  INNER JOIN scheduled_payment_attempts AS scheduled_payment_attempts1 
+                  ON (scheduled_payment_attempts1.scheduled_payment_id) = (scheduled_payments1.id) 
                 WHERE 
                   (
-                    "j0"."status" = 'in_progress'
-                    AND "t0"."id" IS NOT NULL
+                    scheduled_payment_attempts1.status = 'in_progress'
+                    AND scheduled_payments1.id IS NOT NULL
                   )
               )
             )
           )
         )
-        ORDER BY CASE WHEN  "last_failed_payment_attempts"."started_at" IS NULL THEN 0 ELSE 1 END
-        LIMIT 10;`;
+        ORDER BY 
+          CASE WHEN last_failed_payment_attempt.started_at IS NULL 
+          THEN ${convertDateToUTC(new Date(0))} 
+          ELSE last_failed_payment_attempt.started_at END
+        LIMIT ${limit};`;
 
     // Retrieve scheduledPayment prisma object based on filtered id
     return prisma.scheduledPayment.findMany({ where: { id: { in: results.map((result) => result.id) } } });
