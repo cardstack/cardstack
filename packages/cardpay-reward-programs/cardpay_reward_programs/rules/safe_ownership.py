@@ -79,9 +79,26 @@ class SafeOwnership(Rule):
         df["validTo"] = payment_cycle + self.duration
         df["token"] = self.token
         df["amount"] = df["payable_safes"] * self.reward_per_safe
-        df["explanationData"] = self.get_explanation_data()
+        df["explanationData"] = df.apply(
+            lambda row: self.get_explanation_data(
+                {
+                    "rewardProgramID": row.rewardProgramID,
+                    "payee": row.payee,
+                    "paymentCycle": row.paymentCycle,
+                    "validFrom": row.validFrom,
+                    "validTo": row.validTo,
+                    "amount": row.amount,
+                    "token": row.token,
+                }
+            ),
+            axis=1,
+        )
         df = df.drop(["payable_safes"], axis=1)
         return df
 
-    def get_explanation_data(self):
-        return {}
+    def get_explanation_data(self, payment):
+        return {
+            "amount": payment["amount"],
+            "token": self.token,
+            "safe_type": self.safe_type,
+        }
