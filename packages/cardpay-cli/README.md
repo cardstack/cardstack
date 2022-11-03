@@ -89,11 +89,11 @@ yarn cardpay safe list --walletConnect
  - [`cardpay rewards admin recover-reward-tokens <safeAddress> <rewardProgramId> <tokenAddress> [amount]`](#cardpay-rewards-admin-recover-reward-tokens-safeaddress-rewardprogramid-tokenaddress-amount)
  - [`cardpay rewards admin set-admin <fundingCard> <rewardProgramId> <newAdmin>`](#cardpay-rewards-admin-set-admin-fundingcard-rewardprogramid-newadmin)
  - [`cardpay rewards claim <rewardSafe> <leaf> <proof> [acceptPartialClaim]`](#cardpay-rewards-claim-rewardsafe-leaf-proof-acceptpartialclaim)
- - [`cardpay rewards claimable-proofs <address>`](#cardpay-rewards-claimable-proofs-address)
+ - [`cardpay rewards claimable-proofs <address> <rewardProgramId>`](#cardpay-rewards-claimable-proofs-address-rewardprogramid)
  - [`cardpay rewards list`](#cardpay-rewards-list)
  - [`cardpay rewards pool-balances <rewardProgramId>`](#cardpay-rewards-pool-balances-rewardprogramid)
  - [`cardpay rewards register <prepaidCard> <rewardProgramId>`](#cardpay-rewards-register-prepaidcard-rewardprogramid)
- - [`cardpay rewards reward-balances <address> [safeAddress] [rewardProgramId]`](#cardpay-rewards-reward-balances-address-safeaddress-rewardprogramid)
+ - [`cardpay rewards reward-balances <address> <rewardProgramId> [safeAddress]`](#cardpay-rewards-reward-balances-address-rewardprogramid-safeaddress)
  - [`cardpay rewards transfer-safe <rewardSafe> <newOwner>`](#cardpay-rewards-transfer-safe-rewardsafe-newowner)
  - [`cardpay rewards withdraw-from-safe <rewardSafe> <recipient> <tokenAddress> [amount]`](#cardpay-rewards-withdraw-from-safe-rewardsafe-recipient-tokenaddress-amount)
  - [`cardpay rewards view <rewardProgramId>`](#cardpay-rewards-view-rewardprogramid)
@@ -101,15 +101,25 @@ yarn cardpay safe list --walletConnect
  - [`cardpay rewards claim-reward-gas-estimate <rewardSafe> <leaf> <proof> [acceptPartialClaim]`](#cardpay-rewards-claim-reward-gas-estimate-rewardsafe-leaf-proof-acceptpartialclaim)
  - [`cardpay rewards withdraw-gas-estimate <rewardSafe> <recipient> <tokenAddress> <amount>`](#cardpay-rewards-withdraw-gas-estimate-rewardsafe-recipient-tokenaddress-amount)
  - [`cardpay rewards check-claim-params <rewardSafe> <leaf> <proof> [acceptPartialClaim]`](#cardpay-rewards-check-claim-params-rewardsafe-leaf-proof-acceptpartialclaim)
- - [`cardpay rewards claim-all <rewardSafe> [rewardProgramId] [tokenAddress]`](#cardpay-rewards-claim-all-rewardsafe-rewardprogramid-tokenaddress)
- - [`cardpay rewards claim-all-rewards-gas-estimate <rewardSafe> <tokenAddress> [rewardProgramId]`](#cardpay-rewards-claim-all-rewards-gas-estimate-rewardsafe-tokenaddress-rewardprogramid)
+ - [`cardpay rewards claim-all <rewardSafe> <rewardProgramId> [tokenAddress]`](#cardpay-rewards-claim-all-rewardsafe-rewardprogramid-tokenaddress)
+ - [`cardpay rewards claim-all-rewards-gas-estimate <rewardSafe> <rewardProgramId> <tokenAddress>`](#cardpay-rewards-claim-all-rewards-gas-estimate-rewardsafe-rewardprogramid-tokenaddress)
+ - [`cardpay rewards get-explanation <rewardProgramId> [explanationId]`](#cardpay-rewards-get-explanation-rewardprogramid-explanationid)
+ - [`cardpay rewards get-rule <rewardProgramId>`](#cardpay-rewards-get-rule-rewardprogramid)
+ - [`cardpay safe create [threshold] [tokenAddress] [owners...]`](#cardpay-safe-create-threshold-tokenaddress-owners...)
  - [`cardpay safe list [address] [safeType]`](#cardpay-safe-list-address-safetype)
  - [`cardpay safe transfer-tokens [safeAddress] [token] [recipient] [amount]`](#cardpay-safe-transfer-tokens-safeaddress-token-recipient-amount)
  - [`cardpay safe transfer-tokens-gas-estimate [safeAddress] [token] [recipient] [amount]`](#cardpay-safe-transfer-tokens-gas-estimate-safeaddress-token-recipient-amount)
  - [`cardpay safe view [safeAddress]`](#cardpay-safe-view-safeaddress)
  - [`cardpay safe debug-sign-typed-data [data] [address]`](#cardpay-safe-debug-sign-typed-data-data-address)
  - [`cardpay testing create-account <createPrepaidCardSafe> <createMerchantSafe> <createRewardSafe> <createDepotSafe>`](#cardpay-testing-create-account-createprepaidcardsafe-createmerchantsafe-createrewardsafe-createdepotsafe)
+ - [`cardpay scheduled-payment cancel <safeAddress> <moduleAddress> <gasTokenAddress> <spHash>`](#cardpay-scheduled-payment-cancel-safeaddress-moduleaddress-gastokenaddress-sphash)
+ - [`cardpay scheduled-payment create-safe`](#cardpay-scheduled-payment-create-safe)
+ - [`cardpay scheduled-payment create-safe-estimation`](#cardpay-scheduled-payment-create-safe-estimation)
+ - [`cardpay scheduled-payment create-sp-hash <moduleAddress> <tokenAddress> <amount> <payeeAddress> <fixedUSDFee> <percentageFee> <executionGas> <maxGasPrice> <gasTokenAddress> <salt>`](#cardpay-scheduled-payment-create-sp-hash-moduleaddress-tokenaddress-amount-payeeaddress-fixedusdfee-percentagefee-executiongas-maxgasprice-gastokenaddress-salt)
  - [`cardpay scheduled-payment enable-module <safeAddress> <gasTokenAddress>`](#cardpay-scheduled-payment-enable-module-safeaddress-gastokenaddress)
+ - [`cardpay scheduled-payment estimate-execution <moduleAddress> <tokenAddress> <amount> <payeeAddress> <fixedUSDFee> <percentageFee> <maxGasPrice> <gasTokenAddress> <salt>`](#cardpay-scheduled-payment-estimate-execution-moduleaddress-tokenaddress-amount-payeeaddress-fixedusdfee-percentagefee-maxgasprice-gastokenaddress-salt)
+ - [`cardpay scheduled-payment execute <moduleAddress> <tokenAddress> <amount> <payeeAddress> <fixedUSDFee> <feePercentage> <executionGas> <maxGasPrice> <gasTokenAddress> <salt> <gasPrice>`](#cardpay-scheduled-payment-execute-moduleaddress-tokenaddress-amount-payeeaddress-fixedusdfee-feepercentage-executiongas-maxgasprice-gastokenaddress-salt-gasprice)
+ - [`cardpay scheduled-payment schedule-payment <safeAddress> <moduleAddress> <tokenAddress> <amount> <payeeAddress> <fixedUSDFee> <feePercentage> <executionGas> <maxGasPrice> <gasTokenAddress> <salt>`](#cardpay-scheduled-payment-schedule-payment-safeaddress-moduleaddress-tokenaddress-amount-payeeaddress-fixedusdfee-feepercentage-executiongas-maxgasprice-gastokenaddress-salt)
 
 
 ## `cardpay assets token-balance [tokenAddress]`
@@ -125,7 +135,7 @@ Options:
   -t, --trezor          A flag to indicate that trezor should be used for the wallet  [boolean]
   -m, --mnemonic        Phrase for mnemonic wallet  [string]
   -e, --ethersMnemonic  Phrase for mnemonic wallet using ethers.js signer  [string]
-  -n, --network         The network to run this script on  [string] [required] [choices: "sokol", "kovan", "gnosis", "xdai", "mainnet"]
+  -n, --network         The network to run this script on  [string] [required] [choices: "sokol", "kovan", "goerli", "mumbai", "gnosis", "xdai", "mainnet"]
 ```
 
 ## `cardpay bridge await-to-l1 <fromBlock> <txnHash>`
@@ -769,7 +779,7 @@ Options:
   -t, --trezor          A flag to indicate that trezor should be used for the wallet  [boolean]
   -m, --mnemonic        Phrase for mnemonic wallet  [string]
   -e, --ethersMnemonic  Phrase for mnemonic wallet using ethers.js signer  [string]
-  -n, --network         The network to run this script on  [string] [required] [choices: "sokol", "kovan", "gnosis", "xdai", "mainnet"]
+  -n, --network         The network to run this script on  [string] [required] [choices: "sokol", "kovan", "goerli", "mumbai", "gnosis", "xdai", "mainnet"]
 ```
 
 ## `cardpay price usd <token> [amount]`
@@ -786,7 +796,7 @@ Options:
   -t, --trezor          A flag to indicate that trezor should be used for the wallet  [boolean]
   -m, --mnemonic        Phrase for mnemonic wallet  [string]
   -e, --ethersMnemonic  Phrase for mnemonic wallet using ethers.js signer  [string]
-  -n, --network         The network to run this script on  [string] [required] [choices: "sokol", "kovan", "gnosis", "xdai", "mainnet"]
+  -n, --network         The network to run this script on  [string] [required] [choices: "sokol", "kovan", "goerli", "mumbai", "gnosis", "xdai", "mainnet"]
 ```
 
 ## `cardpay rewards admin add-tokens <safeAddress> <rewardProgramId> <tokenAddress> <amount>`
@@ -917,24 +927,24 @@ Options:
   -n, --network             The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "gnosis", "xdai"]
 ```
 
-## `cardpay rewards claimable-proofs <address>`
+## `cardpay rewards claimable-proofs <address> <rewardProgramId>`
 
 View proofs that are claimable
 
 ```
 Positionals:
-  address  The address that tally rewarded -- The owner of prepaid card.  [string] [required]
+  address          The address that tally rewarded -- The owner of prepaid card.  [string] [required]
+  rewardProgramId  The reward program id.  [string] [required]
 
 Options:
-  -w, --walletConnect    A flag to indicate that wallet connect should be used for the wallet  [boolean]
-  -t, --trezor           A flag to indicate that trezor should be used for the wallet  [boolean]
-  -m, --mnemonic         Phrase for mnemonic wallet  [string]
-  -e, --ethersMnemonic   Phrase for mnemonic wallet using ethers.js signer  [string]
-      --safeAddress      safe address. Specify if you want gas estimates for each claim  [string]
-      --rewardProgramId  The reward program id.  [string]
-      --tokenAddress     The address of the tokens that are being claimed as rewards  [string]
-      --isValidOnly      Filter proofs which are valid, i.e. validFrom <= currentBlock < validTo  [boolean]
-  -n, --network          The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "gnosis", "xdai"]
+  -w, --walletConnect   A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -t, --trezor          A flag to indicate that trezor should be used for the wallet  [boolean]
+  -m, --mnemonic        Phrase for mnemonic wallet  [string]
+  -e, --ethersMnemonic  Phrase for mnemonic wallet using ethers.js signer  [string]
+      --safeAddress     safe address. Specify if you want gas estimates for each claim  [string]
+      --tokenAddress    The address of the tokens that are being claimed as rewards  [string]
+      --isValidOnly     Filter proofs which are valid, i.e. validFrom <= currentBlock < validTo  [boolean]
+  -n, --network         The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "gnosis", "xdai"]
 ```
 
 ## `cardpay rewards list`
@@ -984,22 +994,22 @@ Options:
   -n, --network         The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "gnosis", "xdai"]
 ```
 
-## `cardpay rewards reward-balances <address> [safeAddress] [rewardProgramId]`
+## `cardpay rewards reward-balances <address> <rewardProgramId> [safeAddress]`
 
 View token balances of unclaimed rewards in the reward pool
 
 ```
 Positionals:
-  address  The address that tally rewarded -- The owner of prepaid card.  [string] [required]
+  address          The address that tally rewarded -- The owner of prepaid card.  [string] [required]
+  rewardProgramId  The reward program id.  [string] [required]
 
 Options:
-  -w, --walletConnect    A flag to indicate that wallet connect should be used for the wallet  [boolean]
-  -t, --trezor           A flag to indicate that trezor should be used for the wallet  [boolean]
-  -m, --mnemonic         Phrase for mnemonic wallet  [string]
-  -e, --ethersMnemonic   Phrase for mnemonic wallet using ethers.js signer  [string]
-      --safeAddress      safe address. Specify if you want gas estimates for each claim  [string]
-      --rewardProgramId  The reward program id.  [string]
-  -n, --network          The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "gnosis", "xdai"]
+  -w, --walletConnect   A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -t, --trezor          A flag to indicate that trezor should be used for the wallet  [boolean]
+  -m, --mnemonic        Phrase for mnemonic wallet  [string]
+  -e, --ethersMnemonic  Phrase for mnemonic wallet using ethers.js signer  [string]
+      --safeAddress     safe address. Specify if you want gas estimates for each claim  [string]
+  -n, --network         The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "gnosis", "xdai"]
 ```
 
 ## `cardpay rewards transfer-safe <rewardSafe> <newOwner>`
@@ -1129,40 +1139,92 @@ Options:
   -n, --network             The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "gnosis", "xdai"]
 ```
 
-## `cardpay rewards claim-all <rewardSafe> [rewardProgramId] [tokenAddress]`
+## `cardpay rewards claim-all <rewardSafe> <rewardProgramId> [tokenAddress]`
 
 claim all token of rewardee
 
 ```
 Positionals:
-  rewardSafe  The address of the rewardSafe which will receive the rewards  [string] [required]
+  rewardSafe       The address of the rewardSafe which will receive the rewards  [string] [required]
+  rewardProgramId  The reward program id.  [string] [required]
 
 Options:
-  -w, --walletConnect    A flag to indicate that wallet connect should be used for the wallet  [boolean]
-  -t, --trezor           A flag to indicate that trezor should be used for the wallet  [boolean]
-  -m, --mnemonic         Phrase for mnemonic wallet  [string]
-  -e, --ethersMnemonic   Phrase for mnemonic wallet using ethers.js signer  [string]
-      --rewardProgramId  The reward program id.  [string]
-      --tokenAddress     The address of the tokens that are being claimed as rewards  [string]
-  -n, --network          The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "gnosis", "xdai"]
+  -w, --walletConnect   A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -t, --trezor          A flag to indicate that trezor should be used for the wallet  [boolean]
+  -m, --mnemonic        Phrase for mnemonic wallet  [string]
+  -e, --ethersMnemonic  Phrase for mnemonic wallet using ethers.js signer  [string]
+      --tokenAddress    The address of the tokens that are being claimed as rewards  [string]
+  -n, --network         The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "gnosis", "xdai"]
 ```
 
-## `cardpay rewards claim-all-rewards-gas-estimate <rewardSafe> <tokenAddress> [rewardProgramId]`
+## `cardpay rewards claim-all-rewards-gas-estimate <rewardSafe> <rewardProgramId> <tokenAddress>`
 
 Obtain a gas estimate to claim all rewards corresponding to a rewardProgrmaId and tokenAddress
 
 ```
 Positionals:
-  rewardSafe    The address of the rewardSafe which will receive the rewards  [string] [required]
-  tokenAddress  The address of the tokens that are being claimed as rewards  [string] [required]
+  rewardSafe       The address of the rewardSafe which will receive the rewards  [string] [required]
+  rewardProgramId  The reward program id.  [string] [required]
+  tokenAddress     The address of the tokens that are being claimed as rewards  [string] [required]
 
 Options:
-  -w, --walletConnect    A flag to indicate that wallet connect should be used for the wallet  [boolean]
-  -t, --trezor           A flag to indicate that trezor should be used for the wallet  [boolean]
-  -m, --mnemonic         Phrase for mnemonic wallet  [string]
-  -e, --ethersMnemonic   Phrase for mnemonic wallet using ethers.js signer  [string]
-      --rewardProgramId  The reward program id.  [string]
-  -n, --network          The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "gnosis", "xdai"]
+  -w, --walletConnect   A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -t, --trezor          A flag to indicate that trezor should be used for the wallet  [boolean]
+  -m, --mnemonic        Phrase for mnemonic wallet  [string]
+  -e, --ethersMnemonic  Phrase for mnemonic wallet using ethers.js signer  [string]
+  -n, --network         The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "gnosis", "xdai"]
+```
+
+## `cardpay rewards get-explanation <rewardProgramId> [explanationId]`
+
+Get template explanation for reward program and claim
+
+```
+Positionals:
+  rewardProgramId  The reward program id.  [string] [required]
+
+Options:
+  -w, --walletConnect   A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -t, --trezor          A flag to indicate that trezor should be used for the wallet  [boolean]
+  -m, --mnemonic        Phrase for mnemonic wallet  [string]
+  -e, --ethersMnemonic  Phrase for mnemonic wallet using ethers.js signer  [string]
+      --explanationId   The reward program id.  [string]
+  -n, --network         The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "gnosis", "xdai"]
+```
+
+## `cardpay rewards get-rule <rewardProgramId>`
+
+Get JSON rule structure for reward program
+
+```
+Positionals:
+  rewardProgramId  Reward program id  [string] [required]
+
+Options:
+  -w, --walletConnect   A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -t, --trezor          A flag to indicate that trezor should be used for the wallet  [boolean]
+  -m, --mnemonic        Phrase for mnemonic wallet  [string]
+  -e, --ethersMnemonic  Phrase for mnemonic wallet using ethers.js signer  [string]
+  -n, --network         The Layer 2 network to run this script on  [string] [required] [choices: "sokol", "gnosis", "xdai"]
+```
+
+## `cardpay safe create [threshold] [tokenAddress] [owners...]`
+
+Create new safe
+
+```
+Positionals:
+  threshold     threshold of safe signature  [number]
+  tokenAddress  The token address (defaults to Kovan DAI)  [string]
+  owners        The address of owners (separated by spaces)  [array] [default: []]
+
+Options:
+  -w, --walletConnect   A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -t, --trezor          A flag to indicate that trezor should be used for the wallet  [boolean]
+  -m, --mnemonic        Phrase for mnemonic wallet  [string]
+  -e, --ethersMnemonic  Phrase for mnemonic wallet using ethers.js signer  [string]
+      --saltNonce       Salt nonce  [string]
+  -n, --network         The network to run this script on  [string] [required] [choices: "sokol", "kovan", "goerli", "mumbai", "gnosis", "xdai", "mainnet"]
 ```
 
 ## `cardpay safe list [address] [safeType]`
@@ -1274,6 +1336,80 @@ Options:
   -n, --network             The Layer 1 network to run this script on  [string] [required] [choices: "kovan", "mainnet"]
 ```
 
+## `cardpay scheduled-payment cancel <safeAddress> <moduleAddress> <gasTokenAddress> <spHash>`
+
+Cancel a scheduled payment
+
+```
+Positionals:
+  safeAddress      The address of the safe that will fund the scheduled payment  [string] [required]
+  moduleAddress    The address of scheduled payment module  [string] [required]
+  gasTokenAddress  The address of gas token  [string] [required]
+  spHash           Keccak hash of the scheduled payment params  [string] [required]
+
+Options:
+  -w, --walletConnect   A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -t, --trezor          A flag to indicate that trezor should be used for the wallet  [boolean]
+  -m, --mnemonic        Phrase for mnemonic wallet  [string]
+  -e, --ethersMnemonic  Phrase for mnemonic wallet using ethers.js signer  [string]
+  -n, --network         The network to run this script on  [string] [required] [choices: "sokol", "kovan", "goerli", "mumbai", "gnosis", "xdai", "mainnet"]
+```
+
+## `cardpay scheduled-payment create-safe`
+
+Create a new safe with SP module and meta guard installed
+
+```
+Options:
+  -w, --walletConnect   A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -t, --trezor          A flag to indicate that trezor should be used for the wallet  [boolean]
+  -m, --mnemonic        Phrase for mnemonic wallet  [string]
+  -e, --ethersMnemonic  Phrase for mnemonic wallet using ethers.js signer  [string]
+      --txnHash         The hash of multi send safe creation transaction  [string]
+  -n, --network         The network to run this script on  [string] [required] [choices: "sokol", "kovan", "goerli", "mumbai", "gnosis", "xdai", "mainnet"]
+```
+
+## `cardpay scheduled-payment create-safe-estimation`
+
+Estimate gas limit to create a new safe with SP module and meta guard installed
+
+```
+Options:
+  -w, --walletConnect   A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -t, --trezor          A flag to indicate that trezor should be used for the wallet  [boolean]
+  -m, --mnemonic        Phrase for mnemonic wallet  [string]
+  -e, --ethersMnemonic  Phrase for mnemonic wallet using ethers.js signer  [string]
+  -n, --network         The network to run this script on  [string] [required] [choices: "sokol", "kovan", "goerli", "mumbai", "gnosis", "xdai", "mainnet"]
+```
+
+## `cardpay scheduled-payment create-sp-hash <moduleAddress> <tokenAddress> <amount> <payeeAddress> <fixedUSDFee> <percentageFee> <executionGas> <maxGasPrice> <gasTokenAddress> <salt>`
+
+Generates a scheduled payment hash which is calculated from the given arguments. The hash serves as a unique identifier used for scheduling, executing, and canceling scheduled payments
+
+```
+Positionals:
+  moduleAddress    The address of scheduled payment module  [string] [required]
+  tokenAddress     The address of the token being transferred  [string] [required]
+  amount           Amount of tokens you would like transferred (in the smallest units of token)  [string] [required]
+  payeeAddress     The address of the payee of scheduled payment  [string] [required]
+  fixedUSDFee      Fixed USD fee (e.g. 0.25)  [number] [required]
+  percentageFee    Percentage fee (e.g. 5%, 0.05)  [number] [required]
+  executionGas     The gas limit to execute scheduled payment  [number] [required]
+  maxGasPrice      Maximum gas price (in the smallest units of gas token)  [string] [required]
+  gasTokenAddress  The address of the gas token  [string] [required]
+  salt             Arbitrary string to make SP unique  [string] [required]
+
+Options:
+  -w, --walletConnect        A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -t, --trezor               A flag to indicate that trezor should be used for the wallet  [boolean]
+  -m, --mnemonic             Phrase for mnemonic wallet  [string]
+  -e, --ethersMnemonic       Phrase for mnemonic wallet using ethers.js signer  [string]
+      --payAt                The unix UTC time in seconds from scheduled payment execution time  [number]
+      --recurringDayOfMonth  Day of the month on which the payment will be made recurringly (range: 1-31). Used for recurring scheduled payments. In case the month has less than days than the value provided, the payment will me made on the last day of the month. Should be an empty string when payAt is set.  [number]
+      --recurringUntil       Unix UTC time in seconds that represents the point in time when the recurring payment should be stopped. Used for recurring scheduled payments. Should be an empty string when payAt is set  [number]
+  -n, --network              The network to run this script on  [string] [required] [choices: "sokol", "kovan", "goerli", "mumbai", "gnosis", "xdai", "mainnet"]
+```
+
 ## `cardpay scheduled-payment enable-module <safeAddress> <gasTokenAddress>`
 
 Enable scheduled payment module on the safe
@@ -1281,14 +1417,99 @@ Enable scheduled payment module on the safe
 ```
 Positionals:
   safeAddress      The address of the safe whose enables the scheduled payment module  [string] [required]
-  gasTokenAddress  The token address (defaults to Kovan DAI)  [string] [required]
+  gasTokenAddress  The token address (defaults to Goerli DAI)  [string] [required]
 
 Options:
   -w, --walletConnect   A flag to indicate that wallet connect should be used for the wallet  [boolean]
   -t, --trezor          A flag to indicate that trezor should be used for the wallet  [boolean]
   -m, --mnemonic        Phrase for mnemonic wallet  [string]
   -e, --ethersMnemonic  Phrase for mnemonic wallet using ethers.js signer  [string]
-  -n, --network         The network to run this script on  [string] [required] [choices: "sokol", "kovan", "gnosis", "xdai", "mainnet"]
+  -n, --network         The network to run this script on  [string] [required] [choices: "sokol", "kovan", "goerli", "mumbai", "gnosis", "xdai", "mainnet"]
+```
+
+## `cardpay scheduled-payment estimate-execution <moduleAddress> <tokenAddress> <amount> <payeeAddress> <fixedUSDFee> <percentageFee> <maxGasPrice> <gasTokenAddress> <salt>`
+
+Enable scheduled payment module on the safe
+
+```
+Positionals:
+  moduleAddress    The address of scheduled payment module  [string] [required]
+  tokenAddress     The address of the token being transferred  [string] [required]
+  amount           Amount of tokens you would like transferred (in the smallest units of token)  [string] [required]
+  payeeAddress     The address of the payee of scheduled payment  [string] [required]
+  fixedUSDFee      Fixed USD fee (e.g. 0.25)  [number] [required]
+  percentageFee    Percentage fee (e.g. 5%, 0.05)  [number] [required]
+  maxGasPrice      Maximum gas price (in the smallest units of gas token)  [string] [required]
+  gasTokenAddress  The address of the gas token  [string] [required]
+  salt             Arbitrary string to make SP unique  [string] [required]
+
+Options:
+  -w, --walletConnect        A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -t, --trezor               A flag to indicate that trezor should be used for the wallet  [boolean]
+  -m, --mnemonic             Phrase for mnemonic wallet  [string]
+  -e, --ethersMnemonic       Phrase for mnemonic wallet using ethers.js signer  [string]
+      --payAt                Time to execute scheduled payments (in seconds)  [number]
+      --recurringDayOfMonth  Days of the month in the range of 1-28 to make recurring payments  [number]
+      --recurringUntil       End date of recurring payment  [number]
+  -n, --network              The network to run this script on  [string] [required] [choices: "sokol", "kovan", "goerli", "mumbai", "gnosis", "xdai", "mainnet"]
+```
+
+## `cardpay scheduled-payment execute <moduleAddress> <tokenAddress> <amount> <payeeAddress> <fixedUSDFee> <feePercentage> <executionGas> <maxGasPrice> <gasTokenAddress> <salt> <gasPrice>`
+
+Execute a scheduled payment
+
+```
+Positionals:
+  moduleAddress    The address of scheduled payment module  [string] [required]
+  tokenAddress     The address of the token being transferred  [string] [required]
+  amount           Amount of tokens you would like transferred (in the smallest units of token)  [string] [required]
+  payeeAddress     The address of the payee of scheduled payment  [string] [required]
+  fixedUSDFee      Fixed USD fee (e.g. 0.25)  [number] [required]
+  feePercentage    Percentage fee (e.g. 5%, 0.05)  [number] [required]
+  executionGas     The gas limit to execute scheduled payment  [string] [required]
+  maxGasPrice      Maximum gas price (in the smallest units of gas token)  [string] [required]
+  gasTokenAddress  The address of the gas token  [string] [required]
+  salt             Arbitrary string to make SP unique  [string] [required]
+  gasPrice         Gas price (in the smallest units of gas token)  [string] [required]
+
+Options:
+  -w, --walletConnect        A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -t, --trezor               A flag to indicate that trezor should be used for the wallet  [boolean]
+  -m, --mnemonic             Phrase for mnemonic wallet  [string]
+  -e, --ethersMnemonic       Phrase for mnemonic wallet using ethers.js signer  [string]
+      --payAt                Unix UTC time in seconds that represents the point in time when the payment should be executed. Used for one-time scheduled payments. Should be an empty string when recurringDayOfMonth and recurringUntil are set  [number]
+      --recurringDayOfMonth  Day of the month on which the payment will be made recurringly (range: 1-31). Used for recurring scheduled payments. In case the month has less than days than the value provided, the payment will me made on the last day of the month. Should be an empty string when payAt is set.  [number]
+      --recurringUntil       Unix UTC time in seconds that represents the point in time when the recurring payment should be stopped. Used for recurring scheduled payments. Should be an empty string when payAt is set  [number]
+  -n, --network              The network to run this script on  [string] [required] [choices: "sokol", "kovan", "goerli", "mumbai", "gnosis", "xdai", "mainnet"]
+```
+
+## `cardpay scheduled-payment schedule-payment <safeAddress> <moduleAddress> <tokenAddress> <amount> <payeeAddress> <fixedUSDFee> <feePercentage> <executionGas> <maxGasPrice> <gasTokenAddress> <salt>`
+
+Schedules a one-time or a recurring payment. This creates a record in the crank (hub) and stores the scheduled payment hash in the safe's scheduled payment module contract. The crank is responsible for executing the payment at the scheduled time.
+
+```
+Positionals:
+  safeAddress      The address of the safe that will fund the scheduled payment  [string] [required]
+  moduleAddress    The address of the scheduled payment safe module  [string] [required]
+  tokenAddress     The address of the token to be transferred  [string] [required]
+  amount           The amount of tokens to be transferred  [string] [required]
+  payeeAddress     The address of the payee (recipient)  [string] [required]
+  fixedUSDFee      Fixed USD fee (e.g. 0.25)  [number] [required]
+  percentageFee    Percentage fee (e.g. 5%, 0.05)  [number]
+  executionGas     The gas limit to execute scheduled payment  [number] [required]
+  maxGasPrice      Maximum gas price (in the smallest units of gas token)  [string] [required]
+  gasTokenAddress  The address of the gas token  [string] [required]
+  salt             Arbitrary string to make SP unique  [string] [required]
+
+Options:
+  -w, --walletConnect        A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -t, --trezor               A flag to indicate that trezor should be used for the wallet  [boolean]
+  -m, --mnemonic             Phrase for mnemonic wallet  [string]
+  -e, --ethersMnemonic       Phrase for mnemonic wallet using ethers.js signer  [string]
+      --payAt                Unix UTC time in seconds that represents the point in time when the payment should be executed. Used for one-time scheduled payments. Should be an empty string when recurringDayOfMonth and recurringUntil are set  [number]
+      --recurringDayOfMonth  Day of the month on which the payment will be made recurringly (range: 1-31). Used for recurring scheduled payments. In case the month has less than days than the value provided, the payment will me made on the last day of the month. Should be an empty string when payAt is set.  [number]
+      --recurringUntil       Unix UTC time in seconds that represents the point in time when the recurring payment should be stopped. Used for recurring scheduled payments. Should be an empty string when payAt is set  [number]
+  -n, --network              The network to run this script on  [string] [required] [choices: "sokol", "kovan", "goerli", "mumbai", "gnosis", "xdai", "mainnet"]
 ```
 
 <!-- END CLI DOCS GENERATED BY yarn command-docs -->
