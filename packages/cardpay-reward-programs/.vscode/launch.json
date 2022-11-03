@@ -15,6 +15,20 @@
       "args": ["./input/flat_payment/parameters.json"]
     },
     {
+      "name": "Run Flat Drop",
+      "type": "python",
+      "request": "launch",
+      "module": "scripts.flat_drop",
+      "args": ["./input/flat_payment/parameters.json"]
+    },
+    {
+      "name": "Read S3 Parquet",
+      "type": "python",
+      "request": "launch",
+      "module": "scripts.read_parquet",
+      "args": ["0xab20c80fcc025451a3fc73bB953aaE1b9f640949", "27559539", "--env", "staging"]
+    },
+    {
       "name": "Explore using Streamlit",
       "type": "python",
       "request": "launch",
