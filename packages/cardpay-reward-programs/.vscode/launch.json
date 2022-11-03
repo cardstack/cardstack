@@ -19,7 +19,7 @@
       "type": "python",
       "request": "launch",
       "module": "scripts.flat_drop",
-      "args": ["./input/flat_payment/parameters.json"]
+      "args": []
     },
     {
       "name": "Read S3 Parquet",
