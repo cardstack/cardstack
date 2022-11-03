@@ -5,7 +5,7 @@ import { getSDK } from '@cardstack/cardpay-sdk';
 
 export default {
   command: 'get-rule <rewardProgramId>',
-  describe: 'Get JSON rule structure',
+  describe: 'Get JSON rule structure for reward program',
   builder(yargs: Argv) {
     return yargs
       .positional('rewardProgramId', {

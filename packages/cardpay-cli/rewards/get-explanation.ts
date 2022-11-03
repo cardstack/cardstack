@@ -5,7 +5,7 @@ import { getSDK } from '@cardstack/cardpay-sdk';
 
 export default {
   command: 'get-explanation <rewardProgramId> [explanationId]',
-  describe: `Get explanation for reward program and translation definitions`,
+  describe: `Get template explanation for reward program and claim`,
   builder(yargs: Argv) {
     return yargs
       .positional('rewardProgramId', {
