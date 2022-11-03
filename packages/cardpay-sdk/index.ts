@@ -27,15 +27,7 @@ export type { TransactionOptions } from './sdk/utils/general-utils';
 
 export { viewSafe } from './sdk/safes';
 export { getAddress, getAddressByNetwork, getOracle, getOracleByNetwork } from './contracts/addresses';
-export {
-  getConstant,
-  getConstantByNetwork,
-  networks,
-  networkIds,
-  CARDWALLET_SCHEME,
-  MERCHANT_PAYMENT_UNIVERSAL_LINK_HOSTNAME,
-  MERCHANT_PAYMENT_UNIVERSAL_LINK_STAGING_HOSTNAME,
-} from './sdk/constants';
+export * from './sdk/constants';
 export {
   waitForTransactionConsistency,
   waitUntilBlock,
@@ -60,3 +52,4 @@ export { default as Web3Provider } from './providers/web3-provider';
 export { MIN_PAYMENT_AMOUNT_IN_SPEND as MIN_PAYMENT_AMOUNT_IN_SPEND__PREFER_ON_CHAIN_WHEN_POSSIBLE } from './sdk/do-not-use-on-chain-constants';
 export { protocolVersions } from './contracts/addresses';
 export { gasPriceInToken } from './sdk/utils/conversions';
+export * from './sdk/network-config-utils';

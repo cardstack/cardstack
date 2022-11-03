@@ -13,6 +13,12 @@ type NestedKeyOf<Obj extends object> = {
   [K in keyof Obj]: Obj[K] extends object ? NestedKeyOf<Obj[K]> : K;
 }[keyof Obj];
 
+export const supportedChains = {
+  ethereum: ['mainnet', 'goerli'],
+  gnosis: ['gnosis', 'sokol'],
+  polygon: ['polygon', 'mumbai'],
+};
+
 const testHubUrl = {
   hubUrl: 'https://hub-staging.stack.cards',
 };
@@ -130,7 +136,7 @@ const networksConstants = {
 
 type NetworksType = typeof networksConstants;
 
-type Networks = keyof NetworksType | 'xdai';
+export type Networks = keyof NetworksType | 'xdai';
 
 type ConstantKeys = NestedKeyOf<NetworksType>;
 
@@ -160,7 +166,7 @@ const constants: Record<Networks, NetworkContants> = {
   ...networksConstants,
 } as const;
 
-const networkNames = Object.keys(constants);
+export const networkNames = Object.keys(constants);
 
 export const networkIds: Record<string, number> = Object.freeze(
   networkNames.reduce(
