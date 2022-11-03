@@ -19,6 +19,8 @@ export const supportedChains = {
   polygon: ['polygon', 'mumbai'],
 };
 
+export const supportedChainsArray = Object.values(supportedChains).flat();
+
 const testHubUrl = {
   hubUrl: 'https://hub-staging.stack.cards',
 };

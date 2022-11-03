@@ -1,4 +1,4 @@
-import { supportedChains, Networks, networks } from './constants';
+import { supportedChains, Networks, networks, supportedChainsArray } from './constants';
 import { HubConfigResponse } from './hub-config';
 
 type Networkish = string | number | Networks;
@@ -15,5 +15,4 @@ export const getWeb3ConfigByNetwork = (config: HubConfigResponse, network: Netwo
   throw new Error(`Unsupported network: ${network}`);
 };
 
-export const isSupportedChain = (network: Networkish) =>
-  Object.values(supportedChains).flat().includes(convertChainIdToName(network));
+export const isSupportedChain = (network: Networkish) => supportedChainsArray.includes(convertChainIdToName(network));
