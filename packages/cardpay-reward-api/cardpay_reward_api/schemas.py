@@ -15,7 +15,7 @@ class Proof(BaseModel):
     leaf: str
     validFrom: int
     validTo: int
-    explanationId: str
+    explanationId: Optional[str]
     explanationData: Any
 
     @validator("leaf", pre=True)

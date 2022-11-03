@@ -125,7 +125,7 @@ class PaymentTree:
         # Arrow tables are constructed by column
         # so we need to flip the data
 
-        explanation_id = py_.get(self.parameters, "metadata.explanation_id", "no_id")
+        explanation_id = py_.get(self.parameters, "metadata.explanation_id")
         columns = defaultdict(list)
         if len(self.data) > 0:
             root = self.get_hex_root()
