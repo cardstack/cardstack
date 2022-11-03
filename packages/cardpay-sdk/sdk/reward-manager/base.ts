@@ -1084,11 +1084,11 @@ The owner of reward safe ${safeAddress} is ${rewardSafeOwner}, but the signer is
     return content;
   }
 
-  getProgramExplainer(rule: RuleJson, languageTag: string = 'en') {
+  getProgramExplainer(rule: RuleJson, languageTag = 'en') {
     return get(rule, `explanation.${languageTag}.program`, undefined);
   }
 
-  getClaimExplainer(rule: RuleJson, explanationId: string, languageTag: string = 'en') {
+  getClaimExplainer(rule: RuleJson, explanationId: string, languageTag = 'en') {
     return get(rule, `explanation.${languageTag}.claim.${explanationId}`, undefined);
   }
 
