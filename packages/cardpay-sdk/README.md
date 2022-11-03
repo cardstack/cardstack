@@ -768,7 +768,7 @@ interface RewardTokenBalance {
 
 ```js
 let rewardPool = await getSDK('RewardPool', web3);
-let balanceForAllTokens = await rewardPool.rewardTokenBalancesWithoutDust(address, rewardSafe, rewardProgramId?)
+let balanceForAllTokens = await rewardPool.rewardTokenBalancesWithoutDust(address, rewardProgramId, rewardSafe)
 ```
 
 ### `RewardPool.addRewardTokens`
@@ -814,7 +814,7 @@ The `claimAll` is used by the rewardee to claim all rewards from a list of proof
 
 ```js
 let rewardManagerAPI = await getSDK('RewardManager', web3);
-await rewardManagerAPI.claimAll(rewardSafe, rewardProgramId?, tokenAddress?)
+await rewardManagerAPI.claimAll(rewardSafe, rewardProgramId, tokenAddress?)
 ```
 
 ### `RewardPool.claimGasEstimate`
@@ -846,7 +846,7 @@ interface GasEstimate {
 
 ```js
 let rewardManagerAPI = await getSDK('RewardManager', web3);
-await rewardManagerAPI.claimAllGasEstimate(rewardSafe, tokenAddress, rewardProgramId?)
+await rewardManagerAPI.claimAllGasEstimate(rewardSafe, rewardProgramId,tokenAddress)
 ```
 
 
@@ -865,6 +865,8 @@ interface Proof {
   amount: BN;
   leaf: string;
   isValid: boolean;
+  explanationTemplate: string;
+  explanationData: any;
 }
 
 interface ClaimableProof extends Proof {
@@ -873,11 +875,9 @@ interface ClaimableProof extends Proof {
 }
 ```
 
-`
-
 ```js
 let rewardPool = await getSDK('RewardPool', web3);
-await rewardPool.getProofs(address, safeAddress?, rewardProgramId?, tokenAddress?, knownClaimed?)
+await rewardPool.getProofs(address, rewardProgramId, safeAddress?, tokenAddress?, knownClaimed?)
 ```
 
 ### `RewardPool.recoverTokens`
@@ -1000,7 +1000,14 @@ interface GasEstimate {
 let rewardManagerAPI = await getSDK('RewardManager', web3);
 await rewardManagerAPI.registerRewardeeGasEstimate(prepaidCard, rewardProgramId)
 ```
+### `RewardManager.getRuleJson`
 
+The `getRuleJson` returns the rule structure of a particular reward program. The rule json will include on-chaain "explanation" block which is the lookup map for explanation of each reward. A client can use this map alongside `explanationId` and `explanationData` returned by the reward api.
+
+```js
+let rewardManagerAPI = await getSDK('RewardManager', web3);
+await rewardManagerAPI.getRuleJson(rewardProgramId)
+```
 
 ## `LayerOneOracle`
 The `LayerOneOracle` API is used to get the current exchange rates in USD of ETH. This rate us fed by the Chainlink price feeds. Please supply a layer 1 web3 instance obtaining an `LayerOneOracle` API from `getSDK()`.

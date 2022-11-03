@@ -4,7 +4,7 @@ import { Arguments, CommandModule } from 'yargs';
 import { getConstant, getSDK } from '@cardstack/cardpay-sdk';
 
 export default {
-  command: 'claim-all <rewardSafe> [rewardProgramId] [tokenAddress]',
+  command: 'claim-all <rewardSafe> <rewardProgramId> [tokenAddress]',
   describe: 'claim all token of rewardee',
   builder(yargs: Argv) {
     return yargs
@@ -12,7 +12,7 @@ export default {
         type: 'string',
         description: 'The address of the rewardSafe which will receive the rewards',
       })
-      .option('rewardProgramId', {
+      .positional('rewardProgramId', {
         type: 'string',
         description: 'The reward program id.',
       })
@@ -26,7 +26,7 @@ export default {
     let { network, rewardSafe, rewardProgramId, tokenAddress } = args as unknown as {
       network: string;
       rewardSafe: string;
-      rewardProgramId?: string;
+      rewardProgramId: string;
       tokenAddress?: string;
     };
     let { web3 } = await getEthereumClients(network, getConnectionType(args));

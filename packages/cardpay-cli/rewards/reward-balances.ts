@@ -5,7 +5,7 @@ import { getSDK } from '@cardstack/cardpay-sdk';
 import { displayRewardTokenBalance } from './utils';
 
 export default {
-  command: 'reward-balances <address> [safeAddress] [rewardProgramId]',
+  command: 'reward-balances <address> <rewardProgramId> [safeAddress]',
   describe: 'View token balances of unclaimed rewards in the reward pool',
   builder(yargs: Argv) {
     return yargs
@@ -13,13 +13,13 @@ export default {
         type: 'string',
         description: 'The address that tally rewarded -- The owner of prepaid card.',
       })
+      .positional('rewardProgramId', {
+        type: 'string',
+        description: 'The reward program id.',
+      })
       .option('safeAddress', {
         type: 'string',
         description: 'safe address. Specify if you want gas estimates for each claim',
-      })
-      .option('rewardProgramId', {
-        type: 'string',
-        description: 'The reward program id.',
       })
       .option('network', NETWORK_OPTION_LAYER_2);
   },
@@ -27,14 +27,14 @@ export default {
     let { network, address, safeAddress, rewardProgramId } = args as unknown as {
       network: string;
       address: string;
+      rewardProgramId: string;
       safeAddress?: string;
-      rewardProgramId?: string;
     };
     let { web3 } = await getEthereumClients(network, getConnectionType(args));
     let rewardPool = await getSDK('RewardPool', web3);
     console.log(`Reward balances for ${address}`);
     if (safeAddress) {
-      const tokenBalances = await rewardPool.rewardTokenBalancesWithoutDust(address, safeAddress, rewardProgramId);
+      const tokenBalances = await rewardPool.rewardTokenBalancesWithoutDust(address, rewardProgramId, safeAddress);
       displayRewardTokenBalance(tokenBalances);
     } else {
       const tokenBalances = await rewardPool.rewardTokenBalances(address, rewardProgramId);
