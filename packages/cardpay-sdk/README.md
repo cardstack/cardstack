@@ -1000,7 +1000,14 @@ interface GasEstimate {
 let rewardManagerAPI = await getSDK('RewardManager', web3);
 await rewardManagerAPI.registerRewardeeGasEstimate(prepaidCard, rewardProgramId)
 ```
+### `RewardManager.getRuleJson`
 
+The `getRuleJson` returns the rule structure of a particular reward program. The rule json will include on-chaain "explanation" block which is the lookup map for explanation of each reward. A client can use this map alongside `explanationId` and `explanationData` returned by the reward api.
+
+```js
+let rewardManagerAPI = await getSDK('RewardManager', web3);
+await rewardManagerAPI.getRuleJson(rewardProgramId)
+```
 
 ## `LayerOneOracle`
 The `LayerOneOracle` API is used to get the current exchange rates in USD of ETH. This rate us fed by the Chainlink price feeds. Please supply a layer 1 web3 instance obtaining an `LayerOneOracle` API from `getSDK()`.
