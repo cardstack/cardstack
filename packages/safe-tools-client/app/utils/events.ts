@@ -1,9 +1,9 @@
-/* eslint-disable @typescript-eslint/ban-types */
+import { VoidCallback } from './types';
 // based on https://github.com/ai/nanoevents/blob/main/index.js
 export type UnbindEventListener = () => void;
 
 export interface Emitter<EmitterEvent = string> {
-  on(event: EmitterEvent, cb: Function): UnbindEventListener;
+  on(event: EmitterEvent, cb: VoidCallback): UnbindEventListener;
 }
 
 /**
@@ -60,14 +60,13 @@ export interface Emitter<EmitterEvent = string> {
  */
 
 export class SimpleEmitter {
-  events: Record<string, Function[]> = {};
+  events: Record<string, VoidCallback[]> = {};
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  emit(event: string, ...args: any[]) {
+  emit(event: string, ...args: unknown[]) {
     (this.events[event] || []).forEach((i) => i(...args));
   }
 
-  on(event: string, cb: Function): UnbindEventListener {
+  on(event: string, cb: VoidCallback): UnbindEventListener {
     (this.events[event] = this.events[event] || []).push(cb);
     const unbind = () =>
       (this.events[event] = (this.events[event] || []).filter((i) => i !== cb));

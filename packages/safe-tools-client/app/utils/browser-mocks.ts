@@ -1,17 +1,19 @@
-/* eslint-disable @typescript-eslint/ban-types */
 import { SimpleEmitter, UnbindEventListener } from './events';
 
 /**
  *  Mock broadcast channel with a subset of broadcast channel functionality.
  *  Use `test__simulateMessageEvent` to simulate a message event with only the data property
  */
+
+type EventCallback = (ev: unknown) => unknown;
+
 export class MockBroadcastChannel {
   postedMessages: Array<unknown> = [];
   channelName: string;
   private simpleEmitter = new SimpleEmitter();
   private unbindMap: {
-    message: WeakMap<Function, UnbindEventListener>;
-    messageerror: WeakMap<Function, UnbindEventListener>;
+    message: WeakMap<EventCallback, UnbindEventListener>;
+    messageerror: WeakMap<EventCallback, UnbindEventListener>;
   } = {
     message: new WeakMap(),
     messageerror: new WeakMap(),

@@ -1,6 +1,7 @@
 import {
   IWalletConnectOptions,
   IPushServerOptions,
+  IClientMeta,
 } from '@walletconnect/types';
 import * as cryptoLib from '@walletconnect/iso-crypto';
 
@@ -35,14 +36,15 @@ export default class CustomStorageWalletConnect extends Connector {
     });
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-empty-function, @typescript-eslint/no-explicit-any
-  set clientMeta(_value: any) {}
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  set clientMeta(_value: IClientMeta | null) {}
 
   get clientMeta() {
     return {
       description: '',
       url: window.location.origin,
       name: 'Cardstack',
+      icons: [],
     };
   }
 }
