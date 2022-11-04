@@ -38,8 +38,9 @@ interface Signature {
   Element: HTMLUListElement;
   Args: {
     class?: string;
-    closeMenu: () => void;
+    closeMenu?: () => void;
     items: Array<MenuItem|MenuDivider>;
+    itemClass?: string;
   };
   Blocks: EmptyObject;
 }
@@ -72,8 +73,10 @@ export default class Menu extends Component<Signature> {
                 role="none"
                 class={{cn
                   "boxel-menu__item"
+                  @itemClass
                   boxel-menu__item--dangerous=menuItem.dangerous
                   boxel-menu__item--has-icon=menuItem.icon
+                  boxel-menu__item--selected=menuItem.selected
                 }}
                 data-test-boxel-menu-item
               >
@@ -82,6 +85,7 @@ export default class Menu extends Component<Signature> {
                   role="menuitem"
                   href="#"
                   data-test-boxel-menu-item-text={{menuItem.text}}
+                  tabindex={{menuItem.tabindex}}
                   {{on "click" (fn this.invokeMenuItemAction menuItem.action)}}
                 >
                   {{#if menuItem.icon}}
@@ -99,7 +103,7 @@ export default class Menu extends Component<Signature> {
           </MenuItemRenderer>
         {{/each}}
       {{/if}}
-    </ul>    
+    </ul>
   </template>
 }
 

@@ -2,11 +2,8 @@ import { module, test } from 'qunit';
 import { setupRenderingTest } from 'ember-qunit';
 import { render, waitUntil } from '@ember/test-helpers';
 import { hbs } from 'ember-cli-htmlbars';
-function delay(delayAmountMs) {
-  return new Promise((resolve) => {
-    setTimeout(resolve, delayAmountMs);
-  });
-}
+import { delay } from '../../helpers';
+
 module('Integration | Modifiers | autoscroll', function (hooks) {
   setupRenderingTest(hooks);
 

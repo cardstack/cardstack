@@ -6,6 +6,7 @@ import cn from '@cardstack/boxel/helpers/cn';
 import focusTrap from 'ember-focus-trap/modifiers/focus-trap';
 import { modifier as createModifier, FunctionBasedModifier } from "ember-modifier";
 import BasicDropdown,{ Dropdown } from 'ember-basic-dropdown/components/basic-dropdown'
+import { action } from '@ember/object';
 
 import './index.css';
 
@@ -22,10 +23,14 @@ interface DropdownTriggerSignature {
   };
 }
 
+export type DropdownAPI = Dropdown;
+
 interface Signature {
   Element: HTMLDivElement;
   Args: {
     contentClass?: string;
+    registerAPI?: (publicAPI: Dropdown) => void
+    onClose?: () => void
   };
   Blocks: {
     trigger: [FunctionBasedModifier<{
@@ -41,13 +46,21 @@ interface Signature {
 
 // Needs to be class, BasicDropdown doesn't work with const
 class BoxelDropdown extends Component<Signature> {
+  @action registerAPI(publicAPI: DropdownAPI) {
+    this.args.registerAPI?.(publicAPI);
+  }
+
   <template>
     {{!--
       Note:
       ...attributes will only apply to BasicDropdown if @renderInPlace={{true}}
       because otherwise it does not render any HTML elements of its own, only its yielded content
     --}}
-    <BasicDropdown as |dd|>
+    <BasicDropdown
+      @registerAPI={{this.registerAPI}}
+      @onClose={{@onClose}}
+      as |dd|
+    >
       {{yield (modifier
         this.dropdownModifier
         dropdown=dd
