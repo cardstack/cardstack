@@ -24,7 +24,7 @@ class StubEthersProvider {
   }
 }
 
-describe.only('locking the nonce', function () {
+describe('locking the nonce', function () {
   let subject: CrankNonceLock;
   let prisma: ExtendedPrismaClient;
   let chainId = 80001; //mumbai

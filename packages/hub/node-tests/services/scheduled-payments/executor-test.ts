@@ -43,7 +43,7 @@ class StubCardpaySDK {
   }
 }
 
-describe.only('executing scheduled payments', function () {
+describe('executing scheduled payments', function () {
   let { getJobIdentifiers, getJobPayloads } = setupStubWorkerClient(this);
   let subject: ScheduledPaymentsExecutorService;
   let prisma: ExtendedPrismaClient;
