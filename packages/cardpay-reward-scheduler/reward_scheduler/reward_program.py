@@ -131,7 +131,12 @@ class RewardProgram:
         if blob and blob != b"":
             try:
                 did = blob.decode("utf-8")  # new blob format: hex encodes a did string
-                rules = resolve_rule(did)
+                doc = resolve_did(did)
+                rules = doc.get("tasks", [])
+                if rules is None:
+                    raise Exception("No rules specified")
+                else:
+                    return rules
             except Exception:
                 # old blob format: our rule blobs were hex encoded json
                 # try..except maintains backward compatibality with our old blob format
@@ -143,6 +148,15 @@ class RewardProgram:
                 return [rules]
         else:
             return []
+
+    def get_explanation(self):
+        blob = self.reward_manager.caller.rule(self.reward_program_id)
+        if blob and blob != b"":
+            did = blob.decode("utf-8")  # new blob format: hex encodes a did string
+            doc = resolve_did(did)
+            return doc.get("explanation", {})
+        else:
+            return {}
 
     def raise_on_payment_cycle_overlap(self, rules):
         """
@@ -164,7 +178,13 @@ class RewardProgram:
                 )
             current_cycles.update(rule_cycles)
 
-    def run_payment_cycle(self, payment_cycle, rule, previous_cycle=None):
+    def run_payment_cycle(
+        self,
+        payment_cycle,
+        rule,
+        explanation_block={},
+        previous_cycle=None,
+    ):
         """
         Trigger a job in AWS batch for a single payment cycle and single rule
         """
@@ -196,6 +216,8 @@ class RewardProgram:
             )
             return None
 
+        submission_data["explanation"] = explanation_block
+
         # We can't pass much data directly in AWS batch, so write the
         # parameters we want to use to S3 and pass the location into the task
         parameters_location = payment_cycle_output.joinpath("parameters.json")
@@ -213,7 +235,7 @@ class RewardProgram:
         )
         return job
 
-    def run_rule(self, rule) -> None:
+    def run_rule(self, rule, explanation_block={}) -> None:
         processable_payment_cycles = (
             self.get_all_payment_cycles(rule) - self.processed_cycles
         )
@@ -222,17 +244,19 @@ class RewardProgram:
                 previous_cycle = payment_cycle - rule["core"]["payment_cycle_length"]
                 if payment_cycle == rule["core"]["start_block"]:
                     # There can't be any previous ones for the first cycle
-                    self.run_payment_cycle(payment_cycle, rule)
+                    self.run_payment_cycle(payment_cycle, rule, explanation_block)
                 elif previous_cycle in self.processed_cycles:
                     # Only run if the previous cycle has been processed
                     # because the output of the previous cycle is needed
-                    self.run_payment_cycle(payment_cycle, rule, previous_cycle)
+                    self.run_payment_cycle(
+                        payment_cycle, rule, explanation_block, previous_cycle
+                    )
                 else:
                     # There's nothing to do here as the previous cycle hasn't been processed
                     pass
 
             else:
-                self.run_payment_cycle(payment_cycle, rule)
+                self.run_payment_cycle(payment_cycle, rule, explanation_block)
 
     def run_all_rules(self) -> None:
         """
@@ -244,15 +268,16 @@ class RewardProgram:
             return
 
         self.update_processed()
+        explanation = self.get_explanation()
         rules = self.get_rules()
         logging.info(f"Reward program {self.reward_program_id} has {len(rules)} rules")
         self.raise_on_payment_cycle_overlap(rules)
         for rule in rules:
-            self.run_rule(rule)
+            self.run_rule(rule, explanation)
 
         logging.info(f"All new payment cycles triggered for {self.reward_program_id}")
 
 
-def resolve_rule(did: str):
+def resolve_did(did: str):
     url = Resolver(get_resolver()).resolve(did)["didDocument"]["alsoKnownAs"][0]
     return requests.get(url).json()

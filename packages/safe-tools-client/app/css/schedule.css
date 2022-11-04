@@ -1,6 +1,33 @@
 .safe-tools__dashboard-schedule {
+  background-color: var(--boxel-dashboard-background-color);
+
   display: flex;
   flex-direction: row;
+}
+
+.safe-tools__dashboard-schedule-control-panel-wallet-address {
+  color: var(--boxel-purple-300);
+  font-family: var(--boxel-monospace-font-family);
+  font-size: var(--boxel-font-size-sm);
+}
+
+.safe-tools__dashboard-schedule-control-panel-connected-status {
+  --icon-fill-color: var(--boxel-green);
+  --icon-border: var(--boxel-green);
+
+  display: flex;
+  gap: var(--boxel-sp-xxxs);
+  font-size: var(--boxel-font-size-xs);
+  margin-top: var(--boxel-sp-xxxs);
+  margin-bottom: var(--boxel-sp-sm);
+}
+
+.safe-tools__dashboard-schedule-control-panel-connected-status-icon {
+  padding-bottom: 1px;
+}
+
+.safe-tools__dashboard-schedule-control-panel-connect-button {
+  width: 100%;
 }
 
 .safe-tools__dashboard-schedule-content {
@@ -34,7 +61,28 @@
 }
 
 .temporary-form-container {
-  display:flex;
-  justify-content:center;
-  margin-top:var(--boxel-sp-xl);
+  display: flex;
+  justify-content: center;
+  margin-top: var(--boxel-sp-xl);
+}
+
+.safe-tools__dashboard-network-selector {
+  display: inline-flex;
+  align-items: center;
+}
+
+.safe-tools__dashboard-network-selector.boxel-select .boxel-select__item {
+  font-weight: 600;
+  font-size: var(--boxel-font-size-sm);
+}
+
+.safe-tools__dashboard-network-selector .ember-power-select-status-icon {
+  -webkit-mask: url('/@cardstack/boxel/images/icons/caret-down.svg') no-repeat;
+  mask: url('/@cardstack/boxel/images/icons/caret-down.svg') no-repeat;
+
+  background-color: var(--boxel-cyan);
+  display: inline-block;
+  width: 11px;
+  height: 9px;
+  margin-top: 5px;
 }

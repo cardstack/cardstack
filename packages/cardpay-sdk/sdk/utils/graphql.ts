@@ -18,12 +18,12 @@ export async function query(
   graphQLQuery: string,
   variables?: { [varName: string]: string | number | null }
 ): Promise<{ data: any }> {
-  let subgraphURL: string;
-  if (typeof networkOrWeb3 === 'string') {
-    subgraphURL = await getConstant('subgraphURL', networkOrWeb3);
-  } else {
-    subgraphURL = await getConstant('subgraphURL', networkOrWeb3);
+  const subgraphURL = await getConstant('subgraphURL', networkOrWeb3);
+
+  if (!subgraphURL) {
+    throw `No subgraphURL for ${networkOrWeb3}`;
   }
+
   let response = await fetch(subgraphURL, {
     method: 'POST',
     headers: {

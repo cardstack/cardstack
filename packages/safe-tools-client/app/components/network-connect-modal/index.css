@@ -49,7 +49,7 @@
 .network-connect-modal .network-connect-modal__cancel-button {
   min-height: 1.25rem;
   min-width: unset;
-  padding: 0 var(--boxel-sp-xxxs);
+  padding: 0;
   border: unset;
   margin: 0;
   display: inline-block;

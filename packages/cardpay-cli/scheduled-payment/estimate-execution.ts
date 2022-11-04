@@ -5,7 +5,7 @@ import { Arguments, CommandModule } from 'yargs';
 
 export default {
   command:
-    'estimate-execution <moduleAddress> <tokenAddress> <amount> <payeeAddress> <fixedUSDFee> <percentageFee> <maxGasPrice> <gasTokenAddress> <salt> <payAt> <recurringDayOfMonth> <recurringUntil>',
+    'estimate-execution <moduleAddress> <tokenAddress> <amount> <payeeAddress> <fixedUSDFee> <percentageFee> <maxGasPrice> <gasTokenAddress> <salt>',
   describe: 'Enable scheduled payment module on the safe',
   builder(yargs: Argv) {
     return yargs
@@ -45,15 +45,15 @@ export default {
         type: 'string',
         description: 'Arbitrary string to make SP unique',
       })
-      .positional('payAt', {
+      .option('payAt', {
         type: 'number',
         description: 'Time to execute scheduled payments (in seconds)',
       })
-      .positional('recurringDayOfMonth', {
+      .option('recurringDayOfMonth', {
         type: 'number',
         description: 'Days of the month in the range of 1-28 to make recurring payments',
       })
-      .positional('recurringUntil', {
+      .option('recurringUntil', {
         type: 'number',
         description: 'End date of recurring payment',
       })
@@ -85,9 +85,9 @@ export default {
       maxGasPrice: string;
       gasTokenAddress: string;
       salt: string;
-      payAt: number | null;
-      recurringDayOfMonth: number | null;
-      recurringUntil: number | null;
+      payAt?: number | null;
+      recurringDayOfMonth?: number | null;
+      recurringUntil?: number | null;
     };
 
     // Empty strings are converted to 0 by yargs. We want to convert them to null

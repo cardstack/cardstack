@@ -10,6 +10,7 @@ export interface IHubAuth {
   getNonce(): Promise<NonceResponse>;
   authenticate(): Promise<string>;
   checkValidAuth(authToken: string): Promise<boolean>;
+  getHubUrl(network?: string): Promise<string>;
 }
 interface NonceResponse {
   nonce: string;
@@ -122,6 +123,6 @@ export default class HubAuth implements IHubAuth {
   async getHubUrl(network?: string): Promise<string> {
     const netName = network || (await networkName(this.web3OrEthersProvider));
 
-    return this.hubRootUrl || getConstantByNetwork('hubUrl', netName);
+    return this.hubRootUrl || getConstantByNetwork('hubUrl', netName) || '';
   }
 }

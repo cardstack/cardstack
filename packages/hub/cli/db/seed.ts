@@ -15,8 +15,7 @@ export async function handler(_argv: Argv) {
   console.log(`Seeding ${db.database}...`);
   try {
     await seed(db);
+  } finally {
     container.teardown();
-  } catch (e) {
-    console.error(e);
   }
 }

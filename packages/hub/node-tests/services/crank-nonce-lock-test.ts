@@ -1,14 +1,15 @@
 import { subSeconds } from 'date-fns';
-import { supportedChains } from '../../services/ethers-provider';
 import { ExtendedPrismaClient } from '../../services/prisma-manager';
 import { nowUtc } from '../../utils/dates';
 import { registry, setupHub } from '../helpers/server';
 import BN from 'bn.js';
 import CrankNonceLock from '../../services/crank-nonce-lock';
+import { getWeb3ConfigByNetwork } from '@cardstack/cardpay-sdk';
+import config from 'config';
 
 class StubEthersProvider {
   getInstance(chainId: number) {
-    let rpcUrl = supportedChains.find((chain) => chain.id === chainId)?.rpcUrl as string;
+    let rpcUrl = getWeb3ConfigByNetwork({ web3: config.get('web3') }, chainId)?.rpcNodeHttpsUrl as string;
     if (!rpcUrl) {
       throw `chain id is not supported`;
     }
@@ -23,7 +24,7 @@ class StubEthersProvider {
   }
 }
 
-describe('locking the nonce', function () {
+describe.only('locking the nonce', function () {
   let subject: CrankNonceLock;
   let prisma: ExtendedPrismaClient;
   let chainId = 80001; //mumbai

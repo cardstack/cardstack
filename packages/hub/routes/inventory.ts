@@ -4,6 +4,13 @@ import { ensureLoggedIn } from './utils/auth';
 import { inject } from '@cardstack/di';
 import qs from 'qs';
 
+const isFiatOnRampDisabled = true;
+
+const isTestEnv = process.env.NODE_ENV === 'test';
+
+// Keep testing functionally even though feature is temp disabled;
+const shouldReturnEmptyInventory = isFiatOnRampDisabled && !isTestEnv;
+
 export default class InventoryRoute {
   inventory = inject('inventory');
 
@@ -22,7 +29,7 @@ export default class InventoryRoute {
       issuer = filter.issuer;
     }
 
-    let data = await this.inventory.getSKUSummaries(issuer);
+    let data = shouldReturnEmptyInventory ? [] : await this.inventory.getSKUSummaries(issuer);
 
     ctx.status = 200;
     ctx.body = {

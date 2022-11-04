@@ -1,14 +1,12 @@
 import Component from '@glimmer/component';
-import { taskFor } from 'ember-concurrency-ts';
-import { task } from 'ember-concurrency-decorators';
-import { action } from '@ember/object';
-import { timeout } from 'ember-concurrency';
+import { inject as service} from '@ember/service';
+import { tracked } from '@glimmer/tracking';
 //@ts-expect-error glint does not think this is consumed-but it is consumed in the template https://github.com/typed-ember/glint/issues/374
 import { concat, fn, hash } from '@ember/helper';
 import { on } from '@ember/modifier';
 import focusTrap from 'ember-focus-trap/modifiers/focus-trap';
 import not from 'ember-truth-helpers/helpers/not';
-import walletProviders, { WalletProvider } from '@cardstack/safe-tools-client/utils/wallet-providers';
+import WalletService from '@cardstack/safe-tools-client/services/wallet';
 
 import cssVar from '@cardstack/boxel/helpers/css-var';
 import { svgJar } from '@cardstack/boxel/utils/svg-jar';
@@ -16,6 +14,7 @@ import BoxelActionContainer from '@cardstack/boxel/components/boxel/action-conta
 import BoxelLoadingIndicator from '@cardstack/boxel/components/boxel/loading-indicator';
 import BoxelModal from '@cardstack/boxel/components/boxel/modal';
 import BoxelRadioInput from '@cardstack/boxel/components/boxel/radio-input';
+import { type ActionChinState } from '@cardstack/boxel/components/boxel/action-chin/state';
 
 import './index.css';
 
@@ -24,7 +23,6 @@ interface Signature {
   isOpen: boolean;
   isConnected: boolean;
   isConnecting: boolean;
-  currentWalletProviderId: WalletProvider['id'];
   changeWalletProvider: () => void;
   onClose: () => void;
   onConnect: (() => void) | undefined;
@@ -32,46 +30,12 @@ interface Signature {
 }
 
 class NetworkConnectModal extends Component<Signature> {
-  walletProviders = walletProviders.map((w) =>
-    w.id === 'metamask'
-      ? {
-          ...w,
-          //@ts-expect-error This and the below can be removed when this is imported: https://github.com/cardstack/cardstack/blob/c2ddb8ab7b8bc577c8211527f3c5193d5f6accde/packages/web-client/app/utils/web3-strategies/layer-1-connection-manager.ts#L1
-          enabled: !!window.ethereum?.isMetaMask,
-          //@ts-expect-error
-          explanation: window.ethereum?.isMetaMask
-            ? ''
-            : 'MetaMask extension not detected',
-        }
-      : { ...w, enabled: true, explanation: '' }
-  );
+  @service declare wallet: WalletService;
 
-  walletProviderId: string | undefined;
+  @tracked chosenProviderId: string | undefined;
 
-  isConnected = false;
-
-  @action connect() {
-    if (!this.isConnected) {
-      taskFor(this.connectWalletTask).perform();
-    }
-  }
-
-  @task *connectWalletTask() {
-    // TODO
-    console.log('Would connect…');
-    yield timeout(500); // allow time for strategy to verify connected chain -- it might not accept the connection
-    if (this.isConnected) {
-      this.args.onConnect?.();
-    }
-  }
-
-  get radioWalletProviderId() {
-    // TODO
-    return this.walletProviders[0].id;
-  }
-
-  @action cancelConnection() {
-    // TODO
+  get connectionState(): ActionChinState {
+    return this.wallet.isConnecting ? 'in-progress' : 'default';
   }
 
   <template>
@@ -130,9 +94,9 @@ class NetworkConnectModal extends Component<Signature> {
               @orientation="horizontal"
               @spacing="default"
               @groupDescription='Select a wallet to connect to'
-              @items={{this.walletProviders}}
-              @disabled={{@isConnecting}}
-              @checkedId={{this.walletProviderId}}
+              @items={{this.wallet.walletProviders}}
+              @disabled={{this.wallet.isConnecting}}
+              @checkedId={{this.chosenProviderId}}
               @hideRadio={{true}}
               class='network-connect-modal__wallet-group'
               data-test-wallet-selection as |option|
@@ -140,7 +104,7 @@ class NetworkConnectModal extends Component<Signature> {
               {{#let option.data as |item|}}
                 <option.component
                   @name='wallet-provider-selection'
-                  @onChange={{fn (mut this.walletProviderId) item.id}}
+                  @onChange={{fn (mut this.chosenProviderId) item.id}}
                   @disabled={{not item.enabled}}
                   data-test-wallet-option={{item.id}}
                 >
@@ -169,19 +133,19 @@ class NetworkConnectModal extends Component<Signature> {
             </BoxelRadioInput>
           </Section>
 
-          <ActionChin @state='default'>
+          <ActionChin @state={{this.connectionState}}>
             <:default as |a|>
-              <a.ActionButton {{on "click" this.connect}} data-test-mainnet-connect-button>
+              <a.ActionButton {{on "click" (fn this.wallet.connect this.chosenProviderId @onClose)}} data-test-mainnet-connect-button disabled={{not this.chosenProviderId}}>
                 Connect Wallet
               </a.ActionButton>
             </:default>
             <:inProgress as |i|>
               <i.ActionStatusArea class="network-connect-modal__in-progress-logo" @icon={{concat
-                this.radioWalletProviderId "-logo" }} style={{cssVar status-icon-size="2.5rem" }}>
+                this.wallet.providerId "-logo" }} style={{cssVar status-icon-size="2.5rem" }}>
                 <BoxelLoadingIndicator class="network-connect-modal__loading-indicator" @color="var(--boxel-light)" />
                 <div class="network-connect-modal__waiting-status">
                   Waiting for you to connect your {{!-- network-display-info "conversationalName" --}} wallet...
-                  <i.CancelButton class="network-connect-modal__cancel-button" {{on "click" this.cancelConnection}}>
+                  <i.CancelButton class="network-connect-modal__cancel-button" {{on "click" this.wallet.cancelConnection}}>
                     Cancel
                   </i.CancelButton>
                 </div>

@@ -12,6 +12,7 @@
     "@actions/core": "^1.2.6",
     "@actions/github": "^4.0.0",
     "@types/ethereum-protocol": "^1.0.2",
+    "@types/fs-extra": "^9.0.11",
     "@types/node": "14.14.35",
     "@typescript-eslint/eslint-plugin": "^5.35.1",
     "@typescript-eslint/parser": "^5.35.1",
@@ -38,18 +39,22 @@
   },
   "scripts": {
     "clean": "git clean -x -f --exclude=packages/*/.env --exclude=cardstack.code-workspace && lerna run clean",
-    "postinstall": "yarn --cwd packages/cardpay-sdk codegen && patch-package",
+    "postinstall": "yarn --cwd packages/cardpay-sdk codegen && yarn --cwd packages/ember-shared/addon build",
     "cardpay": "yarn --cwd packages/cardpay-cli cardpay",
     "codegen:subgraph-sokol": "yarn --cwd packages/cardpay-subgraph codegen-sokol",
     "codegen:subgraph-xdai": "yarn --cwd packages/cardpay-subgraph codegen-xdai",
+    "codegen:python-package-abis": "node scripts/update-python-abis.js",
     "build:hub": "yarn --cwd packages/hub build",
+    "build:ember-shared": "yarn --cwd packages/ember-shared/addon build",
     "build:ssr-web:staging": "cd packages/ssr-web && ember build --environment=production",
     "build:ssr-web:production": "cd packages/ssr-web && ember build --environment=production",
     "build:subgraph": "yarn --cwd packages/cardpay-subgraph build",
     "check:waypoint-secrets": "ts-node scripts/verify-waypoint-secrets.ts",
     "lint": "npm-run-all --aggregate-output --continue-on-error --parallel lint:*",
-    "lint:boxel": "yarn --cwd packages/boxel",
+    "lint:boxel": "yarn --cwd packages/boxel lint",
     "lint:cardhost": "yarn --cwd packages/cardhost lint",
+    "lint:ember-shared": "yarn --cwd packages/ember-shared/addon lint",
+    "lint:ember-shared-tests": "yarn --cwd packages/ember-shared/test-app lint",
     "lint:ssr-web": "yarn --cwd packages/ssr-web lint",
     "lint:web-client": "yarn --cwd packages/web-client lint",
     "lint:safe-tools-client": "yarn --cwd packages/safe-tools-client lint",
@@ -66,6 +71,7 @@
     "test:boxel": "cd packages/boxel && ember test",
     "test:boxel:percy": "cd packages/boxel && percy exec -- ember test",
     "test:boxel:try": "cd packages/boxel && ember try:one",
+    "test:ember-shared": "cd packages/ember-shared/test-app && ember test",
     "test:hub": "NODE_ENV=test cd packages/hub && yarn test",
     "test:did-resolver": "yarn --cwd packages/did-resolver test",
     "test:discord-bot": "yarn --cwd packages/discord-bot test",
@@ -106,6 +112,7 @@
   "workspaces": {
     "packages": [
       "packages/*",
+      "packages/ember-shared/*",
       "packages/firebase-functions/**"
     ],
     "nohoist": [

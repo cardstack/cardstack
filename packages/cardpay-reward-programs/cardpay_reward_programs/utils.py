@@ -1,6 +1,4 @@
 import binascii
-import itertools
-import json
 import tempfile
 from pathlib import PosixPath
 
@@ -13,12 +11,6 @@ from cloudpathlib import AnyPath, CloudPath
 from pyarrow import fs
 
 from .payment_tree import decode_payment
-
-
-def group_by(data_array, callback):
-    # remember: itertools.groupby requires that keys are sorted; it only groups common keys which are next to each other
-    sorted_data = sorted(data_array, key=callback)
-    return itertools.groupby(sorted_data, callback)
 
 
 def get_local_file(file_location):
@@ -82,19 +74,6 @@ def write_parquet_file(file_location, table):
     else:
         file_location.mkdir(parents=True, exist_ok=True)
         pq.write_table(table, file_location / "results.parquet")
-
-
-def write_parameters_file(file_location, o):
-    if isinstance(file_location, CloudPath):
-        with tempfile.TemporaryDirectory() as temp_dir:
-            parameters_file_location = AnyPath(temp_dir) / "parameters.json"
-            with open(parameters_file_location, "w") as f:
-                f.write(json.dumps(o))
-            file_location.joinpath("parameters.json").upload_from(
-                parameters_file_location
-            )
-    else:
-        raise Exception("Should only write to s3 bucket")
 
 
 def get_unclaimed_rewards(previous_output_location, claims_data_root, block):

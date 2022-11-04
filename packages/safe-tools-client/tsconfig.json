@@ -25,7 +25,8 @@
       "@cardstack/safe-tools-client/tests/*": ["tests/*"],
       "@cardstack/safe-tools-client/*": ["app/*"],
       "@cardstack/boxel/*": ["../boxel/addon/*"],
-      "*": ["types/*", "../boxel/types/*"]
+      "*": ["types/*", "../boxel/types/*"],
+      "web3-provider-engine": ["../../types/web3-provider-engine"]
     }
   },
   "glint": {

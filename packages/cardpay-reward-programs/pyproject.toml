@@ -22,6 +22,8 @@ dependencies = [
     "future-fstrings>=1.2.0",
     "sentry-sdk>=1.5.12",
     "duckdb>=0.4.0",
+    "protobuf>=3.20.3",
+    "pydash>=5.1.1",
 ]
 requires-python = ">=3.9"
 license = {text = "MIT"}
@@ -54,3 +56,4 @@ claim_info= "python scripts/claim_info.py"
 prepaid_cards_less_gas = "python scripts/prepaid_cards_less_gas.py"
 flat_drop = "python scripts/flat_drop.py"
 check_missing_roots = "python scripts/check_missing_roots.py"
+read_parquet= "python scripts/read_parquet.py"

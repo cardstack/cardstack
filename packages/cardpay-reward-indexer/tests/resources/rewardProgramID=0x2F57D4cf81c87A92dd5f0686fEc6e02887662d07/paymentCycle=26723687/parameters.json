@@ -1,17 +1,32 @@
 {
+  "explanation": {
+    "en": {
+      "program": "Reward Program managed by Cardstack Foundation",
+      "claim": {
+        "flat_payment": "Earned {amount} {token} for a one-time aidrop",
+        "retro_airdrop": "Earned {amount} {token} averaged over time period for payments within {start_snapshot_block} and {end_snapshot_block}",
+        "safe_ownership": "Earned {amount} {token} for owning a {safe_type}",
+        "staking": "Earned {amount} {token} for staking CARD monthly in your L2 depot between blocks {from_block} and {to_block}, {rollover_amount} tokens rolled over from unclaimed previous cycles",
+        "profile_creation": "Earned {amount} {token} for creating first profile by block {from_block}"
+      }
+    }
+  },
   "core": {
     "payment_cycle_length": 100,
     "start_block": 26723687,
     "end_block": 26723887,
-    "subgraph_config_locations": { "safe_owner": "s3://cardpay-staging-partitioned-graph-data/data/safe_owner/0.0.1/" }
+    "subgraph_config_locations": { "safe_owner": "s3://cardpay-staging-partitioned-graph-data/data/safe_owner/0.0.1/" },
+    "duration": 518400
   },
   "user_defined": {
     "token": "0xB0427e9F03Eb448D030bE3EBC96F423857ceEb2f",
-    "duration": 518400,
     "reward_per_safe": 5000000000000000000,
     "start_analysis_block": 26721687,
     "safe_type": "merchant",
     "max_rewards": 1
+  },
+  "metadata": {
+    "explanation_id": "safe_ownership"
   },
   "run": { "reward_program_id": "0x2F57D4cf81c87A92dd5f0686fEc6e02887662d07", "payment_cycle": 26723687 }
 }

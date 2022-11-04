@@ -601,6 +601,65 @@ app "reward-indexer" {
   }
 }
 
+app "reward-indexer-blue" {
+  path = "./packages/cardpay-reward-indexer"
+
+  config {
+    env = {
+      ENVIRONMENT    = "staging"
+      REWARDS_BUCKET = "s3://cardpay-staging-reward-programs"
+      SUBGRAPH_URL   = "https://graph-staging.stack.cards/subgraphs/name/habdelra/cardpay-sokol"
+    }
+  }
+
+  build {
+    use "docker" {
+      dockerfile = "Dockerfile"
+    }
+
+    registry {
+      use "aws-ecr" {
+        region     = "us-east-1"
+        repository = "reward-indexer"
+        tag        = "latest"
+      }
+    }
+  }
+
+  deploy {
+    use "aws-ecs" {
+      region              = "us-east-1"
+      memory              = "512"
+      cluster             = "reward-indexer-blue"
+      count               = 1
+      subnets             = ["subnet-004c18e7177f0a9a2", "subnet-053fc89a829849140"]
+      task_role_name      = "reward-indexer-blue-ecs-task"
+      execution_role_name = "reward-indexer-blue-ecs-task-execution"
+      security_group_ids  = ["sg-0a896e4ebe2606421"]
+      disable_alb         = true
+
+      secrets = {
+        DB_STRING  = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_reward_api_database_url_blue-Y020ZN"
+        SENTRY_DSN = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_reward_api_sentry_dsn-Ugaqpm"
+      }
+    }
+
+    hook {
+      when    = "after"
+      command = ["node", "./scripts/waypoint-ecs-add-tags.mjs", "reward-indexer-blue"]
+    }
+
+    hook {
+      when    = "after"
+      command = ["node", "./scripts/wait-service-stable.mjs", "reward-indexer-blue"]
+    }
+  }
+
+  url {
+    auto_hostname = false
+  }
+}
+
 app "reward-scheduler" {
   path = "./packages/cardpay-reward-scheduler"
 
@@ -609,10 +668,10 @@ app "reward-scheduler" {
       ENVIRONMENT                        = "staging"
       REWARDS_BUCKET                     = "s3://cardpay-staging-reward-programs"
       SUBGRAPH_URL                       = "https://graph-staging.stack.cards/subgraphs/name/habdelra/cardpay-sokol"
-      REWARD_SCHEDULER_APPROVED_PROGRAMS = "0x0885ce31D73b63b0Fcb1158bf37eCeaD8Ff0fC72"
+      REWARD_SCHEDULER_APPROVED_PROGRAMS = "0x0885ce31D73b63b0Fcb1158bf37eCeaD8Ff0fC72,0xab20c80fcc025451a3fc73bB953aaE1b9f640949"
       REWARD_MANAGER_ADDRESS             = "0xC29EfEa853fb7c781488c70aF9135c853d809147"
       REWARDS_SUBGRAPH_EXTRACTION        = "s3://cardpay-staging-partitioned-graph-data/data/rewards/0.0.2/"
-      REWARD_SCHEDULER_UPDATE_FREQUENCY  = "600"
+      REWARD_SCHEDULER_UPDATE_FREQUENCY  = "60"
     }
   }
 

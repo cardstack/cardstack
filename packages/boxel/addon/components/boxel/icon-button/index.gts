@@ -7,7 +7,7 @@ import cn from '@cardstack/boxel/helpers/cn';
 import '@cardstack/boxel/styles/global.css';
 import './index.css';
 
-interface Signature {
+export interface Signature {
   Element: HTMLButtonElement;
   Args: {
     variant?: string;

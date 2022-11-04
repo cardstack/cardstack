@@ -11,6 +11,8 @@ from sqlalchemy.orm import Session
 
 from . import models
 
+MAX_INDEX_SIZE = 100
+
 
 class Indexer:
     def __init__(self, subgraph_url, archived_reward_programs):
@@ -39,8 +41,12 @@ class Indexer:
             new_roots = self.get_merkle_roots(
                 reward_program_id, last_submitted_root_block_number
             )
+            index_size = min(len(new_roots), MAX_INDEX_SIZE)
             if len(new_roots) > 0:
-                for root in sorted(new_roots, key=lambda x: x["blockNumber"]):
+                for root in sorted(
+                    new_roots,
+                    key=lambda x: x["blockNumber"],
+                )[:index_size]:
                     file_name = (
                         storage_location
                         + f"/rewardProgramID={reward_program_id}/paymentCycle={root['paymentCycle']}/results.parquet"
@@ -85,7 +91,7 @@ class Indexer:
             i = models.Proof(
                 rootHash=payment["root"],
                 paymentCycle=payment["paymentCycle"],
-                tokenAddress=to_checksum_address(token),
+                tokenAddress=to_checksum_address(token) if token else "",
                 payee=payment["payee"],
                 proofArray=payment["proof"],
                 rewardProgramId=payment["rewardProgramID"],
@@ -93,6 +99,8 @@ class Indexer:
                 leaf=payment["leaf"],
                 validFrom=payment["validFrom"],
                 validTo=payment["validTo"],
+                explanationId=payment.get("explanationId"),
+                explanationData=dict(payment.get("explanationData", {})),
             )
             proofs.append(i)
             leafs.append(payment["leaf"])
@@ -113,7 +121,10 @@ class Indexer:
             ["address", "uint256", "uint256", "uint256", "uint256", "address", "bytes"],
             HexBytes(payment["leaf"]),
         )
-        return eth_abi.decode_abi(["address", "uint256"], transfer_data)
+        if token_type == 1:
+            return eth_abi.decode_abi(["address", "uint256"], transfer_data)
+        else:
+            return (None, None)
 
     def get_last_indexed_root_block_number(self, db: Session, reward_program_id: str):
         o = (

@@ -40,6 +40,10 @@ export default class MenuUsage extends Component {
           @name="closeMenu"
           @description="Invoke this action to close the menu (e.g. when it is displayed as part of a dropdown"
         />
+        <Args.String
+          @name="itemClass"
+          @description="CSS class to be added to the menu item."
+        />
       </:api>
     </FreestyleUsage>
   </template>

@@ -46,7 +46,7 @@ export async function handler(argv: any) {
     server = await container.lookup('hubServer');
   } catch (err: any) {
     log.error('Server failed to start cleanly: %s', err.stack || err);
-    process.exit(-1);
+    throw err;
   }
 
   process.on('warning', (warning: Error) => {

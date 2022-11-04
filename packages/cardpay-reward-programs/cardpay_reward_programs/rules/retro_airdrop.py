@@ -12,7 +12,11 @@ class RetroAirdrop(Rule):
     Test accounts are not included in the reward calculation, but are given a nominal reward of `test_reward`
     """
 
-    def __init__(self, core_parameters, user_defined_parameters):
+    def __init__(
+        self,
+        core_parameters,
+        user_defined_parameters,
+    ):
         super(RetroAirdrop, self).__init__(core_parameters, user_defined_parameters)
 
     def set_user_defined_parameters(
@@ -71,6 +75,7 @@ class RetroAirdrop(Rule):
         new_df["validTo"] = payment_cycle + self.duration
         new_df["token"] = self.token
         new_df["amount"] = new_df["transactions"] * reward_per_transaction
+        new_df["explanationData"] = self.get_explanation_data()
         new_df = new_df.drop(["transactions"], axis=1)
         return new_df
 
@@ -84,6 +89,7 @@ class RetroAirdrop(Rule):
                 "validTo": payment_cycle + self.duration,
                 "token": self.token,
                 "amount": self.test_reward,
+                "explanationData": self.get_explanation_data(),
             }
             for account in self.test_accounts
         )
@@ -103,3 +109,6 @@ class RetroAirdrop(Rule):
             return pd.concat([airdrop_payments, test_payments])
         else:
             return airdrop_payments
+
+    def get_explanation_data(self):
+        return {}

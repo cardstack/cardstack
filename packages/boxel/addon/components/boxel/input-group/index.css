@@ -108,7 +108,8 @@
 .boxel-input-group--disabled .boxel-input-group__form-control,
 .boxel-input-group--disabled .boxel-input-group__text-accessory,
 .boxel-input-group--disabled .boxel-input-group__icon-button-accessory,
-.boxel-input-group--disabled .boxel-input-group__button-accessory {
+.boxel-input-group--disabled .boxel-input-group__button-accessory,
+.boxel-input-group--disabled .boxel-input-group__select-accessory {
   border-color: var(--boxel-input-group-border-color);
   color: rgb(0 0 0 / 50%);
   opacity: 0.5;

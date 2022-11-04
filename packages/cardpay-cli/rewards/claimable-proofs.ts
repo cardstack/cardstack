@@ -6,7 +6,7 @@ import groupBy from 'lodash/groupBy';
 import { fromWei } from 'web3-utils';
 
 export default {
-  command: 'claimable-proofs <address>',
+  command: 'claimable-proofs <address> <rewardProgramId>',
   describe: 'View proofs that are claimable',
   builder(yargs: Argv) {
     return yargs
@@ -14,13 +14,13 @@ export default {
         type: 'string',
         description: 'The address that tally rewarded -- The owner of prepaid card.',
       })
+      .positional('rewardProgramId', {
+        type: 'string',
+        description: 'The reward program id.',
+      })
       .option('safeAddress', {
         type: 'string',
         description: 'safe address. Specify if you want gas estimates for each claim',
-      })
-      .option('rewardProgramId', {
-        type: 'string',
-        description: 'The reward program id.',
       })
       .option('tokenAddress', {
         type: 'string',
@@ -36,8 +36,8 @@ export default {
     let { network, address, rewardProgramId, tokenAddress, isValidOnly, safeAddress } = args as unknown as {
       network: string;
       address: string;
+      rewardProgramId: string;
       safeAddress?: string;
-      rewardProgramId?: string;
       tokenAddress?: string;
       isValidOnly?: boolean;
     };
@@ -45,9 +45,9 @@ export default {
     let rewardPool = await getSDK('RewardPool', web3);
     let proofs;
     if (safeAddress) {
-      proofs = await rewardPool.getProofs(address, safeAddress, rewardProgramId, tokenAddress, false);
+      proofs = await rewardPool.getProofs(address, rewardProgramId, safeAddress, tokenAddress, false);
     } else {
-      proofs = await rewardPool.getProofs(address, undefined, rewardProgramId, tokenAddress, false);
+      proofs = await rewardPool.getProofs(address, rewardProgramId, undefined, tokenAddress, false);
     }
     if (isValidOnly) {
       displayProofs(
@@ -73,12 +73,12 @@ function displayProofs(proofs: WithSymbol<Proof | ClaimableProof>[], rewardPool:
 ---------------------------------------------------------------------`);
     let p = groupedByRewardProgram[rewardProgramId];
     p.map((o) => {
-      displayProof(o, rewardPool);
+      logProof(o, rewardPool);
     });
   });
 }
 
-function displayProof(o: WithSymbol<Proof> | WithSymbol<ClaimableProof>, rewardPool: RewardPool) {
+function logProof(o: WithSymbol<Proof> | WithSymbol<ClaimableProof>, rewardPool: RewardPool) {
   console.log(`
       proof: ${fromProofArray(o.proofArray)}
       leaf: ${o.leaf}
@@ -88,6 +88,9 @@ function displayProof(o: WithSymbol<Proof> | WithSymbol<ClaimableProof>, rewardP
       gasFees: ${
         rewardPool.isClaimableProof(o) ? fromWei(o.gasEstimate.amount) + ' ' + o.tokenSymbol : 'No Gas Estimates'
       }
+      explanationTemplate: ${o.explanationTemplate ?? 'Not specified'} 
+      explanationData: 
+         ${JSON.stringify(o.explanationData, null, 4) ?? 'Not specified'} 
         `);
 }
 

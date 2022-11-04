@@ -7,6 +7,14 @@ on:
         description: Deployment environment
         required: false
         default: staging
+      node:
+        type: choice
+        description: Node
+        required: true
+        default: "reward-indexer"
+        options:
+          - reward-indexer
+          - reward-indexer-blue
 
 permissions:
   contents: read
@@ -18,16 +26,9 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Set up node_modules cache
-        uses: actions/cache@v3
+      - uses: ./.github/actions/setup-node-modules-cache
         with:
-          path: |
-            node_modules
-            packages/*/node_modules
-            packages/firebase-functions/*/functions/node_modules
-          key: ${{ runner.os }}-node-modules-${{ hashFiles('yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-node-modules-
+          yarn_lock_md5: ${{ hashFiles('yarn.lock') }}
 
       - name: Set up env
         env:
@@ -56,7 +57,7 @@ jobs:
       - name: Deploy reward indexer
         uses: ./.github/actions/waypoint-deploy
         with:
-          app: reward-indexer
+          app: ${{ github.event.inputs.node }}
           retain: "0"
           environment: ${{ github.event.inputs.environment }}
           discord_webhook: ${{ secrets.DISCORD_WEBHOOK }}

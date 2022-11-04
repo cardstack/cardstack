@@ -549,6 +549,65 @@ app "reward-indexer" {
   }
 }
 
+app "reward-indexer-blue" {
+  path = "./packages/cardpay-reward-indexer"
+
+  config {
+    env = {
+      ENVIRONMENT    = "production"
+      REWARDS_BUCKET = "s3://cardpay-production-reward-programs"
+      SUBGRAPH_URL   = "https://graph.cardstack.com/subgraphs/name/habdelra/cardpay-xdai"
+    }
+  }
+
+  build {
+    use "docker" {
+      dockerfile = "Dockerfile"
+    }
+
+    registry {
+      use "aws-ecr" {
+        region     = "us-east-1"
+        repository = "reward-indexer"
+        tag        = "latest"
+      }
+    }
+  }
+
+  deploy {
+    use "aws-ecs" {
+      region              = "us-east-1"
+      memory              = "512"
+      cluster             = "reward-indexer-blue"
+      count               = 1
+      subnets             = ["subnet-0d71c50519109f369", "subnet-03eac43ed0e35227e"]
+      task_role_name      = "reward-indexer-blue-ecs-task"
+      execution_role_name = "reward-indexer-blue-ecs-task-execution"
+      security_group_ids  = ["sg-05c9c059e019205ca"]
+      disable_alb         = true
+
+      secrets = {
+        DB_STRING  = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_reward_api_database_url_blue-gtyUuy"
+        SENTRY_DSN = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_reward_api_sentry_dsn-Pwim3k"
+      }
+    }
+
+    hook {
+      when    = "after"
+      command = ["node", "./scripts/waypoint-ecs-add-tags.mjs", "reward-indexer-blue"]
+    }
+
+    hook {
+      when    = "after"
+      command = ["node", "./scripts/wait-service-stable.mjs", "reward-indexer-blue"]
+    }
+  }
+
+  url {
+    auto_hostname = false
+  }
+}
+
 app "reward-scheduler" {
   path = "./packages/cardpay-reward-scheduler"
 

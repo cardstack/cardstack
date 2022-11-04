@@ -1,6 +1,8 @@
 /node_modules
 /packages/*/node_modules
+/packages/ember-shared/*/node_modules
 /packages/*/dist
+/packages/ember-shared/*/dist
 /packages/*/tmp
 /packages/*/vendor
 /packages/web-client/deploy/node_modules
