@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @typescript-eslint/ban-types */
 import { HubConfig, networkIds } from '@cardstack/cardpay-sdk';
 import config from '@cardstack/safe-tools-client/config/environment';
 import WalletConnectProvider from '@cardstack/wc-provider';
@@ -7,10 +5,12 @@ import { action } from '@ember/object';
 import detectEthereumProvider from '@metamask/detect-provider';
 import WalletConnectQRCodeModal from '@walletconnect/qrcode-modal';
 import Web3 from 'web3';
+import { provider } from 'web3-core';
 import { MockLocalStorage } from './browser-mocks';
 import { Emitter, SimpleEmitter } from './events';
 import { TypedChannel } from './typed-channel';
 import { WalletProviderId } from './wallet-providers';
+
 import CustomStorageWalletConnect, {
   clearWalletConnectStorage,
 } from './wc-connector';
@@ -19,6 +19,10 @@ import {
   Provider as TestProvider,
   WalletConnectProvider as TestWalletConnectProvider,
 } from 'eth-testing/lib/providers';
+
+import { BaseProvider } from '@metamask/providers';
+import { IWalletConnectSession } from '@walletconnect/types';
+import { VoidCallback } from './types';
 
 type ProductionChainName = 'mainnet' | 'gnosis' | 'polygon';
 type StagingChainName = 'goerli' | 'sokol' | 'mumbai';
@@ -167,13 +171,14 @@ export class ChainConnectionManager {
     await this.setup(providerId);
     if (!this.strategy)
       throw new Error('Failed to setup strategy in layer 1 connection manager');
-    web3.setProvider(this.provider);
+    if (!this.provider) throw new Error('Missing Provider');
+    web3.setProvider(this.provider as provider);
     return await this.strategy.connect();
   }
 
   async reconnect(web3: Web3, providerId: WalletProviderId, session?: unknown) {
     await this.setup(providerId, session);
-    web3.setProvider(this.provider);
+    web3.setProvider(this.provider as provider);
     await this.strategy?.reconnect();
   }
 
@@ -181,7 +186,7 @@ export class ChainConnectionManager {
     this.strategy?.disconnect();
   }
 
-  on(event: ConnectionManagerEvent, cb: Function) {
+  on(event: ConnectionManagerEvent, cb: VoidCallback) {
     return this.simpleEmitter.on(event, cb);
   }
 
@@ -282,15 +287,13 @@ export abstract class ConnectionStrategy
   abstract disconnect(): Promise<void>;
 
   // concrete classes may optionally implement these methods
-  abstract getSession(): any;
+  abstract getSession(): unknown;
   abstract destroy(): void;
 
   // networkSymbol and chainId are initialized in the constructor
   networkSymbol: ChainName;
   chainId: number;
-
-  // this is initialized in the `setup` method of concrete classes
-  provider: any;
+  provider?: WalletConnectProvider | TestWalletConnectProvider | BaseProvider;
   mockProvider?: TestProvider;
 
   constructor(options: ConnectionManagerOptions) {
@@ -300,11 +303,11 @@ export abstract class ConnectionStrategy
     this.mockProvider = options.mockProvider;
   }
 
-  on(event: ConnectionManagerWalletEvent, cb: Function) {
+  on(event: ConnectionManagerWalletEvent, cb: VoidCallback) {
     return this.simpleEmitter.on(event, cb);
   }
 
-  emit(event: ConnectionManagerWalletEvent, ...args: any[]) {
+  emit(event: ConnectionManagerWalletEvent, ...args: unknown[]) {
     return this.simpleEmitter.emit(event, ...args);
   }
 
@@ -322,10 +325,14 @@ export abstract class ConnectionStrategy
 }
 
 class MetaMaskConnectionStrategy extends ConnectionStrategy {
+  // this is initialized in the `setup` method of concrete classes
+  provider?: BaseProvider;
+
   providerId = 'metamask' as WalletProviderId;
 
   async setup() {
-    const provider: any | undefined = await detectEthereumProvider();
+    const provider: BaseProvider | undefined =
+      (await detectEthereumProvider()) as BaseProvider | undefined;
 
     if (!provider) {
       // TODO: some UI prompt for getting people to setup metamask
@@ -365,10 +372,10 @@ class MetaMaskConnectionStrategy extends ConnectionStrategy {
   async connect() {
     if (!this.provider)
       throw new Error('Trying to connect before provider is set');
-    const accounts = await this.provider.request({
+    const accounts = (await this.provider.request({
       method: 'eth_accounts',
-    });
-    if (accounts.length) {
+    })) as string[] | undefined;
+    if (accounts?.length) {
       // so we had accounts before, let's just connect to them now
       // metamask's disconnection is a faux-disconnection - the wallet still thinks
       // it is connected to the account so it will not fire the connection/account change events
@@ -393,13 +400,7 @@ class MetaMaskConnectionStrategy extends ConnectionStrategy {
       }
     }
 
-    const chainId = parseInt(
-      await this.provider.request({
-        method: 'eth_chainId',
-      })
-    );
-
-    this.onChainChanged(chainId);
+    await this.detectChainId();
 
     return true;
   }
@@ -413,23 +414,34 @@ class MetaMaskConnectionStrategy extends ConnectionStrategy {
 
   // unlike the connect method, here we do not try to open the popup (eth_requestAccounts) if there is no account
   async reconnect() {
+    if (!this.provider) {
+      throw new Error('No provider present');
+    }
     const accounts = await this.provider.request({ method: 'eth_accounts' });
-    if (accounts.length) {
+    if (Array.isArray(accounts) && accounts.length) {
       // metamask's disconnection is a faux-disconnection - the wallet still thinks
       // it is connected to the account so it will not fire the connection/account change events
+      await this.detectChainId();
       this.onConnect(accounts);
-
-      const chainId = parseInt(
-        await this.provider.request({
-          method: 'eth_chainId',
-        })
-      );
-
-      this.onChainChanged(chainId);
     } else {
       // if we didn't find accounts, then the stored provider key is not useful, delete it
       ChainConnectionManager.removeProviderFromStorage(this.chainId);
     }
+  }
+
+  async detectChainId() {
+    if (!this.provider) {
+      throw new Error('No provider present');
+    }
+
+    const chainId = await this.provider.request({
+      method: 'eth_chainId',
+    });
+
+    if (typeof chainId != 'string') {
+      throw new Error('Could not determine chainId');
+    }
+    this.onChainChanged(parseInt(chainId));
   }
 
   // eslint-disable-next-line ember/classic-decorator-hooks
@@ -446,15 +458,20 @@ class MetaMaskConnectionStrategy extends ConnectionStrategy {
 
 class WalletConnectConnectionStrategy extends ConnectionStrategy {
   providerId = 'wallet-connect' as WalletProviderId;
+  provider?: WalletConnectProvider | TestWalletConnectProvider;
 
   getSession() {
-    return this.provider.connector?.session;
+    if (this.provider?.constructor == WalletConnectProvider) {
+      return this.provider.connector.session;
+    } else {
+      return null;
+    }
   }
 
   // eslint-disable-next-line ember/classic-decorator-hooks, @typescript-eslint/no-empty-function
   destroy() {}
 
-  async setup(session?: any) {
+  async setup(session?: IWalletConnectSession) {
     const { chainId } = this;
     // in case we've disconnected, we should clear wallet connect's local storage data as well
     // As per https://github.com/WalletConnect/walletconnect-monorepo/issues/258 there is no way
@@ -478,7 +495,7 @@ class WalletConnectConnectionStrategy extends ConnectionStrategy {
 
     let provider;
     if (this.mockProvider) {
-      provider = this.mockProvider;
+      provider = this.mockProvider as TestWalletConnectProvider;
     } else {
       const hubConfigApi = new HubConfig(config.hubUrl);
       const hubConfigResponse = await hubConfigApi.getConfig();
@@ -528,7 +545,7 @@ class WalletConnectConnectionStrategy extends ConnectionStrategy {
 
   async connect() {
     try {
-      await this.provider.enable();
+      await this.provider?.enable();
       return true;
     } catch (e) {
       // check modal_closed event in WalletConnectProvider for message to match
@@ -541,13 +558,13 @@ class WalletConnectConnectionStrategy extends ConnectionStrategy {
   }
 
   async disconnect() {
-    return await this.provider.disconnect();
+    return await this.provider?.disconnect();
   }
 
   async reconnect() {
     // if the qr code modal ever pops up when the application is loading, it's time to revisit this code
     // this typically should not open the modal if CustomStorageWalletConnect is initialized with a
     // valid session from localStorage
-    return await this.provider.enable();
+    await this.provider?.enable();
   }
 }

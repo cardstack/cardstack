@@ -40,6 +40,7 @@
     "@glint/environment-ember-template-imports": "^0.9.7",
     "@hyperbola/svgo-loader": "0.1.2",
     "@metamask/detect-provider": "^1.2.0",
+    "@metamask/providers": "^10.2.0",
     "@types/ember-qunit": "^5.0.0",
     "@types/ember-resolver": "^5.0.11",
     "@types/ember__application": "^4.0.2",
