@@ -65,6 +65,7 @@ jobs:
         uses: ./.github/actions/deploy-ember-preview
         env:
           HUB_URL: https://hub-staging.stack.cards
+          S3_PREVIEW_BUCKET_NAME: safe-tools-preview.stack.cards
           AWS_S3_BUCKET: safe-tools-preview.stack.cards
           AWS_REGION: us-east-1
           AWS_CLOUDFRONT_DISTRIBUTION: E21LN3O969NVVW
@@ -90,6 +91,7 @@ jobs:
         uses: ./.github/actions/deploy-ember-preview
         env:
           HUB_URL: https://hub.cardstack.com
+          S3_PREVIEW_BUCKET_NAME: safe-tools-preview.cardstack.com
           AWS_S3_BUCKET: safe-tools-preview.cardstack.com
           AWS_REGION: us-east-1
           AWS_CLOUDFRONT_DISTRIBUTION: E2RX1JI5H3FD5M
