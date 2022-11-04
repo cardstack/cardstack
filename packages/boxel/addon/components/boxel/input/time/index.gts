@@ -29,12 +29,7 @@ import {
 import '@cardstack/boxel/styles/global.css';
 import './index.css';
 
-export interface Time {
-  getHours: () => number;
-  getMinutes: () => number;
-  getTime: () => number;
-  toLocaleTimeString: (arg1: any, options: any) => string;
-}
+export type Time = Pick<Date, 'toLocaleTimeString' | 'getHours' | 'getMinutes' | 'getTime'>;
 
 interface ComponentArgs {
   value?: Time;
@@ -185,7 +180,7 @@ export default class BoxelInputTime extends Component<Signature> implements Keyb
     }
     if (this.hour === 0) {
       this.setHour(11);
-      this.setMeridian(this.meridian == 'am' ? 'pm' : 'am');
+      this.toggleMeridian();
     }
   }
 
@@ -200,7 +195,7 @@ export default class BoxelInputTime extends Component<Signature> implements Keyb
     }
     if (this.hour === 11) {
       this.setHour(0);
-      this.setMeridian(this.meridian == 'am' ? 'pm' : 'am');
+      this.toggleMeridian();
     }
   }
 
