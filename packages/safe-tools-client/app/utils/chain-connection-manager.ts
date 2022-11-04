@@ -1,19 +1,24 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/ban-types */
-import detectEthereumProvider from '@metamask/detect-provider';
-import WalletConnectProvider from '@cardstack/wc-provider';
-import WalletConnectQRCodeModal from '@walletconnect/qrcode-modal';
+import { HubConfig, networkIds } from '@cardstack/cardpay-sdk';
 import config from '@cardstack/safe-tools-client/config/environment';
+import WalletConnectProvider from '@cardstack/wc-provider';
+import { action } from '@ember/object';
+import detectEthereumProvider from '@metamask/detect-provider';
+import WalletConnectQRCodeModal from '@walletconnect/qrcode-modal';
+import Web3 from 'web3';
+import { MockLocalStorage } from './browser-mocks';
+import { Emitter, SimpleEmitter } from './events';
+import { TypedChannel } from './typed-channel';
+import { WalletProviderId } from './wallet-providers';
 import CustomStorageWalletConnect, {
   clearWalletConnectStorage,
 } from './wc-connector';
-import { Emitter, SimpleEmitter } from './events';
-import { WalletProviderId } from './wallet-providers';
-import { action } from '@ember/object';
-import { networkIds, HubConfig } from '@cardstack/cardpay-sdk';
-import Web3 from 'web3';
-import { TypedChannel } from './typed-channel';
-import { MockLocalStorage } from './browser-mocks';
+
+import {
+  Provider as TestProvider,
+  WalletConnectProvider as TestWalletConnectProvider,
+} from 'eth-testing/lib/providers';
 
 type ProductionChainName = 'mainnet' | 'gnosis' | 'polygon';
 type StagingChainName = 'goerli' | 'sokol' | 'mumbai';
@@ -27,6 +32,7 @@ const WALLET_CONNECT_BRIDGE = 'https://bridge.walletconnect.org';
 interface ConnectionManagerOptions {
   chainId: number;
   networkSymbol: ChainName;
+  mockProvider?: TestProvider;
 }
 
 type ConnectionManagerWalletEvent =
@@ -232,6 +238,12 @@ export class ChainConnectionManager {
 }
 
 class ConcreteStrategyFactory implements ConnectionManagerStrategyFactory {
+  mockProvider?: TestWalletConnectProvider;
+
+  setMockProvider(mockProvider: TestWalletConnectProvider) {
+    this.mockProvider = mockProvider;
+  }
+
   createStrategy(
     chainId: number,
     networkSymbol: ChainName,
@@ -246,6 +258,7 @@ class ConcreteStrategyFactory implements ConnectionManagerStrategyFactory {
       return new WalletConnectConnectionStrategy({
         chainId,
         networkSymbol,
+        mockProvider: this.mockProvider,
       });
     } else {
       throw new Error(`Unrecognised wallet provider id: ${providerId}`);
@@ -278,11 +291,13 @@ export abstract class ConnectionStrategy
 
   // this is initialized in the `setup` method of concrete classes
   provider: any;
+  mockProvider?: TestProvider;
 
   constructor(options: ConnectionManagerOptions) {
     this.chainId = options.chainId;
     this.networkSymbol = options.networkSymbol;
     this.simpleEmitter = new SimpleEmitter();
+    this.mockProvider = options.mockProvider;
   }
 
   on(event: ConnectionManagerWalletEvent, cb: Function) {
@@ -462,8 +477,8 @@ class WalletConnectConnectionStrategy extends ConnectionStrategy {
     }
 
     let provider;
-    if (window.testWalletConnectProvider) {
-      provider = window.testWalletConnectProvider;
+    if (this.mockProvider) {
+      provider = this.mockProvider;
     } else {
       const hubConfigApi = new HubConfig(config.hubUrl);
       const hubConfigResponse = await hubConfigApi.getConfig();
