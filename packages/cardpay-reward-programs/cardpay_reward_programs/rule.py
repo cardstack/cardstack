@@ -85,7 +85,7 @@ class Rule(ABC):
             return current_cycle_payments_df
         else:
             if previous_output is None and rewards_subgraph_location is None:
-                current_cycle_payments_df["rollover_amount"] = 0
+                current_cycle_payments_df["explanationData"]["rollover_amount"] = 0
                 return current_cycle_payments_df
             payment_list = current_cycle_payments_df.to_dict("records")
             unclaimed_payments = get_unclaimed_rewards(
