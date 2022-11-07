@@ -1,41 +1,18 @@
 import { truncateMiddle } from '@cardstack/ember-shared/helpers/truncate-middle';
-import WalletService from '@cardstack/safe-tools-client/services/wallet';
 import { click, visit } from '@ember/test-helpers';
-import { setupApplicationTest } from 'ember-qunit';
-import { generateTestingUtils } from 'eth-testing';
-import {
-  MetaMaskProvider,
-  WalletConnectProvider,
-} from 'eth-testing/lib/providers';
-import { TestingUtils } from 'eth-testing/lib/testing-utils';
+
 import { module, test } from 'qunit';
 
-const FAKE_ACCOUNT_1 = '0xf61B443A155b07D2b2cAeA2d99715dC84E839EEf';
-
-declare global {
-  interface Window {
-    testWalletConnectProvider?: WalletConnectProvider;
-  }
-}
+import {
+  FAKE_META_MASK_ACCOUNT,
+  FAKE_WALLET_CONNECT_ACCOUNT,
+  setupApplicationTest,
+} from '../helpers';
 
 module('Acceptance | wallet connection', function (hooks) {
   setupApplicationTest(hooks);
-  let testingUtils: TestingUtils;
-  hooks.afterEach(function () {
-    testingUtils.clearAllMocks();
-    window.ethereum = undefined;
-    window.testWalletConnectProvider = undefined;
-  });
 
-  module('With Metamask', function (hooks) {
-    hooks.beforeEach(function () {
-      testingUtils = generateTestingUtils({ providerType: 'MetaMask' });
-      window.ethereum = testingUtils.getProvider() as MetaMaskProvider;
-
-      testingUtils.mockNotConnectedWallet();
-      testingUtils.mockAccounts([FAKE_ACCOUNT_1]);
-    });
-
+  module('With Metamask', function () {
     test('connecting wallet', async function (assert) {
       await visit('/schedule');
       await click('.connect-button__button');
@@ -48,27 +25,11 @@ module('Acceptance | wallet connection', function (hooks) {
 
       assert
         .dom('.safe-tools__dashboard-schedule-control-panel-wallet-address')
-        .hasText(truncateMiddle([FAKE_ACCOUNT_1]));
+        .hasText(truncateMiddle([FAKE_META_MASK_ACCOUNT]));
     });
   });
 
-  module('With Wallet Connect', function (hooks) {
-    hooks.beforeEach(function () {
-      testingUtils = generateTestingUtils({
-        providerType: 'WalletConnect',
-      });
-
-      testingUtils.mockNotConnectedWallet();
-      testingUtils.mockAccounts([FAKE_ACCOUNT_1]);
-
-      const walletService = this.owner.lookup(
-        'service:wallet'
-      ) as WalletService;
-      walletService.chainConnectionManager.strategyFactory.setMockProvider(
-        testingUtils.getProvider() as WalletConnectProvider
-      );
-    });
-
+  module('With Wallet Connect', function () {
     test('connecting wallet', async function (assert) {
       await visit('/schedule');
       await click('.connect-button__button');
@@ -81,12 +42,12 @@ module('Acceptance | wallet connection', function (hooks) {
 
       await click('[data-test-mainnet-connect-button]');
 
-      testingUtils.mockAccountsChanged([FAKE_ACCOUNT_1]);
+      this.mockWalletConnect.mockAccountsChanged([FAKE_WALLET_CONNECT_ACCOUNT]);
 
       await click('.network-connect-modal__close-button'); // FIXME: I don't think this click should be necessary
       assert
         .dom('.safe-tools__dashboard-schedule-control-panel-wallet-address')
-        .hasText(truncateMiddle([FAKE_ACCOUNT_1]));
+        .hasText(truncateMiddle([FAKE_WALLET_CONNECT_ACCOUNT]));
     });
   });
 });

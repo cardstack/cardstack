@@ -11,6 +11,7 @@ import walletProviders, {
 } from '@cardstack/safe-tools-client/utils/wallet-providers';
 import Web3 from 'web3';
 import { timeout } from 'ember-concurrency';
+import Owner from '@ember/owner';
 
 const CHAIN_NAME_FIXME = 'mainnet';
 const CHAIN_ID_FIXME = 1;
@@ -22,7 +23,7 @@ export default class Wallet extends Service {
   @tracked isConnecting = false;
 
   web3 = new Web3();
-  chainConnectionManager = new ChainConnectionManager(CHAIN_NAME_FIXME);
+  chainConnectionManager: ChainConnectionManager;
 
   walletProviders = walletProviders.map((w) =>
     w.id === 'metamask'
@@ -36,8 +37,13 @@ export default class Wallet extends Service {
       : { ...w, enabled: true, explanation: '' }
   );
 
-  constructor() {
+  constructor(owner: Owner) {
     super();
+
+    this.chainConnectionManager = new ChainConnectionManager(
+      CHAIN_NAME_FIXME,
+      owner
+    );
 
     this.chainConnectionManager.on('connected', (accounts: string[]) => {
       this.isConnected = true;
@@ -49,7 +55,7 @@ export default class Wallet extends Service {
     });
 
     const providerId =
-      ChainConnectionManager.getProviderIdForChain(CHAIN_ID_FIXME);
+      this.chainConnectionManager.getProviderIdForChain(CHAIN_ID_FIXME);
     if (providerId !== 'wallet-connect' && providerId !== 'metamask') {
       return;
     }

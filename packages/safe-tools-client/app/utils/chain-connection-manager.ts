@@ -6,7 +6,6 @@ import detectEthereumProvider from '@metamask/detect-provider';
 import WalletConnectQRCodeModal from '@walletconnect/qrcode-modal';
 import Web3 from 'web3';
 import { provider } from 'web3-core';
-import { MockLocalStorage } from './browser-mocks';
 import { Emitter, SimpleEmitter } from './events';
 import { TypedChannel } from './typed-channel';
 import { WalletProviderId } from './wallet-providers';
@@ -15,14 +14,13 @@ import CustomStorageWalletConnect, {
   clearWalletConnectStorage,
 } from './wc-connector';
 
-import {
-  Provider as TestProvider,
-  WalletConnectProvider as TestWalletConnectProvider,
-} from 'eth-testing/lib/providers';
+import { WalletConnectProvider as TestWalletConnectProvider } from 'eth-testing/lib/providers';
 
 import { BaseProvider } from '@metamask/providers';
 import { IWalletConnectSession } from '@walletconnect/types';
 import { VoidCallback } from './types';
+import { getOwner, setOwner } from '@ember/application';
+import Owner from '@ember/owner';
 
 type ProductionChainName = 'mainnet' | 'gnosis' | 'polygon';
 type StagingChainName = 'goerli' | 'sokol' | 'mumbai';
@@ -33,10 +31,10 @@ const GET_PROVIDER_STORAGE_KEY = (chainId: number) =>
   `cardstack-chain-${chainId}-provider`;
 const WALLET_CONNECT_BRIDGE = 'https://bridge.walletconnect.org';
 
-interface ConnectionManagerOptions {
+interface ConnectionStrategyOptions {
   chainId: number;
   networkSymbol: ChainName;
-  mockProvider?: TestProvider;
+  connectionManager: ChainConnectionManager;
 }
 
 type ConnectionManagerWalletEvent =
@@ -67,14 +65,6 @@ interface DisconnectEvent {
 }
 type ConnectionEvent = ConnectEvent | DisconnectEvent;
 
-export interface ConnectionManagerStrategyFactory {
-  createStrategy(
-    chainId: number,
-    networkSymbol: ChainName,
-    providerId: WalletProviderId
-  ): ConnectionStrategy;
-}
-
 /**
  * # ConnectionManager
  * This class simplifies the interface to communicate with wallet providers (MetaMask or WalletConnect).
@@ -93,10 +83,7 @@ export interface ConnectionManagerStrategyFactory {
  * This class does not, at the moment, store any state used directly by the UI besides providerId.
  */
 export class ChainConnectionManager {
-  static storage =
-    config.environment === 'test'
-      ? new MockLocalStorage()
-      : window.localStorage;
+  storage: Storage;
 
   broadcastChannel: TypedChannel<ConnectionEvent>;
   strategy: ConnectionStrategy | undefined;
@@ -104,10 +91,12 @@ export class ChainConnectionManager {
   networkSymbol: ChainName;
   simpleEmitter = new SimpleEmitter();
 
-  constructor(
-    networkSymbol: ChainName,
-    readonly strategyFactory = new ConcreteStrategyFactory()
-  ) {
+  constructor(networkSymbol: ChainName, owner: Owner) {
+    setOwner(this, owner);
+
+    this.storage =
+      (owner.lookup('storage:local') as Storage) || window.localStorage;
+
     this.networkSymbol = networkSymbol;
     this.chainId = networkIds[networkSymbol];
 
@@ -122,23 +111,16 @@ export class ChainConnectionManager {
     );
   }
 
-  static getProviderIdForChain(chainId: number) {
-    return ChainConnectionManager.storage.getItem(
-      GET_PROVIDER_STORAGE_KEY(chainId)
-    );
+  getProviderIdForChain(chainId: number) {
+    return this.storage.getItem(GET_PROVIDER_STORAGE_KEY(chainId));
   }
 
-  static removeProviderFromStorage(chainId: number) {
-    ChainConnectionManager.storage.removeItem(
-      GET_PROVIDER_STORAGE_KEY(chainId)
-    );
+  removeProviderFromStorage(chainId: number) {
+    this.storage.removeItem(GET_PROVIDER_STORAGE_KEY(chainId));
   }
 
-  static addProviderToStorage(chainId: number, providerId: WalletProviderId) {
-    ChainConnectionManager.storage.setItem(
-      GET_PROVIDER_STORAGE_KEY(chainId),
-      providerId
-    );
+  addProviderToStorage(chainId: number, providerId: WalletProviderId) {
+    this.storage.setItem(GET_PROVIDER_STORAGE_KEY(chainId), providerId);
   }
 
   get provider() {
@@ -155,7 +137,7 @@ export class ChainConnectionManager {
   }
 
   private async setup(providerId: WalletProviderId, session?: unknown) {
-    this.strategy = this.strategyFactory.createStrategy(
+    this.strategy = this.createStrategy(
       this.chainId,
       this.networkSymbol,
       providerId
@@ -165,6 +147,33 @@ export class ChainConnectionManager {
     this.strategy.on('chain-changed', this.onChainChanged);
     this.strategy.on('websocket-disconnected', this.onWebsocketDisconnected);
     await this.strategy.setup(session);
+  }
+
+  createStrategy(
+    chainId: number,
+    networkSymbol: ChainName,
+    providerId: WalletProviderId
+  ) {
+    if (providerId === 'metamask') {
+      return new MetaMaskConnectionStrategy({
+        connectionManager: this,
+        chainId,
+        networkSymbol,
+      });
+    } else if (providerId === 'wallet-connect') {
+      const provider = getOwner(this)?.lookup(
+        'ethereum-provider:wallet-connect'
+      ) as WalletConnectProviderish | undefined;
+
+      return new WalletConnectConnectionStrategy({
+        connectionManager: this,
+        chainId,
+        networkSymbol,
+        provider,
+      });
+    } else {
+      throw new Error(`Unrecognised wallet provider id: ${providerId}`);
+    }
   }
 
   async connect(web3: Web3, providerId: WalletProviderId) {
@@ -208,7 +217,7 @@ export class ChainConnectionManager {
 
   @action onDisconnect(broadcast: boolean) {
     if (!this.strategy) return;
-    ChainConnectionManager.removeProviderFromStorage(this.chainId);
+    this.removeProviderFromStorage(this.chainId);
     this.emit('disconnected');
     if (broadcast)
       this.broadcastChannel?.postMessage({
@@ -218,10 +227,7 @@ export class ChainConnectionManager {
 
   @action onConnect(accounts: string[]) {
     if (!this.strategy) return;
-    ChainConnectionManager.addProviderToStorage(
-      this.chainId,
-      this.strategy.providerId
-    );
+    this.addProviderToStorage(this.chainId, this.strategy.providerId);
     this.emit('connected', accounts);
 
     if (this.providerId) {
@@ -239,35 +245,6 @@ export class ChainConnectionManager {
 
   @action onWebsocketDisconnected() {
     this.emit('websocket-disconnected');
-  }
-}
-
-class ConcreteStrategyFactory implements ConnectionManagerStrategyFactory {
-  mockProvider?: TestWalletConnectProvider;
-
-  setMockProvider(mockProvider: TestWalletConnectProvider) {
-    this.mockProvider = mockProvider;
-  }
-
-  createStrategy(
-    chainId: number,
-    networkSymbol: ChainName,
-    providerId: WalletProviderId
-  ) {
-    if (providerId === 'metamask') {
-      return new MetaMaskConnectionStrategy({
-        chainId,
-        networkSymbol,
-      });
-    } else if (providerId === 'wallet-connect') {
-      return new WalletConnectConnectionStrategy({
-        chainId,
-        networkSymbol,
-        mockProvider: this.mockProvider,
-      });
-    } else {
-      throw new Error(`Unrecognised wallet provider id: ${providerId}`);
-    }
   }
 }
 
@@ -293,14 +270,14 @@ export abstract class ConnectionStrategy
   // networkSymbol and chainId are initialized in the constructor
   networkSymbol: ChainName;
   chainId: number;
+  connectionManager: ChainConnectionManager;
   provider?: WalletConnectProvider | TestWalletConnectProvider | BaseProvider;
-  mockProvider?: TestProvider;
 
-  constructor(options: ConnectionManagerOptions) {
+  constructor(options: ConnectionStrategyOptions) {
+    this.connectionManager = options.connectionManager;
     this.chainId = options.chainId;
     this.networkSymbol = options.networkSymbol;
     this.simpleEmitter = new SimpleEmitter();
-    this.mockProvider = options.mockProvider;
   }
 
   on(event: ConnectionManagerWalletEvent, cb: VoidCallback) {
@@ -425,7 +402,7 @@ class MetaMaskConnectionStrategy extends ConnectionStrategy {
       this.onConnect(accounts);
     } else {
       // if we didn't find accounts, then the stored provider key is not useful, delete it
-      ChainConnectionManager.removeProviderFromStorage(this.chainId);
+      this.connectionManager.removeProviderFromStorage(this.chainId);
     }
   }
 
@@ -456,9 +433,13 @@ class MetaMaskConnectionStrategy extends ConnectionStrategy {
   }
 }
 
+type WalletConnectProviderish =
+  | WalletConnectProvider
+  | TestWalletConnectProvider;
+
 class WalletConnectConnectionStrategy extends ConnectionStrategy {
   providerId = 'wallet-connect' as WalletProviderId;
-  provider?: WalletConnectProvider | TestWalletConnectProvider;
+  provider?: WalletConnectProviderish;
 
   getSession() {
     if (this.provider?.constructor == WalletConnectProvider) {
@@ -471,6 +452,13 @@ class WalletConnectConnectionStrategy extends ConnectionStrategy {
   // eslint-disable-next-line ember/classic-decorator-hooks, @typescript-eslint/no-empty-function
   destroy() {}
 
+  constructor(
+    options: ConnectionStrategyOptions & { provider?: WalletConnectProviderish }
+  ) {
+    super(options);
+    this.provider = options.provider;
+  }
+
   async setup(session?: IWalletConnectSession) {
     const { chainId } = this;
     // in case we've disconnected, we should clear wallet connect's local storage data as well
@@ -478,7 +466,7 @@ class WalletConnectConnectionStrategy extends ConnectionStrategy {
     // for us to tell if this is valid before we connect, but we don't want to connect to something
     // if we have disconnected from it in the first place (since we cleared our local storage identification of provider)
     if (
-      ChainConnectionManager.getProviderIdForChain(chainId) !== this.providerId
+      this.connectionManager.getProviderIdForChain(chainId) !== this.providerId
     ) {
       clearWalletConnectStorage(chainId);
     }
@@ -493,13 +481,10 @@ class WalletConnectConnectionStrategy extends ConnectionStrategy {
       };
     }
 
-    let provider;
-    if (this.mockProvider) {
-      provider = this.mockProvider as TestWalletConnectProvider;
-    } else {
+    if (!this.provider) {
       const hubConfigApi = new HubConfig(config.hubUrl);
       const hubConfigResponse = await hubConfigApi.getConfig();
-      provider = new WalletConnectProvider({
+      this.provider = new WalletConnectProvider({
         chainId,
         infuraId: config.infuraId,
         rpc: {
@@ -516,12 +501,12 @@ class WalletConnectConnectionStrategy extends ConnectionStrategy {
     }
 
     // Subscribe to accounts change
-    provider.on('accountsChanged', (accounts: string[]) => {
+    this.provider.on('accountsChanged', (accounts: string[]) => {
       if (accounts.length) this.onConnect(accounts);
     });
 
     // Subscribe to chainId change
-    provider.on('chainChanged', (changedChainId: number) => {
+    this.provider.on('chainChanged', (changedChainId: number) => {
       this.onChainChanged(changedChainId);
     });
 
@@ -529,17 +514,16 @@ class WalletConnectConnectionStrategy extends ConnectionStrategy {
     // This is how WalletConnect informs us if we disconnect the Dapp
     // from the wallet side. Unlike MetaMask, listening to 'accountsChanged'
     // does not work.
-    provider.on('disconnect', (code: number, reason: string) => {
+    this.provider.on('disconnect', (code: number, reason: string) => {
       console.log('disconnect from wallet connect', code, reason);
       this.onDisconnect(false);
     });
 
-    provider.on('websocket-disconnected', () => {
+    this.provider.on('websocket-disconnected', () => {
       this.emit('websocket-disconnected');
       this.disconnect();
     });
 
-    this.provider = provider;
     return;
   }
 
