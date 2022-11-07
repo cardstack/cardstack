@@ -27,11 +27,11 @@
         <Boxel::Select
             class="safe-tools__dashboard-network-selector"
             @selected={{this.network}}
-            @onChange={{this.onSelectNetwork}}
-            @options={{this.availableNetworks}}
+            @onChange={{this.network.onSelect}}
+            @options={{this.network.supportedList}}
             as |network itemCssClass|
           >
-          <div class={{itemCssClass}}>{{network}}</div>
+          <div class={{itemCssClass}}>{{network.name}}</div>
         </Boxel::Select>
     </cp.Item>
     <cp.Item @title='Safe' @icon='safe'>
