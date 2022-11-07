@@ -28,7 +28,6 @@ def test_adds_metadata_to_payment_tree():
             "token": "0x0000000000000000000000000000000000000000",
             "duration": 43200,
         },
-        "explanation": {},
         "metadata": {"explanation_id": "min_other_merchants"},
     }
     tree = PaymentTree(
