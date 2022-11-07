@@ -41,7 +41,14 @@ export default class CrankNonceLock {
 
   async withNonce(chainId: number, cb: (nonce: BN) => Promise<any>) {
     let prisma = await this.prismaManager.getClient();
+
+    //10s timeout is to wait
+    //until the transaction sent to the RPC node
+    //don't wait the transaction to be mined
+    let timeout = 10;
+    await prisma.$executeRaw`SET lock_timeout TO '${timeout}s'`;
     await prisma.$executeRaw`SELECT pg_advisory_lock(${this.CRANK_LOCK_KEY})`;
+
     //Make database transaction here
     //because if the execution failed the nonce should be rollback
     try {
@@ -50,7 +57,7 @@ export default class CrankNonceLock {
           let nonce = await this.getNonce(chainId, tx);
           return await cb(nonce);
         },
-        { maxWait: 3000, timeout: 10000 }
+        { maxWait: 3000, timeout: timeout * 1000 }
       );
     } finally {
       await prisma.$executeRaw`SELECT pg_advisory_unlock(${this.CRANK_LOCK_KEY})`;
