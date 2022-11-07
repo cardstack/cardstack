@@ -182,7 +182,6 @@ class RewardProgram:
         self,
         payment_cycle,
         rule,
-        explanation_block={},
         previous_cycle=None,
     ):
         """
@@ -216,8 +215,6 @@ class RewardProgram:
             )
             return None
 
-        submission_data["explanation"] = explanation_block
-
         # We can't pass much data directly in AWS batch, so write the
         # parameters we want to use to S3 and pass the location into the task
         parameters_location = payment_cycle_output.joinpath("parameters.json")
@@ -235,7 +232,7 @@ class RewardProgram:
         )
         return job
 
-    def run_rule(self, rule, explanation_block={}) -> None:
+    def run_rule(self, rule) -> None:
         processable_payment_cycles = (
             self.get_all_payment_cycles(rule) - self.processed_cycles
         )
@@ -244,19 +241,17 @@ class RewardProgram:
                 previous_cycle = payment_cycle - rule["core"]["payment_cycle_length"]
                 if payment_cycle == rule["core"]["start_block"]:
                     # There can't be any previous ones for the first cycle
-                    self.run_payment_cycle(payment_cycle, rule, explanation_block)
+                    self.run_payment_cycle(payment_cycle, rule)
                 elif previous_cycle in self.processed_cycles:
                     # Only run if the previous cycle has been processed
                     # because the output of the previous cycle is needed
-                    self.run_payment_cycle(
-                        payment_cycle, rule, explanation_block, previous_cycle
-                    )
+                    self.run_payment_cycle(payment_cycle, rule, previous_cycle)
                 else:
                     # There's nothing to do here as the previous cycle hasn't been processed
                     pass
 
             else:
-                self.run_payment_cycle(payment_cycle, rule, explanation_block)
+                self.run_payment_cycle(payment_cycle, rule)
 
     def run_all_rules(self) -> None:
         """
