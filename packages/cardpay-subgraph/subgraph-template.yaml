@@ -41,7 +41,7 @@ dataSources:
         - name: GnosisSafe
           file: ./abis/GnosisSafe.json
       eventHandlers:
-        - event: CreatePrepaidCard(address,address,address,address,uint256,uint256,uint256,string)
+        - event: CreatePrepaidCard(address,address,address,address,address,uint256,uint256,uint256,string)
           handler: handleCreatePrepaidCard
         - event: TransferredPrepaidCard(address,address,address)
           handler: handleTransferPrepaidCard
