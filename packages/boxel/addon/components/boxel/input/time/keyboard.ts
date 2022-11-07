@@ -1,3 +1,4 @@
+import { getMethodNames } from '@cardstack/boxel/utils/reflection';
 import { DropdownAPI } from '../../dropdown';
 
 export type KeyboardFocus = 'none' | 'hour' | 'minute' | 'meridian';
@@ -63,7 +64,9 @@ abstract class BaseKeyboardHandler implements KeyboardHandler {
     const isValidMethodKey = (
       methodName: string
     ): methodName is ValidStringKey => {
-      return Object.keys(this).includes(methodName);
+      return getMethodNames(this as Record<string, unknown>).includes(
+        methodName
+      );
     };
 
     let handlerMethodName = `on${eventCode}`;
