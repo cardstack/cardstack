@@ -10,12 +10,19 @@ import {
   supportedChainsArray,
 } from '@cardstack/cardpay-sdk';
 
+interface NetworkInfo {
+  chainId: number;
+  name: string;
+  symbol: Networks;
+}
 const DEFAULT_NETWORK = 'mainnet' as const; // TODO: add default based on env
 
-export default class Network extends Service {
-  @tracked chainId = getConstantByNetwork('chainId', DEFAULT_NETWORK);
-  @tracked name = getConstantByNetwork('name', DEFAULT_NETWORK);
-  @tracked symbol: Networks = DEFAULT_NETWORK;
+export default class NetworkService extends Service {
+  @tracked networkInfo: NetworkInfo = {
+    chainId: getConstantByNetwork('chainId', DEFAULT_NETWORK),
+    name: getConstantByNetwork('name', DEFAULT_NETWORK),
+    symbol: DEFAULT_NETWORK,
+  };
 
   get supportedList() {
     return supportedChainsArray
@@ -27,22 +34,30 @@ export default class Network extends Service {
       .filter(({ name }) => name !== this.name);
   }
 
-  @action onSelect({ chainId, symbol, name }: Network) {
-    this.name = name;
-    this.symbol = symbol;
-    this.chainId = chainId;
+  @action onSelect(networkInfo: NetworkInfo) {
+    this.networkInfo = networkInfo;
   }
 
   @action onChainChanged(chainId: number) {
     const symbol = networks[chainId];
     const name = getConstantByNetwork('name', symbol);
 
-    this.onSelect({ chainId, symbol, name } as Network);
+    this.onSelect({ chainId, symbol, name } as NetworkInfo);
+  }
+
+  get chainId() {
+    return this.networkInfo.chainId;
+  }
+  get name() {
+    return this.networkInfo.name;
+  }
+  get symbol() {
+    return this.networkInfo.symbol;
   }
 }
 
 declare module '@ember/service' {
   interface Registry {
-    network: Network;
+    network: NetworkService;
   }
 }
