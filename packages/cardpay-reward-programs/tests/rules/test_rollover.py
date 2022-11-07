@@ -192,3 +192,17 @@ def test_multiple_claims_with_multiple_people(
         assert payment_list[0]["explanationData"]["rollover_amount"] == 0
         assert payment_list[1]["explanationData"]["rollover_amount"] == 0
         assert payment_list[2]["explanationData"]["rollover_amount"] == 1000
+
+
+@patch("cardpay_reward_programs.utils.get_table_dataset")
+def test_default_rollover_amount_when_no_previous_output(_, rollover_rule):
+
+    with TemporaryDirectory() as tempdir:
+        tempdir = AnyPath(tempdir)
+
+        run_parameters = {
+            "reward_program_id": "0x0885ce31D73b63b0Fcb1158bf37eCeaD8Ff0fC72",
+            "payment_cycle": 100,
+        }
+        payment_list = rollover_rule.get_payments(**run_parameters).to_dict("records")
+        assert payment_list[0]["explanationData"]["rollover_amount"] == 0
