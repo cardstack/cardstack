@@ -13,7 +13,7 @@ import { action } from '@ember/object';
 import {
   HubConfig,
   getWeb3ConfigByNetwork,
-  Networks,
+  Network,
 } from '@cardstack/cardpay-sdk';
 import Web3 from 'web3';
 import { TypedChannel } from './typed-channel';
@@ -25,7 +25,7 @@ const WALLET_CONNECT_BRIDGE = 'https://bridge.walletconnect.org';
 
 interface ConnectionManagerOptions {
   chainId: number;
-  networkSymbol: Networks;
+  networkSymbol: Network;
 }
 
 type ConnectionManagerWalletEvent =
@@ -59,7 +59,7 @@ type ConnectionEvent = ConnectEvent | DisconnectEvent;
 export interface ConnectionManagerStrategyFactory {
   createStrategy(
     chainId: number,
-    networkSymbol: Networks,
+    networkSymbol: Network,
     providerId: WalletProviderId
   ): ConnectionStrategy;
 }
@@ -90,11 +90,11 @@ export class ChainConnectionManager {
   broadcastChannel: TypedChannel<ConnectionEvent>;
   strategy: ConnectionStrategy | undefined;
   chainId: number;
-  networkSymbol: Networks;
+  networkSymbol: Network;
   simpleEmitter = new SimpleEmitter();
 
   constructor(
-    networkSymbol: Networks,
+    networkSymbol: Network,
     chainId: number,
     readonly strategyFactory = new ConcreteStrategyFactory()
   ) {
@@ -234,7 +234,7 @@ export class ChainConnectionManager {
 class ConcreteStrategyFactory implements ConnectionManagerStrategyFactory {
   createStrategy(
     chainId: number,
-    networkSymbol: Networks,
+    networkSymbol: Network,
     providerId: WalletProviderId
   ) {
     if (providerId === 'metamask') {
@@ -273,7 +273,7 @@ export abstract class ConnectionStrategy
   abstract destroy(): void;
 
   // networkSymbol and chainId are initialized in the constructor
-  networkSymbol: Networks;
+  networkSymbol: Network;
   chainId: number;
 
   // this is initialized in the `setup` method of concrete classes

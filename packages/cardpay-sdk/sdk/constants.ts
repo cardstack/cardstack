@@ -138,7 +138,7 @@ const networksConstants = {
 
 type NetworksType = typeof networksConstants;
 
-export type Networks = keyof NetworksType | 'xdai';
+export type Network = keyof NetworksType | 'xdai';
 
 type ConstantKeys = NestedKeyOf<NetworksType>;
 
@@ -163,7 +163,7 @@ interface RequiredNetworkConstants {
 type NetworkContants = OptionalNetworkContants & RequiredNetworkConstants;
 
 // Order matters, if both have same chainId the last one is used.
-const constants: Record<Networks, NetworkContants> = {
+const constants: Record<Network, NetworkContants> = {
   xdai: networksConstants['gnosis'],
   ...networksConstants,
 } as const;
@@ -174,7 +174,7 @@ export const networkIds: Record<string, number> = Object.freeze(
   networkNames.reduce(
     (netIds, networkName) => ({
       ...netIds,
-      [networkName]: constants[networkName as Networks].chainId,
+      [networkName]: constants[networkName as Network].chainId,
     }),
     {}
   )
@@ -183,8 +183,8 @@ export const networkIds: Record<string, number> = Object.freeze(
 // invert the networkIds object, so { mainnet: 1, ... } becomes { '1': 'mainnet', ... }
 export const networks = invert(networkIds);
 
-export function getConstantByNetwork<K extends ConstantKeys>(name: K, network: Networks | string) {
-  let value = constants[network as Networks][name];
+export function getConstantByNetwork<K extends ConstantKeys>(name: K, network: Network | string) {
+  let value = constants[network as Network][name];
   if (!value) {
     throw new Error(`Don't know about the constant '${name}' for network ${network}`);
   }
@@ -202,7 +202,7 @@ export async function getConstant<K extends ConstantKeys>(
     network = await networkName(web3OrNetworkOrEthersProvider);
   }
 
-  let value = constants[network as Networks][name];
+  let value = constants[network as Network][name];
   if (!value) {
     throw new Error(`Don't know about the constant '${name}' for network ${network}`);
   }

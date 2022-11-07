@@ -1,7 +1,7 @@
-import { supportedChains, Networks, networks, supportedChainsArray } from './constants';
+import { supportedChains, Network, networks, supportedChainsArray } from './constants';
 import { HubConfigResponse } from './hub-config';
 
-type Networkish = string | number | Networks;
+type Networkish = string | number | Network;
 
 const convertChainIdToName = (network: Networkish) => (typeof network === 'number' ? networks[network] : network);
 

@@ -5,7 +5,7 @@ import { tracked } from '@glimmer/tracking';
 
 import {
   getConstantByNetwork,
-  Networks,
+  Network,
   networks,
   supportedChainsArray,
 } from '@cardstack/cardpay-sdk';
@@ -13,7 +13,7 @@ import {
 interface NetworkInfo {
   chainId: number;
   name: string;
-  symbol: Networks;
+  symbol: Network;
 }
 const DEFAULT_NETWORK = 'mainnet' as const; // TODO: add default based on env
 
