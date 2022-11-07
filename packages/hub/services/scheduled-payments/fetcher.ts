@@ -1,7 +1,7 @@
 import { inject } from '@cardstack/di';
-import { ScheduledPayment } from '@prisma/client';
-import { startOfDay, subDays } from 'date-fns';
-import { convertDateToUTC } from '../../utils/dates';
+import { Prisma, ScheduledPayment } from '@prisma/client';
+import { addDays, startOfDay, subDays } from 'date-fns';
+import { nowUtc } from '../../utils/dates';
 
 export default class ScheduledPaymentsFetcherService {
   prismaManager = inject('prisma-manager', { as: 'prismaManager' });
@@ -9,7 +9,7 @@ export default class ScheduledPaymentsFetcherService {
 
   // This query fetches scheduled payments that are due to be executed now.
   // Will prioritize scheduled payments with no payment attempts.
-  // After that scheduled payments with the earlier falied payment attempts.
+  // After that scheduled payments with the earlier failed payment attempts.
   // Payment scheduler will periodically try to fetch these payments at regular intervals and execute them if they are due.
   // This query mostly relies on the payAt field, which is set to the time when the payment should be executed.
   // In case of one-time payments, payAt is set only initially, and then never changed.
@@ -19,8 +19,14 @@ export default class ScheduledPaymentsFetcherService {
 
   async fetchScheduledPayments(limit = 10): Promise<ScheduledPayment[]> {
     let prisma = await this.prismaManager.getClient();
-    let nowUtc = convertDateToUTC(new Date());
+    let _nowUtc = nowUtc();
 
+    let validRecurringDays = [];
+    let startValidDate = startOfDay(subDays(_nowUtc, this.validForDays));
+    while (startValidDate <= _nowUtc) {
+      validRecurringDays.push(startValidDate.getDate());
+      startValidDate = addDays(startValidDate, 1);
+    }
     let results: [{ id: string; started_at: Date }] = await prisma.$queryRaw`SELECT 
         scheduled_payments.id AS id,
         last_failed_payment_attempt.started_at
@@ -36,11 +42,10 @@ export default class ScheduledPaymentsFetcherService {
         (
           scheduled_payments.canceled_at IS NULL 
           AND scheduled_payments.creation_block_number > 0 
-          AND scheduled_payments.pay_at > ${startOfDay(subDays(nowUtc, this.validForDays))}
-          AND scheduled_payments.pay_at <= ${nowUtc}
           AND (
             (
-              scheduled_payments.recurring_day_of_month IS NULL 
+              scheduled_payments.pay_at > ${startOfDay(subDays(_nowUtc, this.validForDays))}
+              AND scheduled_payments.pay_at <= ${_nowUtc}
               AND (
                 scheduled_payments.id
               ) NOT IN (
@@ -61,8 +66,8 @@ export default class ScheduledPaymentsFetcherService {
               )
             ) 
             OR (
-              scheduled_payments.recurring_day_of_month > 0 
-              AND scheduled_payments.recurring_until >= ${nowUtc}
+              scheduled_payments.recurring_day_of_month IN (${Prisma.join(validRecurringDays, ',')})
+              AND scheduled_payments.recurring_until >= ${_nowUtc}
               AND (
                 scheduled_payments.id
               ) NOT IN (
@@ -81,10 +86,7 @@ export default class ScheduledPaymentsFetcherService {
             )
           )
         )
-        ORDER BY 
-          CASE WHEN last_failed_payment_attempt.started_at IS NULL 
-          THEN ${convertDateToUTC(new Date(0))} 
-          ELSE last_failed_payment_attempt.started_at END
+        ORDER BY last_failed_payment_attempt.started_at ASC NULLS FIRST
         LIMIT ${limit};`;
 
     // Retrieve scheduledPayment prisma object based on filtered id

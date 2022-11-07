@@ -2,7 +2,7 @@ import shortUUID from 'short-uuid';
 import ScheduledPaymentsFetcherService from '../../../services/scheduled-payments/fetcher';
 import { setupHub } from '../../helpers/server';
 import crypto from 'crypto';
-import { addDays, addMinutes, addMonths, subDays, subMinutes, subMonths } from 'date-fns';
+import { addDays, addMinutes, addMonths, subDays, subHours, subMinutes, subMonths } from 'date-fns';
 import { ScheduledPayment, ScheduledPaymentAttemptStatusEnum } from '@prisma/client';
 import { convertDateToUTC } from '../../../utils/dates';
 import { ExtendedPrismaClient } from '../../../services/prisma-manager';
@@ -99,6 +99,27 @@ describe('fetching scheduled payments that are due', function () {
 
       expect((await subject.fetchScheduledPayments()).map((sp) => sp.id)).to.deep.equal([sp1.id]);
     });
+
+    it('fetches 3 of 5 scheduled payment that are due', async function () {
+      //Scheduled payment with no failed payment attempt
+      let sp1 = await createScheduledPayment({ payAt: now });
+
+      // scheduled payment with failed payment attempt 1 days ago
+      let sp2And3Date = subDays(now, 1);
+      let sp2 = await createScheduledPayment({ payAt: sp2And3Date }); // still valid to retry
+      let sp3 = await createScheduledPayment({ payAt: sp2And3Date }); // still valid to retry
+      await createScheduledPaymentAttempt(sp2, sp2And3Date, addMinutes(sp2And3Date, 5), 'failed');
+      await createScheduledPaymentAttempt(sp3, sp2And3Date, addMinutes(sp2And3Date, 5), 'failed');
+
+      //scheduled payment with failed payment attempt 5 hours ago
+      let sp4And5Date = subHours(now, 5);
+      let sp4 = await createScheduledPayment({ payAt: sp4And5Date });
+      let sp5 = await createScheduledPayment({ payAt: sp4And5Date });
+      await createScheduledPaymentAttempt(sp4, sp4And5Date, addMinutes(sp4And5Date, 5), 'failed');
+      await createScheduledPaymentAttempt(sp5, sp4And5Date, addMinutes(sp4And5Date, 5), 'failed');
+
+      expect((await subject.fetchScheduledPayments(3)).map((sp) => sp.id)).to.deep.equal([sp1.id, sp2.id, sp3.id]);
+    });
   });
 
   describe('recurring scheduled payments', function () {
@@ -107,28 +128,24 @@ describe('fetching scheduled payments that are due', function () {
       await createScheduledPayment({
         recurringUntil: addMonths(now, 6),
         recurringDayOfMonth: subDays(now, validForDays + 1).getDate(),
-        payAt: subDays(now, validForDays + 1),
       });
 
       // valid to retry
       let sp1 = await createScheduledPayment({
         recurringUntil: addMonths(now, 6),
         recurringDayOfMonth: subDays(now, 1).getDate(),
-        payAt: subDays(now, 1),
       });
 
       // due now
       let sp2 = await createScheduledPayment({
         recurringUntil: addMonths(now, 6),
         recurringDayOfMonth: now.getDate(),
-        payAt: now,
       });
 
       // future payment for tomorrow, not due to execute now
       await createScheduledPayment({
         recurringUntil: addMonths(now, 6),
         recurringDayOfMonth: addDays(now, 1).getDate(),
-        payAt: addDays(now, 1),
       });
 
       expect((await subject.fetchScheduledPayments()).map((sp) => sp.id)).to.deep.equal([sp1.id, sp2.id]);
@@ -137,7 +154,6 @@ describe('fetching scheduled payments that are due', function () {
     it('does not fetch payments that have recurringUntil in the past', async function () {
       await createScheduledPayment({
         recurringDayOfMonth: now.getDate(),
-        payAt: now,
         recurringUntil: subDays(now, 1),
       });
 
@@ -148,12 +164,49 @@ describe('fetching scheduled payments that are due', function () {
       let sp1 = await createScheduledPayment({
         recurringUntil: addMonths(now, 6),
         recurringDayOfMonth: now.getDate(),
-        payAt: now,
       });
 
       await createScheduledPaymentAttempt(sp1, subMonths(now, 1), addMinutes(subMonths(now, 1), 1), 'succeeded');
 
       expect((await subject.fetchScheduledPayments()).map((sp) => sp.id)).to.deep.equal([sp1.id]);
+    });
+
+    it('fetches 3 of 5 scheduled payment that are due', async function () {
+      //Scheduled payment with no failed payment attempt
+      let sp1 = await createScheduledPayment({
+        recurringUntil: addMonths(now, 6),
+        recurringDayOfMonth: now.getDate(),
+      });
+
+      // scheduled payment with failed payment attempt 1 days ago
+      let sp2And3Date = subDays(now, 1);
+      let sp2And3RecurringDay = sp2And3Date.getDate();
+      let sp2 = await createScheduledPayment({
+        recurringUntil: addMonths(now, 6),
+        recurringDayOfMonth: sp2And3RecurringDay,
+      }); // still valid to retry
+      let sp3 = await createScheduledPayment({
+        recurringUntil: addMonths(now, 6),
+        recurringDayOfMonth: sp2And3RecurringDay,
+      }); // still valid to retry
+      await createScheduledPaymentAttempt(sp2, sp2And3Date, addMinutes(sp2And3Date, 5), 'failed');
+      await createScheduledPaymentAttempt(sp3, sp2And3Date, addMinutes(sp2And3Date, 5), 'failed');
+
+      //scheduled payment with failed payment attempt 5 hours ago
+      let sp4And5Date = subHours(now, 5);
+      let sp4And5RecurringDay = sp2And3Date.getDate();
+      let sp4 = await createScheduledPayment({
+        recurringUntil: addMonths(now, 6),
+        recurringDayOfMonth: sp4And5RecurringDay,
+      }); // still valid to retry
+      let sp5 = await createScheduledPayment({
+        recurringUntil: addMonths(now, 6),
+        recurringDayOfMonth: sp4And5RecurringDay,
+      }); // still valid to retry
+      await createScheduledPaymentAttempt(sp4, sp4And5Date, addMinutes(sp4And5Date, 5), 'failed');
+      await createScheduledPaymentAttempt(sp5, sp4And5Date, addMinutes(sp4And5Date, 5), 'failed');
+
+      expect((await subject.fetchScheduledPayments(3)).map((sp) => sp.id)).to.deep.equal([sp1.id, sp2.id, sp3.id]);
     });
   });
 
