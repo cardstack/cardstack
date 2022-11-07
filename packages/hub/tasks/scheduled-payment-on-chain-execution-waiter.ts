@@ -2,6 +2,7 @@ import { inject } from '@cardstack/di';
 import { isBefore, subDays } from 'date-fns';
 
 import { nowUtc } from '../utils/dates';
+import { calculateNextPayAt } from '../utils/scheduled-payments';
 
 export default class ScheduledPaymentOnChainExecutionWaiter {
   prismaManager = inject('prisma-manager', { as: 'prismaManager' });
@@ -32,6 +33,16 @@ export default class ScheduledPaymentOnChainExecutionWaiter {
         where: { id: paymentAttempt.id },
         data: { status: 'succeeded', endedAt: nowUtc() },
       });
+
+      if (scheduledPayment.recurringDayOfMonth && scheduledPayment.recurringUntil) {
+        let nextPayAt = calculateNextPayAt(new Date(), scheduledPayment.recurringDayOfMonth);
+        if (nextPayAt <= scheduledPayment.recurringUntil) {
+          await prisma.scheduledPayment.update({
+            where: { id: scheduledPayment.id },
+            data: { payAt: nextPayAt },
+          });
+        }
+      }
     } catch (error: any) {
       // waitUntilTransactionMined will return "Transaction took too long to complete" in case it wasn't mined in 60 minutes.
       // In this case we want to restart the task and wait some more. We could throw an error here so that the worker would restart the task, but

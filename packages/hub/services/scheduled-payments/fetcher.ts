@@ -1,6 +1,6 @@
 import { inject } from '@cardstack/di';
-import { Prisma, ScheduledPayment } from '@prisma/client';
-import { addDays, startOfDay, subDays } from 'date-fns';
+import { ScheduledPayment } from '@prisma/client';
+import { startOfDay, subDays } from 'date-fns';
 import { nowUtc } from '../../utils/dates';
 
 export default class ScheduledPaymentsFetcherService {
@@ -21,12 +21,6 @@ export default class ScheduledPaymentsFetcherService {
     let prisma = await this.prismaManager.getClient();
     let _nowUtc = nowUtc();
 
-    let validRecurringDays = [];
-    let startValidDate = startOfDay(subDays(_nowUtc, this.validForDays));
-    while (startValidDate <= _nowUtc) {
-      validRecurringDays.push(startValidDate.getDate());
-      startValidDate = addDays(startValidDate, 1);
-    }
     let results: [{ id: string; started_at: Date }] = await prisma.$queryRaw`SELECT 
         scheduled_payments.id AS id,
         last_failed_payment_attempt.started_at
@@ -42,10 +36,11 @@ export default class ScheduledPaymentsFetcherService {
         (
           scheduled_payments.canceled_at IS NULL 
           AND scheduled_payments.creation_block_number > 0 
+          AND scheduled_payments.pay_at > ${startOfDay(subDays(_nowUtc, this.validForDays))}
+          AND scheduled_payments.pay_at <= ${_nowUtc}
           AND (
             (
-              scheduled_payments.pay_at > ${startOfDay(subDays(_nowUtc, this.validForDays))}
-              AND scheduled_payments.pay_at <= ${_nowUtc}
+              scheduled_payments.recurring_day_of_month IS NULL 
               AND (
                 scheduled_payments.id
               ) NOT IN (
@@ -66,7 +61,7 @@ export default class ScheduledPaymentsFetcherService {
               )
             ) 
             OR (
-              scheduled_payments.recurring_day_of_month IN (${Prisma.join(validRecurringDays, ',')})
+              scheduled_payments.recurring_day_of_month > 0 
               AND scheduled_payments.recurring_until >= ${_nowUtc}
               AND (
                 scheduled_payments.id
