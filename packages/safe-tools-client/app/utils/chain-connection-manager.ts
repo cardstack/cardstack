@@ -17,7 +17,7 @@ import CustomStorageWalletConnect, {
 import { WalletConnectProvider as TestWalletConnectProvider } from 'eth-testing/lib/providers';
 
 import { getWeb3ConfigByNetwork, Network } from '@cardstack/cardpay-sdk';
-import { getOwner } from '@ember/application';
+import { getOwner, setOwner } from '@ember/application';
 import Owner from '@ember/owner';
 import { BaseProvider } from '@metamask/providers';
 import { IWalletConnectSession } from '@walletconnect/types';
@@ -88,6 +88,8 @@ export class ChainConnectionManager {
   simpleEmitter = new SimpleEmitter();
 
   constructor(networkSymbol: Network, chainId: number, owner: Owner) {
+    setOwner(this, owner);
+
     this.storage =
       (owner.lookup('storage:local') as Storage) || window.localStorage;
 

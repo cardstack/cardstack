@@ -44,6 +44,7 @@ function setupApplicationTest(hooks: NestedHooks, options?: SetupTestOptions) {
 
     this.mockWalletConnect.mockNotConnectedWallet();
     this.mockWalletConnect.mockAccounts([FAKE_WALLET_CONNECT_ACCOUNT]);
+    this.mockWalletConnect.mockChainId(1);
 
     this.owner.register(
       'ethereum-provider:wallet-connect',
@@ -52,10 +53,12 @@ function setupApplicationTest(hooks: NestedHooks, options?: SetupTestOptions) {
     );
 
     this.mockMetaMask = generateTestingUtils({ providerType: 'MetaMask' });
+
     window.ethereum = this.mockMetaMask.getProvider() as MetaMaskProvider;
 
     this.mockMetaMask.mockNotConnectedWallet();
     this.mockMetaMask.mockAccounts([FAKE_META_MASK_ACCOUNT]);
+    this.mockMetaMask.mockChainId(1);
   });
 
   hooks.afterEach(function () {

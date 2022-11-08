@@ -42,6 +42,7 @@ module('Acceptance | wallet connection', function (hooks) {
 
       await click('[data-test-mainnet-connect-button]');
 
+      this.mockWalletConnect.mockConnectedWallet([FAKE_WALLET_CONNECT_ACCOUNT]);
       this.mockWalletConnect.mockAccountsChanged([FAKE_WALLET_CONNECT_ACCOUNT]);
 
       await click('.network-connect-modal__close-button'); // FIXME: I don't think this click should be necessary
