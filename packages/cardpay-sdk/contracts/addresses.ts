@@ -108,7 +108,7 @@ const MUMBAI = {
   gnosisProxyFactory_v1_3: '0xa6B71E26C5e0845f74c812102Ca7114b6a896AB2',
   scheduledPaymentConfig: '0x9c1371554F2db7F7df79cEa1c41aBaBB42EDEb9D',
   scheduledPaymentExchange: '0x63f0A6a12fE77b8fCe4E1bf10344d16F6318CF56',
-  scheduledPaymentModule: '0x9cFf23e3a53e18A689CEaEa3c03aF2d70DF2FE50',
+  scheduledPaymentModule: '0x029f3c00Af557c3e8361eFD3af5d79f6dD1f03D2',
   multiSend: '0xA238CBeb142c10Ef7Ad8442C6D1f9E89e07e7761',
   multiSendCallOnly: '0x40A2aCCbd92BCA938b02010E17A5b8929b49130D',
   moduleProxyFactory: '0x00000000000DC7F163742Eb4aBEf650037b1f588',
