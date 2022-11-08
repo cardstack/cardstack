@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/safe-tools-client",
-  "version": "0.0.0",
+  "version": "1.0.14",
   "private": true,
   "description": "The front-end app for cardstack safe tools",
   "repository": "",
@@ -23,10 +23,10 @@
     "test:ember": "ember test"
   },
   "devDependencies": {
-    "@cardstack/boxel": "1.0.13",
-    "@cardstack/cardpay-sdk": "1.0.13",
-    "@cardstack/ember-shared": "^1.0.13",
-    "@cardstack/wc-provider": "1.0.13",
+    "@cardstack/boxel": "1.0.14",
+    "@cardstack/cardpay-sdk": "1.0.14",
+    "@cardstack/ember-shared": "1.0.14",
+    "@cardstack/wc-provider": "1.0.14",
     "@ember/optional-features": "^2.0.0",
     "@ember/test-helpers": "^2.8.1",
     "@embroider/compat": "^1.8.3",
