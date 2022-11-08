@@ -47,6 +47,7 @@ fNnC/5IGBxBkFQIgGC1mdtwPDSBMQY0XpAzPw6dXE8z0LaoV5qXeB8LV8CECIGmi
   emailHashSalt: 'P91APjz3Ef6q3KAdOCfKa5hOcEmOyrPeRPG6+g380LY=',
   checkly: {
     handleWebhookRequests: true,
+    webhookSecret: '123',
   },
   web3: {
     ethereum: {

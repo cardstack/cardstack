@@ -46,6 +46,9 @@ export default class APIRouter {
   inventoryRoute = inject('inventory-route', { as: 'inventoryRoute' });
   wyrePricesRoute = inject('wyre-prices-route', { as: 'wyrePricesRoute' });
   scheduledPaymentsRoute = inject('scheduled-payments-route', { as: 'scheduledPaymentsRoute' });
+  dataIntegrityChecksRoute = inject('data-integrity-checks-route', {
+    as: 'dataIntegrityChecksRoute',
+  });
 
   routes() {
     let {
@@ -69,6 +72,7 @@ export default class APIRouter {
       pushNotificationRegistrationsRoute,
       notificationPreferencesRoute,
       scheduledPaymentsRoute,
+      dataIntegrityChecksRoute,
     } = this;
     let apiSubrouter = new Router();
     apiSubrouter.get('/boom', boomRoute.get);
@@ -141,6 +145,7 @@ export default class APIRouter {
     apiSubrouter.patch('/scheduled-payments/:scheduled_payment_id', parseBody, scheduledPaymentsRoute.patch);
     apiSubrouter.delete('/scheduled-payments/:scheduled_payment_id', parseBody, scheduledPaymentsRoute.delete);
     apiSubrouter.get('/wyre-prices', parseBody, wyrePricesRoute.get);
+    apiSubrouter.get('/data-integrity-checks/:check_name', parseBody, dataIntegrityChecksRoute.get);
     apiSubrouter.all('/(.*)', notFound);
 
     let apiRouter = new Router();
