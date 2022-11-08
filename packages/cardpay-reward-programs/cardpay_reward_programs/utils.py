@@ -100,6 +100,8 @@ def get_unclaimed_rewards(previous_output_location, claims_data_root, block):
     # We only need to look at claims made that happened after the first one became eligible to claim
     # e.g. if the first claim became eligible to claim at block 100 (validFrom=100), we only need to
     # look at claims made after block 100, and only up to the "current" block
+    if rewards.empty:
+        return []
     first_claimable_reward_block = int(rewards["validFrom"].min())
     claimed_df = con.execute(
         "select leaf from rewardee_claims where _block_number >= ? and _block_number <= ?",
