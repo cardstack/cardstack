@@ -36,4 +36,5 @@ declare const config: {
   walletConnectIcons: string[];
   APP: Record<string, unknown>;
   threadAnimationInterval: number;
+  isIssuePrepaidCardEnabled: boolean;
 };
