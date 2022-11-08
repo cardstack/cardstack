@@ -25,7 +25,7 @@ import Owner from '@ember/owner';
 type ProductionChainName = 'mainnet' | 'gnosis' | 'polygon';
 type StagingChainName = 'goerli' | 'sokol' | 'mumbai';
 
-export type ChainName = ProductionChainName | StagingChainName;
+export type Network = ProductionChainName | StagingChainName;
 
 const GET_PROVIDER_STORAGE_KEY = (chainId: number) =>
   `cardstack-chain-${chainId}-provider`;
@@ -33,7 +33,7 @@ const WALLET_CONNECT_BRIDGE = 'https://bridge.walletconnect.org';
 
 interface ConnectionStrategyOptions {
   chainId: number;
-  networkSymbol: ChainName;
+  networkSymbol: Network;
   connectionManager: ChainConnectionManager;
 }
 
@@ -88,10 +88,10 @@ export class ChainConnectionManager {
   broadcastChannel: TypedChannel<ConnectionEvent>;
   strategy: ConnectionStrategy | undefined;
   chainId: number;
-  networkSymbol: ChainName;
+  networkSymbol: Network;
   simpleEmitter = new SimpleEmitter();
 
-  constructor(networkSymbol: ChainName, owner: Owner) {
+  constructor(networkSymbol: Network, owner: Owner) {
     setOwner(this, owner);
 
     this.storage =
@@ -151,7 +151,7 @@ export class ChainConnectionManager {
 
   createStrategy(
     chainId: number,
-    networkSymbol: ChainName,
+    networkSymbol: Network,
     providerId: WalletProviderId
   ) {
     if (providerId === 'metamask') {
@@ -268,7 +268,7 @@ export abstract class ConnectionStrategy
   abstract destroy(): void;
 
   // networkSymbol and chainId are initialized in the constructor
-  networkSymbol: ChainName;
+  networkSymbol: Network;
   chainId: number;
   connectionManager: ChainConnectionManager;
   provider?: WalletConnectProvider | TestWalletConnectProvider | BaseProvider;
