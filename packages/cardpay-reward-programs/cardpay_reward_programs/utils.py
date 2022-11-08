@@ -120,3 +120,7 @@ def get_unclaimed_rewards(previous_output_location, claims_data_root, block):
         unclaimed_payments.append(decode_payment(claim["leaf"]))
 
     return unclaimed_payments
+
+
+def format_amount(possibly_scientific_amount):
+    return "{:.0f}".format(possibly_scientific_amount)

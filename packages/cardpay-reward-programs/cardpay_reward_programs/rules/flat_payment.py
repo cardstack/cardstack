@@ -1,6 +1,7 @@
 import pandas as pd
 from cardpay_reward_programs.config import default_payment_list
 from cardpay_reward_programs.rule import Rule
+from cardpay_reward_programs.utils import format_amount
 
 
 class FlatPayment(Rule):
@@ -43,4 +44,4 @@ class FlatPayment(Rule):
         return pd.DataFrame.from_records(payment_list)
 
     def get_explanation_data(self, payment):
-        return {"amount": payment["amount"], "token": payment["token"]}
+        return {"amount": format_amount(payment["amount"]), "token": payment["token"]}
