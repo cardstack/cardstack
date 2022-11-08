@@ -1,6 +1,6 @@
 {
   "name": "review-feature",
-  "version": "1.0.15",
+  "version": "1.0.16",
   "scripts": {
     "build": "tsc",
     "serve": "npm run build && firebase emulators:start --only functions",
