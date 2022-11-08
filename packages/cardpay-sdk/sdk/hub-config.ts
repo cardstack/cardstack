@@ -13,7 +13,7 @@ interface Web3HubConfig {
   polygon: RpcNodeUrl;
 }
 
-interface RpcNodeUrl {
+export interface RpcNodeUrl {
   rpcNodeHttpsUrl: string;
   rpcNodeWssUrl: string;
 }
