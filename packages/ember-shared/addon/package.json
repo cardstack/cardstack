@@ -5,6 +5,7 @@
   "keywords": [
     "ember-addon"
   ],
+  "private": true,
   "repository": "",
   "license": "MIT",
   "author": "",
