@@ -1,7 +1,7 @@
 export interface HubConfigResponse {
   web3: Web3HubConfig;
 }
-interface Web3HubConfig {
+export interface Web3HubConfig {
   layer1Network: string;
   layer1RpcNodeHttpsUrl: string;
   layer1RpcNodeWssUrl: string;
@@ -13,7 +13,7 @@ interface Web3HubConfig {
   polygon: RpcNodeUrl;
 }
 
-interface RpcNodeUrl {
+export interface RpcNodeUrl {
   rpcNodeHttpsUrl: string;
   rpcNodeWssUrl: string;
 }

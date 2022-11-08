@@ -65,6 +65,8 @@ const networksConstants = {
     merchantUniLinkDomain: MERCHANT_PAYMENT_UNIVERSAL_LINK_STAGING_HOSTNAME,
     tallyServiceURL: 'https://reward-api-staging.stack.cards',
     chainId: 77,
+    scheduledPaymentFeeFixedUSD: 0,
+    scheduledPaymentFeePercentage: 0
   },
   kovan: {
     ...testHubUrl,
@@ -87,6 +89,8 @@ const networksConstants = {
     name: 'Goerli',
     relayServiceURL: 'https://relay-goerli.staging.stack.cards/api',
     chainId: 5,
+    scheduledPaymentFeeFixedUSD: 0,
+    scheduledPaymentFeePercentage: 0
   },
   polygon: {
     ...hubUrl,
@@ -95,6 +99,8 @@ const networksConstants = {
     blockExplorer: 'https://polygonscan.com',
     name: 'Polygon',
     chainId: 137,
+    scheduledPaymentFeeFixedUSD: 0.25,
+    scheduledPaymentFeePercentage: 0.1 //10%
   },
   mumbai: {
     ...testHubUrl,
@@ -104,6 +110,8 @@ const networksConstants = {
     name: 'Mumbai',
     relayServiceURL: 'https://relay-mumbai.staging.stack.cards/api',
     chainId: 80001,
+    scheduledPaymentFeeFixedUSD: 0,
+    scheduledPaymentFeePercentage: 0
   },
   mainnet: {
     ...hubUrl,
@@ -116,6 +124,8 @@ const networksConstants = {
     ambFinalizationRate: '20',
     relayServiceURL: 'https://relay-ethereum.cardstack.com/api',
     chainId: 1,
+    scheduledPaymentFeeFixedUSD: 0.25,
+    scheduledPaymentFeePercentage: 0.1 //10%
   },
   gnosis: {
     ...hubUrl,
@@ -133,6 +143,8 @@ const networksConstants = {
     merchantUniLinkDomain: MERCHANT_PAYMENT_UNIVERSAL_LINK_HOSTNAME,
     tallyServiceURL: 'https://reward-api.cardstack.com',
     chainId: 100,
+    scheduledPaymentFeeFixedUSD: 0.25,
+    scheduledPaymentFeePercentage: 0.1 //10%
   },
 };
 
@@ -203,7 +215,7 @@ export async function getConstant<K extends ConstantKeys>(
   }
 
   let value = constants[network as Network][name];
-  if (!value) {
+  if (value == undefined) {
     throw new Error(`Don't know about the constant '${name}' for network ${network}`);
   }
   return value;

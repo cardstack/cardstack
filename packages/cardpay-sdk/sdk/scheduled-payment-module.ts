@@ -40,6 +40,7 @@ import { waitUntilSchedulePaymentTransactionMined } from './scheduled-payment/ut
 import BN from 'bn.js';
 import { Interface } from 'ethers/lib/utils';
 import JsonRpcProvider from '../providers/json-rpc-provider';
+import { getConstant } from './constants';
 
 export interface EnableModuleAndGuardResult {
   scheduledPaymentModuleAddress: string;
@@ -688,8 +689,6 @@ export default class ScheduledPaymentModule {
     tokenAddress: string,
     amount: string,
     payeeAddress: string,
-    feeFixedUSD: number,
-    feePercentage: number,
     executionGas: number,
     maxGasPrice: string,
     gasTokenAddress: string,
@@ -705,8 +704,6 @@ export default class ScheduledPaymentModule {
     tokenAddress?: string,
     amount?: string,
     payeeAddress?: string,
-    feeFixedUSD?: number,
-    feePercentage?: number,
     executionGas?: number,
     maxGasPrice?: string,
     gasTokenAddress?: string,
@@ -734,13 +731,13 @@ export default class ScheduledPaymentModule {
     if (!tokenAddress) throw new Error('tokenAddress must be provided ');
     if (!amount) throw new Error('amount must be provided');
     if (!payeeAddress) throw new Error('payeeAddress must be provided');
-    if (feeFixedUSD == undefined) throw new Error('feeFixedUSD must be provided');
-    if (feePercentage == undefined) throw new Error('feePercentage must be provided');
     if (!executionGas) throw new Error('executionGas must be provided');
     if (!maxGasPrice) throw new Error('maxGasPrice must be provided');
     if (!gasTokenAddress) throw new Error('gasTokenAddress must be provided ');
     if (!salt) throw new Error('salt must be provided');
 
+    let feeFixedUSD = (await getConstant('scheduledPaymentFeeFixedUSD', this.ethersProvider)) ?? 0;
+    let feePercentage = (await getConstant('scheduledPaymentFeePercentage', this.ethersProvider)) ?? 0;
     let spHash: string = await this.createSpHash(
       moduleAddress,
       tokenAddress,
