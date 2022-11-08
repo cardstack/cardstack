@@ -11,12 +11,12 @@ runs:
     - name: Get yarn cache directory path
       id: yarn-cache-dir-path
       shell: bash
-      run: echo "::set-output name=dir::$(yarn cache dir)"
+      run: echo CACHE_DIR=$(yarn cache dir) >> $GITHUB_OUTPUT
     - name: Set up node_modules cache
       uses: actions/cache@v3
       with:
         path: |
-          ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          ${{ steps.yarn-cache-dir-path.outputs.CACHE_DIR }}
           node_modules
           packages/*/node_modules
           packages/ember-shared/*/node_modules
