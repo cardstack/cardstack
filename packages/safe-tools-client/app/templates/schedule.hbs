@@ -25,7 +25,7 @@
     </cp.Item>
     <cp.Item @title='Network' @icon='network'>
         <Boxel::Select
-            class="safe-tools__dashboard-network-selector"
+        class='safe-tools__dashboard-network-selector'
             @selected={{this.network}}
             @onChange={{this.network.onSelect}}
             @options={{this.network.supportedList}}
@@ -46,32 +46,28 @@
             </span>
           {{/if}}  
         {{/each}}
+        <Boxel::Button
+          @kind='primary'
+          {{on 'click' (set this 'isDepositModalOpen' true)}}
+        >
+          Add Funds
+        </Boxel::Button>
       {{else}}
         <p class='safe-tools__dashboard-schedule-control-panel-safe-info-create'>
           You need to have a safe which contains funds that would be deducted
           automatically when schedule payments are due.
         </p>
+        <CreateSafeButton />
       {{/if}}
-      <Boxel::Button
-        @kind='primary'
-        {{on 'click' this.onSafeButtonClick}}
-      >
-        {{this.safeButtonLabel}}
-      </Boxel::Button>
     </cp.Item>
   </Boxel::ControlPanel>
   <section class='safe-tools__dashboard-schedule-content'>
     <ScheduleCollapsePanel @open={{not this.wallet.isConnected}} />
-    <div class="temporary-form-container">
+    <div class='temporary-form-container'>
       <SchedulePaymentFormActionCard />
     </div>
   </section>
 </section>
-
-<SetupSafeModal
-  @isOpen={{this.isSetupSafeModalOpen}}
-  @onClose={{set this 'isSetupSafeModalOpen' false}}
-/>
 
 <DepositModal
   @isOpen={{this.isDepositModalOpen}}
