@@ -4,6 +4,7 @@ import { ExtendedPrismaClient } from '../../../services/prisma-manager';
 import ScheduledPaymentsExecutorService from '../../../services/scheduled-payments/executor';
 import { setupStubWorkerClient } from '../../helpers/stub-worker-client';
 import BN from 'bn.js';
+import CrankNonceLock from '../../../services/crank-nonce-lock';
 
 let sdkError: Error | null = null;
 
@@ -46,6 +47,7 @@ describe('executing scheduled payments', function () {
   let { getJobIdentifiers, getJobPayloads } = setupStubWorkerClient(this);
   let subject: ScheduledPaymentsExecutorService;
   let prisma: ExtendedPrismaClient;
+  let crankNonceLock: CrankNonceLock;
 
   this.beforeEach(async function () {
     registry(this).register('cardpay', StubCardpaySDK);
@@ -57,6 +59,13 @@ describe('executing scheduled payments', function () {
     subject = (await getContainer().lookup('scheduled-payment-executor')) as ScheduledPaymentsExecutorService;
     subject.getCurrentGasPrice = async () => new BN('1000000000');
     prisma = await getPrisma();
+    crankNonceLock = (await getContainer().lookup('crank-nonce-lock')) as CrankNonceLock;
+    crankNonceLock.withNonce = async (chainId: number, cb: (nonce: BN) => Promise<any>) => {
+      if (chainId) {
+        let nonce = new BN(1);
+        return await cb(nonce);
+      }
+    };
   });
 
   it('executes a scheduled payment and spawns the task to wait for the transaction to finish', async function () {
@@ -128,7 +137,6 @@ describe('executing scheduled payments', function () {
         scheduledPaymentId: scheduledPayment.id,
       },
     });
-
     expect(scheduledPaymentAttempts.length).to.equal(1);
     expect(scheduledPaymentAttempts[0].status).to.equal('failed');
     expect(scheduledPaymentAttempts[0].failureReason).to.equal('UnknownHash');

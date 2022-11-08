@@ -1,12 +1,11 @@
-import { JsonRpcProvider } from '@cardstack/cardpay-sdk';
 import { inject } from '@cardstack/di';
 import * as Sentry from '@sentry/node';
 import { isBefore, subDays } from 'date-fns';
-import { getHttpRpcUrlByChain } from '../services/scheduled-payments/executor';
 
 export default class ScheduledPaymentOnChainCreationWaiter {
   prismaManager = inject('prisma-manager', { as: 'prismaManager' });
   cardpay = inject('cardpay');
+  ethersProvider = inject('ethers-provider', { as: 'ethersProvider' });
 
   async perform(payload: { scheduledPaymentId: string }) {
     let prisma = await this.prismaManager.getClient();
@@ -14,8 +13,7 @@ export default class ScheduledPaymentOnChainCreationWaiter {
       where: { id: payload.scheduledPaymentId },
     });
 
-    let rpcUrl = getHttpRpcUrlByChain(scheduledPayment.chainId);
-    let provider = new JsonRpcProvider(rpcUrl, scheduledPayment.chainId);
+    let provider = this.ethersProvider.getInstance(scheduledPayment.chainId);
     let scheduledPaymentModule = await this.cardpay.getSDK('ScheduledPaymentModule', provider);
 
     if (scheduledPayment.creationBlockNumber) {

@@ -330,6 +330,16 @@ model ScheduledPayment {
   @@map("scheduled_payments")
 }
 
+model CrankNonce {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  chainId   Int      @unique @map("chain_id")
+  nonce     BigInt
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt DateTime @default(now()) @map("updated_at") @db.Timestamp(6)
+
+  @@map("crank_nonces")
+}
+
 enum DiscordBotsStatusEnum {
   connecting
   connected

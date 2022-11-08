@@ -63,6 +63,7 @@ app "hub" {
         PAGERDUTY_TOKEN                               = "arn:aws:secretsmanager:us-east-1:680542703984:secret:PAGERDUTY_TOKEN-kTxFxL"
         MAILCHIMP_API_KEY                             = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_MAILCHIMP_API_KEY-lkxsEk"
         CRYPTOCOMPARE_API_KEY                         = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_CRYPTOCOMPARE_API_KEY-3Sk0nr"
+        HUB_PRIVATE_KEY                               = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_hub_private_key-fJhPUj"
       }
     }
 
@@ -127,6 +128,7 @@ app "hub-worker" {
         ETHEREUM_RPC_NODE_WSS_URL           = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_evm_ethereum_infura_wss_url-hXLd7Q"
         POLYGON_RPC_NODE_HTTPS_URL          = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_evm_polygon_infura_https_url-wIF3tU"
         POLYGON_RPC_NODE_WSS_URL            = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_evm_polygon_infura_wss_url-UvdYiF"
+        HUB_PRIVATE_KEY                     = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_hub_private_key-fJhPUj"
         # The below is a distribution in the production AWS account
         HUB_STORAGE_CLOUDFRONT_DISTRIBUTION = "arn:aws:secretsmanager:us-east-1:680542703984:secret:hub_storage_cloudfront_distribution-Frtsb3"
         DISCORD_ON_CALL_INTERNAL_WEBHOOK    = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_discord_on_call_internal_webhook-4ylxfM"
@@ -198,6 +200,7 @@ app "hub-bot" {
         HUB_AUTH_SECRET                  = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_hub_auth_secret-50oF6K"
         DISCORD_ON_CALL_INTERNAL_WEBHOOK = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_discord_on_call_internal_webhook-4ylxfM"
         PAGERDUTY_TOKEN                  = "arn:aws:secretsmanager:us-east-1:680542703984:secret:PAGERDUTY_TOKEN-kTxFxL"
+        HUB_PRIVATE_KEY                  = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_hub_private_key-fJhPUj"
       }
     }
 
@@ -264,6 +267,7 @@ app "hub-event-listener" {
         HUB_AUTH_SECRET                  = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_hub_auth_secret-50oF6K"
         DISCORD_ON_CALL_INTERNAL_WEBHOOK = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_discord_on_call_internal_webhook-4ylxfM"
         PAGERDUTY_TOKEN                  = "arn:aws:secretsmanager:us-east-1:680542703984:secret:PAGERDUTY_TOKEN-kTxFxL"
+        HUB_PRIVATE_KEY                  = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_hub_private_key-fJhPUj"
       }
     }
 
