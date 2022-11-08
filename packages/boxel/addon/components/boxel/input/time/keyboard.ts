@@ -1,3 +1,4 @@
+import { getMethodNames } from '@cardstack/boxel/utils/reflection';
 import { DropdownAPI } from '../../dropdown';
 
 export type KeyboardFocus = 'none' | 'hour' | 'minute' | 'meridian';
@@ -29,9 +30,7 @@ abstract class BaseKeyboardHandler implements KeyboardHandler {
 
   handle(ev: KeyboardEvent): void {
     let unhandled = false;
-    let handlerMethodName = `on${ev.code}`;
-    //@ts-expect-error dynamic method lookup
-    let handlerMethod = this[handlerMethodName];
+    let handlerMethod = this.handlerMethodFromEventCode(ev.code);
     if (handlerMethod) {
       handlerMethod.call(this);
     } else if (/^Digit[0-9]$/.test(ev.code)) {
@@ -57,6 +56,24 @@ abstract class BaseKeyboardHandler implements KeyboardHandler {
   onKeyP() {
     this.component.keyboardFocus = 'meridian';
     this.component.setMeridian('pm');
+  }
+
+  private handlerMethodFromEventCode(eventCode: string) {
+    type ValidStringKey = Extract<keyof this, string>;
+
+    const isValidMethodKey = (
+      methodName: string
+    ): methodName is ValidStringKey =>
+      getMethodNames(this).includes(methodName);
+
+    let handlerMethodName = `on${eventCode}`;
+    if (isValidMethodKey(handlerMethodName)) {
+      let candidate = this[handlerMethodName];
+      if (typeof candidate === 'function') {
+        return candidate;
+      }
+    }
+    return undefined;
   }
 
   abstract onNumberKey(ev: KeyboardEvent): void;
