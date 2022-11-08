@@ -1,4 +1,4 @@
-import { HubConfig, networkIds } from '@cardstack/cardpay-sdk';
+import { HubConfig } from '@cardstack/cardpay-sdk';
 import config from '@cardstack/safe-tools-client/config/environment';
 import WalletConnectProvider from '@cardstack/wc-provider';
 import { action } from '@ember/object';
@@ -16,16 +16,12 @@ import CustomStorageWalletConnect, {
 
 import { WalletConnectProvider as TestWalletConnectProvider } from 'eth-testing/lib/providers';
 
+import { getWeb3ConfigByNetwork, Network } from '@cardstack/cardpay-sdk';
+import { getOwner } from '@ember/application';
+import Owner from '@ember/owner';
 import { BaseProvider } from '@metamask/providers';
 import { IWalletConnectSession } from '@walletconnect/types';
 import { VoidCallback } from './types';
-import { getOwner, setOwner } from '@ember/application';
-import Owner from '@ember/owner';
-
-type ProductionChainName = 'mainnet' | 'gnosis' | 'polygon';
-type StagingChainName = 'goerli' | 'sokol' | 'mumbai';
-
-export type Network = ProductionChainName | StagingChainName;
 
 const GET_PROVIDER_STORAGE_KEY = (chainId: number) =>
   `cardstack-chain-${chainId}-provider`;
@@ -91,14 +87,12 @@ export class ChainConnectionManager {
   networkSymbol: Network;
   simpleEmitter = new SimpleEmitter();
 
-  constructor(networkSymbol: Network, owner: Owner) {
-    setOwner(this, owner);
-
+  constructor(networkSymbol: Network, chainId: number, owner: Owner) {
     this.storage =
       (owner.lookup('storage:local') as Storage) || window.localStorage;
 
     this.networkSymbol = networkSymbol;
-    this.chainId = networkIds[networkSymbol];
+    this.chainId = chainId;
 
     // we want to ensure that users don't get confused by different tabs having
     // different wallets connected so we communicate connections and disconnections across tabs
@@ -296,8 +290,26 @@ export abstract class ConnectionStrategy
     this.emit('connected', accounts);
   }
 
-  onChainChanged(chainId: number) {
-    this.emit('chain-changed', chainId);
+  async emitChainIdChange(id?: number) {
+    let intChainId: number;
+
+    if (id) {
+      intChainId = id;
+    } else {
+      if (!this.provider) {
+        throw new Error('No provider present');
+      }
+      const chainId = await this.provider.request({
+        method: 'eth_chainId',
+      });
+
+      if (typeof chainId != 'string') {
+        throw new Error('Could not determine chainId');
+      }
+      intChainId = parseInt(chainId);
+    }
+
+    this.emit('chain-changed', intChainId);
   }
 }
 
@@ -333,7 +345,7 @@ class MetaMaskConnectionStrategy extends ConnectionStrategy {
 
     // Subscribe to chainId change
     provider.on('chainChanged', (changedChainId: string) => {
-      this.onChainChanged(parseInt(changedChainId));
+      this.emitChainIdChange(parseInt(changedChainId));
     });
 
     // Note that this is, following EIP-1193, about connection of the wallet to the
@@ -377,7 +389,7 @@ class MetaMaskConnectionStrategy extends ConnectionStrategy {
       }
     }
 
-    await this.detectChainId();
+    this.emitChainIdChange();
 
     return true;
   }
@@ -398,27 +410,12 @@ class MetaMaskConnectionStrategy extends ConnectionStrategy {
     if (Array.isArray(accounts) && accounts.length) {
       // metamask's disconnection is a faux-disconnection - the wallet still thinks
       // it is connected to the account so it will not fire the connection/account change events
-      await this.detectChainId();
       this.onConnect(accounts);
+      this.emitChainIdChange();
     } else {
       // if we didn't find accounts, then the stored provider key is not useful, delete it
       this.connectionManager.removeProviderFromStorage(this.chainId);
     }
-  }
-
-  async detectChainId() {
-    if (!this.provider) {
-      throw new Error('No provider present');
-    }
-
-    const chainId = await this.provider.request({
-      method: 'eth_chainId',
-    });
-
-    if (typeof chainId != 'string') {
-      throw new Error('Could not determine chainId');
-    }
-    this.onChainChanged(parseInt(chainId));
   }
 
   // eslint-disable-next-line ember/classic-decorator-hooks
@@ -484,16 +481,20 @@ class WalletConnectConnectionStrategy extends ConnectionStrategy {
     if (!this.provider) {
       const hubConfigApi = new HubConfig(config.hubUrl);
       const hubConfigResponse = await hubConfigApi.getConfig();
+
+      const { rpcNodeHttpsUrl, rpcNodeWssUrl } = getWeb3ConfigByNetwork(
+        hubConfigResponse,
+        this.networkSymbol
+      );
+
       this.provider = new WalletConnectProvider({
         chainId,
         infuraId: config.infuraId,
         rpc: {
-          [networkIds[this.networkSymbol]]:
-            hubConfigResponse.web3.ethereum.rpcNodeHttpsUrl, // FIXME don’t hardcode ethereum
+          [chainId]: rpcNodeHttpsUrl,
         },
         rpcWss: {
-          [networkIds[this.networkSymbol]]:
-            hubConfigResponse.web3.ethereum.rpcNodeWssUrl,
+          [chainId]: rpcNodeWssUrl,
         },
         // based on https://github.com/WalletConnect/walletconnect-monorepo/blob/7aa9a7213e15489fa939e2e020c7102c63efd9c4/packages/providers/web3-provider/src/index.ts#L47-L52
         connector: new CustomStorageWalletConnect(connectorOptions, chainId),
@@ -507,7 +508,7 @@ class WalletConnectConnectionStrategy extends ConnectionStrategy {
 
     // Subscribe to chainId change
     this.provider.on('chainChanged', (changedChainId: number) => {
-      this.onChainChanged(changedChainId);
+      this.emitChainIdChange(changedChainId);
     });
 
     // Subscribe to session disconnection
@@ -530,6 +531,9 @@ class WalletConnectConnectionStrategy extends ConnectionStrategy {
   async connect() {
     try {
       await this.provider?.enable();
+
+      // we need to trigger the event manually to update dapp with wallet network
+      this.emitChainIdChange();
       return true;
     } catch (e) {
       // check modal_closed event in WalletConnectProvider for message to match

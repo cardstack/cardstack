@@ -81,11 +81,16 @@ class Rule(ABC):
         """
         current_cycle_payments_df = self.run(payment_cycle, reward_program_id)
         # If rollover isn't set, or this is the first and there's no previous output, return the current cycle
-        if not self.rollover or (
-            previous_output is None and rewards_subgraph_location is None
-        ):
+        if not self.rollover:
             return current_cycle_payments_df
         else:
+            if previous_output is None and rewards_subgraph_location is None:
+                current_cycle_payments_df[
+                    "explanationData"
+                ] = current_cycle_payments_df.explanationData.apply(
+                    lambda row: {**row, **{"rollover_amount": 0}}
+                )
+                return current_cycle_payments_df
             payment_list = current_cycle_payments_df.to_dict("records")
             unclaimed_payments = get_unclaimed_rewards(
                 previous_output_location=previous_output,

@@ -64,7 +64,8 @@
         "tests/dummy/app/components/media-registry/**/*",
         "tests/dummy/app/components/mode-indicator/**/*",
         "tests/dummy/app/components/*",
-        "tests/integration/**/*",
+        "tests/integration/components/boxel/card-picker-test.ts",
+        "tests/integration/components/boxel/dropdown-test.ts",
       ]
     }
   },

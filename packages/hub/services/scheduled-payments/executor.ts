@@ -8,7 +8,7 @@ import { Wallet } from 'ethers';
 import { JsonRpcProvider, gasPriceInToken, getWeb3ConfigByNetwork } from '@cardstack/cardpay-sdk';
 
 export const getHttpRpcUrlByChain = (chainId: number) =>
-  getWeb3ConfigByNetwork(config.get('web3'), chainId)?.rpcNodeHttpsUrl;
+  getWeb3ConfigByNetwork({ web3: config.get('web3') }, chainId)?.rpcNodeHttpsUrl;
 
 export default class ScheduledPaymentsExecutorService {
   prismaManager = inject('prisma-manager', { as: 'prismaManager' });

@@ -1,16 +1,4 @@
 {
-  "explanation": {
-    "en": {
-      "program": "Reward Program managed by Cardstack Foundation",
-      "claim": {
-        "flat_payment": "Earned {amount} {token} for a one-time aidrop",
-        "retro_airdrop": "Earned {amount} {token} averaged over time period for payments within {start_snapshot_block} and {end_snapshot_block}",
-        "safe_ownership": "Earned {amount} {token} for owning a {safe_type}",
-        "staking": "Earned {amount} {token} for staking CARD monthly in your L2 depot between blocks {from_block} and {to_block}, {rollover_amount} tokens rolled over from unclaimed previous cycles",
-        "profile_creation": "Earned {amount} {token} for creating first profile by block {from_block}"
-      }
-    }
-  },
   "core": {
     "payment_cycle_length": 32768,
     "start_block": 23592960,

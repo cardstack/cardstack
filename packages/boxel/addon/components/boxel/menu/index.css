@@ -1,16 +1,22 @@
 .boxel-menu {
+  --boxel-menu-color: var(--boxel-light);
+  --boxel-menu-current-color: var(--boxel-light-100);
+  --boxel-menu-selected-color: var(--boxel-highlight);
+  --boxel-menu-font: var(--boxel-font-sm);
+
   list-style-type: none;
   margin: 0;
   padding: 0;
 }
 
 .boxel-menu__item {
-  font: var(--boxel-font-sm);
+  background-color: var(--boxel-menu-color);
+  font: var(--boxel-menu-font);
   letter-spacing: var(--boxel-lsp-sm);
 }
 
 .boxel-menu__item:hover {
-  background-color: var(--boxel-light-300);
+  background-color: var(--boxel-menu-current-color);
   cursor: pointer;
 }
 
@@ -32,7 +38,12 @@
 }
 
 .boxel-menu__item--dangerous {
-  color: var(--boxel-error-100);
+  color: var(--boxel-error-200);
+}
+
+.boxel-menu__item--selected,
+.boxel-menu__item--selected.boxel-menu__item:hover {
+  background-color: var(--boxel-menu-selected-color);
 }
 
 .boxel-menu__separator {

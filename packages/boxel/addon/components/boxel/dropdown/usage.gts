@@ -20,6 +20,13 @@ export default class BoxelDropdownUsage extends Component {
 
   <template>
     <FreestyleUsage @name="Dropdown">
+      <:description>
+      This component is a building block for more complex components. By default this component
+      will render the dropdown in the body using #-in-element and absolutely position it to
+      place it in the proper coordinates relative to the trigger. Consider using
+      <a href="https://github.com/josemarluedke/ember-focus-trap">ember-focus-trap</a>
+      within the content block to improve accessibility when the dropdown is open.
+      </:description>
       <:example>
         <BoxelDropdown>
           <:trigger as |bindings|>
@@ -40,8 +47,36 @@ export default class BoxelDropdownUsage extends Component {
           </:content>
         </BoxelDropdown>
 
+        <!-- Note: the shape of the PublicAPI object passed to the optional
+        registerAPI action is as follows:
+
+          {
+            uniqueId: string;
+            disabled: boolean;
+            isOpen: boolean;
+            actions: {
+              toggle: (e?: Event) => void;
+              close: (e?: Event, skipFocus?: boolean) => void;
+              open: (e?: Event) => void;
+              reposition: (...args: any[]) => undefined | RepositionChanges;
+            };
+          }
+        -->
       </:example>
       <:api as |Args|>
+        <Args.String
+          @name="contentClass"
+          @description="CSS Class to apply to the dropdown content div"
+          @hideControls={{true}}
+        />
+        <Args.Action
+          @name="registerAPI"
+          @description="Action called when the publicAPI changes, passing the publicAPI object."
+        />
+        <Args.Action
+          @name="onClose"
+          @description="Action called when the dropdown is closing"
+        />
         <Args.Yield
           @name="trigger"
           @description="Content to be used as trigger for basic dropdown. Yields a bindings modifier which applies aria- attributes and event handling."

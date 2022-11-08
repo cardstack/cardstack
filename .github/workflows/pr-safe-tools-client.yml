@@ -3,12 +3,12 @@ name: CI [safe-tools-client]
 on:
   pull_request:
     paths:
-      - 'packages/safe-tools-client/**'
-      - 'packages/boxel/**'
-      - 'packages/eslint-config/**'
-      - '.github/workflows/safe-tools-client.yml'
-      - 'package.json'
-      - 'yarn.lock'
+      - "packages/safe-tools-client/**"
+      - "packages/boxel/**"
+      - "packages/eslint-config/**"
+      - ".github/workflows/safe-tools-client.yml"
+      - "package.json"
+      - "yarn.lock"
 
 permissions:
   contents: read
@@ -32,3 +32,69 @@ jobs:
         run: yarn --prefer-offline --frozen-lockfile
       - name: Run tests
         run: yarn test:safe-tools-client
+
+  check-if-requires-preview:
+    name: Check if a preview deploy is required
+    runs-on: ubuntu-latest
+    outputs:
+      safe-tools-client-files-changed: ${{ steps.safe-tools-client-files-that-changed.outputs.any_changed }}
+    steps:
+      - uses: actions/checkout@v3
+      - name: Get safe-tools-client files that changed
+        id: safe-tools-client-files-that-changed
+        uses: tj-actions/changed-files@v1.1.2
+        with:
+          files: |
+            ^packages/safe-tools-client
+
+  deploy-safe-tools-preview-staging:
+    name: Deploy a safe-tools-client staging preview to S3
+    runs-on: ubuntu-latest
+    # github.event.pull_request.head.repo.full_name == github.repository: true if pr is from the original repo, false if it's from a fork
+    # github.head_ref: the branch that the pull request is from. only appears on pull_request events
+    if: github.event.pull_request.head.repo.full_name == github.repository && github.head_ref && needs.check-if-requires-preview.outputs.safe-tools-client-files-changed == 'true'
+    needs: check-if-requires-preview
+    steps:
+      - uses: actions/checkout@v3
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          role-to-assume: arn:aws:iam::680542703984:role/safe-tools-client
+          aws-region: us-east-1
+      - name: Deploy safe-tools-client preview
+        uses: ./.github/actions/deploy-ember-preview
+        env:
+          HUB_URL: https://hub-staging.stack.cards
+          S3_PREVIEW_BUCKET_NAME: safe-tools-preview.stack.cards
+          AWS_S3_BUCKET: safe-tools-preview.stack.cards
+          AWS_REGION: us-east-1
+          AWS_CLOUDFRONT_DISTRIBUTION: E21LN3O969NVVW
+        with:
+          package: safe-tools-client
+          environment: staging
+
+  deploy-safe-tools-preview-production:
+    name: Deploy a safe-tools-client production preview to S3
+    runs-on: ubuntu-latest
+    # github.event.pull_request.head.repo.full_name == github.repository: true if pr is from the original repo, false if it's from a fork
+    # github.head_ref: the branch that the pull request is from. only appears on pull_request events
+    if: github.event.pull_request.head.repo.full_name == github.repository && github.head_ref && needs.check-if-requires-preview.outputs.safe-tools-client-files-changed == 'true'
+    needs: check-if-requires-preview
+    steps:
+      - uses: actions/checkout@v3
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          role-to-assume: arn:aws:iam::120317779495:role/safe-tools-client
+          aws-region: us-east-1
+      - name: Deploy safe-tools-client preview
+        uses: ./.github/actions/deploy-ember-preview
+        env:
+          HUB_URL: https://hub.cardstack.com
+          S3_PREVIEW_BUCKET_NAME: safe-tools-preview.cardstack.com
+          AWS_S3_BUCKET: safe-tools-preview.cardstack.com
+          AWS_REGION: us-east-1
+          AWS_CLOUDFRONT_DISTRIBUTION: E2RX1JI5H3FD5M
+        with:
+          package: safe-tools-client
+          environment: production

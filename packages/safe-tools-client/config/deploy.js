@@ -2,6 +2,7 @@
 
 module.exports = function (deployTarget) {
   let ENV = {
+    plugins: ['build', 'compress', 's3', 'cloudfront'],
     build: {},
     s3: {
       allowOverwrite: true,
@@ -21,6 +22,13 @@ module.exports = function (deployTarget) {
 
   if (deployTarget === 'production') {
     ENV.build.environment = 'production';
+  }
+
+  if (
+    deployTarget === 's3-preview-staging' ||
+    deployTarget === 's3-preview-production'
+  ) {
+    ENV.s3.prefix = process.env.PR_BRANCH_NAME;
   }
 
   return ENV;
