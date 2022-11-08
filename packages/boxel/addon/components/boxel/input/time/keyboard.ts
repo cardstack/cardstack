@@ -63,11 +63,8 @@ abstract class BaseKeyboardHandler implements KeyboardHandler {
 
     const isValidMethodKey = (
       methodName: string
-    ): methodName is ValidStringKey => {
-      return getMethodNames(this as Record<string, unknown>).includes(
-        methodName
-      );
-    };
+    ): methodName is ValidStringKey =>
+      getMethodNames(this).includes(methodName);
 
     let handlerMethodName = `on${eventCode}`;
     if (isValidMethodKey(handlerMethodName)) {
