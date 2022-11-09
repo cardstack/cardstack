@@ -294,25 +294,26 @@ export abstract class ConnectionStrategy
   }
 
   async emitChainIdChange(id?: number) {
-    let intChainId: number;
-
     if (id) {
-      intChainId = id;
-    } else {
-      if (!this.provider) {
-        throw new Error('No provider present');
-      }
-      const chainId = await this.provider.request({
-        method: 'eth_chainId',
-      });
-
-      if (typeof chainId !== 'string') {
-        throw new Error('Could not determine chainId');
-      }
-      intChainId = parseInt(chainId);
+      this.emit('chain-changed', id);
+      return;
     }
 
-    this.emit('chain-changed', intChainId);
+    if (!this.provider) {
+      throw new Error('No provider present');
+    }
+
+    const chainId = parseInt(
+      (await this.provider.request({
+        method: 'eth_chainId',
+      })) as string // even though we cast it to string some providers might return it as a number
+    );
+
+    if (isNaN(chainId)) {
+      throw new Error(`Couldn't determine chainId`);
+    }
+
+    this.emit('chain-changed', chainId);
   }
 }
 
