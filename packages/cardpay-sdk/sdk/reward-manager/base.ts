@@ -1073,15 +1073,23 @@ The owner of reward safe ${safeAddress} is ${rewardSafeOwner}, but the signer is
   async getBlob(rewardProgramId: string): Promise<string> {
     return await (await this.getRewardManager()).methods.rule(rewardProgramId).call();
   }
-  async getRuleDid(rewardProgramId: string): Promise<string> {
+  async getRuleDid(rewardProgramId: string): Promise<string | undefined> {
     const blob = await this.getBlob(rewardProgramId);
-    return Buffer.from(blob.replace('0x', ''), 'hex').toString('utf-8');
+    if (blob) {
+      return Buffer.from(blob.replace('0x', ''), 'hex').toString('utf-8');
+    } else {
+      return undefined;
+    }
   }
 
   async getRuleJson(rewardProgramId: string): Promise<RuleJson> {
     const did = await this.getRuleDid(rewardProgramId);
-    const content = await resolveDoc(did);
-    return content;
+    if (did) {
+      const content = await resolveDoc(did);
+      return content;
+    } else {
+      return { explanation: {}, rules: [] };
+    }
   }
 
   getProgramExplainer(rule: RuleJson, languageTag = 'en') {
