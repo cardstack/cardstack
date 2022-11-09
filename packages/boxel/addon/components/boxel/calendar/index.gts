@@ -12,9 +12,6 @@ interface Signature {
     center?: Day;
     onCenterChange?: Function;
   };
-  Blocks: {
-    'default': []
-  }
 }
 
 export interface Day {
