@@ -1,0 +1,31 @@
+.boxel-input-date__trigger {
+  border: 0;
+  padding: 0;
+  border-radius: 0;
+  font-weight: bold;
+  font-size: var(--boxel-font-size);
+}
+
+.boxel-input-date__icon {
+  --icon-color: var(--boxel-highlight);
+
+  width: var(--boxel-icon-sm);
+  height: var(--boxel-icon-sm);
+  margin-right: var(--boxel-sp-xxs);
+}
+
+.boxel-input-date__caret {
+  --icon-color: var(--boxel-purple-200);
+
+  margin-left: var(--boxel-sp-xxs);
+}
+
+.boxel-input-date__content {
+  background-color: transparent;
+  box-shadow: none;
+}
+
+.boxel-input-date__calendar-container {
+  padding-top: 0.2rem;
+  padding-bottom: 0.35rem;
+}

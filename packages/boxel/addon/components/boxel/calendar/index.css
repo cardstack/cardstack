@@ -1,0 +1,111 @@
+.boxel-calendar.ember-power-calendar {
+  --boxel-calendar-cell-width: 1.4rem;
+  --boxel-calendar-cell-height: 1.5rem;
+
+  box-sizing: border-box;
+  font: var(--boxel-font-sm);
+  position: relative;
+}
+
+.boxel-calendar .ember-power-calendar-nav {
+  box-sizing: border-box;
+  display: flex;
+  justify-content: space-between;
+  line-height: 2;
+}
+
+.boxel-calendar .ember-power-calendar-nav-control {
+  appearance: none;
+  background-color: transparent;
+  background-color: initial;
+  border: none;
+  border: initial;
+  outline: none;
+  outline: initial;
+  line-height: 1;
+  font-size: 150%;
+}
+
+.boxel-calendar .ember-power-calendar-nav *,
+.boxel-calendar .ember-power-calendar-days,
+.boxel-calendar .ember-power-calendar-days * {
+  box-sizing: border-box;
+}
+
+.boxel-calendar .ember-power-calendar-nav-title {
+  flex: 1;
+  text-align: center;
+}
+
+.boxel-calendar .ember-power-calendar-row {
+  display: flex;
+  justify-content: space-between;
+}
+
+.boxel-calendar .ember-power-calendar-weekday {
+  appearance: none;
+  flex: 1 1 100%;
+  padding: 0;
+  background-color: transparent;
+  background-color: initial;
+  border: none;
+  border: initial;
+  outline: none;
+  outline: initial;
+  justify-content: center;
+  display: flex;
+  align-items: center;
+}
+
+.boxel-calendar .ember-power-calendar-day {
+  appearance: none;
+  background-color: transparent;
+  background-color: initial;
+  border: none;
+  border: initial;
+  outline: none;
+  outline: initial;
+  flex: 1 1 100%;
+  font-size: inherit;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+.boxel-calendar .ember-power-calendar-nav-control:focus {
+  transform: scale(1.2);
+}
+
+.boxel-calendar .ember-power-calendar-day--selected,
+.boxel-calendar .ember-power-calendar-day--selected:not([disabled]):hover {
+  background-color: var(--boxel-highlight);
+  border-radius: 50px;
+}
+
+.boxel-calendar .ember-power-calendar-day--interactive[disabled] {
+  opacity: 0.4;
+}
+
+.boxel-calendar .ember-power-calendar-weekdays {
+  background-color: var(--boxel-purple-100);
+}
+
+.boxel-calendar .ember-power-calendar-day,
+.boxel-calendar .ember-power-calendar-weekday {
+  max-width: var(--boxel-calendar-cell-width);
+  max-height: var(--boxel-calendar-cell-height);
+  width: var(--boxel-calendar-cell-width);
+  height: var(--boxel-calendar-cell-height);
+  border-radius: 50px;
+}
+
+.boxel-calendar .ember-power-calendar-weekdays,
+.boxel-calendar .ember-power-calendar-week {
+  height: var(--boxel-calendar-cell-height);
+  padding-left: 0.7rem;
+  padding-right: 0.7rem;
+}
+
+.boxel-calendar .ember-power-calendar-day--other-month:not([disabled]) {
+  color: var(--boxel-purple-300);
+}
