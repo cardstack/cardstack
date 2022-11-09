@@ -288,7 +288,7 @@ export async function signTypedData(
       signature = await signer._signTypedData(domain, types, message);
     } else if (web3OrSignerOrEthersProvider instanceof JsonRpcProvider) {
       let ethersProvider = web3OrSignerOrEthersProvider;
-      return await ethersProvider.send('eth_signTypedData', [account, data]);
+      return await ethersProvider.send('eth_signTypedData', [account, JSON.stringify(data)]);
     } else {
       signature = await signTypedDataWithWeb3(web3OrSignerOrEthersProvider, account, data);
     }
@@ -305,7 +305,7 @@ async function signTypedDataWithWeb3(web3: Web3, account: string, data: any): Pr
     let payload = {
       jsonrpc: '2.0',
       method: 'eth_signTypedData',
-      params: [account, data],
+      params: [account, JSON.stringify(data)],
       id: new Date().getTime(),
     };
 
