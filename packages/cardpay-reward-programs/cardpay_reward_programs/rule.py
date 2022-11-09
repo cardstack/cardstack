@@ -88,7 +88,7 @@ class Rule(ABC):
                 current_cycle_payments_df[
                     "explanationData"
                 ] = current_cycle_payments_df.explanationData.apply(
-                    lambda row: {**row, **{"rollover_amount": 0}}
+                    lambda row: {**row, **{"rollover_amount": "0"}}
                 )
                 return current_cycle_payments_df
             payment_list = current_cycle_payments_df.to_dict("records")
