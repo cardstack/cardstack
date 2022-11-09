@@ -142,7 +142,7 @@ def test_claimed_rewards_dont_rollover(get_table_dataset, rollover_rule):
         assert (
             payment_list[0]["amount"] == 1000
         )  # And no extra payments as the value has not rolled over
-        assert payment_list[0]["explanationData"]["rollover_amount"] == 0
+        assert payment_list[0]["explanationData"]["rollover_amount"] == "0"
 
 
 @patch("cardpay_reward_programs.utils.get_table_dataset")
