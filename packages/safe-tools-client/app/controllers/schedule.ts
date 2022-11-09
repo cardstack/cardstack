@@ -16,6 +16,7 @@ export default class Schedule extends Controller {
   @tracked isDepositModalOpen = false;
 
   get safe() {
+    return undefined;
     //TODO: get safe info from sdk and format it,
     return {
       address: '0x8a40AFffb53f4F953a204cAE087219A28771df9d',

@@ -6,10 +6,12 @@ import { Networkish } from '@ethersproject/networks';
 const errorGas = ['call', 'estimateGas'];
 
 function isExpectedMessage(message: string) {
+  console.log('isExpectedMessage', message);
   return message.toLocaleLowerCase().match('reverted') || message.match(/0x.+/);
 }
 
 function spelunk(value: any): null | { message: string; data: string } {
+  console.log('spelunk', value);
   if (value == null) {
     return null;
   }
