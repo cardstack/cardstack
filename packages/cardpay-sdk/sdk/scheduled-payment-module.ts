@@ -184,7 +184,7 @@ export default class ScheduledPaymentModule {
       AddressZero,
       generateSaltNonce('cardstack-sp-create-safe')
     );
-    let enableModuleTxs = await this.generateEnableModuleTxs(expectedSafeAddress);
+    let enableModuleTxs = await this.generateEnableModuleTxs(expectedSafeAddress, [from]);
     let setGuardTxs = await this.generateSetGuardTxs(expectedSafeAddress);
 
     let multiSendTx = await encodeMultiSend(this.ethersProvider, [...enableModuleTxs.txs, ...setGuardTxs.txs]);
@@ -291,7 +291,7 @@ export default class ScheduledPaymentModule {
     };
   }
 
-  async generateEnableModuleTxs(safeAddress: string) {
+  async generateEnableModuleTxs(safeAddress: string, safeOwners: string[] = []) {
     let masterCopy = new Contract(
       await getAddress('scheduledPaymentModule', this.ethersProvider),
       ScheduledPaymentABI,
@@ -300,8 +300,8 @@ export default class ScheduledPaymentModule {
     let configAddress = await getAddress('scheduledPaymentConfig', this.ethersProvider);
     let exchangeAddress = await getAddress('scheduledPaymentExchange', this.ethersProvider);
     let { transaction, expectedModuleAddress } = await deployAndSetUpModule(this.ethersProvider, masterCopy, {
-      types: ['address', 'address', 'address', 'address', 'address'],
-      values: [safeAddress, safeAddress, safeAddress, configAddress, exchangeAddress],
+      types: ['address', 'address', 'address[]', 'address', 'address', 'address'],
+      values: [safeAddress, safeAddress, safeOwners, safeAddress, configAddress, exchangeAddress],
     });
     let safe = new Contract(safeAddress, GnosisSafeABI, this.ethersProvider);
     let enableModuleData = safe.interface.encodeFunctionData('enableModule', [expectedModuleAddress]);
