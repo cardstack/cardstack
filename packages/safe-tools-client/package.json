@@ -16,7 +16,7 @@
     "lint:fix": "npm-run-all --aggregate-output --continue-on-error --parallel lint:*:fix",
     "lint:hbs": "ember-template-lint .",
     "lint:hbs:fix": "ember-template-lint . --fix",
-    "lint:js": "eslint . --cache --ext .js,.ts",
+    "lint:js": "eslint .",
     "lint:js:fix": "eslint . --fix",
     "lint:glint": "glint",
     "start": "ember serve",
@@ -137,6 +137,7 @@
   },
   "dependencies": {
     "@babel/core": "^7.17.8",
+    "eslint-plugin-import": "^2.26.0",
     "typescript": "^4.7.4"
   }
 }

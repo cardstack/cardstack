@@ -1,5 +1,9 @@
-import Web3 from 'web3';
-
+import { isSupportedChain } from '@cardstack/cardpay-sdk';
+import NetworkService from '@cardstack/safe-tools-client/services/network';
+import { ChainConnectionManager } from '@cardstack/safe-tools-client/utils/chain-connection-manager';
+import walletProviders, {
+  WalletProviderId,
+} from '@cardstack/safe-tools-client/utils/wallet-providers';
 import { action } from '@ember/object';
 import type { default as Owner } from '@ember/owner';
 import Service, { inject as service } from '@ember/service';
@@ -7,13 +11,7 @@ import { tracked } from '@glimmer/tracking';
 import { timeout } from 'ember-concurrency';
 import { task } from 'ember-concurrency-decorators';
 import { taskFor } from 'ember-concurrency-ts';
-
-import { isSupportedChain } from '@cardstack/cardpay-sdk';
-import NetworkService from '@cardstack/safe-tools-client/services/network';
-import { ChainConnectionManager } from '@cardstack/safe-tools-client/utils/chain-connection-manager';
-import walletProviders, {
-  WalletProviderId,
-} from '@cardstack/safe-tools-client/utils/wallet-providers';
+import Web3 from 'web3';
 
 export default class Wallet extends Service {
   @service declare network: NetworkService;

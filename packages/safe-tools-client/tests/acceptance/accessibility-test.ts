@@ -1,7 +1,7 @@
-import { module, test } from 'qunit';
 import { visit, currentURL } from '@ember/test-helpers';
-import { setupApplicationTest } from 'ember-qunit';
 import a11yAudit from 'ember-a11y-testing/test-support/audit';
+import { setupApplicationTest } from 'ember-qunit';
+import { module, test } from 'qunit';
 
 module('Acceptance | accessibility', function (hooks) {
   setupApplicationTest(hooks);

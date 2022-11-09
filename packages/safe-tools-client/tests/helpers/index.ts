@@ -1,10 +1,11 @@
 import { MockLocalStorage } from '@cardstack/safe-tools-client/utils/browser-mocks';
+
+import { TestContext } from '@ember/test-helpers';
 import {
   setupApplicationTest as upstreamSetupApplicationTest,
   setupRenderingTest as upstreamSetupRenderingTest,
   setupTest as upstreamSetupTest,
 } from 'ember-qunit';
-
 import { generateTestingUtils } from 'eth-testing';
 import { MetaMaskProvider } from 'eth-testing/lib/providers';
 import { TestingUtils } from 'eth-testing/lib/testing-utils';
@@ -33,7 +34,7 @@ declare module '@ember/test-helpers' {
 function setupApplicationTest(hooks: NestedHooks, options?: SetupTestOptions) {
   upstreamSetupApplicationTest(hooks, options);
 
-  hooks.beforeEach(function () {
+  hooks.beforeEach(function (this: TestContext) {
     this.owner.register('storage:local', new MockLocalStorage(), {
       instantiate: false,
     });
@@ -61,7 +62,7 @@ function setupApplicationTest(hooks: NestedHooks, options?: SetupTestOptions) {
     this.mockMetaMask.mockChainId(1);
   });
 
-  hooks.afterEach(function () {
+  hooks.afterEach(function (this: TestContext) {
     this.mockMetaMask.clearAllMocks();
     this.mockWalletConnect.clearAllMocks();
     window.ethereum = undefined;

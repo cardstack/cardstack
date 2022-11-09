@@ -1,6 +1,5 @@
 import { truncateMiddle } from '@cardstack/ember-shared/helpers/truncate-middle';
 import { click, visit } from '@ember/test-helpers';
-
 import { module, test } from 'qunit';
 
 import {

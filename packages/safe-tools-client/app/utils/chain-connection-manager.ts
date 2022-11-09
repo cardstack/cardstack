@@ -1,27 +1,28 @@
-import { HubConfig } from '@cardstack/cardpay-sdk';
+import {
+  HubConfig,
+  getWeb3ConfigByNetwork,
+  Network,
+} from '@cardstack/cardpay-sdk';
 import config from '@cardstack/safe-tools-client/config/environment';
 import WalletConnectProvider from '@cardstack/wc-provider';
+import { getOwner, setOwner } from '@ember/application';
 import { action } from '@ember/object';
+import Owner from '@ember/owner';
 import detectEthereumProvider from '@metamask/detect-provider';
+import { BaseProvider } from '@metamask/providers';
 import WalletConnectQRCodeModal from '@walletconnect/qrcode-modal';
+import { IWalletConnectSession } from '@walletconnect/types';
+import { WalletConnectProvider as TestWalletConnectProvider } from 'eth-testing/lib/providers';
 import Web3 from 'web3';
 import { provider } from 'web3-core';
+
 import { Emitter, SimpleEmitter } from './events';
 import { TypedChannel } from './typed-channel';
+import { VoidCallback } from './types';
 import { WalletProviderId } from './wallet-providers';
-
 import CustomStorageWalletConnect, {
   clearWalletConnectStorage,
 } from './wc-connector';
-
-import { WalletConnectProvider as TestWalletConnectProvider } from 'eth-testing/lib/providers';
-
-import { getWeb3ConfigByNetwork, Network } from '@cardstack/cardpay-sdk';
-import { getOwner, setOwner } from '@ember/application';
-import Owner from '@ember/owner';
-import { BaseProvider } from '@metamask/providers';
-import { IWalletConnectSession } from '@walletconnect/types';
-import { VoidCallback } from './types';
 
 const GET_PROVIDER_STORAGE_KEY = (chainId: number) =>
   `cardstack-chain-${chainId}-provider`;
@@ -305,7 +306,7 @@ export abstract class ConnectionStrategy
         method: 'eth_chainId',
       });
 
-      if (typeof chainId != 'string') {
+      if (typeof chainId !== 'string') {
         throw new Error('Could not determine chainId');
       }
       intChainId = parseInt(chainId);
@@ -441,7 +442,7 @@ class WalletConnectConnectionStrategy extends ConnectionStrategy {
   provider?: WalletConnectProviderish;
 
   getSession() {
-    if (this.provider?.constructor == WalletConnectProvider) {
+    if (this.provider?.constructor === WalletConnectProvider) {
       return this.provider.connector.session;
     } else {
       return null;

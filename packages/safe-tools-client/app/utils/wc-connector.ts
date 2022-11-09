@@ -1,12 +1,11 @@
+import Connector from '@walletconnect/core';
+import SessionStorage from '@walletconnect/core/dist/cjs/storage';
+import * as cryptoLib from '@walletconnect/iso-crypto';
 import {
   IWalletConnectOptions,
   IPushServerOptions,
   IClientMeta,
 } from '@walletconnect/types';
-import * as cryptoLib from '@walletconnect/iso-crypto';
-
-import Connector from '@walletconnect/core';
-import SessionStorage from '@walletconnect/core/dist/cjs/storage';
 
 const GET_STORAGE_ID = (chainId: number) => `wallet-connect-chain-${chainId}`;
 
