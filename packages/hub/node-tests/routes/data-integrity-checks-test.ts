@@ -15,7 +15,8 @@ describe('GET /api/data-integrity-checks/scheduled-payments', async function () 
 
   it('returns operational status for provided check', async function () {
     await request()
-      .get('/api/data-integrity-checks/scheduled-payments?secret=123')
+      .get('/api/data-integrity-checks/scheduled-payments')
+      .set('X-Data-Integrity-Checks-Authorization', '123')
       .set('Accept', 'application/vnd.api+json')
       .set('Content-Type', 'application/vnd.api+json')
       .expect(200)
@@ -58,7 +59,8 @@ describe('GET /api/data-integrity-checks/scheduled-payments', async function () 
     });
 
     await request()
-      .get('/api/data-integrity-checks/scheduled-payments?secret=123')
+      .get('/api/data-integrity-checks/scheduled-payments')
+      .set('X-Data-Integrity-Checks-Authorization', '123')
       .set('Accept', 'application/vnd.api+json')
       .set('Content-Type', 'application/vnd.api+json')
       .expect(200)
@@ -78,15 +80,17 @@ describe('GET /api/data-integrity-checks/scheduled-payments', async function () 
 
   it('returns not found for unknown check name', async function () {
     await request()
-      .get('/api/data-integrity-checks/unknown-check?secret=123')
+      .get('/api/data-integrity-checks/unknown-check')
+      .set('X-Data-Integrity-Checks-Authorization', '123')
       .set('Accept', 'application/vnd.api+json')
       .set('Content-Type', 'application/vnd.api+json')
       .expect(404);
   });
 
-  it('returns not allowed for wrong or missing secret', async function () {
+  it('returns not allowed for wrong or missing route authorization', async function () {
     await request()
-      .get('/api/data-integrity-checks/scheduled-payments?secret=asd')
+      .get('/api/data-integrity-checks/scheduled-payments')
+      .set('X-Data-Integrity-Checks-Authorization', 'wrongauth')
       .set('Accept', 'application/vnd.api+json')
       .set('Content-Type', 'application/vnd.api+json')
       .expect(403);

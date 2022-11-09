@@ -19,7 +19,14 @@ export default class DataIntegrityChecksRoute {
   }
 
   async get(ctx: Koa.Context) {
-    if (ctx.query.secret !== config.get('checkly.webhookSecret')) {
+    // The middleware converts header names to lower case
+    let authorization = ctx.headers['x-data-integrity-checks-authorization'] as string;
+
+    // Checkly's webhookSecret is used in checkly-webhook.ts for authorizing
+    // requests to create incidents in statuspage. For convenience, since Checkly will
+    // consume this route as well, we use the same secret here to authorize requests to this private route.
+
+    if (authorization !== config.get('checkly.webhookSecret')) {
       ctx.status = 403;
       return;
     }
