@@ -23,7 +23,7 @@ interface Signature {
 const HelpBox: TemplateOnlyComponent<Signature> = <template>
   <BoxelSidebarCardContainer class="boxel-help-box" ...attributes>
     <header class="boxel-help-box__title">
-      {{svgJar "help-circle" width="20px" height="20px" aria-hidden=true}}
+      {{svgJar "help-circle" width="20px" height="20px" aria-hidden="true"}}
       {{or @prompt "Need help?"}}
     </header>
     {{#if (has-block)}}
