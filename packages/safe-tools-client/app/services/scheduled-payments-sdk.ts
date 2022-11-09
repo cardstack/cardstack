@@ -20,31 +20,27 @@ export default class SchedulePaymentSDKService extends Service {
   }
 
   @action async getCreateSafeGasEstimation(): Promise<BigNumber | undefined> {
-    try {
-      const scheduledPayments = await this.getSchedulePaymentsModule();
+    // TODO: Remove once sdk starts working with dapp
+    // return new Promise((resolve) => {
+    //   setTimeout(() => {
+    //     console.log('Create safe');
+    //     resolve(BigNumber.from('100000000000000000'));
+    //   }, 2000);
+    // });
 
-      const estimatedSafeCreationGas =
-        await scheduledPayments.createSafeWithModuleAndGuardEstimation();
+    const scheduledPayments = await this.getSchedulePaymentsModule();
 
-      return estimatedSafeCreationGas;
-    } catch (e) {
-      // TODO: handle error
-      console.log(e);
-    }
-    return;
+    const estimatedSafeCreationGas =
+      await scheduledPayments.createSafeWithModuleAndGuardEstimation();
+
+    return estimatedSafeCreationGas;
   }
 
-  // TODO convert it to task
+  // TODO: convert it to task
   @action async createSafe() {
-    try {
-      const scheduledPayments = await this.getSchedulePaymentsModule();
+    const scheduledPayments = await this.getSchedulePaymentsModule();
 
-      const result = await scheduledPayments.createSafeWithModuleAndGuard();
-      console.log({ result });
-    } catch (e) {
-      // TODO: handle error
-      console.log(e);
-    }
+    await scheduledPayments.createSafeWithModuleAndGuard();
   }
 }
 
