@@ -38,6 +38,7 @@ module.exports = function (environment) {
     locationType: 'history',
     exportApplicationGlobal: true,
     hubURL: process.env.HUB_URL,
+    isIssuePrepaidCardEnabled: false,
     universalLinkDomain:
       universalLinkHostnamesByTarget[deployTargetClass] ??
       PAYMENT_UNIVERSAL_LINK_STAGING_HOSTNAME,
@@ -139,6 +140,8 @@ module.exports = function (environment) {
       enabled: true,
       trackRequests: true,
     };
+
+    ENV.isIssuePrepaidCardEnabled = true;
   }
 
   if (environment === 'production') {
