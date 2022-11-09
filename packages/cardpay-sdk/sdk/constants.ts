@@ -66,7 +66,7 @@ const networksConstants = {
     tallyServiceURL: 'https://reward-api-staging.stack.cards',
     chainId: 77,
     scheduledPaymentFeeFixedUSD: 0,
-    scheduledPaymentFeePercentage: 0
+    scheduledPaymentFeePercentage: 0,
   },
   kovan: {
     ...testHubUrl,
@@ -90,7 +90,7 @@ const networksConstants = {
     relayServiceURL: 'https://relay-goerli.staging.stack.cards/api',
     chainId: 5,
     scheduledPaymentFeeFixedUSD: 0,
-    scheduledPaymentFeePercentage: 0
+    scheduledPaymentFeePercentage: 0,
   },
   polygon: {
     ...hubUrl,
@@ -100,7 +100,7 @@ const networksConstants = {
     name: 'Polygon',
     chainId: 137,
     scheduledPaymentFeeFixedUSD: 0.25,
-    scheduledPaymentFeePercentage: 0.1 //10%
+    scheduledPaymentFeePercentage: 0.1, //10%
   },
   mumbai: {
     ...testHubUrl,
@@ -111,7 +111,7 @@ const networksConstants = {
     relayServiceURL: 'https://relay-mumbai.staging.stack.cards/api',
     chainId: 80001,
     scheduledPaymentFeeFixedUSD: 0,
-    scheduledPaymentFeePercentage: 0
+    scheduledPaymentFeePercentage: 0,
   },
   mainnet: {
     ...hubUrl,
@@ -125,7 +125,7 @@ const networksConstants = {
     relayServiceURL: 'https://relay-ethereum.cardstack.com/api',
     chainId: 1,
     scheduledPaymentFeeFixedUSD: 0.25,
-    scheduledPaymentFeePercentage: 0.1 //10%
+    scheduledPaymentFeePercentage: 0.1, //10%
   },
   gnosis: {
     ...hubUrl,
@@ -144,7 +144,7 @@ const networksConstants = {
     tallyServiceURL: 'https://reward-api.cardstack.com',
     chainId: 100,
     scheduledPaymentFeeFixedUSD: 0.25,
-    scheduledPaymentFeePercentage: 0.1 //10%
+    scheduledPaymentFeePercentage: 0.1, //10%
   },
 };
 
@@ -195,7 +195,12 @@ export const networkIds: Record<string, number> = Object.freeze(
 // invert the networkIds object, so { mainnet: 1, ... } becomes { '1': 'mainnet', ... }
 export const networks = invert(networkIds);
 
-export function getConstantByNetwork<K extends ConstantKeys>(name: K, network: Network | string) {
+export function getConstantByNetwork<K extends ConstantKeys>(name: K, network: Network | string | number) {
+  //Convert chain id to network name
+  if (typeof network === 'number') {
+    network = networks[network];
+  }
+
   let value = constants[network as Network][name];
   if (!value) {
     throw new Error(`Don't know about the constant '${name}' for network ${network}`);

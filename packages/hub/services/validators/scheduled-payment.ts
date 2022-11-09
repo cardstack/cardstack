@@ -2,6 +2,7 @@ import Web3 from 'web3';
 import { ScheduledPayment } from '@prisma/client';
 import { startCase } from 'lodash';
 import { isSupportedChain } from '@cardstack/cardpay-sdk';
+import { inject } from '@cardstack/di';
 const { isAddress } = Web3.utils;
 
 type ScheduledPaymentAttribute =
@@ -27,6 +28,8 @@ type ScheduledPaymentAttribute =
 type ScheduledPaymentErrors = Record<ScheduledPaymentAttribute, string[]>;
 
 export default class ScheduledPaymentValidator {
+  cardpay = inject('cardpay');
+
   validate(scheduledPayment: Partial<ScheduledPayment>): ScheduledPaymentErrors {
     let errors: ScheduledPaymentErrors = {
       senderSafeAddress: [],
@@ -88,6 +91,20 @@ export default class ScheduledPaymentValidator {
 
     if (scheduledPayment.chainId && !isSupportedChain(scheduledPayment.chainId)) {
       errors.chainId.push(`chain is not supported`);
+    }
+
+    if (scheduledPayment.chainId && isSupportedChain(scheduledPayment.chainId)) {
+      let feeFixedUSD = this.cardpay.getConstantByNetwork('scheduledPaymentFeeFixedUSD', scheduledPayment.chainId) ?? 0;
+      let feePercentage =
+        this.cardpay.getConstantByNetwork('scheduledPaymentFeeFixedUSD', scheduledPayment.chainId) ?? 0;
+
+      if (Number(scheduledPayment.feeFixedUsd) < feeFixedUSD) {
+        errors.feeFixedUsd.push(`fee USD must be greater than or equal ${feeFixedUSD}`);
+      }
+
+      if (Number(scheduledPayment.feePercentage) < feePercentage) {
+        errors.feePercentage.push(`fee percentage must be greater than or equal ${feePercentage}`);
+      }
     }
 
     return errors;
