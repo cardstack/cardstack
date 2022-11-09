@@ -126,6 +126,8 @@ export default class Wallet extends Service {
       symbol: getConstantByNetwork('nativeTokenSymbol', this.network.symbol),
       amount: balance || '0',
     };
+
+    return this.nativeTokenBalance;
   }
 }
 
