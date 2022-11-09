@@ -1,5 +1,5 @@
 from cardpay_reward_programs.rule import Rule
-from cardpay_reward_programs.utils import get_table_dataset
+from cardpay_reward_programs.utils import format_amount, get_table_dataset
 
 
 class Staking(Rule):
@@ -139,7 +139,7 @@ class Staking(Rule):
 
     def get_explanation_data(self, payment):
         return {
-            "amount": payment["amount"],
+            "amount": format_amount(payment["amount"]),
             "token": self.token,
             "rollover_amount": payment.get("rollover_amount"),
             "interest_rate": self.interest_rate_monthly,
