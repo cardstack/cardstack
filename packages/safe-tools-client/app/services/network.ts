@@ -1,14 +1,12 @@
-import Service from '@ember/service';
-
-import { action } from '@ember/object';
-import { tracked } from '@glimmer/tracking';
-
 import {
   getConstantByNetwork,
   Network,
   networks,
   supportedChainsArray,
 } from '@cardstack/cardpay-sdk';
+import { action } from '@ember/object';
+import Service from '@ember/service';
+import { tracked } from '@glimmer/tracking';
 
 interface NetworkInfo {
   chainId: number;

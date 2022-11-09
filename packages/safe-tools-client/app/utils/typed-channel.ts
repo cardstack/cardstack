@@ -1,4 +1,5 @@
 import config from '../config/environment';
+
 import { MockBroadcastChannel } from './browser-mocks';
 
 export class TypedChannel<MessageType = unknown> {

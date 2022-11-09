@@ -3,9 +3,9 @@
 
 process.env.EMBROIDER_REBUILD_ADDONS = '@cardstack/boxel';
 
-const EmberApp = require('ember-cli/lib/broccoli/ember-app');
-const { Webpack } = require('@embroider/webpack');
 const { compatBuild } = require('@embroider/compat');
+const { Webpack } = require('@embroider/webpack');
+const EmberApp = require('ember-cli/lib/broccoli/ember-app');
 const svgoUniqueId = require('svgo-unique-id');
 const webpack = require('webpack');
 
