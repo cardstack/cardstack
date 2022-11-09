@@ -48,3 +48,7 @@
 .boxel-field__yield--with-icon {
   width: 100%;
 }
+
+.boxel-field--vertical + .boxel-field--vertical {
+  margin-top: var(--boxel-sp);
+}
