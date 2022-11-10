@@ -1,7 +1,7 @@
 import { truncateMiddle } from '@cardstack/ember-shared/helpers/truncate-middle';
 import { click, visit } from '@ember/test-helpers';
 import percySnapshot from '@percy/ember';
-import { module, test } from 'qunit';
+import { module, test, todo } from 'qunit';
 
 import {
   FAKE_META_MASK_ACCOUNT,
@@ -30,6 +30,20 @@ module('Acceptance | wallet connection', function (hooks) {
 
       await percySnapshot(assert);
     });
+
+    test('reconnecting', async function (assert) {
+      // FIXME can this be extracted?
+      (this.owner.lookup('storage:local') as Storage).setItem(
+        'cardstack-chain-1-provider',
+        'metamask'
+      );
+
+      await visit('/schedule');
+
+      assert
+        .dom('.safe-tools__dashboard-schedule-control-panel-wallet-address')
+        .hasText(truncateMiddle([FAKE_META_MASK_ACCOUNT]));
+    });
   });
 
   module('With Wallet Connect', function () {
@@ -49,6 +63,19 @@ module('Acceptance | wallet connection', function (hooks) {
       this.mockWalletConnect.mockAccountsChanged([FAKE_WALLET_CONNECT_ACCOUNT]);
 
       await click('.network-connect-modal__close-button'); // FIXME: I don't think this click should be necessary
+      assert
+        .dom('.safe-tools__dashboard-schedule-control-panel-wallet-address')
+        .hasText(truncateMiddle([FAKE_WALLET_CONNECT_ACCOUNT]));
+    });
+
+    todo('reconnecting', async function (assert) {
+      (this.owner.lookup('storage:local') as Storage).setItem(
+        'cardstack-chain-1-provider',
+        'wallet-connect'
+      );
+
+      await visit('/schedule');
+
       assert
         .dom('.safe-tools__dashboard-schedule-control-panel-wallet-address')
         .hasText(truncateMiddle([FAKE_WALLET_CONNECT_ACCOUNT]));
