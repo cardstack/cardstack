@@ -118,7 +118,7 @@
     "ember-set-helper": "^2.0.1",
     "ember-sinon-qunit": "^6.0.0",
     "ember-source": "~4.6.0",
-    "ember-svg-jar": "^2.3.3",
+    "ember-svg-jar": "^2.4.2",
     "ember-template-imports": "^3.1.2",
     "ember-template-lint": "^3.16.0",
     "ember-window-mock": "^0.8.1",

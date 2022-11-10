@@ -175,7 +175,7 @@ export default class CardCatalogTrayItemUsage extends Component {
               type="button"
               aria-label="Close"
             >
-              {{svgJar "close" width="100%" height="100%" aria-hidden=true}}
+              {{svgJar "close" width="100%" height="100%" aria-hidden="true"}}
             </button>
           </header>
           <div class="boxel-card-catalog-tray-example__list-container" tabindex="0">

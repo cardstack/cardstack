@@ -37,7 +37,7 @@ export function svgJar(
     desc?: string;
     style?: string | SafeString;
     'aria-label'?: string;
-    'aria-hidden'?: boolean;
+    'aria-hidden'?: 'true' | 'false';
     'data-test-boxel-menu-item-icon'?: boolean;
   }
 ): ContentValue {

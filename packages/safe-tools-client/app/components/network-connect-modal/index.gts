@@ -85,7 +85,7 @@ class NetworkConnectModal extends Component<Signature> {
             aria-label='Close'
             {{on 'click' @onClose}}
           >
-            {{svgJar 'close' width='100%' height='100%' aria-hidden=true}}
+            {{svgJar 'close' width='100%' height='100%' aria-hidden='true'}}
           </button>
 
           <Section @title="Connect your wallet">
