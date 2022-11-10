@@ -6,6 +6,11 @@
   --boxel-field-label-align: center;
 }
 
+.schedule-payment-form-action-card .boxel-field.schedule-payment-form-action-card__frequency {
+  --boxel-field-label-align: top;
+  --boxel-field-label-padding-top: var(--boxel-sp-lg);
+}
+
 .schedule-payment-form-action-card--max-gas-fee-name {
   font-weight: bold;
 }
@@ -25,4 +30,24 @@
 
 .schedule-payment-form-action-card--fee-info-icon {
   margin: 0 var(--boxel-sp-xxxs);
+}
+
+.schedule-payment-form-action-card__frequency-fieldset {
+  border: 0;
+  padding: 0;
+}
+
+.schedule-payment-form-action-card__frequency-fieldset-container {
+  display: flex;
+  gap: var(--boxel-sp);
+  max-width: 100%;
+  width: 100%;
+}
+
+.schedule-payment-form-action-card__frequency-fieldset-container > div {
+  flex-basis: 50%;
+}
+
+.schedule-payment-form-action-card__when-fields {
+  padding: var(--boxel-sp-sm) var(--boxel-sp-sm) 0 var(--boxel-sp-sm);
 }

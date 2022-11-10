@@ -59,8 +59,8 @@ export default class BoxelInputDate extends Component<Signature> {
           {{registerElement (set this 'containerElement')}}
         >
           <BoxelCalendar
-            @selected={{this.args.value}}
-            @onSelect={{this.args.onChange}}
+            @selected={{@value}}
+            @onSelect={{@onChange}}
             @center={{this.center}}
             @onCenterChange={{fn (mut this.center)}}
           />

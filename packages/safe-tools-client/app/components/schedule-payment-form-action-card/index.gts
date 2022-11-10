@@ -1,9 +1,12 @@
 import Component from '@glimmer/component';
 import BoxelActionContainer from '@cardstack/boxel/components/boxel/action-container';
 import BoxelField from '@cardstack/boxel/components/boxel/field';
+import BoxelInputDate, { Day } from '@cardstack/boxel/components/boxel/input/date';
+import BoxelInputTime, { Time } from '@cardstack/boxel/components/boxel/input/time';
 import BoxelInput from '@cardstack/boxel/components/boxel/input';
 import BoxelRadioInput from '@cardstack/boxel/components/boxel/radio-input';
 import BoxelInputSelectableTokenAmount from '@cardstack/boxel/components/boxel/input/selectable-token-amount';
+import RangedNumberPicker from '@cardstack/boxel/components/boxel/input/ranged-number-picker';
 import { SelectableToken } from '@cardstack/boxel/components/boxel/input/selectable-token';
 import BoxelTokenSelect from '@cardstack/boxel/components/boxel/input/token-select';
 import BoxelToggleButtonGroup from '@cardstack/boxel/components/boxel/toggle-button-group';
@@ -13,6 +16,7 @@ import { fn } from '@ember/helper';
 import cssVar from '@cardstack/boxel/helpers/css-var';
 import { on } from '@ember/modifier';
 import { svgJar } from '@cardstack/boxel/utils/svg-jar';
+import eq from 'ember-truth-helpers/helpers/eq';
 import './index.css';
 
 interface Signature {
@@ -29,7 +33,43 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
   }
   @tracked selectedPaymentType: string | undefined;
   @action onSelectPaymentType(paymentTypeId: string) {
+    if (paymentTypeId === 'one-time' && !this.paymentDate) {
+      this.paymentDate = new Date();
+    }
+    if (paymentTypeId === 'monthly') {
+      if (!this.monthlyUntil) {
+        let now = new Date();
+        this.monthlyUntil = new Date(now.getFullYear() + 1, now.getMonth(), now.getDate());
+      }
+      if (!this.paymentDayOfMonth) {
+        this.paymentDayOfMonth = 1;
+      }
+    }
     this.selectedPaymentType = paymentTypeId;
+  }
+
+  @tracked paymentDate: Date | undefined;
+  @action onSetPaymentDate(day: Day) {
+    this.paymentDate?.setFullYear(day.getFullYear(), day.getMonth(), day.getDate()); 
+    this.paymentDate = new Date((day as Date).getTime()); // trigger reactivity
+  }
+
+  @action onSetPaymentTime(time: Time) {
+    this.paymentDate?.setHours(time.getHours(), time.getMinutes());
+    this.paymentDate = new Date((time as Date).getTime()); // trigger reactivity
+  }
+
+  @tracked monthlyUntil: Date | undefined;
+  @action onSetMonthlyUntil(day: Day) {
+    this.monthlyUntil?.setFullYear(day.getFullYear(), day.getMonth(), day.getDate()); 
+    if (this.monthlyUntil) {
+      this.monthlyUntil = new Date(this.monthlyUntil?.getTime()); // trigger reactivity
+    }
+  }
+
+  @tracked paymentDayOfMonth: number | undefined;
+  @action onSelectPaymentDayOfMonth(val: number) {
+    this.paymentDayOfMonth = val;
   }
 
   @tracked recipientAddress = '';
@@ -39,6 +79,7 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
   @tracked paymentAmount: string = '';
   @tracked isPaymentAmountInvalid = false;
   @tracked paymentTokenErrorMessage = '';
+
   tokens: SelectableToken[] = [
     { name: 'CARD', icon: 'card' },
     { name: 'HI', icon: 'emoji' },
@@ -79,20 +120,61 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
       ...attributes
     as |Section ActionChin|>
       <Section @title="Schedule Payment">
-        <BoxelField @label="Frequency">
-          <BoxelRadioInput
-            @groupDescription="Select a type of scheduled payment"
-            @name="payment-type"
-            @items={{this.paymentTypeOptions}}
-            @checkedId={{this.selectedPaymentType}}
-            style={{cssVar
-              boxel-radio-input-option-padding="var(boxel-sp-lg)"
-            }}
-          as |item|>
-            <item.component @onChange={{fn this.onSelectPaymentType item.data.id}}>
-              {{item.data.text}}
-            </item.component>
-          </BoxelRadioInput>
+        <BoxelField @label="Frequency" class="schedule-payment-form-action-card__frequency">
+          <div>
+            <BoxelRadioInput
+              @groupDescription="Select a type of scheduled payment"
+              @name="payment-type"
+              @items={{this.paymentTypeOptions}}
+              @checkedId={{this.selectedPaymentType}}
+            as |item|>
+              <item.component @onChange={{fn this.onSelectPaymentType item.data.id}}>
+                {{item.data.text}}
+              </item.component>
+            </BoxelRadioInput>
+            {{#if this.selectedPaymentType}}
+              <fieldset class="schedule-payment-form-action-card__frequency-fieldset">
+                {{!-- this div is necessary because Chrome has a special case for fieldsets and it breaks grid auto placement --}}
+                <div class="schedule-payment-form-action-card__frequency-fieldset-container">
+                  <div class="schedule-payment-form-action-card__when-fields">
+                    {{#if (eq this.selectedPaymentType 'one-time')}}
+                      <BoxelField @label="Payment Date" @vertical={{true}}>
+                        <BoxelInputDate
+                          @value={{this.paymentDate}}
+                          @onChange={{this.onSetPaymentDate}}
+                        />
+                      </BoxelField>
+                      <BoxelField @label="Specific Time" @vertical={{true}}>
+                        <BoxelInputTime
+                          @value={{this.paymentDate}}
+                          @onChange={{this.onSetPaymentTime}}
+                        />
+                      </BoxelField>
+                    {{/if}}
+                  </div>
+                  <div class="schedule-payment-form-action-card__when-fields">
+                    {{#if (eq this.selectedPaymentType 'monthly')}}
+                      <BoxelField @label="Day of Month" @vertical={{true}}>
+                        <RangedNumberPicker
+                          @min={{1}}
+                          @max={{28}}
+                          @icon="calendar"
+                          @onChange={{this.onSelectPaymentDayOfMonth}}
+                          @value={{this.paymentDayOfMonth}}
+                        />
+                      </BoxelField>
+                      <BoxelField @label="Until" @vertical={{true}}>
+                        <BoxelInputDate
+                          @value={{this.monthlyUntil}}
+                          @onChange={{this.onSetMonthlyUntil}}
+                        />
+                      </BoxelField>
+                    {{/if}}
+                  </div>
+                </div>
+              </fieldset>
+            {{/if}}
+          </div>
         </BoxelField>
         <BoxelField @label="Recipient">
           <BoxelInput
