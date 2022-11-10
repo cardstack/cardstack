@@ -1,4 +1,5 @@
 import { truncateMiddle } from '@cardstack/ember-shared/helpers/truncate-middle';
+import { ChainConnectionManager } from '@cardstack/safe-tools-client/utils/chain-connection-manager';
 import { click, visit } from '@ember/test-helpers';
 import percySnapshot from '@percy/ember';
 import { module, test, todo } from 'qunit';
@@ -32,11 +33,12 @@ module('Acceptance | wallet connection', function (hooks) {
     });
 
     test('reconnecting', async function (assert) {
-      // FIXME can this be extracted?
-      (this.owner.lookup('storage:local') as Storage).setItem(
-        'cardstack-chain-1-provider',
-        'metamask'
+      const chainConnectionManager = new ChainConnectionManager(
+        'mainnet',
+        1,
+        this.owner
       );
+      chainConnectionManager.addProviderToStorage(1, 'metamask');
 
       await visit('/schedule');
 
@@ -69,10 +71,12 @@ module('Acceptance | wallet connection', function (hooks) {
     });
 
     todo('reconnecting', async function (assert) {
-      (this.owner.lookup('storage:local') as Storage).setItem(
-        'cardstack-chain-1-provider',
-        'wallet-connect'
+      const chainConnectionManager = new ChainConnectionManager(
+        'mainnet',
+        1,
+        this.owner
       );
+      chainConnectionManager.addProviderToStorage(1, 'wallet-connect');
 
       await visit('/schedule');
 
