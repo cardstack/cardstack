@@ -67,12 +67,38 @@ describe('ScheduledPaymentValidator', function () {
 
     const scheduledPayment: Partial<ScheduledPayment> = {
       chainId: 1, //Mainnet
-      feeFixedUsd: new Decimal(0),
-      feePercentage: new Decimal(0),
+      feeFixedUsd: new Decimal(0.1),
+      feePercentage: new Decimal(0.05),
     };
 
     let errors = await subject.validate(scheduledPayment);
     expect(errors.feeFixedUsd).deep.equal(['fee USD must be greater than or equal 0.25']);
-    expect(errors.feePercentage).deep.equal(['fee percentage must be greater than or equal 0.25']);
+    expect(errors.feePercentage).deep.equal(['fee percentage must be greater than or equal 0.1']);
+  });
+
+  it('validates scheduled payment with fee percentage lower than 0', async function () {
+    let subject = await getContainer().lookup('scheduled-payment-validator');
+
+    const scheduledPayment: Partial<ScheduledPayment> = {
+      chainId: 1, //Mainnet
+      feeFixedUsd: new Decimal(0.25),
+      feePercentage: new Decimal(-1),
+    };
+
+    let errors = await subject.validate(scheduledPayment);
+    expect(errors.feePercentage).deep.equal(['fee percentage must be between 0 and 1']);
+  });
+
+  it('validates scheduled payment with fee percentage greater than 1', async function () {
+    let subject = await getContainer().lookup('scheduled-payment-validator');
+
+    const scheduledPayment: Partial<ScheduledPayment> = {
+      chainId: 1, //Mainnet
+      feeFixedUsd: new Decimal(0.25),
+      feePercentage: new Decimal(2),
+    };
+
+    let errors = await subject.validate(scheduledPayment);
+    expect(errors.feePercentage).deep.equal(['fee percentage must be between 0 and 1']);
   });
 });

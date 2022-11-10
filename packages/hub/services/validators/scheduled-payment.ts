@@ -95,14 +95,16 @@ export default class ScheduledPaymentValidator {
 
     if (scheduledPayment.chainId && isSupportedChain(scheduledPayment.chainId)) {
       let feeFixedUSD = this.cardpay.getConstantByNetwork('scheduledPaymentFeeFixedUSD', scheduledPayment.chainId) ?? 0;
-      let feePercentage =
-        this.cardpay.getConstantByNetwork('scheduledPaymentFeePercentage', scheduledPayment.chainId) ?? 0;
-
       if (Number(scheduledPayment.feeFixedUsd) < feeFixedUSD) {
         errors.feeFixedUsd.push(`fee USD must be greater than or equal ${feeFixedUSD}`);
       }
 
-      if (Number(scheduledPayment.feePercentage) < feePercentage) {
+      let feePercentage =
+        this.cardpay.getConstantByNetwork('scheduledPaymentFeePercentage', scheduledPayment.chainId) ?? 0;
+      let _feePercentage = Number(scheduledPayment.feePercentage);
+      if (_feePercentage < 0 || _feePercentage > 1) {
+        errors.feePercentage.push(`fee percentage must be between 0 and 1`);
+      } else if (_feePercentage < feePercentage) {
         errors.feePercentage.push(`fee percentage must be greater than or equal ${feePercentage}`);
       }
     }
