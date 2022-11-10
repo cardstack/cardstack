@@ -55,6 +55,7 @@ export default class BoxelInputRangedNumberPicker extends Component<Signature> {
       @onChange={{this.setSelectedNumber}}
       @renderInPlace={{true}}
       @dropdownClass="boxel-ranged-number-picker__dropdown"
+      {{! @glint-expect-error: ember-power-select types triggerComponent as a string only }}
       @triggerComponent={{component BoxelDropdownTrigger
         icon=@icon
         label=(or @value this.placeholder)
