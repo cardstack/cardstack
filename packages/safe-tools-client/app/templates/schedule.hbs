@@ -34,31 +34,33 @@
           <div class={{itemCssClass}}>{{network.name}}</div>
         </Boxel::Select>
     </cp.Item>
-    <cp.Item @title='Safe' @icon='safe'>
-      {{#if this.safe}}
-        {{#each this.safe.tokens as |token|}}
-          {{#if (gt token.balance 0)}}
-            <span class='safe-tools__dashboard-schedule-control-panel-safe-info-address'>
-              {{token.address}}:{{truncate-middle this.safe.address}}
-            </span>
-            <span class='safe-tools__dashboard-schedule-control-panel-safe-info-balance'>
-              {{token.balance}} {{token.symbol}}
-            </span>
-          {{/if}}  
-        {{/each}}
-        <Boxel::Button
-          @kind='primary'
-          {{on 'click' (set this 'isDepositModalOpen' true)}}
-        >
-          Add Funds
-        </Boxel::Button>
-      {{else}}
-        <p class='safe-tools__dashboard-schedule-control-panel-safe-info-create'>
-          You need to have a safe which contains funds that would be deducted
-          automatically when schedule payments are due.
-        </p>
-        <CreateSafeButton />
-      {{/if}}
+    <cp.Item @title='Safe' @icon='safe' @isActive={{this.wallet.isConnected}}>
+      {{#if this.wallet.isConnected}}
+        {{#if this.safe}}
+          {{#each this.safe.tokens as |token|}}
+            {{#if (gt token.balance 0)}}
+              <span class='safe-tools__dashboard-schedule-control-panel-safe-info-address'>
+                {{token.address}}:{{truncate-middle this.safe.address}}
+              </span>
+              <span class='safe-tools__dashboard-schedule-control-panel-safe-info-balance'>
+                {{token.balance}} {{token.symbol}}
+              </span>
+            {{/if}}  
+          {{/each}}
+          <Boxel::Button
+            @kind='primary'
+            {{on 'click' (set this 'isDepositModalOpen' true)}}
+          >
+            Add Funds
+          </Boxel::Button>
+        {{else}}
+          <p class='safe-tools__dashboard-schedule-control-panel-safe-info-create'>
+            You need to have a safe which contains funds that would be deducted
+            automatically when schedule payments are due.
+          </p>
+          <CreateSafeButton />
+        {{/if}}
+      {{/if}}  
     </cp.Item>
   </Boxel::ControlPanel>
   <section class='safe-tools__dashboard-schedule-content'>
