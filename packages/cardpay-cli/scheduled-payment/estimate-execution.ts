@@ -5,7 +5,7 @@ import { Arguments, CommandModule } from 'yargs';
 
 export default {
   command:
-    'estimate-execution <moduleAddress> <tokenAddress> <amount> <payeeAddress> <fixedUSDFee> <percentageFee> <maxGasPrice> <gasTokenAddress> <salt>',
+    'estimate-execution <moduleAddress> <tokenAddress> <amount> <payeeAddress> <maxGasPrice> <gasTokenAddress> <salt>',
   describe: 'Enable scheduled payment module on the safe',
   builder(yargs: Argv) {
     return yargs
@@ -66,8 +66,6 @@ export default {
       tokenAddress,
       amount,
       payeeAddress,
-      fixedUSDFee,
-      percentageFee,
       maxGasPrice,
       gasTokenAddress,
       salt,
@@ -80,8 +78,6 @@ export default {
       tokenAddress: string;
       amount: string;
       payeeAddress: string;
-      fixedUSDFee: number;
-      percentageFee: number;
       maxGasPrice: string;
       gasTokenAddress: string;
       salt: string;
@@ -105,10 +101,6 @@ export default {
       tokenAddress,
       amount,
       payeeAddress,
-      {
-        fixedUSD: fixedUSDFee,
-        percentage: percentageFee,
-      },
       maxGasPrice,
       gasTokenAddress,
       salt,

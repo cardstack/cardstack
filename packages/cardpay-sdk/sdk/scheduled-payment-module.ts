@@ -60,10 +60,6 @@ export interface CreateSafeWithModuleAndGuardTx {
   expectedMetaGuardAddress: string;
 }
 
-export interface Fee {
-  fixedUSD: number;
-  percentage: number;
-}
 export const FEE_BASE_POW = new BN(18);
 export const FEE_BASE = new BN(10).pow(FEE_BASE_POW);
 
@@ -365,7 +361,6 @@ export default class ScheduledPaymentModule {
     tokenAddress: string,
     amount: string,
     payeeAddress: string,
-    fee: Fee,
     maxGasPrice: string,
     gasTokenAddress: string,
     salt: string,
@@ -386,6 +381,8 @@ export default class ScheduledPaymentModule {
       return decodedError.args[0].toNumber();
     };
 
+    let feeFixedUSD = (await getConstant('scheduledPaymentFeeFixedUSD', this.ethersProvider)) ?? 0;
+    let feePercentage = (await getConstant('scheduledPaymentFeePercentage', this.ethersProvider)) ?? 0;
     let requiredGas = 0;
     try {
       let module = new Contract(moduleAddress, ScheduledPaymentABI, this.ethersProvider);
@@ -398,10 +395,10 @@ export default class ScheduledPaymentModule {
           payeeAddress,
           {
             fixedUSD: {
-              value: FEE_BASE.mul(new BN(fee.fixedUSD)).toString(),
+              value: FEE_BASE.mul(new BN(feeFixedUSD)).toString(),
             },
             percentage: {
-              value: FEE_BASE.mul(new BN(fee.percentage)).toString(),
+              value: FEE_BASE.mul(new BN(feePercentage)).toString(),
             },
           },
           maxGasPrice,
@@ -420,10 +417,10 @@ export default class ScheduledPaymentModule {
           payeeAddress,
           {
             fixedUSD: {
-              value: FEE_BASE.mul(new BN(fee.fixedUSD)).toString(),
+              value: FEE_BASE.mul(new BN(feeFixedUSD)).toString(),
             },
             percentage: {
-              value: FEE_BASE.mul(new BN(fee.percentage)).toString(),
+              value: FEE_BASE.mul(new BN(feePercentage)).toString(),
             },
           },
           maxGasPrice,
@@ -552,7 +549,6 @@ export default class ScheduledPaymentModule {
     tokenAddress: string,
     amount: string,
     payeeAddress: string,
-    fee: Fee,
     executionGas: number,
     maxGasPrice: string,
     gasTokenAddress: string,
@@ -568,6 +564,8 @@ export default class ScheduledPaymentModule {
 
     let spHash;
     let module = new Contract(moduleAddress, ScheduledPaymentABI, this.ethersProvider);
+    let feeFixedUSD = (await getConstant('scheduledPaymentFeeFixedUSD', this.ethersProvider)) ?? 0;
+    let feePercentage = (await getConstant('scheduledPaymentFeePercentage', this.ethersProvider)) ?? 0;
     if (recurringUntil) {
       spHash = await module.callStatic[
         'createSpHash(address,uint256,address,((uint256),(uint256)),uint256,uint256,address,string,uint256,uint256)'
@@ -577,10 +575,10 @@ export default class ScheduledPaymentModule {
         payeeAddress,
         {
           fixedUSD: {
-            value: FEE_BASE.mul(new BN(fee.fixedUSD)).toString(),
+            value: FEE_BASE.mul(new BN(feeFixedUSD)).toString(),
           },
           percentage: {
-            value: FEE_BASE.mul(new BN(fee.percentage)).toString(),
+            value: FEE_BASE.mul(new BN(feePercentage)).toString(),
           },
         },
         executionGas,
@@ -599,10 +597,10 @@ export default class ScheduledPaymentModule {
         payeeAddress,
         {
           fixedUSD: {
-            value: FEE_BASE.mul(new BN(fee.fixedUSD)).toString(),
+            value: FEE_BASE.mul(new BN(feeFixedUSD)).toString(),
           },
           percentage: {
-            value: FEE_BASE.mul(new BN(fee.percentage)).toString(),
+            value: FEE_BASE.mul(new BN(feePercentage)).toString(),
           },
         },
         executionGas,
@@ -736,14 +734,11 @@ export default class ScheduledPaymentModule {
     if (!gasTokenAddress) throw new Error('gasTokenAddress must be provided ');
     if (!salt) throw new Error('salt must be provided');
 
-    let feeFixedUSD = (await getConstant('scheduledPaymentFeeFixedUSD', this.ethersProvider)) ?? 0;
-    let feePercentage = (await getConstant('scheduledPaymentFeePercentage', this.ethersProvider)) ?? 0;
     let spHash: string = await this.createSpHash(
       moduleAddress,
       tokenAddress,
       amount,
       payeeAddress,
-      { fixedUSD: feeFixedUSD, percentage: feePercentage },
       executionGas,
       maxGasPrice,
       gasTokenAddress,
@@ -757,6 +752,8 @@ export default class ScheduledPaymentModule {
 
     let signer = this.signer ? this.signer : this.ethersProvider.getSigner();
     let account = await signer.getAddress();
+    let feeFixedUSD = (await getConstant('scheduledPaymentFeeFixedUSD', this.ethersProvider)) ?? 0;
+    let feePercentage = (await getConstant('scheduledPaymentFeePercentage', this.ethersProvider)) ?? 0;
     let scheduledPaymentResponse = await hubRequest(hubRootUrl, 'api/scheduled-payments', authToken, 'POST', {
       data: {
         attributes: {

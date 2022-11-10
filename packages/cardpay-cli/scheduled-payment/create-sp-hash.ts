@@ -5,7 +5,7 @@ import { Arguments, CommandModule } from 'yargs';
 
 export default {
   command:
-    'create-sp-hash <moduleAddress> <tokenAddress> <amount> <payeeAddress> <fixedUSDFee> <percentageFee> <executionGas> <maxGasPrice> <gasTokenAddress> <salt>',
+    'create-sp-hash <moduleAddress> <tokenAddress> <amount> <payeeAddress> <executionGas> <maxGasPrice> <gasTokenAddress> <salt>',
   describe:
     'Generates a scheduled payment hash which is calculated from the given arguments. The hash serves as a unique identifier used for scheduling, executing, and canceling scheduled payments',
   builder(yargs: Argv) {
@@ -25,14 +25,6 @@ export default {
       .positional('payeeAddress', {
         type: 'string',
         description: 'The address of the payee of scheduled payment',
-      })
-      .positional('fixedUSDFee', {
-        type: 'number',
-        description: 'Fixed USD fee (e.g. 0.25)',
-      })
-      .positional('percentageFee', {
-        type: 'number',
-        description: 'Percentage fee (e.g. 5%, 0.05)',
       })
       .positional('executionGas', {
         type: 'number',
@@ -73,8 +65,6 @@ export default {
       tokenAddress,
       amount,
       payeeAddress,
-      fixedUSDFee,
-      percentageFee,
       executionGas,
       maxGasPrice,
       gasTokenAddress,
@@ -88,8 +78,6 @@ export default {
       tokenAddress: string;
       amount: string;
       payeeAddress: string;
-      fixedUSDFee: number;
-      percentageFee: number;
       executionGas: number;
       maxGasPrice: string;
       gasTokenAddress: string;
@@ -108,10 +96,6 @@ export default {
       tokenAddress,
       amount,
       payeeAddress,
-      {
-        fixedUSD: fixedUSDFee,
-        percentage: percentageFee,
-      },
       executionGas,
       maxGasPrice,
       gasTokenAddress,
