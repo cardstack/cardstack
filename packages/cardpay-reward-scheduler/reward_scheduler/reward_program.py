@@ -227,17 +227,29 @@ class RewardProgram:
         processable_payment_cycles = (
             self.get_all_payment_cycles(rule) - self.processed_cycles
         )
+        logging.info(
+            f"There are {len(processable_payment_cycles)} payment cycles to process for {self.reward_program_id} with rule {rule}"
+        )
         for payment_cycle in sorted(processable_payment_cycles):
             if rule["core"].get("rollover"):
                 previous_cycle = payment_cycle - rule["core"]["payment_cycle_length"]
                 if payment_cycle == rule["core"]["start_block"]:
                     # There can't be any previous ones for the first cycle
+                    logging.info(
+                        f"Skipping rollover for {payment_cycle}, no previous cycle"
+                    )
                     self.run_payment_cycle(payment_cycle, rule)
                 elif previous_cycle in self.processed_cycles:
                     # Only run if the previous cycle has been processed
                     # because the output of the previous cycle is needed
+                    logging.info(
+                        f"Previous cycle ({previous_cycle}) has been processed, running {payment_cycle}"
+                    )
                     self.run_payment_cycle(payment_cycle, rule, previous_cycle)
                 else:
+                    logging.info(
+                        f"Previous cycle has not been processed, waiting for {previous_cycle}"
+                    )
                     # There's nothing to do here as the previous cycle hasn't been processed
                     pass
 

@@ -3,6 +3,7 @@ import os
 import boto3
 import pyarrow.dataset as ds
 import yaml
+import logging
 from cachetools import TTLCache, cached
 from cloudpathlib import AnyPath
 from pyarrow import fs
@@ -48,7 +49,11 @@ def get_latest_written_block(subgraph_extract_locations):
     latest_written_blocks = map(
         get_latest_written_block_for_single_extract, subgraph_extract_locations
     )
-    return min(latest_written_blocks)
+    latest_written_block = min(latest_written_blocks)
+    logging.info(
+        f"Latest available data block is {latest_written_block} for data in {subgraph_extract_locations}"
+    )
+    return latest_written_block
 
 
 def get_job_definition_for_image(image_name):
@@ -67,6 +72,11 @@ def get_job_definition_for_image(image_name):
 
 
 def run_job(image_name, parameters_location, output_location, tags={}):
+    if os.environ.get("DRY_RUN"):
+        logging.info(
+            f"DRY_RUN: Would have run job with image {image_name} and parameters {parameters_location} and output {output_location}"
+        )
+        return
     client = boto3.client("batch")
     # The job definition is required to run a container
     # it defines CPU/RAM requirements etc.

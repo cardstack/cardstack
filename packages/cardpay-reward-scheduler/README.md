@@ -29,6 +29,12 @@ Once this is installed you can install the required packages with
 
     pdm install
 
+# Developing
+
+If you are manually testing the scheduler locally, set an environment variable DRY_RUN=TRUE to prevent the scheduler from submitting jobs to AWS batch.
+
+    DRY_RUN=TRUE python -m reward_scheduler.main
+
 # Deploying
 
 This project is deployed using waypoint:
