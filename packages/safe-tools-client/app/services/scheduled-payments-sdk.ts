@@ -12,7 +12,9 @@ export default class SchedulePaymentSDKService extends Service {
   estimatedSafeCreationGas: undefined | BigNumber;
 
   private async getSchedulePaymentsModule() {
-    const ethersProvider = new Web3Provider(this.wallet.web3.givenProvider);
+    //@ts-expect-error currentProvider does not match Web3Provider,
+    //not worth typing as we should replace the web3 one with ethers soon
+    const ethersProvider = new Web3Provider(this.wallet.web3.currentProvider);
 
     const module = await getSDK('ScheduledPaymentModule', ethersProvider);
 

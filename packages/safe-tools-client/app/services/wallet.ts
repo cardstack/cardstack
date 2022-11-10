@@ -29,6 +29,7 @@ export default class Wallet extends Service {
 
   @tracked nativeTokenBalance: Record<'symbol' | 'amount', string> | undefined;
 
+  // TODO: replace with ethers
   web3 = new Web3();
   chainConnectionManager: ChainConnectionManager;
 
