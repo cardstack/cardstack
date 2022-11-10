@@ -2,6 +2,9 @@
 
 module.exports = function (deployTarget) {
   let ENV = {
+    pipeline: {
+      activateOnDeploy: true,
+    },
     plugins: ['build', 'compress', 's3', 'cloudfront'],
     build: {},
     s3: {
