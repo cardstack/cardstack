@@ -65,7 +65,6 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
     this.monthlyUntil = this.monthlyUntil; // trigger reactivity
   }
 
-  daysOfMonth = Array.from({length: 28}, (_, i) => i + 1)
   @tracked paymentDayOfMonth: number | undefined;
   @action onSelectPaymentDayOfMonth(val: number) {
     this.paymentDayOfMonth = val;
