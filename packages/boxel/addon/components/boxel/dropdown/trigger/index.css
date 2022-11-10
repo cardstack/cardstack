@@ -1,0 +1,25 @@
+.boxel-dropdown-trigger {
+  border: 0;
+  padding: 0;
+  border-radius: 0;
+  font-weight: bold;
+  font-size: var(--boxel-font-size);
+}
+
+.boxel-dropdown-trigger--showing-placeholder {
+  color: var(--boxel-purple-300);
+}
+
+.boxel-dropdown-trigger__icon {
+  --icon-color: var(--boxel-highlight);
+
+  width: var(--boxel-icon-sm);
+  height: var(--boxel-icon-sm);
+  margin-right: var(--boxel-sp-xxs);
+}
+
+.boxel-dropdown-trigger__caret {
+  --icon-color: var(--boxel-purple-200);
+
+  margin-left: var(--boxel-sp-xxs);
+}

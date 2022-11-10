@@ -1,10 +1,9 @@
 import Component from '@glimmer/component';
 import BoxelDropdown from '../../dropdown';
 import BoxelCalendar, { Day } from '../../calendar';
-import BoxelButton from '../../button';
+import BoxelDropdownTrigger from '../../dropdown/trigger';
 import registerElement from '@cardstack/boxel/modifiers/register-element';
 import set from 'ember-set-helper/helpers/set';
-import { svgJar } from '@cardstack/boxel/utils/svg-jar';
 //@ts-expect-error glint does not think this is consumed-but it is consumed in the template https://github.com/typed-ember/glint/issues/374
 import { fn, array, hash } from '@ember/helper';
 import { default as Owner } from '@ember/owner';
@@ -44,17 +43,15 @@ export default class BoxelInputDate extends Component<Signature> {
       data-test-boxel-input-date
     >
       <:trigger as |bindings|>
-        <BoxelButton
+        <BoxelDropdownTrigger
+          @icon="calendar"
+          @label={{this.dateString}}
           {{bindings}}
           {{registerElement (set this 'triggerElement')}}
           class="boxel-input-date__trigger"
           data-test-boxel-input-date-trigger
           ...attributes
-        >
-          {{svgJar 'calendar' class="boxel-input-date__icon" role="presentation"}}
-          {{this.dateString}}
-          {{svgJar "caret-down" class="boxel-input-date__caret" width=8 height=8 role="presentation"}}
-        </BoxelButton>
+        />
       </:trigger>
       <:content>
         <div
