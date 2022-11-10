@@ -1,8 +1,8 @@
 import { ScheduledPaymentModuleSetup } from '../generated/ScheduledPaymentModule/ScheduledPaymentModule';
 import { Account, Safe, SafeOwner, SafeOwnerChange } from '../generated/schema';
-import { toChecksumAddress } from './utils';
 import { store } from '@graphprotocol/graph-ts';
 import { AddedOwner, RemovedOwner } from '../generated/GnosisSafe/GnosisSafe';
+import { toChecksumAddress } from '@cardstack/cardpay-subgraph/src/utils';
 
 export function handleScheduledPaymentModuleSetup(event: ScheduledPaymentModuleSetup): void {
   let safeAddress = toChecksumAddress(event.params.owner);

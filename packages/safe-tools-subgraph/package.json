@@ -1,5 +1,6 @@
 {
   "name": "safe-tools-subgraph",
+  "version": "1.0.0",
   "scripts": {
     "codegen": "graph codegen",
     "build": "graph build",
@@ -12,5 +13,8 @@
   "dependencies": {
     "@graphprotocol/graph-cli": "0.29.0",
     "@graphprotocol/graph-ts": "0.26.0"
+  },
+  "devDependencies": {
+    "@protofire/subgraph-toolkit": "^0.1.2"
   }
 }
