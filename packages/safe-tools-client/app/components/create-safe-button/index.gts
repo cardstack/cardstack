@@ -26,14 +26,13 @@ export default class CreateSafeButton extends Component<Signature> {
 
   @tracked isModalOpen = false;
 
-  @tracked gasInfo = {
-    isLoading: false,
-    hasEnoughBalance:  false,
-    costDisplay: `Couldn't estimate gas`
-  }
+  @tracked isLoadingGasInfo = false;
+  @tracked hasEnoughBalance = false;
+  @tracked gasCostDisplay =  `Couldn't estimate gas`
+
 
   @action async onClick() {
-    this.gasInfo.isLoading = true;
+    this.isLoadingGasInfo = true;
     this.isModalOpen = true;
 
     try {
@@ -44,20 +43,20 @@ export default class CreateSafeButton extends Component<Signature> {
 
       const balance = BigNumber.from(nativeTokenBalance?.amount);
 
-      this.gasInfo.hasEnoughBalance = !!gasEstimate?.lt(balance);
+      this.hasEnoughBalance = !!gasEstimate?.lt(balance);
 
       const tokenSymbol = nativeTokenBalance?.symbol || '';
       const gasEstimateString = Web3.utils.fromWei(
         gasEstimate?.toString() || ''
       )
 
-      this.gasInfo.costDisplay = `${gasEstimateString} ${tokenSymbol}`
+      this.gasCostDisplay = `${gasEstimateString} ${tokenSymbol}`
 
     } catch (e) {
       // TODO: handle error 
       console.log('gasEstimate', e);
     } finally {
-      this.gasInfo.isLoading = false;
+      this.isLoadingGasInfo = false;
     }
   }
 
@@ -73,11 +72,11 @@ export default class CreateSafeButton extends Component<Signature> {
     <SetupSafeModal
       @isOpen={{this.isModalOpen}}
       @onClose={{set this 'isModalOpen' false}}
-      @isLoadingGasInfo={{this.gasInfo.isLoading}}
+      @isLoadingGasInfo={{this.isLoadingGasInfo}}
       @provisioning={{false}}
       @onProvisionClick={{this.handleSafeCreation}}
-      @hasEnoughBalance={{this.gasInfo.hasEnoughBalance}}
-      @gasCostDisplay={{this.gasInfo.costDisplay}}
+      @hasEnoughBalance={{this.hasEnoughBalance}}
+      @gasCostDisplay={{this.gasCostDisplay}}
     />
   </template>
 }
