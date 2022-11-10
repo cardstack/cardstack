@@ -96,6 +96,8 @@ package-lock.json
 /packages/cardpay-subgraph/subgraph.yaml
 /packages/cardpay-subgraph/abis/generated/
 /packages/cardpay-subgraph/src/generated/
+/packages/safe-tools-subgraph/generated/**
+/packages/safe-tools-subgraph/build/**
 
 /packages/wc-provider/**/*.d.ts
 
