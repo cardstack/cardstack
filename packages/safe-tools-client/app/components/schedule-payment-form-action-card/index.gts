@@ -126,16 +126,13 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
               @name="payment-type"
               @items={{this.paymentTypeOptions}}
               @checkedId={{this.selectedPaymentType}}
-              style={{cssVar
-                boxel-radio-input-option-padding="var(boxel-sp-lg)"
-              }}
             as |item|>
               <item.component @onChange={{fn this.onSelectPaymentType item.data.id}}>
                 {{item.data.text}}
               </item.component>
             </BoxelRadioInput>
             {{#if this.selectedPaymentType}}
-              <fieldset class="schedule-payment-form-action-card__frequency-fieldset" ...attributes>
+              <fieldset class="schedule-payment-form-action-card__frequency-fieldset">
                 {{!-- this div is necessary because Chrome has a special case for fieldsets and it breaks grid auto placement --}}
                 <div class="schedule-payment-form-action-card__frequency-fieldset-container">
                   <div class="schedule-payment-form-action-card__when-fields">

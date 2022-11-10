@@ -8,6 +8,7 @@
 
 .schedule-payment-form-action-card .boxel-field.schedule-payment-form-action-card__frequency {
   --boxel-field-label-align: top;
+  --boxel-field-label-padding-top: var(--boxel-sp-lg);
 }
 
 .schedule-payment-form-action-card--max-gas-fee-name {
