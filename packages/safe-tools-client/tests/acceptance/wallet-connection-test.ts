@@ -1,8 +1,8 @@
 import { truncateMiddle } from '@cardstack/ember-shared/helpers/truncate-middle';
 import { ChainConnectionManager } from '@cardstack/safe-tools-client/utils/chain-connection-manager';
-import { click, visit } from '@ember/test-helpers';
+import { click, settled, visit } from '@ember/test-helpers';
 import percySnapshot from '@percy/ember';
-import { module, test, todo } from 'qunit';
+import { module, test } from 'qunit';
 
 import {
   FAKE_META_MASK_ACCOUNT,
@@ -70,7 +70,7 @@ module('Acceptance | wallet connection', function (hooks) {
         .hasText(truncateMiddle([FAKE_WALLET_CONNECT_ACCOUNT]));
     });
 
-    todo('reconnecting', async function (assert) {
+    test('reconnecting', async function (assert) {
       const chainConnectionManager = new ChainConnectionManager(
         'mainnet',
         1,
@@ -79,6 +79,11 @@ module('Acceptance | wallet connection', function (hooks) {
       chainConnectionManager.addProviderToStorage(1, 'wallet-connect');
 
       await visit('/schedule');
+
+      this.mockWalletConnect.mockConnectedWallet([FAKE_WALLET_CONNECT_ACCOUNT]);
+      this.mockWalletConnect.mockAccountsChanged([FAKE_WALLET_CONNECT_ACCOUNT]);
+
+      await settled();
 
       assert
         .dom('.safe-tools__dashboard-schedule-control-panel-wallet-address')
