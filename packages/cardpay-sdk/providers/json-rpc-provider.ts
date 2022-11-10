@@ -5,13 +5,17 @@ import { Networkish } from '@ethersproject/networks';
 
 const errorGas = ['call', 'estimateGas'];
 
+function isExpectedMessage(message: string) {
+  return message.toLocaleLowerCase().match('reverted') || message.match(/0x.+/);
+}
+
 function spelunk(value: any): null | { message: string; data: string } {
   if (value == null) {
     return null;
   }
 
   // These *are* the droids we're looking for.
-  if (typeof value.message === 'string' && value.message.match('reverted') && isHexString(value.data)) {
+  if (typeof value.message === 'string' && (isExpectedMessage(value.message) || isHexString(value.data))) {
     return { message: value.message, data: value.data };
   }
 
@@ -28,7 +32,11 @@ function spelunk(value: any): null | { message: string; data: string } {
 
   // Might be a JSON string we can further descend...
   if (typeof value === 'string') {
-    return spelunk(JSON.parse(value));
+    try {
+      return spelunk(JSON.parse(value));
+    } catch (e) {
+      return null;
+    }
   }
 
   return null;
@@ -49,10 +57,11 @@ function getResult(payload: { error?: { code?: number; data?: any; message?: str
 function checkError(method: string, error: any): any {
   // Undo the "convenience" some nodes are attempting to prevent backwards
   // incompatibility; maybe for v6 consider forwarding reverts as errors
+  const expectedError = spelunk(error);
+  error = expectedError ?? error;
   if (method === 'call') {
-    const result = spelunk(error);
-    if (result) {
-      return result.data;
+    if (error && error.data) {
+      return error.data;
     }
 
     logger.throwError(
@@ -62,7 +71,6 @@ function checkError(method: string, error: any): any {
     );
   }
 
-  // @TODO: Should we spelunk for message too?
   let message = error.message;
   if (error.code === Logger.errors.SERVER_ERROR && error.error && typeof error.error.message === 'string') {
     message = error.error.message;
