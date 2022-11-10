@@ -51,18 +51,20 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
   @tracked paymentDate: Date | undefined;
   @action onSetPaymentDate(day: Day) {
     this.paymentDate?.setFullYear(day.getFullYear(), day.getMonth(), day.getDate()); 
-    this.paymentDate = this.paymentDate; // trigger reactivity
+    this.paymentDate = new Date((day as Date).getTime()); // trigger reactivity
   }
 
   @action onSetPaymentTime(time: Time) {
     this.paymentDate?.setHours(time.getHours(), time.getMinutes());
-    this.paymentDate = this.paymentDate; // trigger reactivity
+    this.paymentDate = new Date((time as Date).getTime()); // trigger reactivity
   }
 
   @tracked monthlyUntil: Date | undefined;
   @action onSetMonthlyUntil(day: Day) {
     this.monthlyUntil?.setFullYear(day.getFullYear(), day.getMonth(), day.getDate()); 
-    this.monthlyUntil = this.monthlyUntil; // trigger reactivity
+    if (this.monthlyUntil) {
+      this.monthlyUntil = new Date(this.monthlyUntil?.getTime()); // trigger reactivity
+    }
   }
 
   @tracked paymentDayOfMonth: number | undefined;
