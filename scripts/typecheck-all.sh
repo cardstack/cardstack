@@ -1,6 +1,6 @@
 #!/bin/bash
 
-for name in $(find packages -name node_modules -prune -o -name 'cardpay-subgraph' -prune -o -name 'tsconfig.json' -print); do
+for name in $(find packages -name node_modules -prune -o -name '*-subgraph' -prune -o -name 'tsconfig.json' -print); do
   {
   cd $(dirname $name)
   if grep -q "@glint" "package.json"; then
