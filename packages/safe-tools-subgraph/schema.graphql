@@ -1,0 +1,27 @@
+type Safe @entity {
+  id: ID! # address
+  spModule: String! # address
+  owners: [SafeOwner!]! @derivedFrom(field: "safe")
+  ownerChanges: [SafeOwnerChange!]! @derivedFrom(field: "safe")
+}
+
+type SafeOwner @entity {
+  id: ID! # Set to safe.id-owner.id
+  owner: Account!
+  safe: Safe!
+}
+
+type Account @entity {
+  id: ID! # address
+  safes: [SafeOwner!]! @derivedFrom(field: "owner")
+}
+
+type SafeOwnerChange @entity {
+  id: ID! # Set to safeAddress + '-add|remove-' + owner + '-' + txnHash
+  timestamp: BigInt!
+  txnHash: String!
+  safe: Safe!
+  # these are not Account types because the owner may be a contract address
+  ownerAdded: String
+  ownerRemoved: String
+}
