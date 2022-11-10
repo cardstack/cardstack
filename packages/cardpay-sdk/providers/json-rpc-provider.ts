@@ -5,7 +5,10 @@ import { Networkish } from '@ethersproject/networks';
 
 const errorGas = ['call', 'estimateGas'];
 
-function isExpectedMessage(message: string) {
+function isExpectedMessage(message: unknown) {
+  if (typeof message !== 'string') {
+    return false;
+  }
   return message.toLocaleLowerCase().match('reverted') || message.match(/0x.+/);
 }
 
@@ -14,8 +17,10 @@ function spelunk(value: any): null | { message: string; data: string } {
     return null;
   }
 
+  const isDataHexString = isHexString(value.data);
+
   // These *are* the droids we're looking for.
-  if (typeof value.message === 'string' && (isExpectedMessage(value.message) || isHexString(value.data))) {
+  if (isDataHexString || (isExpectedMessage(value.message) && isDataHexString)) {
     return { message: value.message, data: value.data };
   }
 
