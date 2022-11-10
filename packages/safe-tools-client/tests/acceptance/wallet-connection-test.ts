@@ -1,5 +1,6 @@
 import { truncateMiddle } from '@cardstack/ember-shared/helpers/truncate-middle';
 import { click, visit } from '@ember/test-helpers';
+import percySnapshot from '@percy/ember';
 import { module, test } from 'qunit';
 
 import {
@@ -12,6 +13,7 @@ module('Acceptance | wallet connection', function (hooks) {
   setupApplicationTest(hooks);
 
   module('With Metamask', function () {
+    // eslint-disable-next-line qunit/require-expect
     test('connecting wallet', async function (assert) {
       await visit('/schedule');
       await click('.connect-button__button');
@@ -25,6 +27,8 @@ module('Acceptance | wallet connection', function (hooks) {
       assert
         .dom('.safe-tools__dashboard-schedule-control-panel-wallet-address')
         .hasText(truncateMiddle([FAKE_META_MASK_ACCOUNT]));
+
+      await percySnapshot(assert);
     });
   });
 

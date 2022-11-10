@@ -110,7 +110,7 @@ jobs:
         working-directory: packages/hub
       - run: yarn run npm-run-all --aggregate-output --continue-on-error --parallel test:did-resolver test:hub
 
-  test_boxel_and_web_client:
+  test_boxel_safe_tools_client_and_web_client:
     name: web-client Build/Lint/Test
     needs: lint
     runs-on: ubuntu-latest
@@ -142,6 +142,10 @@ jobs:
         env:
           PERCY_TOKEN: ${{ secrets.PERCY_TOKEN_SSR_WEB }}
         run: yarn test:ssr-web:percy
+      - name: Run safe-tools-client tests
+        env:
+          PERCY_TOKEN: ${{ secrets.PERCY_TOKEN_SAFE_TOOLS_CLIENT }}
+        run: yarn test:safe-tools-client:percy
       - name: Publish web-client test results
         uses: EnricoMi/publish-unit-test-result-action@v2
         if: always()
@@ -157,7 +161,7 @@ jobs:
 
   change_check:
     name: Check which packages changed
-    needs: [test_all_but_web_client, test_boxel_and_web_client]
+    needs: [test_all_but_web_client, test_boxel_safe_tools_client_and_web_client]
     runs-on: ubuntu-latest
     outputs:
       hub: ${{ steps.filter.outputs.hub }}
