@@ -33,7 +33,9 @@ export default class SchedulePaymentSDKService extends Service {
     const scheduledPayments = await this.getSchedulePaymentsModule();
 
     const estimatedSafeCreationGas =
-      await scheduledPayments.createSafeWithModuleAndGuardEstimation();
+      await scheduledPayments.createSafeWithModuleAndGuardEstimation({
+        from: this.wallet.address,
+      });
 
     return estimatedSafeCreationGas;
   }
