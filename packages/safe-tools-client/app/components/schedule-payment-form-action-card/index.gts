@@ -13,7 +13,6 @@ import BoxelToggleButtonGroup from '@cardstack/boxel/components/boxel/toggle-but
 import { action } from '@ember/object';
 import { tracked } from '@glimmer/tracking';
 import { fn } from '@ember/helper';
-import cssVar from '@cardstack/boxel/helpers/css-var';
 import { on } from '@ember/modifier';
 import { svgJar } from '@cardstack/boxel/utils/svg-jar';
 import eq from 'ember-truth-helpers/helpers/eq';
