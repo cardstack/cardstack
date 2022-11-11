@@ -100,6 +100,7 @@ import ScheduledPaymentsExecutorService from './services/scheduled-payments/exec
 import EthersProvider from './services/ethers-provider';
 import CrankNonceLock from './services/crank-nonce-lock';
 import DataIntegrityChecksScheduledPayments from './services/data-integrity-checks/scheduled-payments';
+import DataIntegrityChecksRoute from './routes/data-integrity-checks';
 
 //@ts-ignore polyfilling fetch
 global.fetch = fetch;
@@ -187,6 +188,7 @@ export function createRegistry(): Registry {
   registry.register('crank-nonce-lock', CrankNonceLock);
   registry.register('ethers-provider', EthersProvider);
   registry.register('data-integrity-checks-scheduled-payments', DataIntegrityChecksScheduledPayments);
+  registry.register('data-integrity-checks-route', DataIntegrityChecksRoute);
 
   if (process.env.COMPILER) {
     registry.register(

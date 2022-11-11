@@ -16,7 +16,7 @@ function addToMessages(collection: any, message: string, messages: string[]) {
   messages.push(`${message}: ${collection.map((item: any) => item.id).join(', ')}`);
 }
 
-interface IntegrityCheckResult {
+export interface IntegrityCheckResult {
   name: string;
   status: 'degraded' | 'operational';
   message: string | null;
