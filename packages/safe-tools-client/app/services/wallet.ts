@@ -1,19 +1,17 @@
-import Web3 from 'web3';
-
-import Service, { inject as service } from '@ember/service';
-import { action } from '@ember/object';
-import { tracked } from '@glimmer/tracking';
-import { task } from 'ember-concurrency-decorators';
-import { taskFor } from 'ember-concurrency-ts';
-import type { default as Owner } from '@ember/owner';
-import { timeout } from 'ember-concurrency';
-
 import { isSupportedChain } from '@cardstack/cardpay-sdk';
-import { ChainConnectionManager } from '@cardstack/safe-tools-client/utils/chain-connection-manager';
 import NetworkService from '@cardstack/safe-tools-client/services/network';
+import { ChainConnectionManager } from '@cardstack/safe-tools-client/utils/chain-connection-manager';
 import walletProviders, {
   WalletProviderId,
 } from '@cardstack/safe-tools-client/utils/wallet-providers';
+import { action } from '@ember/object';
+import type { default as Owner } from '@ember/owner';
+import Service, { inject as service } from '@ember/service';
+import { tracked } from '@glimmer/tracking';
+import { timeout } from 'ember-concurrency';
+import { task } from 'ember-concurrency-decorators';
+import { taskFor } from 'ember-concurrency-ts';
+import Web3 from 'web3';
 
 export default class Wallet extends Service {
   @service declare network: NetworkService;
@@ -38,14 +36,14 @@ export default class Wallet extends Service {
       : { ...w, enabled: true, explanation: '' }
   );
 
-  constructor(owner?: Owner) {
+  constructor(owner: Owner) {
     super(owner);
 
     this.chainConnectionManager = new ChainConnectionManager(
       this.network.symbol,
-      this.network.chainId
+      this.network.chainId,
+      owner
     );
-
     this.chainConnectionManager.on('connected', (accounts: string[]) => {
       this.isConnected = true;
       this.address = accounts[0];
@@ -65,7 +63,7 @@ export default class Wallet extends Service {
       this.network.onChainChanged(chainId);
     });
 
-    const providerId = ChainConnectionManager.getProviderIdForChain(
+    const providerId = this.chainConnectionManager.getProviderIdForChain(
       this.network.chainId
     );
     if (providerId !== 'wallet-connect' && providerId !== 'metamask') {

@@ -25,7 +25,7 @@ const Infobox: TemplateOnlyComponent<Signature> = <template>
       type="button"
       aria-label="Close"
     >
-      {{svgJar "close" width="100%" height="100%" aria-hidden=true}}
+      {{svgJar "close" width="100%" height="100%" aria-hidden="true"}}
     </button>
   </div>
 </template>

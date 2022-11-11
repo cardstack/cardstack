@@ -1,0 +1,9 @@
+.boxel-input-date__content {
+  background-color: transparent;
+  box-shadow: none;
+}
+
+.boxel-input-date__calendar-container {
+  padding-top: 0.2rem;
+  padding-bottom: 0.35rem;
+}

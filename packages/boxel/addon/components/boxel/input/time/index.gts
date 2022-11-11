@@ -1,7 +1,6 @@
 import Component from '@glimmer/component';
-import { svgJar } from '@cardstack/boxel/utils/svg-jar';
 import BoxelDropdown, { DropdownAPI } from '../../dropdown';
-import BoxelButton from '../../button';
+import BoxelDropdownTrigger from '../../dropdown/trigger';
 import BoxelMenu from '../../menu';
 import menuItem, { menuItemFunc, MenuItem } from '@cardstack/boxel/helpers/menu-item'
 import registerElement from '@cardstack/boxel/modifiers/register-element';
@@ -324,17 +323,15 @@ export default class BoxelInputTime extends Component<Signature> implements Keyb
       data-test-boxel-input-time
     >
       <:trigger as |bindings|>
-        <BoxelButton
+        <BoxelDropdownTrigger
+          @icon="clock"
+          @label={{this.timeString}}
           {{bindings}}
           {{registerElement (set this 'triggerElement')}}
           class="boxel-input-time__trigger"
           data-test-boxel-input-time-trigger
           ...attributes
-        >
-          {{svgJar 'clock' class="boxel-input-time__icon" role="presentation"}}
-          {{this.timeString}}
-          {{svgJar "caret-down" class="boxel-input-time__caret" width=8 height=8 role="presentation"}}
-        </BoxelButton>
+        />
       </:trigger>
       <:content>
         <div

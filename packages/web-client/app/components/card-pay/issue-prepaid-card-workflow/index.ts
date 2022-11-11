@@ -27,6 +27,7 @@ import {
 } from '@cardstack/cardpay-sdk';
 import { standardCancelationPostables } from '@cardstack/web-client/models/workflow/cancelation-helpers';
 import RestorableWorkflowComponent from '../restorable-workflow-component';
+import config from '@cardstack/web-client/config/environment';
 
 export const faceValueOptions = [500, 1000, 2500, 5000, 10000, 50000];
 
@@ -39,6 +40,7 @@ export const FAILURE_REASONS = {
   RESTORATION_UNAUTHENTICATED: 'RESTORATION_UNAUTHENTICATED',
   RESTORATION_L2_ACCOUNT_CHANGED: 'RESTORATION_L2_ACCOUNT_CHANGED',
   RESTORATION_L2_DISCONNECTED: 'RESTORATION_L2_DISCONNECTED',
+  DISABLED: 'DISABLED',
 } as const;
 
 export const MILESTONE_TITLES = [
@@ -94,6 +96,12 @@ class IssuePrepaidCardWorkflow extends Workflow {
           cardName: 'LAYER2_CONNECT',
           componentName: 'card-pay/layer-two-connect-card',
           async check() {
+            if (!config.isIssuePrepaidCardEnabled) {
+              return {
+                success: false,
+                reason: FAILURE_REASONS.DISABLED,
+              };
+            }
             let previouslyCanceledForInsufficientFunds =
               this.workflow?.isCanceled &&
               this.workflow.cancelationReason ===
@@ -314,6 +322,11 @@ class IssuePrepaidCardWorkflow extends Workflow {
       forReason: FAILURE_REASONS.RESTORATION_L2_DISCONNECTED,
       message:
         'You attempted to restore an unfinished workflow, but your Cardstack Wallet got disconnected. Please restart the workflow.',
+    }),
+    conditionalCancelationMessage({
+      forReason: FAILURE_REASONS.DISABLED,
+      message:
+        'Issuing prepaid cards is currently unavailable. My apologies for the inconvenience.',
     }),
     ...standardCancelationPostables(),
   ]);

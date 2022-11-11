@@ -30,8 +30,10 @@ jobs:
           yarn_lock_md5: ${{ hashFiles('yarn.lock') }}
       - name: Install dependencies
         run: yarn --prefer-offline --frozen-lockfile
-      - name: Run tests
-        run: yarn test:safe-tools-client
+      - name: Run tests with percy
+        run: yarn test:safe-tools-client:percy
+        env:
+          PERCY_TOKEN: ${{ secrets.PERCY_TOKEN_SAFE_TOOLS_CLIENT }}
 
   check-if-requires-preview:
     name: Check if a preview deploy is required

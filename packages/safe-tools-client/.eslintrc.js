@@ -13,6 +13,8 @@ module.exports = {
   plugins: ['ember', '@typescript-eslint'],
   extends: [
     'eslint:recommended',
+    'plugin:import/recommended',
+    'plugin:import/typescript',
     'plugin:ember/recommended',
     'plugin:prettier/recommended',
     'plugin:@typescript-eslint/recommended',
@@ -20,13 +22,25 @@ module.exports = {
   env: {
     browser: true,
   },
-  rules: {},
+  rules: {
+    eqeqeq: ['error', 'always'],
+    'import/order': [
+      'error',
+      {
+        'newlines-between': 'always-and-inside-groups',
+        alphabetize: {
+          order: 'asc',
+        },
+      },
+    ],
+    // this doesn't work well with the monorepo. Typescript already complains if you try to import something that's not found
+    'import/no-unresolved': 'off',
+  },
   overrides: [
     // typescript-specific
     {
       files: ['*.ts'],
       rules: {
-        'no-undef': 'off',
         'no-unused-vars': 'off',
         '@typescript-eslint/no-unused-vars': [
           'error',
@@ -43,6 +57,7 @@ module.exports = {
     {
       files: [
         './.eslintrc.js',
+        './.percy.js',
         './.prettierrc.js',
         './.template-lintrc.js',
         './ember-cli-build.js',

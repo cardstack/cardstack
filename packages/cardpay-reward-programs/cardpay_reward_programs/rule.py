@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 import duckdb
 import pandas as pd
 import pydash as py_
-from cardpay_reward_programs.utils import get_unclaimed_rewards
+from cardpay_reward_programs.utils import format_amount, get_unclaimed_rewards
 
 
 class Rule(ABC):
@@ -88,7 +88,7 @@ class Rule(ABC):
                 current_cycle_payments_df[
                     "explanationData"
                 ] = current_cycle_payments_df.explanationData.apply(
-                    lambda row: {**row, **{"rollover_amount": 0}}
+                    lambda row: {**row, **{"rollover_amount": "0"}}
                 )
                 return current_cycle_payments_df
             payment_list = current_cycle_payments_df.to_dict("records")
@@ -121,7 +121,9 @@ class Rule(ABC):
                 new_payment = payments[0].copy()
                 new_payment["amount"] = sum([p["amount"] for p in payments])
                 new_payment["explanationData"] = self.get_explanation_data(new_payment)
-                new_payment["explanationData"]["rollover_amount"] = rollover_amount
+                new_payment["explanationData"]["rollover_amount"] = format_amount(
+                    rollover_amount
+                )
                 new_payment_list.append(new_payment)
             return pd.DataFrame(new_payment_list)
 

@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/ssr-web",
-  "version": "1.0.13",
+  "version": "1.0.17",
   "description": "An Ember Fastboot application for SSR payment requests",
   "repository": "",
   "license": "MIT",
@@ -26,10 +26,10 @@
     "test:ember": "ember test"
   },
   "devDependencies": {
-    "@cardstack/boxel": "1.0.13",
-    "@cardstack/cardpay-sdk": "1.0.13",
-    "@cardstack/did-resolver": "1.0.13",
-    "@cardstack/wc-provider": "1.0.13",
+    "@cardstack/boxel": "1.0.17",
+    "@cardstack/cardpay-sdk": "1.0.17",
+    "@cardstack/did-resolver": "1.0.17",
+    "@cardstack/wc-provider": "1.0.17",
     "@ember/optional-features": "^2.0.0",
     "@ember/render-modifiers": "^2.0.4",
     "@ember/test-helpers": "^2.8.1",
@@ -118,7 +118,7 @@
     "ember-set-helper": "^2.0.1",
     "ember-sinon-qunit": "^6.0.0",
     "ember-source": "~4.6.0",
-    "ember-svg-jar": "^2.3.3",
+    "ember-svg-jar": "^2.4.2",
     "ember-template-imports": "^3.1.2",
     "ember-template-lint": "^3.16.0",
     "ember-window-mock": "^0.8.1",

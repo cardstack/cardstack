@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/web-client",
-  "version": "1.0.13",
+  "version": "1.0.17",
   "description": "The cardstack web front-end app",
   "repository": "",
   "license": "MIT",
@@ -26,10 +26,10 @@
     "test:ember": "ember test"
   },
   "devDependencies": {
-    "@cardstack/boxel": "1.0.13",
-    "@cardstack/cardpay-sdk": "1.0.13",
-    "@cardstack/did-resolver": "1.0.13",
-    "@cardstack/wc-provider": "1.0.13",
+    "@cardstack/boxel": "1.0.17",
+    "@cardstack/cardpay-sdk": "1.0.17",
+    "@cardstack/did-resolver": "1.0.17",
+    "@cardstack/wc-provider": "1.0.17",
     "@ember/optional-features": "^2.0.0",
     "@ember/render-modifiers": "^2.0.4",
     "@ember/test-helpers": "^2.8.1",
@@ -121,7 +121,7 @@
     "ember-set-helper": "^2.0.1",
     "ember-sinon-qunit": "^6.0.0",
     "ember-source": "~4.6.0",
-    "ember-svg-jar": "^2.3.3",
+    "ember-svg-jar": "^2.4.2",
     "ember-template-lint": "^3.16.0",
     "ember-truth-helpers": "^3.1.1",
     "eslint": "^7.32.0",
@@ -161,7 +161,7 @@
     "extends": "../../package.json"
   },
   "dependencies": {
-    "@cardstack/ember-shared": "^1.0.13",
+    "@cardstack/ember-shared": "1.0.17",
     "@ctrl/tinycolor": "^3.4.0",
     "@metamask/safe-event-emitter": "^2.0.0",
     "@walletconnect/client": "^1.6.0",
