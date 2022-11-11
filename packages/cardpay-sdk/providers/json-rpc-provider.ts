@@ -17,10 +17,8 @@ function spelunk(value: any): null | { message: string; data: string } {
     return null;
   }
 
-  const isDataHexString = isHexString(value.data);
-
   // These *are* the droids we're looking for.
-  if (isDataHexString || (isExpectedMessage(value.message) && isDataHexString)) {
+  if (isExpectedMessage(value.message) && (!value.data || isHexString(value.data))) {
     return { message: value.message, data: value.data };
   }
 

@@ -33,6 +33,8 @@ const commonError = {
   message: 'execution reverted: �Դ�n�ȦM\u0019�/�Xf �\u001a��',
 };
 
+const sokolEror = { code: -32015, message: 'Reverted 0xb2416de0dd9fbbcf59843aa426a077e327bb5bda' };
+
 const expectedErrorBase = {
   reason: 'cannot estimate gas; transaction may fail or may require manual gas limit',
   code: 'UNPREDICTABLE_GAS_LIMIT',
@@ -88,6 +90,11 @@ describe.only('JsonRpcProvider', () => {
       } = metamaskOriginalError;
 
       assertErrorStructure(error, { data, message });
+    });
+    it.only('should throw error with correct message when data does not exist', async () => {
+      const error = (await performGasEstimate(sokolEror)) as any;
+
+      chai.expect(error).to.deep.eq(sokolEror);
     });
   });
 });
