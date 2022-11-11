@@ -91,6 +91,7 @@ const networksConstants = {
     chainId: 5,
     scheduledPaymentFeeFixedUSD: 0,
     scheduledPaymentFeePercentage: 0,
+    subgraphURL: 'https://api.thegraph.com/subgraphs/name/cardstack/safe-tools-goerli',
   },
   polygon: {
     ...hubUrl,
@@ -112,6 +113,7 @@ const networksConstants = {
     chainId: 80001,
     scheduledPaymentFeeFixedUSD: 0,
     scheduledPaymentFeePercentage: 0,
+    subgraphURL: 'https://api.thegraph.com/subgraphs/name/cardstack/safe-tools-mumbai',
   },
   mainnet: {
     ...hubUrl,
