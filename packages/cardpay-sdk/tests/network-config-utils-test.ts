@@ -1,8 +1,16 @@
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
+import { setupServer } from 'msw/node';
+import { rest } from 'msw';
+import fetch from 'node-fetch';
+
+if (!globalThis.fetch) {
+  //@ts-ignore polyfilling fetch
+  globalThis.fetch = fetch;
+}
 
 import { HubConfigResponse } from '../sdk/hub-config';
-import { getWeb3ConfigByNetwork, isSupportedChain } from '../sdk/network-config-utils';
+import { getWeb3ConfigByNetwork, isSupportedChain, fetchSupportedGasTokens } from '../sdk/network-config-utils';
 
 chai.use(chaiAsPromised);
 
@@ -101,5 +109,61 @@ describe('isSupportedChain', () => {
 
   it('should return true for supported polygon network as type', () => {
     chai.expect(isSupportedChain(supportedChainAsType)).to.eq(true);
+  });
+});
+
+describe('fetchSupportedGasTokens', () => {
+  const server = setupServer(
+    // NOT "/user", nothing to be relative to!
+    rest.get('https://relay.cardstack.com/api/v1/tokens', (_req, res, ctx) => {
+      return res(
+        ctx.json({
+          count: 2,
+          next: null,
+          previous: null,
+          results: [
+            {
+              address: '0x52031d287Bb58E26A379A7Fec2c84acB54f54fe3',
+              logoUri:
+                'https://gnosis-safe-token-logos.s3.amazonaws.com/0x52031d287Bb58E26A379A7Fec2c84acB54f54fe3.png',
+              default: true,
+              name: 'CARD Token',
+              symbol: 'CARD.CPXD',
+              description: '',
+              decimals: 18,
+              websiteUri: '',
+              gas: true,
+            },
+            {
+              address: '0x26F2319Fbb44772e0ED58fB7c99cf8da59e2b5BE',
+              logoUri:
+                'https://gnosis-safe-token-logos.s3.amazonaws.com/0x26F2319Fbb44772e0ED58fB7c99cf8da59e2b5BE.png',
+              default: true,
+              name: 'DAI Token',
+              symbol: 'DAI.CPXD',
+              description: '',
+              decimals: 18,
+              websiteUri: '',
+              gas: true,
+            },
+          ],
+        })
+      );
+    })
+  );
+
+  before(() => {
+    server.listen();
+  });
+
+  after(() => {
+    server.close();
+  });
+
+  it('retrieves gas tokens from the relay server', async () => {
+    let result = await fetchSupportedGasTokens('gnosis');
+    chai.expect(result.length).to.eq(2);
+    chai.expect(result[0].symbol).to.eq('CARD.CPXD');
+    chai.expect(result[1].symbol).to.eq('DAI.CPXD');
   });
 });

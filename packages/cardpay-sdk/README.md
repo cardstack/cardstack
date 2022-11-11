@@ -59,7 +59,9 @@ This is a package that provides an SDK to use the Cardpay protocol.
   - [`RewardPool.addRewardTokens`](#rewardpooladdrewardtokens)
   - [`RewardPool.rewardProgramBalances`](#rewardpoolrewardprogrambalances)
   - [`RewardPool.claim`](#rewardpoolclaim)
+  - [`RewardPool.claimAll`](#rewardpoolclaimall)
   - [`RewardPool.claimGasEstimate`](#rewardpoolclaimgasestimate)
+  - [`RewardPool.claimAllGasEstimate`](#rewardpoolclaimallgasestimate)
   - [`RewardPool.getProofs`](#rewardpoolgetproofs)
   - [`RewardPool.recoverTokens`](#rewardpoolrecovertokens)
 - [`RewardManager`](#rewardmanager)
@@ -72,6 +74,7 @@ This is a package that provides an SDK to use the Cardpay protocol.
   - [`RewardManager.addRewardRule`](#rewardmanageraddrewardrule)
   - [`RewardManager.getRewardProgramsInfo`](#rewardmanagergetrewardprogramsinfo)
   - [`RewardManager.registerRewardeeGasEstimate`](#rewardmanagerregisterrewardeegasestimate)
+  - [`RewardManager.getRuleJson`](#rewardmanagergetrulejson)
 - [`LayerOneOracle`](#layeroneoracle)
   - [`LayerOneOracle.ethToUsd`](#layeroneoracleethtousd)
   - [LayerOneOracle.getEthToUsdConverter](#layeroneoraclegetethtousdconverter)
@@ -1117,7 +1120,6 @@ let cardOracle = await getOracle("CARD", web3);
 ```js
 let blockExplorer = await getConstant("blockExplorer", web3);
 let relayServiceURL = await getConstant("relayServiceURL", web3);
-let transactionServiceURL = await getConstant("transactionServiceURL", web3);
 ```
 ## `networkIds`
 `networkIds` is a POJO that maps a network name to it's ethereum network ID.
