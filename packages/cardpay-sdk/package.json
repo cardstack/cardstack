@@ -50,6 +50,7 @@
     "@types/chai": "^4.3.3",
     "@types/ember__owner": "^4.0.1",
     "@types/mocha": "^10.0.0",
+    "@types/sinonjs__fake-timers": "^8.1.2",
     "chai": "^4.3.6",
     "chai-as-promised": "^7.1.1",
     "mocha": "^10.1.0",
