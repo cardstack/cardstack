@@ -10,6 +10,8 @@ import RangedNumberPicker from '@cardstack/boxel/components/boxel/input/ranged-n
 import { SelectableToken } from '@cardstack/boxel/components/boxel/input/selectable-token';
 import BoxelTokenSelect from '@cardstack/boxel/components/boxel/input/token-select';
 import BoxelToggleButtonGroup from '@cardstack/boxel/components/boxel/toggle-button-group';
+import { inject as service } from '@ember/service';
+import TokensService from '../services/tokens';
 import { action } from '@ember/object';
 import { tracked } from '@glimmer/tracking';
 import { fn } from '@ember/helper';
@@ -23,7 +25,7 @@ interface Signature {
 }
 
 export default class SchedulePaymentFormActionCard extends Component<Signature> {
-
+  @service declare tokens: TokensService;
   get paymentTypeOptions() {
     return [
       { id: 'one-time', text: 'One-time payment' },
@@ -79,12 +81,12 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
   @tracked isPaymentAmountInvalid = false;
   @tracked paymentTokenErrorMessage = '';
 
-  tokens: SelectableToken[] = [
+  paymentTokens: SelectableToken[] = [
     { name: 'CARD', icon: 'card' },
     { name: 'HI', icon: 'emoji' },
     { name: 'WORLD', icon: 'world' },
   ];
-  @tracked paymentToken: SelectableToken = this.tokens[0];
+  @tracked paymentToken: SelectableToken = this.paymentTokens[0];
 
   @action onUpdatePaymentAmount(val: string) {
     this.paymentAmount = val;
@@ -93,11 +95,6 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
     this.paymentToken = val;
   }
 
-  gasTokens: SelectableToken[] = [
-    { name: 'CARD', icon: 'card' },
-    { name: 'HI', icon: 'emoji' },
-    { name: 'WORLD', icon: 'world' },
-  ];
   @tracked selectedGasToken: SelectableToken | undefined;
   @action onSelectGasToken(val: SelectableToken) {
     this.selectedGasToken = val;
@@ -190,7 +187,7 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
             @invalid={{this.isPaymentAmountInvalid}}
             @errorMessage={{this.paymentTokenErrorMessage}}
             @token={{this.paymentToken}}
-            @tokens={{this.tokens}}
+            @tokens={{this.paymentTokens}}
             @onChooseToken={{this.onUpdatePaymentToken}}
           />
         </BoxelField>
@@ -199,7 +196,7 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
             @placeholder="Choose a Gas Token"
             @value={{this.selectedGasToken}}
             @onChooseToken={{this.onSelectGasToken}}
-            @tokens={{this.gasTokens}}
+            @tokens={{this.tokens.gasTokens.value}}
           />
         </BoxelField>
         <BoxelField @label="Max Gas Fee">
