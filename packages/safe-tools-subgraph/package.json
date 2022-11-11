@@ -1,0 +1,20 @@
+{
+  "name": "safe-tools-subgraph",
+  "version": "1.0.0",
+  "scripts": {
+    "codegen": "graph codegen",
+    "build": "graph build",
+    "deploy:goerli": "graph deploy --product hosted-service cardstack/safe-tools-goerli",
+    "deploy:mumbai": "graph deploy --product hosted-service cardstack/safe-tools-mumbai",
+    "create-local": "graph create --node http://localhost:8020/ cardstack/safe-tools",
+    "remove-local": "graph remove --node http://localhost:8020/ cardstack/safe-tools",
+    "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 cardstack/safe-tools"
+  },
+  "dependencies": {
+    "@graphprotocol/graph-cli": "0.29.0",
+    "@graphprotocol/graph-ts": "0.26.0"
+  },
+  "devDependencies": {
+    "@protofire/subgraph-toolkit": "^0.1.2"
+  }
+}
