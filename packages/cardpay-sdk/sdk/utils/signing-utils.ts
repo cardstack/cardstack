@@ -288,7 +288,7 @@ export async function signTypedData(
       signature = await signer._signTypedData(domain, types, message);
     } else if (web3OrSignerOrEthersProvider instanceof JsonRpcProvider) {
       let ethersProvider = web3OrSignerOrEthersProvider;
-      return await ethersProvider.send('eth_signTypedData', [account, JSON.stringify(data)]);
+      return await ethersProvider.send('eth_signTypedData_v4', [account, JSON.stringify(data)]);
     } else {
       signature = await signTypedDataWithWeb3(web3OrSignerOrEthersProvider, account, data);
     }
