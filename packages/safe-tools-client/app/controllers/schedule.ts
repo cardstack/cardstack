@@ -1,8 +1,8 @@
 import ApplicationController from '@cardstack/safe-tools-client/controllers/application';
 import NetworkService from '@cardstack/safe-tools-client/services/network';
 import WalletService from '@cardstack/safe-tools-client/services/wallet';
+
 import Controller, { inject as controller } from '@ember/controller';
-import { action } from '@ember/object';
 import { inject as service } from '@ember/service';
 import { tracked } from '@glimmer/tracking';
 
@@ -13,11 +13,10 @@ export default class Schedule extends Controller {
   @service declare wallet: WalletService;
   @service declare network: NetworkService;
 
-  // modified with set helper
-  @tracked isSetupSafeModalOpen = false;
   @tracked isDepositModalOpen = false;
 
   get safe() {
+    return undefined;
     //TODO: get safe info from sdk and format it,
     return {
       address: '0x8a40AFffb53f4F953a204cAE087219A28771df9d',
@@ -45,18 +44,6 @@ export default class Schedule extends Controller {
         },
       ],
     };
-  }
-
-  get safeButtonLabel() {
-    return this.safe ? 'Add Funds' : 'Create Safe';
-  }
-
-  @action onSafeButtonClick() {
-    if (this.safe) {
-      this.isDepositModalOpen = true;
-    } else {
-      this.isSetupSafeModalOpen = true;
-    }
   }
 
   get scheduledPaymentsTokensToCover() {

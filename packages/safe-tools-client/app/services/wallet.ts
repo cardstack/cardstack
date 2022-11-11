@@ -1,9 +1,14 @@
-import { isSupportedChain } from '@cardstack/cardpay-sdk';
+import {
+  isSupportedChain,
+  getConstantByNetwork,
+  getSDK,
+} from '@cardstack/cardpay-sdk';
 import NetworkService from '@cardstack/safe-tools-client/services/network';
 import { ChainConnectionManager } from '@cardstack/safe-tools-client/utils/chain-connection-manager';
 import walletProviders, {
   WalletProviderId,
 } from '@cardstack/safe-tools-client/utils/wallet-providers';
+
 import { action } from '@ember/object';
 import type { default as Owner } from '@ember/owner';
 import Service, { inject as service } from '@ember/service';
@@ -11,6 +16,7 @@ import { tracked } from '@glimmer/tracking';
 import { timeout } from 'ember-concurrency';
 import { task } from 'ember-concurrency-decorators';
 import { taskFor } from 'ember-concurrency-ts';
+
 import Web3 from 'web3';
 
 export default class Wallet extends Service {
@@ -21,6 +27,9 @@ export default class Wallet extends Service {
   @tracked address: string | undefined;
   @tracked isConnecting = false;
 
+  @tracked nativeTokenBalance: Record<'symbol' | 'amount', string> | undefined;
+
+  // TODO: replace with ethers
   web3 = new Web3();
   chainConnectionManager: ChainConnectionManager;
 
@@ -109,6 +118,17 @@ export default class Wallet extends Service {
 
   @action disconnect() {
     this.chainConnectionManager.disconnect();
+  }
+
+  @action async fetchNativeTokenBalance() {
+    const assets = await getSDK('Assets', this.web3);
+    const balance = await assets.getNativeTokenBalance(this.address);
+    this.nativeTokenBalance = {
+      symbol: getConstantByNetwork('nativeTokenSymbol', this.network.symbol),
+      amount: balance || '0',
+    };
+
+    return this.nativeTokenBalance;
   }
 }
 

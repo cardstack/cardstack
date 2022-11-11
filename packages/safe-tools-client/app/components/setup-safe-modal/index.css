@@ -16,7 +16,8 @@
   margin: var(--boxel-sp-xxs) 0;
 }
 
-.safe-setup-modal__section-wallet-info {
+.safe-setup-modal__section-wallet-info,
+.safe-setup-modal__section__section-gas-loading {
   display: flex;
   flex-direction: row;
   align-items: center;

@@ -1,14 +1,13 @@
 import Component from '@glimmer/component';
 import { on } from '@ember/modifier';
 import not from 'ember-truth-helpers/helpers/not';
-import { tracked } from '@glimmer/tracking';
-import { action } from '@ember/object';
-
+import or from 'ember-truth-helpers/helpers/or';
 
 import { svgJar } from '@cardstack/boxel/utils/svg-jar';
 import cssVar from '@cardstack/boxel/helpers/css-var';
 import BoxelModal from '@cardstack/boxel/components/boxel/modal';
 import BoxelActionContainer from '@cardstack/boxel/components/boxel/action-container'
+import BoxelLoadingIndicator from '@cardstack/boxel/components/boxel/loading-indicator'
 
 import './index.css';
 
@@ -17,24 +16,18 @@ interface Signature {
   Args: { 
     isOpen: boolean 
     onClose: () => void;
+    hasEnoughBalance: boolean;
+    gasCostDisplay: string;
+    onProvisionClick: () => void;
+    // TODO: provisioning will be status instead of boolean
+    provisioning: boolean;
+    isLoadingGasInfo: boolean;
   };
 }
 
 export default class SetupSafeModal extends Component<Signature> {
-  //TODO: replace with correct flags and logic
-  gasCost = `0.001899365 ETH (USD$3.01)`;
-  notEnoughBalance = false;
-
-  @tracked provisioning = false;
-
-  @action async createSafe(): Promise<void> { 
-     //TODO: use sdk method createSafeWithModuleAndGuard
-    this.provisioning = true;
-    setTimeout(() => {
-      console.log('Create safe')
-      this.provisioning = false;
-      this.args.onClose();
-    }, 2000); 
+  get notEnoughBalance() { 
+    return !this.args.hasEnoughBalance;
   }
 
   <template>
@@ -42,7 +35,7 @@ export default class SetupSafeModal extends Component<Signature> {
       @size='medium'
       @isOpen={{@isOpen}} 
       @onClose={{@onClose}}
-      @isOverlayDismissalDisabled={{this.provisioning}}>
+      @isOverlayDismissalDisabled={{@provisioning}}>
       <BoxelActionContainer as |Section ActionChin|>
         <Section @title='Set up a Payment Safe' class='setup-safe-modal__section'>
           <p>In this step, you create a safe equipped with a module to schedule
@@ -68,30 +61,36 @@ export default class SetupSafeModal extends Component<Signature> {
                fee.
             </li>
           </ul>
-          <b>Estimated gas cost: {{this.gasCost}}</b>
-          <div class='safe-setup-modal__section-wallet-info'>
-            {{svgJar
-              (if this.notEnoughBalance 'icon-x-circle-ht' 'icon-check-circle-ht')
-              class='safe-setup-modal__section-icon'
-              style=(cssVar
-                icon-color=(if this.notEnoughBalance 'var(--boxel-red)' 'var(--boxel-green)')
-              )
-            }}
-            <p>
-              Your wallet has {{if this.notEnoughBalance 'in'}}sufficient funds to cover the estimated gas cost.
-            </p>
-          </div>
+          {{#if @isLoadingGasInfo}} 
+            <div class='safe-setup-modal__section__section-gas-loading'>
+              <BoxelLoadingIndicator /> <p>Calculating estimated gas cost.</p>
+            </div>
+          {{else}}
+            <b>Estimated gas cost: {{@gasCostDisplay}}</b>
+            <div class='safe-setup-modal__section-wallet-info'>
+              {{svgJar
+                (if this.notEnoughBalance 'icon-x-circle-ht' 'icon-check-circle-ht')
+                class='safe-setup-modal__section-icon'
+                style=(cssVar
+                  icon-color=(if this.notEnoughBalance 'var(--boxel-red)' 'var(--boxel-green)')
+                )
+              }}
+              <p>
+                Your wallet has {{if this.notEnoughBalance 'in'}}sufficient funds to cover the estimated gas cost.
+              </p>
+            </div>
+          {{/if}}
         </Section>
         <ActionChin @state='default'>
           <:default as |ac|>
             <ac.ActionButton
-              @loading={{this.provisioning}}
-              disabled={{this.notEnoughBalance}}
-              {{on 'click' this.createSafe}}
+              @loading={{@provisioning}}
+              disabled={{or this.notEnoughBalance @isLoadingGasInfo}}
+              {{on 'click' @onProvisionClick}}
             >
-              Provision{{if this.provisioning 'ing'}}
+              Provision{{if @provisioning 'ing'}}
             </ac.ActionButton>
-            {{#if (not this.provisioning)}}
+            {{#if (not @provisioning)}}
               <ac.CancelButton {{on 'click' @onClose}}>
                 Cancel
               </ac.CancelButton>
