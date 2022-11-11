@@ -90,6 +90,7 @@ jobs:
 
       - name: Deploy ${{ matrix.app }}
         uses: ./.github/actions/waypoint-deploy
+        if: ${{ github.event.inputs.environment != 'staging' && matrix.app != 'hub-event-listener' }}
         with:
           app: ${{ matrix.app }}
           retain: ${{ matrix.retain }}
