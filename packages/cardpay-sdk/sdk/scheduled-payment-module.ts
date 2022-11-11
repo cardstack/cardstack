@@ -40,6 +40,7 @@ import { waitUntilSchedulePaymentTransactionMined } from './scheduled-payment/ut
 import BN from 'bn.js';
 import { Interface } from 'ethers/lib/utils';
 import JsonRpcProvider from '../providers/json-rpc-provider';
+import { getConstant } from './constants';
 
 export interface EnableModuleAndGuardResult {
   scheduledPaymentModuleAddress: string;
@@ -59,10 +60,6 @@ export interface CreateSafeWithModuleAndGuardTx {
   expectedMetaGuardAddress: string;
 }
 
-export interface Fee {
-  fixedUSD: number;
-  percentage: number;
-}
 export const FEE_BASE_POW = new BN(18);
 export const FEE_BASE = new BN(10).pow(FEE_BASE_POW);
 
@@ -364,7 +361,6 @@ export default class ScheduledPaymentModule {
     tokenAddress: string,
     amount: string,
     payeeAddress: string,
-    fee: Fee,
     maxGasPrice: string,
     gasTokenAddress: string,
     salt: string,
@@ -385,6 +381,8 @@ export default class ScheduledPaymentModule {
       return decodedError.args[0].toNumber();
     };
 
+    let feeFixedUSD = (await getConstant('scheduledPaymentFeeFixedUSD', this.ethersProvider)) ?? 0;
+    let feePercentage = (await getConstant('scheduledPaymentFeePercentage', this.ethersProvider)) ?? 0;
     let requiredGas = 0;
     try {
       let module = new Contract(moduleAddress, ScheduledPaymentABI, this.ethersProvider);
@@ -397,10 +395,10 @@ export default class ScheduledPaymentModule {
           payeeAddress,
           {
             fixedUSD: {
-              value: FEE_BASE.mul(new BN(fee.fixedUSD)).toString(),
+              value: FEE_BASE.mul(new BN(feeFixedUSD)).toString(),
             },
             percentage: {
-              value: FEE_BASE.mul(new BN(fee.percentage)).toString(),
+              value: FEE_BASE.mul(new BN(feePercentage)).toString(),
             },
           },
           maxGasPrice,
@@ -419,10 +417,10 @@ export default class ScheduledPaymentModule {
           payeeAddress,
           {
             fixedUSD: {
-              value: FEE_BASE.mul(new BN(fee.fixedUSD)).toString(),
+              value: FEE_BASE.mul(new BN(feeFixedUSD)).toString(),
             },
             percentage: {
-              value: FEE_BASE.mul(new BN(fee.percentage)).toString(),
+              value: FEE_BASE.mul(new BN(feePercentage)).toString(),
             },
           },
           maxGasPrice,
@@ -551,7 +549,6 @@ export default class ScheduledPaymentModule {
     tokenAddress: string,
     amount: string,
     payeeAddress: string,
-    fee: Fee,
     executionGas: number,
     maxGasPrice: string,
     gasTokenAddress: string,
@@ -567,6 +564,8 @@ export default class ScheduledPaymentModule {
 
     let spHash;
     let module = new Contract(moduleAddress, ScheduledPaymentABI, this.ethersProvider);
+    let feeFixedUSD = (await getConstant('scheduledPaymentFeeFixedUSD', this.ethersProvider)) ?? 0;
+    let feePercentage = (await getConstant('scheduledPaymentFeePercentage', this.ethersProvider)) ?? 0;
     if (recurringUntil) {
       spHash = await module.callStatic[
         'createSpHash(address,uint256,address,((uint256),(uint256)),uint256,uint256,address,string,uint256,uint256)'
@@ -576,10 +575,10 @@ export default class ScheduledPaymentModule {
         payeeAddress,
         {
           fixedUSD: {
-            value: FEE_BASE.mul(new BN(fee.fixedUSD)).toString(),
+            value: FEE_BASE.mul(new BN(feeFixedUSD)).toString(),
           },
           percentage: {
-            value: FEE_BASE.mul(new BN(fee.percentage)).toString(),
+            value: FEE_BASE.mul(new BN(feePercentage)).toString(),
           },
         },
         executionGas,
@@ -598,10 +597,10 @@ export default class ScheduledPaymentModule {
         payeeAddress,
         {
           fixedUSD: {
-            value: FEE_BASE.mul(new BN(fee.fixedUSD)).toString(),
+            value: FEE_BASE.mul(new BN(feeFixedUSD)).toString(),
           },
           percentage: {
-            value: FEE_BASE.mul(new BN(fee.percentage)).toString(),
+            value: FEE_BASE.mul(new BN(feePercentage)).toString(),
           },
         },
         executionGas,
@@ -688,8 +687,6 @@ export default class ScheduledPaymentModule {
     tokenAddress: string,
     amount: string,
     payeeAddress: string,
-    feeFixedUSD: number,
-    feePercentage: number,
     executionGas: number,
     maxGasPrice: string,
     gasTokenAddress: string,
@@ -705,8 +702,6 @@ export default class ScheduledPaymentModule {
     tokenAddress?: string,
     amount?: string,
     payeeAddress?: string,
-    feeFixedUSD?: number,
-    feePercentage?: number,
     executionGas?: number,
     maxGasPrice?: string,
     gasTokenAddress?: string,
@@ -734,8 +729,6 @@ export default class ScheduledPaymentModule {
     if (!tokenAddress) throw new Error('tokenAddress must be provided ');
     if (!amount) throw new Error('amount must be provided');
     if (!payeeAddress) throw new Error('payeeAddress must be provided');
-    if (feeFixedUSD == undefined) throw new Error('feeFixedUSD must be provided');
-    if (feePercentage == undefined) throw new Error('feePercentage must be provided');
     if (!executionGas) throw new Error('executionGas must be provided');
     if (!maxGasPrice) throw new Error('maxGasPrice must be provided');
     if (!gasTokenAddress) throw new Error('gasTokenAddress must be provided ');
@@ -746,7 +739,6 @@ export default class ScheduledPaymentModule {
       tokenAddress,
       amount,
       payeeAddress,
-      { fixedUSD: feeFixedUSD, percentage: feePercentage },
       executionGas,
       maxGasPrice,
       gasTokenAddress,
@@ -760,6 +752,8 @@ export default class ScheduledPaymentModule {
 
     let signer = this.signer ? this.signer : this.ethersProvider.getSigner();
     let account = await signer.getAddress();
+    let feeFixedUSD = (await getConstant('scheduledPaymentFeeFixedUSD', this.ethersProvider)) ?? 0;
+    let feePercentage = (await getConstant('scheduledPaymentFeePercentage', this.ethersProvider)) ?? 0;
     let scheduledPaymentResponse = await hubRequest(hubRootUrl, 'api/scheduled-payments', authToken, 'POST', {
       data: {
         attributes: {

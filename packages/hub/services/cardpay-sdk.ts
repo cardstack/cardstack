@@ -1,4 +1,10 @@
-import { getSDK, waitForSubgraphIndex, waitForTransactionConsistency, gqlQuery } from '@cardstack/cardpay-sdk';
+import {
+  getSDK,
+  waitForSubgraphIndex,
+  waitForTransactionConsistency,
+  gqlQuery,
+  getConstantByNetwork,
+} from '@cardstack/cardpay-sdk';
 
 // This service makes it easier to mock the SDK in our tests
 export default class CardpaySDKService {
@@ -6,6 +12,7 @@ export default class CardpaySDKService {
   waitForSubgraphIndex = waitForSubgraphIndex;
   waitForTransactionConsistency = waitForTransactionConsistency;
   gqlQuery = gqlQuery;
+  getConstantByNetwork = getConstantByNetwork;
 }
 
 declare module '@cardstack/di' {

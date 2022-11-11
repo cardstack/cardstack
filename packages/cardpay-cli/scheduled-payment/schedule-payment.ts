@@ -5,7 +5,7 @@ import { Arguments } from 'yargs';
 
 export default {
   command:
-    'schedule-payment <safeAddress> <moduleAddress> <tokenAddress> <amount> <payeeAddress> <fixedUSDFee> <feePercentage> <executionGas> <maxGasPrice> <gasTokenAddress> <salt>',
+    'schedule-payment <safeAddress> <moduleAddress> <tokenAddress> <amount> <payeeAddress> <executionGas> <maxGasPrice> <gasTokenAddress> <salt>',
   describe:
     "Schedules a one-time or a recurring payment. This creates a record in the crank (hub) and stores the scheduled payment hash in the safe's scheduled payment module contract. The crank is responsible for executing the payment at the scheduled time.",
   builder(yargs: Argv) {
@@ -29,14 +29,6 @@ export default {
       .positional('payeeAddress', {
         type: 'string',
         description: 'The address of the payee (recipient)',
-      })
-      .positional('fixedUSDFee', {
-        type: 'number',
-        description: 'Fixed USD fee (e.g. 0.25)',
-      })
-      .positional('percentageFee', {
-        type: 'number',
-        description: 'Percentage fee (e.g. 5%, 0.05)',
       })
       .positional('executionGas', {
         type: 'number',
@@ -79,8 +71,6 @@ export default {
       tokenAddress,
       amount,
       payeeAddress,
-      fixedUSDFee,
-      feePercentage,
       executionGas,
       maxGasPrice,
       gasTokenAddress,
@@ -95,8 +85,6 @@ export default {
       tokenAddress: string;
       amount: string;
       payeeAddress: string;
-      fixedUSDFee: number;
-      feePercentage: number;
       executionGas: number;
       maxGasPrice: string;
       gasTokenAddress: string;
@@ -121,8 +109,6 @@ export default {
       tokenAddress,
       amount,
       payeeAddress,
-      fixedUSDFee,
-      feePercentage,
       executionGas,
       maxGasPrice,
       gasTokenAddress,
