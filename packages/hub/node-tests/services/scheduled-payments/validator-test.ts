@@ -1,9 +1,52 @@
 import { ScheduledPayment } from '@prisma/client';
 import { Decimal } from '@prisma/client/runtime';
-import { setupHub } from '../../helpers/server';
+import { registry, setupHub } from '../../helpers/server';
+import { Networkish, TokenDetail } from '@cardstack/cardpay-sdk';
+
+class StubCardpaySDK {
+  getConstantByNetwork(name: string, network: Networkish) {
+    if (!network) {
+      throw new Error(`network can't be null`);
+    }
+
+    switch (name) {
+      case 'scheduledPaymentFeeFixedUSD':
+        return 0.25;
+      case 'scheduledPaymentFeePercentage':
+        return 0.1;
+      default:
+        throw new Error(`unsupported mock cardpay`);
+    }
+  }
+
+  fetchSupportedGasTokens(network: Networkish): TokenDetail[] {
+    if (!network) {
+      throw new Error(`network can't be null`);
+    }
+
+    return [
+      {
+        address: '0x52031d287Bb58E26A379A7Fec2c84acB54f54fe3',
+        name: 'CARD Token',
+        symbol: 'CARD.CPXD',
+        decimals: 18,
+      },
+      {
+        address: '0x26F2319Fbb44772e0ED58fB7c99cf8da59e2b5BE',
+        name: 'DAI Token',
+        symbol: 'DAI.CPXD',
+        decimals: 18,
+      },
+    ];
+  }
+}
 
 describe('ScheduledPaymentValidator', function () {
   let { getContainer } = setupHub(this);
+
+  this.beforeEach(async function () {
+    registry(this).register('cardpay', StubCardpaySDK);
+  });
 
   it('validates scheduled payment with missing attrs', async function () {
     let subject = await getContainer().lookup('scheduled-payment-validator');
@@ -100,5 +143,19 @@ describe('ScheduledPaymentValidator', function () {
 
     let errors = await subject.validate(scheduledPayment);
     expect(errors.feePercentage).deep.equal(['fee percentage must be between 0 and 1']);
+  });
+
+  it('validates scheduled payment with invalid gas token', async function () {
+    let subject = await getContainer().lookup('scheduled-payment-validator');
+
+    const scheduledPayment: Partial<ScheduledPayment> = {
+      chainId: 1, //Mainnet
+      gasTokenAddress: '0x36F2319Fbb44772e0ED58fB7c99cf8da59e2b5BA',
+    };
+
+    let errors = await subject.validate(scheduledPayment);
+    expect(errors.gasTokenAddress).deep.equal([
+      'gas token is not supported, supported gas token: 0x52031d287Bb58E26A379A7Fec2c84acB54f54fe3, 0x26F2319Fbb44772e0ED58fB7c99cf8da59e2b5BE',
+    ]);
   });
 });

@@ -30,7 +30,7 @@ type ScheduledPaymentErrors = Record<ScheduledPaymentAttribute, string[]>;
 export default class ScheduledPaymentValidator {
   cardpay = inject('cardpay');
 
-  validate(scheduledPayment: Partial<ScheduledPayment>): ScheduledPaymentErrors {
+  async validate(scheduledPayment: Partial<ScheduledPayment>): Promise<ScheduledPaymentErrors> {
     let errors: ScheduledPaymentErrors = {
       senderSafeAddress: [],
       moduleAddress: [],
@@ -89,23 +89,34 @@ export default class ScheduledPaymentValidator {
       }
     }
 
-    if (scheduledPayment.chainId && !isSupportedChain(scheduledPayment.chainId)) {
-      errors.chainId.push(`chain is not supported`);
-    }
+    if (scheduledPayment.chainId) {
+      if (!isSupportedChain(scheduledPayment.chainId)) {
+        errors.chainId.push(`chain is not supported`);
+      } else {
+        let feeFixedUSD =
+          this.cardpay.getConstantByNetwork('scheduledPaymentFeeFixedUSD', scheduledPayment.chainId) ?? 0;
+        if (Number(scheduledPayment.feeFixedUsd) < feeFixedUSD) {
+          errors.feeFixedUsd.push(`fee USD must be greater than or equal ${feeFixedUSD}`);
+        }
 
-    if (scheduledPayment.chainId && isSupportedChain(scheduledPayment.chainId)) {
-      let feeFixedUSD = this.cardpay.getConstantByNetwork('scheduledPaymentFeeFixedUSD', scheduledPayment.chainId) ?? 0;
-      if (Number(scheduledPayment.feeFixedUsd) < feeFixedUSD) {
-        errors.feeFixedUsd.push(`fee USD must be greater than or equal ${feeFixedUSD}`);
-      }
+        let feePercentage =
+          this.cardpay.getConstantByNetwork('scheduledPaymentFeePercentage', scheduledPayment.chainId) ?? 0;
+        if (Number(scheduledPayment.feePercentage) < 0 || Number(scheduledPayment.feePercentage) > 1) {
+          errors.feePercentage.push(`fee percentage must be between 0 and 1`);
+        } else if (Number(scheduledPayment.feePercentage) < feePercentage) {
+          errors.feePercentage.push(`fee percentage must be greater than or equal ${feePercentage}`);
+        }
 
-      let feePercentage =
-        this.cardpay.getConstantByNetwork('scheduledPaymentFeePercentage', scheduledPayment.chainId) ?? 0;
-      let _feePercentage = Number(scheduledPayment.feePercentage);
-      if (_feePercentage < 0 || _feePercentage > 1) {
-        errors.feePercentage.push(`fee percentage must be between 0 and 1`);
-      } else if (_feePercentage < feePercentage) {
-        errors.feePercentage.push(`fee percentage must be greater than or equal ${feePercentage}`);
+        let supportedGasTokens = await this.cardpay.fetchSupportedGasTokens(scheduledPayment.chainId);
+        if (
+          !supportedGasTokens.find(
+            (supportedGasToken) => supportedGasToken.address === scheduledPayment.gasTokenAddress
+          )
+        ) {
+          errors.gasTokenAddress.push(
+            `gas token is not supported, supported gas token: ${supportedGasTokens.map((sp) => sp.address).join(', ')}`
+          );
+        }
       }
     }
 

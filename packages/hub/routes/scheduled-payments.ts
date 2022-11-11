@@ -98,7 +98,7 @@ export default class ScheduledPaymentsRoute {
       params.payAt = calculateNextPayAt(new Date(), params.recurringDayOfMonth);
     }
 
-    let errors = this.scheduledPaymentValidator.validate(params);
+    let errors = await this.scheduledPaymentValidator.validate(params);
     let hasErrors = Object.values(errors).flatMap((i) => i).length > 0;
     if (hasErrors) {
       ctx.status = 422;

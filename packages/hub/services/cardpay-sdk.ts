@@ -4,6 +4,7 @@ import {
   waitForTransactionConsistency,
   gqlQuery,
   getConstantByNetwork,
+  fetchSupportedGasTokens,
 } from '@cardstack/cardpay-sdk';
 
 // This service makes it easier to mock the SDK in our tests
@@ -13,6 +14,7 @@ export default class CardpaySDKService {
   waitForTransactionConsistency = waitForTransactionConsistency;
   gqlQuery = gqlQuery;
   getConstantByNetwork = getConstantByNetwork;
+  fetchSupportedGasTokens = fetchSupportedGasTokens;
 }
 
 declare module '@cardstack/di' {

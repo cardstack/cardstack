@@ -1,3 +1,4 @@
+import { Networkish, TokenDetail } from '@cardstack/cardpay-sdk';
 import { PrismaClient } from '@prisma/client';
 import { calculateNextPayAt } from '../../utils/scheduled-payments';
 import { registry, setupHub } from '../helpers/server';
@@ -6,6 +7,43 @@ import { setupStubWorkerClient } from '../helpers/stub-worker-client';
 class StubAuthenticationUtils {
   validateAuthToken(encryptedAuthToken: string) {
     return handleValidateAuthToken(encryptedAuthToken);
+  }
+}
+class StubCardpaySDK {
+  getConstantByNetwork(name: string, network: Networkish) {
+    if (!network) {
+      throw new Error(`network can't be null`);
+    }
+
+    switch (name) {
+      case 'scheduledPaymentFeeFixedUSD':
+        return 0.25;
+      case 'scheduledPaymentFeePercentage':
+        return 0.1;
+      default:
+        throw new Error(`unsupported mock cardpay`);
+    }
+  }
+
+  fetchSupportedGasTokens(network: Networkish): TokenDetail[] {
+    if (!network) {
+      throw new Error(`network can't be null`);
+    }
+
+    return [
+      {
+        address: '0x52031d287Bb58E26A379A7Fec2c84acB54f54fe3',
+        name: 'CARD Token',
+        symbol: 'CARD.CPXD',
+        decimals: 18,
+      },
+      {
+        address: '0x26F2319Fbb44772e0ED58fB7c99cf8da59e2b5BE',
+        name: 'DAI Token',
+        symbol: 'DAI.CPXD',
+        decimals: 18,
+      },
+    ];
   }
 }
 
@@ -18,6 +56,7 @@ function handleValidateAuthToken(encryptedString: string) {
 describe('POST /api/scheduled-payments', async function () {
   this.beforeEach(async function () {
     registry(this).register('authentication-utils', StubAuthenticationUtils);
+    registry(this).register('cardpay', StubCardpaySDK);
   });
 
   let { request } = setupHub(this);
@@ -181,7 +220,7 @@ describe('POST /api/scheduled-payments', async function () {
             'sender-safe-address': '0xc0ffee254729296a45a3885639AC7E10F9d54979',
             'module-address': '0x7E7d0B97D663e268bB403eb4d72f7C0C7650a6dd',
             'token-address': '0xa455bbB2A81E09E0337c13326BBb302Cb37D7cf6',
-            'gas-token-address': '0xa455bbB2A81E09E0337c13326BBb302Cb37D7cf6',
+            'gas-token-address': '0x26F2319Fbb44772e0ED58fB7c99cf8da59e2b5BE',
             amount: '10000000000000000000',
             'payee-address': '0x821f3Ee0FbE6D1aCDAC160b5d120390Fb8D2e9d3',
             'execution-gas-estimation': 100000,
@@ -211,7 +250,7 @@ describe('POST /api/scheduled-payments', async function () {
             'sender-safe-address': '0xc0ffee254729296a45a3885639AC7E10F9d54979',
             'module-address': '0x7E7d0B97D663e268bB403eb4d72f7C0C7650a6dd',
             'token-address': '0xa455bbB2A81E09E0337c13326BBb302Cb37D7cf6',
-            'gas-token-address': '0xa455bbB2A81E09E0337c13326BBb302Cb37D7cf6',
+            'gas-token-address': '0x26F2319Fbb44772e0ED58fB7c99cf8da59e2b5BE',
             amount: '10000000000000000000',
             'payee-address': '0x821f3Ee0FbE6D1aCDAC160b5d120390Fb8D2e9d3',
             'execution-gas-estimation': 100000,
@@ -250,7 +289,7 @@ describe('POST /api/scheduled-payments', async function () {
             'sender-safe-address': '0xc0ffee254729296a45a3885639AC7E10F9d54979',
             'module-address': '0x7E7d0B97D663e268bB403eb4d72f7C0C7650a6dd',
             'token-address': '0xa455bbB2A81E09E0337c13326BBb302Cb37D7cf6',
-            'gas-token-address': '0xa455bbB2A81E09E0337c13326BBb302Cb37D7cf6',
+            'gas-token-address': '0x26F2319Fbb44772e0ED58fB7c99cf8da59e2b5BE',
             amount: '100',
             'payee-address': '0x821f3Ee0FbE6D1aCDAC160b5d120390Fb8D2e9d3',
             'execution-gas-estimation': 100000,
@@ -284,7 +323,7 @@ describe('POST /api/scheduled-payments', async function () {
             'sender-safe-address': '0xc0ffee254729296a45a3885639AC7E10F9d54979',
             'module-address': '0x7E7d0B97D663e268bB403eb4d72f7C0C7650a6dd',
             'token-address': '0xa455bbB2A81E09E0337c13326BBb302Cb37D7cf6',
-            'gas-token-address': '0xa455bbB2A81E09E0337c13326BBb302Cb37D7cf6',
+            'gas-token-address': '0x26F2319Fbb44772e0ED58fB7c99cf8da59e2b5BE',
             amount: '100',
             'payee-address': '0x821f3Ee0FbE6D1aCDAC160b5d120390Fb8D2e9d3',
             'execution-gas-estimation': 100000,

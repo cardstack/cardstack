@@ -3,7 +3,7 @@
 import { getConstant, supportedChains, Network, networks, supportedChainsArray } from './constants';
 import { HubConfigResponse, RpcNodeUrl } from './hub-config';
 
-type Networkish = string | number | Network;
+export type Networkish = string | number | Network;
 
 const convertChainIdToName = (network: Networkish) => (typeof network === 'number' ? networks[network] : network);
 
