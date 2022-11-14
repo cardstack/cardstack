@@ -6,8 +6,8 @@ import { on } from '@ember/modifier';
 import { tracked } from '@glimmer/tracking';
 import { action } from '@ember/object';
 import { inject as service } from '@ember/service';
-import set from 'ember-set-helper/helpers/set';
 import { type EmptyObject } from '@ember/component/helper';
+import { taskFor } from 'ember-concurrency-ts';
 
 import BoxelButton from '@cardstack/boxel/components/boxel/button';
 import WalletService from '@cardstack/safe-tools-client/services/wallet';
@@ -60,8 +60,22 @@ export default class CreateSafeButton extends Component<Signature> {
     }
   }
 
-  @action async handleSafeCreation() {
-    //TODO: implement safe creating and handle status
+  @action closeModal() {
+    this.isModalOpen = false
+  }
+
+  @action handleSafeCreation() {
+    taskFor(this.scheduledPaymentsSdk.createSafe).perform()
+    .then(() => { 
+      this.closeModal();
+    }).catch((e) => {
+      //TODO: handle error case
+      console.log('Error creating safe', e)
+    })
+  }
+
+  get isProvisioning() { 
+    return taskFor(this.scheduledPaymentsSdk.createSafe).isRunning
   }
 
   <template>
@@ -71,9 +85,9 @@ export default class CreateSafeButton extends Component<Signature> {
 
     <SetupSafeModal
       @isOpen={{this.isModalOpen}}
-      @onClose={{set this 'isModalOpen' false}}
+      @onClose={{this.closeModal}}
       @isLoadingGasInfo={{this.isLoadingGasInfo}}
-      @provisioning={{false}}
+      @isProvisioning={{this.isProvisioning}}
       @onProvisionClick={{this.handleSafeCreation}}
       @hasEnoughBalance={{this.hasEnoughBalance}}
       @gasCostDisplay={{this.gasCostDisplay}}
