@@ -26,6 +26,7 @@ export type { AddressKeys } from './contracts/addresses';
 export type { TransactionOptions } from './sdk/utils/general-utils';
 
 export { viewSafe } from './sdk/safes';
+export { getSafesWithSpModuleEnabled } from './sdk/scheduled-payment/safes';
 export { getAddress, getAddressByNetwork, getOracle, getOracleByNetwork } from './contracts/addresses';
 export * from './sdk/constants';
 export {
