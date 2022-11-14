@@ -14,28 +14,22 @@ export default class TokensService extends Service {
   @service declare network: NetworkService;
 
   @use gasTokens = resource(() => {
-    const state = new TrackedObject({
+    const state: GasTokenResourceState = new TrackedObject({
       isLoading: true,
-    } as GasTokenResourceState);
+    });
 
     // because networkInfo is tracked, anytime the network switches,
     // this resource will re-run
+    const chainId = this.network.networkInfo.chainId;
     (async () => {
       try {
-        state.value = await fetchSupportedGasTokens(
-          this.network.networkInfo.chainId
-        );
+        state.value = await fetchSupportedGasTokens(chainId);
       } catch (error) {
         state.error = error;
       } finally {
         state.isLoading = false;
       }
     })();
-    // TODO: enrich gas token array with icons so the result looks like:
-    //     [{ name: 'CARD', ..., icon: 'card' },
-    //      { name: 'HI', ..., icon: 'emoji' },
-    //      { name: 'WORLD', ..., icon: 'world' }]
-
     return state;
   });
 }

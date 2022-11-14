@@ -11,13 +11,14 @@ import { SelectableToken } from '@cardstack/boxel/components/boxel/input/selecta
 import BoxelTokenSelect from '@cardstack/boxel/components/boxel/input/token-select';
 import BoxelToggleButtonGroup from '@cardstack/boxel/components/boxel/toggle-button-group';
 import { inject as service } from '@ember/service';
-import TokensService from '../services/tokens';
+import TokensService from '../../services/tokens';
 import { action } from '@ember/object';
 import { tracked } from '@glimmer/tracking';
 import { fn } from '@ember/helper';
 import { on } from '@ember/modifier';
 import { svgJar } from '@cardstack/boxel/utils/svg-jar';
 import eq from 'ember-truth-helpers/helpers/eq';
+import withTokenIcons from '../../helpers/with-token-icons';
 import './index.css';
 
 interface Signature {
@@ -196,7 +197,7 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
             @placeholder="Choose a Gas Token"
             @value={{this.selectedGasToken}}
             @onChooseToken={{this.onSelectGasToken}}
-            @tokens={{this.tokens.gasTokens.value}}
+            @tokens={{withTokenIcons this.tokens.gasTokens.value}}
           />
         </BoxelField>
         <BoxelField @label="Max Gas Fee">
