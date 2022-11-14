@@ -7,8 +7,8 @@ import { isStorage404 } from '@cardstack/web-client/utils/fetch-off-chain-json';
 
 interface Args {
   named: {
-    infoDID: string;
-    waitForInfo: boolean;
+    infoDID?: string;
+    waitForInfo?: boolean;
   };
 }
 
@@ -33,10 +33,10 @@ export class Profile extends Resource<Args> implements ProfileResource {
   @service declare offChainJson: OffChainJsonService;
 
   modify(_positional: any, named: any) {
-    this.run(named.infoDID, named.waitForInfo);
+    this.run(named.infoDID, named.waitForInfo ?? false);
   }
 
-  private async run(infoDID: string, waitForInfo: boolean) {
+  private async run(infoDID: string | undefined, waitForInfo: boolean) {
     try {
       await this.fetchProfile(infoDID, waitForInfo);
       this.loading = false;
@@ -52,9 +52,12 @@ export class Profile extends Resource<Args> implements ProfileResource {
   }
 
   private async fetchProfile(
-    infoDID: string,
+    infoDID?: string,
     waitForInfo = false
   ): Promise<void> {
+    if (!infoDID) {
+      return;
+    }
     let jsonApiDocument = await this.offChainJson.fetch(infoDID, waitForInfo);
 
     if (jsonApiDocument) {
