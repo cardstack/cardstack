@@ -66,7 +66,9 @@ export default class CreateSafeButton extends Component<Signature> {
 
   @action handleSafeCreation() {
     taskFor(this.scheduledPaymentsSdk.createSafe).perform()
-    .then(() => { 
+    .then(async () => { 
+      // Fetch from sdk or add task result manually ??
+      await this.wallet.fetchSafes();
       this.closeModal();
     }).catch((e) => {
       //TODO: handle error case
