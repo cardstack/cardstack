@@ -64,6 +64,7 @@ app "hub" {
         MAILCHIMP_API_KEY                             = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_MAILCHIMP_API_KEY-lkxsEk"
         CRYPTOCOMPARE_API_KEY                         = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_CRYPTOCOMPARE_API_KEY-3Sk0nr"
         HUB_PRIVATE_KEY                               = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_hub_private_key-fJhPUj"
+        CHECKLY_WEBHOOK_SECRET                        = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_hub_checkly_webhook_secret-etKeUa"
       }
     }
 
