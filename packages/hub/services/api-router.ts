@@ -142,6 +142,7 @@ export default class APIRouter {
     apiSubrouter.put('/notification-preferences/:push_client_id', parseBody, notificationPreferencesRoute.put);
     apiSubrouter.post('/scheduled-payments', parseBody, scheduledPaymentsRoute.post);
     apiSubrouter.get('/scheduled-payments/:scheduled_payment_id', parseBody, scheduledPaymentsRoute.get);
+    apiSubrouter.get('/scheduled-payments', parseBody, scheduledPaymentsRoute.list);
     apiSubrouter.patch('/scheduled-payments/:scheduled_payment_id', parseBody, scheduledPaymentsRoute.patch);
     apiSubrouter.delete('/scheduled-payments/:scheduled_payment_id', parseBody, scheduledPaymentsRoute.delete);
     apiSubrouter.get('/wyre-prices', parseBody, wyrePricesRoute.get);

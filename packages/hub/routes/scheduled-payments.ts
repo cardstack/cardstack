@@ -51,6 +51,29 @@ export default class ScheduledPaymentsRoute {
     ctx.type = 'application/vnd.api+json';
   }
 
+  async list(ctx: Koa.Context) {
+    if (!ensureLoggedIn(ctx)) {
+      return;
+    }
+
+    let prisma = await this.prismaManager.getClient();
+
+    let minPayAt = new Date((ctx.query['filter[payAt][gt]'] as string) || 0);
+
+    let scheduledPayments = await prisma.scheduledPayment.findMany({
+      where: {
+        userAddress: ctx.state.userAddress,
+        payAt: {
+          gt: minPayAt,
+        },
+      },
+    });
+
+    ctx.body = this.scheduledPaymentSerializer.serialize(scheduledPayments);
+    ctx.status = 200;
+    ctx.type = 'application/vnd.api+json';
+  }
+
   async post(ctx: Koa.Context) {
     if (!ensureLoggedIn(ctx)) {
       return;

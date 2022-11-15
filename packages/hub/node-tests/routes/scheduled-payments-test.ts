@@ -1,4 +1,7 @@
 import { PrismaClient } from '@prisma/client';
+import { subDays } from 'date-fns';
+import shortUuid from 'short-uuid';
+import { nowUtc } from '../../utils/dates';
 import { calculateNextPayAt } from '../../utils/scheduled-payments';
 import { registry, setupHub } from '../helpers/server';
 import { setupStubWorkerClient } from '../helpers/stub-worker-client';
@@ -311,6 +314,181 @@ describe('POST /api/scheduled-payments', async function () {
         let payAt = new Date(responsePayAt);
         let delta = Math.abs(payAt.getTime() - calculatedPayAt.getTime());
         expect(delta).to.be.lessThan(2000);
+      });
+  });
+});
+
+describe('GET /api/scheduled-payments', async function () {
+  let prisma: PrismaClient;
+
+  this.beforeEach(async function () {
+    registry(this).register('authentication-utils', StubAuthenticationUtils);
+  });
+
+  let { request, getContainer } = setupHub(this);
+
+  this.beforeEach(async function () {
+    let container = getContainer();
+    prisma = await (await container.lookup('prisma-manager')).getClient();
+  });
+
+  it('returns a 401 if the auth token is invalid', async function () {
+    await request()
+      .get('/api/scheduled-payments')
+      .set('Accept', 'application/vnd.api+json')
+      .set('Content-Type', 'application/vnd.api+json')
+      .expect(401)
+      .expect({
+        errors: [
+          {
+            status: '401',
+            title: 'No valid auth token',
+          },
+        ],
+      })
+      .expect('Content-Type', 'application/vnd.api+json');
+  });
+
+  it('returns scheduled payments for the user', async function () {
+    let sp1 = await prisma.scheduledPayment.create({
+      data: {
+        id: shortUuid.uuid(),
+        senderSafeAddress: '0xc0ffee254729296a45a3885639AC7E10F9d54979',
+        moduleAddress: '0x7E7d0B97D663e268bB403eb4d72f7C0C7650a6dd',
+        tokenAddress: '0xa455bbB2A81E09E0337c13326BBb302Cb37D7cf6',
+        gasTokenAddress: '0x6A50E3807FB9cD0B07a79F64e561B9873D3b132E',
+        amount: '100',
+        payeeAddress: '0x821f3Ee0FbE6D1aCDAC160b5d120390Fb8D2e9d3',
+        executionGasEstimation: 100000,
+        maxGasPrice: '1000000000',
+        feeFixedUsd: '0',
+        feePercentage: '0',
+        salt: '54lt',
+        payAt: '2022-11-14T18:49:13.000Z',
+        spHash: '0x123',
+        chainId: 1,
+        userAddress: stubUserAddress,
+        creationTransactionHash: null,
+      },
+    });
+
+    // Payment by another user
+    await prisma.scheduledPayment.create({
+      data: {
+        id: shortUuid.uuid(),
+        senderSafeAddress: '0xc0ffee254729296a45a3885639AC7E10F9d54979',
+        moduleAddress: '0x7E7d0B97D663e268bB403eb4d72f7C0C7650a6dd',
+        tokenAddress: '0xa455bbB2A81E09E0337c13326BBb302Cb37D7cf6',
+        gasTokenAddress: '0x6A50E3807FB9cD0B07a79F64e561B9873D3b132E',
+        amount: '100',
+        payeeAddress: '0x821f3Ee0FbE6D1aCDAC160b5d120390Fb8D2e9d3',
+        executionGasEstimation: 100000,
+        maxGasPrice: '1000000000',
+        feeFixedUsd: '0',
+        feePercentage: '0',
+        salt: '54lt',
+        payAt: '2022-11-14T18:49:13.000Z',
+        spHash: '0x1234',
+        chainId: 1,
+        userAddress: '0x821f3Ee0FbE6D1aCDAC160b5d120390Fb8D2e9d3',
+        creationTransactionHash: null,
+      },
+    });
+
+    await request()
+      .get(`/api/scheduled-payments`)
+      .set('Authorization', 'Bearer abc123--def456--ghi789')
+      .set('Accept', 'application/vnd.api+json')
+      .set('Content-Type', 'application/vnd.api+json')
+      .expect(200)
+      .expect({
+        data: [
+          {
+            id: sp1.id,
+            type: 'scheduled-payment',
+            attributes: {
+              'sender-safe-address': '0xc0ffee254729296a45a3885639AC7E10F9d54979',
+              'module-address': '0x7E7d0B97D663e268bB403eb4d72f7C0C7650a6dd',
+              'token-address': '0xa455bbB2A81E09E0337c13326BBb302Cb37D7cf6',
+              'gas-token-address': '0x6A50E3807FB9cD0B07a79F64e561B9873D3b132E',
+              amount: '100',
+              'payee-address': '0x821f3Ee0FbE6D1aCDAC160b5d120390Fb8D2e9d3',
+              'execution-gas-estimation': 100000,
+              'max-gas-price': '1000000000',
+              'fee-fixed-usd': '0',
+              'fee-percentage': '0',
+              salt: '54lt',
+              'pay-at': '2022-11-14T18:49:13.000Z',
+              'sp-hash': '0x123',
+              'chain-id': 1,
+              'user-address': stubUserAddress,
+              'creation-transaction-hash': null,
+              'creation-block-number': null,
+              'creation-transaction-error': null,
+              'cancelation-transaction-hash': null,
+              'cancelation-block-number': null,
+              'recurring-day-of-month': null,
+              'recurring-until': null,
+            },
+          },
+        ],
+      });
+  });
+
+  it('returns filtered scheduled payments', async function () {
+    await prisma.scheduledPayment.create({
+      data: {
+        id: shortUuid.uuid(),
+        senderSafeAddress: '0xc0ffee254729296a45a3885639AC7E10F9d54979',
+        moduleAddress: '0x7E7d0B97D663e268bB403eb4d72f7C0C7650a6dd',
+        tokenAddress: '0xa455bbB2A81E09E0337c13326BBb302Cb37D7cf6',
+        gasTokenAddress: '0x6A50E3807FB9cD0B07a79F64e561B9873D3b132E',
+        amount: '100',
+        payeeAddress: '0x821f3Ee0FbE6D1aCDAC160b5d120390Fb8D2e9d3',
+        executionGasEstimation: 100000,
+        maxGasPrice: '1000000000',
+        feeFixedUsd: '0',
+        feePercentage: '0',
+        salt: '54lt',
+        payAt: subDays(nowUtc(), 3),
+        spHash: '0x123',
+        chainId: 1,
+        userAddress: stubUserAddress,
+        creationTransactionHash: null,
+      },
+    });
+
+    let sp2 = await prisma.scheduledPayment.create({
+      data: {
+        id: shortUuid.uuid(),
+        senderSafeAddress: '0xc0ffee254729296a45a3885639AC7E10F9d54979',
+        moduleAddress: '0x7E7d0B97D663e268bB403eb4d72f7C0C7650a6dd',
+        tokenAddress: '0xa455bbB2A81E09E0337c13326BBb302Cb37D7cf6',
+        gasTokenAddress: '0x6A50E3807FB9cD0B07a79F64e561B9873D3b132E',
+        amount: '100',
+        payeeAddress: '0x821f3Ee0FbE6D1aCDAC160b5d120390Fb8D2e9d3',
+        executionGasEstimation: 100000,
+        maxGasPrice: '1000000000',
+        feeFixedUsd: '0',
+        feePercentage: '0',
+        salt: '54lt',
+        payAt: subDays(nowUtc(), 1),
+        spHash: '0x1234',
+        chainId: 1,
+        userAddress: stubUserAddress,
+        creationTransactionHash: null,
+      },
+    });
+
+    await request()
+      .get(`/api/scheduled-payments?filter[payAt][gt]=${subDays(nowUtc(), 2).toISOString()}`)
+      .set('Authorization', 'Bearer abc123--def456--ghi789')
+      .set('Accept', 'application/vnd.api+json')
+      .set('Content-Type', 'application/vnd.api+json')
+      .expect(200)
+      .then((response) => {
+        expect(response.body.data.length).to.equal(1);
+        expect(response.body.data[0].id).to.equal(sp2.id);
       });
   });
 });
