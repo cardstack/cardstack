@@ -110,5 +110,10 @@
   },
   "authSecret": "HUB_AUTH_SECRET",
   "emailHashSalt": "HUB_EMAIL_HASH_SALT",
-  "hubPrivateKey": "HUB_PRIVATE_KEY"
+  "hubPrivateKey": "HUB_PRIVATE_KEY",
+  "gasStationUrls": {
+    "gnosis": "GNOSIS_GAS_STATION_URL",
+    "ethereum": "ETHEREUM_GAS_STATION_URL",
+    "polygon": "POLYGON_GAS_STATION_URL"
+  }
 }

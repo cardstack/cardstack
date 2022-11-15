@@ -5,7 +5,8 @@ import { HubConfigResponse, RpcNodeUrl } from './hub-config';
 
 type Networkish = string | number | Network;
 
-const convertChainIdToName = (network: Networkish) => (typeof network === 'number' ? networks[network] : network);
+export const convertChainIdToName = (network: Networkish) =>
+  typeof network === 'number' ? networks[network] : network;
 
 export const getWeb3ConfigByNetwork = (config: HubConfigResponse, network: Networkish): RpcNodeUrl => {
   const networkName = convertChainIdToName(network);

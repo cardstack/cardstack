@@ -340,6 +340,18 @@ model CrankNonce {
   @@map("crank_nonces")
 }
 
+model GasPrice {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  chainId   Int      @unique @map("chain_id")
+  slow      String
+  standard  String
+  fast      String
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt DateTime @default(now()) @map("updated_at") @db.Timestamp(6)
+
+  @@map("gas_prices")
+}
+
 enum DiscordBotsStatusEnum {
   connecting
   connected
