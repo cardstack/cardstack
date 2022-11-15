@@ -62,6 +62,7 @@ app "hub" {
         PAGERDUTY_TOKEN                               = "arn:aws:secretsmanager:us-east-1:120317779495:secret:PAGERDUTY_TOKEN-1L68JJ"
         MAILCHIMP_API_KEY                             = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_MAILCHIMP_API_KEY-XCGDUW"
         CRYPTOCOMPARE_API_KEY                         = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_CRYPTOCOMPARE_API_KEY-c9yTJ9"
+        CHECKLY_WEBHOOK_SECRET                        = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_hub_checkly_webhook_secret-1VZEgk"
       }
     }
 
