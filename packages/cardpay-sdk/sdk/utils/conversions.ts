@@ -24,11 +24,11 @@ export async function gasPriceInToken(provider: JsonRpcProvider, tokenAddress: s
   let network = await networkName(provider);
 
   // Gas station will return current gas price in native token in wei.
-  let gasStationResponse = await fetch(`${getConstantByNetwork('relayServiceURL', network)}/v1/gas-station/`, {
+  let gasStationResponse = await fetch(`${getConstantByNetwork('hubUrl', network)}/api/gas-station/${provider.network.chainId}`, {
     method: 'GET',
     headers: {
-      'Content-Type': 'application/json',
-      Accept: 'application/json',
+      'Content-Type': 'application/vnd.api+json',
+      Accept: 'application/vnd.api+json',
     },
   });
   let gasPriceInNativeTokenInWei = new BN((await gasStationResponse.json()).standard);
