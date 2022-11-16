@@ -55,6 +55,7 @@
     "chai-as-promised": "^7.1.1",
     "mocha": "^10.1.0",
     "node-fetch": "^2.6.1",
+    "sinon": "^14.0.2",
     "ts-node": "^10.9.1",
     "tsup": "^5.11.7",
     "typescript": "^4.7.4"
