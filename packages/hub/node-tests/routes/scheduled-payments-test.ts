@@ -481,7 +481,7 @@ describe('GET /api/scheduled-payments', async function () {
     });
 
     await request()
-      .get(`/api/scheduled-payments?filter[payAt][gt]=${subDays(nowUtc(), 2).toISOString()}`)
+      .get(`/api/scheduled-payments?filter[pay-at][gt]=${subDays(nowUtc(), 2).toISOString()}`)
       .set('Authorization', 'Bearer abc123--def456--ghi789')
       .set('Accept', 'application/vnd.api+json')
       .set('Content-Type', 'application/vnd.api+json')
