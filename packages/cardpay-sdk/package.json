@@ -67,6 +67,9 @@
     "clean": "rm -rf dist generated",
     "postinstall": "yarn codegen",
     "codegen": "if [ -f ./bin/codegen.js ]; then node bin/codegen.js; fi",
+    "lint": "npm-run-all --aggregate-output --continue-on-error --parallel \"lint:!(fix)\"",
+    "lint:js": "eslint . --cache",
+    "lint:js:fix": "eslint . --fix",
     "prepack": "rm -rf ./dist && tsup ./index.ts --format esm,cjs --dts --legacy-output",
     "test": "mocha -r ts-node/register 'tests/**/*-test.ts' --timeout 60000",
     "autotest": "mocha -r ts-node/register -w --reporter=min 'tests/**/*-test.ts' --timeout 60000"
