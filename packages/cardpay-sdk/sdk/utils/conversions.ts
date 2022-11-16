@@ -24,13 +24,16 @@ export async function gasPriceInToken(provider: JsonRpcProvider, tokenAddress: s
   let network = await networkName(provider);
 
   // Gas station will return current gas price in native token in wei.
-  let gasStationResponse = await fetch(`${getConstantByNetwork('hubUrl', network)}/api/gas-station/${provider.network.chainId}`, {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/vnd.api+json',
-      Accept: 'application/vnd.api+json',
-    },
-  });
+  let gasStationResponse = await fetch(
+    `${getConstantByNetwork('hubUrl', network)}/api/gas-station/${provider.network.chainId}`,
+    {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/vnd.api+json',
+        Accept: 'application/vnd.api+json',
+      },
+    }
+  );
   let gasPriceInNativeTokenInWei = new BN((await gasStationResponse.json()).standard);
 
   // We use the wrapped native token address because the native token doesn't have an address in Uniswap.
