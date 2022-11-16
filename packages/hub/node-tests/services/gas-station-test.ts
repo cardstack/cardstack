@@ -20,16 +20,16 @@ const ethereumGasPrice = {
 
 const polygonGasPrice = {
   safeLow: {
-    maxPriorityFee: 1.39333,
-    maxFee: 1.39333,
+    maxPriorityFee: 1.3933308172,
+    maxFee: 1.3933373142,
   },
   standard: {
-    maxPriorityFee: 1.473333,
-    maxFee: 1.4733396,
+    maxPriorityFee: 1.4733331094666666,
+    maxFee: 1.4733396064666666,
   },
   fast: {
-    maxPriorityFee: 1.69998,
-    maxFee: 1.7,
+    maxPriorityFee: 1.6999998912666667,
+    maxFee: 1.7000063882666667,
   },
   estimatedBaseFee: 0.000006497,
   blockTime: 5,
@@ -72,6 +72,27 @@ describe('GasStationService', function () {
     mockServer.close();
   });
 
+  it('throws unsupported network if chain id not supported', async function () {
+    let chainId = 0;
+    await expect(subject.getGasPriceByChainId(chainId)).to.be.rejectedWith(
+      'Cannot get gas station url, unsupported network: 0'
+    );
+  });
+
+  it('throws cannot retrieve gas price if chain id not supported', async function () {
+    let newMockServer = setupServer(
+      rest.get(config.get('gasStationUrls.ethereum'), (_req, res, ctx) => {
+        return res(ctx.status(500));
+      })
+    );
+    newMockServer.listen();
+    let chainId = 1;
+    await expect(subject.getGasPriceByChainId(chainId)).to.be.rejectedWith(
+      `Cannot retrieve gas price from gas station: ${config.get('gasStationUrls.ethereum')}`
+    );
+    newMockServer.close();
+  });
+
   it('returns gas price for ethereum', async function () {
     let chainId = 1;
     let prisma = await getPrisma();
@@ -101,11 +122,15 @@ describe('GasStationService', function () {
     });
 
     expect(gasPrice).not.null;
-    expect(gasPrice?.slow).equal(ethers.utils.parseUnits(String(polygonGasPrice.safeLow.maxFee), 'gwei').toString());
-    expect(gasPrice?.standard).equal(
-      ethers.utils.parseUnits(String(polygonGasPrice.standard.maxFee), 'gwei').toString()
+    expect(gasPrice?.slow).equal(
+      ethers.utils.parseUnits(String(polygonGasPrice.safeLow.maxFee.toFixed(9)), 'gwei').toString()
     );
-    expect(gasPrice?.fast).equal(ethers.utils.parseUnits(String(polygonGasPrice.fast.maxFee), 'gwei').toString());
+    expect(gasPrice?.standard).equal(
+      ethers.utils.parseUnits(String(polygonGasPrice.standard.maxFee.toFixed(9)), 'gwei').toString()
+    );
+    expect(gasPrice?.fast).equal(
+      ethers.utils.parseUnits(String(polygonGasPrice.fast.maxFee.toFixed(9)), 'gwei').toString()
+    );
     expect(gasPrice?.chainId).equal(gasPriceFromDB?.chainId);
     expect(gasPrice?.slow).equal(gasPriceFromDB?.slow);
     expect(gasPrice?.standard).equal(gasPriceFromDB?.standard);

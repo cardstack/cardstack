@@ -1,27 +1,30 @@
 import Koa from 'koa';
 import autoBind from 'auto-bind';
 import { inject } from '@cardstack/di';
+import { NotFound } from '@cardstack/core/src/utils/errors';
 
 export default class GasStationRoute {
-  gasStationService = inject('gas-station-service');
+  gasStationService = inject('gas-station-service', { as: 'gasStationService' });
 
   constructor() {
     autoBind(this);
   }
 
   async get(ctx: Koa.Context) {
-    let chainId: number = ctx.params.chainId;
-    let gasPrice = await this.gasStationService.getGasPriceByChainId(chainId);
-    if (!gasPrice) {
-      ctx.status = 404;
-      return;
+    try {
+      let chainId = Number(ctx.params.chain_id);
+      let gasPrice = await this.gasStationService.getGasPriceByChainId(chainId);
+      ctx.status = 200;
+      ctx.body = gasPrice;
+      ctx.type = 'application/vnd.api+json';
+    } catch (error) {
+      if (error instanceof NotFound) {
+        ctx.status = 404;
+        ctx.message = error.message;
+      } else {
+        ctx.status = 500;
+      }
     }
-
-    ctx.status = 200;
-    ctx.body = {
-      gasPrice,
-    };
-    ctx.type = 'application/vnd.api+json';
   }
 }
 

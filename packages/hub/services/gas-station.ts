@@ -6,6 +6,7 @@ import { addMilliseconds } from 'date-fns';
 import { nowUtc } from '../utils/dates';
 import config from 'config';
 import { ethers } from 'ethers';
+import { NotFound } from '@cardstack/core/src/utils/errors';
 
 export default class GasStationService {
   prismaManager = inject('prisma-manager', { as: 'prismaManager' });
@@ -17,74 +18,83 @@ export default class GasStationService {
       where: { chainId },
     });
 
-    if (!gasPrice || addMilliseconds(gasPrice.updatedAt, this.gasPriceTTL) <= nowUtc()) {
-      let url = this.getGasStatioUrl(chainId);
-      let response = await fetch(url, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          Accept: 'application/json',
-        },
-      });
-      if (!response.ok) {
-        throw new Error(`Cannot retrieve gas price from gas station: ${url}`);
-      }
-
-      let gasPriceResponse = this.extractGasPriceResponse(chainId, await response.json());
-      gasPrice = await prisma.gasPrice.upsert({
-        where: { chainId },
-        create: {
-          chainId,
-          slow: gasPriceResponse.slow.toString(),
-          standard: gasPriceResponse.standard.toString(),
-          fast: gasPriceResponse.fast.toString(),
-        },
-        update: {
-          slow: gasPriceResponse.slow.toString(),
-          standard: gasPriceResponse.standard.toString(),
-          fast: gasPriceResponse.fast.toString(),
-        },
-      });
+    if (gasPrice && addMilliseconds(gasPrice.updatedAt, this.gasPriceTTL) > nowUtc()) {
+      return gasPrice;
     }
+
+    let url = this.getGasStationUrl(chainId);
+    let response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+      },
+    });
+    if (!response.ok) {
+      throw new Error(`Cannot retrieve gas price from gas station: ${url}`);
+    }
+
+    let gasPriceResponse = this.extractGasPriceResponse(chainId, await response.json());
+    gasPrice = await prisma.gasPrice.upsert({
+      where: { chainId },
+      create: {
+        chainId,
+        slow: gasPriceResponse.slow.toString(),
+        standard: gasPriceResponse.standard.toString(),
+        fast: gasPriceResponse.fast.toString(),
+      },
+      update: {
+        slow: gasPriceResponse.slow.toString(),
+        standard: gasPriceResponse.standard.toString(),
+        fast: gasPriceResponse.fast.toString(),
+      },
+    });
 
     return gasPrice;
   }
 
-  private getGasStatioUrl(chainId: number) {
+  private getGasStationUrl(chainId: number) {
     const networkName = convertChainIdToName(chainId);
     const gasStationUrls: { ethereum: string; gnosis: string; polygon: string } = config.get('gasStationUrls');
     if (supportedChains.ethereum.includes(networkName)) return gasStationUrls.ethereum;
     if (supportedChains.gnosis.includes(networkName)) return gasStationUrls.gnosis;
     if (supportedChains.polygon.includes(networkName)) return gasStationUrls.polygon;
 
-    throw new Error(`Cannot get gas station url, unsupported network: ${chainId}`);
+    throw new NotFound(`Cannot get gas station url, unsupported network: ${chainId}`);
   }
 
   private extractGasPriceResponse(chainId: number, response: any) {
+    let gasPrice;
     const networkName = convertChainIdToName(chainId);
     if (supportedChains.ethereum.includes(networkName)) {
-      return {
-        slow: ethers.utils.parseUnits(String(response.result?.SafeGasPrice), 'gwei'),
-        standard: ethers.utils.parseUnits(String(response.result?.ProposeGasPrice), 'gwei'),
-        fast: ethers.utils.parseUnits(String(response.result?.FastGasPrice), 'gwei'),
+      gasPrice = {
+        slow: Number(response.result?.SafeGasPrice),
+        standard: Number(response.result?.ProposeGasPrice),
+        fast: Number(response.result?.FastGasPrice),
       };
-    }
-    if (supportedChains.gnosis.includes(networkName)) {
-      return {
-        slow: ethers.utils.parseUnits(String(response.slow), 'gwei'),
-        standard: ethers.utils.parseUnits(String(response.average), 'gwei'),
-        fast: ethers.utils.parseUnits(String(response.fast), 'gwei'),
+    } else if (supportedChains.gnosis.includes(networkName)) {
+      gasPrice = {
+        slow: Number(response.slow),
+        standard: Number(response.average),
+        fast: Number(response.fast),
       };
-    }
-    if (supportedChains.polygon.includes(networkName)) {
-      return {
-        slow: ethers.utils.parseUnits(String(response.safeLow?.maxFee), 'gwei'),
-        standard: ethers.utils.parseUnits(String(response.standard?.maxFee), 'gwei'),
-        fast: ethers.utils.parseUnits(String(response.fast?.maxFee), 'gwei'),
+    } else if (supportedChains.polygon.includes(networkName)) {
+      gasPrice = {
+        slow: Number(response.safeLow?.maxFee),
+        standard: Number(response.standard?.maxFee),
+        fast: Number(response.fast?.maxFee),
       };
+    } else {
+      throw new NotFound(`Cannot extract gas price, unsupported network: ${chainId}`);
     }
 
-    throw new Error(`Cannot extract gas price, unsupported network: ${chainId}`);
+    // Convert from gwei to wei
+    // ensure decimal point of gwei is 9 to avoid underflow error
+    return {
+      slow: ethers.utils.parseUnits(String(gasPrice.slow.toFixed(9)), 'gwei'),
+      standard: ethers.utils.parseUnits(String(gasPrice.standard.toFixed(9)), 'gwei'),
+      fast: ethers.utils.parseUnits(String(gasPrice.fast.toFixed(9)), 'gwei'),
+    };
   }
 }
 
