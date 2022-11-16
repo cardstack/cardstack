@@ -2,6 +2,7 @@ import {
   isSupportedChain,
   getConstantByNetwork,
   getSDK,
+  getSafesWithSpModuleEnabled,
 } from '@cardstack/cardpay-sdk';
 import NetworkService from '@cardstack/safe-tools-client/services/network';
 import { ChainConnectionManager } from '@cardstack/safe-tools-client/utils/chain-connection-manager';
@@ -28,6 +29,7 @@ export default class Wallet extends Service {
   @tracked isConnecting = false;
 
   @tracked nativeTokenBalance: Record<'symbol' | 'amount', string> | undefined;
+  @tracked safes = [];
 
   // TODO: replace with ethers
   web3 = new Web3();
@@ -55,7 +57,7 @@ export default class Wallet extends Service {
     );
     this.chainConnectionManager.on('connected', (accounts: string[]) => {
       this.isConnected = true;
-      this.address = accounts[0];
+      this.address = Web3.utils.toChecksumAddress(accounts[0]);
     });
 
     this.chainConnectionManager.on('disconnected', () => {
@@ -92,6 +94,7 @@ export default class Wallet extends Service {
         .perform()
         .then(() => {
           if (this.isConnected) {
+            this.fetchSafes();
             onConnectSuccess();
           }
         })
@@ -129,6 +132,20 @@ export default class Wallet extends Service {
     };
 
     return this.nativeTokenBalance;
+  }
+
+  @action async fetchSafes() {
+    try {
+      if (this.address) {
+        // @ts-expect-error we should add correct typing to safe when integrating safesInfo
+        this.safes = await getSafesWithSpModuleEnabled(
+          this.network.symbol,
+          this.address
+        );
+      }
+    } catch (e) {
+      console.log('error fetching safes', e);
+    }
   }
 }
 
