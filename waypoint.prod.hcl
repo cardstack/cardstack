@@ -63,6 +63,9 @@ app "hub" {
         MAILCHIMP_API_KEY                             = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_MAILCHIMP_API_KEY-XCGDUW"
         CRYPTOCOMPARE_API_KEY                         = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_CRYPTOCOMPARE_API_KEY-c9yTJ9"
         CHECKLY_WEBHOOK_SECRET                        = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_hub_checkly_webhook_secret-1VZEgk"
+        GNOSIS_GAS_STATION_URL                        = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_gnosis_gas_station_url-HQGlfM"
+        ETHEREUM_GAS_STATION_URL                      = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_ethereum_gas_station_url-tVEK2G"
+        POLYGON_GAS_STATION_URL                       = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_polygon_gas_station_url-j7D7GO"
       }
     }
 
@@ -131,6 +134,9 @@ app "hub-worker" {
         DISCORD_ON_CALL_INTERNAL_WEBHOOK    = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_discord_on_call_internal_webhook-n7SCZC"
         PAGERDUTY_TOKEN                     = "arn:aws:secretsmanager:us-east-1:120317779495:secret:PAGERDUTY_TOKEN-1L68JJ"
         MAILCHIMP_API_KEY                   = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_MAILCHIMP_API_KEY-XCGDUW"
+        GNOSIS_GAS_STATION_URL              = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_gnosis_gas_station_url-HQGlfM"
+        ETHEREUM_GAS_STATION_URL            = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_ethereum_gas_station_url-tVEK2G"
+        POLYGON_GAS_STATION_URL             = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_polygon_gas_station_url-j7D7GO"
       }
     }
 
@@ -197,6 +203,9 @@ app "hub-bot" {
         HUB_AUTH_SECRET                  = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_hub_auth_secret-amva1E"
         DISCORD_ON_CALL_INTERNAL_WEBHOOK = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_discord_on_call_internal_webhook-n7SCZC"
         PAGERDUTY_TOKEN                  = "arn:aws:secretsmanager:us-east-1:120317779495:secret:PAGERDUTY_TOKEN-1L68JJ"
+        GNOSIS_GAS_STATION_URL           = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_gnosis_gas_station_url-HQGlfM"
+        ETHEREUM_GAS_STATION_URL         = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_ethereum_gas_station_url-tVEK2G"
+        POLYGON_GAS_STATION_URL          = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_polygon_gas_station_url-j7D7GO"
       }
     }
 
@@ -263,6 +272,9 @@ app "hub-event-listener" {
         HUB_AUTH_SECRET                  = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_hub_auth_secret-amva1E"
         DISCORD_ON_CALL_INTERNAL_WEBHOOK = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_discord_on_call_internal_webhook-n7SCZC"
         PAGERDUTY_TOKEN                  = "arn:aws:secretsmanager:us-east-1:120317779495:secret:PAGERDUTY_TOKEN-1L68JJ"
+        GNOSIS_GAS_STATION_URL           = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_gnosis_gas_station_url-HQGlfM"
+        ETHEREUM_GAS_STATION_URL         = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_ethereum_gas_station_url-tVEK2G"
+        POLYGON_GAS_STATION_URL          = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_polygon_gas_station_url-j7D7GO"
       }
     }
 
