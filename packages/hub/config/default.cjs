@@ -143,4 +143,9 @@ module.exports = {
   pagerDuty: {
     token: null,
   },
+  gasStationUrls: {
+    gnosis: "https://blockscout.com/poa/sokol/api/v1/gas-price-oracle",
+    ethereum: "https://api.etherscan.io/api?module=gastracker&action=gasoracle",
+    polygon: "https://gasstation-mumbai.matic.today/v2"
+  }
 };

@@ -49,6 +49,7 @@ export default class APIRouter {
   dataIntegrityChecksRoute = inject('data-integrity-checks-route', {
     as: 'dataIntegrityChecksRoute',
   });
+  gasStationRoute = inject('gas-station-route', { as: 'gasStationRoute' });
 
   routes() {
     let {
@@ -73,6 +74,7 @@ export default class APIRouter {
       notificationPreferencesRoute,
       scheduledPaymentsRoute,
       dataIntegrityChecksRoute,
+      gasStationRoute,
     } = this;
     let apiSubrouter = new Router();
     apiSubrouter.get('/boom', boomRoute.get);
@@ -147,6 +149,7 @@ export default class APIRouter {
     apiSubrouter.delete('/scheduled-payments/:scheduled_payment_id', parseBody, scheduledPaymentsRoute.delete);
     apiSubrouter.get('/wyre-prices', parseBody, wyrePricesRoute.get);
     apiSubrouter.get('/data-integrity-checks/:check_name', parseBody, dataIntegrityChecksRoute.get);
+    apiSubrouter.get('/gas-station/:chain_id', gasStationRoute.get);
     apiSubrouter.all('/(.*)', notFound);
 
     let apiRouter = new Router();
