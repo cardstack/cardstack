@@ -3,6 +3,8 @@ import NetworkService from '@cardstack/safe-tools-client/services/network';
 import WalletService from '@cardstack/safe-tools-client/services/wallet';
 
 import Controller, { inject as controller } from '@ember/controller';
+import { action } from '@ember/object';
+import { default as Owner } from '@ember/owner';
 import { inject as service } from '@ember/service';
 import { tracked } from '@glimmer/tracking';
 
@@ -14,10 +16,37 @@ export default class Schedule extends Controller {
   @service declare network: NetworkService;
 
   @tracked isDepositModalOpen = false;
+  @tracked isInitializingSafes = false;
 
+  constructor(owner: Owner) {
+    super(owner);
+    this.initializeSafes();
+  }
+
+  @action async initializeSafes() {
+    try {
+      this.isInitializingSafes = true;
+
+      // TODO: replace with ember resources
+      // Waits a bit to get connection on refresh
+      setTimeout(async () => {
+        if (this.wallet.isConnected) {
+          await this.wallet.fetchSafes();
+        }
+        this.isInitializingSafes = false;
+      }, 500);
+    } catch (e) {
+      console.log('Error initializing safes', e);
+    }
+  }
+
+  // TODO: handle safe info, right now it returns mocked info
+  // even when safes exists
   get safe() {
-    return undefined;
-    //TODO: get safe info from sdk and format it,
+    if (!this.wallet.safes.length) {
+      return undefined;
+    }
+
     return {
       address: '0x8a40AFffb53f4F953a204cAE087219A28771df9d',
       tokens: [
@@ -45,7 +74,6 @@ export default class Schedule extends Controller {
       ],
     };
   }
-
   get scheduledPaymentsTokensToCover() {
     const hasScheduledPayments = false;
     // TODO: Add helper functions to map amounts, use fromWei function

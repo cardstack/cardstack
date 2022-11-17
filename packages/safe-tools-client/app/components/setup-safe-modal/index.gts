@@ -1,12 +1,12 @@
 import Component from '@glimmer/component';
 import { on } from '@ember/modifier';
-import not from 'ember-truth-helpers/helpers/not';
 import or from 'ember-truth-helpers/helpers/or';
 
 import { svgJar } from '@cardstack/boxel/utils/svg-jar';
 import cssVar from '@cardstack/boxel/helpers/css-var';
 import BoxelModal from '@cardstack/boxel/components/boxel/modal';
 import BoxelActionContainer from '@cardstack/boxel/components/boxel/action-container'
+import { type ActionChinState }from '@cardstack/boxel/components/boxel/action-chin/state'
 import BoxelLoadingIndicator from '@cardstack/boxel/components/boxel/loading-indicator'
 
 import './index.css';
@@ -19,8 +19,7 @@ interface Signature {
     hasEnoughBalance: boolean;
     gasCostDisplay: string;
     onProvisionClick: () => void;
-    // TODO: provisioning will be status instead of boolean
-    provisioning: boolean;
+    isProvisioning: boolean;
     isLoadingGasInfo: boolean;
   };
 }
@@ -30,12 +29,16 @@ export default class SetupSafeModal extends Component<Signature> {
     return !this.args.hasEnoughBalance;
   }
 
+  get state(): ActionChinState { 
+    return this.args.isProvisioning ? 'in-progress' : 'default'
+  }
+  
   <template>
     <BoxelModal 
       @size='medium'
       @isOpen={{@isOpen}} 
       @onClose={{@onClose}}
-      @isOverlayDismissalDisabled={{@provisioning}}>
+      @isOverlayDismissalDisabled={{@isProvisioning}}>
       <BoxelActionContainer as |Section ActionChin|>
         <Section @title='Set up a Payment Safe' class='setup-safe-modal__section'>
           <p>In this step, you create a safe equipped with a module to schedule
@@ -81,21 +84,23 @@ export default class SetupSafeModal extends Component<Signature> {
             </div>
           {{/if}}
         </Section>
-        <ActionChin @state='default'>
+        <ActionChin @state={{this.state}}>
           <:default as |ac|>
             <ac.ActionButton
-              @loading={{@provisioning}}
               disabled={{or this.notEnoughBalance @isLoadingGasInfo}}
               {{on 'click' @onProvisionClick}}
             >
-              Provision{{if @provisioning 'ing'}}
+              Provision
             </ac.ActionButton>
-            {{#if (not @provisioning)}}
-              <ac.CancelButton {{on 'click' @onClose}}>
-                Cancel
-              </ac.CancelButton>
-            {{/if}}
+            <ac.CancelButton {{on 'click' @onClose}}>
+              Cancel
+            </ac.CancelButton>
           </:default>
+          <:inProgress as |ip|>
+            <ip.ActionButton>
+              Provisioning
+            </ip.ActionButton>
+          </:inProgress>
         </ActionChin>
       </BoxelActionContainer>
     </BoxelModal>

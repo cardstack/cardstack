@@ -12,7 +12,7 @@ let log = Logger('checkly-webhook');
 type CheckName =
   | 'graph-production status check'
   | 'xdai archive health check (eth_blockNumber)'
-  | 'xdai non-archive health check - late-cold-smoke (eth_blockNumber)'
+  | 'xdai non-archive health check - lively-wandering-flower (eth_blockNumber)'
   | 'relay-production health check';
 type ComponentName =
   | 'Subgraph'
@@ -44,7 +44,7 @@ export default class ChecklyWebhookRoute {
       incidentMessage:
         'We are experiencing degraded service with our archive RPC node. This will result in increased transaction processing times.',
     },
-    'xdai non-archive health check - late-cold-smoke (eth_blockNumber)': {
+    'xdai non-archive health check - lively-wandering-flower (eth_blockNumber)': {
       componentName: 'RPC node (non-archive)',
       incidentName: 'Transactions delayed',
       incidentMessage:

@@ -3,6 +3,8 @@ import WalletService from '@cardstack/safe-tools-client/services/wallet';
 
 import { action } from '@ember/object';
 import Service, { inject as service } from '@ember/service';
+import { TaskGenerator } from 'ember-concurrency';
+import { task } from 'ember-concurrency-decorators';
 
 import { BigNumber } from 'ethers';
 
@@ -21,30 +23,29 @@ export default class SchedulePaymentSDKService extends Service {
     return module;
   }
 
-  @action async getCreateSafeGasEstimation(): Promise<BigNumber | undefined> {
-    // TODO: Remove once sdk starts working with dapp
-    // return new Promise((resolve) => {
-    //   setTimeout(() => {
-    //     console.log('Create safe');
-    //     resolve(BigNumber.from('100000000000000000'));
-    //   }, 2000);
-    // });
+  private get contractOptions() {
+    return { from: this.wallet.address };
+  }
 
+  @action async getCreateSafeGasEstimation(): Promise<BigNumber | undefined> {
     const scheduledPayments = await this.getSchedulePaymentsModule();
 
     const estimatedSafeCreationGas =
-      await scheduledPayments.createSafeWithModuleAndGuardEstimation({
-        from: this.wallet.address,
-      });
+      await scheduledPayments.createSafeWithModuleAndGuardEstimation(
+        this.contractOptions
+      );
 
     return estimatedSafeCreationGas;
   }
 
-  // TODO: convert it to task
-  @action async createSafe() {
-    const scheduledPayments = await this.getSchedulePaymentsModule();
+  @task *createSafe(): TaskGenerator<void> {
+    const scheduledPayments = yield this.getSchedulePaymentsModule();
 
-    await scheduledPayments.createSafeWithModuleAndGuard();
+    yield scheduledPayments.createSafeWithModuleAndGuard(
+      undefined,
+      undefined,
+      this.contractOptions
+    );
   }
 }
 

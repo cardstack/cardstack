@@ -67,6 +67,7 @@ app "hub" {
         GNOSIS_GAS_STATION_URL                        = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_gnosis_gas_station_url-0xbRlJ"
         ETHEREUM_GAS_STATION_URL                      = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_ethereum_gas_station_url-AlItsC"
         POLYGON_GAS_STATION_URL                       = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_polygon_gas_station_url-cUpbHc"
+        CHECKLY_WEBHOOK_SECRET                        = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_hub_checkly_webhook_secret-etKeUa"
       }
     }
 
