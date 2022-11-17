@@ -11,7 +11,7 @@
   "license": "MIT",
   "description": "Stock API server for the Cardstack tech stack.",
   "scripts": {
-    "build": "prisma generate && webpack --progress",
+    "build": "yarn db:generate-prisma && webpack --progress",
     "build_if_missing": "[ -d dist ] || yarn build",
     "clean": "rm -rf dist",
     "rebuild": "prisma generate && webpack --watch --progress",
@@ -24,6 +24,7 @@
     "migrate": "node-pg-migrate",
     "db:test-init": "yarn build_if_missing && NODE_ENV=test node --no-deprecation -r source-map-support/register ./dist/hub.js db init",
     "db:migrate": "node --no-deprecation -r source-map-support/register dist/hub.js db migrate --no-check-order",
+    "db:generate-prisma": "prisma generate",
     "db:update-prisma": "prisma db pull && node dist/hub.js db transform-prisma-schema && prisma format && prisma generate",
     "test": "yarn build_if_missing && npm-run-all test:*",
     "test:node": "NODE_ENV=test mocha --no-deprecation -r source-map-support/register dist/tests.js --timeout 60000",
