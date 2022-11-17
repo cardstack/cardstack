@@ -25,7 +25,6 @@ export function withTokenIcons([tokenDetails]: PostionalArgs) {
     return [];
   }
   const result = tokenDetails.map((tokenDetail) => {
-    console.log(tokenDetail.symbol);
     return {
       ...tokenDetail,
       icon: SYMBOLS_TO_ICONS[tokenDetail.symbol] || '',
