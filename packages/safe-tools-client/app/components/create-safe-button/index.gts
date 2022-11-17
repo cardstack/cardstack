@@ -8,6 +8,7 @@ import { action } from '@ember/object';
 import { inject as service } from '@ember/service';
 import { type EmptyObject } from '@ember/component/helper';
 import { taskFor } from 'ember-concurrency-ts';
+import { getCurrentGasPrice } from '@cardstack/cardpay-sdk';
 
 import BoxelButton from '@cardstack/boxel/components/boxel/button';
 import WalletService from '@cardstack/safe-tools-client/services/wallet';
@@ -36,18 +37,20 @@ export default class CreateSafeButton extends Component<Signature> {
     this.isModalOpen = true;
 
     try {
-      const [gasEstimate, nativeTokenBalance] = await Promise.all([
+      const [gasEstimate, nativeTokenBalance, currentGasPrice] = await Promise.all([
         this.scheduledPaymentsSdk.getCreateSafeGasEstimation(),
         this.wallet.fetchNativeTokenBalance(),
+        getCurrentGasPrice(this.wallet.network.chainId)
       ]);
 
+      const gasPrice = BigNumber.from(currentGasPrice?.standard.toString());
+      const gasEstimateInWei = gasEstimate?.mul(gasPrice);
       const balance = BigNumber.from(nativeTokenBalance?.amount);
-
-      this.hasEnoughBalance = !!gasEstimate?.lt(balance);
+      this.hasEnoughBalance = !!gasEstimateInWei?.lt(balance);
 
       const tokenSymbol = nativeTokenBalance?.symbol || '';
       const gasEstimateString = Web3.utils.fromWei(
-        gasEstimate?.toString() || ''
+        gasEstimateInWei?.toString() || ''
       )
 
       this.gasCostDisplay = `${gasEstimateString} ${tokenSymbol}`
