@@ -244,11 +244,57 @@ export default class ScheduledPaymentModule {
     let signer = this.signer ? this.signer : this.ethersProvider.getSigner();
     let from = contractOptions?.from ?? (await signer.getAddress());
 
-    let { multiSendCallOnlyTx } = await this.createSafeWithModuleAndGuardTx(from);
-    return await this.ethersProvider.estimateGas({
-      to: multiSendCallOnlyTx.to,
-      data: multiSendCallOnlyTx.data,
+    let { expectedSafeAddress, create2SafeTx } = await generateCreate2SafeTx(
+      this.ethersProvider,
+      [from],
+      1,
+      AddressZero,
+      '0x',
+      AddressZero,
+      AddressZero,
+      '0',
+      AddressZero,
+      generateSaltNonce('cardstack-sp-create-safe')
+    );
+    let enableModuleTxs = await this.generateEnableModuleTxs(expectedSafeAddress, [from]);
+    let setGuardTxs = await this.generateSetGuardTxs(expectedSafeAddress);
+
+    let createSafeGas = await this.ethersProvider.estimateGas({
+      to: create2SafeTx.to,
+      data: create2SafeTx.data,
     });
+    let deploySPModuleGas = await this.ethersProvider.estimateGas({
+      to: enableModuleTxs.txs[0].to,
+      data: enableModuleTxs.txs[0].data,
+    });
+    let deployMetaGuardGas = await this.ethersProvider.estimateGas({
+      to: setGuardTxs.txs[0].to,
+      data: setGuardTxs.txs[0].data,
+    });
+
+    let estimateEnableSPModule = await gasEstimate(
+      this.ethersProvider,
+      await getAddress('gnosisSafeMasterCopy', this.ethersProvider),
+      utils.getAddress(enableModuleTxs.txs[1].to),
+      enableModuleTxs.txs[1].value,
+      enableModuleTxs.txs[1].data,
+      enableModuleTxs.txs[1].operation,
+      AddressZero
+    );
+    let enableSPModuleGas = BigNumber.from(estimateEnableSPModule.baseGas).add(estimateEnableSPModule.safeTxGas);
+
+    let estimateSetMetaGuard = await gasEstimate(
+      this.ethersProvider,
+      await getAddress('gnosisSafeMasterCopy', this.ethersProvider),
+      utils.getAddress(enableModuleTxs.txs[1].to),
+      setGuardTxs.txs[1].value,
+      setGuardTxs.txs[1].data,
+      setGuardTxs.txs[1].operation,
+      AddressZero
+    );
+    let setMetaGuardGas = BigNumber.from(estimateSetMetaGuard.baseGas).add(estimateSetMetaGuard.safeTxGas);
+
+    return createSafeGas.add(deploySPModuleGas).add(deployMetaGuardGas).add(enableSPModuleGas).add(setMetaGuardGas);
   }
 
   async createSafeWithModuleAndGuard(
