@@ -40,7 +40,7 @@
     "url-parse": "^1.5.3",
     "uuid": "^9.0.0",
     "web3": "1.5.2",
-    "web3-core": "1.5.2",
+    "web3-core": "1.7.3",
     "web3-eth": "1.5.2",
     "web3-eth-contract": "1.5.2",
     "web3-provider-engine": "^16.0.1",
@@ -67,6 +67,9 @@
     "clean": "rm -rf dist generated",
     "postinstall": "yarn codegen",
     "codegen": "if [ -f ./bin/codegen.js ]; then node bin/codegen.js; fi",
+    "lint": "npm-run-all --aggregate-output --continue-on-error --parallel \"lint:!(fix)\"",
+    "lint:js": "eslint . --cache",
+    "lint:js:fix": "eslint . --fix",
     "prepack": "rm -rf ./dist && tsup ./index.ts --format esm,cjs --dts --legacy-output",
     "test": "mocha -r ts-node/register 'tests/**/*-test.ts' --timeout 60000",
     "autotest": "mocha -r ts-node/register -w --reporter=min 'tests/**/*-test.ts' --timeout 60000"

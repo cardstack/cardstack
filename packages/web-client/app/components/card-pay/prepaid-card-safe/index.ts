@@ -3,7 +3,7 @@ import { CardCustomization } from '@cardstack/web-client/resources/card-customiz
 import { PrepaidCardSafe } from '@cardstack/cardpay-sdk';
 
 interface CardPayPrepaidCardSafeComponentArgs {
-  safe: PrepaidCardSafe;
+  safe?: PrepaidCardSafe;
   waitForCustomization?: boolean;
 }
 
