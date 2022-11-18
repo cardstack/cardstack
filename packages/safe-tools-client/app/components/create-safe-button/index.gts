@@ -37,20 +37,18 @@ export default class CreateSafeButton extends Component<Signature> {
     this.isModalOpen = true;
 
     try {
-      const [gasEstimate, nativeTokenBalance, currentGasPrice] = await Promise.all([
+      const [gasEstimate, nativeTokenBalance] = await Promise.all([
         this.scheduledPaymentsSdk.getCreateSafeGasEstimation(),
         this.wallet.fetchNativeTokenBalance(),
-        getCurrentGasPrice(this.wallet.network.chainId)
       ]);
 
-      const gasPrice = BigNumber.from(currentGasPrice?.standard.toString());
-      const gasEstimateInWei = gasEstimate?.mul(gasPrice);
       const balance = BigNumber.from(nativeTokenBalance?.amount);
-      this.hasEnoughBalance = !!gasEstimateInWei?.lt(balance);
+
+      this.hasEnoughBalance = !!gasEstimate?.lt(balance);
 
       const tokenSymbol = nativeTokenBalance?.symbol || '';
       const gasEstimateString = Web3.utils.fromWei(
-        gasEstimateInWei?.toString() || ''
+        gasEstimate?.toString() || ''
       )
 
       this.gasCostDisplay = `${gasEstimateString} ${tokenSymbol}`

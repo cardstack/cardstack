@@ -8,11 +8,7 @@ import { networkName } from './general-utils';
 import BN from 'bn.js';
 import { BaseProvider } from '@ethersproject/providers';
 
-export interface GasPrice {
-  slow: BN,
-  standard: BN,
-  fast: BN
-}
+type GasPrice = Record<'slow' | 'standard' | 'fast', BN>;
 
 async function tokenPairRate(provider: JsonRpcProvider, token1Address: string, token2Address: string): Promise<Price> {
   let network = await provider.getNetwork();
@@ -47,21 +43,18 @@ export async function gasPriceInToken(provider: JsonRpcProvider, tokenAddress: s
 }
 
 export async function getCurrentGasPrice(chainId: number): Promise<GasPrice> {
-  let gasStationResponse = await fetch(
-    `${getConstantByNetwork('hubUrl', chainId)}/api/gas-station/${chainId}`,
-    {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/vnd.api+json',
-        Accept: 'application/vnd.api+json',
-      },
-    }
-  );
+  let gasStationResponse = await fetch(`${getConstantByNetwork('hubUrl', chainId)}/api/gas-station/${chainId}`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/vnd.api+json',
+      Accept: 'application/vnd.api+json',
+    },
+  });
   let gasPriceJson = await gasStationResponse.json();
 
   return {
     slow: new BN(gasPriceJson.slow),
     standard: new BN(gasPriceJson.standard),
-    fast: new BN(gasPriceJson.fast)
-  }
+    fast: new BN(gasPriceJson.fast),
+  };
 }
