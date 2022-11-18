@@ -39,6 +39,7 @@ describe('Network constants', () => {
     });
     it('should throw an error if constant does not exist for network', () => {
       chai
+        // @ts-expect-error bridgedDaiTokenSymbol doesn't exist on polygon and ts knows is, but we want to force to test it
         .expect(() => getConstantByNetwork('bridgedDaiTokenSymbol', 'polygon'))
         .to.throw(`Don't know about the constant 'bridgedDaiTokenSymbol' for network polygon`);
     });
