@@ -5,7 +5,7 @@ import { Arguments } from 'yargs';
 
 export default {
   command:
-    'schedule-payment <safeAddress> <moduleAddress> <tokenAddress> <amount> <payeeAddress> <executionGas> <maxGasPrice> <gasTokenAddress> <salt>',
+    'schedule-payment <safeAddress> <moduleAddress> <tokenAddress> <amount> <payeeAddress> <executionGas> <maxGasPrice> <gasTokenAddress> <salt> <payAt> <recurringDayOfMonth> <recurringUntil>',
   describe:
     "Schedules a one-time or a recurring payment. This creates a record in the crank (hub) and stores the scheduled payment hash in the safe's scheduled payment module contract. The crank is responsible for executing the payment at the scheduled time.",
   builder(yargs: Argv) {
