@@ -7,8 +7,8 @@ import { inject as service } from '@ember/service';
 
 interface Args {
   named: {
-    customizationDID: string;
-    waitForCustomization: boolean;
+    customizationDID?: string;
+    waitForCustomization?: boolean;
   };
 }
 
@@ -29,10 +29,13 @@ export class CardCustomization extends Resource<Args> {
   modify(_positional: any, named: any) {
     if (!this.didSetup) {
       this.didSetup = true;
-      this.run(named.customizationDID, named.waitForCustomization);
+      this.run(named.customizationDID, named.waitForCustomization ?? false);
     }
   }
-  private async run(customizationDID: string, waitForCustomization: boolean) {
+  private async run(
+    customizationDID: string | undefined,
+    waitForCustomization: boolean
+  ) {
     try {
       await this.fetchCardCustomization(customizationDID, waitForCustomization);
       this.loading = false;
@@ -48,9 +51,12 @@ export class CardCustomization extends Resource<Args> {
   }
 
   private async fetchCardCustomization(
-    customizationDID: string,
+    customizationDID: string | undefined,
     waitForCustomization = false
   ): Promise<void> {
+    if (!customizationDID) {
+      return;
+    }
     let jsonApiDocument = await this.offChainJson.fetch(
       customizationDID,
       waitForCustomization

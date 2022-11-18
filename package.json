@@ -44,6 +44,7 @@
     "codegen:subgraph-sokol": "yarn --cwd packages/cardpay-subgraph codegen-sokol",
     "codegen:subgraph-xdai": "yarn --cwd packages/cardpay-subgraph codegen-xdai",
     "codegen:python-package-abis": "node scripts/update-python-abis.js",
+    "codegen:hub-schema": "yarn --cwd packages/hub db:generate-prisma",
     "build:hub": "yarn --cwd packages/hub build",
     "build:ember-shared": "yarn --cwd packages/ember-shared/addon build",
     "build:ssr-web:staging": "cd packages/ssr-web && ember build --environment=production",

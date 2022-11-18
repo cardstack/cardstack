@@ -49,17 +49,17 @@ export default {
       .option('payAt', {
         type: 'number',
         description:
-          'Unix UTC time in seconds that represents the point in time when the payment should be executed. Used for one-time scheduled payments. Should be an empty string when recurringDayOfMonth and recurringUntil are set',
+          'Unix UTC time in seconds that represents the point in time when the payment should be executed. Used for one-time scheduled payments. Should not be provided when recurringDayOfMonth and recurringUntil are set',
       })
       .option('recurringDayOfMonth', {
         type: 'number',
         description:
-          'Day of the month on which the payment will be made recurringly (range: 1-31). Used for recurring scheduled payments. In case the month has less than days than the value provided, the payment will me made on the last day of the month. Should be an empty string when payAt is set.',
+          'Day of the month on which the payment will be made recurringly (range: 1-31). Used for recurring scheduled payments. In case the month has less than days than the value provided, the payment will me made on the last day of the month. Should not be provided when payAt is set.',
       })
       .option('recurringUntil', {
         type: 'number',
         description:
-          'Unix UTC time in seconds that represents the point in time when the recurring payment should be stopped. Used for recurring scheduled payments. Should be an empty string when payAt is set',
+          'Unix UTC time in seconds that represents the point in time when the recurring payment should be stopped. Used for recurring scheduled payments. Should not be provided when payAt is set',
       })
       .option('network', NETWORK_OPTION_ANY);
   },
