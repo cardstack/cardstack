@@ -9,7 +9,6 @@ chai.use(chaiAsPromised);
 describe('Network constants', () => {
   it('should return an object with network names as key and chainId as value', () => {
     chai.expect(networkIds).to.deep.eq({
-      xdai: 100,
       sokol: 77,
       kovan: 42,
       goerli: 5,

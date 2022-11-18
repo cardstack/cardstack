@@ -20,6 +20,8 @@ export const getWeb3ConfigByNetwork = (config: HubConfigResponse, network: Netwo
 
 export const isSupportedChain = (network: Networkish) => supportedChainsArray.includes(convertChainIdToName(network));
 
+export const isCardPaySupportedNetwork = (network: Network | string) => supportedChains.gnosis.includes(network);
+
 export interface TokenDetail {
   address: string;
   name: string;

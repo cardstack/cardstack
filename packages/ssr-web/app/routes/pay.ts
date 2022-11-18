@@ -34,7 +34,7 @@ export default class PayRoute extends Route {
     network: string;
     merchant_safe_id: string;
   }): Promise<PayRouteModel> {
-    let network = params.network === 'xdai' ? 'gnosis' : params.network;
+    const { network } = params;
     try {
       const merchantSafe = (await this.fetchMerchantSafe(
         network,
