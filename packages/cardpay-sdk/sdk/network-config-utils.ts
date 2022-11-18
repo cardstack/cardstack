@@ -1,6 +1,13 @@
 /*global fetch */
 
-import { getConstant, supportedChains, Network, networks, supportedChainsArray } from './constants';
+import {
+  getConstant,
+  supportedChains,
+  Network,
+  networks,
+  supportedChainsArray,
+  schedulerSupportedChainsArray,
+} from './constants';
 import { HubConfigResponse, RpcNodeUrl } from './hub-config';
 
 export type Networkish = string | number | Network;
@@ -19,6 +26,9 @@ export const getWeb3ConfigByNetwork = (config: HubConfigResponse, network: Netwo
 };
 
 export const isSupportedChain = (network: Networkish) => supportedChainsArray.includes(convertChainIdToName(network));
+
+export const isSchedulerSupportedChain = (network: Networkish) =>
+  schedulerSupportedChainsArray.includes(convertChainIdToName(network));
 
 export const isCardPaySupportedNetwork = (network: Network | string) => supportedChains.gnosis.includes(network);
 

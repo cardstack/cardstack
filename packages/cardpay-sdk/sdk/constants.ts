@@ -7,6 +7,7 @@ import goerliTokenList from '../token-lists/goerli-tokenlist.json';
 import mumbaiTokenList from '../token-lists/mumbai-tokenlist.json';
 import polygonTokenList from '../token-lists/polygon-tokenlist.json';
 import { type TokenList } from '@uniswap/token-lists';
+import { pullAll } from 'lodash';
 
 export const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000';
 
@@ -21,6 +22,7 @@ export const supportedChains = {
 };
 
 export const supportedChainsArray = Object.values(supportedChains).flat();
+export const schedulerSupportedChainsArray = pullAll(supportedChainsArray, supportedChains.gnosis);
 
 export type CardPayCapableNetworks = 'sokol' | 'gnosis';
 export type SchedulerCapableNetworks = 'mainnet' | 'goerli' | 'polygon' | 'mumbai';

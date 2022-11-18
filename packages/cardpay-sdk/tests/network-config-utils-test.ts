@@ -10,7 +10,12 @@ if (!globalThis.fetch) {
 }
 
 import { HubConfigResponse } from '../sdk/hub-config';
-import { getWeb3ConfigByNetwork, isSupportedChain, fetchSupportedGasTokens } from '../sdk/network-config-utils';
+import {
+  getWeb3ConfigByNetwork,
+  isSupportedChain,
+  fetchSupportedGasTokens,
+  isSchedulerSupportedChain,
+} from '../sdk/network-config-utils';
 
 chai.use(chaiAsPromised);
 
@@ -109,6 +114,32 @@ describe('isSupportedChain', () => {
 
   it('should return true for supported polygon network as type', () => {
     chai.expect(isSupportedChain(supportedChainAsType)).to.eq(true);
+  });
+});
+
+describe('isSchedulerSupportedChain', () => {
+  const supportedChainNames = ['mainnet', 'goerli'];
+  const supportedChainIds = [5, 80001];
+
+  const unsupportedChains = ['kovan', 'gnosis'];
+  const nonExistingChains = ['foo', 'bar'];
+
+  const supportedChainAsType = 'polygon' as const;
+
+  [...supportedChainNames, ...supportedChainIds].forEach((network) => {
+    it(`should return true for supported network ${network}`, () => {
+      chai.expect(isSchedulerSupportedChain(network)).to.eq(true);
+    });
+  });
+
+  [...unsupportedChains, ...nonExistingChains].forEach((network) => {
+    it(`should return false for non-supported network ${network}`, () => {
+      chai.expect(isSchedulerSupportedChain(network)).to.eq(false);
+    });
+  });
+
+  it('should return true for supported polygon network as type', () => {
+    chai.expect(isSchedulerSupportedChain(supportedChainAsType)).to.eq(true);
   });
 });
 

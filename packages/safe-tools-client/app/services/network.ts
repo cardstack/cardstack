@@ -2,7 +2,7 @@ import {
   getConstantByNetwork,
   Network,
   networks,
-  supportedChainsArray,
+  schedulerSupportedChainsArray,
 } from '@cardstack/cardpay-sdk';
 import { action } from '@ember/object';
 import Service from '@ember/service';
@@ -23,7 +23,7 @@ export default class NetworkService extends Service {
   };
 
   get supportedList() {
-    return supportedChainsArray
+    return schedulerSupportedChainsArray
       .map((networkSymbol) => ({
         name: getConstantByNetwork('name', networkSymbol),
         chainId: getConstantByNetwork('chainId', networkSymbol),
