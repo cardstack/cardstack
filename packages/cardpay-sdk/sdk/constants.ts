@@ -204,7 +204,7 @@ export function getConstantByNetwork<K extends ConstantKeys>(name: K, network: N
   }
 
   let value = constants[network as Network][name];
-  if (!value) {
+  if (value == null) {
     throw new Error(`Don't know about the constant '${name}' for network ${network}`);
   }
   return value;
