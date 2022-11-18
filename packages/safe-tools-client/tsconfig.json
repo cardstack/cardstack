@@ -21,6 +21,7 @@
     "baseUrl": ".",
     "module": "es2020",
     "experimentalDecorators": true,
+    "resolveJsonModule": true,
     "paths": {
       "@cardstack/safe-tools-client/tests/*": ["tests/*"],
       "@cardstack/safe-tools-client/*": ["app/*"],
