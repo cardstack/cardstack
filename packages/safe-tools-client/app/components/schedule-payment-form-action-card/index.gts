@@ -83,9 +83,9 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
   @tracked paymentTokenErrorMessage = '';
 
   paymentTokens: SelectableToken[] = [
-    { name: 'CARD', icon: 'card' },
-    { name: 'HI', icon: 'emoji' },
-    { name: 'WORLD', icon: 'world' },
+    { name: 'CARD', logoURI: 'card', symbol: 'CARD', address: '0x0111111111' },
+    { name: 'HI', logoURI: 'emoji', symbol: 'CARD', address: '0x0111111111' },
+    { name: 'WORLD', logoURI: 'world', symbol: 'CARD', address: '0x0111111111' },
   ];
   @tracked paymentToken: SelectableToken = this.paymentTokens[0];
 

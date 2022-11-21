@@ -34,13 +34,6 @@
   margin-right: var(--boxel-sp);
 }
 
-.boxel-input-token-select__icon {
-  margin-right: var(--boxel-sp-xxxs);
-  vertical-align: bottom;
-  width: var(--boxel-icon-sm);
-  height: var(--boxel-icon-sm);
-}
-
 .boxel-input-token-select__select[aria-disabled="true"] {
   opacity: 0.5;
 }

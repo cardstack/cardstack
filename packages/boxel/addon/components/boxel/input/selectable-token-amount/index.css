@@ -7,13 +7,6 @@
   font-size: var(--boxel-input-selectable-token-amount-input-font-size);
 }
 
-.boxel-input-selectable-token-amount__icon {
-  margin-right: var(--boxel-sp-xxxs);
-  vertical-align: bottom;
-  width: var(--boxel-icon-sm);
-  height: var(--boxel-icon-sm);
-}
-
 .boxel-input-selectable-token-amount__select[aria-disabled="true"] {
   opacity: 0.5;
 }
