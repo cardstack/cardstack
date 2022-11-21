@@ -2,7 +2,7 @@ import Component from '@glimmer/component';
 import '@cardstack/boxel/styles/global.css';
 import './index.css';
 import BoxelInputGroup from '../../input-group';
-import { svgJar } from '@cardstack/boxel/utils/svg-jar';
+import SelectableTokenItem from './item';
 import { fn } from '@ember/helper';
 import { guidFor } from '@ember/object/internals';
 import cn from '@cardstack/boxel/helpers/cn';
@@ -58,14 +58,10 @@ export default class SelectableTokenAmount extends Component<Signature> {
           @dropdownClass="boxel-input-selectable-token-amount__dropdown"
           @verticalPosition="below" as |item itemCssClass|
         >
-          <div class={{cn itemCssClass "boxel-input-selectable-token-amount__dropdown-item"}}>
-            {{svgJar
-              item.icon
-              class="boxel-input-selectable-token-amount__icon"
-              role="presentation"
-            }}
-            {{item.name}}
-          </div>
+          <SelectableTokenItem
+            @item={{item}}
+            class={{cn itemCssClass "boxel-input-selectable-token-amount__dropdown-item"}}
+          /> 
         </Accessories.Select>
       </:after>
     </BoxelInputGroup>
