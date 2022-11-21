@@ -1,49 +1,33 @@
 import { Argv } from 'yargs';
-import { getConstant, getSDK } from '@cardstack/cardpay-sdk';
+import { getSDK } from '@cardstack/cardpay-sdk';
 import { getEthereumClients, getConnectionType, NETWORK_OPTION_ANY } from '../utils';
 import { Arguments, CommandModule } from 'yargs';
 
 export default {
-  command: 'cancel <safeAddress> <moduleAddress> <gasTokenAddress> <spHash>',
-  describe: 'Cancel a scheduled payment',
+  command: 'cancel-payment <scheduledPaymentId>',
+  describe:
+    'Cancels a scheduled payment by updating it in the crank and removing the scheduled payment hash from the payment module contract',
   builder(yargs: Argv) {
     return yargs
-      .positional('safeAddress', {
+      .positional('scheduledPaymentId', {
         type: 'string',
-        description: 'The address of the safe that will fund the scheduled payment',
-      })
-      .positional('moduleAddress', {
-        type: 'string',
-        description: 'The address of scheduled payment module',
-      })
-      .positional('gasTokenAddress', {
-        type: 'string',
-        description: 'The address of gas token',
-      })
-      .positional('spHash', {
-        type: 'string',
-        description: 'Keccak hash of the scheduled payment params',
+        description: 'The id of the scheduled payment to be canceled (uuid of the record in the crank)',
       })
       .option('network', NETWORK_OPTION_ANY);
   },
   async handler(args: Arguments) {
-    let { network, safeAddress, moduleAddress, gasTokenAddress, spHash } = args as unknown as {
+    let { network, scheduledPaymentId } = args as unknown as {
       network: string;
-      safeAddress: string;
-      moduleAddress: string;
-      gasTokenAddress: string;
-      spHash: string;
+      scheduledPaymentId: string;
     };
+
+    console.log(`Canceling scheduled payment ${scheduledPaymentId}...`);
+
     let { ethersProvider, signer } = await getEthereumClients(network, getConnectionType(args));
     let scheduledPaymentModule = await getSDK('ScheduledPaymentModule', ethersProvider, signer);
-    let blockExplorer = await getConstant('blockExplorer', ethersProvider);
 
-    console.log(`Cancel scheduled payment with spHash: ${spHash} ...`);
-    let onTxnHash = (txnHash: string) => console.log(`Transaction hash: ${blockExplorer}/tx/${txnHash}`);
-    await scheduledPaymentModule.cancelScheduledPayment(safeAddress, moduleAddress, spHash, gasTokenAddress, {
-      onTxnHash,
-    });
+    await scheduledPaymentModule.cancelScheduledPayment(scheduledPaymentId);
 
-    console.log(`Scheduled payment canceled successfuly (spHash: ${spHash})`);
+    console.log(`Scheduled payment canceled successfully.`);
   },
 } as CommandModule;
