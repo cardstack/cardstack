@@ -74,6 +74,7 @@ export const SelectAccessory: TemplateOnlyComponent<SelectAccessorySignature> = 
       @dropdownClass={{@dropdownClass}}
       @placeholder={{@placeholder}}
       @options={{@options}}
+      @searchField={{@searchField}}
       @selected={{@selected}}
       @onChange={{@onChange}}
       data-test-boxel-input-group-select-accessory-trigger
