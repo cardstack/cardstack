@@ -24,6 +24,7 @@ import RemoveOldSentNotificationsTask from './tasks/remove-old-sent-notification
 import WyreTransferTask from './tasks/wyre-transfer';
 import PrintQueuedJobsTask from './tasks/print-queued-jobs';
 import ScheduledPaymentOnChainCreationWaiter from './tasks/scheduled-payment-on-chain-creation-waiter';
+import ScheduledPaymentOnChainCancelationWaiter from './tasks/scheduled-payment-on-chain-cancelation-waiter';
 import ScheduledPaymentOnChainExecutionWaiter from './tasks/scheduled-payment-on-chain-execution-waiter';
 import ExecuteScheduledPayments from './tasks/execute-scheduled-payments';
 
@@ -85,6 +86,7 @@ export class HubWorker {
         'wyre-transfer': this.instantiateTask(WyreTransferTask),
         's3-put-json': s3PutJson,
         'scheduled-payment-on-chain-creation-waiter': this.instantiateTask(ScheduledPaymentOnChainCreationWaiter),
+        'scheduled-payment-on-chain-cancelation-waiter': this.instantiateTask(ScheduledPaymentOnChainCancelationWaiter),
         'scheduled-payment-on-chain-execution-waiter': this.instantiateTask(ScheduledPaymentOnChainExecutionWaiter),
         'execute-scheduled-payments': this.instantiateTask(ExecuteScheduledPayments),
       },

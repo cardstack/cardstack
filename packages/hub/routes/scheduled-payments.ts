@@ -9,6 +9,7 @@ import ScheduledPaymentSerializer from '../services/serializers/scheduled-paymen
 import WorkerClient from '../services/worker-client';
 import { calculateNextPayAt } from '../utils/scheduled-payments';
 import { ScheduledPayment } from '@prisma/client';
+import { nowUtc } from '../utils/dates';
 
 export default class ScheduledPaymentsRoute {
   scheduledPaymentValidator: ScheduledPaymentValidator = inject('scheduled-payment-validator', {
@@ -157,31 +158,47 @@ export default class ScheduledPaymentsRoute {
       },
     });
 
-    if (scheduledPayment) {
-      let creationTransactionHash = ctx.request.body.data.attributes['creation-transaction-hash'];
+    if (!scheduledPayment) return (ctx.status = 404);
 
-      if (creationTransactionHash) {
-        scheduledPayment = await prisma.scheduledPayment.update({
-          where: {
-            id: scheduledPayment.id,
-          },
-          data: {
-            creationTransactionHash,
-          },
-        });
+    let creationTransactionHash = ctx.request.body.data.attributes['creation-transaction-hash'];
+    let cancelationTransactionHash = ctx.request.body.data.attributes['cancelation-transaction-hash'];
 
-        await this.workerClient.addJob('scheduled-payment-on-chain-creation-waiter', {
-          scheduledPaymentId: scheduledPayment.id,
-        });
+    if (creationTransactionHash) {
+      scheduledPayment = await prisma.scheduledPayment.update({
+        where: {
+          id: scheduledPayment.id,
+        },
+        data: {
+          creationTransactionHash,
+        },
+      });
 
-        ctx.body = this.scheduledPaymentSerializer.serialize(scheduledPayment);
-        ctx.status = 200;
-      }
+      await this.workerClient.addJob('scheduled-payment-on-chain-creation-waiter', {
+        scheduledPaymentId: scheduledPayment.id,
+      });
+    } else if (cancelationTransactionHash) {
+      scheduledPayment = await prisma.scheduledPayment.update({
+        where: {
+          id: scheduledPayment.id,
+        },
+        data: {
+          cancelationTransactionHash,
+          canceledAt: nowUtc(),
+        },
+      });
+
+      await this.workerClient.addJob('scheduled-payment-on-chain-cancelation-waiter', {
+        scheduledPaymentId: scheduledPayment.id,
+      });
     } else {
-      ctx.status = 404;
+      ctx.status = 422;
     }
 
+    ctx.body = this.scheduledPaymentSerializer.serialize(scheduledPayment);
+    ctx.status = 200;
     ctx.type = 'application/vnd.api+json';
+
+    return; // To avoid "Not all paths return a value" TS error (we have an early 404 return)
   }
 
   async delete(ctx: Koa.Context) {
@@ -205,6 +222,42 @@ export default class ScheduledPaymentsRoute {
       await prisma.scheduledPayment.delete({
         where: {
           id: scheduledPaymentId,
+        },
+      });
+      ctx.status = 200;
+      ctx.body = {};
+    } else {
+      ctx.status = 404;
+    }
+
+    ctx.type = 'application/vnd.api+json';
+  }
+
+  async cancel(ctx: Koa.Context) {
+    if (!ensureLoggedIn(ctx)) {
+      return;
+    }
+
+    let prisma = await this.prismaManager.getClient();
+
+    let userAddress = ctx.state.userAddress;
+    let scheduledPaymentId: string = ctx.params.scheduled_payment_id;
+
+    let scheduledPayment = await prisma.scheduledPayment.findFirst({
+      where: {
+        id: scheduledPaymentId,
+        userAddress,
+      },
+    });
+
+    if (scheduledPayment) {
+      await prisma.scheduledPayment.update({
+        where: {
+          id: scheduledPaymentId,
+        },
+        data: {
+          canceledAt: new Date(),
+          payAt: null,
         },
       });
       ctx.status = 200;
