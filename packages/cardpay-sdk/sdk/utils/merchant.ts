@@ -5,6 +5,7 @@ import {
   MERCHANT_PAYMENT_UNIVERSAL_LINK_STAGING_HOSTNAME,
 } from '../constants';
 import Url from 'url-parse';
+import { isCardPaySupportedNetwork } from '../network-config-utils';
 
 export function validateMerchantId(value: string) {
   const subdomainFriendlyLength = 50;
@@ -35,7 +36,7 @@ export const generateMerchantPaymentUrl = ({
 }: MerchantPaymentURLParams) => {
   const handleAmountAndCurrency = currency ? `?${amount ? `amount=${amount}&` : ''}currency=${currency}` : '';
   const https = isUniversalDomain(domain) ? 'https://' : '';
-  network = network === 'gnosis' ? 'xdai' : network;
+
   return `${https}${domain}/pay/${network}/${merchantSafeID}${handleAmountAndCurrency}`;
 };
 
@@ -53,10 +54,7 @@ export const isValidUniversalLinkMerchantPaymentUrl = (url: Url) => {
   // skip the leading slash
   let [, action, network, merchantSafeID] = parts;
   let hasCorrectPath =
-    parts.length === 4 &&
-    action === 'pay' &&
-    ['sokol', 'gnosis', 'xdai'].includes(network) &&
-    isAddress(merchantSafeID);
+    parts.length === 4 && action === 'pay' && isCardPaySupportedNetwork(network) && isAddress(merchantSafeID);
 
   return usesCorrectProtocol && hasCorrectHostname && hasCorrectPath;
 };
@@ -67,10 +65,7 @@ export const isValidCustomProtocolMerchantPaymentUrl = (url: Url) => {
   // skip the leading slash
   let [, network, merchantSafeID] = parts;
   let hasCorrectPath =
-    parts.length === 3 &&
-    url.hostname === 'pay' &&
-    ['sokol', 'gnosis', 'xdai'].includes(network) &&
-    isAddress(merchantSafeID);
+    parts.length === 3 && url.hostname === 'pay' && isCardPaySupportedNetwork(network) && isAddress(merchantSafeID);
 
   return usesCorrectProtocol && hasCorrectPath;
 };

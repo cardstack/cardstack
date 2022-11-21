@@ -181,7 +181,6 @@ const addresses: {
   mumbai: MUMBAI,
   mainnet: MAINNET,
   gnosis: GNOSIS,
-  xdai: GNOSIS,
 });
 
 export type AddressKeys =

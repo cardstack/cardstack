@@ -1,8 +1,8 @@
 import {
-  isSupportedChain,
   getConstantByNetwork,
   getSDK,
   getSafesWithSpModuleEnabled,
+  isSchedulerSupportedChain,
 } from '@cardstack/cardpay-sdk';
 import NetworkService from '@cardstack/safe-tools-client/services/network';
 import { ChainConnectionManager } from '@cardstack/safe-tools-client/utils/chain-connection-manager';
@@ -65,7 +65,7 @@ export default class Wallet extends Service {
     });
 
     this.chainConnectionManager.on('chain-changed', (chainId: number) => {
-      if (!isSupportedChain(chainId)) {
+      if (!isSchedulerSupportedChain(chainId)) {
         // TODO: improve unsupported net handling
         alert('Unsupported network! Choose a supported one and reconnect');
         this.disconnect();

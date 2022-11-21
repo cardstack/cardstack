@@ -8,10 +8,10 @@ import { encodeDID } from '@cardstack/did-resolver';
 import { rest } from 'msw';
 import { setupServer, SetupServerApi } from 'msw/node';
 import config from 'config';
-import { getConstantByNetwork } from '@cardstack/cardpay-sdk';
+import { getConstantByNetwork, Network } from '@cardstack/cardpay-sdk';
 import { ExtendedPrismaClient } from '../../services/prisma-manager';
 
-let relayUrl = getConstantByNetwork('relayServiceURL', config.get('web3.layer2Network'));
+let relayUrl = getConstantByNetwork('relayServiceURL', config.get('web3.layer2Network') as Network);
 
 let exampleEthereumAddress = '0x323B2318F35c6b31113342830204335Dac715AA8';
 let prisma: ExtendedPrismaClient, jobTicketId: string, merchantInfosId: string;
