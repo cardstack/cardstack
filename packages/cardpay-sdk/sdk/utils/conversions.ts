@@ -8,6 +8,8 @@ import { networkName } from './general-utils';
 import BN from 'bn.js';
 import { BaseProvider } from '@ethersproject/providers';
 
+type GasPrice = Record<'slow' | 'standard' | 'fast', BN>;
+
 async function tokenPairRate(provider: JsonRpcProvider, token1Address: string, token2Address: string): Promise<Price> {
   let network = await provider.getNetwork();
   let token1 = await Fetcher.fetchTokenData(network.chainId, token1Address, provider as unknown as BaseProvider);
@@ -24,17 +26,7 @@ export async function gasPriceInToken(provider: JsonRpcProvider, tokenAddress: s
   let network = await networkName(provider);
 
   // Gas station will return current gas price in native token in wei.
-  let gasStationResponse = await fetch(
-    `${getConstantByNetwork('hubUrl', network)}/api/gas-station/${provider.network.chainId}`,
-    {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/vnd.api+json',
-        Accept: 'application/vnd.api+json',
-      },
-    }
-  );
-  let gasPriceInNativeTokenInWei = new BN((await gasStationResponse.json()).standard);
+  let gasPriceInNativeTokenInWei = (await getCurrentGasPrice(provider.network.chainId)).standard;
 
   // We use the wrapped native token address because the native token doesn't have an address in Uniswap.
   // The price of the wrapped native token, such as WETH, is the same as the price of the native token.
@@ -48,4 +40,21 @@ export async function gasPriceInToken(provider: JsonRpcProvider, tokenAddress: s
   return gasPriceInNativeTokenInWei
     .mul(new BN(rate.adjusted.numerator.toString())) // rate.adjusted is an adjustment of the difference in coin decimals, for example WETH has 18 decimals, USDT and USDC have 6.
     .div(new BN(rate.adjusted.denominator.toString()));
+}
+
+export async function getCurrentGasPrice(chainId: number): Promise<GasPrice> {
+  let gasStationResponse = await fetch(`${getConstantByNetwork('hubUrl', chainId)}/api/gas-station/${chainId}`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/vnd.api+json',
+      Accept: 'application/vnd.api+json',
+    },
+  });
+  let gasPriceJson = await gasStationResponse.json();
+
+  return {
+    slow: new BN(gasPriceJson.slow),
+    standard: new BN(gasPriceJson.standard),
+    fast: new BN(gasPriceJson.fast),
+  };
 }

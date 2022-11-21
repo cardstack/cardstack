@@ -41,6 +41,7 @@ import BN from 'bn.js';
 import { Interface } from 'ethers/lib/utils';
 import JsonRpcProvider from '../providers/json-rpc-provider';
 import { getConstant } from './constants';
+import { getCurrentGasPrice } from './utils/conversions';
 
 export interface EnableModuleAndGuardResult {
   scheduledPaymentModuleAddress: string;
@@ -293,8 +294,14 @@ export default class ScheduledPaymentModule {
       AddressZero
     );
     let setMetaGuardGas = BigNumber.from(estimateSetMetaGuard.baseGas).add(estimateSetMetaGuard.safeTxGas);
+    let totalGas = createSafeGas
+      .add(deploySPModuleGas)
+      .add(deployMetaGuardGas)
+      .add(enableSPModuleGas)
+      .add(setMetaGuardGas);
+    let gasPrice = await getCurrentGasPrice(this.ethersProvider.network.chainId);
 
-    return createSafeGas.add(deploySPModuleGas).add(deployMetaGuardGas).add(enableSPModuleGas).add(setMetaGuardGas);
+    return totalGas.mul(gasPrice.standard.toString());
   }
 
   async createSafeWithModuleAndGuard(
