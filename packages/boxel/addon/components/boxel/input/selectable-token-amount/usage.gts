@@ -13,6 +13,8 @@ export default class BoxelSelectableInputTokenAmountUsage extends Component {
     { name: 'CARD', icon: 'card' },
     { name: 'HI', icon: 'emoji' },
     { name: 'WORLD', icon: 'world' },
+    { name: 'MASQ', icon: 'https://raw.githubusercontent.com/MASQ-Project/MASQ-contract/master/MASQ%20Logo%20Blue%20Solo%20Transparent.png' },
+    { name: 'ETH', icon: 'https://wallet-asset.matic.network/img/tokens/eth.svg' },
   ];
 
   @tracked id = 'boxel-input-selectable-token-amount-usage';

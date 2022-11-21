@@ -21,3 +21,7 @@
 .boxel-input-selectable-token-amount__dropdown-item {
   white-space: nowrap;
 }
+
+.boxel-input-selectable-token-amount__dropdown .ember-power-select-options[role="listbox"] {
+  max-height: 18em;
+}
