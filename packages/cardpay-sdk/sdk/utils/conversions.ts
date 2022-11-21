@@ -7,6 +7,7 @@ import JsonRpcProvider from '../../providers/json-rpc-provider';
 import { networkName } from './general-utils';
 import BN from 'bn.js';
 import { BaseProvider } from '@ethersproject/providers';
+import { convertChainIdToName } from '../network-config-utils';
 
 type GasPrice = Record<'slow' | 'standard' | 'fast', BN>;
 
@@ -43,7 +44,9 @@ export async function gasPriceInToken(provider: JsonRpcProvider, tokenAddress: s
 }
 
 export async function getCurrentGasPrice(chainId: number): Promise<GasPrice> {
-  let gasStationResponse = await fetch(`${getConstantByNetwork('hubUrl', chainId)}/api/gas-station/${chainId}`, {
+  const network = convertChainIdToName(chainId);
+
+  let gasStationResponse = await fetch(`${getConstantByNetwork('hubUrl', network)}/api/gas-station/${chainId}`, {
     method: 'GET',
     headers: {
       'Content-Type': 'application/vnd.api+json',
