@@ -2034,7 +2034,7 @@
       "name": "Synthetix",
       "symbol": "SNX",
       "decimals": 18,
-      "logoURI": "https://assets-cdn.trustwallet.com/blockchains/ethereum/assets//logo.png"
+      "logoURI": "https://assets-cdn.trustwallet.com/blockchains/ethereum/assets/0xC011a73ee8576Fb46F5E1c5751cA3B9Fe0af2a6F/logo.png"
     },
     {
       "asset": "c60_t0xC0bA369c8Db6eB3924965e5c4FD0b4C1B91e305F",
@@ -2172,16 +2172,6 @@
       "logoURI": "https://assets-cdn.trustwallet.com/blockchains/ethereum/assets/0xD23Ac27148aF6A2f339BD82D0e3CFF380b5093de/logo.png"
     },
     {
-      "chainId": 1,
-      "asset": "c60_t0xd26114cd6EE289AccF82350c8d8487fedB8A0C07",
-      "tags": ["erc20"],
-      "address": "0xd26114cd6EE289AccF82350c8d8487fedB8A0C07",
-      "name": "OMG Network",
-      "symbol": "OMG",
-      "decimals": 18,
-      "logoURI": "https://assets-cdn.trustwallet.com/blockchains/ethereum/assets//logo.png"
-    },
-    {
       "asset": "c60_t0xd2877702675e6cEb975b4A1dFf9fb7BAF4C91ea9",
       "tags": ["erc20"],
       "address": "0xd2877702675e6cEb975b4A1dFf9fb7BAF4C91ea9",
@@ -2198,16 +2188,6 @@
       "symbol": "DETS",
       "decimals": 18,
       "logoURI": "https://assets-cdn.trustwallet.com/blockchains/ethereum/assets/0xd379700999F4805Ce80aa32DB46A94dF64561108/logo.png"
-    },
-    {
-      "chainId": 1,
-      "asset": "c60_t0xD46bA6D942050d489DBd938a2C909A5d5039A161",
-      "tags": ["erc20"],
-      "address": "0xD46bA6D942050d489DBd938a2C909A5d5039A161",
-      "name": "Ampleforth",
-      "symbol": "AMPL",
-      "decimals": 9,
-      "logoURI": "https://assets-cdn.trustwallet.com/blockchains/ethereum/assets//logo.png"
     },
     {
       "asset": "c60_t0xD478161C952357F05f0292B56012Cd8457F1cfbF",
