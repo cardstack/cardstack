@@ -2,7 +2,7 @@ import Component from '@glimmer/component';
 import '@cardstack/boxel/styles/global.css';
 import './index.css';
 import BoxelInputGroup from '../../input-group';
-import SelectableTokenItem from './item';
+import SelectableTokenItem from '../selectable-token-item';
 import { fn } from '@ember/helper';
 import { guidFor } from '@ember/object/internals';
 import cn from '@cardstack/boxel/helpers/cn';

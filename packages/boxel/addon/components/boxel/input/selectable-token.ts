@@ -1,4 +1,6 @@
 export interface SelectableToken {
   name: string;
-  icon: string;
+  symbol: string;
+  address: string;
+  logoURI?: string;
 }

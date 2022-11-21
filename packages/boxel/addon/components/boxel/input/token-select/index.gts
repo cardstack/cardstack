@@ -2,7 +2,7 @@ import Component from '@glimmer/component';
 import '@cardstack/boxel/styles/global.css';
 import './index.css';
 import BoxelSelect from '../../select';
-import { svgJar } from '@cardstack/boxel/utils/svg-jar';
+import SelectableTokenItem from '../selectable-token-item';
 import cn from '@cardstack/boxel/helpers/cn';
 import { SelectableToken } from '../selectable-token';
 
@@ -32,14 +32,10 @@ export default class TokenSelect extends Component<Signature> {
       class={{cn "boxel-input-token-select" boxel-input-token-select--disabled=@disabled}}
       ...attributes
      as |item itemCssClass|>
-      <div class={{cn itemCssClass "boxel-input-token-select__dropdown-item"}}>
-        {{svgJar
-          item.icon
-          class="boxel-input-token-select__icon"
-          role="presentation"
-        }}
-        {{item.name}}
-      </div>
+      <SelectableTokenItem
+        @item={{item}}
+        class={{cn itemCssClass "boxel-input-token-select__dropdown-item"}}
+      /> 
     </BoxelSelect>
   </template>
 }

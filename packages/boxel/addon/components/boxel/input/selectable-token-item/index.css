@@ -1,0 +1,6 @@
+.boxel-selectable-token-icon__icon {
+  margin-right: var(--boxel-sp-xxxs);
+  vertical-align: bottom;
+  width: var(--boxel-icon-sm);
+  height: var(--boxel-icon-sm);
+}
