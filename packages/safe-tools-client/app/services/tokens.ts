@@ -41,7 +41,7 @@ export default class TokensService extends Service {
   get transactionTokens() {
     const tokens = getConstantByNetwork(
       'tokenList',
-      this.network.networkInfo.symbol
+      this.network.symbol
     )?.tokens;
     if (tokens) {
       return sortBy(tokens, ['symbol', 'name']);

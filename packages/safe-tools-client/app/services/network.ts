@@ -3,6 +3,7 @@ import {
   Network,
   networks,
   schedulerSupportedChainsArray,
+  SchedulerCapableNetworks,
 } from '@cardstack/cardpay-sdk';
 import { action } from '@ember/object';
 import Service from '@ember/service';
@@ -49,8 +50,8 @@ export default class NetworkService extends Service {
   get name() {
     return this.networkInfo.name;
   }
-  get symbol() {
-    return this.networkInfo.symbol;
+  get symbol(): SchedulerCapableNetworks {
+    return this.networkInfo.symbol as SchedulerCapableNetworks;
   }
 }
 
