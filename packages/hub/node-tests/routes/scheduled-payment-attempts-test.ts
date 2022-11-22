@@ -126,6 +126,18 @@ describe('GET /api/scheduled-payment-attempts', async function () {
       },
     });
 
+    // One failed to ensure we're filtering by status
+    await prisma.scheduledPaymentAttempt.create({
+      data: {
+        id: shortUuid.uuid(),
+        startedAt: '2022-10-23T12:14:25.000Z',
+        endedAt: '2022-10-23T13:14:25.000Z',
+        status: 'failed',
+        scheduledPaymentId: sp.id,
+        transactionHash: '0x12345',
+      },
+    });
+
     // One much older than the others to ensure we're filtering by startedAt
     await prisma.scheduledPaymentAttempt.create({
       data: {
@@ -139,7 +151,7 @@ describe('GET /api/scheduled-payment-attempts', async function () {
     });
 
     await request()
-      .get(`/api/scheduled-payment-attempts?filter[started-at][gt]='2022-10-01`)
+      .get(`/api/scheduled-payment-attempts?filter[started-at][gt]=2022-10-01&filter[status]=succeeded`)
       .set('Authorization', 'Bearer abc123--def456--ghi789')
       .set('Accept', 'application/vnd.api+json')
       .set('Content-Type', 'application/vnd.api+json')

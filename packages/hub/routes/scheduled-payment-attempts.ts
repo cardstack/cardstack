@@ -2,7 +2,7 @@ import Koa from 'koa';
 import autoBind from 'auto-bind';
 import { ensureLoggedIn } from './utils/auth';
 import { inject } from '@cardstack/di';
-import { ScheduledPayment, ScheduledPaymentAttempt } from '@prisma/client';
+import { ScheduledPayment, ScheduledPaymentAttempt, ScheduledPaymentAttemptStatusEnum } from '@prisma/client';
 
 export type ScheduledPaymentAttemptWithScheduledPayment = ScheduledPaymentAttempt & {
   scheduledPayment: ScheduledPayment;
@@ -24,6 +24,12 @@ export default class ScheduledPaymentAttemptsRoute {
     }
 
     let minStartedAt = new Date((ctx.query['filter[started-at][gt]'] as string) || 0);
+
+    let status: ScheduledPaymentAttemptStatusEnum | undefined = undefined;
+    let statusQuery = ctx.query['filter[status]'] as string;
+    if (['failed', 'succeeded', 'inProgress'].includes(statusQuery)) {
+      status = statusQuery as ScheduledPaymentAttemptStatusEnum;
+    }
 
     let prisma = await this.prismaManager.getClient();
 
@@ -54,6 +60,9 @@ export default class ScheduledPaymentAttemptsRoute {
       where: {
         startedAt: {
           gt: minStartedAt,
+        },
+        status: {
+          equals: status,
         },
         scheduledPayment: {
           userAddress: ctx.state.userAddress,
