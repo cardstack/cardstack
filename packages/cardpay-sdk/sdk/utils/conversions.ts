@@ -7,8 +7,9 @@ import JsonRpcProvider from '../../providers/json-rpc-provider';
 import { networkName } from './general-utils';
 import BN from 'bn.js';
 import { BaseProvider } from '@ethersproject/providers';
+import { BigNumber } from 'ethers';
 
-type GasPrice = Record<'slow' | 'standard' | 'fast', BN>;
+type GasPrice = Record<'slow' | 'standard' | 'fast', BigNumber>;
 
 async function tokenPairRate(provider: JsonRpcProvider, token1Address: string, token2Address: string): Promise<Price> {
   let network = await provider.getNetwork();
@@ -26,7 +27,7 @@ export async function gasPriceInToken(provider: JsonRpcProvider, tokenAddress: s
   let network = await networkName(provider);
 
   // Gas station will return current gas price in native token in wei.
-  let gasPriceInNativeTokenInWei = (await getCurrentGasPrice(provider.network.chainId)).standard;
+  let gasPriceInNativeTokenInWei = new BN((await getCurrentGasPrice(provider.network.chainId)).standard.toString());
 
   // We use the wrapped native token address because the native token doesn't have an address in Uniswap.
   // The price of the wrapped native token, such as WETH, is the same as the price of the native token.
@@ -53,8 +54,8 @@ export async function getCurrentGasPrice(chainId: number): Promise<GasPrice> {
   let gasPriceJson = await gasStationResponse.json();
 
   return {
-    slow: new BN(gasPriceJson.slow),
-    standard: new BN(gasPriceJson.standard),
-    fast: new BN(gasPriceJson.fast),
+    slow: BigNumber.from(gasPriceJson.slow),
+    standard: BigNumber.from(gasPriceJson.standard),
+    fast: BigNumber.from(gasPriceJson.fast),
   };
 }

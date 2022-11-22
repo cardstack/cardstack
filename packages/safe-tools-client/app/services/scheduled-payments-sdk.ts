@@ -1,4 +1,8 @@
-import { getSDK, Web3Provider } from '@cardstack/cardpay-sdk';
+import {
+  GasEstimationScenario,
+  getSDK,
+  Web3Provider,
+} from '@cardstack/cardpay-sdk';
 import WalletService from '@cardstack/safe-tools-client/services/wallet';
 
 import { action } from '@ember/object';
@@ -30,12 +34,11 @@ export default class SchedulePaymentSDKService extends Service {
   @action async getCreateSafeGasEstimation(): Promise<BigNumber | undefined> {
     const scheduledPayments = await this.getSchedulePaymentsModule();
 
-    const estimatedSafeCreationGas =
-      await scheduledPayments.createSafeWithModuleAndGuardEstimation(
-        this.contractOptions
-      );
+    const estimatedGas = await scheduledPayments.estimateGas(
+      GasEstimationScenario.create_safe_with_module
+    );
 
-    return estimatedSafeCreationGas;
+    return estimatedGas.gasRangeInWei.standard;
   }
 
   @task *createSafe(): TaskGenerator<void> {

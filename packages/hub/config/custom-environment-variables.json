@@ -111,6 +111,11 @@
   "authSecret": "HUB_AUTH_SECRET",
   "emailHashSalt": "HUB_EMAIL_HASH_SALT",
   "hubPrivateKey": "HUB_PRIVATE_KEY",
+  "hubSPModuleAddress": {
+    "gnosis": "GNOSIS_HUB_SP_MODULE_ADDRESS",
+    "ethereum": "ETHEREUM_HUB_SP_MODULE_ADDRESS",
+    "polygon": "POLYGON_HUB_SP_MODULE_ADDRESS"
+  },
   "gasStationUrls": {
     "gnosis": "GNOSIS_GAS_STATION_URL",
     "ethereum": "ETHEREUM_GAS_STATION_URL",

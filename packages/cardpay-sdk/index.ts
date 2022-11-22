@@ -54,3 +54,4 @@ export { MIN_PAYMENT_AMOUNT_IN_SPEND as MIN_PAYMENT_AMOUNT_IN_SPEND__PREFER_ON_C
 export { protocolVersions } from './contracts/addresses';
 export { gasPriceInToken, getCurrentGasPrice } from './sdk/utils/conversions';
 export * from './sdk/network-config-utils';
+export * from './sdk/scheduled-payment/utils';

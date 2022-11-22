@@ -27,13 +27,16 @@ class StubEthersProvider {
 describe('locking the nonce', function () {
   let subject: CrankNonceLock;
   let prisma: ExtendedPrismaClient;
-  let chainId = 80001; //mumbai
+  let chainId = 5; //goerli
+
+  this.beforeEach(async function () {
+    registry(this).register('ethers-provider', StubEthersProvider);
+  });
 
   let { getPrisma, getContainer } = setupHub(this);
 
   this.beforeEach(async function () {
     prisma = await getPrisma();
-    registry(this).register('ethers-provider', StubEthersProvider);
     subject = (await getContainer().lookup('crank-nonce-lock')) as CrankNonceLock;
   });
 
