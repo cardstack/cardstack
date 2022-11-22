@@ -19,7 +19,7 @@ interface Signature {
     errorMessage: string;
     onInput: (amount: string) => void;
     onChooseToken: (token: SelectableToken) => void;
-    token: SelectableToken;
+    token: SelectableToken | undefined;
     tokens: SelectableToken[];
   };
   Blocks: {
@@ -51,6 +51,7 @@ export default class SelectableTokenAmount extends Component<Signature> {
       <:after as |Accessories|>
         <Accessories.Select
           class="boxel-input-selectable-token-amount__select"
+          @placeholder="Choose token"
           @options={{@tokens}}
           @selected={{@token}}
           @searchField="symbol"
