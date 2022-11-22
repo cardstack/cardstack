@@ -3,6 +3,7 @@ import autoBind from 'auto-bind';
 import { ensureLoggedIn } from './utils/auth';
 import { inject } from '@cardstack/di';
 import { ScheduledPayment, ScheduledPaymentAttempt, ScheduledPaymentAttemptStatusEnum } from '@prisma/client';
+import { isValidDate } from '../utils/dates';
 
 export type ScheduledPaymentAttemptWithScheduledPayment = ScheduledPaymentAttempt & {
   scheduledPayment: ScheduledPayment;
@@ -23,7 +24,14 @@ export default class ScheduledPaymentAttemptsRoute {
       return;
     }
 
-    let minStartedAt = new Date((ctx.query['filter[started-at][gt]'] as string) || 0);
+    let minStartedAt: Date | undefined = undefined;
+    let minStartedAtQuery = ctx.query['filter[started-at][gt]'] as string;
+    if (minStartedAtQuery) {
+      let parsedDate = new Date(minStartedAtQuery);
+      if (isValidDate(parsedDate)) {
+        minStartedAt = parsedDate;
+      }
+    }
 
     let status: ScheduledPaymentAttemptStatusEnum | undefined = undefined;
     let statusQuery = ctx.query['filter[status]'] as string;
