@@ -248,7 +248,7 @@ describe('POST /api/scheduled-payments', async function () {
       .expect({
         data: {
           id: 'id',
-          type: 'scheduled-payment',
+          type: 'scheduled-payments',
           attributes: {
             'sender-safe-address': '0xc0ffee254729296a45a3885639AC7E10F9d54979',
             'module-address': '0x7E7d0B97D663e268bB403eb4d72f7C0C7650a6dd',
@@ -321,7 +321,7 @@ describe('POST /api/scheduled-payments', async function () {
       .expect({
         data: {
           id: 'id',
-          type: 'scheduled-payment',
+          type: 'scheduled-payments',
           attributes: {
             'sender-safe-address': '0xc0ffee254729296a45a3885639AC7E10F9d54979',
             'module-address': '0x7E7d0B97D663e268bB403eb4d72f7C0C7650a6dd',
@@ -444,7 +444,7 @@ describe('GET /api/scheduled-payments', async function () {
         data: [
           {
             id: sp1.id,
-            type: 'scheduled-payment',
+            type: 'scheduled-payments',
             attributes: {
               'sender-safe-address': '0xc0ffee254729296a45a3885639AC7E10F9d54979',
               'module-address': '0x7E7d0B97D663e268bB403eb4d72f7C0C7650a6dd',
@@ -595,7 +595,7 @@ describe('GET /api/scheduled-payments/:id', async function () {
       .expect({
         data: {
           id: scheduledPayment.id,
-          type: 'scheduled-payment',
+          type: 'scheduled-payments',
           attributes: {
             'sender-safe-address': '0xc0ffee254729296a45a3885639AC7E10F9d54979',
             'module-address': '0x7E7d0B97D663e268bB403eb4d72f7C0C7650a6dd',
@@ -698,7 +698,7 @@ describe('PATCH /api/scheduled-payments/:id', async function () {
       .expect({
         data: {
           id: scheduledPayment.id,
-          type: 'scheduled-payment',
+          type: 'scheduled-payments',
           attributes: {
             'sender-safe-address': '0xc0ffee254729296a45a3885639AC7E10F9d54979',
             'module-address': '0x7E7d0B97D663e268bB403eb4d72f7C0C7650a6dd',
@@ -770,7 +770,7 @@ describe('PATCH /api/scheduled-payments/:id', async function () {
       .expect({
         data: {
           id: scheduledPayment.id,
-          type: 'scheduled-payment',
+          type: 'scheduled-payments',
           attributes: {
             'sender-safe-address': '0xc0ffee254729296a45a3885639AC7E10F9d54979',
             'module-address': '0x7E7d0B97D663e268bB403eb4d72f7C0C7650a6dd',

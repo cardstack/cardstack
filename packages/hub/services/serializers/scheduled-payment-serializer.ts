@@ -11,7 +11,7 @@ export default class ScheduledPaymentSerializer {
       return {
         data: {
           id: model.id,
-          type: 'scheduled-payment',
+          type: 'scheduled-payments',
           attributes: {
             'user-address': model.userAddress,
             'sender-safe-address': model.senderSafeAddress,
