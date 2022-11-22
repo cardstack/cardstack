@@ -53,6 +53,7 @@ export default class SelectableTokenAmount extends Component<Signature> {
           class="boxel-input-selectable-token-amount__select"
           @options={{@tokens}}
           @selected={{@token}}
+          @searchField="symbol"
           @disabled={{@disabled}}
           @onChange={{@onChooseToken}}
           @dropdownClass="boxel-input-selectable-token-amount__dropdown"

@@ -26,6 +26,7 @@ export default class TokenSelect extends Component<Signature> {
       @placeholder={{this.placeholder}}
       @options={{@tokens}}
       @selected={{@value}}
+      @searchField="symbol"
       @disabled={{@disabled}}
       @onChange={{@onChooseToken}}
       @verticalPosition="below"

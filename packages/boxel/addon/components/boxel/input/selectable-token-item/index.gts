@@ -36,7 +36,7 @@ export default class SelectableTokenAmount extends Component<Signature> {
           role="presentation"
         />
       {{/if}}
-      {{@item.name}}
+      {{@item.symbol}} ({{@item.name}})
     </div>
   </template>
 }

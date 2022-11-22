@@ -19,6 +19,7 @@ export default class BoxelSelectUsage extends Component {
 
   @tracked renderInPlace = false;
   @tracked disabled = false;
+  @tracked searchField = '';
 
   @cssVariable({ cssClassName: 'boxel-select__dropdown'}) declare boxelSelectCurrentColor: CSSVariableInfo;
   @cssVariable({ cssClassName: 'boxel-select__dropdown'}) declare boxelSelectSelectedColor: CSSVariableInfo;
@@ -42,6 +43,7 @@ export default class BoxelSelectUsage extends Component {
         </style>
         <BoxelSelect
           @placeholder={{this.placeholder}}
+          @searchField={{this.searchField}}
           @selected={{this.selectedItem}}
           @onChange={{this.onSelectItem}}
           @options={{this.items}}
@@ -104,7 +106,13 @@ export default class BoxelSelectUsage extends Component {
           @defaults={{false}}
           @onInput={{fn (mut this.disabled)}}
           @description="When truthy the component cannot be interacted"
-        />  
+        />
+        <Args.String
+          @name="searchField"
+          @onInput={{fn (mut this.searchField)}}
+          @description="Tells the component what property of the options should be used to filter
+"
+        />
         <Args.String
           @name="dropdownClass"
           @description="Class to be applied to the dropdown only"

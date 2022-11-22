@@ -8,6 +8,7 @@ type PartialBy<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>
 
 type BasePowerSelectArgs = PartialBy<Pick<
   PatchedPowerSelectArgs,
+  | 'searchField'
   | 'selected'
   | 'selectedItemComponent'
   | 'placeholder'
@@ -37,6 +38,7 @@ const BoxelSelect: TemplateOnlyComponent<Signature> =
   <PowerSelect
     class={{cn "boxel-select" boxel-select--selected=@selected}}
     @options={{@options}}
+    @searchField={{@searchField}}
     @selected={{@selected}}
     @selectedItemComponent={{@selectedItemComponent}}
     @placeholder={{@placeholder}}
