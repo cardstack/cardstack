@@ -232,42 +232,6 @@ export default class ScheduledPaymentsRoute {
 
     ctx.type = 'application/vnd.api+json';
   }
-
-  async cancel(ctx: Koa.Context) {
-    if (!ensureLoggedIn(ctx)) {
-      return;
-    }
-
-    let prisma = await this.prismaManager.getClient();
-
-    let userAddress = ctx.state.userAddress;
-    let scheduledPaymentId: string = ctx.params.scheduled_payment_id;
-
-    let scheduledPayment = await prisma.scheduledPayment.findFirst({
-      where: {
-        id: scheduledPaymentId,
-        userAddress,
-      },
-    });
-
-    if (scheduledPayment) {
-      await prisma.scheduledPayment.update({
-        where: {
-          id: scheduledPaymentId,
-        },
-        data: {
-          canceledAt: new Date(),
-          payAt: null,
-        },
-      });
-      ctx.status = 200;
-      ctx.body = {};
-    } else {
-      ctx.status = 404;
-    }
-
-    ctx.type = 'application/vnd.api+json';
-  }
 }
 
 declare module '@cardstack/di' {
