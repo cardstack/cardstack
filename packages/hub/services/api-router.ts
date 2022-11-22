@@ -46,6 +46,7 @@ export default class APIRouter {
   inventoryRoute = inject('inventory-route', { as: 'inventoryRoute' });
   wyrePricesRoute = inject('wyre-prices-route', { as: 'wyrePricesRoute' });
   scheduledPaymentsRoute = inject('scheduled-payments-route', { as: 'scheduledPaymentsRoute' });
+  scheduledPaymentAttemptsRoute = inject('scheduled-payment-attempts-route', { as: 'scheduledPaymentAttemptsRoute' });
   dataIntegrityChecksRoute = inject('data-integrity-checks-route', {
     as: 'dataIntegrityChecksRoute',
   });
@@ -73,6 +74,7 @@ export default class APIRouter {
       pushNotificationRegistrationsRoute,
       notificationPreferencesRoute,
       scheduledPaymentsRoute,
+      scheduledPaymentAttemptsRoute,
       dataIntegrityChecksRoute,
       gasStationRoute,
     } = this;
@@ -147,6 +149,7 @@ export default class APIRouter {
     apiSubrouter.get('/scheduled-payments', parseBody, scheduledPaymentsRoute.list);
     apiSubrouter.patch('/scheduled-payments/:scheduled_payment_id', parseBody, scheduledPaymentsRoute.patch);
     apiSubrouter.delete('/scheduled-payments/:scheduled_payment_id', parseBody, scheduledPaymentsRoute.delete);
+    apiSubrouter.get('/scheduled-payment-attempts', parseBody, scheduledPaymentAttemptsRoute.list);
     apiSubrouter.get('/wyre-prices', parseBody, wyrePricesRoute.get);
     apiSubrouter.get('/data-integrity-checks/:check_name', parseBody, dataIntegrityChecksRoute.get);
     apiSubrouter.get('/gas-station/:chain_id', gasStationRoute.get);
