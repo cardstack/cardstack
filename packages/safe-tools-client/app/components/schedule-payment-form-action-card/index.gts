@@ -85,7 +85,7 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
   get paymentTokens(): SelectableToken[] {
     return this.tokens.transactionTokens;
   }
-  @tracked paymentToken: SelectableToken = this.paymentTokens[0];
+  @tracked paymentToken: SelectableToken | undefined;
 
   @action onUpdatePaymentAmount(val: string) {
     this.paymentAmount = val;

@@ -39,7 +39,7 @@ export default class BoxelSelectableInputTokenAmountUsage extends Component {
   @tracked invalid = false;
   @tracked icon = 'card';
   @tracked symbol = 'CARD';
-  @tracked token = this.tokens[0];
+  @tracked token: SelectableToken | undefined;
 
   cssClassName = 'boxel-input-selectable-token-amount';
   @cssVariable declare boxelInputSelectableTokenAmountInputFontSize: CSSVariableInfo;
@@ -106,6 +106,24 @@ export default class BoxelSelectableInputTokenAmountUsage extends Component {
           @value={{this.errorMessage}}
           @onInput={{fn (mut this.errorMessage)}}
         />
+        <Args.String
+          @name="value"
+          @description="The value of the input"
+          @value={{this.value}}
+          @onInput={{fn (mut this.value)}}
+        />
+        <Args.Object
+          @name="token"
+          @description="The selected token"
+          @value={{this.token}}
+          hideControls={{true}}
+        />
+        <Args.Object
+          @name="tokens"
+          @description="The available token list"
+          @value={{this.tokens}}
+          @hideControls={{true}}
+        />
         <Args.Action
           @name="onInput"
           @description="Action called when the input value changes"
@@ -113,12 +131,6 @@ export default class BoxelSelectableInputTokenAmountUsage extends Component {
         <Args.Action
           @name="onChooseToken"
           @description="Action called when an item is chosen from the token dropdown"
-        />
-        <Args.String
-          @name="value"
-          @description="The value of the input"
-          @value={{this.value}}
-          @onInput={{fn (mut this.value)}}
         />
       </:api>
       <:cssVars as |Css|>
