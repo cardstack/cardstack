@@ -73,8 +73,7 @@ jobs:
         with:
           waypoint_config_file: waypoint.prod.hcl
 
-  test_all_but_web_client:
-    name: hub, did-resolver Build/Test
+  test_node_packages:
     needs: lint
     runs-on: ubuntu-latest
     env:
@@ -110,8 +109,8 @@ jobs:
         working-directory: packages/hub
       - run: yarn run npm-run-all --aggregate-output --continue-on-error --parallel test:did-resolver test:hub
 
-  test_boxel_safe_tools_client_and_web_client:
-    name: web-client Build/Lint/Test
+  test_ember_apps:
+    name: Ember apps Build/Lint/Test
     needs: lint
     runs-on: ubuntu-latest
     steps:
@@ -161,7 +160,7 @@ jobs:
 
   change_check:
     name: Check which packages changed
-    needs: [test_all_but_web_client, test_boxel_safe_tools_client_and_web_client]
+    needs: [test_node_packages, test_ember_apps]
     runs-on: ubuntu-latest
     outputs:
       hub: ${{ steps.filter.outputs.hub }}
