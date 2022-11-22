@@ -196,7 +196,7 @@ const constants: {
     ...hubUrl,
     ...polygonNativeTokens,
     tokenList: polygonTokenList,
-    apiBaseUrl: 'https://api-testnet.polygon.io/api', // TODO: add official polygon api
+    apiBaseUrl: 'https://api.polygonscan.com/api',
     blockExplorer: 'https://polygonscan.com',
     name: 'Polygon',
     chainId: 137,
@@ -209,7 +209,7 @@ const constants: {
     ...testHubUrl,
     ...polygonNativeTokens,
     tokenList: mumbaiTokenList,
-    apiBaseUrl: 'https://api-testnet.polygon.io/api',
+    apiBaseUrl: 'https://api-testnet.polygonscan.com/api',
     blockExplorer: 'https://mumbai.polygonscan.com',
     name: 'Mumbai',
     relayServiceURL: 'https://relay-mumbai.staging.stack.cards/api',
