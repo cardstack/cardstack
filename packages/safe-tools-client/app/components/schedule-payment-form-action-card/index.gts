@@ -1,25 +1,13 @@
 import Component from '@glimmer/component';
-import BoxelActionContainer from '@cardstack/boxel/components/boxel/action-container';
-import BoxelField from '@cardstack/boxel/components/boxel/field';
-import BoxelInputDate, { Day } from '@cardstack/boxel/components/boxel/input/date';
-import BoxelInputTime, { Time } from '@cardstack/boxel/components/boxel/input/time';
-import BoxelInput from '@cardstack/boxel/components/boxel/input';
-import BoxelRadioInput from '@cardstack/boxel/components/boxel/radio-input';
-import BoxelInputSelectableTokenAmount from '@cardstack/boxel/components/boxel/input/selectable-token-amount';
-import RangedNumberPicker from '@cardstack/boxel/components/boxel/input/ranged-number-picker';
+import SchedulePaymentFormActionCardUI from './ui';
 import { SelectableToken } from '@cardstack/boxel/components/boxel/input/selectable-token';
-import BoxelTokenSelect from '@cardstack/boxel/components/boxel/input/token-select';
-import BoxelToggleButtonGroup from '@cardstack/boxel/components/boxel/toggle-button-group';
 import { inject as service } from '@ember/service';
 import TokensService from '../../services/tokens';
 import { action } from '@ember/object';
 import { tracked } from '@glimmer/tracking';
-import { fn } from '@ember/helper';
-import { on } from '@ember/modifier';
-import { svgJar } from '@cardstack/boxel/utils/svg-jar';
-import eq from 'ember-truth-helpers/helpers/eq';
+import { Day } from '@cardstack/boxel/components/boxel/input/date';
+import { Time } from '@cardstack/boxel/components/boxel/input/time';
 import withTokenIcons from '../../helpers/with-token-icons';
-import './index.css';
 
 interface Signature {
   Element: HTMLElement;
@@ -62,8 +50,8 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
   }
 
   @tracked monthlyUntil: Date | undefined;
-  @action onSetMonthlyUntil(day: Day) {
-    this.monthlyUntil?.setFullYear(day.getFullYear(), day.getMonth(), day.getDate()); 
+  @action onSetMonthlyUntil(date: Date) {
+    this.monthlyUntil?.setFullYear(date.getFullYear(), date.getMonth(), date.getDate()); 
     if (this.monthlyUntil) {
       this.monthlyUntil = new Date(this.monthlyUntil?.getTime()); // trigger reactivity
     }
@@ -110,143 +98,34 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
   }
 
   <template>
-    <BoxelActionContainer
-      class="schedule-payment-form-action-card"
-      ...attributes
-    as |Section ActionChin|>
-      <Section @title="Schedule Payment">
-        <BoxelField @label="Frequency" class="schedule-payment-form-action-card__frequency">
-          <div>
-            <BoxelRadioInput
-              @groupDescription="Select a type of scheduled payment"
-              @name="payment-type"
-              @items={{this.paymentTypeOptions}}
-              @checkedId={{this.selectedPaymentType}}
-            as |item|>
-              <item.component @onChange={{fn this.onSelectPaymentType item.data.id}}>
-                {{item.data.text}}
-              </item.component>
-            </BoxelRadioInput>
-            {{#if this.selectedPaymentType}}
-              <fieldset class="schedule-payment-form-action-card__frequency-fieldset">
-                {{!-- this div is necessary because Chrome has a special case for fieldsets and it breaks grid auto placement --}}
-                <div class="schedule-payment-form-action-card__frequency-fieldset-container">
-                  <div class="schedule-payment-form-action-card__when-fields">
-                    {{#if (eq this.selectedPaymentType 'one-time')}}
-                      <BoxelField @label="Payment Date" @vertical={{true}}>
-                        <BoxelInputDate
-                          @value={{this.paymentDate}}
-                          @onChange={{this.onSetPaymentDate}}
-                        />
-                      </BoxelField>
-                      <BoxelField @label="Specific Time" @vertical={{true}}>
-                        <BoxelInputTime
-                          @value={{this.paymentDate}}
-                          @onChange={{this.onSetPaymentTime}}
-                        />
-                      </BoxelField>
-                    {{/if}}
-                  </div>
-                  <div class="schedule-payment-form-action-card__when-fields">
-                    {{#if (eq this.selectedPaymentType 'monthly')}}
-                      <BoxelField @label="Day of Month" @vertical={{true}}>
-                        <RangedNumberPicker
-                          @min={{1}}
-                          @max={{28}}
-                          @icon="calendar"
-                          @onChange={{this.onSelectPaymentDayOfMonth}}
-                          @value={{this.paymentDayOfMonth}}
-                        />
-                      </BoxelField>
-                      <BoxelField @label="Until" @vertical={{true}}>
-                        <BoxelInputDate
-                          @value={{this.monthlyUntil}}
-                          @onChange={{this.onSetMonthlyUntil}}
-                        />
-                      </BoxelField>
-                    {{/if}}
-                  </div>
-                </div>
-              </fieldset>
-            {{/if}}
-          </div>
-        </BoxelField>
-        <BoxelField @label="Recipient">
-          <BoxelInput
-            placeholder="Enter Address"
-            @value={{this.recipientAddress}}
-            @invalid={{this.isRecipientAddressInvalid}}
-            @errorMessage={{this.recipientAddressErrorMessage}}
-          />
-        </BoxelField>
-        <BoxelField @label="Amount">
-          <BoxelInputSelectableTokenAmount
-            @value={{this.paymentAmount}}
-            @onInput={{this.onUpdatePaymentAmount}}
-            @invalid={{this.isPaymentAmountInvalid}}
-            @errorMessage={{this.paymentTokenErrorMessage}}
-            @token={{this.paymentToken}}
-            @tokens={{this.paymentTokens}}
-            @onChooseToken={{this.onUpdatePaymentToken}}
-          />
-        </BoxelField>
-        <BoxelField @label="Gas">
-          <BoxelTokenSelect
-            @placeholder="Choose a Gas Token"
-            @value={{this.selectedGasToken}}
-            @onChooseToken={{this.onSelectGasToken}}
-            @tokens={{withTokenIcons this.tokens.gasTokens.value}}
-          />
-        </BoxelField>
-        <BoxelField @label="Max Gas Fee">
-          <BoxelToggleButtonGroup
-            @groupDescription="The maximum gas fee you are willing to spend for this payment"
-            @name="max-gas-fee"
-            @value={{this.maxGasFee}}
-            @onChange={{this.onUpdateMaxGasFee}} as |group|
-          >
-            <group.Button @value="normal">
-              <div class="schedule-payment-form-action-card--max-gas-fee-name">
-                Normal
-              </div>
-              <div class="schedule-payment-form-action-card--max-gas-fee-description">
-                Less than $0.10 USD
-              </div>
-            </group.Button>
-            <group.Button @value="high">
-              <div class="schedule-payment-form-action-card--max-gas-fee-name">
-                High
-              </div>
-              <div class="schedule-payment-form-action-card--max-gas-fee-description">
-                Less than $1.00 USD
-              </div>
-            </group.Button>
-            <group.Button @value="max">
-              <div class="schedule-payment-form-action-card--max-gas-fee-name">
-                Max
-              </div>
-              <div class="schedule-payment-form-action-card--max-gas-fee-description">
-                Capped at $10 USD
-              </div>
-            </group.Button>
-          </BoxelToggleButtonGroup>
-          <div><!-- empty --></div>
-          <div class="schedule-payment-form-action-card--fee-details">
-            {{svgJar "info" width="17px" height="17px" class="schedule-payment-form-action-card--fee-info-icon"}}
-            <span>Cardstack charges $0.25 USD and 0.1% of the transaction as a fee for executing your scheduled payments.</span>
-          </div>
-        </BoxelField>
-      </Section>
-        <ActionChin @state='default'>
-          <:default as |ac|>
-            <ac.ActionButton
-              {{on 'click' this.schedulePayment}}
-            >
-              Schedule Payment
-            </ac.ActionButton>
-          </:default>
-        </ActionChin>
-    </BoxelActionContainer>
+    <SchedulePaymentFormActionCardUI
+      @paymentTypeOptions={{this.paymentTypeOptions}}
+      @selectedPaymentType={{this.selectedPaymentType}}
+      @onSelectPaymentType={{this.onSelectPaymentType}}
+      @paymentDate={{this.paymentDate}}
+      @onSetPaymentTime={{this.onSetPaymentTime}}
+      @onSetPaymentDate={{this.onSetPaymentDate}}
+      @paymentDayOfMonth={{this.paymentDayOfMonth}}
+      @onSelectPaymentDayOfMonth={{this.onSelectPaymentDayOfMonth}}
+      @monthlyUntil={{this.monthlyUntil}}
+      @onSetMonthlyUntil={{this.onSetMonthlyUntil}}
+      @recipientAddress={{this.recipientAddress}}
+      @isRecipientAddressInvalid={{this.isRecipientAddressInvalid}}
+      @recipientAddressErrorMessage={{this.recipientAddressErrorMessage}}
+      @paymentAmount={{this.paymentAmount}}
+      @onUpdatePaymentAmount={{this.onUpdatePaymentAmount}}
+      @isPaymentAmountInvalid={{this.isPaymentAmountInvalid}}
+      @paymentTokenErrorMessage={{this.paymentTokenErrorMessage}}
+      @paymentToken={{this.paymentToken}}
+      @paymentTokens={{this.paymentTokens}}
+      @onUpdatePaymentToken={{this.onUpdatePaymentToken}}
+      @selectedGasToken={{this.selectedGasToken}}
+      @gasTokens={{withTokenIcons this.tokens.gasTokens.value}}
+      @onSelectGasToken={{this.onSelectGasToken}}
+      @maxGasFee={{this.maxGasFee}}
+      @onUpdateMaxGasFee={{this.onUpdateMaxGasFee}}
+      @onSchedulePayment={{this.schedulePayment}}
+    />
   </template>
 }
 
