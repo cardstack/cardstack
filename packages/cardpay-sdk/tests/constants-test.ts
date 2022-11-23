@@ -2,7 +2,14 @@ import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import Web3 from 'web3';
 import JsonRpcProvider from '../providers/json-rpc-provider';
-import { networkIds, networks, getConstantByNetwork, getConstant } from '../sdk/constants';
+import {
+  networkIds,
+  networks,
+  getConstantByNetwork,
+  getConstant,
+  supportedChainsArray,
+  schedulerSupportedChainsArray,
+} from '../sdk/constants';
 
 chai.use(chaiAsPromised);
 
@@ -28,6 +35,12 @@ describe('Network constants', () => {
       1: 'mainnet',
       100: 'gnosis',
     });
+  });
+  it('should return all supported networks in an array', () => {
+    chai.expect(supportedChainsArray).to.eql(['mainnet', 'goerli', 'gnosis', 'sokol', 'polygon', 'mumbai']);
+  });
+  it('should return all scheduler supported networks in an array', () => {
+    chai.expect(schedulerSupportedChainsArray).to.eql(['mainnet', 'goerli', 'polygon', 'mumbai']);
   });
 
   describe('getConstantByNetwork', () => {
