@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/camelcase */
 import { MigrationBuilder } from 'node-pg-migrate';
 
 const TABLE = 'reward_root_index';
