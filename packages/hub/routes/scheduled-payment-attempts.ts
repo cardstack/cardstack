@@ -2,8 +2,6 @@ import Koa from 'koa';
 import autoBind from 'auto-bind';
 import { ensureLoggedIn } from './utils/auth';
 import { inject } from '@cardstack/di';
-import ScheduledPaymentValidator from '../services/validators/scheduled-payment';
-import ScheduledPaymentSerializer from '../services/serializers/scheduled-payment-serializer';
 import { ScheduledPayment, ScheduledPaymentAttempt } from '@prisma/client';
 
 export type ScheduledPaymentAttemptWithScheduledPayment = ScheduledPaymentAttempt & {
@@ -11,13 +9,6 @@ export type ScheduledPaymentAttemptWithScheduledPayment = ScheduledPaymentAttemp
 };
 
 export default class ScheduledPaymentAttemptsRoute {
-  scheduledPaymentValidator: ScheduledPaymentValidator = inject('scheduled-payment-validator', {
-    as: 'scheduledPaymentValidator',
-  });
-  scheduledPaymentSerializer: ScheduledPaymentSerializer = inject('scheduled-payment-serializer', {
-    as: 'scheduledPaymentSerializer',
-  });
-  web3 = inject('web3-http', { as: 'web3' });
   prismaManager = inject('prisma-manager', { as: 'prismaManager' });
   scheduledPaymentAttemptSerializer = inject('scheduled-payment-attempt-serializer', {
     as: 'scheduledPaymentAttemptSerializer',
