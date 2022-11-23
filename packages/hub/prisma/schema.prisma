@@ -352,6 +352,12 @@ model GasPrice {
   @@map("gas_prices")
 }
 
+model RewardRootIndex {
+  blockNumber Int @id @map("block_number")
+
+  @@map("reward_root_index")
+}
+
 enum DiscordBotsStatusEnum {
   connecting
   connected
