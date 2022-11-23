@@ -84,6 +84,7 @@
     "test:web-client:serve": "cd packages/web-client && ember test --serve --no-launch",
     "test:safe-tools-client": "cd packages/safe-tools-client && ember test",
     "test:safe-tools-client:percy": "cd packages/safe-tools-client && percy exec -- ember test",
+    "test:cardpay-sdk": "yarn --cwd packages/cardpay-sdk test",
     "deploy:boxel": "cd ./packages/boxel && ember deploy production --verbose",
     "deploy:boxel:preview": "cd ./packages/boxel && ember deploy s3-preview --verbose",
     "deploy:ssr-web:preview-staging": "cd ./packages/ssr-web && ember deploy s3-preview-staging --verbose",
