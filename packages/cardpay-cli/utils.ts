@@ -66,7 +66,7 @@ export async function getEthereumClients(
 ): Promise<{ web3: Web3; ethersProvider: JsonRpcProvider; signer?: Signer }> {
   let rpcNodeHttpsUrl!: string;
   let rpcNodeWssUrl!: string;
-  let bridge!: string;
+
   let hubConfigResponse;
   let hubUrl = process.env.HUB_URL || getConstantByNetwork('hubUrl', network);
   let hubConfig = new HubConfig(hubUrl);
@@ -75,25 +75,21 @@ export async function getEthereumClients(
     case 'kovan':
       rpcNodeHttpsUrl = hubConfigResponse.web3.layer1RpcNodeHttpsUrl as string;
       rpcNodeWssUrl = hubConfigResponse.web3.layer1RpcNodeWssUrl as string;
-      bridge = 'https://bridge.walletconnect.org';
       break;
     case 'goerli':
     case 'mainnet':
       rpcNodeHttpsUrl = hubConfigResponse.web3.ethereum.rpcNodeHttpsUrl as string;
       rpcNodeWssUrl = hubConfigResponse.web3.ethereum.rpcNodeWssUrl as string;
-      bridge = 'https://bridge.walletconnect.org';
       break;
     case 'sokol':
     case 'gnosis':
       rpcNodeHttpsUrl = hubConfigResponse.web3.gnosis.rpcNodeHttpsUrl as string;
       rpcNodeWssUrl = hubConfigResponse.web3.gnosis.rpcNodeWssUrl as string;
-      bridge = 'https://safe-walletconnect.gnosis.io/';
       break;
     case 'mumbai':
     case 'polygon':
       rpcNodeHttpsUrl = hubConfigResponse.web3.polygon.rpcNodeHttpsUrl as string;
       rpcNodeWssUrl = hubConfigResponse.web3.polygon.rpcNodeWssUrl as string;
-      bridge = 'https://bridge.walletconnect.org';
       break;
   }
 
@@ -109,7 +105,7 @@ export async function getEthereumClients(
         chainId: networkIds[network],
         rpc: { [networkIds[network]]: rpcNodeHttpsUrl },
         rpcWss: { [networkIds[network]]: rpcNodeWssUrl },
-        bridge,
+        bridge: 'https://bridge.walletconnect.org',
       });
       await walletConnectProvider.enable();
       return {
