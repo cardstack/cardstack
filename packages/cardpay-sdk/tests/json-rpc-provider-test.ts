@@ -33,7 +33,7 @@ const commonError = {
   message: 'execution reverted: �Դ�n�ȦM\u0019�/�Xf �\u001a��',
 };
 
-const sokolEror = { code: -32015, message: 'Reverted 0xb2416de0dd9fbbcf59843aa426a077e327bb5bda' };
+const sokolEror = { message: 'Reverted 0xb2416de0dd9fbbcf59843aa426a077e327bb5bda' };
 
 const expectedErrorBase = {
   reason: 'cannot estimate gas; transaction may fail or may require manual gas limit',
@@ -65,7 +65,7 @@ const assertErrorStructure = (error: any, expectedError: { data: string; message
   chai.expect(error?.message).to.eq(expectedError?.message);
 };
 
-describe.only('JsonRpcProvider', () => {
+describe('JsonRpcProvider', () => {
   describe('gasEstimate', () => {
     it('should throw error with correct data and message for error object with level 1', async () => {
       const error = await performGasEstimate(commonError);
@@ -91,10 +91,10 @@ describe.only('JsonRpcProvider', () => {
 
       assertErrorStructure(error, { data, message });
     });
-    it.only('should throw error with correct message when data does not exist', async () => {
+    it('should throw error with correct message when data does not exist', async () => {
       const error = (await performGasEstimate(sokolEror)) as any;
 
-      chai.expect(error).to.deep.eq(sokolEror);
+      chai.expect(error).to.deep.eq({ ...sokolEror, data: undefined });
     });
   });
 });
