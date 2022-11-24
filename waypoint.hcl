@@ -57,6 +57,9 @@ app "hub" {
         ETHEREUM_RPC_NODE_WSS_URL                     = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_evm_ethereum_infura_wss_url-hXLd7Q"
         POLYGON_RPC_NODE_HTTPS_URL                    = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_evm_polygon_infura_https_url-wIF3tU"
         POLYGON_RPC_NODE_WSS_URL                      = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_evm_polygon_infura_wss_url-UvdYiF"
+        GNOSIS_HUB_SP_MODULE_ADDRESS                  = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_gnosis_hub_sp_module_address-OnJ0YE"
+        ETHEREUM_HUB_SP_MODULE_ADDRESS                = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_ethereum_hub_sp_module_address-aDErRZ"
+        POLYGON_HUB_SP_MODULE_ADDRESS                 = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_polygon_hub_sp_module_address-BHTgw2"
         # The below is a distribution in the production AWS account
         HUB_STORAGE_CLOUDFRONT_DISTRIBUTION           = "arn:aws:secretsmanager:us-east-1:680542703984:secret:hub_storage_cloudfront_distribution-Frtsb3"
         DISCORD_ON_CALL_INTERNAL_WEBHOOK              = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_discord_on_call_internal_webhook-4ylxfM"
@@ -136,6 +139,9 @@ app "hub-worker" {
         GNOSIS_GAS_STATION_URL              = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_gnosis_gas_station_url-0xbRlJ"
         ETHEREUM_GAS_STATION_URL            = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_ethereum_gas_station_url-AlItsC"
         POLYGON_GAS_STATION_URL             = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_polygon_gas_station_url-cUpbHc"
+        GNOSIS_HUB_SP_MODULE_ADDRESS        = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_gnosis_hub_sp_module_address-OnJ0YE"
+        ETHEREUM_HUB_SP_MODULE_ADDRESS      = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_ethereum_hub_sp_module_address-aDErRZ"
+        POLYGON_HUB_SP_MODULE_ADDRESS       = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_polygon_hub_sp_module_address-BHTgw2"
         # The below is a distribution in the production AWS account
         HUB_STORAGE_CLOUDFRONT_DISTRIBUTION = "arn:aws:secretsmanager:us-east-1:680542703984:secret:hub_storage_cloudfront_distribution-Frtsb3"
         DISCORD_ON_CALL_INTERNAL_WEBHOOK    = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_discord_on_call_internal_webhook-4ylxfM"
@@ -211,6 +217,9 @@ app "hub-bot" {
         GNOSIS_GAS_STATION_URL           = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_gnosis_gas_station_url-0xbRlJ"
         ETHEREUM_GAS_STATION_URL         = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_ethereum_gas_station_url-AlItsC"
         POLYGON_GAS_STATION_URL          = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_polygon_gas_station_url-cUpbHc"
+        GNOSIS_HUB_SP_MODULE_ADDRESS     = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_gnosis_hub_sp_module_address-OnJ0YE"
+        ETHEREUM_HUB_SP_MODULE_ADDRESS   = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_ethereum_hub_sp_module_address-aDErRZ"
+        POLYGON_HUB_SP_MODULE_ADDRESS    = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_polygon_hub_sp_module_address-BHTgw2"
       }
     }
 
@@ -281,6 +290,9 @@ app "hub-event-listener" {
         GNOSIS_GAS_STATION_URL           = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_gnosis_gas_station_url-0xbRlJ"
         ETHEREUM_GAS_STATION_URL         = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_ethereum_gas_station_url-AlItsC"
         POLYGON_GAS_STATION_URL          = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_polygon_gas_station_url-cUpbHc"
+        GNOSIS_HUB_SP_MODULE_ADDRESS     = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_gnosis_hub_sp_module_address-OnJ0YE"
+        ETHEREUM_HUB_SP_MODULE_ADDRESS   = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_ethereum_hub_sp_module_address-aDErRZ"
+        POLYGON_HUB_SP_MODULE_ADDRESS    = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_polygon_hub_sp_module_address-BHTgw2"
       }
     }
 
