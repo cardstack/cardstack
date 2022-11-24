@@ -1,8 +1,8 @@
 {
   "name": "@cardstack/ember-shared-test-app",
-  "version": "1.0.17",
+  "version": "1.0.19",
   "dependencies": {
-    "@cardstack/ember-shared": "1.0.17",
+    "@cardstack/ember-shared": "1.0.19",
     "ember-template-imports": "^3.1.2"
   },
   "devDependencies": {

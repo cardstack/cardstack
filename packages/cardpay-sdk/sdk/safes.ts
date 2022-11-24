@@ -219,7 +219,7 @@ const safesFilteredQuery = `
   }
 `;
 
-export async function viewSafe(network: 'gnosis' | 'xdai' | 'sokol', safeAddress: string): Promise<ViewSafeResult> {
+export async function viewSafe(network: 'gnosis' | 'sokol', safeAddress: string): Promise<ViewSafeResult> {
   let {
     data: { safe, _meta },
   } = await query(network, safeQuery, { id: safeAddress });

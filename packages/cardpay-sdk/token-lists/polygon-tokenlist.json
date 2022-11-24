@@ -1,0 +1,747 @@
+{
+  "name": "Polygon Tokens",
+  "version": {
+    "major": 1,
+    "minor": 0,
+    "patch": 0
+  },
+  "logoURI": "https://wallet-asset.matic.network/img/tokens/matic.svg",
+  "keywords": ["polygon", "mainnet", "default", "tokens"],
+  "tags": {
+    "stablecoin": {
+      "name": "stablecoin",
+      "description": "Tokens that are fixed to an external asset, e.g. the US dollar"
+    },
+    "erc20": {
+      "name": "erc20",
+      "description": "Tokens are of ERC20 token type"
+    },
+    "relayGas": {
+      "name": "relayGas",
+      "description": "Tokens that can be used to reimburse gas to the Cardstack relay server on this chain"
+    }
+  },
+  "timestamp": "2022-11-15T18:44:00.000Z",
+  "tokens": [
+    {
+      "chainId": 137,
+      "name": "Ether - PoS",
+      "symbol": "ETH",
+      "decimals": 18,
+      "address": "0x7ceb23fd6bc0add59e62ac25578270cff1b9f619",
+      "logoURI": "https://wallet-asset.matic.network/img/tokens/eth.svg",
+      "tags": ["erc20"],
+      "extensions": {
+        "rootAddress": "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
+      }
+    },
+    {
+      "chainId": 137,
+      "name": "Matic Token",
+      "symbol": "MATIC",
+      "decimals": 18,
+      "address": "0x0000000000000000000000000000000000001010",
+      "logoURI": "https://wallet-asset.matic.network/img/tokens/matic.svg",
+      "tags": ["erc20", "relayGas"],
+      "extensions": {
+        "rootAddress": "0x7d1afa7b718fb893db30a3abc0cfc608aacfebb0"
+      }
+    },
+    {
+      "chainId": 137,
+      "name": "USD Coin",
+      "symbol": "USDC",
+      "decimals": 6,
+      "address": "0x2791bca1f2de4661ed88a30c99a7a9449aa84174",
+      "logoURI": "https://wallet-asset.matic.network/img/tokens/usdc.svg",
+      "tags": ["stablecoin", "erc20", "relayGas"],
+      "extensions": {
+        "rootAddress": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"
+      }
+    },
+    {
+      "chainId": 137,
+      "name": "Tether USD",
+      "symbol": "USDT",
+      "decimals": 6,
+      "address": "0xc2132d05d31c914a87c6611c10748aeb04b58e8f",
+      "logoURI": "https://wallet-asset.matic.network/img/tokens/usdt.svg",
+      "tags": ["stablecoin", "erc20", "relayGas"],
+      "extensions": {
+        "rootAddress": "0xdac17f958d2ee523a2206206994597c13d831ec7"
+      }
+    },
+    {
+      "chainId": 137,
+      "name": "Dai - PoS",
+      "symbol": "DAI",
+      "decimals": 18,
+      "address": "0x8f3cf7ad23cd3cadbd9735aff958023239c6a063",
+      "logoURI": "https://wallet-asset.matic.network/img/tokens/dai.svg",
+      "tags": ["stablecoin", "erc20", "relayGas"],
+      "extensions": {
+        "rootAddress": "0x6b175474e89094c44da98b954eedeac495271d0f"
+      }
+    },
+    {
+      "chainId": 137,
+      "name": "Aave",
+      "symbol": "AAVE",
+      "decimals": 18,
+      "address": "0xd6df932a45c0f255f85145f286ea0b292b21c90b",
+      "logoURI": "https://wallet-asset.matic.network/img/tokens/aave.svg",
+      "tags": ["erc20"],
+      "extensions": {
+        "rootAddress": "0x7fc66500c84a76ad7e9c93437bfc5ac33e2ddae9"
+      }
+    },
+    {
+      "chainId": 137,
+      "name": "ChainLink Token",
+      "symbol": "LINK",
+      "decimals": 18,
+      "address": "0x53e0bca35ec356bd5dddfebbd1fc0fd03fabad39",
+      "logoURI": "https://wallet-asset.matic.network/img/tokens/link.svg",
+      "tags": ["erc20"],
+      "extensions": {
+        "rootAddress": "0x514910771AF9Ca656af840dff83E8264EcF986CA"
+      }
+    },
+    {
+      "chainId": 137,
+      "name": "Wrapped BTC",
+      "symbol": "WBTC",
+      "decimals": 8,
+      "address": "0x1bfd67037b42cf73acf2047067bd4f2c47d9bfd6",
+      "logoURI": "https://wallet-asset.matic.network/img/tokens/wbtc.svg",
+      "tags": ["erc20"],
+      "extensions": {
+        "rootAddress": "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599"
+      }
+    },
+    {
+      "chainId": 137,
+      "name": "Uniswap",
+      "symbol": "UNI",
+      "decimals": 18,
+      "address": "0xb33eaad8d922b1083446dc23f610c2567fb5180f",
+      "logoURI": "https://wallet-asset.matic.network/img/tokens/uni.svg",
+      "tags": ["erc20"],
+      "extensions": {
+        "rootAddress": "0x1f9840a85d5af5bf1d1762f925bdaddc4201f984"
+      }
+    },
+    {
+      "chainId": 137,
+      "name": "SushiToken",
+      "symbol": "SUSHI",
+      "decimals": 18,
+      "address": "0x0b3f868e0be5597d5db7feb59e1cadbb0fdda50a",
+      "logoURI": "https://wallet-asset.matic.network/img/tokens/sushi.svg",
+      "tags": ["erc20"],
+      "extensions": {
+        "rootAddress": "0x6b3595068778dd592e39a122f4f5a5cf09c90fe2"
+      }
+    },
+    {
+      "chainId": 137,
+      "name": "Quickswap",
+      "symbol": "QUICK",
+      "decimals": 18,
+      "address": "0x831753dd7087cac61ab5644b308642cc1c33dc13",
+      "logoURI": "https://wallet-asset.matic.network/img/tokens/quick.svg",
+      "tags": ["erc20"],
+      "extensions": {
+        "rootAddress": "0x6c28AeF8977c9B773996d0e8376d2EE379446F2f"
+      }
+    },
+    {
+      "chainId": 137,
+      "name": "Aavegotchi GHST Token",
+      "symbol": "GHST",
+      "decimals": 18,
+      "address": "0x385eeac5cb85a38a9a07a70c73e0a3271cfb54a7",
+      "logoURI": "https://polygonscan.com/token/images/aavegotchighst_32.png",
+      "tags": ["erc20"],
+      "extensions": {
+        "rootAddress": "0x3F382DbD960E3a9bbCeaE22651E88158d2791550"
+      }
+    },
+    {
+      "chainId": 137,
+      "name": "Telcoin",
+      "symbol": "TEL",
+      "decimals": 2,
+      "address": "0xdf7837de1f2fa4631d716cf2502f8b230f1dcc32",
+      "logoURI": "https://wallet-asset.matic.network/img/tokens/tel.svg",
+      "tags": ["erc20"],
+      "extensions": {
+        "rootAddress": "0x467bccd9d29f223bce8043b84e8c8b282827790f"
+      }
+    },
+    {
+      "chainId": 137,
+      "name": "Balancer",
+      "symbol": "BAL",
+      "decimals": 18,
+      "address": "0x9a71012b13ca4d3d0cdc72a177df3ef03b0e76a3",
+      "logoURI": "https://wallet-asset.matic.network/img/tokens/bal.svg",
+      "tags": ["erc20"],
+      "extensions": {
+        "rootAddress": "0xba100000625a3754423978a60c9317c58a424e3d"
+      }
+    },
+    {
+      "chainId": 137,
+      "name": "Binance USD",
+      "symbol": "BUSD",
+      "decimals": 18,
+      "address": "0xdab529f40e671a1d4bf91361c21bf9f0c9712ab7",
+      "logoURI": "https://wallet-asset.matic.network/img/tokens/busd.svg",
+      "tags": ["erc20"],
+      "extensions": {
+        "rootAddress": "0x4fabb145d64652a948d72533023f6e7a623c7c53"
+      }
+    },
+    {
+      "chainId": 137,
+      "name": "Decentral Games",
+      "symbol": "DG",
+      "decimals": 18,
+      "address": "0xef938b6da8576a896f6E0321ef80996F4890f9c4",
+      "tags": ["erc20"],
+      "extensions": {
+        "rootAddress": "0x4b520c812e8430659fc9f12f6d0c39026c83588d"
+      },
+      "logoURI": "https://wallet-asset.matic.network/img/tokens/dg.svg"
+    },
+    {
+      "chainId": 137,
+      "name": "Decentraland MANA",
+      "symbol": "MANA",
+      "decimals": 18,
+      "address": "0xA1c57f48F0Deb89f569dFbE6E2B7f46D33606fD4",
+      "tags": ["erc20"],
+      "extensions": {
+        "rootAddress": "0x0F5D2fB29fb7d3CFeE444a200298f468908cC942"
+      },
+      "logoURI": "https://wallet-asset.matic.network/img/tokens/mana.svg"
+    },
+    {
+      "chainId": 137,
+      "name": "Shardus",
+      "symbol": "ULT",
+      "decimals": 18,
+      "address": "0xf0059CC2b3E980065A906940fbce5f9Db7ae40A7",
+      "tags": ["erc20"],
+      "extensions": {
+        "rootAddress": "0x09617f6fd6cf8a71278ec86e23bbab29c04353a7"
+      },
+      "logoURI": "https://wallet-asset.matic.network/img/tokens/ult.svg"
+    },
+    {
+      "chainId": 137,
+      "name": "SAND",
+      "symbol": "SAND",
+      "decimals": 18,
+      "address": "0xBbba073C31bF03b8ACf7c28EF0738DeCF3695683",
+      "tags": ["erc20"],
+      "extensions": {
+        "rootAddress": "0x3845badAde8e6dFF049820680d1F14bD3903a5d0"
+      },
+      "logoURI": "https://wallet-asset.matic.network/img/tokens/sand.svg"
+    },
+    {
+      "chainId": 137,
+      "name": "TrueUSD",
+      "symbol": "TUSD",
+      "decimals": 18,
+      "address": "0x2e1AD108fF1D8C782fcBbB89AAd783aC49586756",
+      "tags": ["erc20"],
+      "extensions": {
+        "rootAddress": "0x0000000000085d4780B73119b644AE5ecd22b376"
+      },
+      "logoURI": "https://wallet-asset.matic.network/img/tokens/tusd.svg"
+    },
+    {
+      "chainId": 137,
+      "name": "SportX",
+      "symbol": "SX",
+      "decimals": 18,
+      "address": "0x840195888Db4D6A99ED9F73FcD3B225Bb3cB1A79",
+      "tags": ["erc20"],
+      "extensions": {
+        "rootAddress": "0x99fE3B1391503A1bC1788051347A1324bff41452"
+      },
+      "logoURI": "https://wallet-asset.matic.network/img/tokens/sx.svg"
+    },
+    {
+      "chainId": 137,
+      "name": "Frax",
+      "symbol": "FRAX",
+      "decimals": 18,
+      "address": "0x104592a158490a9228070E0A8e5343B499e125D0",
+      "tags": ["erc20"],
+      "extensions": {
+        "rootAddress": "0x853d955acef822db058eb8505911ed77f175b99e"
+      },
+      "logoURI": "https://wallet-asset.matic.network/img/tokens/frax.svg"
+    },
+    {
+      "chainId": 137,
+      "name": "CRV",
+      "symbol": "CRV",
+      "decimals": 18,
+      "address": "0x172370d5Cd63279eFa6d502DAB29171933a610AF",
+      "tags": ["erc20"],
+      "extensions": {
+        "rootAddress": "0xd533a949740bb3306d119cc777fa900ba034cd52"
+      },
+      "logoURI": "https://wallet-asset.matic.network/img/tokens/crv.svg"
+    },
+    {
+      "chainId": 137,
+      "name": "Wootrade Network",
+      "symbol": "WOO",
+      "decimals": 18,
+      "address": "0x1B815d120B3eF02039Ee11dC2d33DE7aA4a8C603",
+      "tags": ["erc20"],
+      "extensions": {
+        "rootAddress": "0x4691937a7508860f876c9c0a2a617e7d9e945d4b"
+      },
+      "logoURI": "https://wallet-asset.matic.network/img/tokens/woo.svg"
+    },
+    {
+      "chainId": 137,
+      "name": "Wrapped Ether",
+      "symbol": "WETH",
+      "decimals": 18,
+      "address": "0xae740d42e4ff0c5086b2b5b5d149eb2f9e1a754f",
+      "tags": ["erc20"],
+      "extensions": {
+        "rootAddress": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"
+      },
+      "logoURI": "https://assets-cdn.trustwallet.com/blockchains/ethereum/assets/0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2/logo.png"
+    },
+    {
+      "chainId": 137,
+      "name": "STASIS EURS Token",
+      "symbol": "EURS",
+      "decimals": 2,
+      "address": "0xE111178A87A3BFf0c8d18DECBa5798827539Ae99",
+      "tags": ["erc20"],
+      "extensions": {
+        "rootAddress": "0xdb25f211ab05b1c97d595516f45794528a807ad8"
+      },
+      "logoURI": "https://wallet-asset.matic.network/img/tokens/eurs.svg"
+    },
+    {
+      "chainId": 137,
+      "name": "Orbs Token",
+      "symbol": "ORBS",
+      "decimals": 18,
+      "address": "0x614389EaAE0A6821DC49062D56BDA3d9d45Fa2ff",
+      "logoURI": "https://raw.githubusercontent.com/orbs-network/graphical-assets/main/orbs/ethereum/token/logo256.png",
+      "tags": ["erc20"],
+      "extensions": {
+        "rootAddress": "0xff56Cc6b1E6dEd347aA0B7676C85AB0B3D08B0FA"
+      }
+    },
+    {
+      "chainId": 137,
+      "name": "Celsius",
+      "symbol": "CEL",
+      "decimals": 4,
+      "address": "0xD85d1e945766Fea5Eda9103F918Bd915FbCa63E6",
+      "tags": ["erc20"],
+      "extensions": {
+        "rootAddress": "0xaaaebe6fe48e54f431b0c390cfaf0b017d09d42d"
+      },
+      "logoURI": "https://wallet-asset.matic.network/img/tokens/cel.svg"
+    },
+    {
+      "chainId": 137,
+      "name": "Frax Share",
+      "symbol": "FXS",
+      "decimals": 18,
+      "address": "0x3e121107F6F22DA4911079845a470757aF4e1A1b",
+      "tags": ["erc20"],
+      "extensions": {
+        "rootAddress": "0x3432b6a60d23ca0dfca7761b7ab56459d9c964d0"
+      },
+      "logoURI": "https://wallet-asset.matic.network/img/tokens/fxs.svg"
+    },
+    {
+      "chainId": 137,
+      "name": "Monavale",
+      "symbol": "MONA",
+      "decimals": 18,
+      "address": "0x6968105460f67c3BF751bE7C15f92F5286Fd0CE5",
+      "tags": ["erc20"],
+      "extensions": {
+        "rootAddress": "0x275f5Ad03be0Fa221B4C6649B8AeE09a42D9412A"
+      },
+      "logoURI": "https://wallet-asset.matic.network/img/tokens/mona.svg"
+    },
+    {
+      "chainId": 137,
+      "name": "Nash Exchange Token",
+      "symbol": "NEX",
+      "decimals": 8,
+      "address": "0xA486c6BC102f409180cCB8a94ba045D39f8fc7cB",
+      "tags": ["erc20"],
+      "extensions": {
+        "rootAddress": "0xe2dc070524a6e305ddb64d8513dc444b6a1ec845"
+      },
+      "logoURI": "https://wallet-asset.matic.network/img/tokens/nex.svg"
+    },
+    {
+      "chainId": 137,
+      "name": "GET Protocol",
+      "symbol": "GET",
+      "decimals": 18,
+      "address": "0xdb725f82818De83e99F1dAc22A9b5B51d3d04DD4",
+      "tags": ["erc20"],
+      "extensions": {
+        "rootAddress": "0x8a854288a5976036a725879164ca3e91d30c6a1b"
+      },
+      "logoURI": "https://wallet-asset.matic.network/img/tokens/get.svg"
+    },
+    {
+      "chainId": 137,
+      "name": "PLOT",
+      "symbol": "PLOT",
+      "decimals": 18,
+      "address": "0xe82808eaA78339b06a691fd92E1Be79671cAd8D3",
+      "tags": ["erc20"],
+      "extensions": {
+        "rootAddress": "0x72F020f8f3E8fd9382705723Cd26380f8D0c66Bb"
+      },
+      "logoURI": "https://wallet-asset.matic.network/img/tokens/plot.svg"
+    },
+    {
+      "chainId": 137,
+      "name": "GOVI",
+      "symbol": "GOVI",
+      "decimals": 18,
+      "address": "0x43Df9c0a1156c96cEa98737b511ac89D0e2A1F46",
+      "tags": ["erc20"],
+      "extensions": {
+        "rootAddress": "0xeeaa40b28a2d1b0b08f6f97bb1dd4b75316c6107"
+      },
+      "logoURI": "https://wallet-asset.matic.network/img/tokens/govi.svg"
+    },
+    {
+      "chainId": 137,
+      "name": "ChainGuardians Governance Token",
+      "symbol": "CGG",
+      "decimals": 18,
+      "address": "0x2Ab4f9aC80F33071211729e45Cfc346C1f8446d5",
+      "tags": ["erc20"],
+      "extensions": {
+        "rootAddress": "0x1fe24f25b1cf609b9c4e7e12d802e3640dfa5e43"
+      },
+      "logoURI": "https://wallet-asset.matic.network/img/tokens/cgg.svg"
+    },
+    {
+      "chainId": 137,
+      "name": "Route",
+      "symbol": "ROUTE",
+      "decimals": 18,
+      "address": "0x16ECCfDbb4eE1A85A33f3A9B21175Cd7Ae753dB4",
+      "tags": ["erc20"],
+      "extensions": {
+        "rootAddress": "0x16ECCfDbb4eE1A85A33f3A9B21175Cd7Ae753dB4"
+      },
+      "logoURI": "https://wallet-asset.matic.network/img/tokens/route.svg"
+    },
+    {
+      "chainId": 137,
+      "name": "Mysterium",
+      "symbol": "MYST",
+      "decimals": 18,
+      "address": "0x1379E8886A944d2D9d440b3d88DF536Aea08d9F3",
+      "tags": ["erc20"],
+      "extensions": {
+        "rootAddress": "0x4Cf89ca06ad997bC732Dc876ed2A7F26a9E7f361"
+      },
+      "logoURI": "https://wallet-asset.matic.network/img/tokens/myst.svg"
+    },
+    {
+      "chainId": 137,
+      "name": "Render Token",
+      "symbol": "RNDR",
+      "decimals": 18,
+      "address": "0x61299774020dA444Af134c82fa83E3810b309991",
+      "tags": ["erc20"],
+      "extensions": {
+        "rootAddress": "0x6de037ef9ad2725eb40118bb1702ebb27e4aeb24"
+      },
+      "logoURI": "https://wallet-asset.matic.network/img/tokens/rndr.svg"
+    },
+    {
+      "chainId": 137,
+      "name": "Graph Token",
+      "symbol": "GRT",
+      "decimals": 18,
+      "address": "0x5fe2B58c013d7601147DcdD68C143A77499f5531",
+      "tags": ["erc20"],
+      "extensions": {
+        "rootAddress": "0xc944e90c64b2c07662a292be6244bdf05cda44a7"
+      },
+      "logoURI": "https://wallet-asset.matic.network/img/tokens/grt.svg"
+    },
+    {
+      "chainId": 137,
+      "name": "Jarvis Reward Token",
+      "symbol": "JRT",
+      "decimals": 18,
+      "address": "0x596eBE76e2DB4470966ea395B0d063aC6197A8C5",
+      "tags": ["erc20"],
+      "extensions": {
+        "rootAddress": "0x8a9c67fee641579deba04928c4bc45f66e26343a"
+      },
+      "logoURI": "https://wallet-asset.matic.network/img/tokens/jrt.svg"
+    },
+    {
+      "chainId": 137,
+      "name": "MahaDAO",
+      "symbol": "MAHA",
+      "decimals": 18,
+      "address": "0xeDd6cA8A4202d4a36611e2fff109648c4863ae19",
+      "tags": ["erc20"],
+      "extensions": {
+        "rootAddress": "0xb4d930279552397bba2ee473229f89ec245bc365"
+      },
+      "logoURI": "https://wallet-asset.matic.network/img/tokens/maha.svg"
+    },
+    {
+      "chainId": 137,
+      "name": "PoolTogether",
+      "symbol": "POOL",
+      "decimals": 18,
+      "address": "0x25788a1a171ec66Da6502f9975a15B609fF54CF6",
+      "tags": ["erc20"],
+      "extensions": {
+        "rootAddress": "0x0cec1a9154ff802e7934fc916ed7ca50bde6844e"
+      },
+      "logoURI": "https://wallet-asset.matic.network/img/tokens/pool.svg"
+    },
+    {
+      "chainId": 137,
+      "name": "AnRKey X",
+      "symbol": "$ANRX",
+      "decimals": 18,
+      "address": "0x554f074d9cCda8F483d1812d4874cBebD682644E",
+      "tags": ["erc20"],
+      "extensions": {
+        "rootAddress": "0xCae72A7A0Fd9046cf6b165CA54c9e3a3872109E0"
+      },
+      "logoURI": "https://wallet-asset.matic.network/img/tokens/$anrx.svg"
+    },
+    {
+      "chainId": 137,
+      "name": "MASQ",
+      "symbol": "MASQ",
+      "decimals": 18,
+      "address": "0xee9a352f6aac4af1a5b9f467f6a93e0ffbe9dd35",
+      "logoURI": "https://github.com/MASQ-Project/MASQ-contract/raw/master/MASQ%20Logo%20Blue%20Solo%20Transparent.png",
+      "tags": ["erc20"],
+      "extensions": {
+        "rootAddress": "0x06F3C323f0238c72BF35011071f2b5B7F43A054c"
+      }
+    },
+    {
+      "chainId": 137,
+      "name": "Stake DAO Token",
+      "symbol": "SDT",
+      "decimals": 18,
+      "address": "0x361A5a4993493cE00f61C32d4EcCA5512b82CE90",
+      "tags": ["erc20"],
+      "extensions": {
+        "rootAddress": "0x73968b9a57c6e53d41345fd57a6e6ae27d6cdb2f"
+      },
+      "logoURI": "https://wallet-asset.matic.network/img/tokens/sdt.svg"
+    },
+    {
+      "chainId": 137,
+      "name": "Popcorn",
+      "symbol": "POP",
+      "decimals": 18,
+      "address": "0xC5B57e9a1E7914FDA753A88f24E5703e617Ee50c",
+      "tags": ["erc20"],
+      "extensions": {
+        "rootAddress": "0xd0cd466b34a24fcb2f87676278af2005ca8a78c4"
+      },
+      "logoURI": "https://wallet-asset.matic.network/img/tokens/pop.svg"
+    },
+    {
+      "chainId": 137,
+      "name": "dHedge DAO Token",
+      "symbol": "DHT",
+      "decimals": 18,
+      "address": "0x8C92e38eCA8210f4fcBf17F0951b198Dd7668292",
+      "tags": ["erc20"],
+      "extensions": {
+        "rootAddress": "0xca1207647ff814039530d7d35df0e1dd2e91fa84"
+      },
+      "logoURI": "https://wallet-asset.matic.network/img/tokens/dht.svg"
+    },
+    {
+      "chainId": 137,
+      "name": "HEX",
+      "symbol": "HEX",
+      "decimals": 8,
+      "address": "0x23D29D30e35C5e8D321e1dc9A8a61BFD846D4C5C",
+      "tags": ["erc20"],
+      "extensions": {
+        "rootAddress": "0x2b591e99afe9f32eaa6214f7b7629768c40eeb39"
+      },
+      "logoURI": "https://wallet-asset.matic.network/img/tokens/hex.svg"
+    },
+    {
+      "chainId": 137,
+      "name": "JPY Coin",
+      "symbol": "JPYC",
+      "decimals": 18,
+      "address": "0x6AE7Dfc73E0dDE2aa99ac063DcF7e8A63265108c",
+      "tags": ["erc20"],
+      "extensions": {
+        "rootAddress": "0x2370f9d504c7a6E775bf6E14B3F12846b594cD53"
+      },
+      "logoURI": "https://wallet-asset.matic.network/img/tokens/jpyc.svg"
+    },
+    {
+      "chainId": 137,
+      "name": "Unibright",
+      "symbol": "UBT",
+      "decimals": 8,
+      "address": "0x7FBc10850caE055B27039aF31bD258430e714c62",
+      "tags": ["erc20"],
+      "extensions": {
+        "rootAddress": "0x8400d94a5cb0fa0d041a3788e395285d61c9ee5e"
+      },
+      "logoURI": "https://wallet-asset.matic.network/img/tokens/ubt.svg"
+    },
+    {
+      "chainId": 137,
+      "name": "Instadapp",
+      "symbol": "INST",
+      "decimals": 18,
+      "address": "0xf50D05A1402d0adAfA880D36050736f9f6ee7dee",
+      "tags": ["erc20"],
+      "extensions": {
+        "rootAddress": "0x6f40d4A6237C257fff2dB00FA0510DeEECd303eb"
+      },
+      "logoURI": "https://wallet-asset.matic.network/img/tokens/inst.svg"
+    },
+    {
+      "chainId": 137,
+      "name": "Decentral Games Governance",
+      "symbol": "xDG",
+      "decimals": 18,
+      "address": "0xc6480Da81151B2277761024599E8Db2Ad4C388C8",
+      "tags": ["erc20"],
+      "extensions": {
+        "rootAddress": "0x4f81c790581b240a5c948afd173620ecc8c71c8d"
+      },
+      "logoURI": "https://wallet-asset.matic.network/img/tokens/xdg.svg"
+    },
+    {
+      "chainId": 137,
+      "name": "GoBlank Token",
+      "symbol": "BLANK",
+      "decimals": 18,
+      "address": "0xf4C83080E80AE530d6f8180572cBbf1Ac9D5d435",
+      "logoURI": "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0x41A3Dba3D677E573636BA691a70ff2D606c29666/logo.png",
+      "tags": ["erc20"],
+      "extensions": {
+        "rootAddress": "0x41A3Dba3D677E573636BA691a70ff2D606c29666"
+      }
+    },
+    {
+      "chainId": 137,
+      "name": "Rubic",
+      "symbol": "RBC",
+      "decimals": 18,
+      "address": "0xc3cFFDAf8F3fdF07da6D5e3A89B8723D5E385ff8",
+      "tags": ["erc20"],
+      "extensions": {
+        "rootAddress": "0xa4eed63db85311e22df4473f87ccfc3dadcfa3e3"
+      },
+      "logoURI": "https://wallet-asset.matic.network/img/tokens/rbc.svg"
+    },
+    {
+      "chainId": 137,
+      "name": "Nord Token",
+      "symbol": "NORD",
+      "decimals": 18,
+      "address": "0xF6F85b3f9fd581C2eE717c404F7684486F057F95",
+      "tags": ["erc20"],
+      "extensions": {
+        "rootAddress": "0x6e9730ecffbed43fd876a264c982e254ef05a0de"
+      },
+      "logoURI": "https://wallet-asset.matic.network/img/tokens/nord.svg"
+    },
+    {
+      "chainId": 137,
+      "name": "MODEFI ",
+      "symbol": "MOD",
+      "decimals": 18,
+      "address": "0x8346Ab8d5EA7A9Db0209aEd2d1806AFA0E2c4C21",
+      "tags": ["erc20"],
+      "extensions": {
+        "rootAddress": "0xea1ea0972fa092dd463f2968f9bb51cc4c981d71"
+      },
+      "logoURI": "https://wallet-asset.matic.network/img/tokens/mod.svg"
+    },
+    {
+      "chainId": 137,
+      "name": "AurusSILVER",
+      "symbol": "AWS",
+      "decimals": 18,
+      "address": "0xA96D47c621a8316d4F9539E3B38180C7067e84CA",
+      "tags": ["erc20"],
+      "extensions": {
+        "rootAddress": "0xb89903dde3899f0280b99913168ee833a7896b93"
+      },
+      "logoURI": "https://wallet-asset.matic.network/img/tokens/aws.svg"
+    },
+    {
+      "chainId": 137,
+      "name": "YfDAI.finance",
+      "symbol": "Yf-DAI",
+      "decimals": 18,
+      "address": "0x7E7fF932FAb08A0af569f93Ce65e7b8b23698Ad8",
+      "tags": ["erc20"],
+      "extensions": {
+        "rootAddress": "0xf4cd3d3fda8d7fd6c5a500203e38640a70bf9577"
+      },
+      "logoURI": "https://wallet-asset.matic.network/img/tokens/yf-dai.svg"
+    },
+    {
+      "chainId": 137,
+      "name": "Streamr",
+      "symbol": "DATA",
+      "decimals": 18,
+      "address": "0x3a9a81d576d83ff21f26f325066054540720fc34",
+      "logoURI": "https://raw.githubusercontent.com/streamr-dev/design-assets/main/Svg/Marks%20and%20Symbols/Token%20symbols/%24DATA%20new%20token%20symbol.svg",
+      "tags": ["erc20"],
+      "extensions": {
+        "rootAddress": "0x8f693ca8d21b157107184d29d398a8d082b38b76"
+      }
+    },
+    {
+      "chainId": 137,
+      "name": "Apecoin",
+      "symbol": "APE",
+      "decimals": 18,
+      "address": "0xb7b31a6bc18e48888545ce79e83e06003be70930",
+      "logoURI": "https://assets-cdn.trustwallet.com/blockchains/ethereum/assets/0x4d224452801ACEd8B2F0aebE155379bb5D594381/logo.png",
+      "tags": ["erc20"],
+      "extensions": {
+        "rootAddress": "0x4d224452801aced8b2f0aebe155379bb5d594381"
+      }
+    }
+  ]
+}

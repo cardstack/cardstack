@@ -2,16 +2,18 @@ import Web3 from 'web3';
 import invert from 'lodash/invert';
 import { networkName } from './utils/general-utils';
 import JsonRpcProvider from '../providers/json-rpc-provider';
+import ethTokenList from '../token-lists/ethereum-tokenlist.json';
+import goerliTokenList from '../token-lists/goerli-tokenlist.json';
+import mumbaiTokenList from '../token-lists/mumbai-tokenlist.json';
+import polygonTokenList from '../token-lists/polygon-tokenlist.json';
+import { type TokenList } from '@uniswap/token-lists';
+import { pullAll } from 'lodash';
 
 export const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000';
 
 export const MERCHANT_PAYMENT_UNIVERSAL_LINK_HOSTNAME = 'wallet.cardstack.com';
 export const MERCHANT_PAYMENT_UNIVERSAL_LINK_STAGING_HOSTNAME = 'wallet-staging.stack.cards';
 export const CARDWALLET_SCHEME = 'cardwallet';
-
-type NestedKeyOf<Obj extends object> = {
-  [K in keyof Obj]: Obj[K] extends object ? NestedKeyOf<Obj[K]> : K;
-}[keyof Obj];
 
 export const supportedChains = {
   ethereum: ['mainnet', 'goerli'],
@@ -20,6 +22,68 @@ export const supportedChains = {
 };
 
 export const supportedChainsArray = Object.values(supportedChains).flat();
+export const schedulerSupportedChainsArray = pullAll(supportedChainsArray, supportedChains.gnosis);
+
+export type CardPayCapableNetworks = 'sokol' | 'gnosis';
+export type SchedulerCapableNetworks = 'mainnet' | 'goerli' | 'polygon' | 'mumbai';
+export type CardPayRequiredLayer1Networks = 'kovan' | 'mainnet';
+export type SchedulerAndCardPayL1Networks = CardPayRequiredLayer1Networks & SchedulerCapableNetworks;
+
+interface RequiredNetworkConstants {
+  apiBaseUrl: string;
+  blockExplorer: string;
+  chainId: number;
+  hubUrl: string;
+  name: string;
+  nativeTokenAddress: string;
+  nativeTokenCoingeckoId: string;
+  nativeTokenName: string;
+  nativeTokenSymbol: string;
+  subgraphURL: string;
+  relayServiceURL: string;
+}
+
+interface SchedulerCapableNetworkConstants {
+  tokenList: TokenList;
+  scheduledPaymentFeeFixedUSD: number;
+  scheduledPaymentFeePercentage: number;
+}
+
+interface CardPayCapableNetworkConstants {
+  bridgedDaiTokenSymbol: string;
+  bridgedCardTokenSymbol: string;
+  bridgeExplorer: string;
+  merchantUniLinkDomain: string;
+  relayServiceURL: string;
+  tallyServiceURL: string;
+}
+
+interface CardPayRequiredLayer1NetworkConstants {
+  bridgeExplorer: string;
+  ambFinalizationRate: string;
+}
+
+type SchedulerAndCardPayL1NetworkConstants = CardPayRequiredLayer1NetworkConstants & SchedulerCapableNetworkConstants;
+
+type Constants = RequiredNetworkConstants &
+  Partial<SchedulerCapableNetworkConstants & CardPayCapableNetworkConstants & CardPayRequiredLayer1NetworkConstants>;
+
+type ConstantKeys = keyof Constants;
+
+type NetworkConstants<N> = RequiredNetworkConstants &
+  (N extends SchedulerAndCardPayL1Networks
+    ? SchedulerAndCardPayL1NetworkConstants
+    : N extends CardPayCapableNetworks
+    ? CardPayCapableNetworkConstants
+    : N extends SchedulerCapableNetworks
+    ? SchedulerCapableNetworkConstants
+    : N extends CardPayRequiredLayer1Networks
+    ? CardPayRequiredLayer1NetworkConstants
+    : unknown);
+
+export type Network = CardPayCapableNetworks | SchedulerCapableNetworks | CardPayRequiredLayer1Networks;
+
+type NetworkConstantsKeys<N> = keyof NetworkConstants<N>;
 
 const testHubUrl = {
   hubUrl: 'https://hub-staging.stack.cards',
@@ -48,7 +112,9 @@ const polygonNativeTokens = {
   nativeTokenName: 'Matic',
 };
 
-const networksConstants = {
+const constants: {
+  [N in Network]: NetworkConstants<N>;
+} = {
   sokol: {
     ...testHubUrl,
     ...ethNativeTokens,
@@ -65,69 +131,6 @@ const networksConstants = {
     merchantUniLinkDomain: MERCHANT_PAYMENT_UNIVERSAL_LINK_STAGING_HOSTNAME,
     tallyServiceURL: 'https://reward-api-staging.stack.cards',
     chainId: 77,
-    scheduledPaymentFeeFixedUSD: 0,
-    scheduledPaymentFeePercentage: 0,
-  },
-  kovan: {
-    ...testHubUrl,
-    ...ethNativeTokens,
-    apiBaseUrl: 'https://api-kovan.etherscan.io/api',
-    blockExplorer: 'https://kovan.etherscan.io',
-    bridgeExplorer: 'https://alm-test-amb.herokuapp.com/42',
-    name: 'Kovan',
-    // https://docs.tokenbridge.net/kovan-sokol-amb-bridge/about-the-kovan-sokol-amb shows 1 for finalization rate
-    // but making this the same as mainnet so that the dev experience matches prod
-    ambFinalizationRate: '20',
-    subgraphURL: '',
-    chainId: 42,
-  },
-  goerli: {
-    ...testHubUrl,
-    ...ethNativeTokens,
-    apiBaseUrl: 'https://api-goerli.etherscan.io/api',
-    blockExplorer: 'https://goerli.etherscan.io',
-    name: 'Goerli',
-    relayServiceURL: 'https://relay-goerli.staging.stack.cards/api',
-    chainId: 5,
-    scheduledPaymentFeeFixedUSD: 0,
-    scheduledPaymentFeePercentage: 0,
-    subgraphURL: 'https://api.thegraph.com/subgraphs/name/cardstack/safe-tools-goerli',
-  },
-  polygon: {
-    ...hubUrl,
-    ...polygonNativeTokens,
-    apiBaseUrl: 'https://api-testnet.polygon.io/api', // TODO: add official polygon api
-    blockExplorer: 'https://polygonscan.com',
-    name: 'Polygon',
-    chainId: 137,
-    scheduledPaymentFeeFixedUSD: 0.25,
-    scheduledPaymentFeePercentage: 0.1, //10%
-  },
-  mumbai: {
-    ...testHubUrl,
-    ...polygonNativeTokens,
-    apiBaseUrl: 'https://api-testnet.polygon.io/api',
-    blockExplorer: 'https://mumbai.polygonscan.com',
-    name: 'Mumbai',
-    relayServiceURL: 'https://relay-mumbai.staging.stack.cards/api',
-    chainId: 80001,
-    scheduledPaymentFeeFixedUSD: 0,
-    scheduledPaymentFeePercentage: 0,
-    subgraphURL: 'https://api.thegraph.com/subgraphs/name/cardstack/safe-tools-mumbai',
-  },
-  mainnet: {
-    ...hubUrl,
-    ...ethNativeTokens,
-    apiBaseUrl: 'https://api.etherscan.io/api',
-    blockExplorer: 'https://etherscan.io',
-    bridgeExplorer: 'https://alm-xdai.herokuapp.com/1',
-    name: 'Ethereum Mainnet',
-    // check https://docs.tokenbridge.net/eth-xdai-amb-bridge/about-the-eth-xdai-amb for the finalization rate
-    ambFinalizationRate: '20',
-    relayServiceURL: 'https://relay-ethereum.cardstack.com/api',
-    chainId: 1,
-    scheduledPaymentFeeFixedUSD: 0.25,
-    scheduledPaymentFeePercentage: 0.1, //10%
   },
   gnosis: {
     ...hubUrl,
@@ -145,42 +148,77 @@ const networksConstants = {
     merchantUniLinkDomain: MERCHANT_PAYMENT_UNIVERSAL_LINK_HOSTNAME,
     tallyServiceURL: 'https://reward-api.cardstack.com',
     chainId: 100,
+  },
+  kovan: {
+    ...testHubUrl,
+    ...ethNativeTokens,
+    apiBaseUrl: 'https://api-kovan.etherscan.io/api',
+    blockExplorer: 'https://kovan.etherscan.io',
+    bridgeExplorer: 'https://alm-test-amb.herokuapp.com/42',
+    name: 'Kovan',
+    // https://docs.tokenbridge.net/kovan-sokol-amb-bridge/about-the-kovan-sokol-amb shows 1 for finalization rate
+    // but making this the same as mainnet so that the dev experience matches prod
+    ambFinalizationRate: '20',
+    subgraphURL: '',
+    relayServiceURL: '',
+    chainId: 42,
+  },
+  mainnet: {
+    ...hubUrl,
+    ...ethNativeTokens,
+    tokenList: ethTokenList as unknown as TokenList, // TODO: check json to match type
+    apiBaseUrl: 'https://api.etherscan.io/api',
+    blockExplorer: 'https://etherscan.io',
+    bridgeExplorer: 'https://alm-xdai.herokuapp.com/1',
+    name: 'Ethereum Mainnet',
+    // check https://docs.tokenbridge.net/eth-xdai-amb-bridge/about-the-eth-xdai-amb for the finalization rate
+    ambFinalizationRate: '20',
+    relayServiceURL: 'https://relay-ethereum.cardstack.com/api',
+    chainId: 1,
+    scheduledPaymentFeeFixedUSD: 0.25,
+    scheduledPaymentFeePercentage: 0.1, //10%
+    subgraphURL: '',
+  },
+  goerli: {
+    ...testHubUrl,
+    ...ethNativeTokens,
+    tokenList: goerliTokenList,
+    apiBaseUrl: 'https://api-goerli.etherscan.io/api',
+    blockExplorer: 'https://goerli.etherscan.io',
+    name: 'Goerli',
+    relayServiceURL: 'https://relay-goerli.staging.stack.cards/api',
+    chainId: 5,
+    scheduledPaymentFeeFixedUSD: 0,
+    scheduledPaymentFeePercentage: 0,
+    subgraphURL: 'https://api.thegraph.com/subgraphs/name/cardstack/safe-tools-goerli',
+  },
+  polygon: {
+    ...hubUrl,
+    ...polygonNativeTokens,
+    tokenList: polygonTokenList,
+    apiBaseUrl: 'https://api.polygonscan.com/api',
+    blockExplorer: 'https://polygonscan.com',
+    name: 'Polygon',
+    chainId: 137,
+    relayServiceURL: '',
+    subgraphURL: '',
     scheduledPaymentFeeFixedUSD: 0.25,
     scheduledPaymentFeePercentage: 0.1, //10%
   },
+  mumbai: {
+    ...testHubUrl,
+    ...polygonNativeTokens,
+    tokenList: mumbaiTokenList,
+    apiBaseUrl: 'https://api-testnet.polygonscan.com/api',
+    blockExplorer: 'https://mumbai.polygonscan.com',
+    name: 'Mumbai',
+    relayServiceURL: 'https://relay-mumbai.staging.stack.cards/api',
+    chainId: 80001,
+    scheduledPaymentFeeFixedUSD: 0,
+    scheduledPaymentFeePercentage: 0,
+    subgraphURL: 'https://api.thegraph.com/subgraphs/name/cardstack/safe-tools-mumbai',
+  },
 };
-
-type NetworksType = typeof networksConstants;
-
-export type Network = keyof NetworksType | 'xdai';
-
-type ConstantKeys = NestedKeyOf<NetworksType>;
-
-// TODO: create types dynamically
-type OptionalNetworkContants = Partial<
-  NetworksType['sokol'] &
-    NetworksType['gnosis'] &
-    NetworksType['goerli'] &
-    NetworksType['polygon'] &
-    NetworksType['mainnet'] &
-    NetworksType['kovan'] &
-    NetworksType['mumbai']
->;
-
-interface RequiredNetworkConstants {
-  name: string;
-  chainId: number;
-  hubUrl: string;
-  nativeTokenSymbol: string;
-}
-
-type NetworkContants = OptionalNetworkContants & RequiredNetworkConstants;
-
-// Order matters, if both have same chainId the last one is used.
-const constants: Record<Network, NetworkContants> = {
-  xdai: networksConstants['gnosis'],
-  ...networksConstants,
-} as const;
 
 export const networkNames = Object.keys(constants);
 
@@ -195,18 +233,19 @@ export const networkIds: Record<string, number> = Object.freeze(
 );
 
 // invert the networkIds object, so { mainnet: 1, ... } becomes { '1': 'mainnet', ... }
-export const networks = invert(networkIds);
+export const networks: Record<string, string> = invert(networkIds);
 
-export function getConstantByNetwork<K extends ConstantKeys>(name: K, network: Network | string | number) {
-  //Convert chain id to network name
-  if (typeof network === 'number') {
-    network = networks[network];
+export function getConstantByNetwork<K extends NetworkConstantsKeys<N>, N extends Network | string>(
+  name: K,
+  network: N
+): NetworkConstants<N>[K] {
+  // @ts-expect-error ts doesn't know how to handle indexed type, but function params and return already does that;
+  const value = constants[network as Network][name];
+
+  if (!value && value !== 0) {
+    throw new Error(`Don't know about the constant '${String(name)}' for network ${network}`);
   }
 
-  let value = constants[network as Network][name];
-  if (value == null) {
-    throw new Error(`Don't know about the constant '${name}' for network ${network}`);
-  }
   return value;
 }
 
@@ -221,11 +260,7 @@ export async function getConstant<K extends ConstantKeys>(
     network = await networkName(web3OrNetworkOrEthersProvider);
   }
 
-  let value = constants[network as Network][name];
-  if (value == undefined) {
-    throw new Error(`Don't know about the constant '${name}' for network ${network}`);
-  }
-  return value;
+  return getConstantByNetwork(name as NetworkConstantsKeys<typeof network>, network) as Constants[K];
 }
 
 export default constants;

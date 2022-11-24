@@ -248,7 +248,7 @@ describe('POST /api/scheduled-payments', async function () {
       .expect({
         data: {
           id: 'id',
-          type: 'scheduled-payment',
+          type: 'scheduled-payments',
           attributes: {
             'sender-safe-address': '0xc0ffee254729296a45a3885639AC7E10F9d54979',
             'module-address': '0x7E7d0B97D663e268bB403eb4d72f7C0C7650a6dd',
@@ -321,7 +321,7 @@ describe('POST /api/scheduled-payments', async function () {
       .expect({
         data: {
           id: 'id',
-          type: 'scheduled-payment',
+          type: 'scheduled-payments',
           attributes: {
             'sender-safe-address': '0xc0ffee254729296a45a3885639AC7E10F9d54979',
             'module-address': '0x7E7d0B97D663e268bB403eb4d72f7C0C7650a6dd',
@@ -444,7 +444,7 @@ describe('GET /api/scheduled-payments', async function () {
         data: [
           {
             id: sp1.id,
-            type: 'scheduled-payment',
+            type: 'scheduled-payments',
             attributes: {
               'sender-safe-address': '0xc0ffee254729296a45a3885639AC7E10F9d54979',
               'module-address': '0x7E7d0B97D663e268bB403eb4d72f7C0C7650a6dd',
@@ -595,7 +595,7 @@ describe('GET /api/scheduled-payments/:id', async function () {
       .expect({
         data: {
           id: scheduledPayment.id,
-          type: 'scheduled-payment',
+          type: 'scheduled-payments',
           attributes: {
             'sender-safe-address': '0xc0ffee254729296a45a3885639AC7E10F9d54979',
             'module-address': '0x7E7d0B97D663e268bB403eb4d72f7C0C7650a6dd',
@@ -659,7 +659,7 @@ describe('PATCH /api/scheduled-payments/:id', async function () {
       .expect('Content-Type', 'application/vnd.api+json');
   });
 
-  it('updates a scheduled payment', async function () {
+  it('updates a scheduled payment when creation transaction hash is provided', async function () {
     let scheduledPayment = await prisma.scheduledPayment.create({
       data: {
         id: '73994d4b-bb3a-4d73-969f-6fa24da16fb4',
@@ -698,7 +698,7 @@ describe('PATCH /api/scheduled-payments/:id', async function () {
       .expect({
         data: {
           id: scheduledPayment.id,
-          type: 'scheduled-payment',
+          type: 'scheduled-payments',
           attributes: {
             'sender-safe-address': '0xc0ffee254729296a45a3885639AC7E10F9d54979',
             'module-address': '0x7E7d0B97D663e268bB403eb4d72f7C0C7650a6dd',
@@ -728,6 +728,78 @@ describe('PATCH /api/scheduled-payments/:id', async function () {
       .expect('Content-Type', 'application/vnd.api+json');
 
     expect(getJobIdentifiers()[0]).to.equal('scheduled-payment-on-chain-creation-waiter');
+    expect(getJobPayloads()[0]).to.deep.equal({ scheduledPaymentId: scheduledPayment.id });
+  });
+
+  it('updates a scheduled payment when cancelation transaction hash is provided', async function () {
+    let scheduledPayment = await prisma.scheduledPayment.create({
+      data: {
+        id: '73994d4b-bb3a-4d73-969f-6fa24da16fb4',
+        senderSafeAddress: '0xc0ffee254729296a45a3885639AC7E10F9d54979',
+        moduleAddress: '0x7E7d0B97D663e268bB403eb4d72f7C0C7650a6dd',
+        tokenAddress: '0xa455bbB2A81E09E0337c13326BBb302Cb37D7cf6',
+        gasTokenAddress: '0x6A50E3807FB9cD0B07a79F64e561B9873D3b132E',
+        amount: '100',
+        payeeAddress: '0x821f3Ee0FbE6D1aCDAC160b5d120390Fb8D2e9d3',
+        executionGasEstimation: 100000,
+        maxGasPrice: '1000000000',
+        feeFixedUsd: 0,
+        feePercentage: 0,
+        salt: '54lt',
+        payAt: '2021-01-01T00:00:00.000Z',
+        spHash: '0x123',
+        chainId: 1,
+        userAddress: stubUserAddress,
+        creationTransactionHash: null,
+      },
+    });
+
+    await request()
+      .patch(`/api/scheduled-payments/${scheduledPayment.id}`)
+      .send({
+        data: {
+          attributes: {
+            'cancelation-transaction-hash': '0x123',
+          },
+        },
+      })
+      .set('Accept', 'application/vnd.api+json')
+      .set('Authorization', 'Bearer abc123--def456--ghi789')
+      .set('Content-Type', 'application/vnd.api+json')
+      .expect(200)
+      .expect({
+        data: {
+          id: scheduledPayment.id,
+          type: 'scheduled-payments',
+          attributes: {
+            'sender-safe-address': '0xc0ffee254729296a45a3885639AC7E10F9d54979',
+            'module-address': '0x7E7d0B97D663e268bB403eb4d72f7C0C7650a6dd',
+            'token-address': '0xa455bbB2A81E09E0337c13326BBb302Cb37D7cf6',
+            'gas-token-address': '0x6A50E3807FB9cD0B07a79F64e561B9873D3b132E',
+            amount: '100',
+            'payee-address': '0x821f3Ee0FbE6D1aCDAC160b5d120390Fb8D2e9d3',
+            'execution-gas-estimation': 100000,
+            'max-gas-price': '1000000000',
+            'fee-fixed-usd': '0',
+            'fee-percentage': '0',
+            salt: '54lt',
+            'pay-at': '2021-01-01T00:00:00.000Z',
+            'sp-hash': '0x123',
+            'chain-id': 1,
+            'user-address': stubUserAddress,
+            'creation-transaction-hash': null,
+            'creation-block-number': null,
+            'creation-transaction-error': null,
+            'cancelation-transaction-hash': '0x123',
+            'cancelation-block-number': null,
+            'recurring-day-of-month': null,
+            'recurring-until': null,
+          },
+        },
+      })
+      .expect('Content-Type', 'application/vnd.api+json');
+
+    expect(getJobIdentifiers()[0]).to.equal('scheduled-payment-on-chain-cancelation-waiter');
     expect(getJobPayloads()[0]).to.deep.equal({ scheduledPaymentId: scheduledPayment.id });
   });
 });

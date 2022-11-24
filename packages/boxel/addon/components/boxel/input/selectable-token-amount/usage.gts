@@ -9,10 +9,26 @@ import cssVar from '@cardstack/boxel/helpers/css-var';
 import { cssVariable, CSSVariableInfo } from 'ember-freestyle/decorators/css-variable';
 
 export default class BoxelSelectableInputTokenAmountUsage extends Component {
-  tokens = [
-    { name: 'CARD', icon: 'card' },
-    { name: 'HI', icon: 'emoji' },
-    { name: 'WORLD', icon: 'world' },
+  tokens: SelectableToken[] = [
+     { name: 'Cardstack', logoURI: 'card', symbol: 'CARD', address: "0x954b890704693af242613edEf1B603825afcD708" },
+    {
+      address: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+      name: "USD Coin",
+      symbol: "USDC",
+      logoURI: "https://assets-cdn.trustwallet.com/blockchains/ethereum/assets/0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48/logo.png"
+    },
+    {
+      address: "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+      name: "WETH",
+      symbol: "WETH",
+      logoURI: "https://assets-cdn.trustwallet.com/blockchains/ethereum/assets/0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2/logo.png"
+    },
+    {
+      name: "MASQ",
+      symbol: "MASQ",
+      address: "0xee9a352f6aac4af1a5b9f467f6a93e0ffbe9dd35",
+      logoURI: "https://github.com/MASQ-Project/MASQ-contract/raw/master/MASQ%20Logo%20Blue%20Solo%20Transparent.png",
+    },
   ];
 
   @tracked id = 'boxel-input-selectable-token-amount-usage';
@@ -23,7 +39,7 @@ export default class BoxelSelectableInputTokenAmountUsage extends Component {
   @tracked invalid = false;
   @tracked icon = 'card';
   @tracked symbol = 'CARD';
-  @tracked token = this.tokens[0];
+  @tracked token: SelectableToken | undefined;
 
   cssClassName = 'boxel-input-selectable-token-amount';
   @cssVariable declare boxelInputSelectableTokenAmountInputFontSize: CSSVariableInfo;
@@ -90,6 +106,24 @@ export default class BoxelSelectableInputTokenAmountUsage extends Component {
           @value={{this.errorMessage}}
           @onInput={{fn (mut this.errorMessage)}}
         />
+        <Args.String
+          @name="value"
+          @description="The value of the input"
+          @value={{this.value}}
+          @onInput={{fn (mut this.value)}}
+        />
+        <Args.Object
+          @name="token"
+          @description="The selected token"
+          @value={{this.token}}
+          hideControls={{true}}
+        />
+        <Args.Object
+          @name="tokens"
+          @description="The available token list"
+          @value={{this.tokens}}
+          @hideControls={{true}}
+        />
         <Args.Action
           @name="onInput"
           @description="Action called when the input value changes"
@@ -97,12 +131,6 @@ export default class BoxelSelectableInputTokenAmountUsage extends Component {
         <Args.Action
           @name="onChooseToken"
           @description="Action called when an item is chosen from the token dropdown"
-        />
-        <Args.String
-          @name="value"
-          @description="The value of the input"
-          @value={{this.value}}
-          @onInput={{fn (mut this.value)}}
         />
       </:api>
       <:cssVars as |Css|>

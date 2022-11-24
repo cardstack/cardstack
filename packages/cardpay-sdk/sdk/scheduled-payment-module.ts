@@ -34,11 +34,15 @@ import {
 } from './utils/safe-utils';
 import { BigNumber, Contract, Signer, utils } from 'ethers';
 import { signSafeTx, signSafeTxAsBytes, Signature } from './utils/signing-utils';
-import { ERC20ABI, getSDK } from '..';
+import { convertChainIdToName, ERC20ABI, getSDK } from '..';
 import { SuccessfulTransactionReceipt } from './utils/successful-transaction-receipt';
 /* eslint-disable node/no-extraneous-import */
 import { AddressZero } from '@ethersproject/constants';
-import { GasEstimationScenario, waitUntilSchedulePaymentTransactionMined } from './scheduled-payment/utils';
+import {
+  GasEstimationScenario,
+  waitUntilCancelPaymentTransactionMined,
+  waitUntilSchedulePaymentTransactionMined,
+} from './scheduled-payment/utils';
 import BN from 'bn.js';
 import { Interface } from 'ethers/lib/utils';
 import JsonRpcProvider from '../providers/json-rpc-provider';
@@ -498,8 +502,8 @@ export default class ScheduledPaymentModule {
     return requiredGas + PROXY_GAS + OLD_CALL_GAS;
   }
 
-  async cancelScheduledPayment(txnHash: string): Promise<SuccessfulTransactionReceipt>;
-  async cancelScheduledPayment(
+  async cancelScheduledPaymentOnChain(txnHash: string): Promise<SuccessfulTransactionReceipt>;
+  async cancelScheduledPaymentOnChain(
     safeAddress: string,
     moduleAddress: string,
     spHash: string,
@@ -507,7 +511,7 @@ export default class ScheduledPaymentModule {
     txnOptions?: TransactionOptions,
     contractOptions?: ContractOptions
   ): Promise<void>;
-  async cancelScheduledPayment(
+  async cancelScheduledPaymentOnChain(
     safeAddressOrTxnHash: string,
     moduleAddress?: string,
     spHash?: string,
@@ -709,6 +713,46 @@ export default class ScheduledPaymentModule {
     return { nonce, estimate, payload, signature };
   }
 
+  private async generateCancelPaymentTxParams(
+    safeAddress: string,
+    moduleAddress: string,
+    gasTokenAddress: string,
+    spHash: string
+  ) {
+    let contract = new Contract(moduleAddress, ScheduledPaymentABI, this.ethersProvider);
+    let payload = contract.interface.encodeFunctionData('cancelScheduledPayment', [spHash]);
+
+    let estimate = await gasEstimate(
+      this.ethersProvider,
+      safeAddress,
+      moduleAddress,
+      '0',
+      payload,
+      Operation.CALL,
+      gasTokenAddress
+    );
+
+    let nonce = getNextNonceFromEstimate(estimate);
+    let signer = this.signer ? this.signer : this.ethersProvider.getSigner();
+    let from = await signer.getAddress();
+
+    let signature = (
+      await signSafeTx(
+        this.ethersProvider,
+        safeAddress,
+        moduleAddress,
+        payload,
+        Operation.CALL,
+        estimate,
+        nonce,
+        from,
+        this.signer
+      )
+    )[0];
+
+    return { nonce, estimate, payload, signature };
+  }
+
   private async schedulePaymentOnChainAndUpdateCrank(
     hubRootUrl: string,
     authToken: string,
@@ -733,6 +777,146 @@ export default class ScheduledPaymentModule {
         },
       }).catch(reject);
     });
+  }
+
+  private async cancelPaymentOnChainAndUpdateCrank(
+    hubRootUrl: string,
+    authToken: string,
+    scheduledPaymentId: string,
+    safeAddress: string,
+    moduleAddress: string,
+    gasTokenAddress: string,
+    spHash: string,
+    txnParams: TransactionParams
+  ) {
+    return new Promise<void>((resolve, reject) => {
+      this.cancelPaymentOnChain(safeAddress, moduleAddress, gasTokenAddress, spHash, txnParams, {
+        onTxnHash: async (txHash: string) => {
+          await hubRequest(hubRootUrl, `api/scheduled-payments/${scheduledPaymentId}`, authToken, 'PATCH', {
+            data: {
+              attributes: {
+                'cancelation-transaction-hash': txHash,
+              },
+            },
+          });
+          resolve();
+        },
+      }).catch(reject);
+    });
+  }
+
+  async cancelScheduledPayment(scheduledPaymentId: string) {
+    let hubAuth = await getSDK('HubAuth', this.ethersProvider, undefined, this.signer);
+    let hubRootUrl = await hubAuth.getHubUrl();
+    let authToken = await hubAuth.authenticate();
+
+    let scheduledPaymentResponse = await hubRequest(
+      hubRootUrl,
+      `api/scheduled-payments/${scheduledPaymentId}`,
+      authToken,
+      'GET'
+    );
+
+    let scheduledPayment = scheduledPaymentResponse.data.attributes;
+    let safeAddress = scheduledPayment['sender-safe-address'];
+    let moduleAddress = scheduledPayment['module-address'];
+    let cancelationBlockNumber = scheduledPayment['cancelation-block-number'];
+    let cancelationTransactionHash = scheduledPayment['cancelation-transaction-hash'];
+    let gasTokenAddress = scheduledPayment['gas-token-address'];
+    let spHash = scheduledPayment['sp-hash'];
+
+    if (cancelationBlockNumber) {
+      return true; // Already canceled and transaction mined
+    } else if (cancelationTransactionHash) {
+      return await waitUntilCancelPaymentTransactionMined(hubRootUrl, scheduledPaymentId, authToken);
+    }
+
+    let txnParams = await this.generateCancelPaymentTxParams(safeAddress, moduleAddress, gasTokenAddress, spHash);
+
+    await this.cancelPaymentOnChainAndUpdateCrank(
+      hubRootUrl,
+      authToken,
+      scheduledPaymentId,
+      safeAddress,
+      moduleAddress,
+      gasTokenAddress,
+      spHash,
+      txnParams
+    );
+
+    await waitUntilCancelPaymentTransactionMined(hubRootUrl, scheduledPaymentId, authToken);
+  }
+
+  async schedulePaymentOnChain(txnHash: string): Promise<SuccessfulTransactionReceipt>;
+  async schedulePaymentOnChain(
+    safeAddress: string,
+    moduleAddress: string,
+    gasTokenAddress: string,
+    spHash: string,
+    txnParams?: TransactionParams,
+    txnOptions?: TransactionOptions
+  ): Promise<SuccessfulTransactionReceipt>;
+  async schedulePaymentOnChain(
+    safeAddressOrTxnHash: string,
+    moduleAddress?: string,
+    gasTokenAddress?: string,
+    spHash?: string,
+    txnParams?: TransactionParams,
+    txnOptions?: TransactionOptions
+  ): Promise<SuccessfulTransactionReceipt> {
+    let { onTxnHash } = txnOptions ?? {};
+
+    if (isTransactionHash(safeAddressOrTxnHash)) {
+      let txnHash = safeAddressOrTxnHash;
+      return await waitUntilTransactionMined(this.ethersProvider, txnHash);
+    }
+
+    let safeAddress = safeAddressOrTxnHash;
+
+    if (!safeAddress) {
+      throw new Error('safeAddress must be provided');
+    }
+    if (!moduleAddress) {
+      throw new Error('moduleAddress must be provided');
+    }
+    if (!gasTokenAddress) {
+      throw new Error('gasTokenAddress must be provided');
+    }
+    if (!spHash) {
+      throw new Error('spHash must be provided');
+    }
+
+    let nonce, estimate, payload, signature;
+
+    if (txnParams && Object.keys(txnParams).length > 0) {
+      ({ nonce, estimate, payload, signature } = txnParams);
+    } else {
+      ({ nonce, estimate, payload, signature } = await this.generateSchedulePaymentTxParams(
+        safeAddress,
+        moduleAddress,
+        gasTokenAddress,
+        spHash
+      ));
+    }
+
+    let gnosisTxn = await executeTransaction(
+      this.ethersProvider,
+      safeAddress,
+      moduleAddress,
+      payload,
+      Operation.CALL,
+      estimate,
+      nonce,
+      [signature]
+    );
+
+    let txnHash = gnosisTxn.ethereumTx.txHash;
+
+    if (typeof onTxnHash === 'function') {
+      await onTxnHash(txnHash);
+    }
+
+    return await waitUntilTransactionMined(this.ethersProvider, txnHash);
   }
 
   async schedulePayment(scheduledPaymentId: string): Promise<void>;
@@ -862,8 +1046,8 @@ export default class ScheduledPaymentModule {
     await waitUntilSchedulePaymentTransactionMined(hubRootUrl, scheduledPaymentId, authToken);
   }
 
-  async schedulePaymentOnChain(txnHash: string): Promise<SuccessfulTransactionReceipt>;
-  async schedulePaymentOnChain(
+  async cancelPaymentOnChain(txnHash: string): Promise<SuccessfulTransactionReceipt>;
+  async cancelPaymentOnChain(
     safeAddress: string,
     moduleAddress: string,
     gasTokenAddress: string,
@@ -871,7 +1055,7 @@ export default class ScheduledPaymentModule {
     txnParams?: TransactionParams,
     txnOptions?: TransactionOptions
   ): Promise<SuccessfulTransactionReceipt>;
-  async schedulePaymentOnChain(
+  async cancelPaymentOnChain(
     safeAddressOrTxnHash: string,
     moduleAddress?: string,
     gasTokenAddress?: string,
@@ -906,7 +1090,7 @@ export default class ScheduledPaymentModule {
     if (txnParams && Object.keys(txnParams).length > 0) {
       ({ nonce, estimate, payload, signature } = txnParams);
     } else {
-      ({ nonce, estimate, payload, signature } = await this.generateSchedulePaymentTxParams(
+      ({ nonce, estimate, payload, signature } = await this.generateCancelPaymentTxParams(
         safeAddress,
         moduleAddress,
         gasTokenAddress,
@@ -1094,7 +1278,8 @@ export default class ScheduledPaymentModule {
         },
       },
     };
-    let gasEstimationResponse = await fetch(`${getConstantByNetwork('hubUrl', chainId)}/api/gas-estimation`, {
+    const network = convertChainIdToName(chainId);
+    let gasEstimationResponse = await fetch(`${getConstantByNetwork('hubUrl', network)}/api/gas-estimation`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/vnd.api+json',

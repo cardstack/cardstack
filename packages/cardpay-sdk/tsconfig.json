@@ -19,6 +19,7 @@
     "strictPropertyInitialization": true,
     "noFallthroughCasesInSwitch": true,
     "noImplicitReturns": true,
+    "resolveJsonModule": true,
     "skipLibCheck": true,
     "paths": {
       "web3-provider-engine": ["../../types/web3-provider-engine"]
@@ -26,7 +27,7 @@
   },
   "ts-node": {
     "compilerOptions": {
-      "module": "commonjs"
+      "module": "commonjs",
     }
   },
   "exclude": ["node_modules", "dist"],

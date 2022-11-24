@@ -1,7 +1,7 @@
 import Web3 from 'web3';
 import { ScheduledPayment } from '@prisma/client';
 import { startCase } from 'lodash';
-import { isSupportedChain } from '@cardstack/cardpay-sdk';
+import { convertChainIdToName, isSchedulerSupportedChain, SchedulerCapableNetworks } from '@cardstack/cardpay-sdk';
 import { inject } from '@cardstack/di';
 const { isAddress } = Web3.utils;
 
@@ -90,17 +90,17 @@ export default class ScheduledPaymentValidator {
     }
 
     if (scheduledPayment.chainId) {
-      if (!isSupportedChain(scheduledPayment.chainId)) {
+      if (!isSchedulerSupportedChain(scheduledPayment.chainId)) {
         errors.chainId.push(`chain is not supported`);
       } else {
-        let feeFixedUSD =
-          this.cardpay.getConstantByNetwork('scheduledPaymentFeeFixedUSD', scheduledPayment.chainId) ?? 0;
+        const networkName = convertChainIdToName(scheduledPayment.chainId) as SchedulerCapableNetworks;
+
+        let feeFixedUSD = this.cardpay.getConstantByNetwork('scheduledPaymentFeeFixedUSD', networkName) ?? 0;
         if (Number(scheduledPayment.feeFixedUsd) < feeFixedUSD) {
           errors.feeFixedUsd.push(`fee USD must be greater than or equal ${feeFixedUSD}`);
         }
 
-        let feePercentage =
-          this.cardpay.getConstantByNetwork('scheduledPaymentFeePercentage', scheduledPayment.chainId) ?? 0;
+        let feePercentage = this.cardpay.getConstantByNetwork('scheduledPaymentFeePercentage', networkName) ?? 0;
         if (Number(scheduledPayment.feePercentage) < 0 || Number(scheduledPayment.feePercentage) > 1) {
           errors.feePercentage.push(`fee percentage must be between 0 and 1`);
         } else if (Number(scheduledPayment.feePercentage) < feePercentage) {

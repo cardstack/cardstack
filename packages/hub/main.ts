@@ -107,6 +107,8 @@ import GasEstimationRoute from './routes/gas-estimation';
 import GasEstimationService from './services/gas-estimation';
 import GasEstimationValidator from './services/validators/gas-estimation';
 import GasEstimationResultSerializer from './services/serializers/gas-estimation-result-serializer';
+import ScheduledPaymentsAttemptsRoute from './routes/scheduled-payment-attempts';
+import ScheduledPaymentAttemptSerializer from './services/serializers/scheduled-payment-attempt-serializer';
 
 //@ts-ignore polyfilling fetch
 global.fetch = fetch;
@@ -191,6 +193,8 @@ export function createRegistry(): Registry {
   registry.register('scheduled-payment-serializer', ScheduledPaymentSerializer);
   registry.register('scheduled-payment-validator', ScheduledPaymentValidator);
   registry.register('scheduled-payments-route', ScheduledPaymentsRoute);
+  registry.register('scheduled-payment-attempts-route', ScheduledPaymentsAttemptsRoute);
+  registry.register('scheduled-payment-attempt-serializer', ScheduledPaymentAttemptSerializer);
   registry.register('crank-nonce-lock', CrankNonceLock);
   registry.register('ethers-provider', EthersProvider);
   registry.register('data-integrity-checks-scheduled-payments', DataIntegrityChecksScheduledPayments);

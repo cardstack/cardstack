@@ -6,3 +6,7 @@ export function convertDateToUTC(date: Date) {
 export function nowUtc() {
   return convertDateToUTC(new Date());
 }
+
+export function isValidDate(date: Date) {
+  return date instanceof Date && !isNaN(date.getDate());
+}

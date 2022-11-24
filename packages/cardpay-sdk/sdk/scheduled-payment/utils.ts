@@ -24,3 +24,22 @@ export async function waitUntilSchedulePaymentTransactionMined(
     1000
   );
 }
+
+export async function waitUntilCancelPaymentTransactionMined(
+  hubRootUrl: string,
+  scheduledPaymentId: string,
+  authToken: string
+) {
+  return poll(
+    () => hubRequest(hubRootUrl, `api/scheduled-payments/${scheduledPaymentId}`, authToken, 'GET'),
+    (response: any) => {
+      let attributes = response.data.attributes;
+      let error = attributes['cancelation-transaction-error'];
+      if (error) {
+        throw new Error(`Transaction reverted: ${error}`);
+      }
+      return attributes['cancelation-block-number'] != null;
+    },
+    1000
+  );
+}

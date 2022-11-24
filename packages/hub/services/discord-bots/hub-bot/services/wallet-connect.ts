@@ -1,6 +1,6 @@
 import Web3 from 'web3';
 import WalletConnectProvider from '@cardstack/wc-provider';
-import { networkIds, getConstantByNetwork } from '@cardstack/cardpay-sdk';
+import { networkIds, getConstantByNetwork, CardPayCapableNetworks } from '@cardstack/cardpay-sdk';
 import { AbstractProvider } from 'web3-core';
 import config from 'config';
 import logger from '@cardstack/logger';
@@ -11,7 +11,7 @@ import { WalletConnectConfig } from '../types';
 const log = logger('services:wallet-connect');
 
 const { bridge, clientURL, clientName } = config.get('walletConnect') as WalletConnectConfig;
-const network = config.get('web3.layer2Network') as string;
+const network = config.get('web3.layer2Network') as CardPayCapableNetworks;
 export default class WalletConnectService {
   async getWeb3(message: Message): Promise<Web3 | undefined> {
     let provider = new WalletConnectProvider({

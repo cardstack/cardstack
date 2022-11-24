@@ -21,6 +21,7 @@
     "module": "es2020",
     "experimentalDecorators": true,
     "skipLibCheck": false,
+    "resolveJsonModule": true,
     "traceResolution": false,
     "paths": {
       "@cardstack/web-client/tests/*": [

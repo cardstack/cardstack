@@ -85,7 +85,6 @@ export async function getEthereumClients(
       break;
     case 'sokol':
     case 'gnosis':
-    case 'xdai':
       rpcNodeHttpsUrl = hubConfigResponse.web3.gnosis.rpcNodeHttpsUrl as string;
       rpcNodeWssUrl = hubConfigResponse.web3.gnosis.rpcNodeWssUrl as string;
       bridge = 'https://safe-walletconnect.gnosis.io/';
@@ -168,14 +167,14 @@ export const NETWORK_OPTION_LAYER_2 = {
   alias: 'n',
   type: 'string',
   description: 'The Layer 2 network to run this script on',
-  choices: ['sokol', 'gnosis', 'xdai'],
+  choices: ['sokol', 'gnosis'],
 } as Options;
 
 export const NETWORK_OPTION_ANY = {
   alias: 'n',
   type: 'string',
   description: 'The network to run this script on',
-  choices: ['sokol', 'kovan', 'goerli', 'mumbai', 'gnosis', 'xdai', 'mainnet'],
+  choices: ['sokol', 'kovan', 'goerli', 'mumbai', 'gnosis', 'mainnet'],
 } as Options;
 
 export const FROM_OPTION = {
