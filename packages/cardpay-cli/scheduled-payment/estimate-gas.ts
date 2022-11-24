@@ -6,7 +6,7 @@ import { fromWei } from 'web3-utils';
 
 export default {
   command: 'estimate-gas <scenario> <tokenAddress> <gasTokenAddress>',
-  describe: 'Enable scheduled payment module on the safe',
+  describe: `Gas estimates for various scenarios in scheduled payments. This command allows you to estimate gas without sufficient transfer of tokens and gas tokens.`,
   builder(yargs: Argv) {
     return yargs
       .positional('scenario', {
