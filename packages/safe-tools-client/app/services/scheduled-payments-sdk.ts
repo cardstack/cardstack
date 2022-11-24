@@ -1,8 +1,4 @@
-import {
-  GasEstimationScenario,
-  getSDK,
-  Web3Provider,
-} from '@cardstack/cardpay-sdk';
+import { getSDK, Web3Provider } from '@cardstack/cardpay-sdk';
 import WalletService from '@cardstack/safe-tools-client/services/wallet';
 
 import { action } from '@ember/object';
@@ -35,7 +31,7 @@ export default class SchedulePaymentSDKService extends Service {
     const scheduledPayments = await this.getSchedulePaymentsModule();
 
     const estimatedGas = await scheduledPayments.estimateGas(
-      GasEstimationScenario.create_safe_with_module
+      'create_safe_with_module'
     );
 
     return estimatedGas.gasRangeInWei.standard;

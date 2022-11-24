@@ -1,5 +1,5 @@
 import { Argv } from 'yargs';
-import { GasEstimationScenario, getSDK } from '@cardstack/cardpay-sdk';
+import { GAS_ESTIMATION_SCENARIOS, getSDK } from '@cardstack/cardpay-sdk';
 import { getEthereumClients, getConnectionType, NETWORK_OPTION_ANY } from '../utils';
 import { Arguments, CommandModule } from 'yargs';
 import { fromWei } from 'web3-utils';
@@ -11,7 +11,7 @@ export default {
     return yargs
       .positional('scenario', {
         type: 'string',
-        description: `Gas estimation scenario, values = ${Object.values(GasEstimationScenario).join(', ')}`,
+        description: `Gas estimation scenario, values = ${GAS_ESTIMATION_SCENARIOS}`,
       })
       .positional('tokenAddress', {
         type: 'string',
@@ -37,7 +37,7 @@ export default {
     console.log(`Estimate gas for ${scenario} scenario ...`);
 
     let result = await scheduledPaymentModule.estimateGas(
-      scenario as GasEstimationScenario,
+      scenario as typeof GAS_ESTIMATION_SCENARIOS[number],
       tokenAddress,
       gasTokenAddress
     );
