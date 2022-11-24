@@ -1,6 +1,6 @@
 {
   "name": "safe-tools-subgraph",
-  "version": "1.0.19",
+  "version": "1.0.20",
   "scripts": {
     "codegen": "graph codegen",
     "build": "graph build",
