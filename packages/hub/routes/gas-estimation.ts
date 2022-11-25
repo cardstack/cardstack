@@ -13,7 +13,7 @@ export default class GasEstimationRoute {
     autoBind(this);
   }
 
-  async get(ctx: Koa.Context) {
+  async estimate(ctx: Koa.Context) {
     let attrs = ctx.request.body.data.attributes;
     let params = {
       scenario: attrs['scenario'],

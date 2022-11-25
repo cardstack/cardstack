@@ -1268,6 +1268,7 @@ export default class ScheduledPaymentModule {
     gasTokenAddress?: string | null
   ): Promise<GasEstimationResult> {
     let chainId = (await this.ethersProvider.getNetwork()).chainId;
+    const network = convertChainIdToName(chainId);
     let body = {
       data: {
         attributes: {
@@ -1278,7 +1279,6 @@ export default class ScheduledPaymentModule {
         },
       },
     };
-    const network = convertChainIdToName(chainId);
     let gasEstimationResponse = await fetch(`${getConstantByNetwork('hubUrl', network)}/api/gas-estimation`, {
       method: 'POST',
       headers: {

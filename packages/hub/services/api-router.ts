@@ -155,7 +155,7 @@ export default class APIRouter {
     apiSubrouter.get('/wyre-prices', parseBody, wyrePricesRoute.get);
     apiSubrouter.get('/data-integrity-checks/:check_name', parseBody, dataIntegrityChecksRoute.get);
     apiSubrouter.get('/gas-station/:chain_id', gasStationRoute.get);
-    apiSubrouter.post('/gas-estimation', parseBody, gasEstimationRoute.get);
+    apiSubrouter.post('/gas-estimation', parseBody, gasEstimationRoute.estimate);
     apiSubrouter.all('/(.*)', notFound);
 
     let apiRouter = new Router();
