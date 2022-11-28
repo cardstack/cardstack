@@ -8,6 +8,10 @@
   "engines": {
     "node": "^14.0.0"
   },
+  "scripts": {
+    "lint": "npm-run-all --aggregate-output --continue-on-error --parallel lint:*",
+    "lint:boxel": "yarn --cwd packages/boxel lint"
+  },
   "dependencies": {
     "@actions/core": "^1.2.6",
     "@actions/github": "^4.0.0",
