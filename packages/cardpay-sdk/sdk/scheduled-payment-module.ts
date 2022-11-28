@@ -47,7 +47,7 @@ import BN from 'bn.js';
 import { Interface } from 'ethers/lib/utils';
 import JsonRpcProvider from '../providers/json-rpc-provider';
 import { getConstant, getConstantByNetwork, SchedulerCapableNetworks } from './constants';
-import { getCurrentGasPrice, getNativeWeiInToken } from './utils/conversions';
+import { getGasPricesInNativeWei, getNativeWeiInToken } from './utils/conversions';
 
 export interface EnableModuleAndGuardResult {
   scheduledPaymentModuleAddress: string;
@@ -1288,28 +1288,28 @@ export default class ScheduledPaymentModule {
       },
       body: JSON.stringify(body),
     });
-    let gasStationResponse = await getCurrentGasPrice(chainId);
+    let gasStationResponse = await getGasPricesInNativeWei(chainId);
     let gas = BigNumber.from((await gasEstimationResponse.json()).data?.attributes?.gas);
+    let gasRangeInWei = {
+      slow: gas.mul(String(gasStationResponse.slow)),
+      standard: gas.mul(String(gasStationResponse.standard)),
+      fast: gas.mul(String(gasStationResponse.fast)),
+    };
 
     let tokenList = getConstantByNetwork('tokenList', network as SchedulerCapableNetworks)?.tokens;
     let tokenUSD = tokenList.find((t) => t.symbol === 'USDT');
-    let priceWeiInUSD = BigNumber.from(0);
-    if (tokenUSD) {
-      priceWeiInUSD = await getNativeWeiInToken(this.ethersProvider, tokenUSD?.address);
-    }
+    if (!tokenUSD) throw Error('USD token not found');
+    let priceWeiInUSD = String(await getNativeWeiInToken(this.ethersProvider, tokenUSD?.address));
+    let gasRangeInUSD = {
+      slow: gasRangeInWei.slow.mul(priceWeiInUSD),
+      standard: gasRangeInWei.standard.mul(priceWeiInUSD),
+      fast: gasRangeInWei.fast.mul(priceWeiInUSD),
+    };
 
     return {
       gas,
-      gasRangeInWei: {
-        slow: gas.mul(gasStationResponse.slow),
-        standard: gas.mul(gasStationResponse.standard),
-        fast: gas.mul(gasStationResponse.fast),
-      },
-      gasRangeInUSD: {
-        slow: gas.mul(gasStationResponse.slow).mul(priceWeiInUSD),
-        standard: gas.mul(gasStationResponse.standard).mul(priceWeiInUSD),
-        fast: gas.mul(gasStationResponse.fast).mul(priceWeiInUSD),
-      },
+      gasRangeInWei,
+      gasRangeInUSD,
     };
   }
 }
