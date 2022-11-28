@@ -23,5 +23,4 @@ jobs:
           yarn_lock_md5: ${{ hashFiles('yarn.lock') }}
 
       - run: yarn --prefer-offline --frozen-lockfile
-      - run: yarn codegen:hub-schema
       - run: yarn lint
