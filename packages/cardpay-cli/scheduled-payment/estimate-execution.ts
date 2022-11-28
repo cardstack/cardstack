@@ -6,7 +6,7 @@ import { Arguments, CommandModule } from 'yargs';
 export default {
   command:
     'estimate-execution <moduleAddress> <tokenAddress> <amount> <payeeAddress> <maxGasPrice> <gasTokenAddress> <salt>',
-  describe: 'Enable scheduled payment module on the safe',
+  describe: 'Estimate gas for scheduled payment execution',
   builder(yargs: Argv) {
     return yargs
       .positional('moduleAddress', {

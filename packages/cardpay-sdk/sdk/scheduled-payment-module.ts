@@ -1,3 +1,5 @@
+/*global fetch */
+
 import GnosisSafeABI from '../contracts/abi/gnosis-safe';
 import MetaGuardABI from '../contracts/abi/modules/meta-guard';
 import ScheduledPaymentABI from '../contracts/abi/modules/scheduled-payment-module';
@@ -32,18 +34,19 @@ import {
 } from './utils/safe-utils';
 import { BigNumber, Contract, Signer, utils } from 'ethers';
 import { signSafeTx, signSafeTxAsBytes, Signature } from './utils/signing-utils';
-import { ERC20ABI, getSDK } from '..';
+import { convertChainIdToName, ERC20ABI, getSDK } from '..';
 import { SuccessfulTransactionReceipt } from './utils/successful-transaction-receipt';
 /* eslint-disable node/no-extraneous-import */
 import { AddressZero } from '@ethersproject/constants';
 import {
+  GasEstimationScenario,
   waitUntilCancelPaymentTransactionMined,
   waitUntilSchedulePaymentTransactionMined,
 } from './scheduled-payment/utils';
 import BN from 'bn.js';
 import { Interface } from 'ethers/lib/utils';
 import JsonRpcProvider from '../providers/json-rpc-provider';
-import { getConstant } from './constants';
+import { getConstant, getConstantByNetwork } from './constants';
 import { getCurrentGasPrice } from './utils/conversions';
 
 export interface EnableModuleAndGuardResult {
@@ -62,6 +65,12 @@ export interface CreateSafeWithModuleAndGuardTx {
   expectedSafeAddress: string;
   expectedSPModuleAddress: string;
   expectedMetaGuardAddress: string;
+}
+
+type GasRangeInWei = Record<'slow' | 'standard' | 'fast', BigNumber>;
+export interface GasEstimationResult {
+  gas: BigNumber;
+  gasRangeInWei: GasRangeInWei;
 }
 
 export const FEE_BASE_POW = new BN(18);
@@ -297,14 +306,8 @@ export default class ScheduledPaymentModule {
       AddressZero
     );
     let setMetaGuardGas = BigNumber.from(estimateSetMetaGuard.baseGas).add(estimateSetMetaGuard.safeTxGas);
-    let totalGas = createSafeGas
-      .add(deploySPModuleGas)
-      .add(deployMetaGuardGas)
-      .add(enableSPModuleGas)
-      .add(setMetaGuardGas);
-    let gasPrice = await getCurrentGasPrice(this.ethersProvider.network.chainId);
 
-    return totalGas.mul(gasPrice.standard.toString());
+    return createSafeGas.add(deploySPModuleGas).add(deployMetaGuardGas).add(enableSPModuleGas).add(setMetaGuardGas);
   }
 
   async createSafeWithModuleAndGuard(
@@ -1254,5 +1257,45 @@ export default class ScheduledPaymentModule {
       // OutOfGas: executionGas to low to execute scheduled payment
       throw extractSendTransactionError(e, new Interface(ScheduledPaymentABI));
     }
+  }
+
+  // Use the hub as a proxy to estimate
+  // to make the estimation process faster
+  // and doesn't requiring user to have enough balance of token transfer & gas token
+  async estimateGas(
+    scenario: GasEstimationScenario,
+    tokenAddress?: string | null,
+    gasTokenAddress?: string | null
+  ): Promise<GasEstimationResult> {
+    let chainId = (await this.ethersProvider.getNetwork()).chainId;
+    const network = convertChainIdToName(chainId);
+    let body = {
+      data: {
+        attributes: {
+          scenario: scenario,
+          'chain-id': chainId,
+          'token-address': tokenAddress,
+          'gas-token-address': gasTokenAddress,
+        },
+      },
+    };
+    let gasEstimationResponse = await fetch(`${getConstantByNetwork('hubUrl', network)}/api/gas-estimation`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/vnd.api+json',
+        Accept: 'application/vnd.api+json',
+      },
+      body: JSON.stringify(body),
+    });
+    let gasStationResponse = await getCurrentGasPrice(chainId);
+    let gas = BigNumber.from((await gasEstimationResponse.json()).data?.attributes?.gas);
+    return {
+      gas,
+      gasRangeInWei: {
+        slow: gas.mul(gasStationResponse.slow),
+        standard: gas.mul(gasStationResponse.standard),
+        fast: gas.mul(gasStationResponse.fast),
+      },
+    };
   }
 }

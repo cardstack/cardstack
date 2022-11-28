@@ -1,5 +1,12 @@
 import { hubRequest, poll } from '../utils/general-utils';
 
+export const GAS_ESTIMATION_SCENARIOS = [
+  'create_safe_with_module',
+  'execute_one_time_payment',
+  'execute_recurring_payment',
+] as const;
+export type GasEstimationScenario = typeof GAS_ESTIMATION_SCENARIOS[number];
+
 export async function waitUntilSchedulePaymentTransactionMined(
   hubRootUrl: string,
   scheduledPaymentId: string,

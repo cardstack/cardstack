@@ -1,7 +1,4 @@
 {
-  // Use IntelliSense to learn about possible Node.js debug attributes.
-  // Hover to view descriptions of existing attributes.
-  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
   "version": "0.2.0",
   "configurations": [
     {
@@ -10,7 +7,9 @@
       "name": "Web Client: Build web-client",
       "program": "${workspaceFolder}/node_modules/.bin/ember",
       "cwd": "${workspaceRoot}/packages/web-client",
-      "args": ["b"],
+      "args": [
+        "b"
+      ],
       "env": {
         "JOBS": "1"
       },
@@ -23,7 +22,9 @@
       "program": "${workspaceRoot}/packages/hub/dist/hub.js",
       "cwd": "${workspaceRoot}/packages/hub",
       "console": "integratedTerminal",
-      "args": ["serve"]
+      "args": [
+        "serve"
+      ]
     },
     {
       "type": "node",
@@ -35,7 +36,13 @@
       "env": {
         "NODE_ENV": "test"
       },
-      "args": ["-r", "@cardstack/test-support/prepare-node-tests", "node-tests/**/*-test.js", "--timeout", "600000"]
+      "args": [
+        "-r",
+        "@cardstack/test-support/prepare-node-tests",
+        "node-tests/**/*-test.js",
+        "--timeout",
+        "600000"
+      ]
     },
     {
       "type": "node",
@@ -44,7 +51,9 @@
       "program": "${workspaceRoot}/packages/hub/dist/hub.js",
       "cwd": "${workspaceRoot}/packages/hub",
       "console": "integratedTerminal",
-      "args": ["bot"]
+      "args": [
+        "bot"
+      ]
     },
     {
       "type": "node",
@@ -53,7 +62,10 @@
       "program": "${workspaceRoot}/packages/hub/bin/corde",
       "cwd": "${workspaceRoot}/packages/hub",
       "console": "integratedTerminal",
-      "args": ["--files", "./bot-tests/services/discord-bots/hub-bot/**/*.ts"]
+      "args": [
+        "--files",
+        "./bot-tests/services/discord-bots/hub-bot/**/*.ts"
+      ]
     },
     {
       "type": "node",
@@ -64,9 +76,7 @@
       "env": {},
       "args": [
         "hub-auth",
-        // "https://hub.cardstack.com",
         "https://hub-staging.stack.cards",
-        // "http://localhost:3000",
         "--network",
         "${config:cardCli.network.l2.name}",
         "--mnemonic",
@@ -78,17 +88,20 @@
       "request": "launch",
       "name": "Bridge: Bridge to Layer 1",
       "cwd": "${workspaceFolder}/packages/cardpay-cli",
-      "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
+      "runtimeArgs": [
+        "-r",
+        "ts-node/register/transpile-only"
+      ],
       "console": "integratedTerminal",
       "env": {},
       "args": [
         "index.ts",
         "bridge",
         "to-l1",
-        "0x00F0FBDEEa1cDEc029Ba6025ca726Fdcf43E9025", // L2 safe address
+        "0x00F0FBDEEa1cDEc029Ba6025ca726Fdcf43E9025",
         "10",
-        "${config:cardCli.network.l2.daiToken}", // DAI.CPXD
-        "0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13", // L1 receiver
+        "${config:cardCli.network.l2.daiToken}",
+        "0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13",
         "--network",
         "${config:cardCli.network.l2.name}",
         "--mnemonic",
@@ -100,27 +113,18 @@
       "request": "launch",
       "name": "Bridge: Bridge to Layer 2",
       "cwd": "${workspaceFolder}/packages/cardpay-cli",
-      "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
+      "runtimeArgs": [
+        "-r",
+        "ts-node/register/transpile-only"
+      ],
       "console": "integratedTerminal",
       "env": {},
       "args": [
-        // Kovan CARD Bridge args
-        // "index.ts",
-        // "bridge",
-        // "to-l2",
-        // "10000",
-        // "${config:cardCli.network.l1.cardToken}",
-        // "--network",
-        // "${config:cardCli.network.l1.name}",
-        // "--mnemonic",
-        // "${config:cardCli.mnemonic}"
-
-        // Kovan DAI Bridge args
         "index.ts",
         "bridge",
         "to-l2",
         "100",
-        "${config:cardCli.network.l1.daiToken}", // Kovan DAI
+        "${config:cardCli.network.l1.daiToken}",
         "--network",
         "${config:cardCli.network.l1.name}",
         "--mnemonic",
@@ -132,15 +136,18 @@
       "request": "launch",
       "name": "Bridge: Wait for Bridge to Layer 2",
       "cwd": "${workspaceFolder}/packages/cardpay-cli",
-      "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
+      "runtimeArgs": [
+        "-r",
+        "ts-node/register/transpile-only"
+      ],
       "console": "integratedTerminal",
       "env": {},
       "args": [
         "index.ts",
         "bridge",
         "await-to-l2",
-        "21746764", // from block
-        "0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13", // recipient (depot safe owner)
+        "21746764",
+        "0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13",
         "--network",
         "${config:cardCli.network.l2.name}",
         "--mnemonic",
@@ -152,15 +159,18 @@
       "request": "launch",
       "name": "Bridge: Wait for Bridge Validators",
       "cwd": "${workspaceFolder}/packages/cardpay-cli",
-      "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
+      "runtimeArgs": [
+        "-r",
+        "ts-node/register/transpile-only"
+      ],
       "console": "integratedTerminal",
       "env": {},
       "args": [
         "index.ts",
         "bridge",
         "await-to-l1",
-        "22144982", // from block
-        "0x7ccf62e3f83186c695a4a6e54febff97856eef99be8c5a26aaad8bb58f2e99ae", // txn hash
+        "22144982",
+        "0x7ccf62e3f83186c695a4a6e54febff97856eef99be8c5a26aaad8bb58f2e99ae",
         "--network",
         "${config:cardCli.network.l2.name}",
         "--mnemonic",
@@ -172,14 +182,17 @@
       "request": "launch",
       "name": "Bridge: Get Withdrawal Limits",
       "cwd": "${workspaceFolder}/packages/cardpay-cli",
-      "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
+      "runtimeArgs": [
+        "-r",
+        "ts-node/register/transpile-only"
+      ],
       "console": "integratedTerminal",
       "env": {},
       "args": [
         "index.ts",
         "bridge",
         "withdrawal-limits",
-        "${config:cardCli.network.l2.daiToken}", // DAI.CPXD
+        "${config:cardCli.network.l2.daiToken}",
         "--network",
         "${config:cardCli.network.l2.name}",
         "--mnemonic",
@@ -191,17 +204,18 @@
       "request": "launch",
       "name": "Bridge: Claim Layer 1 Tokens",
       "cwd": "${workspaceFolder}/packages/cardpay-cli",
-      "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
+      "runtimeArgs": [
+        "-r",
+        "ts-node/register/transpile-only"
+      ],
       "console": "integratedTerminal",
       "env": {},
       "args": [
         "index.ts",
         "bridge",
         "claim-on-l1",
-        "0x00050000249bfc2f3cc8d68f6b6bf7230ea0a8ed853de7310000000000000abb", // messageId
-        // encodedData
+        "0x00050000249bfc2f3cc8d68f6b6bf7230ea0a8ed853de7310000000000000abb",
         "0x00050000249bfc2f3cc8d68f6b6bf7230ea0a8ed853de7310000000000000abb16a80598dd2f143cfbf091638ce3fb02c9135528366b4cc64d30849568af65522de3a68ea6cc78ce001e84800101004d2a125e4cfb0000000000000000000000004f96fe3b7a6cf9725f59d353f723c1bdb64ca6aa0000000000000000000000002f58630ca445ab1a6de2bb9892aa2e1d60876c130000000000000000000000000000000000000000000000008ac7230489e80000",
-        // signatures (add each signature as a separate command line arg)
         "0x6cf76b8f7abc547f6fe6e4eff5cfbc82d9ee90e399a29de5f861c9b46b108a8f3b2da2c4736617d15a424e4ee02c6d5274f94c3c29a170ce6a9a42bcd90482511b",
         "--network",
         "${config:cardCli.network.l1.name}",
@@ -214,7 +228,10 @@
       "request": "launch",
       "name": "Safe: View Safes",
       "console": "integratedTerminal",
-      "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
+      "runtimeArgs": [
+        "-r",
+        "ts-node/register/transpile-only"
+      ],
       "cwd": "${workspaceRoot}/packages/cardpay-cli",
       "env": {},
       "args": [
@@ -233,7 +250,10 @@
       "name": "Safe: View Safe",
       "cwd": "${workspaceFolder}/packages/cardpay-cli",
       "console": "integratedTerminal",
-      "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
+      "runtimeArgs": [
+        "-r",
+        "ts-node/register/transpile-only"
+      ],
       "env": {},
       "args": [
         "index.ts",
@@ -241,7 +261,7 @@
         "view",
         "--network",
         "${config:cardCli.network.l2.name}",
-        "0x00F0FBDEEa1cDEc029Ba6025ca726Fdcf43E9025", // safe to view
+        "0x00F0FBDEEa1cDEc029Ba6025ca726Fdcf43E9025",
         "--mnemonic",
         "${config:cardCli.mnemonic}"
       ]
@@ -252,17 +272,20 @@
       "name": "Safe: Transfer Tokens from Safe",
       "cwd": "${workspaceFolder}/packages/cardpay-cli",
       "console": "integratedTerminal",
-      "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
+      "runtimeArgs": [
+        "-r",
+        "ts-node/register/transpile-only"
+      ],
       "env": {},
       "args": [
         "index.ts",
         "safe",
         "transfer-tokens",
-        "0xD669AC924eb6812C48afA984B5efFd776d035001", // source safe address
-        "${config:cardCli.network.l2.daiToken}", // DAI.CPXD
-        "0x00F0FBDEEa1cDEc029Ba6025ca726Fdcf43E9025", // destination addrress
+        "0xD669AC924eb6812C48afA984B5efFd776d035001",
+        "${config:cardCli.network.l2.daiToken}",
+        "0x00F0FBDEEa1cDEc029Ba6025ca726Fdcf43E9025",
         "--amount",
-        "500", // amount (in ether units)
+        "500",
         "--network",
         "${config:cardCli.network.l2.name}",
         "--mnemonic",
@@ -275,16 +298,19 @@
       "name": "Safe: Gas Estimate for Transfer Tokens from Safe",
       "cwd": "${workspaceFolder}/packages/cardpay-cli",
       "console": "integratedTerminal",
-      "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
+      "runtimeArgs": [
+        "-r",
+        "ts-node/register/transpile-only"
+      ],
       "env": {},
       "args": [
         "index.ts",
         "safe",
         "transfer-tokens-gas-estimate",
-        "0x00F0FBDEEa1cDEc029Ba6025ca726Fdcf43E9025", // source safe address
-        "${config:cardCli.network.l2.daiToken}", // DAI.CPXD
-        "0x09FBEDDc5f94fA2713CDa75A68457cA8A4527adf", // destination addrress
-        "5", // amount (in ether units)
+        "0x00F0FBDEEa1cDEc029Ba6025ca726Fdcf43E9025",
+        "${config:cardCli.network.l2.daiToken}",
+        "0x09FBEDDc5f94fA2713CDa75A68457cA8A4527adf",
+        "5",
         "--network",
         "${config:cardCli.network.l2.name}",
         "--mnemonic",
@@ -297,7 +323,10 @@
       "name": "Price: USD Price",
       "cwd": "${workspaceFolder}/packages/cardpay-cli",
       "console": "integratedTerminal",
-      "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
+      "runtimeArgs": [
+        "-r",
+        "ts-node/register/transpile-only"
+      ],
       "env": {},
       "args": [
         "index.ts",
@@ -317,7 +346,10 @@
       "name": "Price: ETH Price",
       "cwd": "${workspaceFolder}/packages/cardpay-cli",
       "console": "integratedTerminal",
-      "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
+      "runtimeArgs": [
+        "-r",
+        "ts-node/register/transpile-only"
+      ],
       "env": {},
       "args": [
         "index.ts",
@@ -337,7 +369,10 @@
       "name": "Price: Oracle Update Time",
       "cwd": "${workspaceFolder}/packages/cardpay-cli",
       "console": "integratedTerminal",
-      "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
+      "runtimeArgs": [
+        "-r",
+        "ts-node/register/transpile-only"
+      ],
       "env": {},
       "args": [
         "index.ts",
@@ -356,7 +391,10 @@
       "name": "Prepaid Card: Create Prepaid Card",
       "cwd": "${workspaceFolder}/packages/cardpay-cli",
       "console": "integratedTerminal",
-      "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
+      "runtimeArgs": [
+        "-r",
+        "ts-node/register/transpile-only"
+      ],
       "env": {},
       "args": [
         "index.ts",
@@ -378,15 +416,18 @@
       "name": "Prepaid Card: Split Prepaid Card Equally",
       "cwd": "${workspaceFolder}/packages/cardpay-cli",
       "console": "integratedTerminal",
-      "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
+      "runtimeArgs": [
+        "-r",
+        "ts-node/register/transpile-only"
+      ],
       "env": {},
       "args": [
         "index.ts",
         "prepaid-card",
         "split-equally",
-        "0xE1C3D39e2377F20325f0Fdf40b835c768E257C66", // prepaid card address
-        "2000", // face value
-        "21", // quantity
+        "0xE1C3D39e2377F20325f0Fdf40b835c768E257C66",
+        "2000",
+        "21",
         "--network",
         "${config:cardCli.network.l2.name}",
         "--mnemonic",
@@ -399,16 +440,19 @@
       "name": "Prepaid Card: Split Prepaid Card",
       "cwd": "${workspaceFolder}/packages/cardpay-cli",
       "console": "integratedTerminal",
-      "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
+      "runtimeArgs": [
+        "-r",
+        "ts-node/register/transpile-only"
+      ],
       "env": {},
       "args": [
         "index.ts",
         "prepaidcard",
         "split",
-        "0xe732F27E31e8e0A17c5069Af7cDF277bA7E6Eff5", // prepaid card address
-        "", // customization DID
-        "100", // face values
-        "100", // face values
+        "0xe732F27E31e8e0A17c5069Af7cDF277bA7E6Eff5",
+        "",
+        "100",
+        "100",
         "--network",
         "${config:cardCli.network.l2.name}",
         "--mnemonic",
@@ -421,14 +465,17 @@
       "name": "Prepaid Card: Transfer Prepaid Card",
       "cwd": "${workspaceFolder}/packages/cardpay-cli",
       "console": "integratedTerminal",
-      "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
+      "runtimeArgs": [
+        "-r",
+        "ts-node/register/transpile-only"
+      ],
       "env": {},
       "args": [
         "index.ts",
         "prepaid-card",
         "transfer",
-        "0xEB10912969E24EB119d4463dA12ae7967dd1FcC7", // prepaid card address
-        "0xb21851B00bd13C008f703A21DFDd292b28A736b3", // new owner
+        "0xEB10912969E24EB119d4463dA12ae7967dd1FcC7",
+        "0xb21851B00bd13C008f703A21DFDd292b28A736b3",
         "--network",
         "${config:cardCli.network.l2.name}",
         "--mnemonic",
@@ -441,7 +488,10 @@
       "name": "Prepaid Card: Payment Limits",
       "cwd": "${workspaceFolder}/packages/cardpay-cli",
       "console": "integratedTerminal",
-      "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
+      "runtimeArgs": [
+        "-r",
+        "ts-node/register/transpile-only"
+      ],
       "env": {},
       "args": [
         "index.ts",
@@ -459,14 +509,17 @@
       "name": "Prepaid Card: Pay Merchant",
       "cwd": "${workspaceFolder}/packages/cardpay-cli",
       "console": "integratedTerminal",
-      "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
+      "runtimeArgs": [
+        "-r",
+        "ts-node/register/transpile-only"
+      ],
       "env": {},
       "args": [
         "index.ts",
         "prepaid-card",
         "pay-merchant",
-        "0x08a4F4fB9938940FA49A4F7dC43B2fb2cd5B3b87", // safe for Hassan's merchant (whose address the correlates with the mnemenoic 0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13)
-        "0x22d0ea6Ba8842Ae1355F842a9fAc32F035F18Ca6", // Hassan's prepaid card --feel free to use your own
+        "0x08a4F4fB9938940FA49A4F7dC43B2fb2cd5B3b87",
+        "0x22d0ea6Ba8842Ae1355F842a9fAc32F035F18Ca6",
         "50",
         "--network",
         "${config:cardCli.network.l2.name}",
@@ -480,13 +533,16 @@
       "name": "Prepaid Card: Price for face value",
       "cwd": "${workspaceFolder}/packages/cardpay-cli",
       "console": "integratedTerminal",
-      "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
+      "runtimeArgs": [
+        "-r",
+        "ts-node/register/transpile-only"
+      ],
       "env": {},
       "args": [
         "index.ts",
         "prepaid-card",
         "price-for-face-value",
-        "${config:cardCli.network.l2.daiToken}", // DAI.CPXD
+        "${config:cardCli.network.l2.daiToken}",
         "10000",
         "--network",
         "${config:cardCli.network.l2.name}",
@@ -500,13 +556,16 @@
       "name": "Prepaid Card: New prepaid card gas fee",
       "cwd": "${workspaceFolder}/packages/cardpay-cli",
       "console": "integratedTerminal",
-      "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
+      "runtimeArgs": [
+        "-r",
+        "ts-node/register/transpile-only"
+      ],
       "env": {},
       "args": [
         "index.ts",
         "prepaid-card",
         "creation-gas-fee",
-        "${config:cardCli.network.l2.daiToken}", // DAI.CPXD
+        "${config:cardCli.network.l2.daiToken}",
         "--network",
         "${config:cardCli.network.l2.name}",
         "--mnemonic",
@@ -519,16 +578,19 @@
       "name": "Market V1: Provision Prepaid Card",
       "cwd": "${workspaceFolder}/packages/cardpay-cli",
       "console": "integratedTerminal",
-      "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
+      "runtimeArgs": [
+        "-r",
+        "ts-node/register/transpile-only"
+      ],
       "env": {},
       "args": [
         "index.ts",
         "prepaid-card-market",
         "provision",
-        "0xc8b04fee58da85eab44879150cd06aafedbfa70705c9f7c1eb517aaad8f786ae", // sku
-        "0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13", // recipient
-        "staging", // environment
-        "", // secret
+        "0xc8b04fee58da85eab44879150cd06aafedbfa70705c9f7c1eb517aaad8f786ae",
+        "0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13",
+        "staging",
+        "",
         "--network",
         "${config:cardCli.network.l2.name}",
         "--mnemonic",
@@ -541,7 +603,10 @@
       "name": "Market V1: SKU Info",
       "cwd": "${workspaceFolder}/packages/cardpay-cli",
       "console": "integratedTerminal",
-      "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
+      "runtimeArgs": [
+        "-r",
+        "ts-node/register/transpile-only"
+      ],
       "env": {},
       "args": [
         "index.ts",
@@ -560,13 +625,16 @@
       "name": "Market V1: Prepaid Card Inventory",
       "cwd": "${workspaceFolder}/packages/cardpay-cli",
       "console": "integratedTerminal",
-      "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
+      "runtimeArgs": [
+        "-r",
+        "ts-node/register/transpile-only"
+      ],
       "env": {},
       "args": [
         "index.ts",
         "prepaid-card-market",
         "inventory",
-        "0x7ac394019c3259d7164796fadfcdca28d48cff380444e581c593d6b15f5f148e", // sku
+        "0x7ac394019c3259d7164796fadfcdca28d48cff380444e581c593d6b15f5f148e",
         "--network",
         "${config:cardCli.network.l2.name}",
         "--mnemonic",
@@ -579,13 +647,16 @@
       "name": "Market V1: Prepaid Card Inventories",
       "cwd": "${workspaceFolder}/packages/cardpay-cli",
       "console": "integratedTerminal",
-      "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
+      "runtimeArgs": [
+        "-r",
+        "ts-node/register/transpile-only"
+      ],
       "env": {},
       "args": [
         "index.ts",
         "prepaid-card-market",
         "inventories",
-        "staging", // environment
+        "staging",
         "--network",
         "${config:cardCli.network.l2.name}",
         "--mnemonic",
@@ -598,14 +669,17 @@
       "name": "Market V1: Add Prepaid Card Inventory",
       "cwd": "${workspaceFolder}/packages/cardpay-cli",
       "console": "integratedTerminal",
-      "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
+      "runtimeArgs": [
+        "-r",
+        "ts-node/register/transpile-only"
+      ],
       "env": {},
       "args": [
         "index.ts",
         "prepaid-card-market",
         "add",
-        "0xcd9B5f73cebF760E7113A71B5f47C4430F42AA28", // funding prepaid card
-        "0x024db5796C3CaAB34e9c0995A1DF17A91EECA6cC", // prepaid card to add
+        "0xcd9B5f73cebF760E7113A71B5f47C4430F42AA28",
+        "0x024db5796C3CaAB34e9c0995A1DF17A91EECA6cC",
         "--network",
         "${config:cardCli.network.l2.name}",
         "--mnemonic",
@@ -618,14 +692,17 @@
       "name": "Market V1: Remove Prepaid Card Inventory",
       "cwd": "${workspaceFolder}/packages/cardpay-cli",
       "console": "integratedTerminal",
-      "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
+      "runtimeArgs": [
+        "-r",
+        "ts-node/register/transpile-only"
+      ],
       "env": {},
       "args": [
         "index.ts",
         "prepaid-card-market",
         "remove",
-        "0xcd9B5f73cebF760E7113A71B5f47C4430F42AA28", // funding prepaid card
-        "0x024db5796C3CaAB34e9c0995A1DF17A91EECA6cC", // prepaid cards to remove
+        "0xcd9B5f73cebF760E7113A71B5f47C4430F42AA28",
+        "0x024db5796C3CaAB34e9c0995A1DF17A91EECA6cC",
         "--network",
         "${config:cardCli.network.l2.name}",
         "--mnemonic",
@@ -638,14 +715,17 @@
       "name": "Market V1: Set Prepaid Card Ask",
       "cwd": "${workspaceFolder}/packages/cardpay-cli",
       "console": "integratedTerminal",
-      "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
+      "runtimeArgs": [
+        "-r",
+        "ts-node/register/transpile-only"
+      ],
       "env": {},
       "args": [
         "index.ts",
         "prepaid-card-market",
         "set-ask",
-        "0xcd9B5f73cebF760E7113A71B5f47C4430F42AA28", // funding prepaid card
-        "0x9df6e66eaa9809a86c87711637f857050ed2fbb7b79bb1a38560f383c3df4358", // sku
+        "0xcd9B5f73cebF760E7113A71B5f47C4430F42AA28",
+        "0x9df6e66eaa9809a86c87711637f857050ed2fbb7b79bb1a38560f383c3df4358",
         "20",
         "--network",
         "${config:cardCli.network.l2.name}",
@@ -659,7 +739,10 @@
       "name": "Market V2: Add Tokens",
       "cwd": "${workspaceFolder}/packages/cardpay-cli",
       "console": "integratedTerminal",
-      "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
+      "runtimeArgs": [
+        "-r",
+        "ts-node/register/transpile-only"
+      ],
       "env": {},
       "args": [
         "index.ts",
@@ -682,7 +765,10 @@
       "name": "Market V2: Recover Tokens",
       "cwd": "${workspaceFolder}/packages/cardpay-cli",
       "console": "integratedTerminal",
-      "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
+      "runtimeArgs": [
+        "-r",
+        "ts-node/register/transpile-only"
+      ],
       "env": {},
       "args": [
         "index.ts",
@@ -705,7 +791,10 @@
       "name": "Market V2: Add SKU",
       "cwd": "${workspaceFolder}/packages/cardpay-cli",
       "console": "integratedTerminal",
-      "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
+      "runtimeArgs": [
+        "-r",
+        "ts-node/register/transpile-only"
+      ],
       "env": {},
       "args": [
         "index.ts",
@@ -728,7 +817,10 @@
       "name": "Market V2: Get SKU",
       "cwd": "${workspaceFolder}/packages/cardpay-cli",
       "console": "integratedTerminal",
-      "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
+      "runtimeArgs": [
+        "-r",
+        "ts-node/register/transpile-only"
+      ],
       "env": {},
       "args": [
         "index.ts",
@@ -750,7 +842,10 @@
       "name": "Market V2: Set Ask",
       "cwd": "${workspaceFolder}/packages/cardpay-cli",
       "console": "integratedTerminal",
-      "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
+      "runtimeArgs": [
+        "-r",
+        "ts-node/register/transpile-only"
+      ],
       "env": {},
       "args": [
         "index.ts",
@@ -771,13 +866,16 @@
       "name": "Merchant: Register New Merchant",
       "cwd": "${workspaceFolder}/packages/cardpay-cli",
       "console": "integratedTerminal",
-      "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
+      "runtimeArgs": [
+        "-r",
+        "ts-node/register/transpile-only"
+      ],
       "env": {},
       "args": [
         "index.ts",
         "merchant",
         "register",
-        "0xb51C321b30a173Fd160Ddc21DEa46f91a75E24a4", // Hassan's prepaid card --feel free to use your own
+        "0xb51C321b30a173Fd160Ddc21DEa46f91a75E24a4",
         "test-did",
         "--network",
         "${config:cardCli.network.l2.name}",
@@ -791,13 +889,16 @@
       "name": "Merchant: View Revenue Balances",
       "cwd": "${workspaceFolder}/packages/cardpay-cli",
       "console": "integratedTerminal",
-      "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
+      "runtimeArgs": [
+        "-r",
+        "ts-node/register/transpile-only"
+      ],
       "env": {},
       "args": [
         "index.ts",
         "merchant",
         "revenue-balances",
-        "0x3e6C2b2c3a842b6492F9F43349D77A40568e3d7E", // safe for Hassan's merchant (whose address the correlates with the mnemenoic 0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13)
+        "0x3e6C2b2c3a842b6492F9F43349D77A40568e3d7E",
         "--network",
         "${config:cardCli.network.l2.name}",
         "--mnemonic",
@@ -810,14 +911,17 @@
       "name": "Merchant: Claim Revenue",
       "cwd": "${workspaceFolder}/packages/cardpay-cli",
       "console": "integratedTerminal",
-      "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
+      "runtimeArgs": [
+        "-r",
+        "ts-node/register/transpile-only"
+      ],
       "env": {},
       "args": [
         "index.ts",
         "merchant",
         "claim-revenue",
-        "0x3e6C2b2c3a842b6492F9F43349D77A40568e3d7E", // safe for Hassan's merchant (whose address the correlates with the mnemenoic 0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13)
-        "${config:cardCli.network.l2.daiToken}", // DAI.CPXD
+        "0x3e6C2b2c3a842b6492F9F43349D77A40568e3d7E",
+        "${config:cardCli.network.l2.daiToken}",
         "1",
         "--network",
         "${config:cardCli.network.l2.name}",
@@ -831,14 +935,17 @@
       "name": "Merchant: Claim Revenue Gas Estimate",
       "cwd": "${workspaceFolder}/packages/cardpay-cli",
       "console": "integratedTerminal",
-      "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
+      "runtimeArgs": [
+        "-r",
+        "ts-node/register/transpile-only"
+      ],
       "env": {},
       "args": [
         "index.ts",
         "merchant",
         "claim-revenue-gas-estimate",
-        "0x3e6C2b2c3a842b6492F9F43349D77A40568e3d7E", // safe for Hassan's merchant (whose address the correlates with the mnemenoic 0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13)
-        "${config:cardCli.network.l2.daiToken}", // DAI.CPXD
+        "0x3e6C2b2c3a842b6492F9F43349D77A40568e3d7E",
+        "${config:cardCli.network.l2.daiToken}",
         "1",
         "--network",
         "${config:cardCli.network.l2.name}",
@@ -852,7 +959,10 @@
       "name": "Rewards: View Reward Balances",
       "cwd": "${workspaceFolder}/packages/cardpay-cli",
       "console": "integratedTerminal",
-      "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
+      "runtimeArgs": [
+        "-r",
+        "ts-node/register/transpile-only"
+      ],
       "env": {},
       "args": [
         "index.ts",
@@ -874,7 +984,10 @@
       "name": "Rewards: Register Reward Program",
       "cwd": "${workspaceFolder}/packages/cardpay-cli",
       "console": "integratedTerminal",
-      "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
+      "runtimeArgs": [
+        "-r",
+        "ts-node/register/transpile-only"
+      ],
       "env": {},
       "args": [
         "index.ts",
@@ -895,7 +1008,10 @@
       "name": "Rewards: Register Rewardee",
       "cwd": "${workspaceFolder}/packages/cardpay-cli",
       "console": "integratedTerminal",
-      "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
+      "runtimeArgs": [
+        "-r",
+        "ts-node/register/transpile-only"
+      ],
       "env": {},
       "args": [
         "index.ts",
@@ -915,7 +1031,10 @@
       "name": "Rewards: Register Rewardee Gas Estimate",
       "cwd": "${workspaceFolder}/packages/cardpay-cli",
       "console": "integratedTerminal",
-      "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
+      "runtimeArgs": [
+        "-r",
+        "ts-node/register/transpile-only"
+      ],
       "env": {},
       "args": [
         "index.ts",
@@ -935,7 +1054,10 @@
       "name": "Rewards: Add Reward Tokens",
       "cwd": "${workspaceFolder}/packages/cardpay-cli",
       "console": "integratedTerminal",
-      "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
+      "runtimeArgs": [
+        "-r",
+        "ts-node/register/transpile-only"
+      ],
       "env": {},
       "args": [
         "index.ts",
@@ -958,7 +1080,10 @@
       "name": "Rewards: Get Reward Pool Balance",
       "cwd": "${workspaceFolder}/packages/cardpay-cli",
       "console": "integratedTerminal",
-      "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
+      "runtimeArgs": [
+        "-r",
+        "ts-node/register/transpile-only"
+      ],
       "env": {},
       "args": [
         "index.ts",
@@ -977,7 +1102,10 @@
       "name": "Rewards: Claim Reward",
       "cwd": "${workspaceFolder}/packages/cardpay-cli",
       "console": "integratedTerminal",
-      "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
+      "runtimeArgs": [
+        "-r",
+        "ts-node/register/transpile-only"
+      ],
       "env": {},
       "args": [
         "index.ts",
@@ -998,7 +1126,10 @@
       "name": "Rewards: Claim Rewards Gas Estimate",
       "cwd": "${workspaceFolder}/packages/cardpay-cli",
       "console": "integratedTerminal",
-      "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
+      "runtimeArgs": [
+        "-r",
+        "ts-node/register/transpile-only"
+      ],
       "env": {},
       "args": [
         "index.ts",
@@ -1019,7 +1150,10 @@
       "name": "Rewards: Claim ALL Rewards",
       "cwd": "${workspaceFolder}/packages/cardpay-cli",
       "console": "integratedTerminal",
-      "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
+      "runtimeArgs": [
+        "-r",
+        "ts-node/register/transpile-only"
+      ],
       "env": {},
       "args": [
         "index.ts",
@@ -1039,7 +1173,10 @@
       "name": "Rewards: Claim ALL Rewards Gas Estimate",
       "cwd": "${workspaceFolder}/packages/cardpay-cli",
       "console": "integratedTerminal",
-      "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
+      "runtimeArgs": [
+        "-r",
+        "ts-node/register/transpile-only"
+      ],
       "env": {},
       "args": [
         "index.ts",
@@ -1060,7 +1197,10 @@
       "name": "Rewards: Check Rewards Claim Params",
       "cwd": "${workspaceFolder}/packages/cardpay-cli",
       "console": "integratedTerminal",
-      "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
+      "runtimeArgs": [
+        "-r",
+        "ts-node/register/transpile-only"
+      ],
       "env": {},
       "args": [
         "index.ts",
@@ -1080,7 +1220,10 @@
       "request": "launch",
       "name": "Rewards: Get Claimable Reward Proofs",
       "console": "integratedTerminal",
-      "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
+      "runtimeArgs": [
+        "-r",
+        "ts-node/register/transpile-only"
+      ],
       "cwd": "${workspaceRoot}/packages/cardpay-cli",
       "env": {},
       "args": [
@@ -1101,7 +1244,10 @@
       "name": "Rewards: Lock Reward Program",
       "cwd": "${workspaceFolder}/packages/cardpay-cli",
       "console": "integratedTerminal",
-      "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
+      "runtimeArgs": [
+        "-r",
+        "ts-node/register/transpile-only"
+      ],
       "env": {},
       "args": [
         "index.ts",
@@ -1122,7 +1268,10 @@
       "name": "Rewards: Set Reward Program Admin",
       "cwd": "${workspaceFolder}/packages/cardpay-cli",
       "console": "integratedTerminal",
-      "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
+      "runtimeArgs": [
+        "-r",
+        "ts-node/register/transpile-only"
+      ],
       "env": {},
       "args": [
         "index.ts",
@@ -1144,7 +1293,10 @@
       "name": "Rewards: Withdraw From Reward Safe",
       "cwd": "${workspaceFolder}/packages/cardpay-cli",
       "console": "integratedTerminal",
-      "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
+      "runtimeArgs": [
+        "-r",
+        "ts-node/register/transpile-only"
+      ],
       "env": {},
       "args": [
         "index.ts",
@@ -1154,7 +1306,7 @@
         "0x159ADe032073d930E85f95AbBAB9995110c43C71",
         "${config:cardCli.network.l2.cardToken}",
         "--amount",
-        "1", // amount (in ether units)
+        "1",
         "--network",
         "${config:cardCli.network.l2.name}",
         "--mnemonic",
@@ -1167,7 +1319,10 @@
       "name": "Rewards: Withdraw From Reward Safe Gas Estimate",
       "cwd": "${workspaceFolder}/packages/cardpay-cli",
       "console": "integratedTerminal",
-      "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
+      "runtimeArgs": [
+        "-r",
+        "ts-node/register/transpile-only"
+      ],
       "env": {},
       "args": [
         "index.ts",
@@ -1176,7 +1331,7 @@
         "0xD01C583D24200f11b7ce1b6f94D39Ed08cDa0b85",
         "0x159ADe032073d930E85f95AbBAB9995110c43C71",
         "${config:cardCli.network.l2.cardToken}",
-        "1", // amount (in ether units)
+        "1",
         "--network",
         "${config:cardCli.network.l2.name}",
         "--mnemonic",
@@ -1189,7 +1344,10 @@
       "name": "Rewards: Transfer Reward Safe",
       "cwd": "${workspaceFolder}/packages/cardpay-cli",
       "console": "integratedTerminal",
-      "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
+      "runtimeArgs": [
+        "-r",
+        "ts-node/register/transpile-only"
+      ],
       "env": {},
       "args": [
         "index.ts",
@@ -1209,7 +1367,10 @@
       "name": "Rewards: Recover Reward Tokens",
       "cwd": "${workspaceFolder}/packages/cardpay-cli",
       "console": "integratedTerminal",
-      "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
+      "runtimeArgs": [
+        "-r",
+        "ts-node/register/transpile-only"
+      ],
       "env": {},
       "args": [
         "index.ts",
@@ -1233,7 +1394,10 @@
       "name": "Rewards: View Reward Program",
       "cwd": "${workspaceFolder}/packages/cardpay-cli",
       "console": "integratedTerminal",
-      "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
+      "runtimeArgs": [
+        "-r",
+        "ts-node/register/transpile-only"
+      ],
       "env": {},
       "args": [
         "index.ts",
@@ -1252,7 +1416,10 @@
       "name": "Rewards: View Reward Programs",
       "cwd": "${workspaceFolder}/packages/cardpay-cli",
       "console": "integratedTerminal",
-      "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
+      "runtimeArgs": [
+        "-r",
+        "ts-node/register/transpile-only"
+      ],
       "env": {},
       "args": [
         "index.ts",
@@ -1270,7 +1437,10 @@
       "name": "Rewards: Add Reward Rule",
       "cwd": "${workspaceFolder}/packages/cardpay-cli",
       "console": "integratedTerminal",
-      "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
+      "runtimeArgs": [
+        "-r",
+        "ts-node/register/transpile-only"
+      ],
       "env": {},
       "args": [
         "index.ts",
@@ -1291,7 +1461,10 @@
       "name": "Rewards: Get Explainer",
       "cwd": "${workspaceFolder}/packages/cardpay-cli",
       "console": "integratedTerminal",
-      "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
+      "runtimeArgs": [
+        "-r",
+        "ts-node/register/transpile-only"
+      ],
       "env": {},
       "args": [
         "index.ts",
@@ -1312,7 +1485,10 @@
       "name": "Rewards: View Rule",
       "cwd": "${workspaceFolder}/packages/cardpay-cli",
       "console": "integratedTerminal",
-      "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
+      "runtimeArgs": [
+        "-r",
+        "ts-node/register/transpile-only"
+      ],
       "env": {},
       "args": [
         "index.ts",
@@ -1331,7 +1507,10 @@
       "name": "DID Resolver: Resolve DID",
       "cwd": "${workspaceFolder}/packages/cardpay-cli",
       "console": "integratedTerminal",
-      "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
+      "runtimeArgs": [
+        "-r",
+        "ts-node/register/transpile-only"
+      ],
       "env": {},
       "args": [
         "index.ts",
@@ -1350,7 +1529,10 @@
       "name": "DID Resolver: Resolve DID alsoKnownAs",
       "cwd": "${workspaceFolder}/packages/cardpay-cli",
       "console": "integratedTerminal",
-      "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
+      "runtimeArgs": [
+        "-r",
+        "ts-node/register/transpile-only"
+      ],
       "env": {},
       "args": [
         "index.ts",
@@ -1369,7 +1551,10 @@
       "name": "DID Resolver: Encode DID",
       "cwd": "${workspaceFolder}/packages/cardpay-cli",
       "console": "integratedTerminal",
-      "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
+      "runtimeArgs": [
+        "-r",
+        "ts-node/register/transpile-only"
+      ],
       "env": {},
       "args": [
         "index.ts",
@@ -1390,16 +1575,19 @@
       "name": "Testing: Create account",
       "cwd": "${workspaceFolder}/packages/cardpay-cli",
       "console": "integratedTerminal",
-      "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
+      "runtimeArgs": [
+        "-r",
+        "ts-node/register/transpile-only"
+      ],
       "env": {},
       "args": [
         "index.ts",
         "testing",
         "create-account",
-        "true", //create prepaid card
-        "true", //create merchant, profile
-        "true", //create reward safe
-        "true", //create depot safe
+        "true",
+        "true",
+        "true",
+        "true",
         "--bridgeTokenAddress",
         "${config:cardCli.network.l1.cardToken}",
         "--network",
@@ -1407,6 +1595,13 @@
         "--mnemonic",
         "${config:cardCli.mnemonic}"
       ]
+    },
+    {
+      "type": "node",
+      "name": "Run Script: start",
+      "request": "launch",
+      "command": "yarn run start",
+      "cwd": "${workspaceFolder}"
     }
   ]
 }

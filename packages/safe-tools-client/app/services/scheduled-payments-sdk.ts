@@ -30,12 +30,11 @@ export default class SchedulePaymentSDKService extends Service {
   @action async getCreateSafeGasEstimation(): Promise<BigNumber | undefined> {
     const scheduledPayments = await this.getSchedulePaymentsModule();
 
-    const estimatedSafeCreationGas =
-      await scheduledPayments.createSafeWithModuleAndGuardEstimation(
-        this.contractOptions
-      );
+    const estimatedGas = await scheduledPayments.estimateGas(
+      'create_safe_with_module'
+    );
 
-    return estimatedSafeCreationGas;
+    return estimatedGas.gasRangeInWei.standard;
   }
 
   @task *createSafe(): TaskGenerator<void> {

@@ -66,6 +66,9 @@ app "hub" {
         GNOSIS_GAS_STATION_URL                        = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_gnosis_gas_station_url-HQGlfM"
         ETHEREUM_GAS_STATION_URL                      = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_ethereum_gas_station_url-tVEK2G"
         POLYGON_GAS_STATION_URL                       = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_polygon_gas_station_url-j7D7GO"
+        GNOSIS_HUB_SP_MODULE_ADDRESS                  = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_gnosis_hub_sp_module_address-la1jhT"
+        ETHEREUM_HUB_SP_MODULE_ADDRESS                = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_ethereum_hub_sp_module_address-pHkmRN"
+        POLYGON_HUB_SP_MODULE_ADDRESS                 = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_polygon_hub_sp_module_address-TxJxCP"
       }
     }
 
@@ -137,6 +140,9 @@ app "hub-worker" {
         GNOSIS_GAS_STATION_URL              = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_gnosis_gas_station_url-HQGlfM"
         ETHEREUM_GAS_STATION_URL            = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_ethereum_gas_station_url-tVEK2G"
         POLYGON_GAS_STATION_URL             = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_polygon_gas_station_url-j7D7GO"
+        GNOSIS_HUB_SP_MODULE_ADDRESS        = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_gnosis_hub_sp_module_address-la1jhT"
+        ETHEREUM_HUB_SP_MODULE_ADDRESS      = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_ethereum_hub_sp_module_address-pHkmRN"
+        POLYGON_HUB_SP_MODULE_ADDRESS       = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_polygon_hub_sp_module_address-TxJxCP"
       }
     }
 
@@ -206,6 +212,9 @@ app "hub-bot" {
         GNOSIS_GAS_STATION_URL           = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_gnosis_gas_station_url-HQGlfM"
         ETHEREUM_GAS_STATION_URL         = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_ethereum_gas_station_url-tVEK2G"
         POLYGON_GAS_STATION_URL          = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_polygon_gas_station_url-j7D7GO"
+        GNOSIS_HUB_SP_MODULE_ADDRESS     = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_gnosis_hub_sp_module_address-la1jhT"
+        ETHEREUM_HUB_SP_MODULE_ADDRESS   = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_ethereum_hub_sp_module_address-pHkmRN"
+        POLYGON_HUB_SP_MODULE_ADDRESS    = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_polygon_hub_sp_module_address-TxJxCP"
       }
     }
 

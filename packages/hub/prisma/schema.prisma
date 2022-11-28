@@ -352,6 +352,34 @@ model GasPrice {
   @@map("gas_prices")
 }
 
+model GasEstimationResult {
+  id              String                           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  chainId         Int                              @map("chain_id")
+  scenario        GasEstimationResultsScenarioEnum
+  tokenAddress    String                           @default("") @map("token_address")
+  gasTokenAddress String                           @default("") @map("gas_token_address")
+  gas             Int
+  createdAt       DateTime                         @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt       DateTime                         @default(now()) @map("updated_at") @db.Timestamp(6)
+
+  @@unique([chainId, scenario, tokenAddress, gasTokenAddress], map: "gas_estimation_results_unique_chain_and_scenario")
+  @@map("gas_estimation_results")
+}
+
+model GasLimit {
+  id              String                @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  chainId         Int                   @unique @map("chain_id")
+  scenario        GasLimitsScenarioEnum
+  tokenAddress    String?               @map("token_address")
+  gasTokenAddress String?               @map("gas_token_address")
+  gas             Int
+  createdAt       DateTime              @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt       DateTime              @default(now()) @map("updated_at") @db.Timestamp(6)
+
+  @@unique([chainId, scenario, tokenAddress, gasTokenAddress], map: "unique_chain_and_scenario")
+  @@map("gas_limits")
+}
+
 enum DiscordBotsStatusEnum {
   connecting
   connected
@@ -393,4 +421,19 @@ enum ScheduledPaymentAttemptStatusEnum {
   failed
 
   @@map("scheduled_payment_attempts_status_enum")
+}
+
+enum GasEstimationResultsScenarioEnum {
+  create_safe_with_module
+  execute_one_time_payment
+  execute_recurring_payment
+
+  @@map("gas_estimation_results_scenario_enum")
+}
+
+enum GasLimitsScenarioEnum {
+  create_safe_with_module
+  execute_scheduled_payment
+
+  @@map("gas_limits_scenario_enum")
 }
