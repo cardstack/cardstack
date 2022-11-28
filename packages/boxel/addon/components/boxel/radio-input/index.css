@@ -1,7 +1,0 @@
-@import "./container/index.css";
-@import "./item/index.css";
-
-.boxel-radio-input {
-  --boxel-radio-input-option-padding: var(--boxel-sp);
-  --boxel-radio-input-option-gap: var(--boxel-sp-sm);
-}

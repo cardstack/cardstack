@@ -1,4 +1,0 @@
-.<%= cssClassName %> {
-  --<%= cssClassName %>-background-color: pink;
-  background-color: var(--<%= cssClassName %>-background-color);
-}

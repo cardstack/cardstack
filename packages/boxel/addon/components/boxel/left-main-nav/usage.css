@@ -1,6 +1,0 @@
-.left-main-nav-usage-container {
-  height: 600px;
-  padding: 10px 0;
-  display: grid;
-  grid-template-columns: repeat(auto-fill, 80px);
-}

@@ -1,8 +1,0 @@
-<div class="card-picker-option" ...attributes>
-  <span class="card-picker-option__network-label">On {{network-display-info "layer2" "fullName"}}</span>
-  <div class="card-picker-option__address">{{@card.address}}</div>
-  <div class="card-picker-option__balance">${{format-amount (spend-to-usd @card.spendFaceValue) 2}} USD</div>
-  <div class="card-picker-option__card-container">
-    <CardPay::PrepaidCardSafe class="card-picker-option__card" @safe={{@card}} />
-  </div>
-</div>

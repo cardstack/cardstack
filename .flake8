@@ -1,8 +1,0 @@
-[flake8]
-max-line-length = 88
-extend-ignore = E203, E501
-exclude =
-  */__pypackages__/
-  */.venv/
-  packages/python-did-resolver/
-  node_modules/

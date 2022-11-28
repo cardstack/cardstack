@@ -1,5 +1,0 @@
-subgraph_extractor>=0.2.2
-click
-cloudpathlib[s3]
-schedule
-pyyaml
