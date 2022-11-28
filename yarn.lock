@@ -6580,11 +6580,11 @@ css-tree@^1.1.2:
     source-map "^0.6.1"
 
 css-tree@^2.0.4:
-  version "2.1.0"
-  resolved "https://registry.yarnpkg.com/css-tree/-/css-tree-2.1.0.tgz#170e27ccf94e7c5facb183765c25898be843d1d2"
-  integrity sha512-PcysZRzToBbrpoUrZ9qfblRIRf8zbEAkU0AIpQFtgkFK0vSbzOmBCvdSAx2Zg7Xx5wiYJKUKk0NMP7kxevie/A==
+  version "2.2.1"
+  resolved "https://registry.yarnpkg.com/css-tree/-/css-tree-2.2.1.tgz#36115d382d60afd271e377f9c5f67d02bd48c032"
+  integrity sha512-OA0mILzGc1kCOCSJerOeqDxDQ4HOh+G8NbOJFOTgOCzpw7fCBubk0fEyxp8AgOL/jvLgYA/uV0cMbe43ElF1JA==
   dependencies:
-    mdn-data "2.0.27"
+    mdn-data "2.0.28"
     source-map-js "^1.0.1"
 
 cssesc@^3.0.0:
@@ -7656,7 +7656,7 @@ ember-source@^4.6.0:
     semver "^7.3.7"
     silent-error "^1.1.1"
 
-ember-template-imports@^3.4.0:
+ember-template-imports@^3.1.1, ember-template-imports@^3.4.0:
   version "3.4.0"
   resolved "https://registry.yarnpkg.com/ember-template-imports/-/ember-template-imports-3.4.0.tgz#c40757e2d41e289ce08c0fe80671000bf216e0ef"
   integrity sha512-3Cwcj3NXA129g3ZhmrQ/nYOxksFonTmB/qxyaSNTHrLBSoc93UZys47hBz13DlcfoeSCCrNt2Qpq1j890I04PQ==
@@ -8006,16 +8006,19 @@ eslint-plugin-ember@^10.2.0:
     snake-case "^3.0.3"
 
 eslint-plugin-ember@^11.0.2:
-  version "11.0.5"
-  resolved "https://registry.yarnpkg.com/eslint-plugin-ember/-/eslint-plugin-ember-11.0.5.tgz#b4a1ce7df123e6b2d18c148b9340e62d32bc6b98"
-  integrity sha512-Hc6aQ6lsdjf9xPrgO0rRY5EjTSIssUEJ4IJZU+idtexead0DX1C5hZDgG9XTKYQIYwRR3JFFC5R4h6KOPCcQRQ==
+  version "11.2.0"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-ember/-/eslint-plugin-ember-11.2.0.tgz#00f2db5662a298ada645f21d5ae201355f99764e"
+  integrity sha512-stMzVwyP7OpIJG8cTCUEWEn/QrPwVUKXVrxn88WM0eFFJ4V3003hNueYagRY1Sa9Wd/EtrSb7BMV6AC1YFRRqQ==
   dependencies:
     "@ember-data/rfc395-data" "^0.0.4"
+    "@glimmer/syntax" "^0.83.1"
     css-tree "^2.0.4"
     ember-rfc176-data "^0.3.15"
+    ember-template-imports "^3.1.1"
     eslint-utils "^3.0.0"
     estraverse "^5.2.0"
     lodash.kebabcase "^4.1.1"
+    magic-string "^0.25.7"
     requireindex "^1.2.0"
     snake-case "^3.0.3"
 
@@ -8074,9 +8077,9 @@ eslint-plugin-prettier@^4.0.0, eslint-plugin-prettier@^4.2.1:
     prettier-linter-helpers "^1.0.0"
 
 eslint-plugin-qunit@^7.3.1:
-  version "7.3.1"
-  resolved "https://registry.yarnpkg.com/eslint-plugin-qunit/-/eslint-plugin-qunit-7.3.1.tgz#cb7c0012199a8db8ff43916d07b0361e999a53b1"
-  integrity sha512-L1yutkLqCgr70ZmMAbBKPvUOUwhKryZ0RaJKOzw72Bmn8no3JNBL9hhbX2aTvfZqYM/wLXIT0nICZiGrV4xVJw==
+  version "7.3.3"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-qunit/-/eslint-plugin-qunit-7.3.3.tgz#9c166b491325c077698a238e63c9d8219e7034d0"
+  integrity sha512-rSOb4mLnvuQyKCj2kydnIim+e2c4IGjMkINuIPZxJQu0nqFxrQj6y24EXhD0NvTUeaawOaWtnjHOyvI2aQjwdA==
   dependencies:
     eslint-utils "^3.0.0"
     requireindex "^1.2.0"
@@ -11193,10 +11196,10 @@ mdn-data@2.0.14:
   resolved "https://registry.yarnpkg.com/mdn-data/-/mdn-data-2.0.14.tgz#7113fc4281917d63ce29b43446f701e68c25ba50"
   integrity sha512-dn6wd0uw5GsdswPFfsgMp5NSB0/aDe6fK94YJV/AJDYXL6HVLWBsxeq7js7Ad+mU2K9LAlwpk6kN2D5mwCPVow==
 
-mdn-data@2.0.27:
-  version "2.0.27"
-  resolved "https://registry.yarnpkg.com/mdn-data/-/mdn-data-2.0.27.tgz#1710baa7b0db8176d3b3d565ccb7915fc69525ab"
-  integrity sha512-kwqO0I0jtWr25KcfLm9pia8vLZ8qoAKhWZuZMbneJq3jjBD3gl5nZs8l8Tu3ZBlBAHVQtDur9rdDGyvtfVraHQ==
+mdn-data@2.0.28:
+  version "2.0.28"
+  resolved "https://registry.yarnpkg.com/mdn-data/-/mdn-data-2.0.28.tgz#5ec48e7bef120654539069e1ae4ddc81ca490eba"
+  integrity sha512-aylIc7Z9y4yzHYAJNuESG3hfhC+0Ibp/MAMiaOZgNv4pmEdFyfZhhhny4MNiAfWdBQ1RQ2mfDWmM1x8SvGyp8g==
 
 mdurl@^1.0.1:
   version "1.0.1"
