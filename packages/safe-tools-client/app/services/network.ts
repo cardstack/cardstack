@@ -5,6 +5,7 @@ import {
   schedulerSupportedChainsArray,
   SchedulerCapableNetworks,
 } from '@cardstack/cardpay-sdk';
+import { getOwner } from '@ember/application';
 import { action } from '@ember/object';
 import Service from '@ember/service';
 import { tracked } from '@glimmer/tracking';
@@ -15,13 +16,30 @@ interface NetworkInfo {
   symbol: Network;
 }
 const DEFAULT_NETWORK = 'mainnet' as const; // TODO: add default based on env
+const LOCALSTORAGE_NETWORK_KEY = 'cardstack-cached-network';
 
 export default class NetworkService extends Service {
-  @tracked networkInfo: NetworkInfo = {
-    chainId: getConstantByNetwork('chainId', DEFAULT_NETWORK),
-    name: getConstantByNetwork('name', DEFAULT_NETWORK),
-    symbol: DEFAULT_NETWORK,
-  };
+  storage: Storage;
+  @tracked networkInfo: NetworkInfo;
+
+  constructor(properties?: object | undefined) {
+    super(properties);
+    const owner = getOwner(this);
+    this.storage =
+      (owner.lookup('storage:local') as Storage) || window.localStorage;
+
+    const cachedNetwork = this.storage.getItem(LOCALSTORAGE_NETWORK_KEY);
+
+    const networkName: Network = cachedNetwork?.length
+      ? (cachedNetwork as Network)
+      : DEFAULT_NETWORK;
+
+    this.networkInfo = {
+      chainId: getConstantByNetwork('chainId', networkName),
+      name: getConstantByNetwork('name', networkName),
+      symbol: networkName,
+    };
+  }
 
   get supportedList() {
     return schedulerSupportedChainsArray
@@ -32,9 +50,9 @@ export default class NetworkService extends Service {
       }))
       .filter(({ name }) => name !== this.name);
   }
-
   @action onSelect(networkInfo: NetworkInfo) {
     this.networkInfo = networkInfo;
+    this.storage.setItem(LOCALSTORAGE_NETWORK_KEY, networkInfo.symbol);
   }
 
   @action onChainChanged(chainId: number) {
