@@ -26,6 +26,7 @@ declare module '@ember/test-helpers' {
   interface TestContext {
     mockWalletConnect: TestingUtils;
     mockMetaMask: TestingUtils;
+    mockLocalStorage: MockLocalStorage;
   }
 }
 
@@ -33,7 +34,8 @@ function setupApplicationTest(hooks: NestedHooks, options?: SetupTestOptions) {
   upstreamSetupApplicationTest(hooks, options);
 
   hooks.beforeEach(function (this: TestContext) {
-    this.owner.register('storage:local', new MockLocalStorage(), {
+    this.mockLocalStorage ||= new MockLocalStorage();
+    this.owner.register('storage:local', this.mockLocalStorage, {
       instantiate: false,
     });
 

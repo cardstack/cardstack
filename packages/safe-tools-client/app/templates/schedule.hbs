@@ -31,7 +31,7 @@
             @options={{this.network.supportedList}}
             as |network itemCssClass|
           >
-          <div class={{itemCssClass}}>{{network.name}}</div>
+          <div class={{itemCssClass}} data-test-selected-network>{{network.name}}</div>
         </Boxel::Select>
     </cp.Item>
     <cp.Item @title='Safe' @icon='safe' @isActive={{this.wallet.isConnected}}>

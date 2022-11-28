@@ -1,5 +1,5 @@
 import { truncateMiddle } from '@cardstack/ember-shared/helpers/truncate-middle';
-import { click, settled, visit } from '@ember/test-helpers';
+import { click, settled, TestContext, visit } from '@ember/test-helpers';
 import percySnapshot from '@percy/ember';
 import { module, test } from 'qunit';
 
@@ -71,6 +71,23 @@ module('Acceptance | wallet connection', function (hooks) {
       assert
         .dom('.safe-tools__dashboard-schedule-control-panel-wallet-address')
         .hasText(truncateMiddle([TEST_ACCOUNT_2]));
+    });
+  });
+
+  module('Remembering the selected chain', function () {
+    test('Defaults to mainnet', async function (assert) {
+      await visit('/schedule');
+      assert.dom('[data-test-selected-network]').hasText('Ethereum Mainnet');
+    });
+    module('with localstorage', function (hooks) {
+      hooks.beforeEach(function (this: TestContext) {
+        this.mockLocalStorage.setItem('cardstack-cached-network', 'goerli');
+      });
+      test('Uses localstorage value for other', async function (assert) {
+        await visit('/schedule');
+
+        assert.dom('[data-test-selected-network]').hasText('Goerli');
+      });
     });
   });
 });
