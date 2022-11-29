@@ -46,7 +46,7 @@ import {
 import BN from 'bn.js';
 import { Interface } from 'ethers/lib/utils';
 import JsonRpcProvider from '../providers/json-rpc-provider';
-import { getConstant, getConstantByNetwork, SchedulerCapableNetworks } from './constants';
+import { getConstant, getConstantByNetwork } from './constants';
 import { getGasPricesInNativeWei, getNativeWeiInToken } from './utils/conversions';
 
 export interface EnableModuleAndGuardResult {
@@ -1296,10 +1296,9 @@ export default class ScheduledPaymentModule {
       fast: gas.mul(String(gasStationResponse.fast)),
     };
 
-    let tokenList = getConstantByNetwork('tokenList', network as SchedulerCapableNetworks)?.tokens;
-    let tokenUSD = tokenList.find((t) => t.symbol === 'USDT');
-    if (!tokenUSD) throw Error('USD token not found');
-    let priceWeiInUSD = String(await getNativeWeiInToken(this.ethersProvider, tokenUSD?.address));
+    let usdcToken = await getAddress('usdcToken', this.ethersProvider);
+    if (!usdcToken) throw Error('USDC token not found');
+    let priceWeiInUSD = String(await getNativeWeiInToken(this.ethersProvider, usdcToken));
     let gasRangeInUSD = {
       slow: gasRangeInWei.slow.mul(priceWeiInUSD),
       standard: gasRangeInWei.standard.mul(priceWeiInUSD),
