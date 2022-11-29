@@ -46,14 +46,7 @@
     }
   },
   "glint": {
-    "environment": ["ember-loose", "ember-template-imports"],
-    "transform": {
-      "include": [
-        "../boxel/addon/components/boxel/**/*",
-        "app/components/profile/**/*",
-        "app/components/profile-logo/**/*",
-      ]
-    }
+    "environment": ["ember-loose", "ember-template-imports"]
   },
   "include": [
     "app/**/*",
