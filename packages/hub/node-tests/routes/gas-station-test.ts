@@ -43,7 +43,18 @@ describe('GET /api/gas-station', async function () {
       .set('Accept', 'application/vnd.api+json')
       .set('Content-Type', 'application/vnd.api+json')
       .expect(200)
-      .expect(result)
+      .expect({
+        data: {
+          id: result.id,
+          type: 'gas-prices',
+          attributes: {
+            'chain-id': result.chainId,
+            slow: result.slow,
+            standard: result.standard,
+            fast: result.fast,
+          },
+        },
+      })
       .expect('Content-Type', 'application/vnd.api+json');
   });
 
