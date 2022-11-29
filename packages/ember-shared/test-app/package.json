@@ -12,9 +12,10 @@
     "@embroider/test-setup": "^1.8.3",
     "@glimmer/component": "^1.1.2",
     "@glimmer/tracking": "^1.1.2",
-    "@glint/core": "^0.9.7",
-    "@glint/environment-ember-loose": "^0.9.7",
-    "@glint/environment-ember-template-imports": "^0.9.7",
+    "@glint/core": "1.0.0-beta.1",
+    "@glint/environment-ember-loose": "1.0.0-beta.1",
+    "@glint/environment-ember-template-imports": "1.0.0-beta.1",
+    "@glint/template": "1.0.0-beta.1",
     "@types/ember": "^4.0.0",
     "@types/ember__application": "^4.0.0",
     "@types/ember__array": "^4.0.0",
@@ -70,7 +71,7 @@
     "prettier": "^2.7.1",
     "qunit": "^2.19.3",
     "qunit-dom": "^2.0.0",
-    "typescript": "^4.7.4",
+    "typescript": "^4.9.3",
     "webpack": "^5.74.0"
   },
   "scripts": {

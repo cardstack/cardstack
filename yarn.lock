@@ -4382,57 +4382,34 @@
     "@glimmer/interfaces" "^0.42.2"
     "@glimmer/util" "^0.42.2"
 
-"@glint/config@^0.9.7":
-  version "0.9.7"
-  resolved "https://registry.yarnpkg.com/@glint/config/-/config-0.9.7.tgz#43077e9cd2743d3bb66f6c4670681c49644ac139"
-  integrity sha512-XkWIZ3fuOlcofUJUaJmRS57mVVNi+Af2HtrZkBXEOCh4+BNz2wclxv2WKvkhmtvLhEUOhHb5eU3gwI58SuwgXQ==
+"@glint/core@1.0.0-beta.1":
+  version "1.0.0-beta.1"
+  resolved "https://registry.yarnpkg.com/@glint/core/-/core-1.0.0-beta.1.tgz#1618113d8162912a99dd8e8836e6c50aa68c522a"
+  integrity sha512-J3c5xvAw5IShwqD6h3LFLHKT70D39tS3R6w0RaSIyrWUEx2VDVOMAM9RnggT3RvuGAO5ntYxFZso9CaNE5iMYA==
   dependencies:
+    "@glimmer/syntax" "^0.84.2"
     escape-string-regexp "^4.0.0"
-    minimatch "^3.0.4"
-    resolve "^1.17.0"
     silent-error "^1.1.1"
-
-"@glint/core@^0.9.7":
-  version "0.9.7"
-  resolved "https://registry.yarnpkg.com/@glint/core/-/core-0.9.7.tgz#887dbdfa10d89702549de36197cc2eb0783a5c86"
-  integrity sha512-1YLHNRnuYI1dDUKWq/ue4JqiBt6TVR8e7VQJWy37CKB0tiBhWw/FPvr7/S7XbUxCt6KHO0Kl0x/eqLunu3WiQw==
-  dependencies:
-    "@glint/config" "^0.9.7"
-    "@glint/transform" "^0.9.7"
-    resolve "^1.17.0"
     uuid "^8.3.2"
     vscode-languageserver "^8.0.1"
     vscode-languageserver-textdocument "^1.0.5"
     vscode-uri "^3.0.2"
     yargs "^17.5.1"
 
-"@glint/environment-ember-loose@^0.9.7":
-  version "0.9.7"
-  resolved "https://registry.yarnpkg.com/@glint/environment-ember-loose/-/environment-ember-loose-0.9.7.tgz#8d27e93d6bd3afd59c46acad27a2c3130045dee0"
-  integrity sha512-MlCGZtB1Clp4vQWIm2APSnCm7nL8wVhFMOhVy2qzpV0nfLyg3pcN9CQHNpfdJvCydBB72cA4/ahPj7VEFL6xsg==
-  dependencies:
-    "@glint/config" "^0.9.7"
-    "@glint/template" "^0.9.7"
+"@glint/environment-ember-loose@1.0.0-beta.1":
+  version "1.0.0-beta.1"
+  resolved "https://registry.yarnpkg.com/@glint/environment-ember-loose/-/environment-ember-loose-1.0.0-beta.1.tgz#9587f23049f347eeda25f101f90d632fb8ee2b41"
+  integrity sha512-S7Rs03GJp/nDh1t0tI78HIIJGOt2yUYS6Gd+EHroYO3pi69aNENcZmCjFbqQPTAoEOdE7jTaAF4iM91cUQHlEw==
 
-"@glint/environment-ember-template-imports@^0.9.7":
-  version "0.9.7"
-  resolved "https://registry.yarnpkg.com/@glint/environment-ember-template-imports/-/environment-ember-template-imports-0.9.7.tgz#e277766913bfb1646e6c3c83d773622796da9ceb"
-  integrity sha512-vj+A0g/ucdxq3GUOvlE6GIzM20GtIxV3yK+2q5/GI567zuu6LQwFW2M5b3Z6Xa+uzqVXJHPFysDwKWoV+1lr1g==
-  dependencies:
-    "@glint/template" "^0.9.7"
+"@glint/environment-ember-template-imports@1.0.0-beta.1":
+  version "1.0.0-beta.1"
+  resolved "https://registry.yarnpkg.com/@glint/environment-ember-template-imports/-/environment-ember-template-imports-1.0.0-beta.1.tgz#66e8c632a108de2212f9cf8afee6075836902dd4"
+  integrity sha512-NsNLd6g91pBMVz+nVQWkH34hBrMgD/hGWmGJJuTFL9LRnXJuqKYK8kagxYOfSVvQPv4TB/sG/z6E+QRhJxeKtQ==
 
-"@glint/template@^0.9.7":
-  version "0.9.7"
-  resolved "https://registry.yarnpkg.com/@glint/template/-/template-0.9.7.tgz#8736f357482841962bc66e75831f189f33677165"
-  integrity sha512-MCp8GxQDIbH8ZzfNxHhVqCSKlydBgQfBEwJLDpN81lgFRCldSDPueIbk8sz3EhpGiZJVdNQbpGeYIDsUXe1ocg==
-
-"@glint/transform@^0.9.7":
-  version "0.9.7"
-  resolved "https://registry.yarnpkg.com/@glint/transform/-/transform-0.9.7.tgz#01c60249c1fe6663955d2acd2cf7625a551fb3f3"
-  integrity sha512-vd0th+Zo4cirYepASpC0fE0ZCqAcI9Y6qHYE0xi4+MY05bFRxBr7Q9ggDoWk+slynTyUrVgzCCeazAYOlZsYcg==
-  dependencies:
-    "@glimmer/syntax" "^0.84.2"
-    "@glint/config" "^0.9.7"
+"@glint/template@1.0.0-beta.1":
+  version "1.0.0-beta.1"
+  resolved "https://registry.yarnpkg.com/@glint/template/-/template-1.0.0-beta.1.tgz#2474d5cde637c8742f3da39c53ccffae03bcb997"
+  integrity sha512-JQboeRc9BCuYu2Avle592L+gWxKvJggwxkNKxpHlOeg9Xng5f/sMvG6yWssC8J4fURJmH5tvF7e/BgdUAMegeg==
 
 "@google-cloud/common@^3.8.1":
   version "3.8.1"
@@ -31671,10 +31648,15 @@ typescript-memoize@^1.0.0, typescript-memoize@^1.0.0-alpha.3, typescript-memoize
   resolved "https://registry.yarnpkg.com/typescript-memoize/-/typescript-memoize-1.0.1.tgz#0a8199aa28f6fe18517f6e9308ef7bfbe9a98d59"
   integrity sha512-oJNge1qUrOK37d5Y6Ly2txKeuelYVsFtNF6U9kXIN7juudcQaHJQg2MxLOy0CqtkW65rVDYuTCOjnSIVPd8z3w==
 
-typescript@^4.1.5, typescript@^4.2.4, typescript@^4.7.4:
+typescript@^4.1.5, typescript@^4.2.4:
   version "4.7.4"
   resolved "https://registry.yarnpkg.com/typescript/-/typescript-4.7.4.tgz#1a88596d1cf47d59507a1bcdfb5b9dfe4d488235"
   integrity sha512-C0WQT0gezHuw6AdY1M2jxUO83Rjf0HP7Sk1DtXj6j1EwkQNZrHAg2XPWlq62oqEhYvONq5pkC2Y9oPljWToLmQ==
+
+typescript@^4.9.3:
+  version "4.9.3"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-4.9.3.tgz#3aea307c1746b8c384435d8ac36b8a2e580d85db"
+  integrity sha512-CIfGzTelbKNEnLpLdGFgdyKhG23CKdKgQPOBc+OUNrkJ2vr+KSzsSV5kq5iWhEQbok+quxgGzrAtGWCyU7tHnA==
 
 ua-parser-js@^0.7.28:
   version "0.7.28"
