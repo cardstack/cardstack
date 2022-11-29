@@ -4,7 +4,6 @@ import BoxelCalendar, { Day } from '../../calendar';
 import BoxelDropdownTrigger from '../../dropdown/trigger';
 import registerElement from '@cardstack/boxel/modifiers/register-element';
 import set from 'ember-set-helper/helpers/set';
-//@ts-expect-error glint does not think this is consumed-but it is consumed in the template https://github.com/typed-ember/glint/issues/374
 import { fn, array, hash } from '@ember/helper';
 import { default as Owner } from '@ember/owner';
 

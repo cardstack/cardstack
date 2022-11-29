@@ -3,7 +3,6 @@ import { tracked } from '@glimmer/tracking';
 import FreestyleUsage from 'ember-freestyle/components/freestyle/usage';
 import BoxelCardContainer from './index';
 import BoxelHeader from '../header';
-//@ts-expect-error glint does not think array is consumed-but it is consumed in the template https://github.com/typed-ember/glint/issues/374
 import { array, fn } from '@ember/helper';
 
 export default class CardContainerUsage extends Component {

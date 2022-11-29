@@ -2,7 +2,6 @@ import Component from '@glimmer/component';
 import FreestyleUsage from 'ember-freestyle/components/freestyle/usage';
 import BoxelRadioInput from './index';
 import cssVar from '@cardstack/boxel/helpers/css-var';
-//@ts-expect-error glint does not think this is consumed-but it is consumed in the template https://github.com/typed-ember/glint/issues/374
 import { fn, array, hash } from '@ember/helper';
 
 import { tracked } from '@glimmer/tracking';

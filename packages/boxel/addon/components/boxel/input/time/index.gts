@@ -5,7 +5,6 @@ import BoxelMenu from '../../menu';
 import menuItem, { menuItemFunc, MenuItem } from '@cardstack/boxel/helpers/menu-item'
 import registerElement from '@cardstack/boxel/modifiers/register-element';
 import { action } from '@ember/object';
-//@ts-expect-error glint does not think this is consumed-but it is consumed in the template https://github.com/typed-ember/glint/issues/374
 import { fn, array, hash } from '@ember/helper';
 import onKey from 'ember-keyboard/helpers/on-key';
 import map from 'ember-composable-helpers/helpers/map';

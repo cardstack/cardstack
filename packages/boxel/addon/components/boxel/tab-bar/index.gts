@@ -1,6 +1,5 @@
 import Component from '@glimmer/component';
 import { type EmptyObject } from '@ember/component/helper';
-//@ts-expect-error glint does not think this is consumed-but it is consumed in the template https://github.com/typed-ember/glint/issues/374
 import { hash } from '@ember/helper';
 import { LinkTo } from '@ember/routing';
 import { MenuItem } from '@cardstack/boxel/helpers/menu-item';
