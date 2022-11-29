@@ -14,13 +14,14 @@ import { fn } from '@ember/helper';
 import { on } from '@ember/modifier';
 import { svgJar } from '@cardstack/boxel/utils/svg-jar';
 import eq from 'ember-truth-helpers/helpers/eq';
+import not from 'ember-truth-helpers/helpers/not';
 import './index.css';
 
 interface Signature {
   Element: HTMLElement;
   Args: {
     paymentTypeOptions: { id: string, text: string }[];
-    selectedPaymentType: string | undefined;
+    selectedPaymentType: 'one-time' | 'monthly' | undefined;
     onSelectPaymentType: (paymentTypeId: string) => void;
     paymentDate: Date | undefined;
     onSetPaymentDate: (day: Day) => void;
@@ -45,6 +46,8 @@ interface Signature {
     maxGasFee: string | undefined;
     onUpdateMaxGasFee: (val: string) => void;
     onSchedulePayment: () => void;
+    isSubmitEnabled: boolean;
+    onUpdateRecipientAddress: (val: string) => void;
   }
 }
 
@@ -52,6 +55,7 @@ export default class SchedulePaymentFormActionCardUI extends Component<Signature
   <template>
     <BoxelActionContainer
       class="schedule-payment-form-action-card"
+      data-test-schedule-payment-form-action-card
       ...attributes
     as |Section ActionChin|>
       <Section @title="Schedule Payment">
@@ -120,6 +124,7 @@ export default class SchedulePaymentFormActionCardUI extends Component<Signature
             @value={{@recipientAddress}}
             @invalid={{@isRecipientAddressInvalid}}
             @errorMessage={{@recipientAddressErrorMessage}}
+            @onInput={{@onUpdateRecipientAddress}}
           />
         </BoxelField>
         <BoxelField @label="Amount">
@@ -186,6 +191,8 @@ export default class SchedulePaymentFormActionCardUI extends Component<Signature
         <ActionChin @state='default'>
           <:default as |ac|>
             <ac.ActionButton
+              @disabled={{not @isSubmitEnabled}}
+              data-test-schedule-payment-form-submit-button
               {{on 'click' @onSchedulePayment}}
             >
               Schedule Payment

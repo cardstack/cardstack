@@ -8,23 +8,27 @@ import { tracked } from '@glimmer/tracking';
 import { Day } from '@cardstack/boxel/components/boxel/input/date';
 import { Time } from '@cardstack/boxel/components/boxel/input/time';
 import withTokenIcons from '../../helpers/with-token-icons';
+import SchedulePaymentFormValidator, { ValidatableForm } from './validator';
 
 interface Signature {
   Element: HTMLElement;
 }
 
-export default class SchedulePaymentFormActionCard extends Component<Signature> {
+export default class SchedulePaymentFormActionCard extends Component<Signature> implements ValidatableForm {
   @service declare tokens: TokensService;
+  validator = new SchedulePaymentFormValidator(this);
+
   get paymentTypeOptions() {
     return [
       { id: 'one-time', text: 'One-time payment' },
       { id: 'monthly', text: 'Monthly recurring' },
     ];
   }
-  @tracked selectedPaymentType: string | undefined;
+  @tracked selectedPaymentType: 'one-time' | 'monthly' | undefined;
   @action onSelectPaymentType(paymentTypeId: string) {
     if (paymentTypeId === 'one-time' && !this.paymentDate) {
       this.paymentDate = new Date();
+      this.selectedPaymentType = paymentTypeId;
     }
     if (paymentTypeId === 'monthly') {
       if (!this.monthlyUntil) {
@@ -34,8 +38,8 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
       if (!this.paymentDayOfMonth) {
         this.paymentDayOfMonth = 1;
       }
+      this.selectedPaymentType = paymentTypeId;
     }
-    this.selectedPaymentType = paymentTypeId;
   }
 
   @tracked paymentDate: Date | undefined;
@@ -63,12 +67,11 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
   }
 
   @tracked recipientAddress = '';
-  @tracked isRecipientAddressInvalid = false;
-  @tracked recipientAddressErrorMessage = '';
+  @action onUpdateRecipientAddress(val: string) {
+    this.recipientAddress = val;
+  }
 
   @tracked paymentAmount: string = '';
-  @tracked isPaymentAmountInvalid = false;
-  @tracked paymentTokenErrorMessage = '';
 
   get paymentTokens(): SelectableToken[] {
     return this.tokens.transactionTokens;
@@ -92,6 +95,10 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
     this.maxGasFee = val;
   }
 
+  get isValid(): boolean {
+    return this.validator.isValid;
+  }
+
   @action
   schedulePayment() {
     console.log('TODO...');
@@ -110,12 +117,13 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
       @monthlyUntil={{this.monthlyUntil}}
       @onSetMonthlyUntil={{this.onSetMonthlyUntil}}
       @recipientAddress={{this.recipientAddress}}
-      @isRecipientAddressInvalid={{this.isRecipientAddressInvalid}}
-      @recipientAddressErrorMessage={{this.recipientAddressErrorMessage}}
+      @isRecipientAddressInvalid={{this.validator.isRecipientAddressInvalid}}
+      @recipientAddressErrorMessage={{this.validator.recipientAddressErrorMessage}}
+      @onUpdateRecipientAddress={{this.onUpdateRecipientAddress}}
       @paymentAmount={{this.paymentAmount}}
       @onUpdatePaymentAmount={{this.onUpdatePaymentAmount}}
-      @isPaymentAmountInvalid={{this.isPaymentAmountInvalid}}
-      @paymentTokenErrorMessage={{this.paymentTokenErrorMessage}}
+      @isPaymentAmountInvalid={{this.validator.isPaymentAmountInvalid}}
+      @paymentTokenErrorMessage={{this.validator.paymentTokenErrorMessage}}
       @paymentToken={{this.paymentToken}}
       @paymentTokens={{this.paymentTokens}}
       @onUpdatePaymentToken={{this.onUpdatePaymentToken}}
@@ -125,6 +133,7 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
       @maxGasFee={{this.maxGasFee}}
       @onUpdateMaxGasFee={{this.onUpdateMaxGasFee}}
       @onSchedulePayment={{this.schedulePayment}}
+      @isSubmitEnabled={{this.isValid}}
     />
   </template>
 }
