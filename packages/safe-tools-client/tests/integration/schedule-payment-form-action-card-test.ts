@@ -6,6 +6,11 @@ import hbs from 'htmlbars-inline-precompile';
 import { module, test } from 'qunit';
 
 import { exampleGasTokens } from '../support/tokens';
+import {
+  chooseTime,
+  chooseTomorrow,
+  fillInSchedulePaymentFormWithValidInfo,
+} from '../support/ui-test-helpers';
 
 const EXAMPLE_RECIPIENT = '0xb794f5ea0ba39494ce839613fffba74279579268';
 
@@ -59,19 +64,9 @@ module(
         .dom('[data-test-schedule-payment-form-submit-button]')
         .isDisabled();
 
-      // choose payment date of tomorrow
-      await click('[data-test-boxel-input-date-trigger]');
-      await keyDown('ArrowRight');
-      await keyDown('Enter');
-      await keyDown('Escape');
+      await chooseTomorrow('[data-test-boxel-input-date-trigger]');
 
-      // choose payment time of 9AM
-      await click('[data-test-boxel-input-time-trigger]');
-      await keyDown('9');
-      await keyDown(':');
-      await keyDown('0');
-      await keyDown('A');
-      await keyDown('Enter');
+      await chooseTime('[data-test-boxel-input-time-trigger]', 9, 0, 'am');
 
       assert
         .dom('[data-test-schedule-payment-form-submit-button]')

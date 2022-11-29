@@ -1,12 +1,9 @@
-import { click, fillIn, visit } from '@ember/test-helpers';
-import { keyDown } from 'ember-keyboard/test-support/test-helpers';
-import { selectChoose } from 'ember-power-select/test-support';
+import { click, visit } from '@ember/test-helpers';
 import { module, test } from 'qunit';
 
 import { FAKE_WALLET_CONNECT_ACCOUNT, setupApplicationTest } from '../helpers';
 import { exampleGasTokens } from '../support/tokens';
-
-const EXAMPLE_RECIPIENT = '0xb794f5ea0ba39494ce839613fffba74279579268';
+import { fillInSchedulePaymentFormWithValidInfo } from '../support/ui-test-helpers';
 
 module('Acceptance | scheduling', function (hooks) {
   setupApplicationTest(hooks);
@@ -23,36 +20,7 @@ module('Acceptance | scheduling', function (hooks) {
       tokensService.stubGasTokens(exampleGasTokens);
 
       await visit('/schedule');
-      await click('[data-test-payment-type="one-time"]');
-
-      // choose payment date of tomorrow
-      await click('[data-test-boxel-input-date-trigger]');
-      await keyDown('ArrowRight');
-      await keyDown('Enter');
-      await keyDown('Escape');
-
-      // choose payment time of 9AM
-      await click('[data-test-boxel-input-time-trigger]');
-      await keyDown('9');
-      await keyDown(':');
-      await keyDown('0');
-      await keyDown('A');
-      await keyDown('Enter');
-
-      await fillIn('[data-test-recipient-address-input]', EXAMPLE_RECIPIENT);
-      await fillIn('[data-test-amount-input] input', '15.0');
-      // Choose USDC for the transaction token
-      await selectChoose(
-        '[data-test-amount-input] [data-test-boxel-input-group-select-accessory-trigger]',
-        'USDC'
-      );
-
-      // Choose USDC for the gas token
-      await selectChoose('[data-test-gas-token-select]', 'USDC');
-
-      await click(
-        '[data-test-max-gas-toggle] [data-toggle-group-option="normal"]'
-      );
+      await fillInSchedulePaymentFormWithValidInfo();
 
       // click "Schedule Payment" button
       await click(
