@@ -57,9 +57,9 @@ export async function getGasPricesInNativeWei(chainId: number): Promise<GasPrice
   let gasPriceJson = await gasStationResponse.json();
 
   return {
-    slow: new BN(gasPriceJson.slow),
-    standard: new BN(gasPriceJson.standard),
-    fast: new BN(gasPriceJson.fast),
+    slow: new BN(gasPriceJson.data.attributes.slow),
+    standard: new BN(gasPriceJson.data.attributes.standard),
+    fast: new BN(gasPriceJson.data.attributes.fast),
   };
 }
 

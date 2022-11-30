@@ -1,11 +1,11 @@
 import { truncateMiddle } from '@cardstack/ember-shared/helpers/truncate-middle';
-import { click, visit } from '@ember/test-helpers';
+import { click, settled, TestContext, visit } from '@ember/test-helpers';
 import percySnapshot from '@percy/ember';
 import { module, test } from 'qunit';
 
 import {
-  FAKE_META_MASK_ACCOUNT,
-  FAKE_WALLET_CONNECT_ACCOUNT,
+  TEST_ACCOUNT_1,
+  TEST_ACCOUNT_2,
   setupApplicationTest,
 } from '../helpers';
 
@@ -26,9 +26,28 @@ module('Acceptance | wallet connection', function (hooks) {
 
       assert
         .dom('.safe-tools__dashboard-schedule-control-panel-wallet-address')
-        .hasText(truncateMiddle([FAKE_META_MASK_ACCOUNT]));
+        .hasText(truncateMiddle([TEST_ACCOUNT_1]));
 
       await percySnapshot(assert);
+
+      await this.mockMetaMask.mockAccountsChanged([TEST_ACCOUNT_2]);
+
+      await settled();
+      assert
+        .dom('.safe-tools__dashboard-schedule-control-panel-wallet-address')
+        .hasText(truncateMiddle([TEST_ACCOUNT_2]));
+      assert
+        .dom('.safe-tools__dashboard-schedule-control-panel-wallet-address')
+        .doesNotContainText(truncateMiddle([TEST_ACCOUNT_1]));
+
+      await click('[data-test-disconnect-button]');
+
+      assert
+        .dom('.safe-tools__dashboard-schedule-control-panel-wallet-address')
+        .doesNotExist();
+
+      assert.dom('[data-test-connect-button]').exists();
+      assert.dom('[data-test-disconnect-button]').doesNotExist();
     });
   });
 
@@ -45,13 +64,30 @@ module('Acceptance | wallet connection', function (hooks) {
 
       await click('[data-test-mainnet-connect-button]');
 
-      this.mockWalletConnect.mockConnectedWallet([FAKE_WALLET_CONNECT_ACCOUNT]);
-      this.mockWalletConnect.mockAccountsChanged([FAKE_WALLET_CONNECT_ACCOUNT]);
+      this.mockWalletConnect.mockConnectedWallet([TEST_ACCOUNT_2]);
+      this.mockWalletConnect.mockAccountsChanged([TEST_ACCOUNT_2]);
 
       await click('.network-connect-modal__close-button'); // FIXME: I don't think this click should be necessary
       assert
         .dom('.safe-tools__dashboard-schedule-control-panel-wallet-address')
-        .hasText(truncateMiddle([FAKE_WALLET_CONNECT_ACCOUNT]));
+        .hasText(truncateMiddle([TEST_ACCOUNT_2]));
+    });
+  });
+
+  module('Remembering the selected chain', function () {
+    test('Defaults to mainnet', async function (assert) {
+      await visit('/schedule');
+      assert.dom('[data-test-selected-network]').hasText('Ethereum Mainnet');
+    });
+    module('with localstorage', function (hooks) {
+      hooks.beforeEach(function (this: TestContext) {
+        this.mockLocalStorage.setItem('cardstack-cached-network', 'goerli');
+      });
+      test('Uses localstorage value for other', async function (assert) {
+        await visit('/schedule');
+
+        assert.dom('[data-test-selected-network]').hasText('Goerli');
+      });
     });
   });
 });

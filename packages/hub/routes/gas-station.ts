@@ -5,6 +5,7 @@ import { NotFound } from '@cardstack/core/src/utils/errors';
 
 export default class GasStationRoute {
   gasStationService = inject('gas-station-service', { as: 'gasStationService' });
+  gasPriceSerializer = inject('gas-price-serializer', { as: 'gasPriceSerializer' });
 
   constructor() {
     autoBind(this);
@@ -15,7 +16,7 @@ export default class GasStationRoute {
       let chainId = Number(ctx.params.chain_id);
       let gasPrice = await this.gasStationService.getGasPriceByChainId(chainId);
       ctx.status = 200;
-      ctx.body = gasPrice;
+      ctx.body = this.gasPriceSerializer.serialize(gasPrice);
       ctx.type = 'application/vnd.api+json';
     } catch (error) {
       if (error instanceof NotFound) {
