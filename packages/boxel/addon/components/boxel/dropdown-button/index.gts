@@ -48,11 +48,13 @@ const DropdownButton: TemplateOnlyComponent<Signature> = <template>
           data-test-boxel-dropdown-button
           ...attributes
         >
-          {{svgJar
-            @icon
-            width=(or @iconSize 16)
-            height=(or @iconSize 16)
-          }}
+          {{#if @icon}}
+            {{svgJar
+              @icon
+              width=(or @iconSize 16)
+              height=(or @iconSize 16)
+            }}
+          {{/if}}
         </button>
       </:trigger>
       <:content as |dd|>
