@@ -1,5 +1,5 @@
 import Component from '@glimmer/component';
-import { fn, array } from '@ember/helper';
+import { fn } from '@ember/helper';
 import FreestyleUsage from 'ember-freestyle/components/freestyle/usage';
 
 import BoxelDropdownTrigger from './index';

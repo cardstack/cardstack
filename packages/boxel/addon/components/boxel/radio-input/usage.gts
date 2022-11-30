@@ -2,7 +2,7 @@ import Component from '@glimmer/component';
 import FreestyleUsage from 'ember-freestyle/components/freestyle/usage';
 import BoxelRadioInput from './index';
 import cssVar from '@cardstack/boxel/helpers/css-var';
-import { fn, array, hash } from '@ember/helper';
+import { fn, array } from '@ember/helper';
 
 import { tracked } from '@glimmer/tracking';
 import { action } from '@ember/object';

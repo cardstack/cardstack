@@ -4,7 +4,7 @@ import BoxelCalendar, { Day } from '../../calendar';
 import BoxelDropdownTrigger from '../../dropdown/trigger';
 import registerElement from '@cardstack/boxel/modifiers/register-element';
 import set from 'ember-set-helper/helpers/set';
-import { fn, array, hash } from '@ember/helper';
+import { fn } from '@ember/helper';
 import { default as Owner } from '@ember/owner';
 
 import '@cardstack/boxel/styles/global.css';
