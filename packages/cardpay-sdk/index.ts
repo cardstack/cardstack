@@ -36,6 +36,7 @@ export {
   waitForSubgraphIndex,
   waitUntilOneBlockAfterTxnMined,
 } from './sdk/utils/general-utils';
+export { getTokenBalancesForSafe } from './sdk/utils/safe-utils';
 export { signTypedData } from './sdk/utils/signing-utils';
 export * from './sdk/currency-utils';
 export * from './sdk/currencies';

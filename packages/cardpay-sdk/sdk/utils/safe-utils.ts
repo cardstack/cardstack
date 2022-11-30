@@ -17,6 +17,7 @@ import { Contract, ethers, utils } from 'ethers';
 import { AddressZero } from '@ethersproject/constants';
 import { Interface, LogDescription } from 'ethers/lib/utils';
 import JsonRpcProvider from '../../providers/json-rpc-provider';
+import { ERC20ABI } from '../..';
 
 export interface EventABI {
   topic: string;
@@ -475,3 +476,19 @@ export function gasInToken(estimate: Estimate): BN {
 // The number is based off empirical observation of sentry errors; the baseGas difference is usually 12
 // https://github.com/cardstack/card-protocol-relay-service/blob/master/safe.py#L303-L316
 export const baseGasBuffer: BN = new BN('30');
+
+export async function getTokenBalancesForSafe(
+  provider: JsonRpcProvider,
+  tokenAddresses: string[],
+  safeAddress: string
+) {
+  return await Promise.all(
+    tokenAddresses.map(async (tokenAddress: string) => {
+      let token = new Contract(tokenAddress, ERC20ABI, provider);
+      let symbol = await token.symbol();
+      let balance = await token.callStatic.balanceOf(safeAddress);
+      let decimals = await token.decimals();
+      return { tokenAddress, symbol, balance, decimals };
+    })
+  );
+}
