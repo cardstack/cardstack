@@ -9,7 +9,6 @@ import {
   chooseTime,
   chooseTomorrow,
   EXAMPLE_RECIPIENT,
-  fillInSchedulePaymentFormWithValidInfo,
 } from '../support/ui-test-helpers';
 
 module(

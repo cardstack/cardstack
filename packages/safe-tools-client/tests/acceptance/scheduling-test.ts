@@ -1,9 +1,12 @@
 import { click, visit } from '@ember/test-helpers';
 import { module, test } from 'qunit';
 
-import { FAKE_WALLET_CONNECT_ACCOUNT, setupApplicationTest } from '../helpers';
+import { setupApplicationTest } from '../helpers';
 import { exampleGasTokens } from '../support/tokens';
 import { fillInSchedulePaymentFormWithValidInfo } from '../support/ui-test-helpers';
+
+const FAKE_WALLET_CONNECT_ACCOUNT =
+  '0x57b8a319bea4438092eeb4e27d9048dbb844e234';
 
 module('Acceptance | scheduling', function (hooks) {
   setupApplicationTest(hooks);
