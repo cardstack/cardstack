@@ -11,6 +11,7 @@ import { taskFor } from 'ember-concurrency-ts';
 
 import BoxelButton from '@cardstack/boxel/components/boxel/button';
 import WalletService from '@cardstack/safe-tools-client/services/wallet';
+import SafesService from '@cardstack/safe-tools-client/services/safes';
 import SchedulePaymentSDKService from '@cardstack/safe-tools-client/services/scheduled-payments-sdk';
 
 import SetupSafeModal from '../setup-safe-modal';
@@ -22,6 +23,7 @@ interface Signature {
 
 export default class CreateSafeButton extends Component<Signature> {
   @service declare wallet: WalletService;
+  @service declare safes: SafesService;
   @service declare scheduledPaymentsSdk: SchedulePaymentSDKService;
 
   @tracked isModalOpen = false;
@@ -66,9 +68,8 @@ export default class CreateSafeButton extends Component<Signature> {
 
   @action handleSafeCreation() {
     taskFor(this.scheduledPaymentsSdk.createSafe).perform()
-    .then(async () => { 
-      // Fetch from sdk or add task result manually ??
-      await this.wallet.fetchSafes();
+    .then(async () => {
+      this.safes.safesResource.load();
       this.closeModal();
     }).catch((e) => {
       //TODO: handle error case

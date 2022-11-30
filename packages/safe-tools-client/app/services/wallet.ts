@@ -1,7 +1,6 @@
 import {
   getConstantByNetwork,
   getSDK,
-  getSafesWithSpModuleEnabled,
   isSchedulerSupportedChain,
 } from '@cardstack/cardpay-sdk';
 import NetworkService from '@cardstack/safe-tools-client/services/network';
@@ -94,7 +93,6 @@ export default class Wallet extends Service {
         .perform()
         .then(() => {
           if (this.isConnected) {
-            this.fetchSafes();
             onConnectSuccess();
           }
         })
@@ -132,20 +130,6 @@ export default class Wallet extends Service {
     };
 
     return this.nativeTokenBalance;
-  }
-
-  @action async fetchSafes() {
-    try {
-      if (this.address) {
-        // @ts-expect-error we should add correct typing to safe when integrating safesInfo
-        this.safes = await getSafesWithSpModuleEnabled(
-          this.network.symbol,
-          this.address
-        );
-      }
-    } catch (e) {
-      console.log('error fetching safes', e);
-    }
   }
 }
 

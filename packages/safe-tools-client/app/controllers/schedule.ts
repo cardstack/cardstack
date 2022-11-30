@@ -1,10 +1,10 @@
 import ApplicationController from '@cardstack/safe-tools-client/controllers/application';
 import NetworkService from '@cardstack/safe-tools-client/services/network';
 import WalletService from '@cardstack/safe-tools-client/services/wallet';
-
+import TokensService from '@cardstack/safe-tools-client/services/tokens';
+import SafesService from '@cardstack/safe-tools-client/services/safes';
 import Controller, { inject as controller } from '@ember/controller';
-import { action } from '@ember/object';
-import { default as Owner } from '@ember/owner';
+
 import { inject as service } from '@ember/service';
 import { tracked } from '@glimmer/tracking';
 
@@ -14,66 +14,11 @@ export default class Schedule extends Controller {
   @controller declare application: ApplicationController;
   @service declare wallet: WalletService;
   @service declare network: NetworkService;
+  @service declare tokens: TokensService;
+  @service declare safes: SafesService;
 
   @tracked isDepositModalOpen = false;
-  @tracked isInitializingSafes = false;
 
-  constructor(owner: Owner) {
-    super(owner);
-    this.initializeSafes();
-  }
-
-  @action async initializeSafes() {
-    try {
-      this.isInitializingSafes = true;
-
-      // TODO: replace with ember resources
-      // Waits a bit to get connection on refresh
-      setTimeout(async () => {
-        if (this.wallet.isConnected) {
-          await this.wallet.fetchSafes();
-        }
-        this.isInitializingSafes = false;
-      }, 500);
-    } catch (e) {
-      console.log('Error initializing safes', e);
-    }
-  }
-
-  // TODO: handle safe info, right now it returns mocked info
-  // even when safes exists
-  get safe() {
-    if (!this.wallet.safes.length) {
-      return undefined;
-    }
-
-    return {
-      address: '0x8a40AFffb53f4F953a204cAE087219A28771df9d',
-      tokens: [
-        {
-          address: 'eth',
-          name: 'Ethereum',
-          symbol: 'ETH',
-          decimals: 18,
-          balance: 1, //in ETH
-        },
-        {
-          address: '0x6B...1d0F', // TODO: check when address is hex, to truncate on template
-          name: 'Dai',
-          symbol: 'DAI',
-          decimals: 18,
-          balance: 1,
-        },
-        {
-          address: 'usdc',
-          name: 'USDC',
-          symbol: 'USDC',
-          decimals: 6,
-          balance: 0,
-        },
-      ],
-    };
-  }
   get scheduledPaymentsTokensToCover() {
     const hasScheduledPayments = false;
     // TODO: Add helper functions to map amounts, use fromWei function
