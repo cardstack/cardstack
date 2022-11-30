@@ -1,8 +1,8 @@
 import ApplicationController from '@cardstack/safe-tools-client/controllers/application';
 import NetworkService from '@cardstack/safe-tools-client/services/network';
-import WalletService from '@cardstack/safe-tools-client/services/wallet';
-import TokensService from '@cardstack/safe-tools-client/services/tokens';
 import SafesService from '@cardstack/safe-tools-client/services/safes';
+import TokensService from '@cardstack/safe-tools-client/services/tokens';
+import WalletService from '@cardstack/safe-tools-client/services/wallet';
 import Controller, { inject as controller } from '@ember/controller';
 
 import { inject as service } from '@ember/service';
