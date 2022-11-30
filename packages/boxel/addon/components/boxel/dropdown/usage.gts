@@ -29,6 +29,7 @@ export default class BoxelDropdownUsage extends Component {
       <:example>
         <BoxelDropdown>
           <:trigger as |bindings|>
+            {{!-- @glint-expect-error: the modifier rejects non-button elements but this can’t tell it’s not an anchor --}}
             <BoxelButton {{bindings}}>
               Trigger
             </BoxelButton>
