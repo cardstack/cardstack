@@ -76,7 +76,7 @@ export default class InputGroup extends Component<Signature> {
         {{#if (has-block "default")}}
           {{yield Controls Accessories this.inputGroupBlockArg }}
         {{else}}
-          <Controls.Input
+          <InputControl
             id={{this.elementId}}
             @placeholder={{@placeholder}}
             @disabled={{@disabled}}
