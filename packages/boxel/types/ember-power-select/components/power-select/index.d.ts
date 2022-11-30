@@ -82,7 +82,7 @@ export interface PowerSelectArgs {
   verticalPosition?: 'auto' | 'below' | 'above';
   dropdownClass?: string;
   disabled?: boolean;
-  eventType?: string; // FIXME probably narrower?
+  eventType: 'click' | 'mousedown';
   buildSelection?: (selected: any, select: Select) => any;
   onChange: (selection: any, select: Select, event?: Event) => void;
   search?: (term: string, select: Select) => any[] | PromiseProxy<any[]>;
