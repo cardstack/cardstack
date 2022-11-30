@@ -1,6 +1,93 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable ember/no-empty-glimmer-component-classes */
+
+// FIXME can these types be extracted from ember-power-select exports without using …/addon?
+
 import Component from '@glimmer/component';
-import { PowerSelectArgs } from 'ember-power-select/addon/components/power-select';
+
+type RepositionChanges = {
+  hPosition: string;
+  vPosition: string;
+  otherStyles: Record<string, string | number | undefined>;
+  top?: string;
+  left?: string;
+  right?: string;
+  width?: string;
+  height?: string;
+};
+
+interface DropdownActions {
+  toggle: (e?: Event) => void;
+  close: (e?: Event, skipFocus?: boolean) => void;
+  open: (e?: Event) => void;
+  reposition: (...args: any[]) => undefined | RepositionChanges;
+}
+interface Dropdown {
+  uniqueId: string;
+  disabled: boolean;
+  isOpen: boolean;
+  actions: DropdownActions;
+}
+
+type MatcherFn = (option: any, text: string) => number;
+
+interface SelectActions extends DropdownActions {
+  search: (term: string) => void;
+  highlight: (option: any) => void;
+  select: (selected: any, e?: Event) => void;
+  choose: (selected: any, e?: Event) => void;
+  scrollTo: (option: any) => void;
+}
+export interface Select extends Dropdown {
+  selected: any;
+  highlighted: any;
+  options: any[];
+  results: any[];
+  resultsCount: number;
+  loading: boolean;
+  isActive: boolean;
+  searchText: string;
+  lastSearchedText: string;
+  actions: SelectActions;
+}
+interface PromiseProxy<T> extends Promise<T> {
+  content: any;
+}
+
+export interface PowerSelectArgs {
+  highlightOnHover?: boolean;
+  placeholderComponent?: string;
+  searchMessage?: string;
+  searchMessageComponent?: string;
+  noMatchesMessage?: string;
+  noMatchesMessageComponent?: string;
+  matchTriggerWidth?: boolean;
+  options: any[] | PromiseProxy<any[]>;
+  selected: any | PromiseProxy<any>;
+  closeOnSelect?: boolean;
+  defaultHighlighted?: any;
+  searchField?: string;
+  searchEnabled?: boolean;
+  tabindex?: number | string;
+  triggerComponent?: string;
+  beforeOptionsComponent?: string;
+  optionsComponent?: string;
+  groupComponent?: string;
+  matcher?: MatcherFn;
+  initiallyOpened?: boolean;
+  typeAheadOptionMatcher?: MatcherFn;
+  buildSelection?: (selected: any, select: Select) => any;
+  onChange: (selection: any, select: Select, event?: Event) => void;
+  search?: (term: string, select: Select) => any[] | PromiseProxy<any[]>;
+  onOpen?: (select: Select, e: Event) => boolean | undefined;
+  onClose?: (select: Select, e: Event) => boolean | undefined;
+  onInput?: (term: string, select: Select, e: Event) => string | false | void;
+  onKeydown?: (select: Select, e: KeyboardEvent) => boolean | undefined;
+  onFocus?: (select: Select, event: FocusEvent) => void;
+  onBlur?: (select: Select, event: FocusEvent) => void;
+  scrollTo?: (option: any, select: Select) => void;
+  registerAPI?: (select: Select) => void;
+}
 
 import {
   BasicDropdownArgs,
@@ -24,7 +111,7 @@ export interface PatchedPowerSelectArgs
 
 export default class PowerSelect extends Component<{
   Element: HTMLDivElement;
-  Args: PatchedPowerSelectArgs;
+  Args: PowerSelectArgs;
   // TODO: figure out property types for default block
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   Blocks: { default: [any, any] };
