@@ -2,7 +2,7 @@ import { click, fillIn } from '@ember/test-helpers';
 import { keyDown } from 'ember-keyboard/test-support/test-helpers';
 import { selectChoose } from 'ember-power-select/test-support';
 
-const EXAMPLE_RECIPIENT = '0xb794f5ea0ba39494ce839613fffba74279579268';
+export const EXAMPLE_RECIPIENT = '0xb794f5ea0ba39494ce839613fffba74279579268';
 
 export async function chooseTomorrow(selector: string): Promise<void> {
   await click(selector);

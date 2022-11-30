@@ -16,34 +16,26 @@ import { svgJar } from '@cardstack/boxel/utils/svg-jar';
 import eq from 'ember-truth-helpers/helpers/eq';
 import not from 'ember-truth-helpers/helpers/not';
 import './index.css';
+import { ValidatableForm } from '../validator';
 
 interface Signature {
   Element: HTMLElement;
-  Args: {
+  Args: ValidatableForm & {
     paymentTypeOptions: { id: string, text: string }[];
-    selectedPaymentType: 'one-time' | 'monthly' | undefined;
     onSelectPaymentType: (paymentTypeId: string) => void;
-    paymentDate: Date | undefined;
     onSetPaymentDate: (day: Day) => void;
     onSetPaymentTime: (time: Time) => void;
-    paymentDayOfMonth: number | undefined;
     onSelectPaymentDayOfMonth: (val: number) => void;
-    monthlyUntil: Date | undefined;
     onSetMonthlyUntil: (date: Date) => void;
-    recipientAddress: string;
     isRecipientAddressInvalid: boolean;
     recipientAddressErrorMessage: string;
-    paymentAmount: string;
     onUpdatePaymentAmount: (val: string) => void;
     isPaymentAmountInvalid: boolean;
     paymentTokenErrorMessage: string;
-    paymentToken: SelectableToken | undefined;
     paymentTokens: SelectableToken[];
     onUpdatePaymentToken: (val: SelectableToken) => void;
-    selectedGasToken: SelectableToken | undefined;
     gasTokens: SelectableToken[];
     onSelectGasToken: (val: SelectableToken) => void;
-    maxGasFee: string | undefined;
     onUpdateMaxGasFee: (val: string) => void;
     onSchedulePayment: () => void;
     isSubmitEnabled: boolean;

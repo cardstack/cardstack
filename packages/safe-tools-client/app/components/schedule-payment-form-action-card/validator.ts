@@ -2,16 +2,24 @@ import { SelectableToken } from '@cardstack/boxel/components/boxel/input/selecta
 import { tracked } from '@glimmer/tracking';
 import { isAddress } from 'web3-utils';
 
+function isNumeric(str: unknown) {
+  if (typeof str !== 'string') return false; // we only process strings!
+  return (
+    !isNaN(str as never) && // use type coercion to parse the _entirety_ of the string (`parseFloat` alone does not do this)...
+    !isNaN(parseFloat(str))
+  ); // ...and ensure strings of whitespace fail
+}
+
 export interface ValidatableForm {
-  selectedGasToken: SelectableToken | undefined;
-  paymentToken: SelectableToken | undefined;
-  paymentAmount: string;
-  recipientAddress: string;
+  selectedPaymentType: 'one-time' | 'monthly' | undefined;
+  paymentDate: Date | undefined;
   paymentDayOfMonth: number | undefined;
   monthlyUntil: Date | undefined;
-  paymentDate: Date | undefined;
-  selectedPaymentType: 'one-time' | 'monthly' | undefined;
-  maxGasFee: string | undefined;
+  recipientAddress: string;
+  paymentAmount: string;
+  paymentToken: SelectableToken | undefined;
+  selectedGasToken: SelectableToken | undefined;
+  maxGasFee: 'normal' | 'high' | 'max' | undefined;
 }
 
 export default class SchedulePaymentFormValidator {
@@ -38,7 +46,7 @@ export default class SchedulePaymentFormValidator {
     );
   }
 
-  get isPaymentTypeValid(): boolean {
+  private get isPaymentTypeValid(): boolean {
     const { form } = this;
     if (form.selectedPaymentType === 'one-time') {
       return !!form.paymentDate;
@@ -49,19 +57,19 @@ export default class SchedulePaymentFormValidator {
     return false;
   }
 
-  get isRecipientValid(): boolean {
+  private get isRecipientValid(): boolean {
     return isAddress(this.form.recipientAddress);
   }
 
-  get isAmountValid(): boolean {
-    return !!this.form.paymentAmount && !!this.form.paymentToken;
+  private get isAmountValid(): boolean {
+    return isNumeric(this.form.paymentAmount) && !!this.form.paymentToken;
   }
 
-  get isGasTokenValid(): boolean {
+  private get isGasTokenValid(): boolean {
     return !!this.form.selectedGasToken;
   }
 
-  get isMaxGasFeeValid(): boolean {
+  private get isMaxGasFeeValid(): boolean {
     return !!this.form.maxGasFee;
   }
 }

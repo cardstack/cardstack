@@ -1,5 +1,4 @@
 import { click, fillIn, render, TestContext } from '@ember/test-helpers';
-import { keyDown } from 'ember-keyboard/test-support/test-helpers';
 import { selectChoose } from 'ember-power-select/test-support';
 import { setupRenderingTest } from 'ember-qunit';
 import hbs from 'htmlbars-inline-precompile';
@@ -9,10 +8,9 @@ import { exampleGasTokens } from '../support/tokens';
 import {
   chooseTime,
   chooseTomorrow,
+  EXAMPLE_RECIPIENT,
   fillInSchedulePaymentFormWithValidInfo,
 } from '../support/ui-test-helpers';
-
-const EXAMPLE_RECIPIENT = '0xb794f5ea0ba39494ce839613fffba74279579268';
 
 module(
   'Integration | Component | schedule-payment-form-action-card',

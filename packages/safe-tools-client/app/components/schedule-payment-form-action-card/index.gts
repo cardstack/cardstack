@@ -90,8 +90,8 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
     this.selectedGasToken = val;
   }
 
-  @tracked maxGasFee: string | undefined;
-  @action onUpdateMaxGasFee(val: string) {
+  @tracked maxGasFee: 'normal' | 'high' | 'max' | undefined;
+  @action onUpdateMaxGasFee(val: 'normal' | 'high' | 'max') {
     this.maxGasFee = val;
   }
 
