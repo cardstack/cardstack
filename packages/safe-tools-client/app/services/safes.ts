@@ -44,7 +44,6 @@ export default class SafesService extends Service {
   @service declare wallet: WalletService;
 
   @tracked selectedSafe?: Safe;
-  @tracked _didCreateSafe = false;
 
   get safes(): Safe[] | undefined {
     return this.safesResource.value;
