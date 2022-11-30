@@ -1,7 +1,9 @@
 import { module, test } from 'qunit';
 import { setupRenderingTest } from 'ember-qunit';
 import { click, render } from '@ember/test-helpers';
-import { hbs } from 'ember-cli-htmlbars';
+import BoxelCardPicker, { PickableCard } from '@cardstack/boxel/components/boxel/card-picker';
+import BoxelCardContainer from '@cardstack/boxel/components/boxel/card-container';
+import BoxelHeader from '@cardstack/boxel/components/boxel/header';
 
 module('Integration | Component | CardPicker', function (hooks) {
   setupRenderingTest(hooks);
@@ -38,28 +40,27 @@ module('Integration | Component | CardPicker', function (hooks) {
       name: 'Mariah Solis',
       description: 'Mixing engineer',
     },
-  ];
+  ] as PickableCard[];
 
-  hooks.beforeEach(async function (this) {
-    this.setProperties({
-      items: CARDS,
-      selectedItem: null,
-      chooseItem: (val: Record<string, unknown>) =>
-        this.set('selectedItem', val),
-    });
+  hooks.beforeEach(async function () {
+    let items = CARDS;
+    let selectedItem: PickableCard | undefined;
+    let chooseItem = (val: PickableCard) => selectedItem = val;
 
     await render(
-      hbs`<Boxel::CardPicker
-        @items={{this.items}}
-        @chooseItem={{this.chooseItem}}
-        @selectedItem={{this.selectedItem}}
-      as |item|>
-        <Boxel::CardContainer @displayBoundaries={{true}} data-test-boxel-cp-item={{item.id}}>
-          <Boxel::Header @header={{item.type}} />
-          <h3>{{item.name}}</h3>
-          <p>{{item.description}}</p>
-        </Boxel::CardContainer>
-      </Boxel::CardPicker>`
+      <template>
+        <BoxelCardPicker
+          @items={{items}}
+          @chooseItem={{chooseItem}}
+          @selectedItem={{selectedItem}}
+        as |item|>
+          <BoxelCardContainer @displayBoundaries={{true}} data-test-boxel-cp-item={{item.id}}>
+            <BoxelHeader @header={{item.type}} />
+            <h3>{{item.name}}</h3>
+            <p>{{item.description}}</p>
+          </BoxelCardContainer>
+        </BoxelCardPicker>
+      </template>
     );
   });
 
