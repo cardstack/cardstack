@@ -56,3 +56,4 @@ export { protocolVersions } from './contracts/addresses';
 export { gasPriceInToken, getGasPricesInNativeWei } from './sdk/utils/conversions';
 export * from './sdk/network-config-utils';
 export * from './sdk/scheduled-payment/utils';
+export { convertRawAmountToDecimalFormat } from './sdk/currency-utils';
