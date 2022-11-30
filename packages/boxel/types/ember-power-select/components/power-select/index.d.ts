@@ -62,6 +62,7 @@ export interface PowerSelectArgs {
   noMatchesMessage?: string;
   noMatchesMessageComponent?: string;
   matchTriggerWidth?: boolean;
+  selectedItemComponent?: string;
   options: any[] | PromiseProxy<any[]>;
   selected: any | PromiseProxy<any>;
   closeOnSelect?: boolean;
@@ -76,6 +77,12 @@ export interface PowerSelectArgs {
   matcher?: MatcherFn;
   initiallyOpened?: boolean;
   typeAheadOptionMatcher?: MatcherFn;
+  placeholder?: string;
+  renderInPlace?: boolean;
+  verticalPosition?: 'auto' | 'below' | 'above';
+  dropdownClass?: string;
+  disabled?: boolean;
+  eventType?: string; // FIXME probably narrower?
   buildSelection?: (selected: any, select: Select) => any;
   onChange: (selection: any, select: Select, event?: Event) => void;
   search?: (term: string, select: Select) => any[] | PromiseProxy<any[]>;
@@ -106,7 +113,7 @@ export interface PatchedPowerSelectArgs
   verticalPosition?: 'auto' | 'below' | 'above';
   dropdownClass?: string;
   placeholder?: string;
-  selectedItemComponent?: unknown;
+  selectedItemComponent?: string;
 }
 
 export default class PowerSelect extends Component<{
