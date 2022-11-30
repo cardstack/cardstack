@@ -21,17 +21,23 @@ export default class SelectableTokenAmount extends Component<Signature> {
     return isPresent(this.args.item.logoURI) && !this.shouldUseSvgJar;
   }
 
+
+  // Makes glint happy
+  get logoURI(): string {
+    return this.args.item.logoURI || '';
+  }
+
   <template>
     <div data-test-token={{@item.symbol}} ...attributes>
       {{#if this.shouldUseSvgJar}}
         {{svgJar
-          @item.logoURI
+          this.logoURI
           class="boxel-selectable-token-icon__icon"
           role="presentation"
         }}
       {{/if}}
       {{#if this.shouldRenderImage}}
-        <img src={{@item.logoURI}}
+        <img src={{this.logoURI}}
           class="boxel-selectable-token-icon__icon"
           loading="lazy"
           role="presentation"
