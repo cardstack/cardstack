@@ -7,7 +7,6 @@ import ActionStatusArea, { StatusAreaSignature } from './action-status-area';
 import InfoArea, { InfoAreaSignature } from './info-area';
 import cn from '@cardstack/boxel/helpers/cn';
 
-//@ts-expect-error glint does not think this is consumed-but it is consumed in the template https://github.com/typed-ember/glint/issues/374
 import { concat, hash } from '@ember/helper';
 import and from 'ember-truth-helpers/helpers/and';
 import { ComponentLike, WithBoundArgs } from '@glint/template';
