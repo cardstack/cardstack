@@ -7,10 +7,9 @@ import JsonRpcProvider from '../../providers/json-rpc-provider';
 import { networkName } from './general-utils';
 import BN from 'bn.js';
 import { BaseProvider } from '@ethersproject/providers';
-import { BigNumber } from 'ethers';
 import { convertChainIdToName } from '../network-config-utils';
 
-type GasPrice = Record<'slow' | 'standard' | 'fast', BigNumber>;
+type GasPrice = Record<'slow' | 'standard' | 'fast', BN>;
 
 async function tokenPairRate(provider: JsonRpcProvider, token1Address: string, token2Address: string): Promise<Price> {
   let network = await provider.getNetwork();
@@ -29,7 +28,7 @@ export async function gasPriceInToken(provider: JsonRpcProvider, tokenAddress: s
   let chainId = (await provider.getNetwork()).chainId;
 
   // Gas station will return current gas price in native token in wei.
-  let gasPriceInNativeTokenInWei = new BN((await getCurrentGasPrice(chainId)).standard.toString());
+  let gasPriceInNativeTokenInWei = new BN((await getGasPricesInNativeWei(chainId)).standard.toString());
 
   // We use the wrapped native token address because the native token doesn't have an address in Uniswap.
   // The price of the wrapped native token, such as WETH, is the same as the price of the native token.
@@ -45,7 +44,7 @@ export async function gasPriceInToken(provider: JsonRpcProvider, tokenAddress: s
     .div(new BN(rate.adjusted.denominator.toString()));
 }
 
-export async function getCurrentGasPrice(chainId: number): Promise<GasPrice> {
+export async function getGasPricesInNativeWei(chainId: number): Promise<GasPrice> {
   const network = convertChainIdToName(chainId);
 
   let gasStationResponse = await fetch(`${getConstantByNetwork('hubUrl', network)}/api/gas-station/${chainId}`, {
@@ -58,8 +57,20 @@ export async function getCurrentGasPrice(chainId: number): Promise<GasPrice> {
   let gasPriceJson = await gasStationResponse.json();
 
   return {
-    slow: BigNumber.from(gasPriceJson.data.attributes.slow),
-    standard: BigNumber.from(gasPriceJson.data.attributes.standard),
-    fast: BigNumber.from(gasPriceJson.data.attributes.fast),
+    slow: new BN(gasPriceJson.data.attributes.slow),
+    standard: new BN(gasPriceJson.data.attributes.standard),
+    fast: new BN(gasPriceJson.data.attributes.fast),
   };
+}
+
+export async function getNativeWeiInToken(provider: JsonRpcProvider, tokenAddress: string): Promise<BN> {
+  let network = await networkName(provider);
+  let wrappedNativeToken = getAddressByNetwork('wrappedNativeToken', network);
+  if (tokenAddress === wrappedNativeToken) {
+    return new BN(1);
+  }
+
+  let rate = await tokenPairRate(provider, tokenAddress, wrappedNativeToken);
+  return new BN(rate.adjusted.numerator.toString()) // rate.adjusted is an adjustment of the difference in coin decimals, for example WETH has 18 decimals, USDT and USDC have 6.
+    .div(new BN(rate.adjusted.denominator.toString()));
 }
