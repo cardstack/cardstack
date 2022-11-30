@@ -46,8 +46,8 @@ export default {
     console.log(`Required gas in ETH (slow): ${fromWei(result.gasRangeInWei.slow.toString(), 'ether')}`);
     console.log(`Required gas in ETH (standard): ${fromWei(result.gasRangeInWei.standard.toString(), 'ether')}`);
     console.log(`Required gas in ETH (fast): ${fromWei(result.gasRangeInWei.fast.toString(), 'ether')}`);
-    console.log(`Required gas in USDT (slow): ${fromWei(result.gasRangeInUSD.slow.toString(), 'ether')}`);
-    console.log(`Required gas in USDT (standard): ${fromWei(result.gasRangeInUSD.standard.toString(), 'ether')}`);
-    console.log(`Required gas in USDT (fast): ${fromWei(result.gasRangeInUSD.fast.toString(), 'ether')}`);
+    console.log(`Required gas in USD (slow): ${fromWei(result.gasRangeInUSD.slow.toString(), 'ether')}`);
+    console.log(`Required gas in USD (standard): ${fromWei(result.gasRangeInUSD.standard.toString(), 'ether')}`);
+    console.log(`Required gas in USD (fast): ${fromWei(result.gasRangeInUSD.fast.toString(), 'ether')}`);
   },
 } as CommandModule;
