@@ -58,8 +58,8 @@ export async function getCurrentGasPrice(chainId: number): Promise<GasPrice> {
   let gasPriceJson = await gasStationResponse.json();
 
   return {
-    slow: BigNumber.from(gasPriceJson.slow),
-    standard: BigNumber.from(gasPriceJson.standard),
-    fast: BigNumber.from(gasPriceJson.fast),
+    slow: BigNumber.from(gasPriceJson.data.attributes.slow),
+    standard: BigNumber.from(gasPriceJson.data.attributes.standard),
+    fast: BigNumber.from(gasPriceJson.data.attributes.fast),
   };
 }

@@ -109,6 +109,7 @@ import GasEstimationValidator from './services/validators/gas-estimation';
 import GasEstimationResultSerializer from './services/serializers/gas-estimation-result-serializer';
 import ScheduledPaymentsAttemptsRoute from './routes/scheduled-payment-attempts';
 import ScheduledPaymentAttemptSerializer from './services/serializers/scheduled-payment-attempt-serializer';
+import GasPriceSerializer from './services/serializers/gas-price-serializer';
 
 //@ts-ignore polyfilling fetch
 global.fetch = fetch;
@@ -201,6 +202,7 @@ export function createRegistry(): Registry {
   registry.register('data-integrity-checks-route', DataIntegrityChecksRoute);
   registry.register('gas-station-service', GasStationService);
   registry.register('gas-station-route', GasStationRoute);
+  registry.register('gas-price-serializer', GasPriceSerializer);
   registry.register('gas-estimation-route', GasEstimationRoute);
   registry.register('gas-estimation-service', GasEstimationService);
   registry.register('gas-estimation-validator', GasEstimationValidator);
