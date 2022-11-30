@@ -1,3 +1,11 @@
+.boxel-control-panel__item-body {
+  padding-left: var(--boxel-sp-lg);
+}
+
+.boxel-control-panel__item-body > * + * {
+  margin-top: var(--boxel-sp-sm);
+}
+
 .safe-tools__dashboard-schedule {
   background-color: var(--boxel-dashboard-background-color);
 
@@ -5,7 +13,7 @@
   flex-direction: row;
 }
 
-.safe-tools__dashboard-schedule-control-panel-wallet-address {
+.safe-tools__dashboard-schedule-control-panel-address {
   color: var(--boxel-purple-300);
   font-family: var(--boxel-monospace-font-family);
   font-size: var(--boxel-font-size-sm);
@@ -19,7 +27,6 @@
   gap: var(--boxel-sp-xxxs);
   font-size: var(--boxel-font-size-xs);
   margin-top: var(--boxel-sp-xxxs);
-  margin-bottom: var(--boxel-sp-sm);
 }
 
 .safe-tools__dashboard-schedule-control-panel-connected-status-icon {
@@ -35,29 +42,9 @@
   padding: var(--boxel-sp-xxl) var(--boxel-sp-lg) 0;
 }
 
-.safe-tools__dashboard-schedule-control-panel-safe-info-address,
-.safe-tools__dashboard-schedule-control-panel-safe-info-balance,
-.safe-tools__dashboard-schedule-control-panel-safe-info-create {
-  inline-size: 200px;
-  display: block;
-  text-align: left;
-  font-weight: normal;
-  font-size: var(--boxel-font-size-sm);
-}
-
-.safe-tools__dashboard-schedule-control-panel-safe-info-create {
-  margin-top: calc(var(--boxel-sp-xxs) * -1);
-}
-
 .safe-tools__dashboard-schedule-control-panel-safe-info-address {
   color: var(--boxel-purple-300);
   margin-bottom: 2px;
-}
-
-.safe-tools__dashboard-schedule-control-panel-safe-info-balance {
-  font-weight: bold;
-  color: var(--boxel-highlight);
-  margin-bottom: var(--boxel-sp-sm);
 }
 
 .temporary-form-container {
@@ -66,17 +53,21 @@
   margin-top: var(--boxel-sp-xl);
 }
 
-.safe-tools__dashboard-network-selector {
+.safe-tools__dashboard-dropdown {
   display: inline-flex;
   align-items: center;
 }
 
-.safe-tools__dashboard-network-selector.boxel-select .boxel-select__item {
+.safe-tools__dashboard-dropdown .ember-power-select-selected-item .boxel-select__item {
+  padding-left: 0;
+}
+
+.safe-tools__dashboard-dropdown.boxel-select .boxel-select__item {
   font-weight: 600;
   font-size: var(--boxel-font-size-sm);
 }
 
-.safe-tools__dashboard-network-selector .ember-power-select-status-icon {
+.safe-tools__dashboard-dropdown .ember-power-select-status-icon {
   -webkit-mask: url('/@cardstack/boxel/images/icons/caret-down.svg') no-repeat;
   mask: url('/@cardstack/boxel/images/icons/caret-down.svg') no-repeat;
 

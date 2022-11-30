@@ -3,7 +3,8 @@
     <cp.Item @title='Wallet' @icon='wallet' @isActive={{not this.wallet.isConnected}}>
       {{#if this.wallet.isConnected}}
         <div
-          class='safe-tools__dashboard-schedule-control-panel-wallet-address'
+          class='safe-tools__dashboard-schedule-control-panel-address'
+          data-test-wallet-address
         >
           {{truncate-middle this.wallet.address}}
         </div>
@@ -25,7 +26,7 @@
     </cp.Item>
     <cp.Item @title='Network' @icon='network'>
         <Boxel::Select
-        class='safe-tools__dashboard-network-selector'
+        class='safe-tools__dashboard-dropdown'
             @selected={{this.network}}
             @onChange={{this.network.onSelect}}
             @options={{this.network.supportedList}}
@@ -34,33 +35,16 @@
           <div class={{itemCssClass}} data-test-selected-network>{{network.name}}</div>
         </Boxel::Select>
     </cp.Item>
-    <cp.Item @title='Safe' @icon='safe' @isActive={{this.wallet.isConnected}}>
+    <cp.Item @title='Safe' @icon='safe'>
       {{#if this.wallet.isConnected}}
-        {{#if this.safe}}
-          {{#each this.safe.tokens as |token|}}
-            {{#if (gt token.balance 0)}}
-              <span class='safe-tools__dashboard-schedule-control-panel-safe-info-address'>
-                {{token.address}}:{{truncate-middle this.safe.address}}
-              </span>
-              <span class='safe-tools__dashboard-schedule-control-panel-safe-info-balance'>
-                {{token.balance}} {{token.symbol}}
-              </span>
-            {{/if}}  
-          {{/each}}
-          <Boxel::Button
-            @kind='primary'
-            {{on 'click' (set this 'isDepositModalOpen' true)}}
-          >
-            Add Funds
-          </Boxel::Button>
-        {{else}}
-          <p class='safe-tools__dashboard-schedule-control-panel-safe-info-create'>
-            You need to have a safe which contains funds that would be deducted
-            automatically when schedule payments are due.
-          </p>
-          <CreateSafeButton />
-        {{/if}}
-      {{/if}}  
+        <SafeInfo
+          @safes={{this.safes.safes}}
+          @currentSafe={{this.safes.currentSafe}}
+          @onSelectSafe={{this.safes.onSelectSafe}}
+          @tokenBalances={{this.safes.tokenBalances}}
+          @onDepositClick={{set this 'isDepositModalOpen' true}}
+        />
+      {{/if}}
     </cp.Item>
   </Boxel::ControlPanel>
   <section class='safe-tools__dashboard-schedule-content'>
@@ -74,7 +58,7 @@
 <DepositModal
   @isOpen={{this.isDepositModalOpen}}
   @onClose={{set this 'isDepositModalOpen' false}}
-  @safeAddress={{this.safe.address}}
+  @safeAddress={{this.safes.curentSafe.address}}
   @networkName={{this.network}}
   @tokensToCover={{this.scheduledPaymentsTokensToCover}}
 />

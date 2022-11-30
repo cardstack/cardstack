@@ -1,0 +1,11 @@
+.boxel-control-panel__item-body {
+  width: 240px;
+}
+
+.blockchain-address {
+  font-family: var(--boxel-monospace-font-family);
+}
+
+.info {
+  font-size: var(--boxel-font-size-sm);
+}
