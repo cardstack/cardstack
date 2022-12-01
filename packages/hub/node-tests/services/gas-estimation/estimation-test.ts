@@ -35,6 +35,16 @@ class StubCardpaySDK {
         throw new Error(`unsupported mock cardpay sdk: ${sdk}`);
     }
   }
+  getConstantByNetwork(_name: string, _network: string) {
+    return {
+      tokens: [
+        {
+          address: '0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6',
+          decimals: 18,
+        },
+      ],
+    };
+  }
 }
 
 describe('estimate gas', function () {
@@ -54,7 +64,7 @@ describe('estimate gas', function () {
     createSafeGas = 7000000;
     let gasEstimationParams: GasEstimationParams = {
       scenario: GasEstimationResultsScenarioEnum.create_safe_with_module,
-      chainId: 1,
+      chainId: 5,
     };
     let gasEstimationResult = await subject.estimate(gasEstimationParams);
 
@@ -69,9 +79,9 @@ describe('estimate gas', function () {
     executionGas = 1000000;
     let gasEstimationParams: GasEstimationParams = {
       scenario: GasEstimationResultsScenarioEnum.execute_one_time_payment,
-      chainId: 1,
-      tokenAddress: '0x0',
-      gasTokenAddress: '0x0',
+      chainId: 5,
+      tokenAddress: '0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6',
+      gasTokenAddress: '0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6',
     };
     let gasEstimationResult = await subject.estimate(gasEstimationParams);
 
@@ -86,9 +96,9 @@ describe('estimate gas', function () {
     executionGas = 1000000;
     let gasEstimationParams: GasEstimationParams = {
       scenario: GasEstimationResultsScenarioEnum.execute_recurring_payment,
-      chainId: 1,
-      tokenAddress: '0x0',
-      gasTokenAddress: '0x0',
+      chainId: 5,
+      tokenAddress: '0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6',
+      gasTokenAddress: '0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6',
     };
     let gasEstimationResult = await subject.estimate(gasEstimationParams);
 
@@ -106,7 +116,7 @@ describe('estimate gas', function () {
 
     let gasEstimationParams: GasEstimationParams = {
       scenario: GasEstimationResultsScenarioEnum.create_safe_with_module,
-      chainId: 1,
+      chainId: 5,
     };
     let prisma = await getPrisma();
     await prisma.gasEstimationResult.create({
@@ -128,7 +138,7 @@ describe('estimate gas', function () {
 
     let gasEstimationParams: GasEstimationParams = {
       scenario: GasEstimationResultsScenarioEnum.execute_one_time_payment,
-      chainId: 1,
+      chainId: 5,
     };
     await expect(subject.estimate(gasEstimationParams)).to.be.rejectedWith(
       'tokenAddress and gasTokenAddress is required in execute_one_time_payment'
@@ -140,7 +150,7 @@ describe('estimate gas', function () {
 
     let gasEstimationParams: GasEstimationParams = {
       scenario: GasEstimationResultsScenarioEnum.execute_recurring_payment,
-      chainId: 1,
+      chainId: 5,
       tokenAddress: '',
       gasTokenAddress: '',
     };
@@ -155,8 +165,8 @@ describe('estimate gas', function () {
     let gasEstimationParams: GasEstimationParams = {
       scenario: GasEstimationResultsScenarioEnum.execute_recurring_payment,
       chainId: 3,
-      tokenAddress: '0x0',
-      gasTokenAddress: '0x0',
+      tokenAddress: '0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6',
+      gasTokenAddress: '0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6',
     };
     await expect(subject.estimate(gasEstimationParams)).to.be.rejectedWith('Unsupported network: 3');
   });

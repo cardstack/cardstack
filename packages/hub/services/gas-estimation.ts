@@ -4,7 +4,7 @@ import { nowUtc } from '../utils/dates';
 import config from 'config';
 import { ethers, Wallet } from 'ethers';
 import { GasEstimationResultsScenarioEnum } from '@prisma/client';
-import { convertChainIdToName } from '@cardstack/cardpay-sdk';
+import { convertChainIdToName, SchedulerCapableNetworks } from '@cardstack/cardpay-sdk';
 import { supportedChains } from '@cardstack/cardpay-sdk';
 import { NotFound } from '@cardstack/core/src/utils/errors';
 
@@ -39,24 +39,71 @@ export default class GasEstimationService {
     let provider = this.ethersProvider.getInstance(params.chainId);
     let signer = new Wallet(config.get('hubPrivateKey'));
     let scheduledPaymentModule = await this.cardpay.getSDK('ScheduledPaymentModule', provider, signer);
+
     let gas;
-    let tokenAmount = ethers.utils.parseUnits('1', 'gwei');
-    let gasTokenAmount = ethers.utils.parseUnits('0.01', 'gwei');
     switch (params.scenario) {
       case GasEstimationResultsScenarioEnum.create_safe_with_module:
         gas = (
           await scheduledPaymentModule.createSafeWithModuleAndGuardEstimation({ from: signer.address })
         ).toNumber();
         break;
+      default:
+        gas = await this.estimatePaymentExecution(params);
+    }
+
+    gasLimit = await prisma.gasEstimationResult.upsert({
+      where: {
+        chainId_scenario_tokenAddress_gasTokenAddress: {
+          chainId: params.chainId,
+          scenario: params.scenario,
+          tokenAddress: params.tokenAddress ?? '',
+          gasTokenAddress: params.gasTokenAddress ?? '',
+        },
+      },
+      create: {
+        chainId: params.chainId,
+        scenario: params.scenario,
+        tokenAddress: params.tokenAddress,
+        gasTokenAddress: params.gasTokenAddress,
+        gas: gas,
+      },
+      update: {
+        gas: gas,
+      },
+    });
+
+    return gasLimit;
+  }
+
+  private async estimatePaymentExecution(params: GasEstimationParams) {
+    if (
+      !params.tokenAddress ||
+      params.tokenAddress === '' ||
+      !params.gasTokenAddress ||
+      params.gasTokenAddress === ''
+    ) {
+      throw Error(`tokenAddress and gasTokenAddress is required in ${params.scenario}`);
+    }
+
+    let provider = this.ethersProvider.getInstance(params.chainId);
+    let networkName = convertChainIdToName(params.chainId);
+    let tokenList = this.cardpay.getConstantByNetwork('tokenList', networkName as SchedulerCapableNetworks);
+    let token = tokenList.tokens.find((t) => t.address === params.tokenAddress);
+    let gasToken = tokenList.tokens.find((t) => t.address === params.gasTokenAddress);
+    if (!token || !gasToken) {
+      throw Error('unknown token and gas token');
+    }
+    //Check the decimals of tokens
+    //to avoid error when converting USD tokens
+    //because USD token's decimals is lower than native token's decimals
+    let tokenAmount = ethers.utils.parseUnits('1', token.decimals >= 18 ? 'gwei' : 3);
+    let gasTokenAmount = ethers.utils.parseUnits('0.01', gasToken.decimals >= 18 ? 'gwei' : 3);
+
+    let signer = new Wallet(config.get('hubPrivateKey'));
+    let scheduledPaymentModule = await this.cardpay.getSDK('ScheduledPaymentModule', provider, signer);
+    let gas;
+    switch (params.scenario) {
       case GasEstimationResultsScenarioEnum.execute_one_time_payment:
-        if (
-          !params.tokenAddress ||
-          params.tokenAddress === '' ||
-          !params.gasTokenAddress ||
-          params.gasTokenAddress === ''
-        ) {
-          throw Error(`tokenAddress and gasTokenAddress is required in ${params.scenario}`);
-        }
         gas = await scheduledPaymentModule.estimateExecutionGas(
           this.getHubSPModuleAddress(params.chainId),
           params.tokenAddress,
@@ -94,30 +141,11 @@ export default class GasEstimationService {
           Math.round(addDays(nowUtc(), 30).getTime() / 1000)
         );
         break;
+      default:
+        throw Error('unknown estimation scenario');
     }
 
-    gasLimit = await prisma.gasEstimationResult.upsert({
-      where: {
-        chainId_scenario_tokenAddress_gasTokenAddress: {
-          chainId: params.chainId,
-          scenario: params.scenario,
-          tokenAddress: params.tokenAddress ?? '',
-          gasTokenAddress: params.gasTokenAddress ?? '',
-        },
-      },
-      create: {
-        chainId: params.chainId,
-        scenario: params.scenario,
-        tokenAddress: params.tokenAddress,
-        gasTokenAddress: params.gasTokenAddress,
-        gas: gas,
-      },
-      update: {
-        gas: gas,
-      },
-    });
-
-    return gasLimit;
+    return gas;
   }
 
   private getHubSPModuleAddress(chainId: number) {
