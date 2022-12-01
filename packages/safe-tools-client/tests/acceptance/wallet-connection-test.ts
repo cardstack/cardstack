@@ -25,7 +25,7 @@ module('Acceptance | wallet connection', function (hooks) {
       await click('[data-test-mainnet-connect-button]');
 
       assert
-        .dom('.safe-tools__dashboard-schedule-control-panel-wallet-address')
+        .dom('[data-test-wallet-address]')
         .hasText(truncateMiddle([TEST_ACCOUNT_1]));
 
       await percySnapshot(assert);
@@ -34,17 +34,15 @@ module('Acceptance | wallet connection', function (hooks) {
 
       await settled();
       assert
-        .dom('.safe-tools__dashboard-schedule-control-panel-wallet-address')
+        .dom('[data-test-wallet-address]')
         .hasText(truncateMiddle([TEST_ACCOUNT_2]));
       assert
-        .dom('.safe-tools__dashboard-schedule-control-panel-wallet-address')
+        .dom('[data-test-wallet-address]')
         .doesNotContainText(truncateMiddle([TEST_ACCOUNT_1]));
 
       await click('[data-test-disconnect-button]');
 
-      assert
-        .dom('.safe-tools__dashboard-schedule-control-panel-wallet-address')
-        .doesNotExist();
+      assert.dom('[data-test-wallet-address]').doesNotExist();
 
       assert.dom('[data-test-connect-button]').exists();
       assert.dom('[data-test-disconnect-button]').doesNotExist();
@@ -69,7 +67,7 @@ module('Acceptance | wallet connection', function (hooks) {
 
       await click('.network-connect-modal__close-button'); // FIXME: I don't think this click should be necessary
       assert
-        .dom('.safe-tools__dashboard-schedule-control-panel-wallet-address')
+        .dom('[data-test-wallet-address]')
         .hasText(truncateMiddle([TEST_ACCOUNT_2]));
     });
   });
