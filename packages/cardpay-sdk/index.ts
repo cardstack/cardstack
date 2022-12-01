@@ -36,6 +36,7 @@ export {
   waitForSubgraphIndex,
   waitUntilOneBlockAfterTxnMined,
 } from './sdk/utils/general-utils';
+export { getTokenBalancesForSafe } from './sdk/utils/safe-utils';
 export { signTypedData } from './sdk/utils/signing-utils';
 export * from './sdk/currency-utils';
 export * from './sdk/currencies';
@@ -55,3 +56,4 @@ export { protocolVersions } from './contracts/addresses';
 export { gasPriceInToken, getGasPricesInNativeWei } from './sdk/utils/conversions';
 export * from './sdk/network-config-utils';
 export * from './sdk/scheduled-payment/utils';
+export { convertRawAmountToDecimalFormat } from './sdk/currency-utils';

@@ -1,3 +1,4 @@
+import { convertChainIdToName } from '../network-config-utils';
 import { query } from '../utils/graphql';
 
 const safesQuery = `
@@ -18,8 +19,9 @@ interface Safe {
   spModuleAddress: string;
 }
 
-export async function getSafesWithSpModuleEnabled(network: string, accountAddress: string): Promise<Safe[]> {
-  let result = await query(network, safesQuery, { account: accountAddress });
+export async function getSafesWithSpModuleEnabled(chainId: number, accountAddress: string): Promise<Safe[]> {
+  let networkName = convertChainIdToName(chainId);
+  let result = await query(networkName, safesQuery, { account: accountAddress });
 
   if (!result.data.account) return [];
 
