@@ -1,7 +1,7 @@
 import { module, test } from 'qunit';
 import { setupRenderingTest } from 'ember-qunit';
 import { render, find, focus, triggerEvent, tap } from '@ember/test-helpers';
-import { hbs } from 'ember-cli-htmlbars';
+import tippy from '@cardstack/web-client/modifiers/tippy';
 
 import { htmlSafe } from '@ember/template';
 
@@ -9,14 +9,16 @@ module('Integration | Modifier | tippy', function (hooks) {
   setupRenderingTest(hooks);
 
   hooks.beforeEach(async function () {
-    this.set('content', 'Tooltip');
+    let content = 'Tooltip';
     // seems like appendTo=parent is necessary
     // to make it possible to detect the tooltip in tests
-    await render(hbs`
-      <div id="trigger" tabindex="0"
-        {{tippy content=this.content appendTo="parent"}}
-      >Trigger</div>
-    `);
+    await render(
+      <template>
+        <div id="trigger" tabindex="0"
+          {{tippy content=content appendTo="parent"}}
+        >Trigger</div>
+      </template>
+    );
   });
 
   test('expected html attrs and structure', async function (assert) {
