@@ -16,7 +16,7 @@ import { svgJar } from '@cardstack/boxel/utils/svg-jar';
 import eq from 'ember-truth-helpers/helpers/eq';
 import not from 'ember-truth-helpers/helpers/not';
 import './index.css';
-import { MaxGasFeeOption, ValidatableForm } from '../validator';
+import { ValidatableForm } from '../validator';
 
 interface Signature {
   Element: HTMLElement;
@@ -37,7 +37,6 @@ interface Signature {
     gasTokens: SelectableToken[];
     onSelectGasToken: (val: SelectableToken) => void;
     onUpdateMaxGasFee: (val: string) => void;
-    maxGasDescriptions?: Record<MaxGasFeeOption, string>;
     onSchedulePayment: () => void;
     isSubmitEnabled: boolean;
     onUpdateRecipientAddress: (val: string) => void;
@@ -154,7 +153,7 @@ export default class SchedulePaymentFormActionCardUI extends Component<Signature
                 Normal
               </div>
               <div class="schedule-payment-form-action-card--max-gas-fee-description">
-                {{@maxGasDescriptions.normal}}
+                Less than $0.10 USD
               </div>
             </group.Button>
             <group.Button @value="high">
@@ -162,7 +161,7 @@ export default class SchedulePaymentFormActionCardUI extends Component<Signature
                 High
               </div>
               <div class="schedule-payment-form-action-card--max-gas-fee-description">
-                {{@maxGasDescriptions.high}}
+                Less than $1.00 USD
               </div>
             </group.Button>
             <group.Button @value="max">
@@ -170,7 +169,7 @@ export default class SchedulePaymentFormActionCardUI extends Component<Signature
                 Max
               </div>
               <div class="schedule-payment-form-action-card--max-gas-fee-description">
-                {{@maxGasDescriptions.max}}
+                Capped at $10 USD
               </div>
             </group.Button>
           </BoxelToggleButtonGroup>

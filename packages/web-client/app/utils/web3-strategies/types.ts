@@ -2,7 +2,6 @@ import { WalletProvider } from '../wallet-providers';
 import BN from 'bn.js';
 import { TransactionReceipt } from 'web3-core';
 import {
-  type ChainAddress,
   DepotSafe,
   MerchantSafe,
   PrepaidCardSafe,
@@ -171,6 +170,7 @@ export interface Layer2Web3Strategy
 
 export type TransactionHash = string;
 export type TxnBlockNumber = number;
+export type ChainAddress = string;
 
 export type Layer1NetworkSymbol = 'kovan' | 'mainnet';
 export type TestLayer1NetworkSymbol = 'test-layer1';

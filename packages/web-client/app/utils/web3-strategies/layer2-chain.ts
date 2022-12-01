@@ -19,6 +19,7 @@ import {
 import WalletInfo from '../wallet-info';
 import CustomStorageWalletConnect from '../wc-connector';
 import {
+  ChainAddress,
   Layer2Web3Strategy,
   TransactionHash,
   Layer2NetworkSymbol,
@@ -31,7 +32,6 @@ import {
   getConstantByNetwork,
   getSDK,
   BridgeValidationResult,
-  type ChainAddress,
   DepotSafe,
   IHubAuth,
   ILayerTwoOracle,

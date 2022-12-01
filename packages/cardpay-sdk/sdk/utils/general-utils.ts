@@ -15,8 +15,6 @@ import { utils } from 'ethers';
 import { getResolver } from '@cardstack/did-resolver';
 import { Resolver } from 'did-resolver';
 
-export type ChainAddress = string;
-
 const POLL_INTERVAL = 500;
 
 const receiptCache = new Map<string, SuccessfulTransactionReceipt>();

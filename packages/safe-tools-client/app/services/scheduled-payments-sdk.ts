@@ -1,9 +1,4 @@
-import {
-  type GasEstimationScenario,
-  type ChainAddress,
-  getSDK,
-  Web3Provider,
-} from '@cardstack/cardpay-sdk';
+import { getSDK, Web3Provider } from '@cardstack/cardpay-sdk';
 import WalletService from '@cardstack/safe-tools-client/services/wallet';
 
 import { action } from '@ember/object';
@@ -12,8 +7,6 @@ import { TaskGenerator } from 'ember-concurrency';
 import { task } from 'ember-concurrency-decorators';
 
 import { BigNumber } from 'ethers';
-
-import { GasEstimationResult } from '../../../cardpay-sdk/sdk/scheduled-payment-module';
 
 export default class SchedulePaymentSDKService extends Service {
   @service declare wallet: WalletService;
@@ -52,23 +45,6 @@ export default class SchedulePaymentSDKService extends Service {
       undefined,
       this.contractOptions
     );
-  }
-
-  @action
-  async getScheduledPaymentGasEstimation(
-    scenario: GasEstimationScenario,
-    tokenAddress: ChainAddress,
-    gasTokenAddress: ChainAddress
-  ): Promise<GasEstimationResult> {
-    const scheduledPayments = await this.getSchedulePaymentsModule();
-
-    const gasEstimationResult = await scheduledPayments.estimateGas(
-      scenario,
-      tokenAddress,
-      gasTokenAddress
-    );
-
-    return gasEstimationResult;
   }
 }
 

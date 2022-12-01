@@ -2,9 +2,9 @@ import { AbiItem } from 'web3-utils';
 import {
   getAddressByNetwork,
   AddressKeys,
-  type ChainAddress,
   ERC20ABI,
 } from '@cardstack/cardpay-sdk';
+import { ChainAddress } from './web3-strategies/types';
 import { NetworkSymbol } from './web3-strategies/types';
 import BN from 'bn.js';
 
