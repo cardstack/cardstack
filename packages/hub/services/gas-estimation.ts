@@ -90,14 +90,14 @@ export default class GasEstimationService {
     let tokenList = this.cardpay.getConstantByNetwork('tokenList', networkName as SchedulerCapableNetworks);
     let token = tokenList.tokens.find((t) => t.address === params.tokenAddress);
     let gasToken = tokenList.tokens.find((t) => t.address === params.gasTokenAddress);
-    if (!token || !gasToken) {
-      throw Error('unknown token and gas token');
-    }
+    if (!token) throw Error('unknown token');
+    if (!gasToken) throw Error('unknown gas token');
+
     //Check the decimals of tokens
     //to avoid error when converting USD tokens
     //because USD token's decimals is lower than native token's decimals
-    let tokenAmount = ethers.utils.parseUnits('1', token.decimals >= 18 ? 'gwei' : 3);
-    let gasTokenAmount = ethers.utils.parseUnits('0.01', gasToken.decimals >= 18 ? 'gwei' : 3);
+    let tokenAmount = ethers.utils.parseUnits('1', token.decimals >= 18 ? 'gwei' : token.decimals);
+    let gasTokenAmount = ethers.utils.parseUnits('0.01', gasToken.decimals >= 18 ? 'gwei' : token.decimals);
 
     let signer = new Wallet(config.get('hubPrivateKey'));
     let scheduledPaymentModule = await this.cardpay.getSDK('ScheduledPaymentModule', provider, signer);
