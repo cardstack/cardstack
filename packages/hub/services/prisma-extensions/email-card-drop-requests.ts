@@ -13,7 +13,7 @@ interface EmailCardDropRequestExtensions {
   ): Promise<EmailCardDropRequestWithExpiry[]>;
   latestRequestForOwner(ownerAddress: string, clock: Clock): Promise<EmailCardDropRequestWithExpiry>;
   activeReservations(clock: Clock): Promise<number>;
-  claimedInLastMinutes(minutes: number, clock: Clock): Promise<EmailCardDropRequestWithExpiry[]>;
+  claimedInLastMinutes(minutes: number, clock: Clock): Promise<number>;
 }
 
 export interface ExtendedEmailCardDropRequest extends EmailCardDropRequestGetter, EmailCardDropRequestExtensions {}

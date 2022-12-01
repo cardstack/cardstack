@@ -156,7 +156,7 @@ export default class EmailCardDropRequestsRoute {
     let { count, periodMinutes } = config.get<Record<string, number>>('cardDrop.email.rateLimit');
     let countOfRecentClaims = await prisma.emailCardDropRequest.claimedInLastMinutes(periodMinutes, this.clock);
 
-    if (countOfRecentClaims.length >= count) {
+    if (countOfRecentClaims >= count) {
       // The rate limit flag must be manually cleared by updating the database
       Sentry.captureException(new Error('Card drop rate limit has been triggered'), {
         level: 'fatal' as SeverityLevel,
