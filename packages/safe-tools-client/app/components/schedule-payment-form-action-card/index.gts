@@ -2,20 +2,35 @@ import Component from '@glimmer/component';
 import SchedulePaymentFormActionCardUI from './ui';
 import { SelectableToken } from '@cardstack/boxel/components/boxel/input/selectable-token';
 import { inject as service } from '@ember/service';
+import NetworkService from '../../services/network';
 import TokensService from '../../services/tokens';
+import ScheduledPaymentsSDKService from '../../services/scheduled-payments-sdk';
+import WalletService from '../../services/wallet';
 import { action } from '@ember/object';
 import { tracked } from '@glimmer/tracking';
 import { Day } from '@cardstack/boxel/components/boxel/input/date';
 import { Time } from '@cardstack/boxel/components/boxel/input/time';
 import withTokenIcons from '../../helpers/with-token-icons';
-import SchedulePaymentFormValidator, { ValidatableForm } from './validator';
+import SchedulePaymentFormValidator, { MaxGasFeeOption, ValidatableForm } from './validator';
+import { use, resource } from 'ember-resources';
+import { TrackedObject } from 'tracked-built-ins';
+import { fromWei } from 'web3-utils';
 
 interface Signature {
   Element: HTMLElement;
 }
+interface MaxGasDescriptionsState {
+  isLoading: boolean;
+  isIndeterminate: boolean;
+  value?: Record<MaxGasFeeOption, string>
+  error?: Error
+}
 
 export default class SchedulePaymentFormActionCard extends Component<Signature> implements ValidatableForm {
+  @service declare network: NetworkService;
+  @service declare scheduledPaymentsSDK: ScheduledPaymentsSDKService;
   @service declare tokens: TokensService;
+  @service declare wallet: WalletService;
   validator = new SchedulePaymentFormValidator(this);
 
   get paymentTypeOptions() {
@@ -99,6 +114,52 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
     return this.validator.isValid;
   }
 
+  @use maxGasDescriptions = resource(() => {
+    const state: MaxGasDescriptionsState = new TrackedObject({
+      isLoading: true,
+      isIndeterminate: false
+    });
+    if (!this.wallet.isConnected) {
+      state.isIndeterminate = true;
+      return state;
+    }
+    let { selectedGasToken } = this;
+    if (!selectedGasToken) {
+      state.isIndeterminate = true;
+      return state;
+    }
+    let paymentTokenAddress = this.paymentToken?.address;
+    if (!paymentTokenAddress) {
+      state.isIndeterminate = true;
+      return state;
+    }
+    if (!this.selectedPaymentType) {
+      state.isIndeterminate = true;
+      return state;
+    }
+
+    // because networkInfo is tracked, anytime the network switches,
+    // this resource will re-run
+    const scenario = this.selectedPaymentType === 'one-time' ? 'execute_one_time_payment' : 'execute_recurring_payment';
+    (async () => {
+      try {
+        let result = await this.scheduledPaymentsSDK.getScheduledPaymentGasEstimation(scenario, paymentTokenAddress, selectedGasToken.address);
+        let gasRangeInWei = result.gasRangeInWei.standard;
+        state.value = {
+          normal: `Less than ${fromWei((gasRangeInWei.mul(2)).toString(), 'ether')} ${selectedGasToken.symbol}`,
+          high: `Less than ${fromWei(gasRangeInWei.mul(4).toString(), 'ether')} ${selectedGasToken.symbol}`,
+          max: `Capped at ${fromWei(gasRangeInWei.mul(6).toString(), 'ether')} ${selectedGasToken.symbol}`,
+        };
+      } catch (error) {
+        console.error(error);
+        state.error = error;
+      } finally {
+        state.isLoading = false;
+      }
+    })();
+    return state;
+  });
+
   @action
   schedulePayment() {
     console.log('TODO...');
@@ -134,6 +195,7 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
       @onUpdateMaxGasFee={{this.onUpdateMaxGasFee}}
       @onSchedulePayment={{this.schedulePayment}}
       @isSubmitEnabled={{this.isValid}}
+      @maxGasDescriptions={{this.maxGasDescriptions.value}}
     />
   </template>
 }

@@ -10,6 +10,8 @@ function isNumeric(str: unknown) {
   ); // ...and ensure strings of whitespace fail
 }
 
+export type MaxGasFeeOption = 'normal' | 'high' | 'max';
+
 export interface ValidatableForm {
   selectedPaymentType: 'one-time' | 'monthly' | undefined;
   paymentDate: Date | undefined;
@@ -19,7 +21,7 @@ export interface ValidatableForm {
   paymentAmount: string;
   paymentToken: SelectableToken | undefined;
   selectedGasToken: SelectableToken | undefined;
-  maxGasFee: 'normal' | 'high' | 'max' | undefined;
+  maxGasFee: MaxGasFeeOption | undefined;
 }
 
 export default class SchedulePaymentFormValidator {
