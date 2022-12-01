@@ -27,7 +27,6 @@ export interface Layer2Web3Strategy
 
 export type TransactionHash = string;
 export type TxnBlockNumber = number;
-export type ChainAddress = string;
 
 export type Layer2NetworkSymbol = 'gnosis' | 'sokol';
 export type TestLayer2NetworkSymbol = 'test-layer2';
