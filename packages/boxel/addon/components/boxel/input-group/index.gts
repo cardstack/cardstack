@@ -53,14 +53,14 @@ export default class InputGroup extends Component<Signature> {
     {{#let
         (and @invalid @errorMessage)
         (hash
-          Text=(component TextAccessory)
+          Text=TextAccessory
           Button=(component ButtonAccessory kind="secondary-light")
-          IconButton=(component IconButtonAccessory)
-          Select=(component SelectAccessory)
+          IconButton=IconButtonAccessory
+          Select=SelectAccessory
         )
         (hash
-          Input=(component InputControl)
-          Textarea=(component TextareaControl)
+          Input=InputControl
+          Textarea=TextareaControl
         )
       as |shouldShowErrorMessage Accessories Controls|}}
       <div

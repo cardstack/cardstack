@@ -91,9 +91,7 @@ export default class ActionChin extends Component<Signature> {
               disabled=@disabled
               class="boxel-action-chin__cancel-button"
             )
-            ActionStatusArea=(component
-              ActionStatusArea
-            )
+            ActionStatusArea=ActionStatusArea
             InfoArea=(component
               InfoArea
               class="boxel-action-chin__info-area"
@@ -139,9 +137,7 @@ export default class ActionChin extends Component<Signature> {
               disabled=@disabled
               class="boxel-action-chin__cancel-button"
             )
-            ActionStatusArea=(component
-              ActionStatusArea
-            )
+            ActionStatusArea=ActionStatusArea
             InfoArea=(component
               InfoArea
               class="boxel-action-chin__info-area"
