@@ -1,49 +1,27 @@
-import { click, render } from '@ember/test-helpers';
+import { click, fillIn, render, TestContext } from '@ember/test-helpers';
+import { selectChoose } from 'ember-power-select/test-support';
 import { setupRenderingTest } from 'ember-qunit';
 import hbs from 'htmlbars-inline-precompile';
 import { module, test } from 'qunit';
+
+import { exampleGasTokens } from '../support/tokens';
+import {
+  chooseTime,
+  chooseTomorrow,
+  EXAMPLE_RECIPIENT,
+} from '../support/ui-test-helpers';
 
 module(
   'Integration | Component | schedule-payment-form-action-card',
   function (hooks) {
     setupRenderingTest(hooks);
 
-    class MockTokensService {
-      transactionTokens = [
-        {
-          name: 'Cardstack',
-          logoURI: 'card',
-          symbol: 'CARD',
-          address: '0x954b890704693af242613edEf1B603825afcD708',
-        },
-        {
-          address: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
-          name: 'USD Coin',
-          symbol: 'USDC',
-          logoURI:
-            'https://assets-cdn.trustwallet.com/blockchains/ethereum/assets/0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48/logo.png',
-        },
-        {
-          address: '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2',
-          name: 'WETH',
-          symbol: 'WETH',
-          logoURI:
-            'https://assets-cdn.trustwallet.com/blockchains/ethereum/assets/0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2/logo.png',
-        },
-        {
-          name: 'MASQ',
-          symbol: 'MASQ',
-          address: '0xee9a352f6aac4af1a5b9f467f6a93e0ffbe9dd35',
-          logoURI:
-            'https://github.com/MASQ-Project/MASQ-contract/raw/master/MASQ%20Logo%20Blue%20Solo%20Transparent.png',
-        },
-      ];
-    }
+    hooks.beforeEach(function (this: TestContext) {
+      const tokensService = this.owner.lookup('service:tokens');
+      tokensService.stubGasTokens(exampleGasTokens);
+    });
 
-    test('It initializes the transaction token to undefined', async function (assert) {
-      this.owner.register('service:tokens', new MockTokensService(), {
-        instantiate: false,
-      });
+    test('it initializes the transaction token to undefined', async function (assert) {
       await render(hbs`
         <SchedulePaymentFormActionCard />
       `);
@@ -54,10 +32,7 @@ module(
         .containsText('Choose token');
     });
 
-    test('It shows tokens from the tokens service', async function (assert) {
-      this.owner.register('service:tokens', new MockTokensService(), {
-        instantiate: false,
-      });
+    test('it shows tokens from the tokens service', async function (assert) {
       await render(hbs`
         <SchedulePaymentFormActionCard />
       `);
@@ -65,8 +40,77 @@ module(
         '.boxel-input-selectable-token-amount [data-test-boxel-input-group-select-accessory-trigger]'
       );
       assert
-        .dom('.ember-power-select-option:nth-child(2)')
+        .dom('.boxel-input-selectable-token-amount__dropdown')
         .containsText('USDC');
+      assert
+        .dom('.boxel-input-selectable-token-amount__dropdown')
+        .containsText('DAI');
     });
+
+    test('it only enables the primary button when the form is valid', async function (assert) {
+      await render(hbs`
+        <SchedulePaymentFormActionCard />
+      `);
+      assert
+        .dom('[data-test-schedule-payment-form-submit-button]')
+        .isDisabled();
+
+      await click('[data-test-payment-type="one-time"]');
+
+      assert
+        .dom('[data-test-schedule-payment-form-submit-button]')
+        .isDisabled();
+
+      await chooseTomorrow('[data-test-boxel-input-date-trigger]');
+
+      await chooseTime('[data-test-boxel-input-time-trigger]', 9, 0, 'am');
+
+      assert
+        .dom('[data-test-schedule-payment-form-submit-button]')
+        .isDisabled();
+
+      await fillIn('[data-test-recipient-address-input]', EXAMPLE_RECIPIENT);
+
+      assert
+        .dom('[data-test-schedule-payment-form-submit-button]')
+        .isDisabled();
+
+      await fillIn('[data-test-amount-input] input', '15.0');
+
+      assert
+        .dom('[data-test-schedule-payment-form-submit-button]')
+        .isDisabled();
+
+      // Choose USDC for the transaction token
+      await selectChoose(
+        '[data-test-amount-input] [data-test-boxel-input-group-select-accessory-trigger]',
+        'USDC'
+      );
+
+      assert
+        .dom('[data-test-schedule-payment-form-submit-button]')
+        .isDisabled();
+
+      // Choose USDC for the gas token
+      await selectChoose('[data-test-gas-token-select]', 'USDC');
+
+      assert
+        .dom('[data-test-schedule-payment-form-submit-button]')
+        .isDisabled();
+
+      await click(
+        '[data-test-max-gas-toggle] [data-toggle-group-option="normal"]'
+      );
+
+      assert.dom('[data-test-schedule-payment-form-submit-button]').isEnabled();
+
+      await fillIn('[data-test-recipient-address-input]', 'Not an address');
+      assert
+        .dom('[data-test-schedule-payment-form-submit-button]')
+        .isDisabled();
+    });
+
+    // TODO: assert state for no network selected/connected
+    // TODO: assert state for no safe present
   }
 );

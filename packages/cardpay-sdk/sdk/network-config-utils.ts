@@ -37,6 +37,7 @@ export interface TokenDetail {
   name: string;
   symbol: string;
   decimals: number;
+  logoURI?: string;
 }
 
 interface RelayServerTokensResponse {

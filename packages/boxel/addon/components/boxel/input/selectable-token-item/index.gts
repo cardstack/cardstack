@@ -22,7 +22,7 @@ export default class SelectableTokenAmount extends Component<Signature> {
   }
 
   <template>
-    <div ...attributes>
+    <div data-test-token={{@item.symbol}} ...attributes>
       {{#if this.shouldUseSvgJar}}
         {{svgJar
           @item.logoURI
@@ -33,6 +33,7 @@ export default class SelectableTokenAmount extends Component<Signature> {
       {{#if this.shouldRenderImage}}
         <img src={{@item.logoURI}}
           class="boxel-selectable-token-icon__icon"
+          loading="lazy"
           role="presentation"
         />
       {{/if}}

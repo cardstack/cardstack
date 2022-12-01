@@ -5,6 +5,7 @@ import {
 } from '@cardstack/cardpay-sdk';
 import NetworkService from '@cardstack/safe-tools-client/services/network';
 import Service, { inject as service } from '@ember/service';
+import { type TokenInfo } from '@uniswap/token-lists';
 import { use, resource } from 'ember-resources';
 import sortBy from 'lodash/sortBy';
 import { TrackedObject } from 'tracked-built-ins';
@@ -28,7 +29,8 @@ export default class TokensService extends Service {
     const chainId = this.network.networkInfo.chainId;
     (async () => {
       try {
-        state.value = await fetchSupportedGasTokens(chainId);
+        state.value =
+          this._stubbedGasTokens || (await fetchSupportedGasTokens(chainId));
       } catch (error) {
         state.error = error;
       } finally {
@@ -38,7 +40,10 @@ export default class TokensService extends Service {
     return state;
   });
 
-  get transactionTokens() {
+  get transactionTokens(): TokenInfo[] {
+    if (this._stubbedTransactionTokens) {
+      return this._stubbedTransactionTokens;
+    }
     const tokens = getConstantByNetwork(
       'tokenList',
       this.network.symbol
@@ -47,5 +52,23 @@ export default class TokensService extends Service {
       return sortBy(tokens, ['symbol', 'name']);
     }
     return [];
+  }
+
+  _stubbedGasTokens: TokenDetail[] | undefined;
+  _stubbedTransactionTokens: TokenInfo[] | undefined;
+
+  stubGasTokens(val: TokenDetail[]) {
+    this._stubbedGasTokens = val;
+  }
+
+  stubTransactionTokens(val: TokenInfo[]) {
+    this._stubbedTransactionTokens = val;
+  }
+}
+
+// DO NOT DELETE: this is how TypeScript knows how to look up your services.
+declare module '@ember/service' {
+  interface Registry {
+    tokens: TokensService;
   }
 }

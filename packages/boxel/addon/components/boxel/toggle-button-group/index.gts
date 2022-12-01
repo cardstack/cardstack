@@ -50,6 +50,7 @@ const Button: TemplateOnlyComponent<ButtonSignature> =
         boxel-toggle-button-group-option--checked=checked
         boxel-toggle-button-group-option--disabled=@disabled
       }}
+      data-toggle-group-option={{@value}}
       ...attributes
     >
       <Input
