@@ -2,20 +2,28 @@ import { module, test } from 'qunit';
 import { setupRenderingTest } from 'ember-qunit';
 import { render, find, focus, triggerEvent, tap } from '@ember/test-helpers';
 import tippy from '@cardstack/web-client/modifiers/tippy';
+import { tracked } from '@glimmer/tracking';
 
 import { htmlSafe } from '@ember/template';
+
+class Bindings {
+  @tracked content: string | ReturnType<typeof htmlSafe> | undefined;
+}
+
+let bindings: Bindings;
 
 module('Integration | Modifier | tippy', function (hooks) {
   setupRenderingTest(hooks);
 
   hooks.beforeEach(async function () {
-    let content = 'Tooltip';
+    bindings = new Bindings();
+    bindings.content = 'Tooltip';
     // seems like appendTo=parent is necessary
     // to make it possible to detect the tooltip in tests
     await render(
       <template>
         <div id="trigger" tabindex="0"
-          {{tippy content=content appendTo="parent"}}
+          {{tippy content=bindings.content appendTo="parent"}}
         >Trigger</div>
       </template>
     );
@@ -95,7 +103,7 @@ module('Integration | Modifier | tippy', function (hooks) {
   });
 
   test('it can render htmlSafe content', async function (assert) {
-    this.set('content', htmlSafe('Tool<b id="b">tip</b>'));
+    bindings.content = htmlSafe('Tool<b id="b">tip</b>');
 
     const trigger = find('#trigger')!;
     await focus(trigger);
