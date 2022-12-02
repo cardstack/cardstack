@@ -1,43 +1,66 @@
 import Component from '@glimmer/component';
-import '@cardstack/boxel/styles/global.css';
-import './index.css';
 import BoxelSelect from '../../select';
 import SelectableTokenItem from '../selectable-token-item';
-import cn from '@cardstack/boxel/helpers/cn';
 import { SelectableToken } from '../selectable-token';
+import { action } from '@ember/object';
+import { guidFor } from '@ember/object/internals';
+import and from 'ember-truth-helpers/helpers/and';
+import cn from '@cardstack/boxel/helpers/cn';
+import { concat } from '@ember/helper';
+import '@cardstack/boxel/styles/global.css';
+import './index.css';
 
 interface Signature {
   Element: HTMLDivElement;
   Args: {
     disabled?: boolean;
     placeholder?: string;
+    errorMessage?: string;
+    invalid?: boolean;
     tokens: SelectableToken[];
     value?: SelectableToken;
     onChooseToken: (token: SelectableToken) => void;
+    onBlur?: (ev: FocusEvent) => void;
   };
 }
 
-export default class TokenSelect extends Component<Signature> { 
+export default class TokenSelect extends Component<Signature> {
+  helperId = guidFor(this);
   get placeholder() {
     return this.args.placeholder || 'Choose a token';
   }
+  @action onBlur(_select: any, ev: FocusEvent): void {
+    this.args.onBlur?.(ev);
+  }
   <template>
-    <BoxelSelect
-      @placeholder={{this.placeholder}}
-      @options={{@tokens}}
-      @selected={{@value}}
-      @searchField="symbol"
-      @disabled={{@disabled}}
-      @onChange={{@onChooseToken}}
-      @verticalPosition="below"
-      class={{cn "boxel-input-token-select" boxel-input-token-select--disabled=@disabled}}
-      ...attributes
-     as |item itemCssClass|>
-      <SelectableTokenItem
-        @item={{item}}
-        class={{cn itemCssClass "boxel-input-token-select__dropdown-item"}}
-      /> 
-    </BoxelSelect>
+    {{#let (and @invalid @errorMessage) as |shouldShowErrorMessage|}}
+      <BoxelSelect
+        @placeholder={{this.placeholder}}
+        @options={{@tokens}}
+        @selected={{@value}}
+        @searchField="symbol"
+        @disabled={{@disabled}}
+        @onChange={{@onChooseToken}}
+        @onBlur={{this.onBlur}}
+        @verticalPosition="below"
+        aria-invalid={{if @invalid "true"}}
+        aria-errormessage={{if shouldShowErrorMessage (concat "error-message-" this.helperId) false}}
+        class={{cn
+          "boxel-input-token-select"
+          boxel-input-token-select--disabled=@disabled
+          boxel-input-token-select--invalid=@invalid
+        }}
+        ...attributes
+      as |item itemCssClass|>
+        <SelectableTokenItem
+          @item={{item}}
+          class={{cn itemCssClass "boxel-input-token-select__dropdown-item"}}
+        /> 
+      </BoxelSelect>
+        {{#if shouldShowErrorMessage}}
+          <div id={{concat "error-message-" this.helperId}} class="boxel-input-token-select__error-message" aria-live="polite" data-test-boxel-input-token-select-error-message>{{@errorMessage}}</div>
+        {{/if}}
+      {{/let}}
   </template>
 }
 

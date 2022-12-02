@@ -1,5 +1,4 @@
 import Component from '@glimmer/component';
-import { type EmptyObject } from '@ember/component/helper';
 import cn from '@cardstack/boxel/helpers/cn';
 import and from 'ember-truth-helpers/helpers/and';
 import not from 'ember-truth-helpers/helpers/not';
@@ -30,7 +29,6 @@ export interface Signature {
     required?: boolean;
     optional?: boolean;
   };
-  Blocks: EmptyObject;
 }
 
 export default class BoxelInput extends Component<Signature> {
