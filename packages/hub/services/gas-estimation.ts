@@ -2,9 +2,9 @@ import { inject } from '@cardstack/di';
 import { addDays, addMilliseconds } from 'date-fns';
 import { nowUtc } from '../utils/dates';
 import config from 'config';
-import { ethers, Wallet } from 'ethers';
+import { Wallet } from 'ethers';
 import { GasEstimationResultsScenarioEnum } from '@prisma/client';
-import { convertChainIdToName, SchedulerCapableNetworks } from '@cardstack/cardpay-sdk';
+import { convertChainIdToName } from '@cardstack/cardpay-sdk';
 import { supportedChains } from '@cardstack/cardpay-sdk';
 import { NotFound } from '@cardstack/core/src/utils/errors';
 
@@ -86,33 +86,22 @@ export default class GasEstimationService {
     }
 
     let provider = this.ethersProvider.getInstance(params.chainId);
-    let networkName = convertChainIdToName(params.chainId);
-    let tokenList = this.cardpay.getConstantByNetwork('tokenList', networkName as SchedulerCapableNetworks);
-    let token = tokenList.tokens.find((t) => t.address === params.tokenAddress);
-    let gasToken = tokenList.tokens.find((t) => t.address === params.gasTokenAddress);
-    if (!token) throw Error('unknown token');
-    if (!gasToken) throw Error('unknown gas token');
-
-    //Check the decimals of tokens
-    //to avoid error when converting USD tokens
-    //because USD token's decimals is lower than native token's decimals
-    let tokenAmount = ethers.utils.parseUnits('1', token.decimals >= 18 ? 'gwei' : token.decimals);
-    let gasTokenAmount = ethers.utils.parseUnits('0.01', gasToken.decimals >= 18 ? 'gwei' : token.decimals);
-
     let signer = new Wallet(config.get('hubPrivateKey'));
     let scheduledPaymentModule = await this.cardpay.getSDK('ScheduledPaymentModule', provider, signer);
+    let transferAmount = '1000';
+    let gasPrice = '100';
     let gas;
     switch (params.scenario) {
       case GasEstimationResultsScenarioEnum.execute_one_time_payment:
         gas = await scheduledPaymentModule.estimateExecutionGas(
           this.getHubSPModuleAddress(params.chainId),
           params.tokenAddress,
-          tokenAmount.toString(),
+          transferAmount.toString(),
           signer.address,
-          gasTokenAmount.toString(),
+          gasPrice.toString(),
           params.gasTokenAddress,
           'salt1',
-          gasTokenAmount.toString(),
+          gasPrice.toString(),
           Math.round(nowUtc().getTime() / 1000),
           null,
           null
@@ -130,12 +119,12 @@ export default class GasEstimationService {
         gas = await scheduledPaymentModule.estimateExecutionGas(
           this.getHubSPModuleAddress(params.chainId),
           params.tokenAddress,
-          tokenAmount.toString(),
+          transferAmount.toString(),
           signer.address,
-          gasTokenAmount.toString(),
+          gasPrice.toString(),
           params.gasTokenAddress,
           'salt1',
-          gasTokenAmount.toString(),
+          gasPrice.toString(),
           null,
           28,
           Math.round(addDays(nowUtc(), 30).getTime() / 1000)
