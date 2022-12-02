@@ -1,13 +1,13 @@
 import Component from '@glimmer/component';
 import Container from './container';
 import Item from './item';
+import ErrorMessage from '../input/error-message';
 import and from 'ember-truth-helpers/helpers/and';
 import eq from 'ember-truth-helpers/helpers/eq';
 import or from 'ember-truth-helpers/helpers/or';
 //@ts-expect-error glint does not think this is consumed-but it is consumed in the template https://github.com/typed-ember/glint/issues/374
 import { concat, hash } from '@ember/helper';
 import cn from '@cardstack/boxel/helpers/cn';
-import { guidFor } from '@ember/object/internals';
 
 import '@cardstack/boxel/styles/global.css';
 import './index.css';
@@ -38,7 +38,6 @@ export interface Signature {
 }
 
 export default class RadioInput extends Component<Signature> {
-  helperId = guidFor(this);
   <template>
     {{#let (and @invalid @errorMessage) as |shouldShowErrorMessage|}}
       <Container
@@ -67,7 +66,9 @@ export default class RadioInput extends Component<Signature> {
         {{/each}}
       </Container>
       {{#if shouldShowErrorMessage}}
-        <div id={{concat "error-message-" this.helperId}} class="boxel-radio-input__error-message" aria-live="polite" data-test-boxel-radio-input-error-message>{{@errorMessage}}</div>
+        <ErrorMessage
+          @message={{@errorMessage}}
+        />
       {{/if}}
     {{/let}}
 

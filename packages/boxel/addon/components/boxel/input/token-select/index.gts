@@ -1,5 +1,6 @@
 import Component from '@glimmer/component';
 import BoxelSelect from '../../select';
+import ErrorMessage from '../error-message';
 import SelectableTokenItem from '../selectable-token-item';
 import { SelectableToken } from '../selectable-token';
 import { action } from '@ember/object';
@@ -58,7 +59,10 @@ export default class TokenSelect extends Component<Signature> {
         /> 
       </BoxelSelect>
         {{#if shouldShowErrorMessage}}
-          <div id={{concat "error-message-" this.helperId}} class="boxel-input-token-select__error-message" aria-live="polite" data-test-boxel-input-token-select-error-message>{{@errorMessage}}</div>
+          <ErrorMessage
+            id={{concat "error-message-" this.helperId}}
+            @message={{@errorMessage}}
+          />
         {{/if}}
       {{/let}}
   </template>

@@ -5,12 +5,3 @@
   --boxel-radio-input-option-padding: var(--boxel-sp);
   --boxel-radio-input-option-gap: var(--boxel-sp-sm);
 }
-
-.boxel-radio-input__error-message {
-  grid-column: 2;
-  margin-top: var(--boxel-sp-xs);
-  margin-left: var(--boxel-sp-xs);
-  color: var(--boxel-error-100);
-  font: var(--boxel-font-sm);
-  letter-spacing: var(--boxel-lsp);
-}

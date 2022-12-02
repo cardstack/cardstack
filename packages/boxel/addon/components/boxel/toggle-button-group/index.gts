@@ -1,5 +1,6 @@
 import Component from '@glimmer/component';
 import { Input } from '@ember/component';
+import ErrorMessage from '../input/error-message';
 
 //@ts-expect-error glint does not think this is consumed-but it is consumed in the template https://github.com/typed-ember/glint/issues/374
 import { concat, hash } from '@ember/helper';
@@ -118,7 +119,10 @@ export default class ToggleButtonGroupComponent extends Component<Signature> {
         </div>
       </fieldset>
       {{#if shouldShowErrorMessage}}
-        <div id={{concat "error-message-" this.helperId}} class="boxel-toggle-button-group__error-message" aria-live="polite" data-test-boxel-toggle-button-group-error-message>{{@errorMessage}}</div>
+        <ErrorMessage
+          id={{concat "error-message-" this.helperId}}
+          @message={{@errorMessage}}
+        />
       {{/if}}
     {{/let}}
   </template>

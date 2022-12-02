@@ -90,15 +90,6 @@
   box-shadow: inset -3px 4px 3px -2px var(--boxel-light-500);
 }
 
-.boxel-toggle-button-group__error-message {
-  grid-column: 2;
-  margin-top: var(--boxel-sp-xs);
-  margin-left: var(--boxel-sp-xs);
-  color: var(--boxel-error-100);
-  font: var(--boxel-font-sm);
-  letter-spacing: var(--boxel-lsp);
-}
-
 .boxel-toggle-button-group--invalid .boxel-toggle-button-group-option {
   border-color: var(--boxel-error-100);
 }
