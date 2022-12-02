@@ -20,7 +20,7 @@
     "baseUrl": ".",
     "module": "es2020",
     "experimentalDecorators": true,
-    "skipLibCheck": false,
+    "skipLibCheck": true,
     "resolveJsonModule": true,
     "traceResolution": false,
     "paths": {
