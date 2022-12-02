@@ -47,6 +47,7 @@ interface SchedulerCapableNetworkConstants {
   tokenList: TokenList;
   scheduledPaymentFeeFixedUSD: number;
   scheduledPaymentFeePercentage: number;
+  uniswapPairInitCodeHash: string;
 }
 
 interface CardPayCapableNetworkConstants {
@@ -178,6 +179,7 @@ const constants: {
     scheduledPaymentFeeFixedUSD: 0.25,
     scheduledPaymentFeePercentage: 0.1, //10%
     subgraphURL: '',
+    uniswapPairInitCodeHash: '0x96e8ac4277198ff8b6f785478aa9a39f403cb768dd02cbee326c3e7da348845f',
   },
   goerli: {
     ...testHubUrl,
@@ -191,6 +193,7 @@ const constants: {
     scheduledPaymentFeeFixedUSD: 0,
     scheduledPaymentFeePercentage: 0,
     subgraphURL: 'https://api.thegraph.com/subgraphs/name/cardstack/safe-tools-goerli',
+    uniswapPairInitCodeHash: '0x96e8ac4277198ff8b6f785478aa9a39f403cb768dd02cbee326c3e7da348845f',
   },
   polygon: {
     ...hubUrl,
@@ -204,6 +207,7 @@ const constants: {
     subgraphURL: '',
     scheduledPaymentFeeFixedUSD: 0.25,
     scheduledPaymentFeePercentage: 0.1, //10%
+    uniswapPairInitCodeHash: '0xe18a34eb0e04b04f7a0ac29a6e80748dca96319b42c54d679cb821dca90c6303',
   },
   mumbai: {
     ...testHubUrl,
@@ -217,6 +221,7 @@ const constants: {
     scheduledPaymentFeeFixedUSD: 0,
     scheduledPaymentFeePercentage: 0,
     subgraphURL: 'https://api.thegraph.com/subgraphs/name/cardstack/safe-tools-mumbai',
+    uniswapPairInitCodeHash: '0xe18a34eb0e04b04f7a0ac29a6e80748dca96319b42c54d679cb821dca90c6303',
   },
 };
 
