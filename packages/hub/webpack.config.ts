@@ -229,15 +229,6 @@ module.exports = {
         test: /\.node$/,
         loader: 'node-loader',
       },
-      {
-        test: /\.cs$/,
-        loader: 'ignore-loader',
-      },
-      {
-        test: /\.html$/,
-        use: 'ignore-loader',
-        exclude: '/node_modules/@mapbox/node-pre-gyp',
-      },
     ],
   },
   ignoreWarnings: [
@@ -325,10 +316,6 @@ module.exports = {
       // trying to dynamically import to check whether a module is available
       module: /node_modules\/@aws-sdk\/util-user-agent-node/,
       message: /Module not found: Error: Can't resolve 'aws-crt'/,
-    },
-    {
-      module: /node_modules\/@mapbox\/node-pre-gyp\/lib\/util\/compile\.js/,
-      message: /Module not found: Error: Can't resolve 'npm'/,
     },
   ],
 };
