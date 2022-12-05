@@ -179,7 +179,7 @@ const constants: {
     scheduledPaymentFeeFixedUSD: 0.25,
     scheduledPaymentFeePercentage: 0.1, //10%
     subgraphURL: '',
-    uniswapPairInitCodeHash: '0x96e8ac4277198ff8b6f785478aa9a39f403cb768dd02cbee326c3e7da348845f', //Result of keccak256(type(UniswapV2Pair).creationCode) from deployed UniswapV2Factory
+    uniswapPairInitCodeHash: '0x96e8ac4277198ff8b6f785478aa9a39f403cb768dd02cbee326c3e7da348845f', // Result of keccak256(type(UniswapV2Pair).creationCode) from deployed UniswapV2Factory. We had to deploy our own Uniswap contracts on some networks (for now Mumbai) because they were missing, and add the patches/@uniswap+sdk+3.0.3.patch to support custom token pairs (by providing factory address and token pair code hash)
   },
   goerli: {
     ...testHubUrl,
