@@ -5,6 +5,7 @@ module.exports = {
     offchainStorage: {
       cloudfrontDistributionId: 'A-FAKE-ID',
       invalidationRoleChain: ['a-fake-role-chain'],
+      rewardsRoleChain: ['a-fake-role-chain'],
     },
   },
   db: {
