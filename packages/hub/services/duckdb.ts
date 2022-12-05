@@ -1,6 +1,6 @@
 import { Database } from 'duckdb-async';
 import config from 'config';
-import awsConfig from '../utils/aws-config';
+import awsConfig, { AwsConfigResult } from '../utils/aws-config';
 import logger from '@cardstack/logger';
 
 const log = logger('hub/duckdb');
@@ -14,25 +14,31 @@ const REQUIRED_DUCKDB_EXTENSIONS = ['httpfs']; //httpfs needed for s3. parquet e
 
 export default class DuckDB {
   private db: Database | undefined;
+  private awsConfig: AwsConfigResult | undefined;
 
-  async getClient() {
+  async getClient(setAws: boolean = true) {
     if (!this.db) {
       this.db = await Database.create(':memory');
     }
     await this.setupExtensions(this.db);
-    await this.setupAws(this.db);
+    if (setAws) {
+      await this.setupAws(this.db);
+    }
     return this.db;
   }
 
   async queryParquet(db: Database, files: s3FileInfo[]) {
+    if (!this.awsConfig) {
+      await this.setupAws(db);
+    }
     // For example, 's3://cardpay-staging-reward-programs/rewardProgramID=0x0885ce31D73b63b0Fcb1158bf37eCeaD8Ff0fC72/paymentCycle=27603400/results.parquet', 's3://cardpay-staging-reward-programs/rewardProgramID=0x0885ce31D73b63b0Fcb1158bf37eCeaD8Ff0fC72/paymentCycle=27625500/results.parquet'
     const s3Urls: string[] = files.map(({ rewardProgramId, paymentCycle }) => {
       return `s3://cardpay-staging-reward-programs/rewardProgramID=${rewardProgramId}/paymentCycle=${paymentCycle}/results.parquet`;
     });
     const sql = `                                                                                                                                                                                          
-    SELECT * FROM parquet_scan(${s3Urls});                                   
+      SELECT * FROM parquet_scan(${s3Urls});                                   
     `;
-    return db.all(sql);
+    return this.query(db, sql);
   }
   async query(db: Database, sqlQuery: string) {
     return db.all(sqlQuery);
