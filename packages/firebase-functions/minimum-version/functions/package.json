@@ -1,6 +1,6 @@
 {
   "name": "minimum-version",
-  "version": "1.0.20",
+  "version": "1.0.21",
   "scripts": {
     "build": "tsc",
     "serve": "npm run build && firebase emulators:start --only functions",
