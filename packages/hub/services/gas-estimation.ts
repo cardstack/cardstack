@@ -88,10 +88,10 @@ export default class GasEstimationService {
     let provider = this.ethersProvider.getInstance(params.chainId);
     let signer = new Wallet(config.get('hubPrivateKey'));
     let scheduledPaymentModule = await this.cardpay.getSDK('ScheduledPaymentModule', provider, signer);
-    
-    // Both transferAmount and gasPrice should be as small as possible 
+
+    // Both transferAmount and gasPrice should be as small as possible
     // (so that we don't have to keep a non-trivial balance of tokens in the crank)
-    // given their token decimal amount. 
+    // given their token decimal amount.
     // For transferAmount we should consider the underflow error,
     // since transferAmount will be calculated with fee percentage.
     // And gasPrice is price per unit of gas, so it will be multiplied by the gas execution.
