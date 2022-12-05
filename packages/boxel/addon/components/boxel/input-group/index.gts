@@ -1,6 +1,7 @@
 import Component from '@glimmer/component';
 import { AccessoriesBlockArg, TextAccessory, SelectAccessory, ButtonAccessory, IconButtonAccessory } from './accessories';
 import { ControlsBlockArg, TextareaControl, InputControl } from './controls';
+import ErrorMessage from '../input/error-message';
 
 import and from 'ember-truth-helpers/helpers/and';
 import cn from '@cardstack/boxel/helpers/cn';
@@ -95,7 +96,12 @@ export default class InputGroup extends Component<Signature> {
         {{yield Accessories this.inputGroupBlockArg to="after"}}
       </div>
       {{#if shouldShowErrorMessage}}
-        <div id={{concat "error-message-" this.elementId}} class="boxel-input-group__error-message" aria-live="polite" data-test-boxel-input-group-error-message>{{@errorMessage}}</div>
+          <ErrorMessage
+            id={{concat "error-message-" this.elementId}}
+            class="boxel-input-group__error-message"
+            data-test-boxel-input-group-error-message
+            @message={{@errorMessage}}
+          />
       {{/if}}
       {{#if @helperText}}
         <div id={{concat "helper-text-" this.elementId}} class="boxel-input-group__helper-text" data-test-boxel-input-group-helper-text>{{@helperText}}</div>

@@ -1,5 +1,5 @@
 import Component from '@glimmer/component';
-import { type EmptyObject } from '@ember/component/helper';
+import ErrorMessage from './error-message';
 import cn from '@cardstack/boxel/helpers/cn';
 import and from 'ember-truth-helpers/helpers/and';
 import not from 'ember-truth-helpers/helpers/not';
@@ -30,7 +30,6 @@ export interface Signature {
     required?: boolean;
     optional?: boolean;
   };
-  Blocks: EmptyObject;
 }
 
 export default class BoxelInput extends Component<Signature> {
@@ -62,7 +61,11 @@ export default class BoxelInput extends Component<Signature> {
           ...attributes
         />
         {{#if shouldShowErrorMessage}}
-          <div id={{concat "error-message-" this.helperId}} class="boxel-input__error-message" aria-live="polite" data-test-boxel-input-error-message>{{@errorMessage}}</div>
+          <ErrorMessage
+            id={{concat "error-message-" this.helperId}}
+            class="boxel-input__error-message"
+            @message={{@errorMessage}}
+          />
         {{/if}}
         {{#if @helperText}}
           <div id={{concat "helper-text-" this.helperId}} class="boxel-input__helper-text" data-test-boxel-input-helper-text>{{@helperText}}</div>

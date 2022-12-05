@@ -9,6 +9,7 @@ import { Day } from '@cardstack/boxel/components/boxel/input/date';
 import { Time } from '@cardstack/boxel/components/boxel/input/time';
 import withTokenIcons from '../../helpers/with-token-icons';
 import SchedulePaymentFormValidator, { ValidatableForm } from './validator';
+import not from 'ember-truth-helpers/helpers/not';
 
 interface Signature {
   Element: HTMLElement;
@@ -109,6 +110,8 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
       @paymentTypeOptions={{this.paymentTypeOptions}}
       @selectedPaymentType={{this.selectedPaymentType}}
       @onSelectPaymentType={{this.onSelectPaymentType}}
+      @isPaymentTypeInvalid={{not this.validator.isPaymentTypeValid}}
+      @paymentTypeErrorMessage={{this.validator.paymentTypeErrorMessage}}
       @paymentDate={{this.paymentDate}}
       @onSetPaymentTime={{this.onSetPaymentTime}}
       @onSetPaymentDate={{this.onSetPaymentDate}}
@@ -117,21 +120,25 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
       @monthlyUntil={{this.monthlyUntil}}
       @onSetMonthlyUntil={{this.onSetMonthlyUntil}}
       @recipientAddress={{this.recipientAddress}}
-      @isRecipientAddressInvalid={{this.validator.isRecipientAddressInvalid}}
+      @isRecipientAddressInvalid={{not this.validator.isRecipientAddressValid}}
       @recipientAddressErrorMessage={{this.validator.recipientAddressErrorMessage}}
       @onUpdateRecipientAddress={{this.onUpdateRecipientAddress}}
       @paymentAmount={{this.paymentAmount}}
       @onUpdatePaymentAmount={{this.onUpdatePaymentAmount}}
-      @isPaymentAmountInvalid={{this.validator.isPaymentAmountInvalid}}
-      @paymentTokenErrorMessage={{this.validator.paymentTokenErrorMessage}}
+      @isPaymentAmountInvalid={{not this.validator.isAmountValid}}
+      @paymentAmountErrorMessage={{this.validator.amountErrorMessage}}
       @paymentToken={{this.paymentToken}}
       @paymentTokens={{this.paymentTokens}}
       @onUpdatePaymentToken={{this.onUpdatePaymentToken}}
       @selectedGasToken={{this.selectedGasToken}}
       @gasTokens={{withTokenIcons this.tokens.gasTokens.value}}
       @onSelectGasToken={{this.onSelectGasToken}}
+      @isGasTokenInvalid={{not this.validator.isGasTokenValid}}
+      @gasTokenErrorMessage={{this.validator.gasTokenErrorMessage}}
       @maxGasFee={{this.maxGasFee}}
       @onUpdateMaxGasFee={{this.onUpdateMaxGasFee}}
+      @isMaxGasFeeInvalid={{not this.validator.isMaxGasFeeValid}}
+      @maxGasFeeErrorMessage={{this.validator.maxGasFeeErrorMessage}}
       @onSchedulePayment={{this.schedulePayment}}
       @isSubmitEnabled={{this.isValid}}
     />

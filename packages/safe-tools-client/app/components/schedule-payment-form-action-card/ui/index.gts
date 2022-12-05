@@ -13,8 +13,10 @@ import { SelectableToken } from '@cardstack/boxel/components/boxel/input/selecta
 import { fn } from '@ember/helper';
 import { on } from '@ember/modifier';
 import { svgJar } from '@cardstack/boxel/utils/svg-jar';
+import { tracked } from '@glimmer/tracking';
 import eq from 'ember-truth-helpers/helpers/eq';
 import not from 'ember-truth-helpers/helpers/not';
+import set from 'ember-set-helper/helpers/set';
 import './index.css';
 import { ValidatableForm } from '../validator';
 
@@ -23,6 +25,8 @@ interface Signature {
   Args: ValidatableForm & {
     paymentTypeOptions: { id: string, text: string }[];
     onSelectPaymentType: (paymentTypeId: string) => void;
+    isPaymentTypeInvalid: boolean;
+    paymentTypeErrorMessage: string;
     onSetPaymentDate: (day: Day) => void;
     onSetPaymentTime: (time: Time) => void;
     onSelectPaymentDayOfMonth: (val: number) => void;
@@ -31,12 +35,16 @@ interface Signature {
     recipientAddressErrorMessage: string;
     onUpdatePaymentAmount: (val: string) => void;
     isPaymentAmountInvalid: boolean;
-    paymentTokenErrorMessage: string;
+    paymentAmountErrorMessage: string;
     paymentTokens: SelectableToken[];
     onUpdatePaymentToken: (val: SelectableToken) => void;
     gasTokens: SelectableToken[];
     onSelectGasToken: (val: SelectableToken) => void;
+    isGasTokenInvalid: boolean;
+    gasTokenErrorMessage: string;
     onUpdateMaxGasFee: (val: string) => void;
+    isMaxGasFeeInvalid: boolean;
+    maxGasFeeErrorMessage: string;
     onSchedulePayment: () => void;
     isSubmitEnabled: boolean;
     onUpdateRecipientAddress: (val: string) => void;
@@ -44,6 +52,47 @@ interface Signature {
 }
 
 export default class SchedulePaymentFormActionCardUI extends Component<Signature> {
+  @tracked hasBlurredPaymentType = false;
+  @tracked hasBlurredRecipientAddress = false;
+  @tracked hasBlurredPaymentAmount = false;
+  @tracked hasBlurredGasToken = false;
+  @tracked hasBlurredMaxGasFee = false;
+
+  get isPaymentTypeInvalid() {
+    if (!this.hasBlurredPaymentType) {
+      return false;
+    }
+    return this.args.isPaymentTypeInvalid;
+  }
+
+  get isRecipientAddressInvalid() {
+    if (!this.hasBlurredRecipientAddress) {
+      return false;
+    }
+    return this.args.isRecipientAddressInvalid;
+  }
+
+  get isPaymentAmountInvalid() {
+    if (!this.hasBlurredPaymentAmount) {
+      return false;
+    }
+    return this.args.isPaymentAmountInvalid;
+  }
+
+  get isGasTokenInvalid() {
+    if (!this.hasBlurredGasToken) {
+      return false;
+    }
+    return this.args.isGasTokenInvalid;
+  }
+
+  get isMaxGasFeeInvalid() {
+    if (!this.hasBlurredMaxGasFee) {
+      return false;
+    }
+    return this.args.isMaxGasFeeInvalid;
+  }
+
   <template>
     <BoxelActionContainer
       class="schedule-payment-form-action-card"
@@ -56,8 +105,11 @@ export default class SchedulePaymentFormActionCardUI extends Component<Signature
             <BoxelRadioInput
               @groupDescription="Select a type of scheduled payment"
               @name="payment-type"
+              @errorMessage={{@paymentTypeErrorMessage}}
+              @invalid={{this.isPaymentTypeInvalid}}
               @items={{@paymentTypeOptions}}
               @checkedId={{@selectedPaymentType}}
+              @onBlur={{set this 'hasBlurredPaymentType' true}}
             as |item|>
               {{#let item.component as |RadioItem|}}
                 <RadioItem @onChange={{fn @onSelectPaymentType item.data.id}} data-test-payment-type={{item.data.id}}>
@@ -114,9 +166,10 @@ export default class SchedulePaymentFormActionCardUI extends Component<Signature
             placeholder="Enter Address"
             data-test-recipient-address-input
             @value={{@recipientAddress}}
-            @invalid={{@isRecipientAddressInvalid}}
+            @invalid={{this.isRecipientAddressInvalid}}
             @errorMessage={{@recipientAddressErrorMessage}}
             @onInput={{@onUpdateRecipientAddress}}
+            @onBlur={{set this 'hasBlurredRecipientAddress' true}}
           />
         </BoxelField>
         <BoxelField @label="Amount">
@@ -124,20 +177,24 @@ export default class SchedulePaymentFormActionCardUI extends Component<Signature
             data-test-amount-input
             @value={{@paymentAmount}}
             @onInput={{@onUpdatePaymentAmount}}
-            @invalid={{@isPaymentAmountInvalid}}
-            @errorMessage={{@paymentTokenErrorMessage}}
+            @invalid={{this.isPaymentAmountInvalid}}
+            @errorMessage={{@paymentAmountErrorMessage}}
             @token={{@paymentToken}}
             @tokens={{@paymentTokens}}
             @onChooseToken={{@onUpdatePaymentToken}}
+            @onBlurToken={{set this 'hasBlurredPaymentAmount' true}}
           />
         </BoxelField>
         <BoxelField @label="Gas">
           <BoxelTokenSelect
             data-test-gas-token-select
             @placeholder="Choose a Gas Token"
+            @invalid={{this.isGasTokenInvalid}}
+            @errorMessage={{@gasTokenErrorMessage}}
             @value={{@selectedGasToken}}
-            @onChooseToken={{@onSelectGasToken}}
             @tokens={{@gasTokens}}
+            @onChooseToken={{@onSelectGasToken}}
+            @onBlur={{set this 'hasBlurredGasToken' true}}
           />
         </BoxelField>
         <BoxelField @label="Max Gas Fee">
@@ -145,8 +202,12 @@ export default class SchedulePaymentFormActionCardUI extends Component<Signature
             data-test-max-gas-toggle
             @groupDescription="The maximum gas fee you are willing to spend for this payment"
             @name="max-gas-fee"
+            @errorMessage={{@maxGasFeeErrorMessage}}
+            @invalid={{this.isMaxGasFeeInvalid}}
             @value={{@maxGasFee}}
-            @onChange={{@onUpdateMaxGasFee}} as |group|
+            @onChange={{@onUpdateMaxGasFee}}
+            @onBlur={{set this 'hasBlurredMaxGasFee' true}}
+            as |group|
           >
             <group.Button @value="normal">
               <div class="schedule-payment-form-action-card--max-gas-fee-name">

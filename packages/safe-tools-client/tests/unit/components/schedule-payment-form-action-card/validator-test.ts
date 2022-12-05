@@ -37,12 +37,20 @@ module('Unit | SchedulePaymentFormActionCard Validator', function (hooks) {
   test('is valid when everything is set', function (assert) {
     const subject = new Validator(exampleForm);
     assert.true(subject.isValid);
+    assert.strictEqual(subject.recipientAddressErrorMessage, '');
+    assert.strictEqual(subject.amountErrorMessage, '');
+    assert.strictEqual(subject.gasTokenErrorMessage, '');
   });
 
   test('is not valid when paymentType is unset', function (assert) {
     exampleForm.selectedPaymentType = undefined;
     const subject = new Validator(exampleForm);
     assert.false(subject.isValid);
+    assert.false(subject.isPaymentTypeValid);
+    assert.strictEqual(
+      subject.paymentTypeErrorMessage,
+      'must choose a payment type'
+    );
   });
 
   test('is not valid when paymentType is one-time but date and time are unset', function (assert) {
@@ -70,42 +78,68 @@ module('Unit | SchedulePaymentFormActionCard Validator', function (hooks) {
     exampleForm.recipientAddress = '';
     const subject = new Validator(exampleForm);
     assert.false(subject.isValid);
+    assert.false(subject.isRecipientAddressValid);
+    assert.strictEqual(subject.recipientAddressErrorMessage, "can't be blank");
   });
 
   test('is not valid when recipient is not an address', function (assert) {
     exampleForm.recipientAddress = 'hello';
     const subject = new Validator(exampleForm);
     assert.false(subject.isValid);
+    assert.false(subject.isRecipientAddressValid);
+    assert.strictEqual(
+      subject.recipientAddressErrorMessage,
+      'must be a valid chain address'
+    );
   });
 
   test('is not valid when paymentAmount is unset', function (assert) {
     exampleForm.paymentAmount = '';
     const subject = new Validator(exampleForm);
     assert.false(subject.isValid);
+    assert.false(subject.isAmountValid);
+    assert.strictEqual(subject.amountErrorMessage, "can't be blank");
   });
 
   test('is not valid when paymentAmount is not a number', function (assert) {
     exampleForm.paymentAmount = 'my left foot';
     const subject = new Validator(exampleForm);
     assert.false(subject.isValid);
+    assert.false(subject.isAmountValid);
+    assert.strictEqual(subject.amountErrorMessage, 'must be numeric');
   });
 
   test('is not valid when paymentToken is unset', function (assert) {
     exampleForm.paymentToken = undefined;
     const subject = new Validator(exampleForm);
     assert.false(subject.isValid);
+    assert.false(subject.isAmountValid);
+    assert.strictEqual(
+      subject.amountErrorMessage,
+      'must choose a token for the payment'
+    );
   });
 
   test('is not valid when selectedGasToken is unset', function (assert) {
     exampleForm.selectedGasToken = undefined;
     const subject = new Validator(exampleForm);
     assert.false(subject.isValid);
+    assert.false(subject.isGasTokenValid);
+    assert.strictEqual(
+      subject.gasTokenErrorMessage,
+      'must choose a token to be used to pay for gas'
+    );
   });
 
   test('is not valid when maxGasFee is unset', function (assert) {
     exampleForm.maxGasFee = undefined;
     const subject = new Validator(exampleForm);
     assert.false(subject.isValid);
+    assert.false(subject.isMaxGasFeeValid);
+    assert.strictEqual(
+      subject.maxGasFeeErrorMessage,
+      'must choose a maximum gas fee to allow'
+    );
   });
 
   // is not valid when paymentType is one-time but date and time are in the past

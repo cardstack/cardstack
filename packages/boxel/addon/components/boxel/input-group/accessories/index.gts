@@ -77,6 +77,7 @@ export const SelectAccessory: TemplateOnlyComponent<SelectAccessorySignature> = 
       @searchField={{@searchField}}
       @selected={{@selected}}
       @onChange={{@onChange}}
+      @onBlur={{@onBlur}}
       data-test-boxel-input-group-select-accessory-trigger
       ...attributes
     as |item itemCssClass|>

@@ -12,6 +12,7 @@ export interface Signature {
     hideBorder?: boolean;
     hideRadio?: boolean;
     name: string;
+    onBlur?: () => void;
     onChange: () => void;
   };
   Blocks: {
@@ -49,6 +50,7 @@ const RadioInputItem: TemplateOnlyComponent<Signature> = <template>
       disabled={{@disabled}}
       name={{@name}}
       {{on "change" (optional @onChange)}}
+      {{on "blur" (optional @onBlur)}}
     />
     <div>
       {{yield}}
