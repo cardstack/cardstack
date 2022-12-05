@@ -90,6 +90,10 @@ module.exports = {
       ],
     }),
 
+    new CopyPlugin({
+      patterns: [{ from: path.dirname(require.resolve('duckdb')), to: path.join('duckdb') }],
+    }),
+
     // copy over pkgs necessary for node-pg-migrate and Prisma to work. these will be added
     // to the docker image's file system
     ...[
@@ -201,6 +205,8 @@ module.exports = {
 
     // @prisma/client fails to build without this
     'util/types': 'util/types',
+
+    duckdb: 'commonjs duckdb',
   },
 
   module: {
@@ -222,6 +228,15 @@ module.exports = {
       {
         test: /\.node$/,
         loader: 'node-loader',
+      },
+      {
+        test: /\.cs$/,
+        loader: 'ignore-loader',
+      },
+      {
+        test: /\.html$/,
+        use: 'ignore-loader',
+        exclude: '/node_modules/@mapbox/node-pre-gyp',
       },
     ],
   },
@@ -310,6 +325,10 @@ module.exports = {
       // trying to dynamically import to check whether a module is available
       module: /node_modules\/@aws-sdk\/util-user-agent-node/,
       message: /Module not found: Error: Can't resolve 'aws-crt'/,
+    },
+    {
+      module: /node_modules\/@mapbox\/node-pre-gyp\/lib\/util\/compile\.js/,
+      message: /Module not found: Error: Can't resolve 'npm'/,
     },
   ],
 };
