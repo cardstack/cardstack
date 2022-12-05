@@ -52,7 +52,7 @@ export default class SchedulePaymentFormValidator {
       }
     } else if (form.selectedPaymentType === 'monthly') {
       if (!form.paymentDayOfMonth) {
-        return 'must choose an payment day of month';
+        return 'must choose a payment day of month';
       }
       if (!form.monthlyUntil) {
         return 'must choose an until date';
