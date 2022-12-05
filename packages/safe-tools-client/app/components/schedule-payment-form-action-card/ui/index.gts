@@ -31,8 +31,8 @@ interface Signature {
     onSetPaymentTime: (time: Time) => void;
     onSelectPaymentDayOfMonth: (val: number) => void;
     onSetMonthlyUntil: (date: Date) => void;
-    isRecipientAddressInvalid: boolean;
-    recipientAddressErrorMessage: string;
+    isPayeeAddressInvalid: boolean;
+    payeeAddressErrorMessage: string;
     onUpdatePaymentAmount: (val: string) => void;
     isPaymentAmountInvalid: boolean;
     paymentAmountErrorMessage: string;
@@ -47,13 +47,13 @@ interface Signature {
     maxGasFeeErrorMessage: string;
     onSchedulePayment: () => void;
     isSubmitEnabled: boolean;
-    onUpdateRecipientAddress: (val: string) => void;
+    onUpdatePayeeAddress: (val: string) => void;
   }
 }
 
 export default class SchedulePaymentFormActionCardUI extends Component<Signature> {
   @tracked hasBlurredPaymentType = false;
-  @tracked hasBlurredRecipientAddress = false;
+  @tracked hasBlurredPayeeAddress = false;
   @tracked hasBlurredPaymentAmount = false;
   @tracked hasBlurredGasToken = false;
   @tracked hasBlurredMaxGasFee = false;
@@ -65,11 +65,11 @@ export default class SchedulePaymentFormActionCardUI extends Component<Signature
     return this.args.isPaymentTypeInvalid;
   }
 
-  get isRecipientAddressInvalid() {
-    if (!this.hasBlurredRecipientAddress) {
+  get isPayeeAddressInvalid() {
+    if (!this.hasBlurredPayeeAddress) {
       return false;
     }
-    return this.args.isRecipientAddressInvalid;
+    return this.args.isPayeeAddressInvalid;
   }
 
   get isPaymentAmountInvalid() {
@@ -164,12 +164,12 @@ export default class SchedulePaymentFormActionCardUI extends Component<Signature
         <BoxelField @label="Recipient">
           <BoxelInput
             placeholder="Enter Address"
-            data-test-recipient-address-input
-            @value={{@recipientAddress}}
-            @invalid={{this.isRecipientAddressInvalid}}
-            @errorMessage={{@recipientAddressErrorMessage}}
-            @onInput={{@onUpdateRecipientAddress}}
-            @onBlur={{set this 'hasBlurredRecipientAddress' true}}
+            data-test-payee-address-input
+            @value={{@payeeAddress}}
+            @invalid={{this.isPayeeAddressInvalid}}
+            @errorMessage={{@payeeAddressErrorMessage}}
+            @onInput={{@onUpdatePayeeAddress}}
+            @onBlur={{set this 'hasBlurredPayeeAddress' true}}
           />
         </BoxelField>
         <BoxelField @label="Amount">

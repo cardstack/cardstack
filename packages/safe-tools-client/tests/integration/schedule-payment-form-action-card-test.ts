@@ -8,7 +8,7 @@ import { exampleGasTokens } from '../support/tokens';
 import {
   chooseTime,
   chooseTomorrow,
-  EXAMPLE_RECIPIENT,
+  EXAMPLE_PAYEE,
 } from '../support/ui-test-helpers';
 
 module(
@@ -69,7 +69,7 @@ module(
         .dom('[data-test-schedule-payment-form-submit-button]')
         .isDisabled();
 
-      await fillIn('[data-test-recipient-address-input]', EXAMPLE_RECIPIENT);
+      await fillIn('[data-test-payee-address-input]', EXAMPLE_PAYEE);
 
       assert
         .dom('[data-test-schedule-payment-form-submit-button]')
@@ -104,7 +104,7 @@ module(
 
       assert.dom('[data-test-schedule-payment-form-submit-button]').isEnabled();
 
-      await fillIn('[data-test-recipient-address-input]', 'Not an address');
+      await fillIn('[data-test-payee-address-input]', 'Not an address');
       assert
         .dom('[data-test-schedule-payment-form-submit-button]')
         .isDisabled();

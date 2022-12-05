@@ -1,7 +1,7 @@
 import Validator, {
   ValidatableForm,
 } from '@cardstack/safe-tools-client/components/schedule-payment-form-action-card/validator';
-import { EXAMPLE_RECIPIENT } from '@cardstack/safe-tools-client/tests/support/ui-test-helpers';
+import { EXAMPLE_PAYEE } from '@cardstack/safe-tools-client/tests/support/ui-test-helpers';
 import { setupTest } from 'ember-qunit';
 import { module, test } from 'qunit';
 
@@ -15,18 +15,20 @@ module('Unit | SchedulePaymentFormActionCard Validator', function (hooks) {
       paymentDate: new Date(2050, 12, 0, 9, 30, 0),
       paymentDayOfMonth: undefined,
       monthlyUntil: undefined,
-      recipientAddress: EXAMPLE_RECIPIENT,
+      payeeAddress: EXAMPLE_PAYEE,
       paymentAmount: '1.5',
       paymentToken: {
         name: 'Cardstack',
         logoURI: 'card',
         symbol: 'CARD',
+        decimals: 18,
         address: '0x954b890704693af242613edEf1B603825afcD708',
       },
       selectedGasToken: {
         address: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
         name: 'USD Coin',
         symbol: 'USDC',
+        decimals: 6,
         logoURI:
           'https://assets-cdn.trustwallet.com/blockchains/ethereum/assets/0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48/logo.png',
       },
@@ -37,7 +39,7 @@ module('Unit | SchedulePaymentFormActionCard Validator', function (hooks) {
   test('is valid when everything is set', function (assert) {
     const subject = new Validator(exampleForm);
     assert.true(subject.isValid);
-    assert.strictEqual(subject.recipientAddressErrorMessage, '');
+    assert.strictEqual(subject.payeeAddressErrorMessage, '');
     assert.strictEqual(subject.amountErrorMessage, '');
     assert.strictEqual(subject.gasTokenErrorMessage, '');
   });
@@ -74,21 +76,21 @@ module('Unit | SchedulePaymentFormActionCard Validator', function (hooks) {
     assert.false(subject.isValid);
   });
 
-  test('is not valid when recipient is missing', function (assert) {
-    exampleForm.recipientAddress = '';
+  test('is not valid when payee is missing', function (assert) {
+    exampleForm.payeeAddress = '';
     const subject = new Validator(exampleForm);
     assert.false(subject.isValid);
-    assert.false(subject.isRecipientAddressValid);
-    assert.strictEqual(subject.recipientAddressErrorMessage, "can't be blank");
+    assert.false(subject.isPayeeAddressValid);
+    assert.strictEqual(subject.payeeAddressErrorMessage, "can't be blank");
   });
 
-  test('is not valid when recipient is not an address', function (assert) {
-    exampleForm.recipientAddress = 'hello';
+  test('is not valid when payee is not an address', function (assert) {
+    exampleForm.payeeAddress = 'hello';
     const subject = new Validator(exampleForm);
     assert.false(subject.isValid);
-    assert.false(subject.isRecipientAddressValid);
+    assert.false(subject.isPayeeAddressValid);
     assert.strictEqual(
-      subject.recipientAddressErrorMessage,
+      subject.payeeAddressErrorMessage,
       'must be a valid chain address'
     );
   });

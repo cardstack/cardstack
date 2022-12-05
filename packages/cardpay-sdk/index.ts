@@ -57,3 +57,4 @@ export { gasPriceInToken, getGasPricesInNativeWei } from './sdk/utils/conversion
 export * from './sdk/network-config-utils';
 export * from './sdk/scheduled-payment/utils';
 export { convertRawAmountToDecimalFormat } from './sdk/currency-utils';
+export { default as ScheduledPaymentModule } from './sdk/scheduled-payment-module';

@@ -1,4 +1,8 @@
-import { getSDK, Web3Provider } from '@cardstack/cardpay-sdk';
+import {
+  getSDK,
+  Web3Provider,
+  ScheduledPaymentModule,
+} from '@cardstack/cardpay-sdk';
 import WalletService from '@cardstack/safe-tools-client/services/wallet';
 
 import { action } from '@ember/object';
@@ -7,6 +11,8 @@ import { TaskGenerator } from 'ember-concurrency';
 import { task } from 'ember-concurrency-decorators';
 
 import { BigNumber } from 'ethers';
+
+import { ChainAddress } from '../../../ssr-web/app/utils/web3-strategies/types';
 
 export default class SchedulePaymentSDKService extends Service {
   @service declare wallet: WalletService;
@@ -44,6 +50,73 @@ export default class SchedulePaymentSDKService extends Service {
       undefined,
       undefined,
       this.contractOptions
+    );
+  }
+
+  @task *estimateExecutionGas(
+    moduleAddress: string,
+    tokenAddress: string,
+    amount: string,
+    payeeAddress: string,
+    maxGasPrice: string,
+    gasTokenAddress: string,
+    salt: string,
+    gasPrice: string,
+    payAt?: number | null,
+    recurringDayOfMonth?: number | null,
+    recurringUntil?: number | null
+  ): TaskGenerator<number> {
+    const scheduledPayments: ScheduledPaymentModule =
+      yield this.getSchedulePaymentsModule();
+    const result = yield scheduledPayments.estimateExecutionGas(
+      moduleAddress,
+      tokenAddress,
+      amount,
+      payeeAddress,
+      maxGasPrice,
+      gasTokenAddress,
+      salt,
+      gasPrice,
+      payAt,
+      recurringDayOfMonth,
+      recurringUntil
+    );
+    return result;
+  }
+
+  @task *schedulePayment(
+    safeAddress: ChainAddress,
+    moduleAddress: ChainAddress,
+    tokenAddress: ChainAddress,
+    amount: string,
+    payeeAddress: ChainAddress,
+    executionGas: number,
+    maxGasPrice: string,
+    gasTokenAddress: ChainAddress,
+    salt: string,
+    payAt: number | null,
+    recurringDayOfMonth: number | null,
+    recurringUntil: number | null,
+    onScheduledPaymentIdReady: (scheduledPaymentId: string) => void
+  ): TaskGenerator<void> {
+    const scheduledPayments = yield this.getSchedulePaymentsModule();
+    yield scheduledPayments.schedulePayment(
+      safeAddress,
+      moduleAddress,
+      tokenAddress,
+      amount,
+      payeeAddress,
+      executionGas,
+      maxGasPrice,
+      gasTokenAddress,
+      salt,
+      payAt,
+      recurringDayOfMonth,
+      recurringUntil,
+      onScheduledPaymentIdReady
+    );
+    console.log(
+      `Scheduled payment added in both crank and on chain successfully.`
     );
   }
 }
