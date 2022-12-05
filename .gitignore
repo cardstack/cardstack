@@ -37,6 +37,7 @@ package-lock.json
 !/packages/hub/db/migrations/*.js
 !/packages/hub/corde.config.js
 /packages/hub/:memory
+/packages/hub/:memory.waI
 
 /packages/core/**/*.d.ts
 /packages/core/**/*.js
