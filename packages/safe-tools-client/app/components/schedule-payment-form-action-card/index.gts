@@ -27,8 +27,11 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
   }
   @tracked selectedPaymentType: 'one-time' | 'monthly' | undefined;
   @action onSelectPaymentType(paymentTypeId: string) {
-    if (paymentTypeId === 'one-time' && !this.paymentDate) {
-      this.paymentDate = new Date();
+    if (paymentTypeId === 'one-time') {
+      if (!this.paymentDate) {
+        this.paymentDate = new Date();
+      }
+      
       this.selectedPaymentType = paymentTypeId;
     }
     if (paymentTypeId === 'monthly') {
