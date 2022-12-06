@@ -109,6 +109,7 @@ export default class SafesService extends Service {
           ...tokenBalances,
         ];
       } catch (error) {
+        console.log(error);
         state.error = error;
       } finally {
         state.isLoading = false;
@@ -125,6 +126,8 @@ export default class SafesService extends Service {
     const address = this.wallet.address;
 
     const state: SafeResourceState = new TrackedObject({
+      error: undefined,
+
       load: async () => {
         if (!address) return;
 
@@ -133,7 +136,10 @@ export default class SafesService extends Service {
         try {
           state.value = await getSafesWithSpModuleEnabled(chainId, address);
         } catch (error) {
-          state.error = error;
+          state.error = new Error(
+            '⚠️ There was an error while fetching your safes. Try switching to this network again, or contact support if the problem persists.'
+          );
+          throw error;
         } finally {
           state.isLoading = false;
         }
