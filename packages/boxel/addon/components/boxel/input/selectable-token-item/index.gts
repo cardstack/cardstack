@@ -21,7 +21,6 @@ export default class SelectableTokenAmount extends Component<Signature> {
     return isPresent(this.args.item.logoURI) && !this.shouldUseSvgJar;
   }
 
-
   // Makes glint happy
   get logoURI(): string {
     return this.args.item.logoURI || '';
