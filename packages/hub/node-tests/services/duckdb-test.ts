@@ -1,12 +1,12 @@
-import DuckDB from '../../services/duckdb';
+import DuckDb from '../../services/duckdb';
 import { setupHub } from '../helpers/server';
 
-describe('DuckDB', function () {
-  let subject: DuckDB;
+describe('DuckDb', function () {
+  let subject: DuckDb;
   let { getContainer } = setupHub(this);
 
   this.beforeEach(async function () {
-    subject = (await getContainer().lookup('duckdb')) as DuckDB;
+    subject = (await getContainer().lookup('duckdb')) as DuckDb;
   });
 
   it('httpfs extension installed and loaded', async function () {

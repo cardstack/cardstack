@@ -12,7 +12,7 @@ interface s3FileInfo {
 
 const REQUIRED_DUCKDB_EXTENSIONS = ['httpfs']; //httpfs needed for s3. parquet extension already built in
 
-export default class DuckDB {
+export default class DuckDb {
   private db: Database | undefined;
   private awsConfig: AwsConfigResult | undefined;
 
@@ -36,7 +36,7 @@ export default class DuckDB {
       return `s3://cardpay-staging-reward-programs/rewardProgramID=${rewardProgramId}/paymentCycle=${paymentCycle}/results.parquet`;
     });
     const sql = `                                                                                                                                                                                          
-      SELECT * FROM parquet_scan(${s3Urls});                                   
+      SELECT * FROM parquet_scan(${JSON.stringify(s3Urls).replace(/"/g, "'")})
     `;
     return this.query(db, sql);
   }
@@ -96,6 +96,6 @@ export default class DuckDB {
 
 declare module '@cardstack/di' {
   interface KnownServices {
-    duckDB: DuckDB;
+    'duck-db': DuckDb;
   }
 }
