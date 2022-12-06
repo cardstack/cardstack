@@ -4,6 +4,7 @@
 // FIXME can these types be extracted from ember-power-select exports without using …/addon?
 
 import Component from '@glimmer/component';
+import { ComponentLike } from '@glint/template';
 
 type RepositionChanges = {
   hPosition: string;
@@ -62,7 +63,7 @@ export interface PowerSelectArgs {
   noMatchesMessage?: string;
   noMatchesMessageComponent?: string;
   matchTriggerWidth?: boolean;
-  selectedItemComponent?: string;
+  selectedItemComponent?: string | ComponentLike;
   options: any[] | PromiseProxy<any[]>;
   selected: any | PromiseProxy<any>;
   closeOnSelect?: boolean;
@@ -82,7 +83,7 @@ export interface PowerSelectArgs {
   verticalPosition?: 'auto' | 'below' | 'above';
   dropdownClass?: string;
   disabled?: boolean;
-  eventType: 'click' | 'mousedown';
+  eventType?: 'click' | 'mousedown';
   buildSelection?: (selected: any, select: Select) => any;
   onChange: (selection: any, select: Select, event?: Event) => void;
   search?: (term: string, select: Select) => any[] | PromiseProxy<any[]>;
@@ -113,7 +114,7 @@ export interface PatchedPowerSelectArgs
   verticalPosition?: 'auto' | 'below' | 'above';
   dropdownClass?: string;
   placeholder?: string;
-  selectedItemComponent?: string;
+  selectedItemComponent?: string | ComponentLike;
 }
 
 export default class PowerSelect extends Component<{
