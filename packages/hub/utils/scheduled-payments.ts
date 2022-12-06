@@ -1,4 +1,3 @@
-import { addMonths } from 'date-fns';
 import { convertDateToUTC } from './dates';
 
 // This function will return the next payment date based on the frequency.
@@ -9,21 +8,20 @@ export function calculateNextPayAt(fromDate: Date, recurringDay: number) {
     throw new Error('Recurring day must be in the range of 1-31');
   }
 
-  let fromDateUtc = convertDateToUTC(fromDate);
   let nextPayAtUtc = convertDateToUTC(fromDate);
 
   // We take min() because some months can have less days than the recurring day (e.g. there is no Feb 31)
-  let adjustedRecurringDay = Math.min(recurringDay, daysInMonth(fromDateUtc));
-  if (fromDate.getDate() < adjustedRecurringDay) {
-    nextPayAtUtc.setDate(adjustedRecurringDay); // next pay this month
+  let adjustedRecurringDay = Math.min(recurringDay, daysInMonth(fromDate));
+  if (fromDate.getUTCDate() < adjustedRecurringDay) {
+    nextPayAtUtc.setUTCDate(adjustedRecurringDay); // next pay this month
   } else {
-    nextPayAtUtc = addMonths(nextPayAtUtc, 1); // next pay next month
-    nextPayAtUtc.setDate(Math.min(recurringDay, daysInMonth(nextPayAtUtc)));
+    nextPayAtUtc.setUTCMonth(nextPayAtUtc.getUTCMonth() + 1);
+    nextPayAtUtc.setUTCDate(Math.min(recurringDay, daysInMonth(nextPayAtUtc)));
   }
 
   return nextPayAtUtc;
 }
 
 function daysInMonth(date: Date) {
-  return new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
+  return new Date(date.getUTCFullYear(), date.getUTCMonth() + 1, 0).getDate();
 }
