@@ -46,7 +46,7 @@
       "name": "Mumbai USD Coin",
       "symbol": "USDC",
       "decimals": 6,
-      "address": "0xe6b8a5cf854791412c1f6efc7caf629f5df1c747",
+      "address": "0xf9A71cf591fd72224eeE9C825Bc9aa4BAE05C55d",
       "logoURI": "https://wallet-asset.matic.network/img/tokens/usdc.svg",
       "tags": ["erc20", "relayGas", "stablecoin"]
     },
@@ -64,7 +64,7 @@
       "name": "Mumbai USDT",
       "symbol": "USDT",
       "decimals": 18,
-      "address": "0xe583769738b6dd4e7caf8451050d1948be717679",
+      "address": "0x41240e0CaCB8C80E343cCA0b590327B221e8575a",
       "logoURI": "https://wallet-asset.matic.network/img/tokens/usdt.svg",
       "tags": ["erc20", "gas", "stablecoin"]
     },
@@ -82,7 +82,7 @@
       "name": "Test Token",
       "symbol": "TST",
       "decimals": 18,
-      "address": "0xa0d9f8282cd48d22fd875e43be32793124f8ed47",
+      "address": "0x44D01e5E547A745dc8C0FD97D5F8365F791281A9",
       "logoURI": "https://wallet-asset.matic.network/img/tokens/eth.svg",
       "tags": ["erc20"]
     }
