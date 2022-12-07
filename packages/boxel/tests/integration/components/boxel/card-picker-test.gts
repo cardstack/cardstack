@@ -1,9 +1,14 @@
 import { module, test } from 'qunit';
 import { setupRenderingTest } from 'ember-qunit';
 import { click, render } from '@ember/test-helpers';
+import { tracked } from '@glimmer/tracking';
 import BoxelCardPicker, { PickableCard } from '@cardstack/boxel/components/boxel/card-picker';
 import BoxelCardContainer from '@cardstack/boxel/components/boxel/card-container';
 import BoxelHeader from '@cardstack/boxel/components/boxel/header';
+
+class TrackedSelectedItem {
+  @tracked value: PickableCard | undefined;
+}
 
 module('Integration | Component | CardPicker', function (hooks) {
   setupRenderingTest(hooks);
@@ -44,15 +49,15 @@ module('Integration | Component | CardPicker', function (hooks) {
 
   hooks.beforeEach(async function () {
     let items = CARDS;
-    let selectedItem: PickableCard | undefined;
-    let chooseItem = (val: PickableCard) => selectedItem = val;
+    let selectedItem = new TrackedSelectedItem();
+    let chooseItem = (val: PickableCard) => { selectedItem.value = val; };
 
     await render(
       <template>
         <BoxelCardPicker
           @items={{items}}
           @chooseItem={{chooseItem}}
-          @selectedItem={{selectedItem}}
+          @selectedItem={{selectedItem.value}}
         as |item|>
           <BoxelCardContainer @displayBoundaries={{true}} data-test-boxel-cp-item={{item.id}}>
             <BoxelHeader @header={{item.type}} />
