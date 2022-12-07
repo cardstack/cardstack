@@ -2,6 +2,7 @@ import {
   getConstantByNetwork,
   getSDK,
   isSchedulerSupportedChain,
+  convertChainIdToName,
 } from '@cardstack/cardpay-sdk';
 import NetworkService from '@cardstack/safe-tools-client/services/network';
 import { ChainConnectionManager } from '@cardstack/safe-tools-client/utils/chain-connection-manager';
@@ -16,7 +17,6 @@ import { tracked } from '@glimmer/tracking';
 import { timeout } from 'ember-concurrency';
 import { task } from 'ember-concurrency-decorators';
 import { taskFor } from 'ember-concurrency-ts';
-
 import Web3 from 'web3';
 
 export default class Wallet extends Service {
@@ -82,6 +82,64 @@ export default class Wallet extends Service {
 
     this.providerId = providerId;
     this.chainConnectionManager.reconnect(this.web3, this.providerId);
+  }
+
+  async switchNetwork(chainId: number) {
+    if (this.providerId !== 'metamask') {
+      return;
+    }
+
+    if (!window.ethereum) {
+      return;
+    }
+
+    const chainIdHex = `0x${chainId.toString(16)}`;
+
+    try {
+      //@ts-expect-error currentProvider does not match Web3Provider Property 'request' does not exist on type 'EthereumProvider'
+      await window.ethereum.request({
+        method: 'wallet_switchEthereumChain',
+        params: [{ chainId: chainIdHex }],
+      });
+    } catch (error) {
+      if (error.code === 4902) {
+        // Network not added in Metamask. We prompt the user to add it.
+
+        const networkName = convertChainIdToName(chainId);
+
+        try {
+          //@ts-expect-error currentProvider does not match Web3Provider Property 'request' does not exist on type 'EthereumProvider'
+          await window.ethereum.request({
+            method: 'wallet_addEthereumChain',
+            params: [
+              {
+                chainId: chainIdHex,
+                chainName: getConstantByNetwork('name', networkName),
+                nativeCurrency: {
+                  name: getConstantByNetwork('nativeTokenName', networkName),
+                  symbol: getConstantByNetwork(
+                    'nativeTokenSymbol',
+                    networkName
+                  ),
+                  decimals: getConstantByNetwork(
+                    'nativeTokenDecimals',
+                    networkName
+                  ),
+                },
+                blockExplorerUrls: [
+                  getConstantByNetwork('blockExplorer', networkName),
+                ],
+                rpcUrls: getConstantByNetwork('publicRpcUrls', networkName),
+              },
+            ],
+          });
+        } catch (error) {
+          const message = `Unable to add selected network to Metamask. Please try again or contact support. As an alternative, you can add it to your Metamask wallet manually, and reload the page. Follow the instructions at https://metamask.zendesk.com/hc/en-us/articles/360043227612-How-to-add-a-custom-network-RP`;
+          alert(message);
+          throw error;
+        }
+      }
+    }
   }
 
   @action connect(providerId: WalletProviderId, onConnectSuccess: () => void) {
