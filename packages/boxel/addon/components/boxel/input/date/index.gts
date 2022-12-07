@@ -16,6 +16,7 @@ export { Day };
 interface ComponentArgs {
   value?: Day;
   onChange: (val: Day) => void;
+  minDate?: Day;
 }
 
 interface Signature {
@@ -63,6 +64,7 @@ export default class BoxelInputDate extends Component<Signature> {
             @onSelect={{@onChange}}
             @center={{this.center}}
             @onCenterChange={{fn (mut this.center)}}
+            @minDate={{@minDate}}
           />
         </div>
       </:content>

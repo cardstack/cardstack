@@ -11,6 +11,7 @@ interface Signature {
     onSelect?: Function;
     center?: Day;
     onCenterChange?: Function;
+    minDate?: Day;
   };
 }
 
@@ -41,7 +42,7 @@ export default class BoxelCalendar extends Component<Signature> {
       as |calendar|
     >
       <calendar.Nav />
-      <calendar.Days @weekdayFormat="min" />
+      <calendar.Days @weekdayFormat="min" @minDate={{@minDate}}/>
     </PowerCalendar>
   </template>
 }
