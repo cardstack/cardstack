@@ -75,7 +75,7 @@ export default class SafeInfo extends Component<Signature> {
     {{/if}}
 
     {{#if @safesLoadingError}}
-      <div class="info">{{@safesLoadingError.message}}</div>
+      <div class="info">⚠️ {{@safesLoadingError.message}}</div>
     {{/if}}
   </template>
 }

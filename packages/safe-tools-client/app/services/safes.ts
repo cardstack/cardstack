@@ -137,7 +137,7 @@ export default class SafesService extends Service {
           state.value = await getSafesWithSpModuleEnabled(chainId, address);
         } catch (error) {
           state.error = new Error(
-            '⚠️ There was an error while fetching your safes. Try switching to this network again, or contact support if the problem persists.'
+            'There was an error while fetching your safes. Try switching to this network again, or contact support if the problem persists.'
           );
           throw error;
         } finally {
