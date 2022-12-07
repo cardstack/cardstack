@@ -39,6 +39,7 @@ interface RequiredNetworkConstants {
   nativeTokenCoingeckoId: string;
   nativeTokenName: string;
   nativeTokenSymbol: string;
+  nativeTokenDecimals: number;
   subgraphURL: string;
   relayServiceURL: string;
 }
@@ -99,6 +100,7 @@ const ethNativeTokens = {
   nativeTokenAddress: 'eth',
   nativeTokenSymbol: 'ETH',
   nativeTokenName: 'Ethereum',
+  nativeTokenDecimals: 18,
 };
 
 const bridgedTokens = {
@@ -111,6 +113,7 @@ const polygonNativeTokens = {
   nativeTokenCoingeckoId: 'matic-network',
   nativeTokenSymbol: 'MATIC',
   nativeTokenName: 'Matic',
+  nativeTokenDecimals: 18,
 };
 
 const constants: {
@@ -143,6 +146,7 @@ const constants: {
     nativeTokenCoingeckoId: 'xdai',
     nativeTokenSymbol: 'XDAI',
     nativeTokenName: 'xDai',
+    nativeTokenDecimals: 18,
     name: 'Gnosis Chain',
     relayServiceURL: 'https://relay.cardstack.com/api',
     subgraphURL: 'https://graph.cardstack.com/subgraphs/name/habdelra/cardpay-xdai',
