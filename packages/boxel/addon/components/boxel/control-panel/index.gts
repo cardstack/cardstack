@@ -20,7 +20,7 @@ interface ItemSignature {
   Element: HTMLElement
   Args: {
     icon: string;
-    isActive: boolean;
+    isActive?: boolean;
     title: string;
   },
   Blocks: {

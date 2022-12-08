@@ -10,9 +10,9 @@ import WalletService from '@cardstack/safe-tools-client/services/wallet';
 interface Signature {
   Element: HTMLDivElement;
   Args: {
-    address: string;
-    isInitializing: boolean;
-    isConnected: boolean;
+    address?: string;
+    isInitializing?: boolean;
+    isConnected?: boolean;
     onConnect: () => void;
   }
 }
@@ -55,3 +55,8 @@ export default class ConnectButton extends Component<Signature> {
   </template>
 }
 
+declare module '@glint/environment-ember-loose/registry' {
+  export default interface Registry {
+    'ConnectButton': typeof ConnectButton;
+  }
+}

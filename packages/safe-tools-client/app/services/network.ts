@@ -8,8 +8,7 @@ import {
 import WalletService from '@cardstack/safe-tools-client/services/wallet';
 import { getOwner } from '@ember/application';
 import { action } from '@ember/object';
-import Service from '@ember/service';
-import { inject as service } from '@ember/service';
+import Service, { inject as service } from '@ember/service';
 import { tracked } from '@glimmer/tracking';
 
 interface NetworkInfo {
