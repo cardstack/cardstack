@@ -131,7 +131,10 @@ export default class Wallet extends Service {
                 blockExplorerUrls: [
                   getConstantByNetwork('blockExplorer', networkName),
                 ],
-                rpcUrls: getConstantByNetwork('publicRpcUrls', networkName),
+                rpcUrls: getConstantByNetwork(
+                  'publicRpcUrls',
+                  networkName as typeof this.network.symbol
+                ),
               },
             ],
           });
