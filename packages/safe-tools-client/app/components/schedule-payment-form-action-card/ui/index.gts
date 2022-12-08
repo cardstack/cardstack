@@ -123,13 +123,13 @@ export default class SchedulePaymentFormActionCardUI extends Component<Signature
                 <div class="schedule-payment-form-action-card__frequency-fieldset-container">
                   <div class="schedule-payment-form-action-card__when-fields">
                     {{#if (eq @selectedPaymentType 'one-time')}}
-                      <BoxelField @label="Payment Date" @vertical={{true}}>
+                      <BoxelField @label="Payment Date" @vertical={{true}} data-test-payment-date>
                         <BoxelInputDate
                           @value={{@paymentDate}}
                           @onChange={{@onSetPaymentDate}}
                         />
                       </BoxelField>
-                      <BoxelField @label="Specific Time" @vertical={{true}}>
+                      <BoxelField @label="Specific Time" @vertical={{true}} data-test-specific-payment-time>
                         <BoxelInputTime
                           @value={{@paymentDate}}
                           @onChange={{@onSetPaymentTime}}
@@ -139,7 +139,7 @@ export default class SchedulePaymentFormActionCardUI extends Component<Signature
                   </div>
                   <div class="schedule-payment-form-action-card__when-fields">
                     {{#if (eq @selectedPaymentType 'monthly')}}
-                      <BoxelField @label="Day of Month" @vertical={{true}}>
+                      <BoxelField @label="Day of Month" @vertical={{true}} data-test-recurring-day-of-month>
                         <RangedNumberPicker
                           @min={{1}}
                           @max={{28}}
@@ -148,7 +148,7 @@ export default class SchedulePaymentFormActionCardUI extends Component<Signature
                           @value={{@paymentDayOfMonth}}
                         />
                       </BoxelField>
-                      <BoxelField @label="Until" @vertical={{true}}>
+                      <BoxelField @label="Until" @vertical={{true}} data-test-recurring-until>
                         <BoxelInputDate
                           @value={{@monthlyUntil}}
                           @onChange={{@onSetMonthlyUntil}}

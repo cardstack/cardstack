@@ -110,6 +110,36 @@ module(
         .isDisabled();
     });
 
+    test('it can switch to one-time payment once switches to monthly', async function (assert) {
+      await render(hbs`
+        <SchedulePaymentFormActionCard />
+      `);
+      assert.dom('[data-test-payment-date]').isNotVisible();
+      assert.dom('[data-test-specific-payment-time]').isNotVisible();
+      assert.dom('[data-test-recurring-day-of-month]').isNotVisible();
+      assert.dom('[data-test-recurring-until]').isNotVisible();
+
+      let paymentType = 'monthly';
+      for (let i = 1; i <= 4; i++) {
+        await click(`[data-test-payment-type="${paymentType}"]`);
+        if (paymentType === 'monthly') {
+          assert.dom('[data-test-payment-date]').isNotVisible();
+          assert.dom('[data-test-specific-payment-time]').isNotVisible();
+          assert.dom('[data-test-recurring-day-of-month]').isVisible();
+          assert.dom('[data-test-recurring-until]').isVisible();
+
+          paymentType = 'one-time';
+        } else {
+          assert.dom('[data-test-payment-date]').isVisible();
+          assert.dom('[data-test-specific-payment-time]').isVisible();
+          assert.dom('[data-test-recurring-day-of-month]').isNotVisible();
+          assert.dom('[data-test-recurring-until]').isNotVisible();
+
+          paymentType = 'monthly';
+        }
+      }
+    });
+
     // TODO: assert state for no network selected/connected
     // TODO: assert state for no safe present
   }
