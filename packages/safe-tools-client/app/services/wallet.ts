@@ -19,6 +19,8 @@ import { task } from 'ember-concurrency-decorators';
 import { taskFor } from 'ember-concurrency-ts';
 import Web3 from 'web3';
 
+const ERR_METAMASK_UNKNOWN_NETWORK = 4902; // The requested chain has not been added by MetaMask
+
 export default class Wallet extends Service {
   @service declare network: NetworkService;
 
@@ -102,7 +104,7 @@ export default class Wallet extends Service {
         params: [{ chainId: chainIdHex }],
       });
     } catch (error) {
-      if (error.code === 4902) {
+      if (error.code === ERR_METAMASK_UNKNOWN_NETWORK) {
         // Network not added in Metamask. We prompt the user to add it.
 
         const networkName = convertChainIdToName(chainId);
