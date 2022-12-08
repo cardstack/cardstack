@@ -78,4 +78,20 @@ module('Integration | Component | Calendar', function (hooks) {
       year: 'numeric',
     }));
   });
+
+  test('the dates before minDate should be disabled', async function (assert) {
+    bindings.selected = new Date(2022, 2, 3, 13, 45);
+    let minDate = new Date(2022, 2, 3, 13, 45);
+
+    await render(<template>
+      <BoxelCalendar
+        @selected={{bindings.selected}}
+        @onSelect={{onSelect}}
+        @minDate={{minDate}}
+      />
+    </template>);
+
+    assert.dom('[data-date="2022-03-02"]').isDisabled();
+    assert.dom('[data-date="2022-03-01"]').isDisabled();
+  });
 });
