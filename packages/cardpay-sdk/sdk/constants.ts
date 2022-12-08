@@ -39,6 +39,7 @@ interface RequiredNetworkConstants {
   nativeTokenCoingeckoId: string;
   nativeTokenName: string;
   nativeTokenSymbol: string;
+  nativeTokenDecimals: number;
   subgraphURL: string;
   relayServiceURL: string;
 }
@@ -48,6 +49,7 @@ interface SchedulerCapableNetworkConstants {
   scheduledPaymentFeeFixedUSD: number;
   scheduledPaymentFeePercentage: number;
   uniswapPairInitCodeHash: string;
+  publicRpcUrls: string[];
 }
 
 interface CardPayCapableNetworkConstants {
@@ -99,6 +101,7 @@ const ethNativeTokens = {
   nativeTokenAddress: 'eth',
   nativeTokenSymbol: 'ETH',
   nativeTokenName: 'Ethereum',
+  nativeTokenDecimals: 18,
 };
 
 const bridgedTokens = {
@@ -111,6 +114,7 @@ const polygonNativeTokens = {
   nativeTokenCoingeckoId: 'matic-network',
   nativeTokenSymbol: 'MATIC',
   nativeTokenName: 'Matic',
+  nativeTokenDecimals: 18,
 };
 
 const constants: {
@@ -143,6 +147,7 @@ const constants: {
     nativeTokenCoingeckoId: 'xdai',
     nativeTokenSymbol: 'XDAI',
     nativeTokenName: 'xDai',
+    nativeTokenDecimals: 18,
     name: 'Gnosis Chain',
     relayServiceURL: 'https://relay.cardstack.com/api',
     subgraphURL: 'https://graph.cardstack.com/subgraphs/name/habdelra/cardpay-xdai',
@@ -180,6 +185,11 @@ const constants: {
     scheduledPaymentFeePercentage: 0.1, //10%
     subgraphURL: '',
     uniswapPairInitCodeHash: '0x96e8ac4277198ff8b6f785478aa9a39f403cb768dd02cbee326c3e7da348845f', // Result of keccak256(type(UniswapV2Pair).creationCode) from deployed UniswapV2Factory. We had to deploy our own Uniswap contracts on some networks (for now Mumbai) because they were missing, and add the patches/@uniswap+sdk+3.0.3.patch to support custom token pairs (by providing factory address and token pair code hash)
+    publicRpcUrls: [
+      'https://ethereum.publicnode.com',
+      'https://rpc.ankr.com/eth',
+      'https://eth-mainnet.public.blastapi.io',
+    ],
   },
   goerli: {
     ...testHubUrl,
@@ -194,6 +204,7 @@ const constants: {
     scheduledPaymentFeePercentage: 0,
     subgraphURL: 'https://api.thegraph.com/subgraphs/name/cardstack/safe-tools-goerli',
     uniswapPairInitCodeHash: '0x96e8ac4277198ff8b6f785478aa9a39f403cb768dd02cbee326c3e7da348845f', //Result of keccak256(type(UniswapV2Pair).creationCode) from deployed UniswapV2Factory
+    publicRpcUrls: ['https://eth-goerli.public.blastapi.io', 'https://rpc.ankr.com/eth_goerli'],
   },
   polygon: {
     ...hubUrl,
@@ -208,6 +219,13 @@ const constants: {
     scheduledPaymentFeeFixedUSD: 0.25,
     scheduledPaymentFeePercentage: 0.1, //10%
     uniswapPairInitCodeHash: '0xe18a34eb0e04b04f7a0ac29a6e80748dca96319b42c54d679cb821dca90c6303', //Result of keccak256(type(UniswapV2Pair).creationCode) from deployed UniswapV2Factory
+    publicRpcUrls: [
+      'https://polygon-rpc.com/',
+      'https://rpc-mainnet.matic.network',
+      'https://matic-mainnet.chainstacklabs.com',
+      'https://rpc-mainnet.maticvigil.com',
+      'https://rpc-mainnet.matic.quiknode.pro',
+    ],
   },
   mumbai: {
     ...testHubUrl,
@@ -222,6 +240,12 @@ const constants: {
     scheduledPaymentFeePercentage: 0,
     subgraphURL: 'https://api.thegraph.com/subgraphs/name/cardstack/safe-tools-mumbai',
     uniswapPairInitCodeHash: '0xe18a34eb0e04b04f7a0ac29a6e80748dca96319b42c54d679cb821dca90c6303', //Result of keccak256(type(UniswapV2Pair).creationCode) from deployed UniswapV2Factory
+    publicRpcUrls: [
+      'https://matic-mumbai.chainstacklabs.com',
+      'https://rpc-mumbai.maticvigil.com',
+      'https://matic-testnet-archive-rpc.bwarelabs.com',
+      'https://polygon-testnet.public.blastapi.io',
+    ],
   },
 };
 

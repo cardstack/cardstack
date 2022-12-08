@@ -43,6 +43,7 @@
           @onSelectSafe={{this.safes.onSelectSafe}}
           @tokenBalances={{this.safes.tokenBalances}}
           @onDepositClick={{set this 'isDepositModalOpen' true}}
+          @safesLoadingError={{this.safes.safesResource.error}}
         />
       {{/if}}
     </cp.Item>
