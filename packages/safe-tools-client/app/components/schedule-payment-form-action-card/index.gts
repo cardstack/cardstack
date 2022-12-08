@@ -129,7 +129,7 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
       convertAmountToRawAmount(this.paymentAmount, this.paymentToken.decimals),
       this.payeeAddress,
       this.executionGas,
-      '5000000000', // TODO: this.maxGasFee,
+      '15000000000', // TODO: this.maxGasFee,
       this.selectedGasToken.address,
       salt,
       Math.round(this.paymentDate.getTime() / 1000),
