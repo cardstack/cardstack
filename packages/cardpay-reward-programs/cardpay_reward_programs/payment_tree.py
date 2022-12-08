@@ -116,7 +116,7 @@ class PaymentTree:
                 pa.field("leaf", pa.string()),
                 pa.field("proof", pa.list_(pa.string())),
                 pa.field("explanationId", pa.string()),
-                pa.field("explanationData", pa.map_(pa.string(), pa.string())),
+                pa.field("explanationData", pa.string()),
             ],
             metadata={
                 "parameters": json.dumps(self.parameters, default=lambda o: o.__dict__)
@@ -145,7 +145,7 @@ class PaymentTree:
                 columns["proof"].append(self.get_hex_proof(leaf))
                 columns["explanationId"].append(explanation_id)
                 columns["explanationData"].append(
-                    [(k, str(v)) for k, v in payment["explanationData"].items()]
+                    json.dumps(payment["explanationData"], separators=(",", ":"))
                 )
         return pa.table(data=columns, schema=schema)
 
