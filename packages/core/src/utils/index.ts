@@ -70,6 +70,6 @@ export function cardURL(card: CardId): string {
   return `${card.realm}${card.id}`;
 }
 
-export function keys<Obj>(o: Obj): (keyof Obj)[] {
+export function keys<Obj extends Object>(o: Obj): (keyof Obj)[] {
   return Object.keys(o) as (keyof Obj)[];
 }

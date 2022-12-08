@@ -3,7 +3,6 @@ import FreestyleUsage from 'ember-freestyle/components/freestyle/usage';
 import BoxelSelectButton from './index';
 import DarkThemeAndLightTheme from 'dummy/components/doc/dark-theme-and-light-theme';
 import { on } from '@ember/modifier';
-//@ts-expect-error glint does not think this is consumed-but it is consumed in the template https://github.com/typed-ember/glint/issues/374
 import { array, fn } from '@ember/helper';
 
 import { tracked } from '@glimmer/tracking';

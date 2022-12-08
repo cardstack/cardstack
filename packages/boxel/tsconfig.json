@@ -52,22 +52,7 @@
     }
   },
   "glint": {
-    "environment": ["ember-loose", "ember-template-imports"],
-    "transform": {
-      "exclude": [
-        "app/components/**/*",
-        "blueprints/**/*",
-        "tests/dummy/app/components/apply-changes-toggle/**/*",
-        "tests/dummy/app/components/boxel/**/*",
-        "tests/dummy/app/components/card-select/**/*",
-        "tests/dummy/app/components/cards/**/*",
-        "tests/dummy/app/components/media-registry/**/*",
-        "tests/dummy/app/components/mode-indicator/**/*",
-        "tests/dummy/app/components/*",
-        "tests/integration/components/boxel/card-picker-test.ts",
-        "tests/integration/components/boxel/dropdown-test.ts",
-      ]
-    }
+    "environment": ["ember-loose", "ember-template-imports"]
   },
   "include": [
     "app/**/*",

@@ -105,7 +105,7 @@ export class ScopeTracker<Value> {
         return matchedOverride;
       }
 
-      if ('unset' in binding.value) {
+      if (isUnset(binding.value)) {
         continue;
       }
       return { type: 'assigned', value: binding.value };
@@ -126,4 +126,8 @@ function enclosingScopeValue<Value>(
     cursor = cursor.parent;
   }
   return undefined;
+}
+
+function isUnset(value: any | Unset): value is Unset {
+  return 'unset' in value;
 }

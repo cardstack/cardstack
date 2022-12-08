@@ -4,7 +4,6 @@ import BoxelSelectionControlGroup from './index';
 import BoxelMenu from '../menu';
 import { tracked } from '@glimmer/tracking';
 import { action } from '@ember/object';
-//@ts-expect-error glint does not think this is consumed-but it is consumed in the template https://github.com/typed-ember/glint/issues/374
 import { array, fn } from '@ember/helper';
 import menuItem from '@cardstack/boxel/helpers/menu-item'
 

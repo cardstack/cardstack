@@ -4,7 +4,6 @@ import { tracked } from '@glimmer/tracking';
 import { action } from '@ember/object';
 import FreestyleUsage from 'ember-freestyle/components/freestyle/usage';
 import BoxelButton from './index';
-//@ts-expect-error glint does not think this is consumed-but it is consumed in the template https://github.com/typed-ember/glint/issues/374
 import { array, fn } from '@ember/helper';
 import cn from '@cardstack/boxel/helpers/cn';
 import eq from 'ember-truth-helpers/helpers/eq';

@@ -1,5 +1,4 @@
 import { module, test } from 'qunit';
-import { hbs } from 'ember-cli-htmlbars';
 import { setupRenderingTest } from 'ember-qunit';
 import { render } from '@ember/test-helpers';
 import { cssUrl } from '@cardstack/boxel/helpers/css-url';
@@ -8,9 +7,12 @@ module('Integration | Helper | css-url', function (hooks) {
   setupRenderingTest(hooks);
 
   test('it renders', async function (assert) {
-    this.set('avatar', '/picture.png');
+    let avatar = '/picture.png';
+
     await render(
-      hbs`<div class="example" style={{css-url "background-image" this.avatar}}></div>`
+      <template>
+        <div class="example" style={{cssUrl "background-image" avatar}}></div>
+      </template>
     );
 
     let style = this.element.querySelector('.example')?.getAttribute('style');

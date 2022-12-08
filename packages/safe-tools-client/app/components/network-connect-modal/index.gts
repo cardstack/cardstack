@@ -1,7 +1,6 @@
 import Component from '@glimmer/component';
 import { inject as service} from '@ember/service';
 import { tracked } from '@glimmer/tracking';
-//@ts-expect-error glint does not think this is consumed-but it is consumed in the template https://github.com/typed-ember/glint/issues/374
 import { concat, fn, hash } from '@ember/helper';
 import { on } from '@ember/modifier';
 import focusTrap from 'ember-focus-trap/modifiers/focus-trap';
