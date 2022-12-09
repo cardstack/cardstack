@@ -34,6 +34,10 @@
   padding: var(--boxel-sp-xs) var(--boxel-sp);
 }
 
+.boxel-menu__item--disabled a {
+  cursor: default;
+}
+
 .boxel-menu__item > a:hover {
   color: inherit;
 }
@@ -48,11 +52,9 @@
 }
 
 .boxel-menu__item--disabled,
-.boxel-menu__item--disabled.boxel-menu__item:hover,
-.boxel-menu__item--disabled a {
+.boxel-menu__item--disabled.boxel-menu__item:hover {
   background-color: initial;
   opacity: 0.4;
-  cursor: default;
 }
 
 .boxel-menu__separator {
