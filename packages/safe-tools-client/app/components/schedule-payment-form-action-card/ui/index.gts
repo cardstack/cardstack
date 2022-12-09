@@ -42,9 +42,9 @@ interface Signature {
     onSelectGasToken: (val: SelectableToken) => void;
     isGasTokenInvalid: boolean;
     gasTokenErrorMessage: string;
-    onUpdateMaxGasFee: (val: string) => void;
-    isMaxGasFeeInvalid: boolean;
-    maxGasFeeErrorMessage: string;
+    onUpdateMaxGasPrice: (val: string) => void;
+    isMaxGasPriceInvalid: boolean;
+    maxGasPriceErrorMessage: string;
     onSchedulePayment: () => void;
     isSubmitEnabled: boolean;
     onUpdatePayeeAddress: (val: string) => void;
@@ -56,7 +56,7 @@ export default class SchedulePaymentFormActionCardUI extends Component<Signature
   @tracked hasBlurredPayeeAddress = false;
   @tracked hasBlurredPaymentAmount = false;
   @tracked hasBlurredGasToken = false;
-  @tracked hasBlurredMaxGasFee = false;
+  @tracked hasBlurredMaxGasPrice = false;
 
   get isPaymentTypeInvalid() {
     if (!this.hasBlurredPaymentType) {
@@ -86,11 +86,11 @@ export default class SchedulePaymentFormActionCardUI extends Component<Signature
     return this.args.isGasTokenInvalid;
   }
 
-  get isMaxGasFeeInvalid() {
-    if (!this.hasBlurredMaxGasFee) {
+  get isMaxGasPriceInvalid() {
+    if (!this.hasBlurredMaxGasPrice) {
       return false;
     }
-    return this.args.isMaxGasFeeInvalid;
+    return this.args.isMaxGasPriceInvalid;
   }
 
   <template>
@@ -202,11 +202,11 @@ export default class SchedulePaymentFormActionCardUI extends Component<Signature
             data-test-max-gas-toggle
             @groupDescription="The maximum gas fee you are willing to spend for this payment"
             @name="max-gas-fee"
-            @errorMessage={{@maxGasFeeErrorMessage}}
-            @invalid={{this.isMaxGasFeeInvalid}}
-            @value={{@maxGasFee}}
-            @onChange={{@onUpdateMaxGasFee}}
-            @onBlur={{set this 'hasBlurredMaxGasFee' true}}
+            @errorMessage={{@maxGasPriceErrorMessage}}
+            @invalid={{this.isMaxGasPriceInvalid}}
+            @value={{@maxGasPrice}}
+            @onChange={{@onUpdateMaxGasPrice}}
+            @onBlur={{set this 'hasBlurredMaxGasPrice' true}}
             as |group|
           >
             <group.Button @value="normal">

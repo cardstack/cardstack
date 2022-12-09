@@ -32,7 +32,7 @@ module('Unit | SchedulePaymentFormActionCard Validator', function (hooks) {
         logoURI:
           'https://assets-cdn.trustwallet.com/blockchains/ethereum/assets/0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48/logo.png',
       },
-      maxGasFee: 'normal',
+      maxGasPrice: 'normal',
     };
   });
 
@@ -133,13 +133,13 @@ module('Unit | SchedulePaymentFormActionCard Validator', function (hooks) {
     );
   });
 
-  test('is not valid when maxGasFee is unset', function (assert) {
-    exampleForm.maxGasFee = undefined;
+  test('is not valid when maxGasPrice is unset', function (assert) {
+    exampleForm.maxGasPrice = undefined;
     const subject = new Validator(exampleForm);
     assert.false(subject.isValid);
-    assert.false(subject.isMaxGasFeeValid);
+    assert.false(subject.isMaxGasPriceValid);
     assert.strictEqual(
-      subject.maxGasFeeErrorMessage,
+      subject.maxGasPriceErrorMessage,
       'must choose a maximum gas fee to allow'
     );
   });

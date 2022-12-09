@@ -101,9 +101,9 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
     this.selectedGasToken = val;
   }
 
-  @tracked maxGasFee: 'normal' | 'high' | 'max' | undefined;
-  @action onUpdateMaxGasFee(val: 'normal' | 'high' | 'max') {
-    this.maxGasFee = val;
+  @tracked maxGasPrice: 'normal' | 'high' | 'max' | undefined;
+  @action onUpdateMaxGasPrice(val: 'normal' | 'high' | 'max') {
+    this.maxGasPrice = val;
   }
 
   get isValid(): boolean {
@@ -129,7 +129,7 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
       convertAmountToRawAmount(this.paymentAmount, this.paymentToken.decimals),
       this.payeeAddress,
       this.executionGas,
-      '15000000000', // TODO: this.maxGasFee,
+      '15000000000', // TODO: this.maxGasPrice,
       this.selectedGasToken.address,
       salt,
       Math.round(this.paymentDate.getTime() / 1000),
@@ -172,10 +172,10 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
       @onSelectGasToken={{this.onSelectGasToken}}
       @isGasTokenInvalid={{not this.validator.isGasTokenValid}}
       @gasTokenErrorMessage={{this.validator.gasTokenErrorMessage}}
-      @maxGasFee={{this.maxGasFee}}
-      @onUpdateMaxGasFee={{this.onUpdateMaxGasFee}}
-      @isMaxGasFeeInvalid={{not this.validator.isMaxGasFeeValid}}
-      @maxGasFeeErrorMessage={{this.validator.maxGasFeeErrorMessage}}
+      @maxGasPrice={{this.maxGasPrice}}
+      @onUpdateMaxGasPrice={{this.onUpdateMaxGasPrice}}
+      @isMaxGasPriceInvalid={{not this.validator.isMaxGasPriceValid}}
+      @maxGasPriceErrorMessage={{this.validator.maxGasPriceErrorMessage}}
       @onSchedulePayment={{this.schedulePayment}}
       @isSubmitEnabled={{this.isValid}}
     />

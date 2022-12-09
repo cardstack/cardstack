@@ -18,7 +18,7 @@ export interface ValidatableForm {
   paymentAmount: string;
   paymentToken: SelectableToken | undefined;
   selectedGasToken: SelectableToken | undefined;
-  maxGasFee: 'normal' | 'high' | 'max' | undefined;
+  maxGasPrice: 'normal' | 'high' | 'max' | undefined;
 }
 
 export default class SchedulePaymentFormValidator {
@@ -36,7 +36,7 @@ export default class SchedulePaymentFormValidator {
       this.isPayeeAddressValid &&
       this.isAmountValid &&
       this.isGasTokenValid &&
-      this.isMaxGasFeeValid
+      this.isMaxGasPriceValid
     );
   }
 
@@ -107,12 +107,12 @@ export default class SchedulePaymentFormValidator {
     return '';
   }
 
-  get isMaxGasFeeValid(): boolean {
-    return this.maxGasFeeErrorMessage === '';
+  get isMaxGasPriceValid(): boolean {
+    return this.maxGasPriceErrorMessage === '';
   }
 
-  get maxGasFeeErrorMessage(): string {
-    if (!this.form.maxGasFee) {
+  get maxGasPriceErrorMessage(): string {
+    if (!this.form.maxGasPrice) {
       return 'must choose a maximum gas fee to allow';
     }
     return '';
