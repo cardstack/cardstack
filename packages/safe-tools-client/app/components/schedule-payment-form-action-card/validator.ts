@@ -11,8 +11,11 @@ function isNumeric(str: unknown) {
 
 export interface ValidatableForm {
   selectedPaymentType: 'one-time' | 'monthly' | undefined;
+  minPaymentDate: Date;
+  minPaymentTime: Date;
   paymentDate: Date | undefined;
   paymentDayOfMonth: number | undefined;
+  minMonthlyUntil: Date;
   monthlyUntil: Date | undefined;
   recipientAddress: string;
   paymentAmount: string;

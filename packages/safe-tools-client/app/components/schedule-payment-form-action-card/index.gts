@@ -25,11 +25,17 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
       { id: 'monthly', text: 'Monthly recurring' },
     ];
   }
+  
+  get minPaymentDate() {
+    let now = new Date();
+    return new Date(now.setHours(now.getHours() + 1, 0, 0, 0));
+  }
+
   @tracked selectedPaymentType: 'one-time' | 'monthly' | undefined;
   @action onSelectPaymentType(paymentTypeId: string) {
     if (paymentTypeId === 'one-time') {
       if (!this.paymentDate) {
-        this.paymentDate = new Date();
+        this.paymentDate = this.minPaymentDate;
       }
       
       this.selectedPaymentType = paymentTypeId;
@@ -41,6 +47,7 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
       }
       if (!this.paymentDayOfMonth) {
         this.paymentDayOfMonth = 1;
+        this.calculateMinMonthlyUntil();
       }
       this.selectedPaymentType = paymentTypeId;
     }
@@ -48,15 +55,30 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
 
   @tracked paymentDate: Date | undefined;
   @action onSetPaymentDate(day: Day) {
-    this.paymentDate?.setFullYear(day.getFullYear(), day.getMonth(), day.getDate()); 
-    this.paymentDate = new Date((day as Date).getTime()); // trigger reactivity
+    let selectedDate = new Date(day.getFullYear(), day.getMonth(), day.getDate(), this.paymentDate?.getHours(), this.paymentDate?.getMinutes());
+    if (selectedDate < this.minPaymentDate) {
+      this.paymentDate = this.minPaymentDate;
+    } else {
+      this.paymentDate = selectedDate;
+    }
+    this.calculateMinPaymentTime();
   }
 
   @action onSetPaymentTime(time: Time) {
     this.paymentDate?.setHours(time.getHours(), time.getMinutes());
     this.paymentDate = new Date((time as Date).getTime()); // trigger reactivity
+    this.calculateMinPaymentTime();
   }
 
+  @tracked minPaymentTime: Date = this.minPaymentDate;
+  calculateMinPaymentTime() {
+    if (this.paymentDate && this.paymentDate.getDate() > this.minPaymentDate.getDate()) {
+      this.minPaymentTime = new Date(this.minPaymentDate.getFullYear(), this.minPaymentDate.getMonth(), this.minPaymentDate.getDate(), 0, 0, 0, 0)
+    } else {
+      this.minPaymentTime = this.minPaymentDate;
+    }
+  }
+  
   @tracked monthlyUntil: Date | undefined;
   @action onSetMonthlyUntil(date: Date) {
     this.monthlyUntil?.setFullYear(date.getFullYear(), date.getMonth(), date.getDate()); 
@@ -68,6 +90,23 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
   @tracked paymentDayOfMonth: number | undefined;
   @action onSelectPaymentDayOfMonth(val: number) {
     this.paymentDayOfMonth = val;
+    this.calculateMinMonthlyUntil();
+  }
+
+  @tracked minMonthlyUntil: Date = new Date();
+  calculateMinMonthlyUntil() {
+    let now = new Date();
+    let nowDate = now.getDate();
+
+    if (this.paymentDayOfMonth && this.paymentDayOfMonth < nowDate) {
+      this.minMonthlyUntil = new Date(now.getFullYear(), now.getMonth() + 1, this.paymentDayOfMonth);
+    } else {
+      this.minMonthlyUntil = now;
+    }
+
+    if (this.monthlyUntil && this.monthlyUntil < this.minMonthlyUntil) {
+      this.monthlyUntil = this.minMonthlyUntil;
+    }
   }
 
   @tracked recipientAddress = '';
@@ -115,11 +154,14 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
       @onSelectPaymentType={{this.onSelectPaymentType}}
       @isPaymentTypeInvalid={{not this.validator.isPaymentTypeValid}}
       @paymentTypeErrorMessage={{this.validator.paymentTypeErrorMessage}}
+      @minPaymentDate={{this.minPaymentDate}}
+      @minPaymentTime={{this.minPaymentTime}}
       @paymentDate={{this.paymentDate}}
       @onSetPaymentTime={{this.onSetPaymentTime}}
       @onSetPaymentDate={{this.onSetPaymentDate}}
       @paymentDayOfMonth={{this.paymentDayOfMonth}}
       @onSelectPaymentDayOfMonth={{this.onSelectPaymentDayOfMonth}}
+      @minMonthlyUntil={{this.minMonthlyUntil}}
       @monthlyUntil={{this.monthlyUntil}}
       @onSetMonthlyUntil={{this.onSetMonthlyUntil}}
       @recipientAddress={{this.recipientAddress}}
