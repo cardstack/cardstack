@@ -77,6 +77,7 @@ export default class Menu extends Component<Signature> {
                   boxel-menu__item--dangerous=menuItem.dangerous
                   boxel-menu__item--has-icon=menuItem.icon
                   boxel-menu__item--selected=menuItem.selected
+                  boxel-menu__item--disabled=menuItem.disabled
                 }}
                 data-test-boxel-menu-item
               >

@@ -11,6 +11,7 @@ export default class BoxelInputTimeUsage extends Component {
 
   @cssVariable declare boxelInputTimeBackgroundColor: CSSVariableInfo; // TODO: replace or remove
   @tracked value = new Date(2022,2,3,13,45);
+  @tracked minValue = new Date(2022,2,3,11,0);
   @tracked minuteInterval = 5;
   @action timeChanged(val: Time) {
     this.value = val as Date; //TODO: casting???
@@ -23,6 +24,7 @@ export default class BoxelInputTimeUsage extends Component {
       <:example>
         <BoxelInputTime
           @value={{this.value}}
+          @minValue={{this.minValue}}
           @minuteInterval={{this.minuteInterval}}
           @onChange={{this.timeChanged}}
         />
@@ -33,6 +35,11 @@ export default class BoxelInputTimeUsage extends Component {
           @description="The current value (undefined or conforming to a Time interface that is a subset of JavaScript's Date API"
           @value={{this.value}}
           @onInput={{fn (mut this.value)}}
+        />
+        <Args.Object
+          @name="minValue"
+          @description="The times before this value will disabled"
+          @value={{this.minValue}}
         />
         <Args.Number
           @name="minuteInterval"

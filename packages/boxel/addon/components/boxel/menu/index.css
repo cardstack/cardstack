@@ -2,6 +2,7 @@
   --boxel-menu-color: var(--boxel-light);
   --boxel-menu-current-color: var(--boxel-light-100);
   --boxel-menu-selected-color: var(--boxel-highlight);
+  --boxel-menu-disabled-color: var(--boxel-highlight);
   --boxel-menu-font: var(--boxel-font-sm);
 
   list-style-type: none;
@@ -44,6 +45,14 @@
 .boxel-menu__item--selected,
 .boxel-menu__item--selected.boxel-menu__item:hover {
   background-color: var(--boxel-menu-selected-color);
+}
+
+.boxel-menu__item--disabled,
+.boxel-menu__item--disabled.boxel-menu__item:hover,
+.boxel-menu__item--disabled a {
+  background-color: initial;
+  opacity: 0.4;
+  cursor: default;
 }
 
 .boxel-menu__separator {
