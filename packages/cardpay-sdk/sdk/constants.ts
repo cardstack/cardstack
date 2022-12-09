@@ -110,7 +110,7 @@ const bridgedTokens = {
 };
 
 const polygonNativeTokens = {
-  nativeTokenAddress: 'matic',
+  nativeTokenAddress: '0x0000000000000000000000000000000000001010',
   nativeTokenCoingeckoId: 'matic-network',
   nativeTokenSymbol: 'MATIC',
   nativeTokenName: 'Matic',
