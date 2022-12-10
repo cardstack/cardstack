@@ -96,6 +96,9 @@ class Indexer:
                 if isinstance(explanation_data_v, str)
                 else dict(explanation_data_v)
             )
+            # explanation_data_v of str represents the new column format
+            # new column format: string (that can be parsed to json)
+            # old column format, map<string, string> (a dictionary)
             i = models.Proof(
                 rootHash=payment["root"],
                 paymentCycle=payment["paymentCycle"],
