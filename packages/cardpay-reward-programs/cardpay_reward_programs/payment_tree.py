@@ -145,7 +145,7 @@ class PaymentTree:
                 columns["proof"].append(self.get_hex_proof(leaf))
                 columns["explanationId"].append(explanation_id)
                 columns["explanationData"].append(
-                    json.dumps(payment["explanationData"], separators=(",", ":"))
+                    json.dumps(payment["explanationData"])
                 )
         return pa.table(data=columns, schema=schema)
 
