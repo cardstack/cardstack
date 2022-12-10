@@ -1,3 +1,4 @@
+import json
 import logging
 from datetime import datetime
 
@@ -30,6 +31,7 @@ class Indexer:
             last_submitted_root_block_number = self.get_last_indexed_root_block_number(
                 db, reward_program_id
             )
+            last_submitted_root_block_number = 27715485
 
             print(
                 f"Indexing reward program {reward_program_id} since block {last_submitted_root_block_number}"
@@ -88,6 +90,12 @@ class Indexer:
         proofs = []
         for payment in payment_list:
             token, amount = self.decode_payment(payment)
+            explanation_data_v = payment.get("explanationData", {})
+            explanation_data = (
+                json.loads(explanation_data_v)
+                if isinstance(explanation_data_v, str)
+                else dict(explanation_data_v)
+            )
             i = models.Proof(
                 rootHash=payment["root"],
                 paymentCycle=payment["paymentCycle"],
@@ -100,7 +108,7 @@ class Indexer:
                 validFrom=payment["validFrom"],
                 validTo=payment["validTo"],
                 explanationId=payment.get("explanationId"),
-                explanationData=dict(payment.get("explanationData", {})),
+                explanationData=explanation_data,
             )
             proofs.append(i)
             leafs.append(payment["leaf"])
