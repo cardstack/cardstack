@@ -52,3 +52,4 @@ You can check if the dbs are synced with s3 by
 ## Deploy 
 
 This application is deployed via a manual dispatch of a github action 
+
