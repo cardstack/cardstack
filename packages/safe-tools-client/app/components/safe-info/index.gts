@@ -19,7 +19,7 @@ interface Signature {
     tokenBalances: TokenBalance[] | undefined;
     safesLoadingError: Error | undefined;
     onDepositClick: () => void;
-    onSelectSafe: (safe: any) => void;
+    onSelectSafe: (safe: Safe) => void;
   }
 }
 
