@@ -17,10 +17,10 @@
   },
   "matic": {
     "ScheduledPaymentModule": {
-      "startBlock": 36537441
+      "startBlock": 36621581
     },
     "GnosisSafe": {
-      "startBlock": 36537441
+      "startBlock": 36621581
     }
   },
   "mainnet": {
