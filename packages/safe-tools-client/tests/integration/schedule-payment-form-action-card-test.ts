@@ -1,4 +1,5 @@
 import { click, fillIn, render, TestContext } from '@ember/test-helpers';
+import { format, subDays, addMonths, addHours, subHours } from 'date-fns';
 import { selectChoose } from 'ember-power-select/test-support';
 import { setupRenderingTest } from 'ember-qunit';
 import hbs from 'htmlbars-inline-precompile';
@@ -138,6 +139,91 @@ module(
           paymentType = 'monthly';
         }
       }
+    });
+
+    test(`it disables dates in the past (one-time payment)`, async function (assert) {
+      await render(hbs`
+        <SchedulePaymentFormActionCard />
+      `);
+      const now = new Date();
+      const yesterday = subDays(now, 1);
+      await click(`[data-test-payment-type="one-time"]`);
+      await click(`[data-test-input-payment-date]`);
+      assert.dom(`[data-date="${format(now, 'yyyy-MM-dd')}"]`).isEnabled();
+      assert
+        .dom(`[data-date="${format(yesterday, 'yyyy-MM-dd')}"]`)
+        .isDisabled();
+    });
+
+    test(`it disables times before one hour from now (one-time payment)`, async function (assert) {
+      await render(hbs`
+        <SchedulePaymentFormActionCard />
+      `);
+      const now = new Date();
+      const nextOneHour = addHours(now, 1);
+      await click(`[data-test-payment-type="one-time"]`);
+      await click(`[data-test-input-specific-payment-time]`);
+      assert
+        .dom(
+          `[data-test-boxel-hour-menu] .boxel-menu__item--selected [data-test-boxel-menu-item-text="${format(
+            nextOneHour,
+            'h'
+          )}"]`
+        )
+        .exists();
+
+      //No disabled times if the nextOneHour is 00:00
+      if (nextOneHour.getHours() > 0) {
+        assert
+          .dom(
+            `[data-test-boxel-hour-menu] .boxel-menu__item--disabled [data-test-boxel-menu-item-text="${format(
+              subHours(nextOneHour, 1),
+              'h'
+            )}"]`
+          )
+          .exists();
+      }
+    });
+
+    test(`it disables dates before the payment day of month`, async function (assert) {
+      await render(hbs`
+        <SchedulePaymentFormActionCard />
+      `);
+      const paymentDayOfMonth = 1;
+      const now = new Date();
+      let minMonthlyUntil;
+      if (paymentDayOfMonth < now.getDate()) {
+        minMonthlyUntil = new Date(
+          addMonths(now, 1).setDate(paymentDayOfMonth)
+        );
+      } else {
+        minMonthlyUntil = now;
+      }
+
+      await click(`[data-test-payment-type="monthly"]`);
+      await click(`[data-test-input-recurring-day-of-month]`);
+      await click(`[data-option-index="${paymentDayOfMonth - 1}"]`);
+      await click(`[data-test-input-recurring-until]`);
+
+      while (
+        this.element
+          .querySelector('.ember-power-calendar-nav-title')
+          ?.textContent?.trim() !== `${format(minMonthlyUntil, 'MMMM yyyy')}`
+      ) {
+        await click(`.ember-power-calendar-nav-control--previous`);
+      }
+      assert
+        .dom(`[data-date="${format(minMonthlyUntil, 'yyyy-MM-dd')}"]`)
+        .isEnabled();
+
+      if (minMonthlyUntil.getDate() === 1) {
+        await click(`.ember-power-calendar-nav-control--previous`);
+      }
+
+      const disabledDate = subDays(minMonthlyUntil, 1);
+      assert
+        .dom(`[data-date="${format(disabledDate, 'yyyy-MM-dd')}"]`)
+        .isDisabled();
     });
 
     // TODO: assert state for no network selected/connected

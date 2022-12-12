@@ -128,6 +128,7 @@ export default class SchedulePaymentFormActionCardUI extends Component<Signature
                           @value={{@paymentDate}}
                           @onChange={{@onSetPaymentDate}}
                           @minDate={{@minPaymentDate}}
+                          data-test-input-payment-date
                         />
                       </BoxelField>
                       <BoxelField @label="Specific Time" @vertical={{true}} data-test-specific-payment-time>
@@ -135,6 +136,7 @@ export default class SchedulePaymentFormActionCardUI extends Component<Signature
                           @value={{@paymentDate}}
                           @onChange={{@onSetPaymentTime}}
                           @minValue={{@minPaymentTime}}
+                          data-test-input-specific-payment-time
                         />
                       </BoxelField>
                     {{/if}}
@@ -148,6 +150,7 @@ export default class SchedulePaymentFormActionCardUI extends Component<Signature
                           @icon="calendar"
                           @onChange={{@onSelectPaymentDayOfMonth}}
                           @value={{@paymentDayOfMonth}}
+                          data-test-input-recurring-day-of-month
                         />
                       </BoxelField>
                       <BoxelField @label="Until" @vertical={{true}} data-test-recurring-until>
@@ -155,6 +158,7 @@ export default class SchedulePaymentFormActionCardUI extends Component<Signature
                           @value={{@monthlyUntil}}
                           @onChange={{@onSetMonthlyUntil}}
                           @minDate={{@minMonthlyUntil}}
+                          data-test-input-recurring-until
                         />
                       </BoxelField>
                     {{/if}}
