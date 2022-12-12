@@ -10,7 +10,6 @@ import { AbiItem } from 'web3-utils';
 import { Operation } from './safe-utils';
 import { v4 } from 'uuid';
 import JsonRpcProvider from '../../providers/json-rpc-provider';
-import { providers } from 'ethers';
 
 import { BytesLike, Interface } from 'ethers/lib/utils';
 import { utils } from 'ethers';
@@ -50,11 +49,8 @@ export interface ErrorFragment {
   inputs: string[];
 }
 
-// We don't care if it's the patched version from the SDK or one instantiated directly from ethers.js
-export function isJsonRpcProvider(
-  web3OrEthersProvider: any
-): web3OrEthersProvider is JsonRpcProvider | providers.JsonRpcProvider {
-  return web3OrEthersProvider instanceof JsonRpcProvider || web3OrEthersProvider instanceof providers.JsonRpcProvider;
+export function isJsonRpcProvider(web3OrEthersProvider: any): web3OrEthersProvider is JsonRpcProvider {
+  return web3OrEthersProvider instanceof JsonRpcProvider;
 }
 
 export async function networkName(web3OrEthersProvider: Web3 | JsonRpcProvider): Promise<string> {
