@@ -19,7 +19,7 @@ export default class SchedulePaymentSDKService extends Service {
 
   estimatedSafeCreationGas: undefined | BigNumber;
 
-  private async getSchedulePaymentsModule() {
+  private async getSchedulePaymentsModule(): Promise<ScheduledPaymentModule> {
     //@ts-expect-error currentProvider does not match Web3Provider,
     //not worth typing as we should replace the web3 one with ethers soon
     const ethersProvider = new Web3Provider(this.wallet.web3.currentProvider);
@@ -51,37 +51,6 @@ export default class SchedulePaymentSDKService extends Service {
       undefined,
       this.contractOptions
     );
-  }
-
-  @task *estimateExecutionGas(
-    moduleAddress: string,
-    tokenAddress: string,
-    amount: string,
-    payeeAddress: string,
-    maxGasPrice: string,
-    gasTokenAddress: string,
-    salt: string,
-    gasPrice: string,
-    payAt?: number | null,
-    recurringDayOfMonth?: number | null,
-    recurringUntil?: number | null
-  ): TaskGenerator<number> {
-    const scheduledPayments: ScheduledPaymentModule =
-      yield this.getSchedulePaymentsModule();
-    const result = yield scheduledPayments.estimateExecutionGas(
-      moduleAddress,
-      tokenAddress,
-      amount,
-      payeeAddress,
-      maxGasPrice,
-      gasTokenAddress,
-      salt,
-      gasPrice,
-      payAt,
-      recurringDayOfMonth,
-      recurringUntil
-    );
-    return result;
   }
 
   @task *schedulePayment(
