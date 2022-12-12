@@ -19,13 +19,7 @@ async function tokenPairRate(provider: JsonRpcProvider, token1Address: string, t
   let networkName = convertChainIdToName(network.chainId);
   let uniswapV2Factory = getAddressByNetwork('uniswapV2Factory', networkName);
   let initCodeHash = getConstantByNetwork('uniswapPairInitCodeHash', networkName as SchedulerCapableNetworks);
-  let pair = await Fetcher.fetchPairData(
-    token1,
-    token2,
-    uniswapV2Factory,
-    initCodeHash,
-    provider as unknown as BaseProvider
-  );
+  let pair = await Fetcher.fetchPairData(token1, token2, uniswapV2Factory, initCodeHash, provider);
 
   let route = new Route([pair], token2);
 

@@ -2,6 +2,8 @@ import Component from '@glimmer/component';
 import SchedulePaymentFormActionCardUI from './ui';
 import { SelectableToken } from '@cardstack/boxel/components/boxel/input/selectable-token';
 import { inject as service } from '@ember/service';
+import SafesService from '../../services/safes';
+import ScheduledPaymentsSdkService from '../../services/scheduled-payments-sdk';
 import TokensService from '../../services/tokens';
 import { action } from '@ember/object';
 import { tracked } from '@glimmer/tracking';
@@ -10,14 +12,19 @@ import { Time } from '@cardstack/boxel/components/boxel/input/time';
 import withTokenIcons from '../../helpers/with-token-icons';
 import SchedulePaymentFormValidator, { ValidatableForm } from './validator';
 import not from 'ember-truth-helpers/helpers/not';
+import { convertAmountToRawAmount } from '@cardstack/cardpay-sdk';
+import { taskFor } from 'ember-concurrency-ts';
 
 interface Signature {
   Element: HTMLElement;
 }
 
 export default class SchedulePaymentFormActionCard extends Component<Signature> implements ValidatableForm {
+  @service declare safes: SafesService;
   @service declare tokens: TokensService;
+  @service declare scheduledPaymentsSdk: ScheduledPaymentsSdkService;
   validator = new SchedulePaymentFormValidator(this);
+  executionGas = 1000; // TODO: this should be set by code that populates Max Gas Options
 
   get paymentTypeOptions() {
     return [
@@ -70,9 +77,9 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
     this.paymentDayOfMonth = val;
   }
 
-  @tracked recipientAddress = '';
-  @action onUpdateRecipientAddress(val: string) {
-    this.recipientAddress = val;
+  @tracked payeeAddress = '';
+  @action onUpdatePayeeAddress(val: string) {
+    this.payeeAddress = val;
   }
 
   @tracked paymentAmount: string = '';
@@ -94,9 +101,9 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
     this.selectedGasToken = val;
   }
 
-  @tracked maxGasFee: 'normal' | 'high' | 'max' | undefined;
-  @action onUpdateMaxGasFee(val: 'normal' | 'high' | 'max') {
-    this.maxGasFee = val;
+  @tracked maxGasPrice: 'normal' | 'high' | 'max' | undefined;
+  @action onUpdateMaxGasPrice(val: 'normal' | 'high' | 'max') {
+    this.maxGasPrice = val;
   }
 
   get isValid(): boolean {
@@ -104,8 +111,35 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
   }
 
   @action
-  schedulePayment() {
-    console.log('TODO...');
+  async schedulePayment() {
+    let { currentSafe } = this.safes;
+    if (!currentSafe) return;
+    if (!this.paymentDate) return;
+    if (!this.paymentToken) return;
+    if (!this.selectedGasToken) return;
+
+    const array = new Uint8Array(32);
+    window.crypto.getRandomValues(array);
+    const salt = btoa(String.fromCharCode.apply(null, array));
+
+    await taskFor(this.scheduledPaymentsSdk.schedulePayment).perform(
+      currentSafe.address,
+      currentSafe.spModuleAddress,
+      this.paymentToken.address,
+      convertAmountToRawAmount(this.paymentAmount, this.paymentToken.decimals),
+      this.payeeAddress,
+      this.executionGas,
+      '15000000000', // TODO: this.maxGasPrice,
+      this.selectedGasToken.address,
+      salt,
+      Math.round(this.paymentDate.getTime() / 1000),
+      null, //TODO: support for recurringDayOfMonth
+      null, //TODO: support for recurringUntil
+      (scheduledPaymentId: string) => {
+        console.log(`Scheduled payment created in the crank: ${scheduledPaymentId}.`);
+        console.log('Waiting for the transaction to be mined...');
+      }
+    )
   }
 
   <template>
@@ -122,10 +156,10 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
       @onSelectPaymentDayOfMonth={{this.onSelectPaymentDayOfMonth}}
       @monthlyUntil={{this.monthlyUntil}}
       @onSetMonthlyUntil={{this.onSetMonthlyUntil}}
-      @recipientAddress={{this.recipientAddress}}
-      @isRecipientAddressInvalid={{not this.validator.isRecipientAddressValid}}
-      @recipientAddressErrorMessage={{this.validator.recipientAddressErrorMessage}}
-      @onUpdateRecipientAddress={{this.onUpdateRecipientAddress}}
+      @payeeAddress={{this.payeeAddress}}
+      @isPayeeAddressInvalid={{not this.validator.isPayeeAddressValid}}
+      @payeeAddressErrorMessage={{this.validator.payeeAddressErrorMessage}}
+      @onUpdatePayeeAddress={{this.onUpdatePayeeAddress}}
       @paymentAmount={{this.paymentAmount}}
       @onUpdatePaymentAmount={{this.onUpdatePaymentAmount}}
       @isPaymentAmountInvalid={{not this.validator.isAmountValid}}
@@ -138,10 +172,10 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
       @onSelectGasToken={{this.onSelectGasToken}}
       @isGasTokenInvalid={{not this.validator.isGasTokenValid}}
       @gasTokenErrorMessage={{this.validator.gasTokenErrorMessage}}
-      @maxGasFee={{this.maxGasFee}}
-      @onUpdateMaxGasFee={{this.onUpdateMaxGasFee}}
-      @isMaxGasFeeInvalid={{not this.validator.isMaxGasFeeValid}}
-      @maxGasFeeErrorMessage={{this.validator.maxGasFeeErrorMessage}}
+      @maxGasPrice={{this.maxGasPrice}}
+      @onUpdateMaxGasPrice={{this.onUpdateMaxGasPrice}}
+      @isMaxGasPriceInvalid={{not this.validator.isMaxGasPriceValid}}
+      @maxGasPriceErrorMessage={{this.validator.maxGasPriceErrorMessage}}
       @onSchedulePayment={{this.schedulePayment}}
       @isSubmitEnabled={{this.isValid}}
     />

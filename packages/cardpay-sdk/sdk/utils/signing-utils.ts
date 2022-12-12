@@ -7,7 +7,7 @@ import { AbiItem, padLeft, toHex, numberToHex, hexToBytes } from 'web3-utils';
 import { getAddress } from '../../contracts/addresses';
 import { ZERO_ADDRESS } from '../constants';
 
-import { networkName } from './general-utils';
+import { isJsonRpcProvider, networkName } from './general-utils';
 import { networkIds } from '../constants';
 import { gte } from 'semver';
 import { Signer } from 'ethers';
@@ -286,7 +286,7 @@ export async function signTypedData(
 
       //@ts-ignore the _signTypedData method is unfortunately not typed
       signature = await signer._signTypedData(domain, types, message);
-    } else if (web3OrSignerOrEthersProvider instanceof JsonRpcProvider) {
+    } else if (isJsonRpcProvider(web3OrSignerOrEthersProvider)) {
       let ethersProvider = web3OrSignerOrEthersProvider;
       return await ethersProvider.send('eth_signTypedData_v4', [account, JSON.stringify(data)]);
     } else {
