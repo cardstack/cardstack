@@ -18,14 +18,14 @@ import { type ActionChinState } from '@cardstack/boxel/components/boxel/action-c
 import './index.css';
 
 interface Signature {
-  name: string | null;
+  name?: string;
   isOpen: boolean;
   isConnected: boolean;
-  isConnecting: boolean;
-  changeWalletProvider: () => void;
+  isConnecting?: boolean;
+  changeWalletProvider?: () => void;
   onClose: () => void;
-  onConnect: (() => void) | undefined;
-  onDisconnect: (() => void) | undefined;
+  onConnect?: (() => void);
+  onDisconnect?: (() => void);
 }
 
 class NetworkConnectModal extends Component<Signature> {
@@ -159,3 +159,10 @@ class NetworkConnectModal extends Component<Signature> {
 }
 
 export default NetworkConnectModal;
+
+
+declare module '@glint/environment-ember-loose/registry' {
+  export default interface Registry {
+    'NetworkConnectModal': typeof NetworkConnectModal;
+  }
+}

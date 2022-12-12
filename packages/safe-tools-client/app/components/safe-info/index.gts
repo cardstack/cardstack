@@ -15,17 +15,20 @@ interface Signature {
   Element: HTMLDivElement;
   Args: {
     currentSafe: Safe | undefined;
-    safes: Safe[];
-    tokenBalances: TokenBalance[];
+    safes: Safe[] | undefined;
+    tokenBalances: TokenBalance[] | undefined;
     safesLoadingError: Error | undefined;
     onDepositClick: () => void;
-    onSelectSafe: () => void;
+    onSelectSafe: (safe: Safe) => void;
   }
 }
 
 export default class SafeInfo extends Component<Signature> {
   get safesHaveLoadedInitially() {
     return this.args.safes !== undefined;
+  }
+  get safes() {
+    return this.args.safes || [];
   }
 
   <template>
@@ -34,7 +37,7 @@ export default class SafeInfo extends Component<Signature> {
         class='safe-tools__dashboard-dropdown'
         @selected={{@currentSafe}}
         @onChange={{@onSelectSafe}}
-        @options={{@safes}}
+        @options={{this.safes}}
         @dropdownClass="boxel-select-usage-dropdown"
         data-test-safe-dropdown
         as |safe itemCssClass|>
