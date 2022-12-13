@@ -1,7 +1,16 @@
 import { getSDK, Web3Provider } from '@cardstack/cardpay-sdk';
 import WalletService from '@cardstack/safe-tools-client/services/wallet';
+import { getOwner } from '@ember/application';
 import Service, { inject as service } from '@ember/service';
 import { tracked } from '@glimmer/tracking';
+
+import config from '../config/environment';
+
+declare global {
+  interface Window {
+    TEST__AUTH_TOKEN?: string;
+  }
+}
 
 export default class HubAuthenticationService extends Service {
   storage: Storage;
@@ -11,8 +20,14 @@ export default class HubAuthenticationService extends Service {
 
   constructor(parameters?: object | undefined) {
     super(parameters);
-
-    this.storage = window.localStorage;
+    this.storage =
+      (getOwner(this).lookup('storage:local') as Storage) ||
+      window.localStorage;
+    if (config.environment === 'test') {
+      if (window.TEST__AUTH_TOKEN) {
+        this.storage.setItem('authToken', window.TEST__AUTH_TOKEN);
+      }
+    }
   }
 
   async ensureAuthenticated(): Promise<void> {

@@ -29,15 +29,55 @@ interface ScheduledPaymentAttempt {
   }
 }
 
+interface ScheduledPaymentResponseItem {
+  attributes: {
+    'id': string;
+    'started-at': any;
+    'ended-at': any;
+    'status': any;
+    'failure-reason': any;
+    'transaction-hash': string;
+  };
+  relationships: {
+    'scheduled-payment': {
+      data: {
+        id: string
+      }
+    }
+  };
+}
+
+interface ScheduledPaymentData {
+    amount: string;
+    'fee-fixed-usd': string;
+    'fee-percentage': string;
+    'token-address': string;
+    'gas-token-address': string;
+    'payee-address': string;
+    'pay-at': string;
+    'chain-id': string;
+}
+
+interface ScheduledPaymentResponseIncludedItem {
+  id: string;
+  type: string;
+  attributes: ScheduledPaymentData;
+}
+
+interface ScheduledPaymentResponse {
+  data: ScheduledPaymentResponseItem[];
+  included: ScheduledPaymentResponseIncludedItem[];
+}
+
 class PaymentTransactionsList extends Component {
   @service declare wallet: WalletService;
   @service declare network: NetworkService;
   @service declare hubAuthentication: HubAuthenticationService;
 
-  deserializeScheduledPaymentResponse(response: unknown): ScheduledPaymentAttempt[] {
+  deserializeScheduledPaymentResponse(response: ScheduledPaymentResponse): ScheduledPaymentAttempt[] {
     return response.data.map(s => {
       let scheduledPaymentId = s.relationships['scheduled-payment'].data.id;
-      let scheduledPayment = response.included.find(i => i.id === scheduledPaymentId && i.type === 'scheduled-payments').attributes;
+      let scheduledPayment = response.included.find(i => i.id === scheduledPaymentId && i.type === 'scheduled-payments')!.attributes;
       return {
         startedAt: new Date(s.attributes['started-at']),
         endedAt: new Date(s.attributes['ended-at']),
@@ -52,6 +92,7 @@ class PaymentTransactionsList extends Component {
           tokenAddress: scheduledPayment['token-address'],
           chainId: scheduledPayment['chain-id'],
           payeeAddress: scheduledPayment['payee-address'],
+          payAt: scheduledPayment['pay-at'],
         }
       };
     })
@@ -139,3 +180,9 @@ class PaymentTransactionsList extends Component {
 }
 
 export default PaymentTransactionsList;
+
+declare module '@glint/environment-ember-loose/registry' {
+  export default interface Registry {
+    'PaymentTransactionsList': typeof PaymentTransactionsList;
+  }
+}
