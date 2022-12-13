@@ -1,0 +1,27 @@
+.table {
+  width: 100%;
+  border-radius: 4px;
+  border-collapse: collapse;
+  margin: 0 auto;
+  margin-top: 2rem;
+  color: black;
+}
+
+.table__header {
+  text-transform: uppercase;
+  font-weight: normal;
+  font-size: 0.75rem;
+  text-align: left;
+}
+
+.table__row {
+  border-bottom: 1px solid var(--boxel-purple-300);
+}
+
+.table__row:last-of-type {
+  border-bottom: 0;
+}
+
+.table__cell {
+  padding: 1rem 1.5rem;
+}

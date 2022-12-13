@@ -416,7 +416,7 @@ export async function hubRequest(
   hubUrl: string,
   path: string,
   authToken: string,
-  method: 'GET' | 'POST' | 'PATCH' | 'DELETE',
+  method: 'GET' | 'POST' | 'PATCH' | 'DELETE' = 'GET',
   body = {}
 ) {
   let url = `${hubUrl}/${path}`;
