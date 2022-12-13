@@ -17,11 +17,11 @@ export interface ValidatableForm {
   paymentDayOfMonth: number | undefined;
   minMonthlyUntil: Date;
   monthlyUntil: Date | undefined;
-  recipientAddress: string;
+  payeeAddress: string;
   paymentAmount: string;
   paymentToken: SelectableToken | undefined;
   selectedGasToken: SelectableToken | undefined;
-  maxGasFee: 'normal' | 'high' | 'max' | undefined;
+  maxGasPrice: 'normal' | 'high' | 'max' | undefined;
 }
 
 export default class SchedulePaymentFormValidator {
@@ -36,10 +36,10 @@ export default class SchedulePaymentFormValidator {
   get isValid() {
     return (
       this.isPaymentTypeValid &&
-      this.isRecipientAddressValid &&
+      this.isPayeeAddressValid &&
       this.isAmountValid &&
       this.isGasTokenValid &&
-      this.isMaxGasFeeValid
+      this.isMaxGasPriceValid
     );
   }
 
@@ -66,16 +66,16 @@ export default class SchedulePaymentFormValidator {
     return '';
   }
 
-  get isRecipientAddressValid(): boolean {
-    return this.recipientAddressErrorMessage === '';
+  get isPayeeAddressValid(): boolean {
+    return this.payeeAddressErrorMessage === '';
   }
 
-  get recipientAddressErrorMessage(): string {
-    const { recipientAddress } = this.form;
-    if (recipientAddress === '') {
+  get payeeAddressErrorMessage(): string {
+    const { payeeAddress } = this.form;
+    if (payeeAddress === '') {
       return "can't be blank";
     }
-    if (!isAddress(recipientAddress)) {
+    if (!isAddress(payeeAddress)) {
       return 'must be a valid chain address';
     }
     return '';
@@ -110,12 +110,12 @@ export default class SchedulePaymentFormValidator {
     return '';
   }
 
-  get isMaxGasFeeValid(): boolean {
-    return this.maxGasFeeErrorMessage === '';
+  get isMaxGasPriceValid(): boolean {
+    return this.maxGasPriceErrorMessage === '';
   }
 
-  get maxGasFeeErrorMessage(): string {
-    if (!this.form.maxGasFee) {
+  get maxGasPriceErrorMessage(): string {
+    if (!this.form.maxGasPrice) {
       return 'must choose a maximum gas fee to allow';
     }
     return '';

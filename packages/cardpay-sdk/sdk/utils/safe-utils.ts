@@ -11,7 +11,7 @@ import { AbiItem } from 'web3-utils';
 import { getAddress } from '../../contracts/addresses';
 import GnosisSafeProxyFactoryABI from '../../contracts/abi/gnosis-safe-proxy-factory';
 import GnosisSafeABI from '../../contracts/abi/gnosis-safe';
-import { Transaction } from './general-utils';
+import { Transaction, isJsonRpcProvider } from './general-utils';
 /* eslint-disable node/no-extraneous-import */
 import { Contract, ethers, utils } from 'ethers';
 import { AddressZero } from '@ethersproject/constants';
@@ -392,7 +392,7 @@ export async function getSafeVersion(
   gnosisSafeAddress: string
 ): Promise<string> {
   let safeVersion;
-  if (web3OrEthersProvider instanceof JsonRpcProvider) {
+  if (isJsonRpcProvider(web3OrEthersProvider)) {
     safeVersion = getSafeVersionWithEthers(web3OrEthersProvider, gnosisSafeAddress);
   } else {
     safeVersion = getSafeVersionWithWeb3(web3OrEthersProvider, gnosisSafeAddress);

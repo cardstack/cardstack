@@ -7,7 +7,6 @@ import cssVar from '@cardstack/boxel/helpers/css-var';
 import or from 'ember-truth-helpers/helpers/or';
 import { svgJar } from '@cardstack/boxel/utils/svg-jar';
 
-//@ts-expect-error glint does not think this is consumed-but it is consumed in the template https://github.com/typed-ember/glint/issues/374
 import { concat, hash } from '@ember/helper';
 
 import '@cardstack/boxel/styles/global.css';
@@ -49,11 +48,13 @@ const DropdownButton: TemplateOnlyComponent<Signature> = <template>
           data-test-boxel-dropdown-button
           ...attributes
         >
-          {{svgJar
-            @icon
-            width=(or @iconSize 16)
-            height=(or @iconSize 16)
-          }}
+          {{#if @icon}}
+            {{svgJar
+              @icon
+              width=(or @iconSize 16)
+              height=(or @iconSize 16)
+            }}
+          {{/if}}
         </button>
       </:trigger>
       <:content as |dd|>

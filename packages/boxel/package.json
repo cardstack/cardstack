@@ -84,9 +84,10 @@
     "@gavant/glint-template-types": "^0.1.5",
     "@glimmer/component": "^1.1.2",
     "@glimmer/tracking": "^1.1.2",
-    "@glint/core": "^0.9.7",
-    "@glint/environment-ember-loose": "^0.9.7",
-    "@glint/environment-ember-template-imports": "^0.9.7",
+    "@glint/core": "1.0.0-beta.1",
+    "@glint/environment-ember-loose": "1.0.0-beta.1",
+    "@glint/environment-ember-template-imports": "1.0.0-beta.1",
+    "@glint/template": "1.0.0-beta.1",
     "@percy/cli": "^1.0.0-beta.70",
     "@percy/ember": "^3.0.1",
     "@types/ember": "^4.0.1",
@@ -113,8 +114,8 @@
     "@types/ember__utils": "^4.0.1",
     "@types/jquery": "^3.5.14",
     "@types/rsvp": "^4.0.4",
-    "@typescript-eslint/eslint-plugin": "^4.18.0",
-    "@typescript-eslint/parser": "^4.18.0",
+    "@typescript-eslint/eslint-plugin": "^5.45.0",
+    "@typescript-eslint/parser": "^5.45.0",
     "babel-eslint": "^10.1.0",
     "broccoli-asset-rev": "^3.0.0",
     "ember-a11y-testing": "^4.0.3",
@@ -159,8 +160,11 @@
     "qunit-dom": "^2.0.0",
     "stylelint": "^14.3.0",
     "stylelint-config-standard": "^24.0.0",
-    "typescript": "^4.7.4",
+    "typescript": "^4.9.3",
     "webpack": "^5.74.0"
+  },
+  "peerDependencies": {
+    "@glint/template": "1.0.0-beta.1"
   },
   "engines": {
     "node": "14.* || >= 16"

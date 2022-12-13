@@ -35,9 +35,10 @@
     "@embroider/webpack": "^1.8.3",
     "@glimmer/component": "^1.1.2",
     "@glimmer/tracking": "^1.1.2",
-    "@glint/core": "^0.9.7",
-    "@glint/environment-ember-loose": "^0.9.7",
-    "@glint/environment-ember-template-imports": "^0.9.7",
+    "@glint/core": "1.0.0-beta.1",
+    "@glint/environment-ember-loose": "1.0.0-beta.1",
+    "@glint/environment-ember-template-imports": "1.0.0-beta.1",
+    "@glint/template": "1.0.0-beta.1",
     "@hyperbola/svgo-loader": "0.1.2",
     "@metamask/detect-provider": "^1.2.0",
     "@metamask/providers": "^10.2.0",
@@ -147,7 +148,7 @@
     "@babel/core": "^7.17.8",
     "date-fns": "^2.29.3",
     "eslint-plugin-import": "^2.26.0",
-    "typescript": "^4.7.4"
+    "typescript": "^4.9.3"
   },
   "msw": {
     "workerDirectory": "public"

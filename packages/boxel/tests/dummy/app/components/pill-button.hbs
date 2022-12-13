@@ -1,3 +1,4 @@
+{{! @glint-nocheck: not typesafe yet }}
 {{#if @route}}
   <LinkTo @route={{@route}} @models={{if @models @models (array @routeModel)}} @query={{@query}} class="boxel-pill-btn boxel-pill-btn__{{@variant}} {{@class}}" ...attributes>
     {{yield}}

@@ -3,7 +3,6 @@ import { action } from '@ember/object';
 import { tracked } from '@glimmer/tracking';
 import FreestyleUsage from 'ember-freestyle/components/freestyle/usage';
 import BoxelDropdownButton from './index';
-//@ts-expect-error glint does not think this is consumed-but it is consumed in the template https://github.com/typed-ember/glint/issues/374
 import { fn, array } from '@ember/helper';
 import menuItem from '@cardstack/boxel/helpers/menu-item'
 import menuDivider from '@cardstack/boxel/helpers/menu-divider'

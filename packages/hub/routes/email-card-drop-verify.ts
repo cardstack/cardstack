@@ -8,8 +8,8 @@ import * as Sentry from '@sentry/node';
 
 let log = Logger('route:email-card-drop-verify');
 
-const { url: webClientUrl } = config.get('webClient');
-const { alreadyClaimed, error, success } = config.get('webClient.paths.cardDrop');
+const { url: webClientUrl } = config.get<Record<string, string>>('webClient');
+const { alreadyClaimed, error, success } = config.get<Record<string, string>>('webClient.paths.cardDrop');
 
 export default class EmailCardDropVerifyRoute {
   clock = inject('clock');

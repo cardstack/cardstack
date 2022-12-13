@@ -1,6 +1,6 @@
 import { helper } from '@ember/component/helper';
 
-type PostionalArgs = [string, number, number] | [string, number] | [string];
+type PostionalArgs = [string | undefined, number, number] | [string | undefined, number] | [string | undefined];
 
 interface Signature {
   Args: {

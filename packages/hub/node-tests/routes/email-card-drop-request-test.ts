@@ -41,7 +41,7 @@ class FrozenClock extends Clock {
 }
 
 const verificationCodeRegex = /^[~.a-zA-Z0-9_-]{10}$/;
-const emailVerificationLinkExpiryMinutes = config.get('cardDrop.email.expiryMinutes') as number;
+const emailVerificationLinkExpiryMinutes = config.get<number>('cardDrop.email.expiryMinutes');
 
 let mockPrepaidCardMarketContractPaused = false;
 let mockPrepaidCardQuantity = 100;
@@ -278,7 +278,7 @@ describe('POST /api/email-card-drop-requests', function () {
     expect(emailCardDropRequest.ownerAddress).to.equal(stubUserAddress);
     expect(emailCardDropRequest.verificationCode).to.match(verificationCodeRegex);
 
-    let hash = crypto.createHmac('sha256', config.get('emailHashSalt'));
+    let hash = crypto.createHmac('sha256', config.get<string>('emailHashSalt'));
     hash.update(email);
     let emailHash = hash.digest('hex');
 
@@ -518,7 +518,7 @@ describe('POST /api/email-card-drop-requests', function () {
   });
 
   it('rejects and triggers the rate limit if enough drops have happened in the interval', async function () {
-    let { count, periodMinutes } = config.get('cardDrop.email.rateLimit');
+    let { count, periodMinutes } = config.get<Record<string, number>>('cardDrop.email.rateLimit');
 
     let timeWithinRateLimitWindow = fakeTime - (periodMinutes / 2) * 60 * 1000; // 2022-04-20 07:37:27
 
@@ -570,7 +570,7 @@ describe('POST /api/email-card-drop-requests', function () {
   });
 
   it('does not trigger the rate limit when the claims are outside the rate limit period', async function () {
-    let { count, periodMinutes } = config.get('cardDrop.email.rateLimit');
+    let { count, periodMinutes } = config.get<Record<string, number>>('cardDrop.email.rateLimit');
 
     for (let i = 0; i <= count * 2; i++) {
       let claim = Object.assign({}, claimedEoa);
@@ -669,7 +669,7 @@ describe('POST /api/email-card-drop-requests', function () {
   it('rejects when the email has already claimed', async function () {
     let email = 'example@gmail.com';
 
-    let hash = crypto.createHmac('sha256', config.get('emailHashSalt'));
+    let hash = crypto.createHmac('sha256', config.get<string>('emailHashSalt'));
     hash.update(email);
     let emailHash = hash.digest('hex');
 

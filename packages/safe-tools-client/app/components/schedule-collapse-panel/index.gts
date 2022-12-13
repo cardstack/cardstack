@@ -87,3 +87,10 @@ const ScheduleCollapsePanel: TemplateOnlyComponent<Signature> = <template>
 </template>
 
 export default ScheduleCollapsePanel;
+
+
+declare module '@glint/environment-ember-loose/registry' {
+  export default interface Registry {
+    'ScheduleCollapsePanel': typeof ScheduleCollapsePanel;
+  }
+}

@@ -14,5 +14,21 @@
     "GnosisSafe": {
       "startBlock": 29044929
     }
+  },
+  "matic": {
+    "ScheduledPaymentModule": {
+      "startBlock": 36621581
+    },
+    "GnosisSafe": {
+      "startBlock": 36621581
+    }
+  },
+  "mainnet": {
+    "ScheduledPaymentModule": {
+      "startBlock": 16119342
+    },
+    "GnosisSafe": {
+      "startBlock": 16119342
+    }
   }
 }

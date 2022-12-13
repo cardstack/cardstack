@@ -31,8 +31,8 @@ interface Signature {
     onSetPaymentTime: (time: Time) => void;
     onSelectPaymentDayOfMonth: (val: number) => void;
     onSetMonthlyUntil: (date: Date) => void;
-    isRecipientAddressInvalid: boolean;
-    recipientAddressErrorMessage: string;
+    isPayeeAddressInvalid: boolean;
+    payeeAddressErrorMessage: string;
     onUpdatePaymentAmount: (val: string) => void;
     isPaymentAmountInvalid: boolean;
     paymentAmountErrorMessage: string;
@@ -42,21 +42,21 @@ interface Signature {
     onSelectGasToken: (val: SelectableToken) => void;
     isGasTokenInvalid: boolean;
     gasTokenErrorMessage: string;
-    onUpdateMaxGasFee: (val: string) => void;
-    isMaxGasFeeInvalid: boolean;
-    maxGasFeeErrorMessage: string;
+    onUpdateMaxGasPrice: (val: string) => void;
+    isMaxGasPriceInvalid: boolean;
+    maxGasPriceErrorMessage: string;
     onSchedulePayment: () => void;
     isSubmitEnabled: boolean;
-    onUpdateRecipientAddress: (val: string) => void;
+    onUpdatePayeeAddress: (val: string) => void;
   }
 }
 
 export default class SchedulePaymentFormActionCardUI extends Component<Signature> {
   @tracked hasBlurredPaymentType = false;
-  @tracked hasBlurredRecipientAddress = false;
+  @tracked hasBlurredPayeeAddress = false;
   @tracked hasBlurredPaymentAmount = false;
   @tracked hasBlurredGasToken = false;
-  @tracked hasBlurredMaxGasFee = false;
+  @tracked hasBlurredMaxGasPrice = false;
 
   get isPaymentTypeInvalid() {
     if (!this.hasBlurredPaymentType) {
@@ -65,11 +65,11 @@ export default class SchedulePaymentFormActionCardUI extends Component<Signature
     return this.args.isPaymentTypeInvalid;
   }
 
-  get isRecipientAddressInvalid() {
-    if (!this.hasBlurredRecipientAddress) {
+  get isPayeeAddressInvalid() {
+    if (!this.hasBlurredPayeeAddress) {
       return false;
     }
-    return this.args.isRecipientAddressInvalid;
+    return this.args.isPayeeAddressInvalid;
   }
 
   get isPaymentAmountInvalid() {
@@ -86,11 +86,11 @@ export default class SchedulePaymentFormActionCardUI extends Component<Signature
     return this.args.isGasTokenInvalid;
   }
 
-  get isMaxGasFeeInvalid() {
-    if (!this.hasBlurredMaxGasFee) {
+  get isMaxGasPriceInvalid() {
+    if (!this.hasBlurredMaxGasPrice) {
       return false;
     }
-    return this.args.isMaxGasFeeInvalid;
+    return this.args.isMaxGasPriceInvalid;
   }
 
   <template>
@@ -171,12 +171,12 @@ export default class SchedulePaymentFormActionCardUI extends Component<Signature
         <BoxelField @label="Recipient">
           <BoxelInput
             placeholder="Enter Address"
-            data-test-recipient-address-input
-            @value={{@recipientAddress}}
-            @invalid={{this.isRecipientAddressInvalid}}
-            @errorMessage={{@recipientAddressErrorMessage}}
-            @onInput={{@onUpdateRecipientAddress}}
-            @onBlur={{set this 'hasBlurredRecipientAddress' true}}
+            data-test-payee-address-input
+            @value={{@payeeAddress}}
+            @invalid={{this.isPayeeAddressInvalid}}
+            @errorMessage={{@payeeAddressErrorMessage}}
+            @onInput={{@onUpdatePayeeAddress}}
+            @onBlur={{set this 'hasBlurredPayeeAddress' true}}
           />
         </BoxelField>
         <BoxelField @label="Amount">
@@ -209,11 +209,11 @@ export default class SchedulePaymentFormActionCardUI extends Component<Signature
             data-test-max-gas-toggle
             @groupDescription="The maximum gas fee you are willing to spend for this payment"
             @name="max-gas-fee"
-            @errorMessage={{@maxGasFeeErrorMessage}}
-            @invalid={{this.isMaxGasFeeInvalid}}
-            @value={{@maxGasFee}}
-            @onChange={{@onUpdateMaxGasFee}}
-            @onBlur={{set this 'hasBlurredMaxGasFee' true}}
+            @errorMessage={{@maxGasPriceErrorMessage}}
+            @invalid={{this.isMaxGasPriceInvalid}}
+            @value={{@maxGasPrice}}
+            @onChange={{@onUpdateMaxGasPrice}}
+            @onBlur={{set this 'hasBlurredMaxGasPrice' true}}
             as |group|
           >
             <group.Button @value="normal">

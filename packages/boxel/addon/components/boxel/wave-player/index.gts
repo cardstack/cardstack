@@ -177,6 +177,7 @@ export default class WavePlayerComponent extends Component<Signature> {
         @height="30px"
       />
       <canvas
+        {{!@glint-expect-error "Passing this function should be valid but it is not as of 1.0.0-beta.1"}}
         {{didInsert this.setupPlayer}}
         role="button"
         aria-label="Audio track"

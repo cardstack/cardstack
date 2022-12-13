@@ -16,8 +16,8 @@ import { SeverityLevel } from '@sentry/node';
 
 const log = logger('hub/email-card-drop-requests');
 
-const cardDropSku = config.get('cardDrop.sku') as string;
-const notifyWhenQuantityBelow = config.get('cardDrop.email.notifyWhenQuantityBelow') as number;
+const cardDropSku = config.get<string>('cardDrop.sku');
+const notifyWhenQuantityBelow = config.get<number>('cardDrop.email.notifyWhenQuantityBelow');
 
 export interface EmailCardDropRequest {
   id: string;
@@ -153,7 +153,7 @@ export default class EmailCardDropRequestsRoute {
       return respondWith503(ctx, 'Rate limit has been triggered');
     }
 
-    let { count, periodMinutes } = config.get('cardDrop.email.rateLimit');
+    let { count, periodMinutes } = config.get<Record<string, number>>('cardDrop.email.rateLimit');
     let countOfRecentClaims = await prisma.emailCardDropRequest.claimedInLastMinutes(periodMinutes, this.clock);
 
     if (countOfRecentClaims >= count) {
