@@ -47,7 +47,6 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
       }
       if (!this.paymentDayOfMonth) {
         this.paymentDayOfMonth = 1;
-        this.calculateMinMonthlyUntil();
       }
       this.selectedPaymentType = paymentTypeId;
     }
@@ -61,22 +60,21 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
     } else {
       this.paymentDate = selectedDate;
     }
-    this.calculateMinPaymentTime();
   }
 
   @action onSetPaymentTime(time: Time) {
     this.paymentDate?.setHours(time.getHours(), time.getMinutes());
     this.paymentDate = new Date((time as Date).getTime()); // trigger reactivity
-    this.calculateMinPaymentTime();
   }
 
-  @tracked minPaymentTime: Date = this.minPaymentDate;
-  calculateMinPaymentTime() {
+  get minPaymentTime() {
+    let minPaymentTime;
     if (this.paymentDate && this.paymentDate.getDate() > this.minPaymentDate.getDate()) {
-      this.minPaymentTime = new Date(this.minPaymentDate.getFullYear(), this.minPaymentDate.getMonth(), this.minPaymentDate.getDate(), 0, 0, 0, 0)
+      minPaymentTime = new Date(this.minPaymentDate.getFullYear(), this.minPaymentDate.getMonth(), this.minPaymentDate.getDate(), 0, 0, 0, 0)
     } else {
-      this.minPaymentTime = this.minPaymentDate;
+      minPaymentTime = this.minPaymentDate;
     }
+    return minPaymentTime;
   }
   
   @tracked monthlyUntil: Date | undefined;
@@ -90,23 +88,23 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
   @tracked paymentDayOfMonth: number | undefined;
   @action onSelectPaymentDayOfMonth(val: number) {
     this.paymentDayOfMonth = val;
-    this.calculateMinMonthlyUntil();
-  }
-
-  @tracked minMonthlyUntil: Date = new Date();
-  calculateMinMonthlyUntil() {
-    let now = new Date();
-    let nowDate = now.getDate();
-
-    if (this.paymentDayOfMonth && this.paymentDayOfMonth < nowDate) {
-      this.minMonthlyUntil = new Date(now.getFullYear(), now.getMonth() + 1, this.paymentDayOfMonth);
-    } else {
-      this.minMonthlyUntil = now;
-    }
 
     if (this.monthlyUntil && this.monthlyUntil < this.minMonthlyUntil) {
       this.monthlyUntil = this.minMonthlyUntil;
     }
+  }
+
+  get minMonthlyUntil() {
+    let minMonthlyUntil;
+    let now = new Date();
+
+    if (this.paymentDayOfMonth && this.paymentDayOfMonth < now.getDate()) {
+      minMonthlyUntil = new Date(now.getFullYear(), now.getMonth() + 1, this.paymentDayOfMonth);
+    } else {
+      minMonthlyUntil = now;
+    }
+
+    return minMonthlyUntil;
   }
 
   @tracked recipientAddress = '';
