@@ -16,7 +16,7 @@ import {
   BridgeableSymbol,
   BridgedTokenSymbol,
 } from '@cardstack/web-client/utils/token';
-import { Emitter } from '../events';
+import { Emitter } from '@cardstack/ember-shared';
 import { TaskGenerator } from 'ember-concurrency';
 import { UsdConvertibleSymbol } from '@cardstack/web-client/services/token-to-usd';
 

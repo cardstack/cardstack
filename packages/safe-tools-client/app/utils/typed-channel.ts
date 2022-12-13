@@ -1,6 +1,6 @@
-import config from '../config/environment';
+import { MockBroadcastChannel } from '@cardstack/ember-shared';
 
-import { MockBroadcastChannel } from './browser-mocks';
+import config from '../config/environment';
 
 export class TypedChannel<MessageType = unknown> {
   channelName: string;

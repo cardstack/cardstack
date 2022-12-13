@@ -6,7 +6,7 @@ import { taskFor } from 'ember-concurrency-ts';
 import { task, TaskGenerator } from 'ember-concurrency';
 import { reads } from 'macro-decorators';
 import { tracked } from '@glimmer/tracking';
-import { MockLocalStorage } from '@cardstack/ssr-web/utils/browser-mocks';
+import { MockLocalStorage } from '@cardstack/ember-shared';
 import Fastboot from 'ember-cli-fastboot/services/fastboot';
 import AppContext from '@cardstack/ssr-web/services/app-context';
 

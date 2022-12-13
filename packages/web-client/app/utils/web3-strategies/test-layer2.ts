@@ -25,9 +25,9 @@ import {
   TransactionOptions,
 } from '@cardstack/cardpay-sdk';
 import {
-  UnbindEventListener,
+  type UnbindEventListener,
   SimpleEmitter,
-} from '@cardstack/web-client/utils/events';
+} from '@cardstack/ember-shared';
 import { task, TaskGenerator } from 'ember-concurrency';
 import { UsdConvertibleSymbol } from '@cardstack/web-client/services/token-to-usd';
 import { Safes } from '@cardstack/web-client/resources/safes';

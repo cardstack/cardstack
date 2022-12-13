@@ -6,7 +6,7 @@ import { taskFor } from 'ember-concurrency-ts';
 import { task, TaskGenerator } from 'ember-concurrency';
 import { reads } from 'macro-decorators';
 import { tracked } from '@glimmer/tracking';
-import { MockLocalStorage } from '../utils/browser-mocks';
+import { MockLocalStorage } from '@cardstack/ember-shared';
 
 declare global {
   interface Window {

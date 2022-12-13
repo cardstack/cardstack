@@ -27,7 +27,7 @@ import {
   Emitter,
   SimpleEmitter,
   UnbindEventListener,
-} from '@cardstack/web-client/utils/events';
+} from '@cardstack/ember-shared';
 import { action } from '@ember/object';
 import HubAuthentication from '@cardstack/web-client/services/hub-authentication';
 import { taskFor } from 'ember-concurrency-ts';

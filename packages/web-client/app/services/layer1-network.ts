@@ -20,7 +20,7 @@ import {
   Emitter,
   SimpleEmitter,
   UnbindEventListener,
-} from '@cardstack/web-client/utils/events';
+} from '@cardstack/ember-shared';
 import { action } from '@ember/object';
 import { TaskGenerator } from 'ember-concurrency';
 import { BridgeValidationResult } from '@cardstack/cardpay-sdk';

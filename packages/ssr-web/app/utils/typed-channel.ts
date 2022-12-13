@@ -1,5 +1,5 @@
 import config from '../config/environment';
-import { MockBroadcastChannel } from './browser-mocks';
+import { MockBroadcastChannel } from '@cardstack/ember-shared';
 
 export class TypedChannel<MessageType = any> {
   channelName: string;

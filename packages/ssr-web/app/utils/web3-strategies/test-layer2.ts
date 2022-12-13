@@ -3,9 +3,9 @@ import WalletInfo from '../wallet-info';
 import { Layer2Web3Strategy } from './types';
 import RSVP, { defer } from 'rsvp';
 import {
-  UnbindEventListener,
+  type UnbindEventListener,
   SimpleEmitter,
-} from '@cardstack/ssr-web/utils/events';
+} from '@cardstack/ember-shared';
 import { task, TaskGenerator } from 'ember-concurrency';
 
 export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
