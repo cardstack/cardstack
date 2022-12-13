@@ -1,7 +1,6 @@
 import Component from '@glimmer/component';
 import { inject as service} from '@ember/service';
 import { tracked } from '@glimmer/tracking';
-//@ts-expect-error glint does not think this is consumed-but it is consumed in the template https://github.com/typed-ember/glint/issues/374
 import { concat, fn, hash } from '@ember/helper';
 import { on } from '@ember/modifier';
 import focusTrap from 'ember-focus-trap/modifiers/focus-trap';
@@ -19,14 +18,14 @@ import { type ActionChinState } from '@cardstack/boxel/components/boxel/action-c
 import './index.css';
 
 interface Signature {
-  name: string | null;
+  name?: string;
   isOpen: boolean;
   isConnected: boolean;
-  isConnecting: boolean;
-  changeWalletProvider: () => void;
+  isConnecting?: boolean;
+  changeWalletProvider?: () => void;
   onClose: () => void;
-  onConnect: (() => void) | undefined;
-  onDisconnect: (() => void) | undefined;
+  onConnect?: (() => void);
+  onDisconnect?: (() => void);
 }
 
 class NetworkConnectModal extends Component<Signature> {
@@ -160,3 +159,10 @@ class NetworkConnectModal extends Component<Signature> {
 }
 
 export default NetworkConnectModal;
+
+
+declare module '@glint/environment-ember-loose/registry' {
+  export default interface Registry {
+    'NetworkConnectModal': typeof NetworkConnectModal;
+  }
+}

@@ -1,6 +1,6 @@
 import Web3 from 'web3';
 import { signTypedData } from './utils/signing-utils';
-import { networkName } from './utils/general-utils';
+import { isJsonRpcProvider, networkName } from './utils/general-utils';
 import { getConstantByNetwork, networkIds } from './constants';
 import { ContractOptions } from 'web3-eth-contract';
 import { Signer } from 'ethers';
@@ -45,7 +45,7 @@ export default class HubAuth implements IHubAuth {
       ownerAddress = contractOptions.from;
     } else if (this.layer2Signer) {
       ownerAddress = await this.layer2Signer.getAddress();
-    } else if (this.web3OrEthersProvider instanceof JsonRpcProvider) {
+    } else if (isJsonRpcProvider(this.web3OrEthersProvider)) {
       ownerAddress = await this.web3OrEthersProvider.getSigner().getAddress();
     } else {
       ownerAddress = (await this.web3OrEthersProvider.eth.getAccounts())[0];

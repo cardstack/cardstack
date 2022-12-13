@@ -8,7 +8,6 @@ import { tracked } from '@glimmer/tracking';
 import cssVars from '@cardstack/boxel/helpers/css-var';
 import { cssVariable, CSSVariableInfo } from 'ember-freestyle/decorators/css-variable';
 
-//@ts-expect-error glint does not think this is consumed-but it is consumed in the template https://github.com/typed-ember/glint/issues/374
 import { fn, array } from '@ember/helper';
 
 export default class FieldUsage extends Component {

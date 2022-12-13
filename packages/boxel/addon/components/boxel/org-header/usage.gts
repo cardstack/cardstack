@@ -4,7 +4,6 @@ import BoxelOrgHeader from './index';
 import { LinkTo } from '@ember/routing';
 import cssVar from '@cardstack/boxel/helpers/css-var';
 import { cssVariable, CSSVariableInfo } from 'ember-freestyle/decorators/css-variable';
-//@ts-expect-error glint does not think this is consumed-but it is consumed in the template https://github.com/typed-ember/glint/issues/374
 import { fn, hash } from '@ember/helper';
 import { tracked } from '@glimmer/tracking';
 import CRDLogo from '@cardstack/boxel/usage-support/images/orgs/crd-icon.svg';

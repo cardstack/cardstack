@@ -3,7 +3,6 @@ import Component from '@glimmer/component';
 import FreestyleUsage from 'ember-freestyle/components/freestyle/usage';
 import BoxelLeftEdgeNav from './index';
 import { tracked } from '@glimmer/tracking';
-//@ts-expect-error glint does not think this is consumed-but it is consumed in the template https://github.com/typed-ember/glint/issues/374
 import { array, hash } from '@ember/helper';
 import { action } from '@ember/object';
 import noop from 'ember-composable-helpers/helpers/noop';

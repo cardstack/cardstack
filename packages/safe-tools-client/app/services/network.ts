@@ -5,9 +5,10 @@ import {
   schedulerSupportedChainsArray,
   SchedulerCapableNetworks,
 } from '@cardstack/cardpay-sdk';
+import WalletService from '@cardstack/safe-tools-client/services/wallet';
 import { getOwner } from '@ember/application';
 import { action } from '@ember/object';
-import Service from '@ember/service';
+import Service, { inject as service } from '@ember/service';
 import { tracked } from '@glimmer/tracking';
 
 interface NetworkInfo {
@@ -20,11 +21,16 @@ const LOCALSTORAGE_NETWORK_KEY = 'cardstack-cached-network';
 
 export default class NetworkService extends Service {
   storage: Storage;
+
+  // @ts-expect-error "Property 'wallet' has no initializer and is not definitely assigned in the constructor" - ignore this error because Ember will inject the service
+  @service wallet: WalletService;
+
   @tracked networkInfo: NetworkInfo;
 
   constructor(properties?: object | undefined) {
     super(properties);
     const owner = getOwner(this);
+
     this.storage =
       (owner.lookup('storage:local') as Storage) || window.localStorage;
 
@@ -50,7 +56,12 @@ export default class NetworkService extends Service {
       }))
       .filter(({ name }) => name !== this.name);
   }
-  @action onSelect(networkInfo: NetworkInfo) {
+
+  @action async onSelect(networkInfo: NetworkInfo) {
+    await this.wallet.switchNetwork(networkInfo.chainId);
+
+    if (this.networkInfo.chainId === networkInfo.chainId) return;
+
     this.networkInfo = networkInfo;
     this.storage.setItem(LOCALSTORAGE_NETWORK_KEY, networkInfo.symbol);
   }
