@@ -56,7 +56,9 @@
     <div class='temporary-form-container'>
       <SchedulePaymentFormActionCard />
 
-      <Boxel::ActionContainer class="past-payments-container" ...attributes as |Section|>
+      <Boxel::ActionContainer
+        class="past-payments-container"
+      as |Section|>
         <Section @title="Past Payments">
           <PaymentTransactionsList />
         </Section>
