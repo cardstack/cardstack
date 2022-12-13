@@ -5,7 +5,11 @@ import Web3 from 'web3';
 import { TransactionReceipt } from 'web3-core';
 import * as Sentry from '@sentry/browser';
 
-import { Emitter, SimpleEmitter, UnbindEventListener } from '../events';
+import {
+  Emitter,
+  SimpleEmitter,
+  UnbindEventListener,
+} from '@cardstack/ember-shared';
 import {
   BridgeableSymbol,
   bridgeableSymbols,

@@ -3,7 +3,7 @@ import PostableCollection from './workflow/postable-collection';
 import { WorkflowPostable } from './workflow/workflow-postable';
 import WorkflowSession, { IWorkflowSession } from './workflow/workflow-session';
 import { tracked } from '@glimmer/tracking';
-import { SimpleEmitter } from '../utils/events';
+import { SimpleEmitter } from '@cardstack/ember-shared';
 import WorkflowPersistence from '@cardstack/web-client/app/services/workflow-persistence';
 import { setOwner } from '@ember/application';
 export { Milestone } from './workflow/milestone';

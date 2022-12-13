@@ -6,7 +6,11 @@ import { IConnector } from '@walletconnect/types';
 import WalletConnectProvider from '@cardstack/wc-provider';
 import { task } from 'ember-concurrency-decorators';
 
-import { Emitter, SimpleEmitter, UnbindEventListener } from '../events';
+import {
+  type Emitter,
+  SimpleEmitter,
+  type UnbindEventListener,
+} from '@cardstack/ember-shared';
 import WalletInfo from '../wallet-info';
 import CustomStorageWalletConnect from '../wc-connector';
 import {

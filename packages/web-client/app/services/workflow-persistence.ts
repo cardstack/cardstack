@@ -1,7 +1,7 @@
 import { default as Service, inject as service } from '@ember/service';
 import { tracked } from '@glimmer/tracking';
 import RouterService from '@ember/routing/router-service';
-import { MockLocalStorage } from '../utils/browser-mocks';
+import { MockLocalStorage } from '@cardstack/ember-shared';
 import config from '../config/environment';
 import { CardPayWorkflowName } from '../models/workflow';
 import { CARD_PAY_WORKFLOW_NAMES } from '@cardstack/web-client/models/workflow';

@@ -5,14 +5,14 @@ import config from '../../config/environment';
 import CustomStorageWalletConnect, {
   clearWalletConnectStorage,
 } from '../wc-connector';
-import { Emitter, SimpleEmitter } from '../events';
+import { Emitter, SimpleEmitter } from '@cardstack/ember-shared';
 import { WalletProviderId } from '../wallet-providers';
 import { action } from '@ember/object';
 import { networkIds, HubConfig } from '@cardstack/cardpay-sdk';
 import { Layer1NetworkSymbol } from './types';
 import Web3 from 'web3';
 import { TypedChannel } from '../typed-channel';
-import { MockLocalStorage } from '../browser-mocks';
+import { MockLocalStorage } from '@cardstack/ember-shared';
 
 const GET_PROVIDER_STORAGE_KEY = (chainId: number) =>
   `cardstack-chain-${chainId}-provider`;
