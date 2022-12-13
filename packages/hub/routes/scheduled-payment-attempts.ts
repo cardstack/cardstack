@@ -39,6 +39,12 @@ export default class ScheduledPaymentAttemptsRoute {
       status = statusQuery as ScheduledPaymentAttemptStatusEnum;
     }
 
+    let chainId: number | undefined = undefined;
+    let chainIdQuery = ctx.query['filter[chain-id]'] as string;
+    if (!isNaN(chainIdQuery as unknown as number)) {
+      chainId = parseInt(chainIdQuery);
+    }
+
     let prisma = await this.prismaManager.getClient();
 
     let attempts = (await prisma.scheduledPaymentAttempt.findMany({
@@ -83,6 +89,7 @@ export default class ScheduledPaymentAttemptsRoute {
         },
         scheduledPayment: {
           userAddress: ctx.state.userAddress,
+          chainId,
         },
       },
       orderBy: {
