@@ -170,7 +170,7 @@ export const NETWORK_OPTION_ANY = {
   alias: 'n',
   type: 'string',
   description: 'The network to run this script on',
-  choices: ['sokol', 'kovan', 'goerli', 'mumbai', 'gnosis', 'mainnet'],
+  choices: ['sokol', 'kovan', 'goerli', 'mumbai', 'gnosis', 'mainnet', 'polygon'],
 } as Options;
 
 export const FROM_OPTION = {

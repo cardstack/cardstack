@@ -214,7 +214,7 @@ const constants: {
     blockExplorer: 'https://polygonscan.com',
     name: 'Polygon',
     chainId: 137,
-    relayServiceURL: '',
+    relayServiceURL: 'https://relay-polygon.cardstack.com/api',
     subgraphURL: 'https://api.thegraph.com/subgraphs/name/cardstack/safe-tools-polygon',
     scheduledPaymentFeeFixedUSD: 0.25,
     scheduledPaymentFeePercentage: 0.1, //10%
