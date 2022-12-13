@@ -51,6 +51,11 @@
   display: flex;
   justify-content: center;
   margin-top: var(--boxel-sp-xl);
+  flex-direction: column;
+}
+
+.temporary-form-container > *+* {
+  margin-top: var(--boxel-sp-lg);
 }
 
 .safe-tools__dashboard-dropdown {
@@ -76,4 +81,8 @@
   width: 11px;
   height: 9px;
   margin-top: 5px;
+}
+
+.boxel-action-container.past-payments-container {
+  min-width: 50rem;
 }
