@@ -1,11 +1,12 @@
-import { getSDK, Web3Provider } from '@cardstack/cardpay-sdk';
+
 import Component from '@glimmer/component';
 import { hubRequest } from '@cardstack/cardpay-sdk';
 import './index.css';
 import { use, resource } from 'ember-resources';
 import WalletService from '@cardstack/safe-tools-client/services/wallet';
+import NetworkService from '@cardstack/safe-tools-client/services/network';
 import HubAuthenticationService from '@cardstack/safe-tools-client/services/hub-authentication';
-import Service, { inject as service } from '@ember/service';
+import { inject as service } from '@ember/service';
 import { TrackedObject } from 'tracked-built-ins';
 import eq from 'ember-truth-helpers/helpers/eq';
 import formatDate from '@cardstack/safe-tools-client/helpers/format-date';
@@ -28,11 +29,10 @@ interface ScheduledPaymentAttempt {
   }
 }
 
-
 class PaymentTransactionsList extends Component {
   @service declare wallet: WalletService;
+  @service declare network: NetworkService;
   @service declare hubAuthentication: HubAuthenticationService;
-
 
   deserializeScheduledPaymentResponse(response: unknown): ScheduledPaymentAttempt[] {
     return response.data.map(s => {
@@ -72,10 +72,13 @@ class PaymentTransactionsList extends Component {
       error: undefined,
     });
 
+    let chainId = this.network.chainId;
+
     (async () => {
       try {
         await this.hubAuthentication.ensureAuthenticated();
-        let response = await hubRequest(this.hubAuthentication.hubUrl, `api/scheduled-payment-attempts`, this.hubAuthentication.authToken!, 'GET');
+
+        let response = await hubRequest(this.hubAuthentication.hubUrl, `api/scheduled-payment-attempts?filter[chain-id]=${chainId}`, this.hubAuthentication.authToken!, 'GET');
         state.value = this.deserializeScheduledPaymentResponse(response);
       } catch (error) {
         console.log(error);
@@ -129,7 +132,6 @@ class PaymentTransactionsList extends Component {
               </td>
             </tr>
           {{/each}}
-
         </tbody>
       </table>
     </div>
