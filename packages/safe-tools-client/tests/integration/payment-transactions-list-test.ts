@@ -17,7 +17,8 @@ class ScheduledPaymentsStub extends Service {
         endedAt: new Date('2022-12-12T12:22:25.530'),
         status: 'succeeded',
         failureReason: null,
-        transactionHash: '0x1234',
+        transactionHash:
+          '0x6f7c54719c0901e30ef018206c37df4daa059224549a08d55acb3360f01094e2',
         scheduledPayment: {
           amount: '10000000',
           feeFixedUSD: '0',
@@ -99,5 +100,14 @@ module('Integration | Component | payment-transactions-list', function (hooks) {
         '[data-test-scheduled-payment-attempts-item="0"] [data-test-scheduled-payment-attempts-item-status]'
       )
       .hasText('succeeded');
+    assert
+      .dom(
+        '[data-test-scheduled-payment-attempts-item="0"] [data-test-scheduled-payment-attempts-item-explorer-button]'
+      )
+      .hasText('View on Etherscan')
+      .hasAttribute(
+        'href',
+        'https://etherscan.io/tx/0x6f7c54719c0901e30ef018206c37df4daa059224549a08d55acb3360f01094e2'
+      );
   });
 });
