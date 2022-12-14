@@ -22,7 +22,8 @@ export const supportedChains = {
 };
 
 export const supportedChainsArray = Object.values(supportedChains).flat();
-export const schedulerSupportedChainsArray = difference(supportedChainsArray, supportedChains.gnosis);
+// Mumbai is not supported by gnosis team https://docs.gnosis-safe.io/backend/available-services
+export const schedulerSupportedChainsArray = difference(supportedChainsArray, [...supportedChains.gnosis, 'mumbai']);
 
 export type CardPayCapableNetworks = 'sokol' | 'gnosis';
 export type SchedulerCapableNetworks = 'mainnet' | 'goerli' | 'polygon' | 'mumbai';
