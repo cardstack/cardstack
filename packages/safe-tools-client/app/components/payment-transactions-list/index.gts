@@ -10,6 +10,8 @@ import { inject as service } from '@ember/service';
 import { TrackedObject } from 'tracked-built-ins';
 import eq from 'ember-truth-helpers/helpers/eq';
 import formatDate from '@cardstack/safe-tools-client/helpers/format-date';
+import { taskFor } from 'ember-concurrency-ts';
+import { task, TaskGenerator } from 'ember-concurrency';
 
 interface ScheduledPaymentAttempt {
   startedAt: Date;
@@ -74,6 +76,17 @@ class PaymentTransactionsList extends Component {
   @service declare network: NetworkService;
   @service declare hubAuthentication: HubAuthenticationService;
 
+  async fetchScheduledPaymentAttempts(chainId: number): Promise<ScheduledPaymentResponse> {
+    await this.hubAuthentication.ensureAuthenticated();
+
+    return hubRequest(this.hubAuthentication.hubUrl, `api/scheduled-payment-attempts?filter[chain-id]=${chainId}`, this.hubAuthentication.authToken!, 'GET');
+  }
+
+  @task *loadScheduledPaymentAttemptsTask(chainId: number): TaskGenerator<ScheduledPaymentAttempt[]> {
+    const response = yield this.fetchScheduledPaymentAttempts(chainId);
+    return this.deserializeScheduledPaymentResponse(response)
+  }
+
   deserializeScheduledPaymentResponse(response: ScheduledPaymentResponse): ScheduledPaymentAttempt[] {
     return response.data.map(s => {
       let scheduledPaymentId = s.relationships['scheduled-payment'].data.id;
@@ -117,10 +130,7 @@ class PaymentTransactionsList extends Component {
 
     (async () => {
       try {
-        await this.hubAuthentication.ensureAuthenticated();
-
-        let response = await hubRequest(this.hubAuthentication.hubUrl, `api/scheduled-payment-attempts?filter[chain-id]=${chainId}`, this.hubAuthentication.authToken!, 'GET');
-        state.value = this.deserializeScheduledPaymentResponse(response);
+        state.value = await taskFor(this.loadScheduledPaymentAttemptsTask).perform(chainId);
       } catch (error) {
         console.log(error);
         state.error = error;
