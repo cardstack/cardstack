@@ -78,7 +78,7 @@ class PaymentTransactionsList extends Component {
             <td class="table__cell" data-test-scheduled-payment-attempts-item-date>
               {{formatDate paymentAttempt.startedAt "dd/MM/yyyy"}}
             </td>
-            <td class="table__cell" data-test-scheduled-payment-attempts-item-payee>
+            <td class="table__cell blockchain-address transactions-table-item-payee" data-test-scheduled-payment-attempts-item-payee>
               {{paymentAttempt.scheduledPayment.payeeAddress}}
             </td>
             <td class="table__cell" data-test-scheduled-payment-attempts-item-amount>
