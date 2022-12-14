@@ -3,6 +3,7 @@ import Component from '@glimmer/component';
 
 import './index.css';
 import { use, resource } from 'ember-resources';
+import BlockExplorerButton from '@cardstack/safe-tools-client/components/block-explorer-button';
 import WalletService from '@cardstack/safe-tools-client/services/wallet';
 import NetworkService from '@cardstack/safe-tools-client/services/network';
 import HubAuthenticationService from '@cardstack/safe-tools-client/services/hub-authentication';
@@ -105,7 +106,11 @@ class PaymentTransactionsList extends Component {
               {{/if}}
             </td>
             <td class="table__cell" data-test-scheduled-payment-attempts-blockexplorer>
-              {{paymentAttempt.transactionHash}}
+              <BlockExplorerButton
+                @networkSymbol={{this.network.symbol}}
+                @transactionHash={{paymentAttempt.transactionHash}}
+                data-test-scheduled-payment-attempts-item-explorer-button
+              />
             </td>
           </tr>
         {{/each}}
