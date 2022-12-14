@@ -25,3 +25,7 @@
 .table__cell {
   padding: 1rem 1.5rem;
 }
+
+.transactions-table-item-payee {
+  font-size: var(--boxel-font-size-sm);
+}
