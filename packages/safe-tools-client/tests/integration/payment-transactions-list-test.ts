@@ -19,13 +19,13 @@ class ScheduledPaymentsStub extends Service {
         failureReason: null,
         transactionHash: '0x1234',
         scheduledPayment: {
-          amount: '10000',
+          amount: '10000000',
           feeFixedUSD: '0',
           feePercentage: '0',
           gasTokenAddress: '0x123',
-          tokenAddress: '0xa455bbB2A81E09E0337c13326BBb302Cb37D7cf6',
-          chainId: 5,
-          payeeAddress: '0x123',
+          tokenAddress: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
+          chainId: 1,
+          payeeAddress: '0xeBCC5516d44FFf5E9aBa2AcaeB65BbB49bC3EBe1',
           payAt: new Date('2022-12-12T12:19:25.530'),
         },
       },
@@ -36,13 +36,13 @@ class ScheduledPaymentsStub extends Service {
         failureReason: 'Funds too low',
         transactionHash: '0x123',
         scheduledPayment: {
-          amount: '10000',
+          amount: '10000000',
           feeFixedUSD: '0',
           feePercentage: '0',
           gasTokenAddress: '0x123',
-          tokenAddress: '0xa455bbB2A81E09E0337c13326BBb302Cb37D7cf6',
-          chainId: 5,
-          payeeAddress: '0x123',
+          tokenAddress: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
+          chainId: 1,
+          payeeAddress: '0xeBCC5516d44FFf5E9aBa2AcaeB65BbB49bC3EBe1',
           payAt: new Date('2022-12-12T12:19:25.530'),
         },
       },
@@ -86,13 +86,13 @@ module('Integration | Component | payment-transactions-list', function (hooks) {
       .dom(
         '[data-test-scheduled-payment-attempts-item="0"] [data-test-scheduled-payment-attempts-item-payee]'
       )
-      .hasText('0x123');
+      .hasText('0xeBCC5516d44FFf5E9aBa2AcaeB65BbB49bC3EBe1');
 
     assert
       .dom(
         '[data-test-scheduled-payment-attempts-item="0"] [data-test-scheduled-payment-attempts-item-amount]'
       )
-      .hasText('10000');
+      .hasText('10 USDC');
 
     assert
       .dom(
