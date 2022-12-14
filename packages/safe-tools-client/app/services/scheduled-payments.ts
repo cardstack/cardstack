@@ -62,17 +62,26 @@ export interface ScheduledPaymentResponse {
   included: ScheduledPaymentResponseIncludedItem[];
 }
 
+export type ScheduledPaymentAttemptStatus =
+  | 'succeeded'
+  | 'failed'
+  | 'inProgress';
+
 export default class ScheduledPaymentsService extends Service {
   @service declare hubAuthentication: HubAuthenticationService;
 
   async fetchScheduledPaymentAttempts(
-    chainId: number
+    chainId: number,
+    status?: ScheduledPaymentAttemptStatus
   ): Promise<ScheduledPaymentAttempt[]> {
     await this.hubAuthentication.ensureAuthenticated();
-
+    let queryString = `?filter[chain-id]=${chainId}`;
+    if (status) {
+      queryString += `&filter[status]=${status}`;
+    }
     const response = await hubRequest(
       this.hubAuthentication.hubUrl,
-      `api/scheduled-payment-attempts?filter[chain-id]=${chainId}`,
+      `api/scheduled-payment-attempts?${queryString}`,
       this.hubAuthentication.authToken!,
       'GET'
     );

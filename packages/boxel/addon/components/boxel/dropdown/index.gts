@@ -11,7 +11,7 @@ import { action } from '@ember/object';
 import './index.css';
 
 interface DropdownTriggerSignature {
-  Element: HTMLButtonElement;
+  Element: HTMLButtonElement | HTMLAnchorElement;
   Args: {
     Named: {
       dropdown: Dropdown;
@@ -34,7 +34,9 @@ interface Signature {
   };
   Blocks: {
     trigger: [FunctionBasedModifier<{
-      Element: HTMLButtonElement;
+      // note: should only be used with Button, but HTMLAnchorElement is included so that the
+      // trigger bindings can be applied to BoxelButton without glint error
+      Element: HTMLButtonElement | HTMLAnchorElement;
       Args: {
         Named: EmptyObject;
         Positional: unknown[];
