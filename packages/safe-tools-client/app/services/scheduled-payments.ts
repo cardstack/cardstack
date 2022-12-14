@@ -2,6 +2,7 @@
 import { hubRequest } from '@cardstack/cardpay-sdk';
 import HubAuthenticationService from '@cardstack/safe-tools-client/services/hub-authentication';
 import Service, { inject as service } from '@ember/service';
+import { BN } from 'bn.js';
 
 export interface ScheduledPaymentAttempt {
   startedAt: Date;
@@ -10,7 +11,7 @@ export interface ScheduledPaymentAttempt {
   failureReason: string;
   transactionHash: string;
   scheduledPayment: {
-    amount: string;
+    amount: typeof BN;
     feeFixedUSD: string;
     feePercentage: string;
     tokenAddress: string;
@@ -94,7 +95,7 @@ export default class ScheduledPaymentsService extends Service {
         failureReason: s.attributes['failure-reason'],
         transactionHash: s.attributes['transaction-hash'],
         scheduledPayment: {
-          amount: scheduledPayment!.amount,
+          amount: new BN(scheduledPayment!.amount) as unknown as typeof BN,
           feeFixedUSD: scheduledPayment!['fee-fixed-usd'],
           feePercentage: scheduledPayment!['fee-percentage'],
           gasTokenAddress: scheduledPayment!['gas-token-address'],
