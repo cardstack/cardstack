@@ -5,10 +5,10 @@ import { setupSentry, waitForSentryReport } from '../helpers/sentry';
 import { ExtendedPrismaClient } from '../../services/prisma-manager';
 import { Clock } from '../../services/clock';
 
-const { sku } = config.get('cardDrop');
-const { url: webClientUrl } = config.get('webClient');
-const { alreadyClaimed, error, success } = config.get('webClient.paths.cardDrop');
-const emailVerificationLinkExpiryMinutes = config.get('cardDrop.email.expiryMinutes') as number;
+const sku = config.get<string>('cardDrop.sku');
+const { url: webClientUrl } = config.get<Record<string, string>>('webClient');
+const { alreadyClaimed, error, success } = config.get<Record<string, string>>('webClient.paths.cardDrop');
+const emailVerificationLinkExpiryMinutes = config.get<number>('cardDrop.email.expiryMinutes');
 
 let claimedEoa: EmailCardDropRequest = {
   id: '2850a954-525d-499a-a5c8-3c89192ad40e',

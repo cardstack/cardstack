@@ -1,3 +1,4 @@
+{{! @glint-nocheck: not typesafe yet }}
 <section class='safe-tools__dashboard-schedule'>
   <Boxel::ControlPanel as |cp|>
     <cp.Item @title='Wallet' @icon='wallet' @isActive={{not this.wallet.isConnected}}>
@@ -43,6 +44,7 @@
           @onSelectSafe={{this.safes.onSelectSafe}}
           @tokenBalances={{this.safes.tokenBalances}}
           @onDepositClick={{set this 'isDepositModalOpen' true}}
+          @safesLoadingError={{this.safes.safesResource.error}}
         />
       {{/if}}
     </cp.Item>
@@ -58,7 +60,7 @@
 <DepositModal
   @isOpen={{this.isDepositModalOpen}}
   @onClose={{set this 'isDepositModalOpen' false}}
-  @safeAddress={{this.safes.curentSafe.address}}
-  @networkName={{this.network}}
+  @safeAddress={{this.safes.currentSafe.address}}
+  @networkName={{this.network.name}}
   @tokensToCover={{this.scheduledPaymentsTokensToCover}}
 />

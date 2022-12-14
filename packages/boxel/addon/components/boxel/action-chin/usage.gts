@@ -10,7 +10,6 @@ import BoxelButton from '../button';
 import BoxelLoadingIndicator from '../loading-indicator';
 import { on } from '@ember/modifier';
 import cssVar from '@cardstack/boxel/helpers/css-var';
-//@ts-expect-error glint does not think array is consumed-but it is consumed in the template https://github.com/typed-ember/glint/issues/374
 import { array, fn } from '@ember/helper';
 import { cssVariable, CSSVariableInfo } from 'ember-freestyle/decorators/css-variable';
 

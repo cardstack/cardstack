@@ -1,3 +1,4 @@
+{{! @glint-nocheck: not typesafe yet }}
 {{#if (and @activeTasks @tasksRoute)}}
   <LinkTo @route={{@tasksRoute}} class="cardflow__taskbar">
     <div class="cardflow__taskbar-count">{{@activeTasks.length}} {{#if (eq @activeTasks.length 1)}}task{{else}}tasks{{/if}} for this workflow</div>

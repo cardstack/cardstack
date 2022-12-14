@@ -3,7 +3,6 @@ import '@cardstack/boxel/styles/global.css';
 import './index.css';
 import cn from '@cardstack/boxel/helpers/cn';
 
-//@ts-expect-error glint does not think this is consumed-but it is consumed in the template https://github.com/typed-ember/glint/issues/374
 import { array, concat, hash } from '@ember/helper';
 import or from 'ember-truth-helpers/helpers/or';
 import eq from 'ember-truth-helpers/helpers/eq';

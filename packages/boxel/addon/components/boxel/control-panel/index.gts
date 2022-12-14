@@ -1,6 +1,5 @@
 import Component from '@glimmer/component';
 import type { TemplateOnlyComponent } from '@ember/component/template-only';
-//@ts-expect-error glint does not think this is consumed-but it is consumed in the template https://github.com/typed-ember/glint/issues/374
 import { hash } from '@ember/helper';
 import cn from '@cardstack/boxel/helpers/cn';
 import { svgJar } from '@cardstack/boxel/utils/svg-jar';

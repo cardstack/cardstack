@@ -4,7 +4,6 @@ import BoxelSortMenu from './index';
 import type { Column, SortDirection } from './item';
 import { tracked } from '@glimmer/tracking';
 import { action } from '@ember/object';
-//@ts-expect-error glint does not think this is consumed-but it is consumed in the template https://github.com/typed-ember/glint/issues/374
 import { fn, array } from '@ember/helper';
 
 const SORTABLE_COLUMNS = [

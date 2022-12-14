@@ -21,21 +21,23 @@ interface Signature {
 export default class ProfileLogo extends Component<Signature> {
 
   <template>
-    {{#if (firstChar @name)}}
-      <div
-        class={{cn 'profile-logo' profile-logo--lg=(eq @size 'large')}}
-        style={{
-          cssVar
-          profile-logo-background=(or @logoBackground 'var(--boxel-blue)')
-          profile-logo-text-color=(or @logoTextColor 'var(--boxel-light)')
-        }}
-        data-test-profile-logo
-        data-test-profile-logo-background={{@logoBackground}}
-        data-test-profile-logo-text-color={{@logoTextColor}}
-        ...attributes
-      >
-        {{capitalize (firstChar @name)}}
-      </div>
-    {{/if}}
+    {{#let (firstChar @name) as |firstCharOfName|}}
+      {{#if firstCharOfName}}
+        <div
+          class={{cn 'profile-logo' profile-logo--lg=(eq @size 'large')}}
+          style={{
+            cssVar
+            profile-logo-background=(or @logoBackground 'var(--boxel-blue)')
+            profile-logo-text-color=(or @logoTextColor 'var(--boxel-light)')
+          }}
+          data-test-profile-logo
+          data-test-profile-logo-background={{@logoBackground}}
+          data-test-profile-logo-text-color={{@logoTextColor}}
+          ...attributes
+        >
+          {{capitalize firstCharOfName}}
+        </div>
+      {{/if}}
+    {{/let}}
   </template>
 }

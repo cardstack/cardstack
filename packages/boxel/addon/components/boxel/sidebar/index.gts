@@ -18,7 +18,7 @@ interface Signature {
 
 const SidebarContainer: TemplateOnlyComponent<Signature> = <template>
   <div class="boxel-sidebar" ...attributes>
-    {{yield (component BoxelSidebarSection)}}
+    {{yield BoxelSidebarSection}}
   </div>
 </template>;
 

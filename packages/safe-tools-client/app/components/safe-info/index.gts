@@ -17,6 +17,7 @@ interface Signature {
     currentSafe: Safe | undefined;
     safes: Safe[];
     tokenBalances: TokenBalance[];
+    safesLoadingError: Error | undefined;
     onDepositClick: () => void;
     onSelectSafe: () => void;
   }
@@ -71,6 +72,10 @@ export default class SafeInfo extends Component<Signature> {
       </p>
 
       <CreateSafeButton />
+    {{/if}}
+
+    {{#if @safesLoadingError}}
+      <div class="info">⚠️ {{@safesLoadingError.message}}</div>
     {{/if}}
   </template>
 }

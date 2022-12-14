@@ -5,9 +5,8 @@ import ErrorMessage from '../input/error-message';
 import and from 'ember-truth-helpers/helpers/and';
 import eq from 'ember-truth-helpers/helpers/eq';
 import or from 'ember-truth-helpers/helpers/or';
-//@ts-expect-error glint does not think this is consumed-but it is consumed in the template https://github.com/typed-ember/glint/issues/374
-import { concat, hash } from '@ember/helper';
 import cn from '@cardstack/boxel/helpers/cn';
+import { hash } from '@ember/helper';
 
 import '@cardstack/boxel/styles/global.css';
 import './index.css';

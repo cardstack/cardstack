@@ -7,7 +7,6 @@ import { svgJar } from '@cardstack/boxel/utils/svg-jar';
 import { on } from '@ember/modifier';
 import element from 'ember-element-helper/helpers/element';
 
-//@ts-expect-error glint does not think this is consumed-but it is consumed in the template https://github.com/typed-ember/glint/issues/374
 import { fn, hash } from '@ember/helper';
 import { action } from '@ember/object';
 

@@ -28,7 +28,7 @@ function getInlineAsset(assetId: string) {
 
 export function svgJar(
   assetId: string,
-  svgAttrs: {
+  svgAttrs?: {
     width?: string | number;
     height?: string | number;
     class?: string;
