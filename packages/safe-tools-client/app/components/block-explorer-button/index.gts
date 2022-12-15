@@ -23,11 +23,11 @@ export default class BlockExplorerButton extends Component<Signature> {
   get blockExplorerName(): string {
     let { blockExplorerUrlRoot } = this;
     if (blockExplorerUrlRoot.startsWith('https://blockscout.com')) {
-      return 'BlockScount';
-    } 
+      return 'Blockscout';
+    }
     if (blockExplorerUrlRoot.includes('etherscan.io')) {
       return 'Etherscan';
-    } 
+    }
     if (blockExplorerUrlRoot.includes('polygonscan.com')) {
       return 'Polygonscan';
     }
