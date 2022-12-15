@@ -10,11 +10,16 @@ class WalletServiceStub extends Service {
   isConnected = true;
 }
 
+let returnEmptyScheduledPaymentAttempts = false;
 class ScheduledPaymentsStub extends Service {
   fetchScheduledPaymentAttempts = (
     chainId: number,
     status?: ScheduledPaymentAttemptStatus
   ) => {
+    if (returnEmptyScheduledPaymentAttempts) {
+      return Promise.resolve([]);
+    }
+
     return Promise.resolve(
       [
         {
@@ -123,6 +128,7 @@ module('Integration | Component | payment-transactions-list', function (hooks) {
         'https://etherscan.io/tx/0x6f7c54719c0901e30ef018206c37df4daa059224549a08d55acb3360f01094e2'
       );
   });
+
   test('it can filter by status', async function (assert) {
     this.set('wallet', { isConnected: true });
 
@@ -163,5 +169,17 @@ module('Integration | Component | payment-transactions-list', function (hooks) {
     assert
       .dom('[data-test-scheduled-payment-attempts-item]')
       .exists({ count: 2 });
+  });
+
+  test('It adds explanation when there are no payment attempts', async function (assert) {
+    returnEmptyScheduledPaymentAttempts = true;
+
+    await render(hbs`
+      <PaymentTransactionsList />
+    `);
+
+    assert
+      .dom('[data-test-scheduled-payment-attempts-empty]')
+      .hasText('No payments found.');
   });
 });
