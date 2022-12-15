@@ -124,7 +124,7 @@ const constants: {
     ...testHubUrl,
     ...ethNativeTokens,
     ...bridgedTokens,
-    apiBaseUrl: 'https://blockscout.com/poa/sokol/api/eth-rpc',
+    apiBaseUrl: 'https://blockscout.com/poa/sokol/api',
     blockExplorer: 'https://blockscout.com/poa/sokol',
     bridgeExplorer: 'https://alm-test-amb.herokuapp.com/77',
     nativeTokenAddress: 'spoa',
