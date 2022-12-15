@@ -32,6 +32,7 @@ export type Time = Pick<Date, 'toLocaleTimeString' | 'getHours' | 'getMinutes' |
 interface ComponentArgs {
   value?: Time;
   minuteInterval?: number;
+  minValue?: Time; 
   onChange?: (arg0: Time) => void;
 }
 
@@ -55,7 +56,7 @@ export default class BoxelInputTime extends Component<Signature> implements Keyb
 
   constructor(owner: Owner, args: ComponentArgs) {
     super(owner, args);
-
+    this.validateValue();
     this.validateMinuteInterval();
     this.keyboardHandlers = {
       none: new NoneFocusKeyboardHandler(this),
@@ -115,6 +116,29 @@ export default class BoxelInputTime extends Component<Signature> implements Keyb
     });
   }
 
+  get disabledHours(): number[] {
+    if (!this.args.value || !this.args.minValue || (this.args.value.getHours() >= 12 && this.args.minValue.getHours() < 12)) {
+      return []
+    }
+    let minHour = this.args.minValue.getHours() >= 12 ? this.args.minValue.getHours() - 12 : this.args.minValue.getHours();
+    return [...Array(12).keys()].filter(minute => minute < minHour);
+  }
+
+  get disabledMinutes(): number[] {
+    if (!this.args.value || !this.args.minValue || this.args.value.getHours() > this.args.minValue.getHours()) {
+      return [];
+    }
+    let minMinute = this.args.minValue.getMinutes();
+    return [...Array(60).keys()].filter(minute => minute < minMinute);
+  }
+
+  get disabledAm(): boolean {
+    if (this.args.minValue && this.args.minValue.getHours() >= 12 ) {
+      return true;
+    }
+    return false;
+  }
+
   get keyboardFocus(): KeyboardFocus {
     let focusedEl = document.activeElement;
     if (!focusedEl) {
@@ -134,6 +158,9 @@ export default class BoxelInputTime extends Component<Signature> implements Keyb
   }
 
   @action setHour(hourNum: number){
+    if (this.disabledHours.includes(hourNum)) {
+      return;
+    }
     let { value } = this.args;
     let effectiveDate = value ? new Date(value.getTime()) : new Date();
     if (effectiveDate.getHours() > 11) {
@@ -144,6 +171,9 @@ export default class BoxelInputTime extends Component<Signature> implements Keyb
   }
 
   @action setMinute(minuteNum: number) {
+    if (this.disabledMinutes.includes(minuteNum)) {
+      return;
+    }
     minuteNum = Math.floor(minuteNum / this.minuteInterval) * this.minuteInterval; // round down to nearest interval
     let { value } = this.args;
     let effectiveDate = value ? new Date(value.getTime()) : new Date();
@@ -152,7 +182,7 @@ export default class BoxelInputTime extends Component<Signature> implements Keyb
   }
 
   @action setMeridian(newMeridian: 'am'|'pm'){
-    if (this.meridian == newMeridian) {
+    if (this.meridian == newMeridian || (this.disabledAm && newMeridian === 'am')) {
       return;
     }
     let { value } = this.args;
@@ -164,6 +194,9 @@ export default class BoxelInputTime extends Component<Signature> implements Keyb
       hourNum = effectiveDate.getHours() + 12;
     }
     let dateMs = effectiveDate.setHours(hourNum);
+    if (this.args.minValue && dateMs < this.args.minValue.getTime()) {
+      dateMs = this.args.minValue.getTime();
+    }
     this.args.onChange?.(new Date(dateMs));
   }
 
@@ -295,8 +328,8 @@ export default class BoxelInputTime extends Component<Signature> implements Keyb
     return matches[0];
   }
 
-  @action buildMenuItem(selectedValue: number, onChoose: (val: number) => void, option: TimeOption): MenuItem {
-    return menuItemFunc([option.display, () => onChoose(option.value)], { selected: selectedValue === option.value,  tabindex: -1});
+  @action buildMenuItem(selectedValue: number, onChoose: (val: number) => void, disabledOptions: number[], option: TimeOption): MenuItem {
+    return menuItemFunc([option.display, () => onChoose(option.value)], { selected: selectedValue === option.value, disabled: disabledOptions.includes(option.value), tabindex: -1});
   }
 
   @action setDropdownAPI(dropdownAPI: DropdownAPI) {
@@ -310,6 +343,12 @@ export default class BoxelInputTime extends Component<Signature> implements Keyb
   validateMinuteInterval() {
     if (this.args.minuteInterval && (60 % this.args.minuteInterval !== 0)) {
       throw new Error(`@minuteInterval passed to Boxel::Input::Time must be a factor of 60 but was ${this.args.minuteInterval}`);
+    }
+  }
+
+  validateValue() {
+    if ((!this.args.value && this.args.minValue) || (this.args.value && this.args.minValue && this.args.value < this.args.minValue)){
+      throw new Error(`@value passed to Boxel::Input::Time must be greater than @minValue`);
     }
   }
 
@@ -344,7 +383,7 @@ export default class BoxelInputTime extends Component<Signature> implements Keyb
             data-test-boxel-hour-menu
             class="boxel-input-time__menu"
             tabindex="1"
-            @items={{map (fn this.buildMenuItem this.hour this.setHour) this.hourOptions}}
+            @items={{map (fn this.buildMenuItem this.hour this.setHour this.disabledHours) this.hourOptions}}
             @itemClass="boxel-input-time__menu-item"
           />
           <BoxelMenu
@@ -352,7 +391,7 @@ export default class BoxelInputTime extends Component<Signature> implements Keyb
             data-test-boxel-minute-menu
             class="boxel-input-time__menu"
             tabindex="2"
-            @items={{map (fn this.buildMenuItem this.minute this.setMinute) this.minuteOptions}}
+            @items={{map (fn this.buildMenuItem this.minute this.setMinute this.disabledMinutes) this.minuteOptions}}
             @itemClass="boxel-input-time__menu-item"
           />
           <BoxelMenu
@@ -361,7 +400,7 @@ export default class BoxelInputTime extends Component<Signature> implements Keyb
             class="boxel-input-time__menu"
             tabindex="3"
             @items={{array
-              (menuItem "am" (fn this.setMeridian 'am') selected=(eq this.meridian "am") tabindex=-1)
+              (menuItem "am" (fn this.setMeridian 'am') selected=(eq this.meridian "am") tabindex=-1 disabled=this.disabledAm)
               (menuItem "pm" (fn this.setMeridian 'pm') selected=(eq this.meridian "pm") tabindex=-1)
             }}
             @itemClass="boxel-input-time__menu-item"
