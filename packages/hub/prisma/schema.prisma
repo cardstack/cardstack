@@ -374,6 +374,21 @@ model RewardRootIndex {
   @@map("reward_root_index")
 }
 
+model RewardProof {
+  rewardProgramId String   @map("reward_program_id")
+  payee           String
+  leaf            String   @id
+  paymentCycle    Int      @map("payment_cycle")
+  proofs          String[]
+  tokenType       Int      @map("token_type")
+  validFrom       Int      @map("valid_from")
+  validTo         Int      @map("valid_to")
+  explanationId   String?  @map("explanation_id")
+  explanationData Json?    @map("explanation_data") @db.Json
+
+  @@map("reward_proofs")
+}
+
 enum DiscordBotsStatusEnum {
   connecting
   connected
