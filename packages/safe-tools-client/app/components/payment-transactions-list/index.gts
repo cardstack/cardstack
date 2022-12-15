@@ -15,10 +15,8 @@ import { inject as service } from '@ember/service';
 import { tracked } from '@glimmer/tracking';
 import { TrackedObject } from 'tracked-built-ins';
 import eq from 'ember-truth-helpers/helpers/eq';
-import or from 'ember-truth-helpers/helpers/or';
-import { array, concat, fn } from '@ember/helper';
-import set from 'ember-set-helper/helpers/set';
-import menuItem, { menuItemFunc, MenuItem } from '@cardstack/boxel/helpers/menu-item'
+import { concat, fn } from '@ember/helper';
+import { menuItemFunc, MenuItem } from '@cardstack/boxel/helpers/menu-item'
 import formatDate from '@cardstack/safe-tools-client/helpers/format-date';
 import { taskFor } from 'ember-concurrency-ts';
 import { task, TaskGenerator } from 'ember-concurrency';
@@ -29,9 +27,9 @@ import { subDays } from 'date-fns';
 import { action } from '@ember/object';
 import map from 'ember-composable-helpers/helpers/map';
 
-type DateFilter = {
+type FilterItem = {
   display: string,
-  value: Date
+  value: any | undefined
 };
 
 class PaymentTransactionsList extends Component {
@@ -41,17 +39,26 @@ class PaymentTransactionsList extends Component {
   @service declare tokens: TokensService;
   @service declare wallet: WalletService;
 
-  readonly dateFilters: DateFilter[] = [
+  readonly dateFilters: FilterItem[] = [
     { display: 'Last 30 days', value: subDays(new Date(), 30) },
     { display: 'Last 90 days', value: subDays(new Date(), 90) },
     { display: 'Last 120 days', value: subDays(new Date(), 120) },
   ]
-  @tracked dateFilter: DateFilter = this.dateFilters[0];
-  @action setDateFilter(dateFilter: DateFilter) {
+  @tracked dateFilter: FilterItem = this.dateFilters[0];
+  @action setDateFilter(dateFilter: FilterItem) {
     this.dateFilter = dateFilter;
   }
 
-  @tracked statusFilter?: ScheduledPaymentAttemptStatus;
+  readonly statusFilters: FilterItem[] = [
+    { display: 'All', value: undefined },
+    { display: 'Succeeded', value: 'succeeded' },
+    { display: 'Failed', value: 'failed' },
+    { display: 'In Progress', value: 'inProgress' },
+  ]
+  @tracked statusFilter: FilterItem = this.statusFilters[0];
+  @action setStatusFilter(statusFilter: FilterItem) {
+    this.statusFilter = statusFilter;
+  }
   
   get paymentAttempts() {
     if (!this.scheduledPaymentAttemptsResource.value) return [];
@@ -86,7 +93,7 @@ class PaymentTransactionsList extends Component {
 
     (async () => {
       try {
-        state.value = await taskFor(this.loadScheduledPaymentAttemptsTask).perform(chainId, this.statusFilter, this.dateFilter.value);
+        state.value = await taskFor(this.loadScheduledPaymentAttemptsTask).perform(chainId, this.statusFilter.value ? this.statusFilter.value as ScheduledPaymentAttemptStatus : undefined, this.dateFilter.value);
       } catch (error) {
         console.log(error);
         state.error = error;
@@ -98,7 +105,7 @@ class PaymentTransactionsList extends Component {
     return state;
   });
 
-  @action buildMenuItem(onChoose: (val: DateFilter) => void, option: DateFilter): MenuItem {
+  @action buildMenuItem(onChoose: (val: FilterItem) => void, option: FilterItem): MenuItem {
     return menuItemFunc([option.display, () => onChoose(option)], {});
   }
 
@@ -123,7 +130,7 @@ class PaymentTransactionsList extends Component {
       <BoxelDropdown>
         <:trigger as |bindings|>
           <BoxelDropdownTrigger
-            @label={{concat 'Status: ' (or this.statusFilter 'All')}}
+            @label={{concat 'Status: ' this.statusFilter.display}}
             {{bindings}}
             class="payment-transactions-list__filter-trigger"
             data-test-scheduled-payment-status-filter
@@ -132,12 +139,7 @@ class PaymentTransactionsList extends Component {
         <:content as |dd|>
           <BoxelMenu
             @closeMenu={{dd.close}}
-            @items={{array
-              (menuItem "All" (set this 'statusFilter' undefined))
-              (menuItem "Succeeded" (set this 'statusFilter' 'succeeded'))
-              (menuItem "Failed" (set this 'statusFilter' 'failed'))
-              (menuItem "In Progress" (set this 'statusFilter' 'inProgress'))
-            }}
+            @items={{map (fn this.buildMenuItem this.setStatusFilter) this.statusFilters}}
           />
         </:content>
       </BoxelDropdown>
