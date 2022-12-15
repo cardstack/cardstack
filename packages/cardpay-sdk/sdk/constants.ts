@@ -37,6 +37,7 @@ interface RequiredNetworkConstants {
   name: string;
   nativeTokenAddress: string;
   nativeTokenCoingeckoId: string;
+  coingeckoPlatform: string;
   nativeTokenName: string;
   nativeTokenSymbol: string;
   nativeTokenDecimals: number;
@@ -102,11 +103,13 @@ const ethNativeTokens = {
   nativeTokenSymbol: 'ETH',
   nativeTokenName: 'Ethereum',
   nativeTokenDecimals: 18,
+  coingeckoPlatform: 'ethereum',
 };
 
 const bridgedTokens = {
   bridgedDaiTokenSymbol: 'DAI.CPXD',
   bridgedCardTokenSymbol: 'CARD.CPXD',
+  coingeckoPlatform: 'xdai',
 };
 
 const polygonNativeTokens = {
@@ -115,6 +118,7 @@ const polygonNativeTokens = {
   nativeTokenSymbol: 'MATIC',
   nativeTokenName: 'Matic',
   nativeTokenDecimals: 18,
+  coingeckoPlatform: 'polygon-pos',
 };
 
 const constants: {
