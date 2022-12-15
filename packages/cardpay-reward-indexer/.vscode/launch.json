@@ -7,7 +7,8 @@
       "module": "cardpay_reward_indexer.main",
       "justMyCode": true,
       "env": {
-        "DB_STRING": "postgresql://postgres:mysecretpassword@localhost:5432/postgres"
+        "DB_STRING": "postgresql://postgres:mysecretpassword@localhost:5432/postgres",
+        "REWARDS_BUCKET": "data"
       }
     }
   ]
