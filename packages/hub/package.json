@@ -55,7 +55,7 @@
     "@koa/router": "^10.0.0",
     "@mailchimp/mailchimp_marketing": "^3.0.75",
     "@pagerduty/pdjs": "^2.2.4",
-    "@prisma/client": "^4.1.0",
+    "@prisma/client": "^4.7.1",
     "@sentry/integrations": "^7.10.0",
     "@sentry/node": "^7.8.0",
     "assert-never": "^1.2.1",
