@@ -1203,6 +1203,26 @@ CREATE TABLE public.reservations (
 ALTER TABLE public.reservations OWNER TO postgres;
 
 --
+-- Name: reward_proofs; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.reward_proofs (
+    reward_program_id text NOT NULL,
+    payee text NOT NULL,
+    leaf text NOT NULL,
+    payment_cycle integer NOT NULL,
+    proof text[] NOT NULL,
+    token_type integer NOT NULL,
+    valid_from integer NOT NULL,
+    valid_to integer NOT NULL,
+    explanation_id text,
+    explanation_data json
+);
+
+
+ALTER TABLE public.reward_proofs OWNER TO postgres;
+
+--
 -- Name: reward_root_index; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -1588,6 +1608,14 @@ ALTER TABLE ONLY public.reservations
 
 
 --
+-- Name: reward_proofs reward_proofs_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.reward_proofs
+    ADD CONSTRAINT reward_proofs_pkey PRIMARY KEY (leaf);
+
+
+--
 -- Name: reward_root_index reward_root_index_unique_reward_program_id_and_payment_cycle; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -1932,14 +1960,14 @@ SET row_security = off;
 --
 
 COPY graphile_worker.migrations (id, ts) FROM stdin;
-1	2022-12-15 19:23:37.57119+08
-2	2022-12-15 19:23:37.57119+08
-3	2022-12-15 19:23:37.57119+08
-4	2022-12-15 19:23:37.57119+08
-5	2022-12-15 19:23:37.57119+08
-6	2022-12-15 19:23:37.57119+08
-7	2022-12-15 19:23:37.57119+08
-8	2022-12-15 19:23:37.57119+08
+1	2022-12-15 21:52:25.504404+08
+2	2022-12-15 21:52:25.504404+08
+3	2022-12-15 21:52:25.504404+08
+4	2022-12-15 21:52:25.504404+08
+5	2022-12-15 21:52:25.504404+08
+6	2022-12-15 21:52:25.504404+08
+7	2022-12-15 21:52:25.504404+08
+8	2022-12-15 21:52:25.504404+08
 \.
 
 
@@ -1948,54 +1976,55 @@ COPY graphile_worker.migrations (id, ts) FROM stdin;
 --
 
 COPY public.pgmigrations (id, name, run_on) FROM stdin;
-1	20210527151505645_create-prepaid-card-tables	2022-12-15 19:23:37.502315
-2	20210614080132698_create-prepaid-card-customizations-table	2022-12-15 19:23:37.540531
-3	20210623052200757_create-graphile-worker-schema	2022-12-15 19:23:37.57119
-4	20210809113449561_merchant-infos	2022-12-15 19:23:37.93071
-5	20210817184105100_wallet-orders	2022-12-15 19:23:37.946603
-6	20210920142313915_prepaid-card-reservations	2022-12-15 19:23:37.96574
-7	20210924200122612_order-indicies	2022-12-15 19:23:37.994823
-8	20211006090701108_create-card-spaces	2022-12-15 19:23:37.999822
-9	20211013155536724_card-index	2022-12-15 19:23:38.020632
-10	20211013173917696_beta-testers	2022-12-15 19:23:38.035564
-11	20211014131843187_add-fields-to-card-spaces	2022-12-15 19:23:38.08626
-12	20211020231214235_discord-bots	2022-12-15 19:23:38.091686
-13	20211105180905492_wyre-price-service	2022-12-15 19:23:38.108818
-14	20211110210324178_card-index-part-duex	2022-12-15 19:23:38.115966
-15	20211118084217151_create-uploads	2022-12-15 19:23:38.118069
-16	20211129083801382_create-push-notification-registrations	2022-12-15 19:23:38.124154
-17	20211129123635817_create-notification-types	2022-12-15 19:23:38.130469
-18	20211129130425303_create-notification-preferences	2022-12-15 19:23:38.142048
-19	20211206195559187_card-index-generations	2022-12-15 19:23:38.149899
-20	20211207151150639_sent-push-notifications	2022-12-15 19:23:38.152424
-21	20211207190527999_create-latest-event-block	2022-12-15 19:23:38.157564
-22	20211214163123421_card-index-errors	2022-12-15 19:23:38.161842
-23	20220103201128435_invalidation-ordering	2022-12-15 19:23:38.167869
-24	20220107151914576_rename-beta-testers-table	2022-12-15 19:23:38.196995
-25	20220111204952452_index-optimizations	2022-12-15 19:23:38.19899
-26	20220119232151260_space-belongs-to-merchant	2022-12-15 19:23:38.200848
-27	20220216104259120_allow-nulls-in-card-spaces	2022-12-15 19:23:38.205528
-28	20220301101637933_create-card-space-profiles-for-existing-merchants	2022-12-15 19:23:38.210794
-29	20220413090421591_card-space-unused-data-cleanup	2022-12-15 19:23:38.212148
-30	20220413215720902_create-email-card-drop-requests	2022-12-15 19:23:38.214942
-31	20220502174343477_create-email-card-drop-state	2022-12-15 19:23:38.220631
-32	20220527204632100_create-exchange-rates	2022-12-15 19:23:38.225943
-33	20220610203119883_create-job-tickets	2022-12-15 19:23:38.23248
-34	20220622235635327_add-job-ticket-spec	2022-12-15 19:23:38.239765
-35	20220629173134216_add-job-ticket-source-arguments	2022-12-15 19:23:38.241339
-36	20220728144935996_add-profiles	2022-12-15 19:23:38.243051
-37	20220802184224370_populate-profiles	2022-12-15 19:23:38.250391
-38	20220802184244353_delete-profile-components	2022-12-15 19:23:38.256164
-39	20220810123016866_create-scheduled-payments	2022-12-15 19:23:38.257636
-40	20220810123029047_create-scheduled-payment-attempts	2022-12-15 19:23:38.268374
-41	20220831081406596_alter-scheduled-payment-fields	2022-12-15 19:23:38.277147
-42	20220921073021534_alter-scheduled-payment-fields-2	2022-12-15 19:23:38.287062
-43	20221003121041200_change_bigint-add-gas-token-address-to-scheduled-payments	2022-12-15 19:23:38.323525
-44	20221014121655874_rename-cancellation-transaction-error	2022-12-15 19:23:38.387629
-45	20221025140643069_create-crank-nonces	2022-12-15 19:23:38.390009
-46	20221115065506357_create-gas-prices	2022-12-15 19:23:38.395332
-47	20221121080727272_create-gas-estimation-results	2022-12-15 19:23:38.40185
-48	20221215102320386_reward-root-index	2022-12-15 19:23:38.409044
+1	20210527151505645_create-prepaid-card-tables	2022-12-15 21:52:25.402855
+2	20210614080132698_create-prepaid-card-customizations-table	2022-12-15 21:52:25.48371
+3	20210623052200757_create-graphile-worker-schema	2022-12-15 21:52:25.504404
+4	20210809113449561_merchant-infos	2022-12-15 21:52:25.725477
+5	20210817184105100_wallet-orders	2022-12-15 21:52:25.744984
+6	20210920142313915_prepaid-card-reservations	2022-12-15 21:52:25.783124
+7	20210924200122612_order-indicies	2022-12-15 21:52:25.802039
+8	20211006090701108_create-card-spaces	2022-12-15 21:52:25.807478
+9	20211013155536724_card-index	2022-12-15 21:52:25.814093
+10	20211013173917696_beta-testers	2022-12-15 21:52:25.822263
+11	20211014131843187_add-fields-to-card-spaces	2022-12-15 21:52:25.829002
+12	20211020231214235_discord-bots	2022-12-15 21:52:25.843415
+13	20211105180905492_wyre-price-service	2022-12-15 21:52:25.854128
+14	20211110210324178_card-index-part-duex	2022-12-15 21:52:25.862825
+15	20211118084217151_create-uploads	2022-12-15 21:52:25.864782
+16	20211129083801382_create-push-notification-registrations	2022-12-15 21:52:25.868842
+17	20211129123635817_create-notification-types	2022-12-15 21:52:25.873478
+18	20211129130425303_create-notification-preferences	2022-12-15 21:52:25.878828
+19	20211206195559187_card-index-generations	2022-12-15 21:52:25.889208
+20	20211207151150639_sent-push-notifications	2022-12-15 21:52:25.891819
+21	20211207190527999_create-latest-event-block	2022-12-15 21:52:25.897202
+22	20211214163123421_card-index-errors	2022-12-15 21:52:25.903829
+23	20220103201128435_invalidation-ordering	2022-12-15 21:52:25.915962
+24	20220107151914576_rename-beta-testers-table	2022-12-15 21:52:25.959628
+25	20220111204952452_index-optimizations	2022-12-15 21:52:25.96141
+26	20220119232151260_space-belongs-to-merchant	2022-12-15 21:52:25.962672
+27	20220216104259120_allow-nulls-in-card-spaces	2022-12-15 21:52:25.967203
+28	20220301101637933_create-card-space-profiles-for-existing-merchants	2022-12-15 21:52:25.971343
+29	20220413090421591_card-space-unused-data-cleanup	2022-12-15 21:52:25.972297
+30	20220413215720902_create-email-card-drop-requests	2022-12-15 21:52:25.974911
+31	20220502174343477_create-email-card-drop-state	2022-12-15 21:52:25.982872
+32	20220527204632100_create-exchange-rates	2022-12-15 21:52:25.986678
+33	20220610203119883_create-job-tickets	2022-12-15 21:52:25.992117
+34	20220622235635327_add-job-ticket-spec	2022-12-15 21:52:26.002736
+35	20220629173134216_add-job-ticket-source-arguments	2022-12-15 21:52:26.004466
+36	20220728144935996_add-profiles	2022-12-15 21:52:26.006256
+37	20220802184224370_populate-profiles	2022-12-15 21:52:26.037544
+38	20220802184244353_delete-profile-components	2022-12-15 21:52:26.060075
+39	20220810123016866_create-scheduled-payments	2022-12-15 21:52:26.061932
+40	20220810123029047_create-scheduled-payment-attempts	2022-12-15 21:52:26.071443
+41	20220831081406596_alter-scheduled-payment-fields	2022-12-15 21:52:26.078765
+42	20220921073021534_alter-scheduled-payment-fields-2	2022-12-15 21:52:26.084204
+43	20221003121041200_change_bigint-add-gas-token-address-to-scheduled-payments	2022-12-15 21:52:26.126285
+44	20221014121655874_rename-cancellation-transaction-error	2022-12-15 21:52:26.204065
+45	20221025140643069_create-crank-nonces	2022-12-15 21:52:26.207371
+46	20221115065506357_create-gas-prices	2022-12-15 21:52:26.215223
+47	20221121080727272_create-gas-estimation-results	2022-12-15 21:52:26.222886
+48	20221215102320386_reward-root-index	2022-12-15 21:52:26.232971
+49	20221215134519797_reward-proofs	2022-12-15 21:52:26.241387
 \.
 
 
@@ -2003,7 +2032,7 @@ COPY public.pgmigrations (id, name, run_on) FROM stdin;
 -- Name: pgmigrations_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.pgmigrations_id_seq', 48, true);
+SELECT pg_catalog.setval('public.pgmigrations_id_seq', 49, true);
 
 
 --
