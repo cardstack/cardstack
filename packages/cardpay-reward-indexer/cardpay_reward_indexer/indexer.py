@@ -31,7 +31,6 @@ class Indexer:
             last_submitted_root_block_number = self.get_last_indexed_root_block_number(
                 db, reward_program_id
             )
-            last_submitted_root_block_number = 27715485
 
             print(
                 f"Indexing reward program {reward_program_id} since block {last_submitted_root_block_number}"
