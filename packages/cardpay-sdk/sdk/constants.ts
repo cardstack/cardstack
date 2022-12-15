@@ -37,6 +37,7 @@ interface RequiredNetworkConstants {
   name: string;
   nativeTokenAddress: string;
   nativeTokenCoingeckoId: string;
+  coingeckoPlatform: string;
   nativeTokenName: string;
   nativeTokenSymbol: string;
   nativeTokenDecimals: number;
@@ -102,19 +103,22 @@ const ethNativeTokens = {
   nativeTokenSymbol: 'ETH',
   nativeTokenName: 'Ethereum',
   nativeTokenDecimals: 18,
+  coingeckoPlatform: 'ethereum',
 };
 
 const bridgedTokens = {
   bridgedDaiTokenSymbol: 'DAI.CPXD',
   bridgedCardTokenSymbol: 'CARD.CPXD',
+  coingeckoPlatform: 'xdai',
 };
 
 const polygonNativeTokens = {
-  nativeTokenAddress: 'matic',
+  nativeTokenAddress: '0x0000000000000000000000000000000000001010',
   nativeTokenCoingeckoId: 'matic-network',
   nativeTokenSymbol: 'MATIC',
   nativeTokenName: 'Matic',
   nativeTokenDecimals: 18,
+  coingeckoPlatform: 'polygon-pos',
 };
 
 const constants: {
@@ -124,7 +128,7 @@ const constants: {
     ...testHubUrl,
     ...ethNativeTokens,
     ...bridgedTokens,
-    apiBaseUrl: 'https://blockscout.com/poa/sokol/api/eth-rpc',
+    apiBaseUrl: 'https://blockscout.com/poa/sokol/api',
     blockExplorer: 'https://blockscout.com/poa/sokol',
     bridgeExplorer: 'https://alm-test-amb.herokuapp.com/77',
     nativeTokenAddress: 'spoa',
