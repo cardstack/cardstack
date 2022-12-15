@@ -5,6 +5,7 @@
   margin: 0 auto;
   margin-top: 2rem;
   color: black;
+  font-size: var(--boxel-font-size-sm);
 }
 
 .table__header {
@@ -28,4 +29,13 @@
 
 .transactions-table-item-payee {
   font-size: var(--boxel-font-size-sm);
+}
+
+.transactions-table-item-status-text {
+  margin-left: var(--boxel-sp-xxs);
+}
+
+.transactions-table-item-status-failure-reason {
+  font-size: var(--boxel-font-size-xs);
+  color: var(--boxel-purple-600);
 }

@@ -105,7 +105,14 @@ module('Integration | Component | payment-transactions-list', function (hooks) {
       .dom(
         '[data-test-scheduled-payment-attempts-item="0"] [data-test-scheduled-payment-attempts-item-status]'
       )
-      .hasText('succeeded');
+      .includesText('Confirmed');
+
+    assert
+      .dom(
+        '[data-test-scheduled-payment-attempts-item="1"] [data-test-scheduled-payment-attempts-item-status]'
+      )
+      .includesText('Failed (Funds too low)');
+
     assert
       .dom(
         '[data-test-scheduled-payment-attempts-item="0"] [data-test-scheduled-payment-attempts-item-explorer-button]'
@@ -139,7 +146,7 @@ module('Integration | Component | payment-transactions-list', function (hooks) {
       .dom(
         '[data-test-scheduled-payment-attempts-item="0"] [data-test-scheduled-payment-attempts-item-status]'
       )
-      .hasText('failed (Funds too low)');
+      .includesText('Failed (Funds too low)');
     await click('[data-test-scheduled-payment-status-filter]');
     await click('[data-test-boxel-menu-item-text="Succeeded"]');
 
@@ -150,7 +157,7 @@ module('Integration | Component | payment-transactions-list', function (hooks) {
       .dom(
         '[data-test-scheduled-payment-attempts-item="0"] [data-test-scheduled-payment-attempts-item-status]'
       )
-      .hasText('succeeded');
+      .includesText('Confirmed');
     await click('[data-test-scheduled-payment-status-filter]');
     await click('[data-test-boxel-menu-item-text="All"]');
     assert

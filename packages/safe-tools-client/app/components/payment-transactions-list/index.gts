@@ -25,6 +25,7 @@ import { task, TaskGenerator } from 'ember-concurrency';
 import weiToDecimal from '@cardstack/safe-tools-client/helpers/wei-to-decimal';
 import { type TokenInfo } from '@uniswap/token-lists';
 import TokensService from '@cardstack/safe-tools-client/services/tokens';
+import { capitalize } from '@ember/string';
 
 class PaymentTransactionsList extends Component {
   @service declare hubAuthentication: HubAuthenticationService;
@@ -32,12 +33,13 @@ class PaymentTransactionsList extends Component {
   @service declare scheduledPayments: ScheduledPaymentsService;
   @service declare tokens: TokensService;
   @service declare wallet: WalletService;
-  
+
   @tracked statusFilter?: ScheduledPaymentAttemptStatus;
 
   get paymentAttempts() {
     if (!this.scheduledPaymentAttemptsResource.value) return [];
 
+    // Add token info to each scheduled payment attempt so that we can display the token symbol and convert the amount to decimal using weiToDecimal
     return this.scheduledPaymentAttemptsResource.value.map((scheduledPaymentAttempt) => {
       const tokenInfo = this.tokens.transactionTokens.find((t) => t.address === scheduledPaymentAttempt.scheduledPayment.tokenAddress) as TokenInfo;
       return { ...scheduledPaymentAttempt, tokenInfo };
@@ -128,12 +130,21 @@ class PaymentTransactionsList extends Component {
               {{paymentAttempt.scheduledPayment.payeeAddress}}
             </td>
             <td class="table__cell" data-test-scheduled-payment-attempts-item-amount>
-              {{weiToDecimal paymentAttempt.scheduledPayment.amount paymentAttempt.tokenInfo.decimals}} {{paymentAttempt.tokenInfo.symbol}}
+              <strong>{{weiToDecimal paymentAttempt.scheduledPayment.amount paymentAttempt.tokenInfo.decimals}} {{paymentAttempt.tokenInfo.symbol}}</strong>
             </td>
             <td class="table__cell" data-test-scheduled-payment-attempts-item-status>
-              {{paymentAttempt.status}}
+              {{#if (eq paymentAttempt.status 'succeeded')}}
+                🟢 <span class="transactions-table-item-status-text">Confirmed</span>
+              {{else if (eq paymentAttempt.status 'failed')}}
+                🔴 <span class="transactions-table-item-status-text">Failed</span>
+              {{else}}
+                🔵 <span class="transactions-table-item-status-text">Pending</span>
+              {{/if}}
+
               {{#if (eq paymentAttempt.status 'failed')}}
-                ({{paymentAttempt.failureReason}})
+                <span class="transactions-table-item-status-failure-reason">
+                  ({{paymentAttempt.failureReason}})
+                </span>
               {{/if}}
             </td>
             <td class="table__cell" data-test-scheduled-payment-attempts-blockexplorer>
