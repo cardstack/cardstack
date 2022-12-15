@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { hubRequest } from '@cardstack/cardpay-sdk';
+import config from '@cardstack/safe-tools-client/config/environment';
 import HubAuthenticationService from '@cardstack/safe-tools-client/services/hub-authentication';
 import Service, { inject as service } from '@ember/service';
 import { BN } from 'bn.js';
@@ -80,7 +81,7 @@ export default class ScheduledPaymentsService extends Service {
       queryString += `&filter[status]=${status}`;
     }
     const response = await hubRequest(
-      this.hubAuthentication.hubUrl,
+      config.hubUrl,
       `api/scheduled-payment-attempts?${queryString}`,
       this.hubAuthentication.authToken!,
       'GET'

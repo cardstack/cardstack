@@ -1,10 +1,9 @@
 import { getSDK, Web3Provider } from '@cardstack/cardpay-sdk';
+import config from '@cardstack/safe-tools-client/config/environment';
 import WalletService from '@cardstack/safe-tools-client/services/wallet';
 import { getOwner } from '@ember/application';
 import Service, { inject as service } from '@ember/service';
 import { tracked } from '@glimmer/tracking';
-
-import config from '../config/environment';
 
 declare global {
   interface Window {
@@ -16,7 +15,6 @@ export default class HubAuthenticationService extends Service {
   storage: Storage;
   @service declare wallet: WalletService;
   @tracked isAuthenticated = false;
-  hubUrl = 'http://localhost:3000'; // TODO - get this from the config
 
   constructor(parameters?: object | undefined) {
     super(parameters);
@@ -55,9 +53,7 @@ export default class HubAuthenticationService extends Service {
   async getHubAuth() {
     const ethersProvider = new Web3Provider(this.wallet.web3.currentProvider);
 
-    const hubAuth = await getSDK('HubAuth', ethersProvider, this.hubUrl);
-
-    return hubAuth;
+    return await getSDK('HubAuth', ethersProvider, config.hubUrl);
   }
 
   get authToken(): string | null {
