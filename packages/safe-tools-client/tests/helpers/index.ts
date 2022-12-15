@@ -1,5 +1,5 @@
-import { truncateMiddle } from '@cardstack/ember-shared/helpers/truncate-middle';
 import { MockLocalStorage } from '@cardstack/ember-shared';
+import { truncateMiddle } from '@cardstack/ember-shared/helpers/truncate-middle';
 import { click, TestContext, visit } from '@ember/test-helpers';
 import {
   setupApplicationTest as upstreamSetupApplicationTest,

@@ -2,17 +2,17 @@
 import { type ScheduledPaymentAttemptStatus } from '@cardstack/safe-tools-client/services/scheduled-payments';
 import Service from '@ember/service';
 import { click, render, TestContext } from '@ember/test-helpers';
+import { subDays, addMinutes, format } from 'date-fns';
 import { setupRenderingTest } from 'ember-qunit';
 import hbs from 'htmlbars-inline-precompile';
 import { module, test } from 'qunit';
-import { subDays, addMinutes, format } from 'date-fns';
 
 class WalletServiceStub extends Service {
   isConnected = true;
 }
 
 let returnEmptyScheduledPaymentAttempts = false;
-let now = new Date();
+const now = new Date();
 class ScheduledPaymentsStub extends Service {
   fetchScheduledPaymentAttempts = (
     chainId: number,
@@ -76,7 +76,9 @@ class ScheduledPaymentsStub extends Service {
             payAt: addMinutes(subDays(now, 60), 120),
           },
         },
-      ].filter((r) => (startedAt ? r.startedAt > startedAt : true)).filter((r) => (status ? r.status === status : true))
+      ]
+        .filter((r) => (startedAt ? r.startedAt > startedAt : true))
+        .filter((r) => (status ? r.status === status : true))
     );
   };
 }
@@ -204,7 +206,9 @@ module('Integration | Component | payment-transactions-list', function (hooks) {
       .dom('[data-test-scheduled-payment-date-filter]')
       .containsText('Date: Last 30 days');
     await click('[data-test-scheduled-payment-date-filter]');
-    assert.dom('.boxel-menu').containsText('Last 30 days Last 90 days Last 120 days');
+    assert
+      .dom('.boxel-menu')
+      .containsText('Last 30 days Last 90 days Last 120 days');
     await click('[data-test-boxel-menu-item-text="Last 90 days"]');
     assert
       .dom('[data-test-scheduled-payment-attempts-item]')
