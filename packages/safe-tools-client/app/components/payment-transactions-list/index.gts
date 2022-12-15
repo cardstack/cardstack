@@ -6,13 +6,17 @@ import { use, resource } from 'ember-resources';
 import WalletService from '@cardstack/safe-tools-client/services/wallet';
 import NetworkService from '@cardstack/safe-tools-client/services/network';
 import HubAuthenticationService from '@cardstack/safe-tools-client/services/hub-authentication';
-import ScheduledPaymentsService, { ScheduledPaymentAttempt, ScheduledPaymentResponse } from '@cardstack/safe-tools-client/services/scheduled-payments';
+import ScheduledPaymentsService, { ScheduledPaymentAttempt } from '@cardstack/safe-tools-client/services/scheduled-payments';
 import { inject as service } from '@ember/service';
 import { TrackedObject } from 'tracked-built-ins';
 import eq from 'ember-truth-helpers/helpers/eq';
 import formatDate from '@cardstack/safe-tools-client/helpers/format-date';
 import { taskFor } from 'ember-concurrency-ts';
 import { task, TaskGenerator } from 'ember-concurrency';
+import BoxelInputFilterSelect from '@cardstack/boxel/components/boxel/input/filter-select';
+import { tracked } from '@glimmer/tracking';
+import { action } from '@ember/object';
+import { array } from '@ember/helper';
 
 class PaymentTransactionsList extends Component {
   @service declare wallet: WalletService;
@@ -55,7 +59,31 @@ class PaymentTransactionsList extends Component {
     return state;
   });
 
+  @tracked dateFilter: string | undefined;
+  @action onSelectDateFilter(selectedDateFilter: string) {
+    this.dateFilter = selectedDateFilter;
+  }
+
+  @tracked statusFilter: string | undefined;
+  @action onSelectStatusFilter(selectedStatusFilter: string) {
+    this.statusFilter = selectedStatusFilter;
+  }
+
   <template>
+    <div class="payment-transactions-list__filter_wrapper">
+      <BoxelInputFilterSelect
+        @value={{this.dateFilter}}
+        @label="Date"
+        @options={{array "Last 30 Days" "Last 90 Days" "Last 120 Days"}}
+        @onChooseFilter={{this.onSelectDateFilter}}
+      />
+      <BoxelInputFilterSelect
+        @value={{this.statusFilter}}
+        @label="Status"
+        @options={{array "All" "Pending" "Failed" "Confirmed"}}
+        @onChooseFilter={{this.onSelectStatusFilter}}
+      />
+    </div>
     <table class="table" data-test-scheduled-payment-attempts>
       <thead class="table__header">
         <tr class="table__row">

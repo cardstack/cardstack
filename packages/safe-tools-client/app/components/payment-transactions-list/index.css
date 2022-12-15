@@ -29,3 +29,12 @@
 .transactions-table-item-payee {
   font-size: var(--boxel-font-size-sm);
 }
+
+.payment-transactions-list__filter_wrapper {
+  display: flex;
+}
+
+.payment-transactions-list__filter_wrapper > * {
+  flex: 0 1 300px;
+  margin-right: 1.5rem;
+}

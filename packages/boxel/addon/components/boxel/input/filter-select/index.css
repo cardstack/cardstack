@@ -1,0 +1,42 @@
+.boxel-input-filter-select {
+  --boxel-input-filter-select-border-color: var(--boxel-form-control-border-color);
+  --boxel-input-filter-select-border-radius: var(--boxel-border-radius-lg);
+
+  align-items: center;
+  border-radius: var(--boxel-input-filter-select-border-radius);
+  border: 1px solid var(--boxel-input-filter-select-border-color);
+  display: flex;
+  font-family: var(--boxel-font-family);
+  font-size: var(--boxel-font-size);
+  height: var(--boxel-form-control-height);
+  position: relative;
+  transition: border-color var(--boxel-transition);
+  width: 100%;
+  padding: var(--boxel-sp-xxs) var(--boxel-sp-sm);
+
+  cursor: pointer;
+}
+
+.boxel-input-filter-select--disabled {
+  opacity: 0.5;
+}
+
+.boxel-input-filter-select__dropdown {
+  flex-grow: 1;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.boxel-input-filter-select__dropdown .ember-power-select-status-icon {
+  background: url("/@cardstack/boxel/images/icons/caret-down.svg") no-repeat;
+  width: 11px;
+  height: 9px;
+  display: inline-block;
+  margin-right: var(--boxel-sp);
+}
+
+.boxel-input-filter-select__dropdown-item {
+  padding: var(--boxel-sp-xxs) var(--boxel-sp-sm);
+}
