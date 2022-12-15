@@ -51,13 +51,14 @@
   border-radius: var(--boxel-input-filter-select-border-radius);
   border: 1px solid var(--boxel-input-filter-select-border-color);
   font-family: var(--boxel-font-family);
-  font-size: var(--boxel-font-size);
+  font-size: var(--boxel-font-size-sm);
+  font-weight: 600;
   height: var(--boxel-form-control-height);
   position: relative;
   transition: border-color var(--boxel-transition);
   padding: var(--boxel-sp-xxs) var(--boxel-sp-sm);
 
-  width: 200px;
+  width: 250px;
   margin-right: var(--boxel-sp);
 }
 
