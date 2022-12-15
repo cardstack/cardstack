@@ -1,4 +1,4 @@
-FROM node:14-alpine
+FROM node:14-slim
 ARG hub_command
 ENV stored_hub_command=$hub_command
 WORKDIR /workspace
