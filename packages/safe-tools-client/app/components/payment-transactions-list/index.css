@@ -39,3 +39,7 @@
   font-size: var(--boxel-font-size-xs);
   color: var(--boxel-purple-600);
 }
+
+.transactions-table-empty-explanation {
+  text-align: center;
+}

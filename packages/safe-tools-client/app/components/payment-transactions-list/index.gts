@@ -158,6 +158,12 @@ class PaymentTransactionsList extends Component {
         {{/each}}
       </tbody>
     </table>
+
+    {{#if (eq this.paymentAttempts.length 0)}}
+      <div class="transactions-table-empty-explanation" data-test-scheduled-payment-attempts-empty>
+        No payments found.
+      </div>
+    {{/if}}
   </template>
 }
 
