@@ -1,7 +1,8 @@
-FROM node:14-alpine3.16
+FROM node:14-alpine
 ARG hub_command
 ENV stored_hub_command=$hub_command
 WORKDIR /workspace
+RUN apk add --no-cache libc6-compat openssl1.1-compat
 COPY dist packages/hub/dist
 COPY config packages/hub/config
 COPY dist/sql node_modules/graphile-worker/sql
