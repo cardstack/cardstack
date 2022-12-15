@@ -16,16 +16,23 @@ import { tracked } from '@glimmer/tracking';
 import { TrackedObject } from 'tracked-built-ins';
 import eq from 'ember-truth-helpers/helpers/eq';
 import or from 'ember-truth-helpers/helpers/or';
-import { array, concat } from '@ember/helper';
+import { array, concat, fn } from '@ember/helper';
 import set from 'ember-set-helper/helpers/set';
-import menuItem from '@cardstack/boxel/helpers/menu-item'
+import menuItem, { menuItemFunc, MenuItem } from '@cardstack/boxel/helpers/menu-item'
 import formatDate from '@cardstack/safe-tools-client/helpers/format-date';
 import { taskFor } from 'ember-concurrency-ts';
 import { task, TaskGenerator } from 'ember-concurrency';
 import weiToDecimal from '@cardstack/safe-tools-client/helpers/wei-to-decimal';
 import { type TokenInfo } from '@uniswap/token-lists';
 import TokensService from '@cardstack/safe-tools-client/services/tokens';
-import { capitalize } from '@ember/string';
+import { subDays } from 'date-fns';
+import { action } from '@ember/object';
+import map from 'ember-composable-helpers/helpers/map';
+
+type DateFilter = {
+  display: string,
+  value: Date
+};
 
 class PaymentTransactionsList extends Component {
   @service declare hubAuthentication: HubAuthenticationService;
@@ -34,8 +41,18 @@ class PaymentTransactionsList extends Component {
   @service declare tokens: TokensService;
   @service declare wallet: WalletService;
 
-  @tracked statusFilter?: ScheduledPaymentAttemptStatus;
+  readonly dateFilters: DateFilter[] = [
+    { display: 'Last 30 days', value: subDays(new Date(), 30) },
+    { display: 'Last 90 days', value: subDays(new Date(), 90) },
+    { display: 'Last 120 days', value: subDays(new Date(), 120) },
+  ]
+  @tracked dateFilter: DateFilter = this.dateFilters[0];
+  @action setDateFilter(dateFilter: DateFilter) {
+    this.dateFilter = dateFilter;
+  }
 
+  @tracked statusFilter?: ScheduledPaymentAttemptStatus;
+  
   get paymentAttempts() {
     if (!this.scheduledPaymentAttemptsResource.value) return [];
 
@@ -46,8 +63,8 @@ class PaymentTransactionsList extends Component {
     });
   }
 
-  @task *loadScheduledPaymentAttemptsTask(chainId: number, status?: ScheduledPaymentAttemptStatus): TaskGenerator<ScheduledPaymentAttempt[]> {
-    return yield this.scheduledPayments.fetchScheduledPaymentAttempts(chainId, status);
+  @task *loadScheduledPaymentAttemptsTask(chainId: number, status?: ScheduledPaymentAttemptStatus, startedAt?: Date): TaskGenerator<ScheduledPaymentAttempt[]> {
+    return yield this.scheduledPayments.fetchScheduledPaymentAttempts(chainId, status, startedAt);
   }
 
   @use scheduledPaymentAttemptsResource = resource(() => {
@@ -69,7 +86,7 @@ class PaymentTransactionsList extends Component {
 
     (async () => {
       try {
-        state.value = await taskFor(this.loadScheduledPaymentAttemptsTask).perform(chainId, this.statusFilter);
+        state.value = await taskFor(this.loadScheduledPaymentAttemptsTask).perform(chainId, this.statusFilter, this.dateFilter.value);
       } catch (error) {
         console.log(error);
         state.error = error;
@@ -81,13 +98,34 @@ class PaymentTransactionsList extends Component {
     return state;
   });
 
+  @action buildMenuItem(onChoose: (val: DateFilter) => void, option: DateFilter): MenuItem {
+    return menuItemFunc([option.display, () => onChoose(option)], {});
+  }
+
   <template>
-    <div>
+    <div class="payment-transactions-list__wrapper">
+      <BoxelDropdown>
+        <:trigger as |bindings|>
+          <BoxelDropdownTrigger
+            @label={{concat 'Date: ' this.dateFilter.display}}
+            {{bindings}}
+            class="payment-transactions-list__filter-trigger"
+            data-test-scheduled-payment-date-filter
+          />
+        </:trigger>
+        <:content as |dd|>
+          <BoxelMenu
+            @closeMenu={{dd.close}}
+            @items={{map (fn this.buildMenuItem this.setDateFilter) this.dateFilters}}
+          />
+        </:content>
+      </BoxelDropdown>
       <BoxelDropdown>
         <:trigger as |bindings|>
           <BoxelDropdownTrigger
             @label={{concat 'Status: ' (or this.statusFilter 'All')}}
             {{bindings}}
+            class="payment-transactions-list__filter-trigger"
             data-test-scheduled-payment-status-filter
           />
         </:trigger>

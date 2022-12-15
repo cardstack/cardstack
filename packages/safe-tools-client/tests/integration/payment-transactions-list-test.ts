@@ -5,26 +5,28 @@ import { click, render, TestContext } from '@ember/test-helpers';
 import { setupRenderingTest } from 'ember-qunit';
 import hbs from 'htmlbars-inline-precompile';
 import { module, test } from 'qunit';
+import { subDays, addMinutes, format } from 'date-fns';
 
 class WalletServiceStub extends Service {
   isConnected = true;
 }
 
 let returnEmptyScheduledPaymentAttempts = false;
+let now = new Date();
 class ScheduledPaymentsStub extends Service {
   fetchScheduledPaymentAttempts = (
     chainId: number,
-    status?: ScheduledPaymentAttemptStatus
+    status?: ScheduledPaymentAttemptStatus,
+    startedAt?: Date
   ) => {
     if (returnEmptyScheduledPaymentAttempts) {
       return Promise.resolve([]);
     }
-
     return Promise.resolve(
       [
         {
-          startedAt: new Date('2022-12-12T12:21:25.530'),
-          endedAt: new Date('2022-12-12T12:22:25.530'),
+          startedAt: subDays(now, 10),
+          endedAt: addMinutes(subDays(now, 10), 120),
           status: 'succeeded',
           failureReason: null,
           transactionHash:
@@ -37,12 +39,12 @@ class ScheduledPaymentsStub extends Service {
             tokenAddress: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
             chainId,
             payeeAddress: '0xeBCC5516d44FFf5E9aBa2AcaeB65BbB49bC3EBe1',
-            payAt: new Date('2022-12-12T12:19:25.530'),
+            payAt: addMinutes(subDays(now, 10), 120),
           },
         },
         {
-          startedAt: new Date('2022-12-12T12:19:25.530'),
-          endedAt: new Date('2022-12-12T12:20:25.530'),
+          startedAt: subDays(now, 20),
+          endedAt: addMinutes(subDays(now, 20), 120),
           status: 'failed',
           failureReason: 'Funds too low',
           transactionHash: '0x123',
@@ -54,10 +56,27 @@ class ScheduledPaymentsStub extends Service {
             tokenAddress: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
             chainId,
             payeeAddress: '0xeBCC5516d44FFf5E9aBa2AcaeB65BbB49bC3EBe1',
-            payAt: new Date('2022-12-12T12:19:25.530'),
+            payAt: addMinutes(subDays(now, 20), 120),
           },
         },
-      ].filter((r) => (status ? r.status === status : true))
+        {
+          startedAt: subDays(now, 60),
+          endedAt: addMinutes(subDays(now, 60), 120),
+          status: 'succeeded',
+          failureReason: undefined,
+          transactionHash: '0x123',
+          scheduledPayment: {
+            amount: '15000000',
+            feeFixedUSD: '0',
+            feePercentage: '0',
+            gasTokenAddress: '0x123',
+            tokenAddress: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
+            chainId,
+            payeeAddress: '0xeBCC5516d44FFf5E9aBa2AcaeB65BbB49bC3EBe1',
+            payAt: addMinutes(subDays(now, 60), 120),
+          },
+        },
+      ].filter((r) => (startedAt ? r.startedAt > startedAt : true)).filter((r) => (status ? r.status === status : true))
     );
   };
 }
@@ -86,13 +105,13 @@ module('Integration | Component | payment-transactions-list', function (hooks) {
       .dom(
         '[data-test-scheduled-payment-attempts-item="0"] [data-test-scheduled-payment-attempts-item-time]'
       )
-      .hasText('12:21:25');
+      .hasText(format(now, 'HH:mm:ss'));
 
     assert
       .dom(
         '[data-test-scheduled-payment-attempts-item="0"] [data-test-scheduled-payment-attempts-item-date]'
       )
-      .hasText('12/12/2022');
+      .hasText(format(subDays(now, 10), 'dd/MM/yyyy'));
 
     assert
       .dom(
@@ -169,6 +188,33 @@ module('Integration | Component | payment-transactions-list', function (hooks) {
     assert
       .dom('[data-test-scheduled-payment-attempts-item]')
       .exists({ count: 2 });
+  });
+
+  test('it can filter by date', async function (assert) {
+    this.set('wallet', { isConnected: true });
+
+    await render(hbs`
+      <PaymentTransactionsList />
+    `);
+
+    assert
+      .dom('[data-test-scheduled-payment-attempts-item]')
+      .exists({ count: 2 });
+    assert
+      .dom('[data-test-scheduled-payment-date-filter]')
+      .containsText('Date: Last 30 days');
+    await click('[data-test-scheduled-payment-date-filter]');
+    assert.dom('.boxel-menu').containsText('Last 30 days Last 90 days Last 120 days');
+    await click('[data-test-boxel-menu-item-text="Last 90 days"]');
+    assert
+      .dom('[data-test-scheduled-payment-attempts-item]')
+      .exists({ count: 3 });
+
+    await click('[data-test-scheduled-payment-date-filter]');
+    await click('[data-test-boxel-menu-item-text="Last 120 days"]');
+    assert
+      .dom('[data-test-scheduled-payment-attempts-item]')
+      .exists({ count: 3 });
   });
 
   test('It adds explanation when there are no payment attempts', async function (assert) {

@@ -43,3 +43,26 @@
 .transactions-table-empty-explanation {
   text-align: center;
 }
+
+.payment-transactions-list__filter-trigger {
+  --boxel-input-filter-select-border-color: var(--boxel-form-control-border-color);
+  --boxel-input-filter-select-border-radius: var(--boxel-border-radius-lg);
+
+  border-radius: var(--boxel-input-filter-select-border-radius);
+  border: 1px solid var(--boxel-input-filter-select-border-color);
+  font-family: var(--boxel-font-family);
+  font-size: var(--boxel-font-size);
+  height: var(--boxel-form-control-height);
+  position: relative;
+  transition: border-color var(--boxel-transition);
+  padding: var(--boxel-sp-xxs) var(--boxel-sp-sm);
+
+  width: 200px;
+  margin-right: var(--boxel-sp);
+}
+
+.payment-transactions-list__wrapper .boxel-dropdown-trigger {
+  justify-content: space-between;
+}
+
+

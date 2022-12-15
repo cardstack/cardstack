@@ -73,12 +73,16 @@ export default class ScheduledPaymentsService extends Service {
 
   async fetchScheduledPaymentAttempts(
     chainId: number,
-    status?: ScheduledPaymentAttemptStatus
+    status?: ScheduledPaymentAttemptStatus,
+    startedAt?: Date
   ): Promise<ScheduledPaymentAttempt[]> {
     await this.hubAuthentication.ensureAuthenticated();
     let queryString = `filter[chain-id]=${chainId}`;
     if (status) {
       queryString += `&filter[status]=${status}`;
+    }
+    if (startedAt) {
+      queryString += `&filter[started-at][gt]=${Math.round(startedAt.getTime() / 1000)}`;
     }
     const response = await hubRequest(
       config.hubUrl,
