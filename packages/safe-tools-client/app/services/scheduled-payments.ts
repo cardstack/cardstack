@@ -82,7 +82,9 @@ export default class ScheduledPaymentsService extends Service {
       queryString += `&filter[status]=${status}`;
     }
     if (startedAt) {
-      queryString += `&filter[started-at][gt]=${Math.round(startedAt.getTime() / 1000)}`;
+      queryString += `&filter[started-at][gt]=${Math.round(
+        startedAt.getTime() / 1000
+      )}`;
     }
     const response = await hubRequest(
       config.hubUrl,
