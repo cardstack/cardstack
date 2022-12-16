@@ -23,6 +23,7 @@ import { ValidatableForm } from '../validator';
 interface Signature {
   Element: HTMLElement;
   Args: ValidatableForm & {
+    isSchedulingPayment: boolean;
     paymentTypeOptions: { id: string, text: string }[];
     onSelectPaymentType: (paymentTypeId: string) => void;
     isPaymentTypeInvalid: boolean;
@@ -248,7 +249,7 @@ export default class SchedulePaymentFormActionCardUI extends Component<Signature
           </div>
         </BoxelField>
       </Section>
-        <ActionChin @state='default'>
+        <ActionChin @state={{if @isSchedulingPayment 'in-progress' 'default'}}>
           <:default as |ac|>
             <ac.ActionButton
               @disabled={{not @isSubmitEnabled}}
@@ -258,6 +259,14 @@ export default class SchedulePaymentFormActionCardUI extends Component<Signature
               Schedule Payment
             </ac.ActionButton>
           </:default>
+          <:inProgress as |ac|>
+            <ac.ActionButton
+              @disabled={{true}}
+              data-test-schedule-payment-form-submit-button
+            >
+              Scheduling...
+            </ac.ActionButton>
+          </:inProgress>
         </ActionChin>
     </BoxelActionContainer>    
   </template>

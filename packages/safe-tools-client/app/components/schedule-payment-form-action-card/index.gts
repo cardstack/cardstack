@@ -23,6 +23,7 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
   @service declare safes: SafesService;
   @service declare tokens: TokensService;
   @service declare scheduledPaymentsSdk: ScheduledPaymentsSdkService;
+  @tracked isSchedulingPayment = false;
   validator = new SchedulePaymentFormValidator(this);
   executionGas = 1000; // TODO: this should be set by code that populates Max Gas Options
 
@@ -159,6 +160,9 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
     window.crypto.getRandomValues(array);
     const salt = btoa(String.fromCharCode.apply(null, array));
 
+    this.isSchedulingPayment = true;
+
+  try {
     await taskFor(this.scheduledPaymentsSdk.schedulePayment).perform(
       currentSafe.address,
       currentSafe.spModuleAddress,
@@ -177,10 +181,16 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
         console.log('Waiting for the transaction to be mined...');
       }
     )
+    } catch(e) {
+      this.isSchedulingPayment = true;
+      throw e;
+    }
+
   }
 
   <template>
     <SchedulePaymentFormActionCardUI
+      @isSchedulingPayment={{this.isSchedulingPayment}}
       @paymentTypeOptions={{this.paymentTypeOptions}}
       @selectedPaymentType={{this.selectedPaymentType}}
       @onSelectPaymentType={{this.onSelectPaymentType}}
