@@ -1,0 +1,53 @@
+diff --git a/node_modules/@uniswap/v2-sdk/dist/entities/pair.d.ts b/node_modules/@uniswap/v2-sdk/dist/entities/pair.d.ts
+index d0e2c7c..088ef02 100644
+--- a/node_modules/@uniswap/v2-sdk/dist/entities/pair.d.ts
++++ b/node_modules/@uniswap/v2-sdk/dist/entities/pair.d.ts
+@@ -7,8 +7,8 @@ export declare const computePairAddress: ({ factoryAddress, tokenA, tokenB }: {
+ export declare class Pair {
+     readonly liquidityToken: Token;
+     private readonly tokenAmounts;
+-    static getAddress(tokenA: Token, tokenB: Token): string;
+-    constructor(currencyAmountA: CurrencyAmount<Token>, tokenAmountB: CurrencyAmount<Token>);
++    static getAddress(tokenA: Token, tokenB: Token, uniswapV2Factory?: string, initCodeHash?: string): string;
++    constructor(currencyAmountA: CurrencyAmount<Token>, tokenAmountB: CurrencyAmount<Token>, uniswapV2Factory?: string, initCodeHash?: string);
+     /**
+      * Returns true if the token is either token0 or token1
+      * @param token to check
+diff --git a/node_modules/@uniswap/v2-sdk/dist/v2-sdk.cjs.development.js b/node_modules/@uniswap/v2-sdk/dist/v2-sdk.cjs.development.js
+index f1a6331..04b3720 100644
+--- a/node_modules/@uniswap/v2-sdk/dist/v2-sdk.cjs.development.js
++++ b/node_modules/@uniswap/v2-sdk/dist/v2-sdk.cjs.development.js
+@@ -221,6 +221,7 @@ var InsufficientInputAmountError = /*#__PURE__*/function (_Error2) {
+ 
+ var computePairAddress = function computePairAddress(_ref) {
+   var factoryAddress = _ref.factoryAddress,
++      initCodeHash = _ref.initCodeHash,
+       tokenA = _ref.tokenA,
+       tokenB = _ref.tokenB;
+ 
+@@ -229,19 +230,20 @@ var computePairAddress = function computePairAddress(_ref) {
+       token1 = _ref2[1]; // does safety checks
+ 
+ 
+-  return address.getCreate2Address(factoryAddress, solidity.keccak256(['bytes'], [solidity.pack(['address', 'address'], [token0.address, token1.address])]), INIT_CODE_HASH);
++  return address.getCreate2Address(factoryAddress, solidity.keccak256(['bytes'], [solidity.pack(['address', 'address'], [token0.address, token1.address])]), initCodeHash);
+ };
+ var Pair = /*#__PURE__*/function () {
+-  function Pair(currencyAmountA, tokenAmountB) {
++  function Pair(currencyAmountA, tokenAmountB, factoryAddress = FACTORY_ADDRESS, initCodeHash = INIT_CODE_HASH) {
+     var tokenAmounts = currencyAmountA.currency.sortsBefore(tokenAmountB.currency) // does safety checks
+     ? [currencyAmountA, tokenAmountB] : [tokenAmountB, currencyAmountA];
+-    this.liquidityToken = new sdkCore.Token(tokenAmounts[0].currency.chainId, Pair.getAddress(tokenAmounts[0].currency, tokenAmounts[1].currency), 18, 'UNI-V2', 'Uniswap V2');
++    this.liquidityToken = new sdkCore.Token(tokenAmounts[0].currency.chainId, Pair.getAddress(tokenAmounts[0].currency, tokenAmounts[1].currency, factoryAddress, initCodeHash), 18, 'UNI-V2', 'Uniswap V2');
+     this.tokenAmounts = tokenAmounts;
+   }
+ 
+-  Pair.getAddress = function getAddress(tokenA, tokenB) {
++  Pair.getAddress = function getAddress(tokenA, tokenB, factoryAddress = FACTORY_ADDRESS, initCodeHash = INIT_CODE_HASH) {
+     return computePairAddress({
+-      factoryAddress: FACTORY_ADDRESS,
++      factoryAddress,
++      initCodeHash,
+       tokenA: tokenA,
+       tokenB: tokenB
+     });

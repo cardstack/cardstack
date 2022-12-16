@@ -1,6 +1,7 @@
 /*global fetch */
 
-import { Fetcher, Route, Price } from '@uniswap/sdk';
+import { Pair, Route } from '@uniswap/v2-sdk';
+import { Token, CurrencyAmount, Price, Fraction } from '@uniswap/sdk-core';
 import { getAddressByNetwork } from '../../contracts/addresses';
 import { getConstantByNetwork, SchedulerCapableNetworks } from '../constants';
 import JsonRpcProvider from '../../providers/json-rpc-provider';
@@ -8,20 +9,57 @@ import { networkName } from './general-utils';
 import BN from 'bn.js';
 import { BaseProvider } from '@ethersproject/providers';
 import { convertChainIdToName } from '../network-config-utils';
+import { Contract } from 'ethers';
+import ERC20ABI from '../../contracts/abi/erc-20';
+import IUniswapV2Pair from '@uniswap/v2-core/build/IUniswapV2Pair.json';
 
 type GasPrice = Record<'slow' | 'standard' | 'fast', BN>;
 
-async function tokenPairRate(provider: JsonRpcProvider, token1Address: string, token2Address: string): Promise<Price> {
+async function fetchTokenData(chainId: number, tokenAddress: string, provider: BaseProvider): Promise<Token> {
+  let tokenContract = new Contract(tokenAddress, ERC20ABI, provider);
+  let decimals = await tokenContract.decimals();
+  return new Token(chainId, tokenAddress, decimals);
+}
+
+async function fetchPairData(
+  tokenA: Token,
+  tokenB: Token,
+  uniswapV2Factory: string,
+  initCodeHash: string,
+  provider: BaseProvider
+): Promise<Pair> {
+  let address = Pair.getAddress(tokenA, tokenB, uniswapV2Factory, initCodeHash);
+  const [reserves0, reserves1] = await new Contract(address, IUniswapV2Pair.abi, provider).getReserves();
+  const balances = tokenA.sortsBefore(tokenB) ? [reserves0, reserves1] : [reserves1, reserves0];
+  return new Pair(
+    CurrencyAmount.fromRawAmount(tokenA, balances[0]),
+    CurrencyAmount.fromRawAmount(tokenB, balances[1]),
+    uniswapV2Factory,
+    initCodeHash
+  );
+}
+
+//Adjustment of the difference in coin decimals, for example WETH has 18 decimals, USDT and USDC have 6.
+function adjustRate(rate: Price<Token, Token>): Fraction {
+  let fraction = new Fraction(rate.numerator, rate.denominator);
+  return fraction.multiply(rate.scalar);
+}
+
+async function tokenPairRate(
+  provider: JsonRpcProvider,
+  token1Address: string,
+  token2Address: string
+): Promise<Price<Token, Token>> {
   let network = await provider.getNetwork();
-  let token1 = await Fetcher.fetchTokenData(network.chainId, token1Address, provider as unknown as BaseProvider);
-  let token2 = await Fetcher.fetchTokenData(network.chainId, token2Address, provider as unknown as BaseProvider);
+  let token1 = await fetchTokenData(network.chainId, token1Address, provider as unknown as BaseProvider);
+  let token2 = await fetchTokenData(network.chainId, token2Address, provider as unknown as BaseProvider);
 
   let networkName = convertChainIdToName(network.chainId);
   let uniswapV2Factory = getAddressByNetwork('uniswapV2Factory', networkName);
   let initCodeHash = getConstantByNetwork('uniswapPairInitCodeHash', networkName as SchedulerCapableNetworks);
-  let pair = await Fetcher.fetchPairData(token1, token2, uniswapV2Factory, initCodeHash, provider);
+  let pair = await fetchPairData(token1, token2, uniswapV2Factory, initCodeHash, provider);
 
-  let route = new Route([pair], token2);
+  let route = new Route([pair], token2, token1);
 
   return route.midPrice; // How many "token 1" we can get for one "token 2" in Uniswap
 }
@@ -40,11 +78,11 @@ export async function gasPriceInToken(provider: JsonRpcProvider, tokenAddress: s
     return gasPriceInNativeTokenInWei;
   }
   let rate = await tokenPairRate(provider, tokenAddress, wrappedNativeToken);
-
+  let rateAdjusted = adjustRate(rate);
   // Convert the current gas price which is in native token to the token we want to pay the gas with.
   return gasPriceInNativeTokenInWei
-    .mul(new BN(rate.adjusted.numerator.toString())) // rate.adjusted is an adjustment of the difference in coin decimals, for example WETH has 18 decimals, USDT and USDC have 6.
-    .div(new BN(rate.adjusted.denominator.toString()));
+    .mul(new BN(rateAdjusted.numerator.toString()))
+    .div(new BN(rateAdjusted.denominator.toString()));
 }
 
 export async function getGasPricesInNativeWei(chainId: number): Promise<GasPrice> {
@@ -74,6 +112,6 @@ export async function getNativeWeiInToken(provider: JsonRpcProvider, tokenAddres
   }
 
   let rate = await tokenPairRate(provider, tokenAddress, wrappedNativeToken);
-  return new BN(rate.adjusted.numerator.toString()) // rate.adjusted is an adjustment of the difference in coin decimals, for example WETH has 18 decimals, USDT and USDC have 6.
-    .div(new BN(rate.adjusted.denominator.toString()));
+  let rateAdjusted = adjustRate(rate);
+  return new BN(rateAdjusted.numerator.toString()).div(new BN(rateAdjusted.denominator.toString()));
 }
