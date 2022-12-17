@@ -22,9 +22,15 @@
       "program": "${workspaceRoot}/packages/hub/dist/hub.js",
       "cwd": "${workspaceRoot}/packages/hub",
       "console": "integratedTerminal",
-      "args": [
-        "serve"
-      ]
+      "args": ["serve"]
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Hub: Run console",
+      "cwd": "${workspaceRoot}/packages/hub",
+      "console": "integratedTerminal",
+      "args": ["--no-deprecation", "--experimental-repl-await", "./dist/hub.js", "console"]
     },
     {
       "type": "node",
