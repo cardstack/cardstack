@@ -4,6 +4,7 @@ import {
   isSchedulerSupportedChain,
   convertChainIdToName,
 } from '@cardstack/cardpay-sdk';
+import HubAuthenticationService from '@cardstack/safe-tools-client/services/hub-authentication';
 import NetworkService from '@cardstack/safe-tools-client/services/network';
 import { ChainConnectionManager } from '@cardstack/safe-tools-client/utils/chain-connection-manager';
 import walletProviders, {
@@ -23,6 +24,7 @@ const ERR_METAMASK_UNKNOWN_NETWORK = 4902; // The requested chain has not been a
 
 export default class Wallet extends Service {
   @service declare network: NetworkService;
+  @service declare hubAuthentication: HubAuthenticationService;
 
   @tracked isConnected = false;
   @tracked providerId: WalletProviderId | undefined;
@@ -56,9 +58,11 @@ export default class Wallet extends Service {
       this.network.chainId,
       owner
     );
+
     this.chainConnectionManager.on('connected', (accounts: string[]) => {
       this.isConnected = true;
       this.address = Web3.utils.toChecksumAddress(accounts[0]);
+      this.hubAuthentication.updateAuthenticationValidity();
     });
 
     this.chainConnectionManager.on('disconnected', () => {

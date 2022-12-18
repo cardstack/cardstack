@@ -10,9 +10,13 @@ import { module, test } from 'qunit';
 class WalletServiceStub extends Service {
   isConnected = true;
 }
+class HubAuthenticationServiceStub extends Service {
+  isAuthenticated = true;
+}
 
 let returnEmptyScheduledPaymentAttempts = false;
 const now = new Date();
+
 class ScheduledPaymentsStub extends Service {
   fetchScheduledPaymentAttempts = (
     chainId: number,
@@ -89,11 +93,13 @@ module('Integration | Component | payment-transactions-list', function (hooks) {
   hooks.beforeEach(function (this: TestContext) {
     this.owner.register('service:wallet', WalletServiceStub);
     this.owner.register('service:scheduled-payments', ScheduledPaymentsStub);
+    this.owner.register(
+      'service:hub-authentication',
+      HubAuthenticationServiceStub
+    );
   });
 
   test('It renders transactions', async function (assert) {
-    this.set('wallet', { isConnected: true });
-
     await render(hbs`
       <PaymentTransactionsList />
     `);

@@ -75,7 +75,7 @@ class PaymentTransactionsList extends Component {
   }
 
   @use scheduledPaymentAttemptsResource = resource(() => {
-    if (!this.wallet.isConnected) {
+    if (!this.hubAuthentication.isAuthenticated) {
       return {
         error: false,
         isLoading: false,

@@ -76,7 +76,6 @@ export default class ScheduledPaymentsService extends Service {
     status?: ScheduledPaymentAttemptStatus,
     startedAt?: Date
   ): Promise<ScheduledPaymentAttempt[]> {
-    await this.hubAuthentication.ensureAuthenticated();
     let queryString = `filter[chain-id]=${chainId}`;
     if (status) {
       queryString += `&filter[status]=${status}`;

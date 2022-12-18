@@ -1,9 +1,17 @@
 import { truncateMiddle } from '@cardstack/ember-shared/helpers/truncate-middle';
+import HubAuthenticationService from '@cardstack/safe-tools-client/services/hub-authentication';
 import SafesService, {
   Safe,
   TokenBalance,
 } from '@cardstack/safe-tools-client/services/safes';
-import { click, settled, TestContext, visit } from '@ember/test-helpers';
+
+import {
+  click,
+  settled,
+  TestContext,
+  visit,
+  waitFor,
+} from '@ember/test-helpers';
 import percySnapshot from '@percy/ember';
 import { BN } from 'bn.js';
 import { module, test } from 'qunit';
@@ -19,6 +27,9 @@ module('Acceptance | wallet connection', function (hooks) {
 
   hooks.beforeEach(function (this: TestContext) {
     const safesService = this.owner.lookup('service:safes') as SafesService;
+    const hubAuthenticationService = this.owner.lookup(
+      'service:hub-authentication'
+    ) as HubAuthenticationService;
 
     safesService.fetchSafes = (): Promise<Safe[]> => {
       return Promise.resolve([
@@ -43,6 +54,18 @@ module('Acceptance | wallet connection', function (hooks) {
           decimals: 6,
         } as unknown as TokenBalance,
       ]);
+    };
+
+    //@ts-expect-error - don't care about the promise return value since this is a mock
+    hubAuthenticationService.getHubAuth = (): Promise<unknown> => {
+      return Promise.resolve({
+        authenticate: async () => {
+          return Promise.resolve('auth-token-1337');
+        },
+        checkValidAuth: async () => {
+          return Promise.resolve(true);
+        },
+      });
     };
   });
 
@@ -78,6 +101,9 @@ module('Acceptance | wallet connection', function (hooks) {
       assert.dom('[data-test-token-balance="ETH"]').hasText('1 ETH');
       assert.dom('[data-test-token-balance="USDT"]').hasText('10 USDT');
 
+      await waitFor('[data-test-hub-auth-modal]');
+      await click('[data-test-hub-auth-modal] button');
+      assert.dom('[data-test-hub-auth-modal]').doesNotExist();
       await click('[data-test-disconnect-button]');
 
       assert.dom('[data-test-wallet-address]').doesNotExist();

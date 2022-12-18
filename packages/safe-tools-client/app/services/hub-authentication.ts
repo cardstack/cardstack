@@ -14,7 +14,7 @@ declare global {
 export default class HubAuthenticationService extends Service {
   storage: Storage;
   @service declare wallet: WalletService;
-  @tracked isAuthenticated = false;
+  @tracked isAuthenticated: boolean | null = null;
 
   constructor(parameters?: object | undefined) {
     super(parameters);
@@ -26,6 +26,10 @@ export default class HubAuthenticationService extends Service {
         this.storage.setItem('authToken', window.TEST__AUTH_TOKEN);
       }
     }
+  }
+
+  async updateAuthenticationValidity() {
+    this.isAuthenticated = await this.hasValidAuthentication();
   }
 
   async ensureAuthenticated(): Promise<void> {
