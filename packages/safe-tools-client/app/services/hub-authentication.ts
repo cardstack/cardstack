@@ -44,6 +44,7 @@ export default class HubAuthenticationService extends Service {
   }
 
   async getHubAuth() {
+    //@ts-expect-error currentProvider does not match Web3Provider - not worth typing as we should replace the web3 one with ethers soon
     const ethersProvider = new Web3Provider(this.wallet.web3.currentProvider);
 
     return await getSDK('HubAuth', ethersProvider, config.hubUrl);
