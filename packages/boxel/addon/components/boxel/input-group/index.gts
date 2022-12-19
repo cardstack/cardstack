@@ -1,10 +1,10 @@
 import Component from '@glimmer/component';
 import { AccessoriesBlockArg, TextAccessory, SelectAccessory, ButtonAccessory, IconButtonAccessory } from './accessories';
 import { ControlsBlockArg, TextareaControl, InputControl } from './controls';
+import ErrorMessage from '../input/error-message';
 
 import and from 'ember-truth-helpers/helpers/and';
 import cn from '@cardstack/boxel/helpers/cn';
-//@ts-expect-error glint does not think this is consumed-but it is consumed in the template https://github.com/typed-ember/glint/issues/374
 import { concat, hash } from '@ember/helper';
 import { guidFor } from '@ember/object/internals';
 
@@ -53,14 +53,14 @@ export default class InputGroup extends Component<Signature> {
     {{#let
         (and @invalid @errorMessage)
         (hash
-          Text=(component TextAccessory)
+          Text=TextAccessory
           Button=(component ButtonAccessory kind="secondary-light")
-          IconButton=(component IconButtonAccessory)
-          Select=(component SelectAccessory)
+          IconButton=IconButtonAccessory
+          Select=SelectAccessory
         )
         (hash
-          Input=(component InputControl)
-          Textarea=(component TextareaControl)
+          Input=InputControl
+          Textarea=TextareaControl
         )
       as |shouldShowErrorMessage Accessories Controls|}}
       <div
@@ -76,7 +76,7 @@ export default class InputGroup extends Component<Signature> {
         {{#if (has-block "default")}}
           {{yield Controls Accessories this.inputGroupBlockArg }}
         {{else}}
-          <Controls.Input
+          <InputControl
             id={{this.elementId}}
             @placeholder={{@placeholder}}
             @disabled={{@disabled}}
@@ -95,7 +95,12 @@ export default class InputGroup extends Component<Signature> {
         {{yield Accessories this.inputGroupBlockArg to="after"}}
       </div>
       {{#if shouldShowErrorMessage}}
-        <div id={{concat "error-message-" this.elementId}} class="boxel-input-group__error-message" aria-live="polite" data-test-boxel-input-group-error-message>{{@errorMessage}}</div>
+          <ErrorMessage
+            id={{concat "error-message-" this.elementId}}
+            class="boxel-input-group__error-message"
+            data-test-boxel-input-group-error-message
+            @message={{@errorMessage}}
+          />
       {{/if}}
       {{#if @helperText}}
         <div id={{concat "helper-text-" this.elementId}} class="boxel-input-group__helper-text" data-test-boxel-input-group-helper-text>{{@helperText}}</div>

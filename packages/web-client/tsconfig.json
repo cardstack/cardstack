@@ -20,7 +20,7 @@
     "baseUrl": ".",
     "module": "es2020",
     "experimentalDecorators": true,
-    "skipLibCheck": false,
+    "skipLibCheck": true,
     "resolveJsonModule": true,
     "traceResolution": false,
     "paths": {
@@ -47,16 +47,7 @@
     },
   },
   "glint": {
-    "environment": ["ember-loose", "ember-template-imports"],
-    "transform": {
-      "include": [
-        "../boxel/addon/components/boxel/**/*",
-        "app/components/card-drop-page/**/*",
-        "app/components/card-pay/dashboard-panel/**/*",
-        "app/components/card-pay/header/workflow-tracker/item/*",
-        "app/components/card-pay/header/**/*",
-      ]
-    }
+    "environment": ["ember-loose", "ember-template-imports"]
   },
   "include": [
     "app/**/*",

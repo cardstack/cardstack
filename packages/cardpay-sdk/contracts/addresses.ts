@@ -102,6 +102,7 @@ const GOERLI = {
   metaGuard: '0xe2847462a574bfd43014d1c7BB6De5769C294691',
   wrappedNativeToken: '0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6', // WETH
   usdcToken: '0x07865c6E87B9F70255377e024ace6630C1Eaa37F',
+  uniswapV2Factory: '0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f',
 };
 const MUMBAI = {
   gnosisSafeMasterCopy: '0xd9Db270c1B5E3Bd161E8c8503c55cEABeE709552',
@@ -115,7 +116,8 @@ const MUMBAI = {
   moduleProxyFactory: '0x00000000000DC7F163742Eb4aBEf650037b1f588',
   metaGuard: '0xe2847462a574bfd43014d1c7BB6De5769C294691',
   wrappedNativeToken: '0x9c3C9283D3e44854697Cd22D3Faa240Cfb032889', // WMATIC
-  usdcToken: '0xe6b8a5CF854791412c1f6EFC7CAf629f5Df1c747',
+  usdcToken: '0xf9A71cf591fd72224eeE9C825Bc9aa4BAE05C55d',
+  uniswapV2Factory: '0xc35DADB65012eC5796536bD9864eD8773aBc74C4',
 };
 
 const MAINNET = {
@@ -124,11 +126,19 @@ const MAINNET = {
   foreignBridge: '0x95d4FAe56F49c2FE6700A7135B6fb7a5aBA5a450',
   foreignAMB: '0x4C36d2919e407f0Cc2Ee3c993ccF8ac26d9CE64e',
   chainlinkEthToUsd: '0x5f4eC3Df9cbd43714FE2740f5E3616155c5b8419',
-  scheduledPaymentConfig: '',
-  scheduledPaymentExchange: '',
-  scheduledPaymentModule: '',
+  gnosisSafeMasterCopy: '0xd9Db270c1B5E3Bd161E8c8503c55cEABeE709552',
+  gnosisProxyFactory_v1_2: '0x76E2cFc1F5Fa8F6a5b3fC4c8F4788F0116861F9B',
+  gnosisProxyFactory_v1_3: '0xa6B71E26C5e0845f74c812102Ca7114b6a896AB2',
+  scheduledPaymentConfig: '0xc0dd52489b04A01b9F4028849dABB46e1E54afDc',
+  scheduledPaymentExchange: '0xc726F652e818abA01c6bFE8edBE4ccE0021337BF',
+  scheduledPaymentModule: '0x024EA6929d03995D16c12B7C33b94CE88E43a6Da',
+  multiSend: '0xA238CBeb142c10Ef7Ad8442C6D1f9E89e07e7761',
+  multiSendCallOnly: '0x40A2aCCbd92BCA938b02010E17A5b8929b49130D',
+  moduleProxyFactory: '0x00000000000DC7F163742Eb4aBEf650037b1f588',
+  metaGuard: '0xe2847462a574bfd43014d1c7BB6De5769C294691',
   wrappedNativeToken: '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2', // WETH
   usdcToken: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
+  uniswapV2Factory: '0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f',
 };
 const GNOSIS = {
   gnosisProxyFactory_v1_2: '0x76E2cFc1F5Fa8F6a5b3fC4c8F4788F0116861F9B',
@@ -172,6 +182,21 @@ const GNOSIS = {
   scheduledPaymentExchange: '',
   scheduledPaymentModule: '',
 };
+const POLYGON = {
+  gnosisSafeMasterCopy: '0xd9Db270c1B5E3Bd161E8c8503c55cEABeE709552',
+  gnosisProxyFactory_v1_2: '0x76E2cFc1F5Fa8F6a5b3fC4c8F4788F0116861F9B',
+  gnosisProxyFactory_v1_3: '0xa6B71E26C5e0845f74c812102Ca7114b6a896AB2',
+  scheduledPaymentConfig: '0x143310ba9eaED49D2B544e4EC9134F5776BF0Be1',
+  scheduledPaymentExchange: '0x8876133F3F961A3C7125A26Ce8aDB0dE53794abB',
+  scheduledPaymentModule: '0x024EA6929d03995D16c12B7C33b94CE88E43a6Da',
+  multiSend: '0xA238CBeb142c10Ef7Ad8442C6D1f9E89e07e7761',
+  multiSendCallOnly: '0x40A2aCCbd92BCA938b02010E17A5b8929b49130D',
+  moduleProxyFactory: '0x00000000000DC7F163742Eb4aBEf650037b1f588',
+  metaGuard: '0xe2847462a574bfd43014d1c7BB6De5769C294691',
+  wrappedNativeToken: '0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270', // WMATIC
+  usdcToken: '0x2791bca1f2de4661ed88a30c99a7a9449aa84174',
+  uniswapV2Factory: '0xc35DADB65012eC5796536bD9864eD8773aBc74C4',
+};
 
 const addresses: {
   [network: string]: {
@@ -184,6 +209,7 @@ const addresses: {
   mumbai: MUMBAI,
   mainnet: MAINNET,
   gnosis: GNOSIS,
+  polygon: POLYGON,
 });
 
 export type AddressKeys =

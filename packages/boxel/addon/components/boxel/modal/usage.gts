@@ -5,7 +5,6 @@ import BoxelButton from '../button';
 import BoxelCardContainer from '../card-container';
 import { tracked } from '@glimmer/tracking';
 import { action } from '@ember/object';
-//@ts-expect-error glint does not think this is consumed-but it is consumed in the template https://github.com/typed-ember/glint/issues/374
 import { array, fn } from '@ember/helper';
 import cssVar from '@cardstack/boxel/helpers/css-var';
 import { cssVariable, CSSVariableInfo } from 'ember-freestyle/decorators/css-variable';

@@ -16,7 +16,8 @@ export default class BoxelCalendarUsage extends Component {
   @action onCenterChange(val: Day) {
     this.center = val;
   }
-  
+  minDate: Day = new Date(2022,7,4);
+
   <template>
     <FreestyleUsage @name="Calendar">
       <:description>
@@ -28,6 +29,7 @@ export default class BoxelCalendarUsage extends Component {
           @onSelect={{this.onSelect}}
           @center={{this.center}}
           @onCenterChange={{this.onCenterChange}}
+          @minDate={{this.minDate}}
         />
       </:example>
       <:api as |Args|>
@@ -50,6 +52,11 @@ export default class BoxelCalendarUsage extends Component {
         <Args.Action
           @name="onCenterChange"
           @description="Called when a user changes the month shown"
+        />
+        <Args.Object
+          @name="minDate"
+          @description="Dates before this date will be disabled"
+          @value={{this.minDate}}
         />
       </:api>
     </FreestyleUsage>

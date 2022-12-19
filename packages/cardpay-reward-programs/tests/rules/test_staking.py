@@ -157,6 +157,8 @@ def test_correct_calc_rewards(monkeypatch):
     assert pytest.approx(get_amount(result, "owner1")) == 82.26866088e9
     assert pytest.approx(get_amount(result, "owner2")) == 80.74258498e9
     assert pytest.approx(get_amount(result, "owner3")) == 60e9
+    assert result["explanationData"][0]["from_block"] == 0
+    assert result["explanationData"][0]["to_block"] == 30
 
 
 def test_correctly_manages_first_deposit_in_cycle(monkeypatch):

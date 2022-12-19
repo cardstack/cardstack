@@ -10,6 +10,7 @@ import { AbiItem } from 'web3-utils';
 import { Operation } from './safe-utils';
 import { v4 } from 'uuid';
 import JsonRpcProvider from '../../providers/json-rpc-provider';
+
 import { BytesLike, Interface } from 'ethers/lib/utils';
 import { utils } from 'ethers';
 import { getResolver } from '@cardstack/did-resolver';
@@ -50,11 +51,14 @@ export interface ErrorFragment {
   inputs: string[];
 }
 
+export function isJsonRpcProvider(web3OrEthersProvider: any): web3OrEthersProvider is JsonRpcProvider {
+  return web3OrEthersProvider instanceof JsonRpcProvider;
+}
+
 export async function networkName(web3OrEthersProvider: Web3 | JsonRpcProvider): Promise<string> {
-  let id =
-    web3OrEthersProvider instanceof JsonRpcProvider
-      ? (await web3OrEthersProvider.getNetwork()).chainId
-      : await web3OrEthersProvider.eth.net.getId();
+  let id = isJsonRpcProvider(web3OrEthersProvider)
+    ? (await web3OrEthersProvider.getNetwork()).chainId
+    : await web3OrEthersProvider.eth.net.getId();
   let name = networks[id];
   if (!name) {
     throw new Error(`Don't know what name the network id ${id} is`);
@@ -96,7 +100,7 @@ export function waitUntilTransactionMined(
 
     try {
       let receipt;
-      if (web3OrEthersProvider instanceof JsonRpcProvider) {
+      if (isJsonRpcProvider(web3OrEthersProvider)) {
         receipt = await web3OrEthersProvider.getTransactionReceipt(txnHash);
       } else {
         receipt = await web3OrEthersProvider.eth.getTransactionReceipt(txnHash);

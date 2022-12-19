@@ -13,6 +13,7 @@ type BasePowerSelectArgs = PartialBy<Pick<
   | 'selectedItemComponent'
   | 'placeholder'
   | 'onChange'
+  | 'onBlur'
   | 'renderInPlace'
   | 'verticalPosition'
   | 'dropdownClass'
@@ -43,6 +44,7 @@ const BoxelSelect: TemplateOnlyComponent<Signature> =
     @selectedItemComponent={{@selectedItemComponent}}
     @placeholder={{@placeholder}}
     @onChange={{@onChange}}
+    @onBlur={{@onBlur}}
     @renderInPlace={{@renderInPlace}}
     @verticalPosition={{@verticalPosition}}
     @dropdownClass={{cn "boxel-select__dropdown" @dropdownClass}}

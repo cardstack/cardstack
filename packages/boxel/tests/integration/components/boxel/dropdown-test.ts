@@ -56,6 +56,7 @@ module('Integration | Component | Dropdown', function (hooks) {
       await render(hbs`
         <Boxel::Dropdown>
           <:trigger as |bindings|>
+            {{!-- @glint-expect-error: this is the error being tested for --}}
             <div data-test-dropdown-trigger {{bindings}}>
               Trigger
             </div>

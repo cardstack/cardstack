@@ -36,7 +36,7 @@ const ActionContainer: TemplateOnlyComponent<Signature> = <template>
       />
     {{/if}}
 
-    {{yield (component ActionContainerSection) (component BoxelActionChin class='boxel-action-container__footer')}}
+    {{yield ActionContainerSection (component BoxelActionChin class='boxel-action-container__footer')}}
           
   </BoxelCardContainer>
 </template>

@@ -6,6 +6,7 @@ import { ComponentLike } from '@glint/template';
 interface DaysComponentSignature {
   Args: {
     weekdayFormat: string;
+    minDate: any;
   };
 }
 
