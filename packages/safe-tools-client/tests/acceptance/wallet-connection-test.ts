@@ -85,6 +85,18 @@ module('Acceptance | wallet connection', function (hooks) {
         .dom('[data-test-wallet-address]')
         .hasText(truncateMiddle([TEST_ACCOUNT_1]));
 
+      assert.dom('[data-test-safe-address-label]').hasText('0x458B...486E');
+      assert.dom('[data-test-token-balance="ETH"]').hasText('1 ETH');
+      assert.dom('[data-test-token-balance="USDT"]').hasText('10 USDT');
+
+      await waitFor('[data-test-hub-auth-modal]');
+      await percySnapshot(assert);
+      await click('[data-test-hub-auth-modal] button');
+      assert.dom('[data-test-hub-auth-modal]').doesNotExist();
+
+      const storage = this.owner.lookup('storage:local') as Storage;
+      assert.strictEqual(storage.getItem('authToken'), 'auth-token-1337');
+
       await percySnapshot(assert);
 
       await this.mockMetaMask.mockAccountsChanged([TEST_ACCOUNT_2]);
@@ -97,17 +109,6 @@ module('Acceptance | wallet connection', function (hooks) {
         .dom('[data-test-wallet-address]')
         .doesNotContainText(truncateMiddle([TEST_ACCOUNT_1]));
 
-      assert.dom('[data-test-safe-address-label]').hasText('0x458B...486E');
-      assert.dom('[data-test-token-balance="ETH"]').hasText('1 ETH');
-      assert.dom('[data-test-token-balance="USDT"]').hasText('10 USDT');
-
-      await waitFor('[data-test-hub-auth-modal]');
-      await click('[data-test-hub-auth-modal] button');
-
-      const storage = this.owner.lookup('storage:local') as Storage;
-      assert.strictEqual(storage.getItem('authToken'), 'auth-token-1337');
-
-      assert.dom('[data-test-hub-auth-modal]').doesNotExist();
       await click('[data-test-disconnect-button]');
 
       assert.dom('[data-test-wallet-address]').doesNotExist();
