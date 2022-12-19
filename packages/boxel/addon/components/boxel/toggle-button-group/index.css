@@ -17,7 +17,6 @@
 
 .boxel-toggle-button-group__fieldset-container {
   display: flex;
-  flex-wrap: wrap;
 }
 
 .boxel-toggle-button-group-option {
