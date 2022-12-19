@@ -4,6 +4,7 @@ import {
   getSDK,
   Web3Provider,
   ScheduledPaymentModule,
+  getNativeWeiInToken
 } from '@cardstack/cardpay-sdk';
 import WalletService from '@cardstack/safe-tools-client/services/wallet';
 
@@ -14,7 +15,11 @@ import { task } from 'ember-concurrency-decorators';
 
 import { BigNumber } from 'ethers';
 
-import { GasEstimationResult } from '../../../cardpay-sdk/sdk/scheduled-payment-module';
+export type GasRange = Record<'normal' | 'high' | 'max', BigNumber>;
+export interface GasEstimationResult {
+  gas: BigNumber,
+  gasRangeInGasTokenWei: GasRange
+}
 
 export default class SchedulePaymentSDKService extends Service {
   @service declare wallet: WalletService;
@@ -68,8 +73,17 @@ export default class SchedulePaymentSDKService extends Service {
       tokenAddress,
       gasTokenAddress
     );
+    const gasRangeInWei = gasEstimationResult.gasRangeInWei;
+    let priceWeiInGasToken = String(await getNativeWeiInToken(new Web3Provider(this.wallet.web3.currentProvider), gasTokenAddress));
 
-    return gasEstimationResult;
+    return {
+      gas: gasEstimationResult.gas,
+      gasRangeInGasTokenWei: {
+        normal: gasRangeInWei.standard.mul(priceWeiInGasToken).mul(2),
+        high: gasRangeInWei.standard.mul(priceWeiInGasToken).mul(4),
+        max: gasRangeInWei.standard.mul(priceWeiInGasToken).mul(6),
+      }
+    };
   }
 
   @task *schedulePayment(

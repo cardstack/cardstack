@@ -4,7 +4,7 @@ import { SelectableToken } from '@cardstack/boxel/components/boxel/input/selecta
 import { inject as service } from '@ember/service';
 import NetworkService from '../../services/network';
 import SafesService from '../../services/safes';
-import ScheduledPaymentsSdkService from '../../services/scheduled-payments-sdk';
+import ScheduledPaymentsSdkService, { GasEstimationResult } from '../../services/scheduled-payments-sdk';
 import TokensService from '../../services/tokens';
 import WalletService from '../../services/wallet';
 import { action } from '@ember/object';
@@ -19,6 +19,7 @@ import { fromWei } from 'web3-utils';
 import not from 'ember-truth-helpers/helpers/not';
 import { convertAmountToRawAmount } from '@cardstack/cardpay-sdk';
 import { taskFor } from 'ember-concurrency-ts';
+import { BigNumber } from 'ethers';
 
 interface Signature {
   Element: HTMLElement;
@@ -37,7 +38,10 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
   @service declare tokens: TokensService;
   @service declare scheduledPaymentsSdk: ScheduledPaymentsSdkService;
   validator = new SchedulePaymentFormValidator(this);
-  executionGas = 1000; // TODO: this should be set by code that populates Max Gas Options
+  gasEstimation: GasEstimationResult = {
+    gas: BigNumber.from(0),
+    gasRangeInGasTokenWei: {}
+  };
 
   get paymentTypeOptions() {
     return [
@@ -183,18 +187,16 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
       state.isIndeterminate = true;
       return state;
     }
-
     // because networkInfo is tracked, anytime the network switches,
     // this resource will re-run
     const scenario = this.selectedPaymentType === 'one-time' ? 'execute_one_time_payment' : 'execute_recurring_payment';
     (async () => {
       try {
-        let result = await this.scheduledPaymentsSDK.getScheduledPaymentGasEstimation(scenario, paymentTokenAddress, selectedGasToken.address);
-        let gasRangeInWei = result.gasRangeInWei.standard;
+        this.gasEstimation = await this.scheduledPaymentsSdk.getScheduledPaymentGasEstimation(scenario, paymentTokenAddress, selectedGasToken.address);
         state.value = {
-          normal: `Less than ${fromWei((gasRangeInWei.mul(2)).toString(), 'ether')} ${selectedGasToken.symbol}`,
-          high: `Less than ${fromWei(gasRangeInWei.mul(4).toString(), 'ether')} ${selectedGasToken.symbol}`,
-          max: `Capped at ${fromWei(gasRangeInWei.mul(6).toString(), 'ether')} ${selectedGasToken.symbol}`,
+          normal: `Less than ${fromWei(this.gasEstimation.gasRangeInGasTokenWei.normal.toString(), 'ether')} ${selectedGasToken.symbol}`,
+          high: `Less than ${fromWei(this.gasEstimation.gasRangeInGasTokenWei.high.toString(), 'ether')} ${selectedGasToken.symbol}`,
+          max: `Capped at ${fromWei(this.gasEstimation.gasRangeInGasTokenWei.max.toString(), 'ether')} ${selectedGasToken.symbol}`,
         };
       } catch (error) {
         console.error(error);
@@ -213,6 +215,23 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
     if (!this.paymentDate) return;
     if (!this.paymentToken) return;
     if (!this.selectedGasToken) return;
+    if (Number(this.gasEstimation.gas) <= 0) return;
+    if (Object.keys(this.gasEstimation.gasRangeInGasTokenWei).length <= 0) return;
+
+    let maxGasPrice;
+    switch(this.maxGasPrice) {
+      case "normal":
+        maxGasPrice = this.gasEstimation.gasRangeInGasTokenWei.normal.div(this.gasEstimation.gas);
+        break;
+      case "high":
+        maxGasPrice = this.gasEstimation.gasRangeInGasTokenWei.high.div(this.gasEstimation.gas);
+        break;
+      case "max":
+        maxGasPrice = this.gasEstimation.gasRangeInGasTokenWei.max.div(this.gasEstimation.gas);
+        break;
+      default:
+        maxGasPrice = BigNumber.from(0);
+    }
 
     const array = new Uint8Array(32);
     window.crypto.getRandomValues(array);
@@ -224,8 +243,8 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
       this.paymentToken.address,
       convertAmountToRawAmount(this.paymentAmount, this.paymentToken.decimals),
       this.payeeAddress,
-      this.executionGas,
-      '15000000000', // TODO: this.maxGasPrice,
+      Number(this.gasEstimation.gas),
+      String(maxGasPrice),
       this.selectedGasToken.address,
       salt,
       Math.round(this.paymentDate.getTime() / 1000),
