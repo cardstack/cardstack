@@ -5,12 +5,6 @@ import { getOwner } from '@ember/application';
 import Service, { inject as service } from '@ember/service';
 import { tracked } from '@glimmer/tracking';
 
-declare global {
-  interface Window {
-    TEST__AUTH_TOKEN?: string;
-  }
-}
-
 export default class HubAuthenticationService extends Service {
   storage: Storage;
   @service declare wallet: WalletService;
@@ -21,11 +15,6 @@ export default class HubAuthenticationService extends Service {
     this.storage =
       (getOwner(this).lookup('storage:local') as Storage) ||
       window.localStorage;
-    if (config.environment === 'test') {
-      if (window.TEST__AUTH_TOKEN) {
-        this.storage.setItem('authToken', window.TEST__AUTH_TOKEN);
-      }
-    }
   }
 
   async updateAuthenticationValidity() {
