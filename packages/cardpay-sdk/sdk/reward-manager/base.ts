@@ -34,6 +34,7 @@ import BN from 'bn.js';
 import ERC20ABI from '../../contracts/abi/erc-20';
 import { signRewardSafe, createEIP1271VerifyingData } from '../utils/signing-utils';
 import { ZERO_ADDRESS } from '../constants';
+// eslint-disable-next-line node/no-extraneous-import
 import { WithSymbol, RewardTokenBalance } from '@cardstack/cardpay-sdk';
 import { query } from '../utils/graphql';
 import { Signer } from 'ethers';
