@@ -4,7 +4,6 @@ import { networkName } from './utils/general-utils';
 import JsonRpcProvider from '../providers/json-rpc-provider';
 import ethTokenList from '../token-lists/ethereum-tokenlist.json';
 import goerliTokenList from '../token-lists/goerli-tokenlist.json';
-import mumbaiTokenList from '../token-lists/mumbai-tokenlist.json';
 import polygonTokenList from '../token-lists/polygon-tokenlist.json';
 import { type TokenList } from '@uniswap/token-lists';
 import { difference } from 'lodash';
@@ -226,26 +225,6 @@ const constants: {
       'https://matic-mainnet.chainstacklabs.com',
       'https://rpc-mainnet.maticvigil.com',
       'https://rpc-mainnet.matic.quiknode.pro',
-    ],
-  },
-  mumbai: {
-    ...testHubUrl,
-    ...polygonNativeTokens,
-    tokenList: mumbaiTokenList,
-    apiBaseUrl: 'https://api-testnet.polygonscan.com/api',
-    blockExplorer: 'https://mumbai.polygonscan.com',
-    name: 'Mumbai',
-    relayServiceURL: 'https://relay-mumbai.staging.stack.cards/api',
-    chainId: 80001,
-    scheduledPaymentFeeFixedUSD: 0,
-    scheduledPaymentFeePercentage: 0,
-    subgraphURL: 'https://api.thegraph.com/subgraphs/name/cardstack/safe-tools-mumbai',
-    uniswapPairInitCodeHash: '0xe18a34eb0e04b04f7a0ac29a6e80748dca96319b42c54d679cb821dca90c6303', //Result of keccak256(type(UniswapV2Pair).creationCode) from deployed UniswapV2Factory
-    publicRpcUrls: [
-      'https://matic-mumbai.chainstacklabs.com',
-      'https://rpc-mumbai.maticvigil.com',
-      'https://matic-testnet-archive-rpc.bwarelabs.com',
-      'https://polygon-testnet.public.blastapi.io',
     ],
   },
 };
