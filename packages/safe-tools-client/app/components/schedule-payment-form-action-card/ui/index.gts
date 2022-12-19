@@ -205,10 +205,10 @@ export default class SchedulePaymentFormActionCardUI extends Component<Signature
             @onBlur={{set this 'hasBlurredGasToken' true}}
           />
         </BoxelField>
-        <BoxelField @label="Max Gas Fee">
+        <BoxelField @label="Max Gas Cost">
           <BoxelToggleButtonGroup
             data-test-max-gas-toggle
-            @groupDescription="The maximum gas fee you are willing to spend for this payment"
+            @groupDescription="The maximum gas cost you are willing to spend for this payment"
             @name="max-gas-fee"
             @errorMessage={{@maxGasPriceErrorMessage}}
             @invalid={{this.isMaxGasPriceInvalid}}

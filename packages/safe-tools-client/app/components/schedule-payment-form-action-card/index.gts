@@ -17,7 +17,7 @@ import { use, resource } from 'ember-resources';
 import { TrackedObject } from 'tracked-built-ins';
 import { fromWei } from 'web3-utils';
 import not from 'ember-truth-helpers/helpers/not';
-import { convertAmountToRawAmount } from '@cardstack/cardpay-sdk';
+import { convertAmountToNativeDisplay, convertAmountToRawAmount } from '@cardstack/cardpay-sdk';
 import { taskFor } from 'ember-concurrency-ts';
 import { BigNumber } from 'ethers';
 
@@ -190,10 +190,11 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
     (async () => {
       try {
         this.gasEstimation = await this.scheduledPaymentsSdk.getScheduledPaymentGasEstimation(scenario, paymentTokenAddress, selectedGasToken.address);
+        const { gasRangeInGasTokenWei, gasRangeInUSD } = this.gasEstimation;
         state.value = {
-          normal: `Less than ${fromWei(this.gasEstimation.gasRangeInGasTokenWei.normal.toString(), 'ether')} ${selectedGasToken.symbol}`,
-          high: `Less than ${fromWei(this.gasEstimation.gasRangeInGasTokenWei.high.toString(), 'ether')} ${selectedGasToken.symbol}`,
-          max: `Capped at ${fromWei(this.gasEstimation.gasRangeInGasTokenWei.max.toString(), 'ether')} ${selectedGasToken.symbol}`,
+          normal: `Less than ${fromWei(gasRangeInGasTokenWei.normal.toString(), 'ether')} ${selectedGasToken.symbol} (~${convertAmountToNativeDisplay(fromWei(gasRangeInUSD.normal.toString(), 'ether'), 'USD')})`,
+          high: `Less than ${fromWei(gasRangeInGasTokenWei.high.toString(), 'ether')} ${selectedGasToken.symbol} (~${convertAmountToNativeDisplay(fromWei(gasRangeInUSD.high.toString(), 'ether'), 'USD')})`,
+          max: `Capped at ${fromWei(gasRangeInGasTokenWei.max.toString(), 'ether')} ${selectedGasToken.symbol} (~${convertAmountToNativeDisplay(fromWei(gasRangeInUSD.max.toString(), 'ether'), 'USD')})`,
         };
       } catch (error) {
         console.error(error);

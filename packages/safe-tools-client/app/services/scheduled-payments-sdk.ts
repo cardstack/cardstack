@@ -15,10 +15,15 @@ import { task } from 'ember-concurrency-decorators';
 
 import { BigNumber } from 'ethers';
 
+const GAS_RANGE_NORMAL_MULTIPLIER = 2;
+const GAS_RANGE_HIGH_MULTIPLIER = 4;
+const GAS_RANGE_MAX_MULTIPLIER = 6;
+
 export type GasRange = Record<'normal' | 'high' | 'max', BigNumber>;
 export interface GasEstimationResult {
   gas: BigNumber;
   gasRangeInGasTokenWei: GasRange;
+  gasRangeInUSD: GasRange;
 }
 
 export default class SchedulePaymentSDKService extends Service {
@@ -73,20 +78,30 @@ export default class SchedulePaymentSDKService extends Service {
       tokenAddress,
       gasTokenAddress
     );
-    const gasRangeInWei = gasEstimationResult.gasRangeInWei;
+    const { gasRangeInWei, gasRangeInUSD } = gasEstimationResult;
     const priceWeiInGasToken = String(
       await getNativeWeiInToken(
         new Web3Provider(this.wallet.web3.currentProvider),
         gasTokenAddress
       )
     );
-
     return {
       gas: gasEstimationResult.gas,
       gasRangeInGasTokenWei: {
-        normal: gasRangeInWei.standard.mul(priceWeiInGasToken).mul(2),
-        high: gasRangeInWei.standard.mul(priceWeiInGasToken).mul(4),
-        max: gasRangeInWei.standard.mul(priceWeiInGasToken).mul(6),
+        normal: gasRangeInWei.standard
+          .mul(priceWeiInGasToken)
+          .mul(GAS_RANGE_NORMAL_MULTIPLIER),
+        high: gasRangeInWei.standard
+          .mul(priceWeiInGasToken)
+          .mul(GAS_RANGE_HIGH_MULTIPLIER),
+        max: gasRangeInWei.standard
+          .mul(priceWeiInGasToken)
+          .mul(GAS_RANGE_MAX_MULTIPLIER),
+      },
+      gasRangeInUSD: {
+        normal: gasRangeInUSD.standard.mul(GAS_RANGE_NORMAL_MULTIPLIER),
+        high: gasRangeInUSD.standard.mul(GAS_RANGE_HIGH_MULTIPLIER),
+        max: gasRangeInUSD.standard.mul(GAS_RANGE_MAX_MULTIPLIER),
       },
     };
   }
