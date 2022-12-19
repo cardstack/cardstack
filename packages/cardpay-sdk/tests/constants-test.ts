@@ -20,7 +20,6 @@ describe('Network constants', () => {
       kovan: 42,
       goerli: 5,
       polygon: 137,
-      mumbai: 80001,
       mainnet: 1,
       gnosis: 100,
     });
@@ -31,7 +30,6 @@ describe('Network constants', () => {
       42: 'kovan',
       5: 'goerli',
       137: 'polygon',
-      80001: 'mumbai',
       1: 'mainnet',
       100: 'gnosis',
     });
