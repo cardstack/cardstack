@@ -119,7 +119,7 @@ describe('isSupportedChain', () => {
 
 describe('isSchedulerSupportedChain', () => {
   const supportedChainNames = ['mainnet', 'goerli'];
-  const supportedChainIds = [5, 80001];
+  const supportedChainIds = [5];
 
   const unsupportedChains = ['kovan', 'gnosis'];
   const nonExistingChains = ['foo', 'bar'];

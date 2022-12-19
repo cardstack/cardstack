@@ -26,7 +26,7 @@ export const supportedChainsArray = Object.values(supportedChains).flat();
 export const schedulerSupportedChainsArray = difference(supportedChainsArray, [...supportedChains.gnosis, 'mumbai']);
 
 export type CardPayCapableNetworks = 'sokol' | 'gnosis';
-export type SchedulerCapableNetworks = 'mainnet' | 'goerli' | 'polygon' | 'mumbai';
+export type SchedulerCapableNetworks = 'mainnet' | 'goerli' | 'polygon';
 export type CardPayRequiredLayer1Networks = 'kovan' | 'mainnet';
 export type SchedulerAndCardPayL1Networks = CardPayRequiredLayer1Networks & SchedulerCapableNetworks;
 
