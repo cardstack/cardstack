@@ -3,7 +3,6 @@ import FreestyleUsage from 'ember-freestyle/components/freestyle/usage';
 import BoxelCardCatalogTrayItem from './index';
 import BoxelSearchbox from '../searchbox';
 import { action } from '@ember/object';
-//@ts-expect-error glint does not think array is consumed-but it is consumed in the template https://github.com/typed-ember/glint/issues/374
 import { array, fn } from '@ember/helper';
 import { on } from '@ember/modifier';
 import { tracked } from '@glimmer/tracking';

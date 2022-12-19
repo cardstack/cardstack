@@ -1,6 +1,11 @@
 import { truncateMiddle } from '@cardstack/ember-shared/helpers/truncate-middle';
+import SafesService, {
+  Safe,
+  TokenBalance,
+} from '@cardstack/safe-tools-client/services/safes';
 import { click, settled, TestContext, visit } from '@ember/test-helpers';
 import percySnapshot from '@percy/ember';
+import { BN } from 'bn.js';
 import { module, test } from 'qunit';
 
 import {
@@ -11,6 +16,35 @@ import {
 
 module('Acceptance | wallet connection', function (hooks) {
   setupApplicationTest(hooks);
+
+  hooks.beforeEach(function (this: TestContext) {
+    const safesService = this.owner.lookup('service:safes') as SafesService;
+
+    safesService.fetchSafes = (): Promise<Safe[]> => {
+      return Promise.resolve([
+        {
+          address: '0x458Bb61A22A0e91855d6D876C88706cfF7bD486E',
+          spModuleAddress: '0xa6b71e26c5e0845f74c812102ca7114b6a896ab2',
+        },
+      ]);
+    };
+
+    safesService.fetchTokenBalances = (): Promise<TokenBalance[]> => {
+      return Promise.resolve([
+        {
+          symbol: 'ETH',
+          balance: new BN('1000000000000000000'),
+          decimals: 18,
+          isNativeToken: true,
+        } as unknown as TokenBalance,
+        {
+          symbol: 'USDT',
+          balance: new BN('10000000'),
+          decimals: 6,
+        } as unknown as TokenBalance,
+      ]);
+    };
+  });
 
   module('With Metamask', function () {
     // eslint-disable-next-line qunit/require-expect
@@ -40,12 +74,17 @@ module('Acceptance | wallet connection', function (hooks) {
         .dom('[data-test-wallet-address]')
         .doesNotContainText(truncateMiddle([TEST_ACCOUNT_1]));
 
+      assert.dom('[data-test-safe-address-label]').hasText('0x458B...486E');
+      assert.dom('[data-test-token-balance="ETH"]').hasText('1 ETH');
+      assert.dom('[data-test-token-balance="USDT"]').hasText('10 USDT');
+
       await click('[data-test-disconnect-button]');
 
       assert.dom('[data-test-wallet-address]').doesNotExist();
 
       assert.dom('[data-test-connect-button]').exists();
       assert.dom('[data-test-disconnect-button]').doesNotExist();
+      assert.dom('[data-test-safe-address-label]').doesNotExist();
     });
   });
 
@@ -69,6 +108,10 @@ module('Acceptance | wallet connection', function (hooks) {
       assert
         .dom('[data-test-wallet-address]')
         .hasText(truncateMiddle([TEST_ACCOUNT_2]));
+
+      assert.dom('[data-test-safe-address-label]').hasText('0x458B...486E');
+      assert.dom('[data-test-token-balance="ETH"]').hasText('1 ETH');
+      assert.dom('[data-test-token-balance="USDT"]').hasText('10 USDT');
     });
   });
 

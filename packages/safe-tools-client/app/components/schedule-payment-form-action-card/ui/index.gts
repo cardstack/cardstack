@@ -13,8 +13,10 @@ import { SelectableToken } from '@cardstack/boxel/components/boxel/input/selecta
 import { fn } from '@ember/helper';
 import { on } from '@ember/modifier';
 import { svgJar } from '@cardstack/boxel/utils/svg-jar';
+import { tracked } from '@glimmer/tracking';
 import eq from 'ember-truth-helpers/helpers/eq';
 import not from 'ember-truth-helpers/helpers/not';
+import set from 'ember-set-helper/helpers/set';
 import './index.css';
 import { MaxGasFeeOption, ValidatableForm } from '../validator';
 
@@ -23,28 +25,75 @@ interface Signature {
   Args: ValidatableForm & {
     paymentTypeOptions: { id: string, text: string }[];
     onSelectPaymentType: (paymentTypeId: string) => void;
+    isPaymentTypeInvalid: boolean;
+    paymentTypeErrorMessage: string;
     onSetPaymentDate: (day: Day) => void;
     onSetPaymentTime: (time: Time) => void;
     onSelectPaymentDayOfMonth: (val: number) => void;
     onSetMonthlyUntil: (date: Date) => void;
-    isRecipientAddressInvalid: boolean;
-    recipientAddressErrorMessage: string;
+    isPayeeAddressInvalid: boolean;
+    payeeAddressErrorMessage: string;
     onUpdatePaymentAmount: (val: string) => void;
     isPaymentAmountInvalid: boolean;
-    paymentTokenErrorMessage: string;
+    paymentAmountErrorMessage: string;
     paymentTokens: SelectableToken[];
     onUpdatePaymentToken: (val: SelectableToken) => void;
     gasTokens: SelectableToken[];
     onSelectGasToken: (val: SelectableToken) => void;
-    onUpdateMaxGasFee: (val: string) => void;
     maxGasDescriptions?: Record<MaxGasFeeOption, string>;
+    isGasTokenInvalid: boolean;
+    gasTokenErrorMessage: string;
+    onUpdateMaxGasPrice: (val: string) => void;
+    isMaxGasPriceInvalid: boolean;
+    maxGasPriceErrorMessage: string;
     onSchedulePayment: () => void;
     isSubmitEnabled: boolean;
-    onUpdateRecipientAddress: (val: string) => void;
+    onUpdatePayeeAddress: (val: string) => void;
   }
 }
 
 export default class SchedulePaymentFormActionCardUI extends Component<Signature> {
+  @tracked hasBlurredPaymentType = false;
+  @tracked hasBlurredPayeeAddress = false;
+  @tracked hasBlurredPaymentAmount = false;
+  @tracked hasBlurredGasToken = false;
+  @tracked hasBlurredMaxGasPrice = false;
+
+  get isPaymentTypeInvalid() {
+    if (!this.hasBlurredPaymentType) {
+      return false;
+    }
+    return this.args.isPaymentTypeInvalid;
+  }
+
+  get isPayeeAddressInvalid() {
+    if (!this.hasBlurredPayeeAddress) {
+      return false;
+    }
+    return this.args.isPayeeAddressInvalid;
+  }
+
+  get isPaymentAmountInvalid() {
+    if (!this.hasBlurredPaymentAmount) {
+      return false;
+    }
+    return this.args.isPaymentAmountInvalid;
+  }
+
+  get isGasTokenInvalid() {
+    if (!this.hasBlurredGasToken) {
+      return false;
+    }
+    return this.args.isGasTokenInvalid;
+  }
+
+  get isMaxGasPriceInvalid() {
+    if (!this.hasBlurredMaxGasPrice) {
+      return false;
+    }
+    return this.args.isMaxGasPriceInvalid;
+  }
+
   <template>
     <BoxelActionContainer
       class="schedule-payment-form-action-card"
@@ -57,8 +106,11 @@ export default class SchedulePaymentFormActionCardUI extends Component<Signature
             <BoxelRadioInput
               @groupDescription="Select a type of scheduled payment"
               @name="payment-type"
+              @errorMessage={{@paymentTypeErrorMessage}}
+              @invalid={{this.isPaymentTypeInvalid}}
               @items={{@paymentTypeOptions}}
               @checkedId={{@selectedPaymentType}}
+              @onBlur={{set this 'hasBlurredPaymentType' true}}
             as |item|>
               {{#let item.component as |RadioItem|}}
                 <RadioItem @onChange={{fn @onSelectPaymentType item.data.id}} data-test-payment-type={{item.data.id}}>
@@ -72,35 +124,42 @@ export default class SchedulePaymentFormActionCardUI extends Component<Signature
                 <div class="schedule-payment-form-action-card__frequency-fieldset-container">
                   <div class="schedule-payment-form-action-card__when-fields">
                     {{#if (eq @selectedPaymentType 'one-time')}}
-                      <BoxelField @label="Payment Date" @vertical={{true}}>
+                      <BoxelField @label="Payment Date" @vertical={{true}} data-test-payment-date>
                         <BoxelInputDate
                           @value={{@paymentDate}}
                           @onChange={{@onSetPaymentDate}}
+                          @minDate={{@minPaymentDate}}
+                          data-test-input-payment-date
                         />
                       </BoxelField>
-                      <BoxelField @label="Specific Time" @vertical={{true}}>
+                      <BoxelField @label="Specific Time" @vertical={{true}} data-test-specific-payment-time>
                         <BoxelInputTime
                           @value={{@paymentDate}}
                           @onChange={{@onSetPaymentTime}}
+                          @minValue={{@minPaymentTime}}
+                          data-test-input-specific-payment-time
                         />
                       </BoxelField>
                     {{/if}}
                   </div>
                   <div class="schedule-payment-form-action-card__when-fields">
                     {{#if (eq @selectedPaymentType 'monthly')}}
-                      <BoxelField @label="Day of Month" @vertical={{true}}>
+                      <BoxelField @label="Day of Month" @vertical={{true}} data-test-recurring-day-of-month>
                         <RangedNumberPicker
                           @min={{1}}
                           @max={{28}}
                           @icon="calendar"
                           @onChange={{@onSelectPaymentDayOfMonth}}
                           @value={{@paymentDayOfMonth}}
+                          data-test-input-recurring-day-of-month
                         />
                       </BoxelField>
-                      <BoxelField @label="Until" @vertical={{true}}>
+                      <BoxelField @label="Until" @vertical={{true}} data-test-recurring-until>
                         <BoxelInputDate
                           @value={{@monthlyUntil}}
                           @onChange={{@onSetMonthlyUntil}}
+                          @minDate={{@minMonthlyUntil}}
+                          data-test-input-recurring-until
                         />
                       </BoxelField>
                     {{/if}}
@@ -113,11 +172,12 @@ export default class SchedulePaymentFormActionCardUI extends Component<Signature
         <BoxelField @label="Recipient">
           <BoxelInput
             placeholder="Enter Address"
-            data-test-recipient-address-input
-            @value={{@recipientAddress}}
-            @invalid={{@isRecipientAddressInvalid}}
-            @errorMessage={{@recipientAddressErrorMessage}}
-            @onInput={{@onUpdateRecipientAddress}}
+            data-test-payee-address-input
+            @value={{@payeeAddress}}
+            @invalid={{this.isPayeeAddressInvalid}}
+            @errorMessage={{@payeeAddressErrorMessage}}
+            @onInput={{@onUpdatePayeeAddress}}
+            @onBlur={{set this 'hasBlurredPayeeAddress' true}}
           />
         </BoxelField>
         <BoxelField @label="Amount">
@@ -125,20 +185,24 @@ export default class SchedulePaymentFormActionCardUI extends Component<Signature
             data-test-amount-input
             @value={{@paymentAmount}}
             @onInput={{@onUpdatePaymentAmount}}
-            @invalid={{@isPaymentAmountInvalid}}
-            @errorMessage={{@paymentTokenErrorMessage}}
+            @invalid={{this.isPaymentAmountInvalid}}
+            @errorMessage={{@paymentAmountErrorMessage}}
             @token={{@paymentToken}}
             @tokens={{@paymentTokens}}
             @onChooseToken={{@onUpdatePaymentToken}}
+            @onBlurToken={{set this 'hasBlurredPaymentAmount' true}}
           />
         </BoxelField>
         <BoxelField @label="Gas">
           <BoxelTokenSelect
             data-test-gas-token-select
             @placeholder="Choose a Gas Token"
+            @invalid={{this.isGasTokenInvalid}}
+            @errorMessage={{@gasTokenErrorMessage}}
             @value={{@selectedGasToken}}
-            @onChooseToken={{@onSelectGasToken}}
             @tokens={{@gasTokens}}
+            @onChooseToken={{@onSelectGasToken}}
+            @onBlur={{set this 'hasBlurredGasToken' true}}
           />
         </BoxelField>
         <BoxelField @label="Max Gas Fee">
@@ -146,8 +210,12 @@ export default class SchedulePaymentFormActionCardUI extends Component<Signature
             data-test-max-gas-toggle
             @groupDescription="The maximum gas fee you are willing to spend for this payment"
             @name="max-gas-fee"
-            @value={{@maxGasFee}}
-            @onChange={{@onUpdateMaxGasFee}} as |group|
+            @errorMessage={{@maxGasPriceErrorMessage}}
+            @invalid={{this.isMaxGasPriceInvalid}}
+            @value={{@maxGasPrice}}
+            @onChange={{@onUpdateMaxGasPrice}}
+            @onBlur={{set this 'hasBlurredMaxGasPrice' true}}
+            as |group|
           >
             <group.Button @value="normal">
               <div class="schedule-payment-form-action-card--max-gas-fee-name">

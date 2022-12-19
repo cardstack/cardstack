@@ -2,7 +2,7 @@
 
 import { Fetcher, Route, Price } from '@uniswap/sdk';
 import { getAddressByNetwork } from '../../contracts/addresses';
-import { getConstantByNetwork } from '../constants';
+import { getConstantByNetwork, SchedulerCapableNetworks } from '../constants';
 import JsonRpcProvider from '../../providers/json-rpc-provider';
 import { networkName } from './general-utils';
 import BN from 'bn.js';
@@ -16,7 +16,10 @@ async function tokenPairRate(provider: JsonRpcProvider, token1Address: string, t
   let token1 = await Fetcher.fetchTokenData(network.chainId, token1Address, provider as unknown as BaseProvider);
   let token2 = await Fetcher.fetchTokenData(network.chainId, token2Address, provider as unknown as BaseProvider);
 
-  let pair = await Fetcher.fetchPairData(token1, token2, provider as unknown as BaseProvider);
+  let networkName = convertChainIdToName(network.chainId);
+  let uniswapV2Factory = getAddressByNetwork('uniswapV2Factory', networkName);
+  let initCodeHash = getConstantByNetwork('uniswapPairInitCodeHash', networkName as SchedulerCapableNetworks);
+  let pair = await Fetcher.fetchPairData(token1, token2, uniswapV2Factory, initCodeHash, provider);
 
   let route = new Route([pair], token2);
 

@@ -24,7 +24,6 @@
 
 .boxel-input--invalid {
   border-color: var(--boxel-error-100);
-  box-shadow: 0 0 0 1px var(--boxel-error-100);
 }
 
 .boxel-input--invalid:focus {
@@ -45,15 +44,6 @@
   font-style: oblique;
   letter-spacing: var(--boxel-lsp);
   text-align: right;
-}
-
-.boxel-input__error-message {
-  grid-column: 2;
-  margin-top: var(--boxel-sp-xs);
-  margin-left: var(--boxel-sp-xs);
-  color: var(--boxel-error-100);
-  font: var(--boxel-font-sm);
-  letter-spacing: var(--boxel-lsp);
 }
 
 .boxel-input__helper-text {

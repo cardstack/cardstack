@@ -141,19 +141,9 @@
 }
 
 .boxel-input-group__helper-text {
-  grid-column: 2;
   margin-top: var(--boxel-sp-xs);
   margin-left: var(--boxel-sp-xs);
   color: rgb(0 0 0 / 75%);
-  font: var(--boxel-font-sm);
-  letter-spacing: var(--boxel-lsp);
-}
-
-.boxel-input-group__error-message {
-  grid-column: 2;
-  margin-top: var(--boxel-sp-xs);
-  margin-left: var(--boxel-sp-xs);
-  color: var(--boxel-error-100);
   font: var(--boxel-font-sm);
   letter-spacing: var(--boxel-lsp);
 }

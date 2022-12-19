@@ -86,29 +86,14 @@ export default class SafesService extends Service {
     (async () => {
       try {
         if (!this.currentSafe) return;
-        const nativeTokenBalance = new BN(
-          (await ethersProvider.getBalance(this.currentSafe.address)).toString()
-        );
 
-        const tokenBalances = await getTokenBalancesForSafe(
-          ethersProvider,
+        state.value = await this.fetchTokenBalances(
+          this.currentSafe.address,
           tokenAddresses,
-          this.currentSafe.address
+          ethersProvider
         );
-
-        state.value = [
-          {
-            symbol: getConstantByNetwork(
-              'nativeTokenSymbol',
-              this.network.symbol
-            ),
-            balance: nativeTokenBalance as unknown as typeof BN,
-            decimals: 18,
-            isNativeToken: true,
-          },
-          ...tokenBalances,
-        ];
       } catch (error) {
+        console.log(error);
         state.error = error;
       } finally {
         state.isLoading = false;
@@ -125,15 +110,20 @@ export default class SafesService extends Service {
     const address = this.wallet.address;
 
     const state: SafeResourceState = new TrackedObject({
+      error: undefined,
+
       load: async () => {
         if (!address) return;
 
         state.isLoading = true;
 
         try {
-          state.value = await getSafesWithSpModuleEnabled(chainId, address);
+          state.value = await this.fetchSafes(chainId, address);
         } catch (error) {
-          state.error = error;
+          state.error = new Error(
+            'There was an error while fetching your safes. Try switching to this network again, or contact support if the problem persists.'
+          );
+          throw error;
         } finally {
           state.isLoading = false;
         }
@@ -143,4 +133,35 @@ export default class SafesService extends Service {
     state.load();
     return state;
   });
+
+  async fetchTokenBalances(
+    safeAddress: string,
+    tokenAddresses: string[],
+    provider: Web3Provider
+  ): Promise<TokenBalance[]> {
+    const nativeTokenBalance = new BN(
+      (await provider.getBalance(safeAddress)).toString()
+    );
+
+    const tokenBalances = await getTokenBalancesForSafe(
+      provider,
+      tokenAddresses,
+      safeAddress
+    );
+
+    return [
+      {
+        symbol: getConstantByNetwork('nativeTokenSymbol', this.network.symbol),
+        balance: nativeTokenBalance as unknown as typeof BN,
+        decimals: 18,
+        isNativeToken: true,
+      },
+      ...tokenBalances,
+    ];
+  }
+
+  // Wrapped in a method for stubbing in tests
+  async fetchSafes(chainId: number, address: string) {
+    return getSafesWithSpModuleEnabled(chainId, address);
+  }
 }

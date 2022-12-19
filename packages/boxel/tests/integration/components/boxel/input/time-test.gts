@@ -11,6 +11,7 @@ const TRIGGER_SELECTOR = '[data-test-boxel-input-time-trigger]';
 
 class Bindings {
   @tracked value: Time | undefined;
+  @tracked minValue: Time | undefined;
 }
 let bindings: Bindings;
 
@@ -223,5 +224,105 @@ module('Integration | Component | InputTime', function (hooks) {
     assert.dom('[data-test-boxel-minute-menu]').doesNotExist();
     assert.dom('[data-test-boxel-meridian-menu]').doesNotExist();
     assert.dom(TRIGGER_SELECTOR).isFocused();
+  });
+
+  test('disables hours before minValue hour', async function (assert) {
+    bindings.value = new Date(2022, 2, 3, 10, 0);
+    bindings.minValue = new Date(2022, 2, 3, 9, 0);
+
+    await render(<template>
+      <BoxelInputTime @value={{bindings.value}} @minValue={{bindings.minValue}} @onChange={{timeChanged}} />
+    </template>);
+    
+
+    assert.dom(TRIGGER_SELECTOR).containsText('10:00 AM');
+    await click(TRIGGER_SELECTOR);
+
+    assert.dom('[data-test-boxel-hour-menu] .boxel-menu__item--selected [data-test-boxel-menu-item-text="10"]').exists();
+    assert.dom('[data-test-boxel-minute-menu] .boxel-menu__item--selected [data-test-boxel-menu-item-text="00"]').exists();
+    assert.dom('[data-test-boxel-meridian-menu] .boxel-menu__item--selected [data-test-boxel-menu-item-text="am"]').exists();
+
+    //Hours before 9 is disabled
+    assert.dom('[data-test-boxel-hour-menu] .boxel-menu__item--disabled [data-test-boxel-menu-item-text="8"]').exists();
+    assert.dom('[data-test-boxel-hour-menu] .boxel-menu__item--disabled [data-test-boxel-menu-item-text="7"]').exists();
+    assert.dom('[data-test-boxel-hour-menu] .boxel-menu__item--disabled [data-test-boxel-menu-item-text="6"]').exists();
+
+    //Click disabled hour will not update value
+    await click('[data-test-boxel-menu-item-text="6"]');
+    assert.dom('[data-test-boxel-hour-menu] .boxel-menu__item--selected [data-test-boxel-menu-item-text="10"]').exists();
+  });
+
+  test('disables minutes before minValue minute', async function (assert) {
+    bindings.value = new Date(2022, 2, 3, 9, 40);
+    bindings.minValue = new Date(2022, 2, 3, 9, 30);
+
+    await render(<template>
+      <BoxelInputTime @value={{bindings.value}} @minValue={{bindings.minValue}} @onChange={{timeChanged}} />
+    </template>);
+    
+
+    assert.dom(TRIGGER_SELECTOR).containsText('9:40 AM');
+    await click(TRIGGER_SELECTOR);
+
+    assert.dom('[data-test-boxel-hour-menu] .boxel-menu__item--selected [data-test-boxel-menu-item-text="9"]').exists();
+    assert.dom('[data-test-boxel-minute-menu] .boxel-menu__item--selected [data-test-boxel-menu-item-text="40"]').exists();
+    assert.dom('[data-test-boxel-meridian-menu] .boxel-menu__item--selected [data-test-boxel-menu-item-text="am"]').exists();
+
+    //Minutes before 30 is disabled
+    assert.dom('[data-test-boxel-minute-menu] .boxel-menu__item--disabled [data-test-boxel-menu-item-text="25"]').exists();
+    assert.dom('[data-test-boxel-minute-menu] .boxel-menu__item--disabled [data-test-boxel-menu-item-text="20"]').exists();
+    assert.dom('[data-test-boxel-minute-menu] .boxel-menu__item--disabled [data-test-boxel-menu-item-text="15"]').exists();
+
+    //Click disabled minute will not update value
+    await click('[data-test-boxel-menu-item-text="25"]');
+    assert.dom('[data-test-boxel-minute-menu] .boxel-menu__item--selected [data-test-boxel-menu-item-text="40"]').exists();
+  });
+
+  test('disables meridian AM if minValue more than 11:59 AM', async function (assert) {
+    bindings.value = new Date(2022, 2, 3, 13, 0);
+    bindings.minValue = new Date(2022, 2, 3, 12, 0);
+
+    await render(<template>
+      <BoxelInputTime @value={{bindings.value}} @minValue={{bindings.minValue}} @onChange={{timeChanged}} />
+    </template>);
+    
+
+    assert.dom(TRIGGER_SELECTOR).containsText('1:00 PM');
+    await click(TRIGGER_SELECTOR);
+
+    assert.dom('[data-test-boxel-hour-menu] .boxel-menu__item--selected [data-test-boxel-menu-item-text="1"]').exists();
+    assert.dom('[data-test-boxel-minute-menu] .boxel-menu__item--selected [data-test-boxel-menu-item-text="00"]').exists();
+    assert.dom('[data-test-boxel-meridian-menu] .boxel-menu__item--selected [data-test-boxel-menu-item-text="pm"]').exists();
+
+    //AM is disabled
+    assert.dom('[data-test-boxel-meridian-menu] .boxel-menu__item--disabled [data-test-boxel-menu-item-text="am"]').exists();
+
+    await click('[data-test-boxel-menu-item-text="am"]');
+    assert.dom('[data-test-boxel-meridian-menu] .boxel-menu__item--selected [data-test-boxel-menu-item-text="pm"]').exists();
+  });
+
+  test('if meridian update to AM and results value lower than minValue, then value will be equal with minValue', async function (assert) {
+    bindings.value = new Date(2022, 2, 3, 13, 0);
+    bindings.minValue = new Date(2022, 2, 3, 9, 0);
+
+    await render(<template>
+      <BoxelInputTime @value={{bindings.value}} @minValue={{bindings.minValue}} @onChange={{timeChanged}} />
+    </template>);
+    
+
+    assert.dom(TRIGGER_SELECTOR).containsText('1:00 PM');
+    await click(TRIGGER_SELECTOR);
+
+    assert.dom('[data-test-boxel-hour-menu] .boxel-menu__item--selected [data-test-boxel-menu-item-text="1"]').exists();
+    assert.dom('[data-test-boxel-minute-menu] .boxel-menu__item--selected [data-test-boxel-menu-item-text="00"]').exists();
+    assert.dom('[data-test-boxel-meridian-menu] .boxel-menu__item--selected [data-test-boxel-menu-item-text="pm"]').exists();
+
+    //Update meridian to AM
+    //value will be equal with minValue
+    //Because 01:00 AM is lower than minValue 09:00 AM
+    await click('[data-test-boxel-menu-item-text="am"]');
+    assert.dom('[data-test-boxel-hour-menu] .boxel-menu__item--selected [data-test-boxel-menu-item-text="9"]').exists();
+    assert.dom('[data-test-boxel-minute-menu] .boxel-menu__item--selected [data-test-boxel-menu-item-text="00"]').exists();
+    assert.dom('[data-test-boxel-meridian-menu] .boxel-menu__item--selected [data-test-boxel-menu-item-text="am"]').exists();
   });
 });

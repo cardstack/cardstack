@@ -1,6 +1,5 @@
 import Component from '@glimmer/component';
-//@ts-expect-error glint does not think array is consumed-but it is consumed in the template https://github.com/typed-ember/glint/issues/374
-import { fn, array } from '@ember/helper';
+import { fn } from '@ember/helper';
 import FreestyleUsage from 'ember-freestyle/components/freestyle/usage';
 
 import BoxelDropdownTrigger from './index';

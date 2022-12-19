@@ -1,0 +1,8 @@
+.boxel-input-error-message {
+  grid-column: 2; /* to position when inside a Boxel::Field */
+  margin-top: var(--boxel-sp-xs);
+  margin-left: var(--boxel-sp-xs);
+  color: var(--boxel-error-100);
+  font: var(--boxel-font-sm);
+  letter-spacing: var(--boxel-lsp);
+}

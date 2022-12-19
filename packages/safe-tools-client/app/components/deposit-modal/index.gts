@@ -28,7 +28,7 @@ interface Signature {
   Args: {
     isOpen: boolean;
     onClose: () => void;
-    safeAddress: string;
+    safeAddress: string | undefined;
     networkName: string;
     tokensToCover?: {
       nextMonth: MonthlyTokensToCover;

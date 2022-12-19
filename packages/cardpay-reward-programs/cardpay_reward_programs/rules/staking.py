@@ -143,6 +143,6 @@ class Staking(Rule):
             "token": self.token,
             "rollover_amount": payment.get("rollover_amount"),
             "interest_rate": self.interest_rate_monthly,
-            "from_block": self.start_block,
-            "end_block": self.end_block,
+            "from_block": payment["paymentCycle"] - self.payment_cycle_length,
+            "to_block": payment["paymentCycle"],
         }

@@ -13,3 +13,10 @@ Currently we are indexing safes that users provision using the safe tools interf
 
 1. `yarn build --network <NETWORK>`
 2. `yarn deploy:<NETWORK> --access-token <TOKEN>`
+
+### ⚠️ Deploying polygon network
+
+Since matic network renamed to polygon, there is an inconsistency with the naming. Please use the following commands to deploy the polygon subgraph:
+
+1. `yarn graph build --network matic`
+2. `yarn deploy:polygon --access-token <TOKEN>`.

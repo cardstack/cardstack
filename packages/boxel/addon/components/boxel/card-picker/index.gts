@@ -56,7 +56,7 @@ export default class BoxelCardPicker extends Component<Signature> {
         class={{cn "boxel-card-picker__select" boxel-card-picker__select--selected=this.isSelected}}
         @options={{@items}}
         @selected={{this.selectedOption}}
-        @selectedItemComponent={{component SelectedItemComponent}}
+        @selectedItemComponent={{SelectedItemComponent}}
         @placeholder="Select Card"
         @onChange={{@chooseItem}}
         @dropdownClass="boxel-card-picker__dropdown"

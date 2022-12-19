@@ -74,3 +74,17 @@
 .boxel-radio-option__focused-item {
   outline: 1px solid var(--boxel-outline-color);
 }
+
+/* stylelint-disable-next-line no-descending-specificity */
+.boxel-radio-input--invalid .boxel-radio-option {
+  box-shadow: 0 0 0 1px var(--boxel-error-100);
+}
+
+.boxel-radio-input--invalid .boxel-radio-option:focus {
+  outline: 1px solid transparent;  /* Make sure that we make the invalid state visible */
+  box-shadow: 0 0 0 1.5px var(--boxel-error-100);
+}
+
+.boxel-radio-input--invalid .boxel-radio-option:hover:not(:disabled) {
+  box-shadow: 0 0 0 1px var(--boxel-error-100);
+}

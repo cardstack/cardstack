@@ -4,8 +4,7 @@ import BoxelCalendar, { Day } from '../../calendar';
 import BoxelDropdownTrigger from '../../dropdown/trigger';
 import registerElement from '@cardstack/boxel/modifiers/register-element';
 import set from 'ember-set-helper/helpers/set';
-//@ts-expect-error glint does not think this is consumed-but it is consumed in the template https://github.com/typed-ember/glint/issues/374
-import { fn, array, hash } from '@ember/helper';
+import { fn } from '@ember/helper';
 import { default as Owner } from '@ember/owner';
 
 import '@cardstack/boxel/styles/global.css';
@@ -16,6 +15,7 @@ export { Day };
 interface ComponentArgs {
   value?: Day;
   onChange: (val: Day) => void;
+  minDate?: Day;
 }
 
 interface Signature {
@@ -46,6 +46,7 @@ export default class BoxelInputDate extends Component<Signature> {
         <BoxelDropdownTrigger
           @icon="calendar"
           @label={{this.dateString}}
+          {{!-- @glint-expect-error: the modifier rejects non-button elements but this can’t tell it’s not an anchor --}}
           {{bindings}}
           {{registerElement (set this 'triggerElement')}}
           class="boxel-input-date__trigger"
@@ -63,6 +64,7 @@ export default class BoxelInputDate extends Component<Signature> {
             @onSelect={{@onChange}}
             @center={{this.center}}
             @onCenterChange={{fn (mut this.center)}}
+            @minDate={{@minDate}}
           />
         </div>
       </:content>

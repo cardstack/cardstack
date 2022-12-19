@@ -1,5 +1,4 @@
 import { SelectableToken } from '@cardstack/boxel/components/boxel/input/selectable-token';
-import { tracked } from '@glimmer/tracking';
 import { isAddress } from 'web3-utils';
 
 function isNumeric(str: unknown) {
@@ -14,23 +13,21 @@ export type MaxGasFeeOption = 'normal' | 'high' | 'max';
 
 export interface ValidatableForm {
   selectedPaymentType: 'one-time' | 'monthly' | undefined;
+  minPaymentDate: Date;
+  minPaymentTime: Date;
   paymentDate: Date | undefined;
   paymentDayOfMonth: number | undefined;
+  minMonthlyUntil: Date;
   monthlyUntil: Date | undefined;
-  recipientAddress: string;
+  payeeAddress: string;
   paymentAmount: string;
   paymentToken: SelectableToken | undefined;
   selectedGasToken: SelectableToken | undefined;
-  maxGasFee: MaxGasFeeOption | undefined;
+  maxGasPrice: 'normal' | 'high' | 'max' | undefined;
 }
 
 export default class SchedulePaymentFormValidator {
   form: ValidatableForm;
-
-  @tracked isRecipientAddressInvalid = false;
-  @tracked recipientAddressErrorMessage = '';
-  @tracked isPaymentAmountInvalid = false;
-  @tracked paymentTokenErrorMessage = '';
 
   constructor(form: ValidatableForm) {
     this.form = form;
@@ -41,37 +38,88 @@ export default class SchedulePaymentFormValidator {
   get isValid() {
     return (
       this.isPaymentTypeValid &&
-      this.isRecipientValid &&
+      this.isPayeeAddressValid &&
       this.isAmountValid &&
       this.isGasTokenValid &&
-      this.isMaxGasFeeValid
+      this.isMaxGasPriceValid
     );
   }
 
-  private get isPaymentTypeValid(): boolean {
+  get isPaymentTypeValid(): boolean {
+    return this.paymentTypeErrorMessage === '';
+  }
+
+  get paymentTypeErrorMessage(): string {
     const { form } = this;
     if (form.selectedPaymentType === 'one-time') {
-      return !!form.paymentDate;
+      if (!form.paymentDate) {
+        return 'must choose a payment date and time';
+      }
+    } else if (form.selectedPaymentType === 'monthly') {
+      if (!form.paymentDayOfMonth) {
+        return 'must choose a payment day of month';
+      }
+      if (!form.monthlyUntil) {
+        return 'must choose an until date';
+      }
+    } else {
+      return 'must choose a payment type';
     }
-    if (form.selectedPaymentType === 'monthly') {
-      return !!form.monthlyUntil && !form.paymentDayOfMonth;
-    }
-    return false;
+    return '';
   }
 
-  private get isRecipientValid(): boolean {
-    return isAddress(this.form.recipientAddress);
+  get isPayeeAddressValid(): boolean {
+    return this.payeeAddressErrorMessage === '';
   }
 
-  private get isAmountValid(): boolean {
+  get payeeAddressErrorMessage(): string {
+    const { payeeAddress } = this.form;
+    if (payeeAddress === '') {
+      return "can't be blank";
+    }
+    if (!isAddress(payeeAddress)) {
+      return 'must be a valid chain address';
+    }
+    return '';
+  }
+
+  get isAmountValid(): boolean {
+    return this.amountErrorMessage === '';
     return isNumeric(this.form.paymentAmount) && !!this.form.paymentToken;
   }
 
-  private get isGasTokenValid(): boolean {
-    return !!this.form.selectedGasToken;
+  get amountErrorMessage(): string {
+    if (this.form.paymentAmount === '') {
+      return "can't be blank";
+    }
+    if (!isNumeric(this.form.paymentAmount)) {
+      return 'must be numeric';
+    }
+    if (!this.form.paymentToken) {
+      return 'must choose a token for the payment';
+    }
+    return '';
   }
 
-  private get isMaxGasFeeValid(): boolean {
-    return !!this.form.maxGasFee;
+  get isGasTokenValid(): boolean {
+    return this.gasTokenErrorMessage === '';
+  }
+
+  get gasTokenErrorMessage() {
+    if (!this.form.selectedGasToken) {
+      return 'must choose a token to be used to pay for gas';
+    }
+    return '';
+  }
+
+  get isMaxGasPriceValid(): boolean {
+    return this.maxGasPriceErrorMessage === '';
+  }
+
+  get maxGasPriceErrorMessage(): string {
+    if (!this.form.maxGasPrice) {
+      return 'must choose a maximum gas fee to allow';
+    }
+    return '';
   }
 }

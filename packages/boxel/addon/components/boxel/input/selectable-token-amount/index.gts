@@ -4,6 +4,7 @@ import './index.css';
 import BoxelInputGroup from '../../input-group';
 import SelectableTokenItem from '../selectable-token-item';
 import { fn } from '@ember/helper';
+import { action } from '@ember/object';
 import { guidFor } from '@ember/object/internals';
 import cn from '@cardstack/boxel/helpers/cn';
 import { SelectableToken } from '../selectable-token';
@@ -17,10 +18,11 @@ interface Signature {
     helperText?: string;
     invalid: boolean;
     errorMessage: string;
-    onInput: (amount: string) => void;
-    onChooseToken: (token: SelectableToken) => void;
     token: SelectableToken | undefined;
     tokens: SelectableToken[];
+    onInput: (amount: string) => void;
+    onChooseToken: (token: SelectableToken) => void;
+    onBlurToken?: (event: FocusEvent) => void
   };
   Blocks: {
     'default': [],
@@ -30,6 +32,9 @@ interface Signature {
 export default class SelectableTokenAmount extends Component<Signature> {
   get id() {
     return this.args.id || guidFor(this);
+  }
+  @action onBlurToken(_select: any, ev: FocusEvent): void {
+    return this.args.onBlurToken?.(ev);
   }
   
   <template>
@@ -57,6 +62,7 @@ export default class SelectableTokenAmount extends Component<Signature> {
           @searchField="symbol"
           @disabled={{@disabled}}
           @onChange={{@onChooseToken}}
+          @onBlur={{this.onBlurToken}}
           @dropdownClass="boxel-input-selectable-token-amount__dropdown"
           @verticalPosition="below" as |item itemCssClass|
         >

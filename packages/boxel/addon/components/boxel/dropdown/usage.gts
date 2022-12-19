@@ -1,7 +1,6 @@
 import Component from '@glimmer/component';
 
 import { action } from '@ember/object';
-//@ts-expect-error glint does not think array is consumed-but it is consumed in the template https://github.com/typed-ember/glint/issues/374
 import { fn, array } from '@ember/helper';
 import FreestyleUsage from 'ember-freestyle/components/freestyle/usage';
 
@@ -30,6 +29,7 @@ export default class BoxelDropdownUsage extends Component {
       <:example>
         <BoxelDropdown>
           <:trigger as |bindings|>
+            {{!-- @glint-expect-error: the modifier rejects non-button elements but this can’t tell it’s not an anchor --}}
             <BoxelButton {{bindings}}>
               Trigger
             </BoxelButton>
