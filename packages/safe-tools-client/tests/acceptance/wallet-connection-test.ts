@@ -103,6 +103,10 @@ module('Acceptance | wallet connection', function (hooks) {
 
       await waitFor('[data-test-hub-auth-modal]');
       await click('[data-test-hub-auth-modal] button');
+
+      const storage = this.owner.lookup('storage:local') as Storage;
+      assert.strictEqual(storage.getItem('authToken'), 'auth-token-1337');
+
       assert.dom('[data-test-hub-auth-modal]').doesNotExist();
       await click('[data-test-disconnect-button]');
 
