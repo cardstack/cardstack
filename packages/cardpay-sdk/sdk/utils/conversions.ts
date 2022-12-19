@@ -1,7 +1,9 @@
 /*global fetch */
 
-import { Pair, Route } from '@uniswap/v2-sdk';
+/* eslint-disable node/no-extraneous-import */
 import { Token, CurrencyAmount, Price, Fraction } from '@uniswap/sdk-core';
+
+import { Pair, Route } from '@uniswap/v2-sdk';
 import { getAddressByNetwork } from '../../contracts/addresses';
 import { getConstantByNetwork, SchedulerCapableNetworks } from '../constants';
 import JsonRpcProvider from '../../providers/json-rpc-provider';
