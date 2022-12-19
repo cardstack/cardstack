@@ -4,7 +4,7 @@ import {
   getSDK,
   Web3Provider,
   ScheduledPaymentModule,
-  getNativeWeiInToken
+  getNativeWeiInToken,
 } from '@cardstack/cardpay-sdk';
 import WalletService from '@cardstack/safe-tools-client/services/wallet';
 
@@ -17,8 +17,8 @@ import { BigNumber } from 'ethers';
 
 export type GasRange = Record<'normal' | 'high' | 'max', BigNumber>;
 export interface GasEstimationResult {
-  gas: BigNumber,
-  gasRangeInGasTokenWei: GasRange
+  gas: BigNumber;
+  gasRangeInGasTokenWei: GasRange;
 }
 
 export default class SchedulePaymentSDKService extends Service {
@@ -74,7 +74,12 @@ export default class SchedulePaymentSDKService extends Service {
       gasTokenAddress
     );
     const gasRangeInWei = gasEstimationResult.gasRangeInWei;
-    let priceWeiInGasToken = String(await getNativeWeiInToken(new Web3Provider(this.wallet.web3.currentProvider), gasTokenAddress));
+    const priceWeiInGasToken = String(
+      await getNativeWeiInToken(
+        new Web3Provider(this.wallet.web3.currentProvider),
+        gasTokenAddress
+      )
+    );
 
     return {
       gas: gasEstimationResult.gas,
@@ -82,7 +87,7 @@ export default class SchedulePaymentSDKService extends Service {
         normal: gasRangeInWei.standard.mul(priceWeiInGasToken).mul(2),
         high: gasRangeInWei.standard.mul(priceWeiInGasToken).mul(4),
         max: gasRangeInWei.standard.mul(priceWeiInGasToken).mul(6),
-      }
+      },
     };
   }
 

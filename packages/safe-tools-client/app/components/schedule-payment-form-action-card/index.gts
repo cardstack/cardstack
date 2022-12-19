@@ -38,10 +38,7 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
   @service declare tokens: TokensService;
   @service declare scheduledPaymentsSdk: ScheduledPaymentsSdkService;
   validator = new SchedulePaymentFormValidator(this);
-  gasEstimation: GasEstimationResult = {
-    gas: BigNumber.from(0),
-    gasRangeInGasTokenWei: {}
-  };
+  gasEstimation?: GasEstimationResult;
 
   get paymentTypeOptions() {
     return [
@@ -215,19 +212,21 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
     if (!this.paymentDate) return;
     if (!this.paymentToken) return;
     if (!this.selectedGasToken) return;
+    if (!this.gasEstimation) return;
     if (Number(this.gasEstimation.gas) <= 0) return;
-    if (Object.keys(this.gasEstimation.gasRangeInGasTokenWei).length <= 0) return;
+    const { gasRangeInGasTokenWei } = this.gasEstimation;
+    if (Object.keys(gasRangeInGasTokenWei).length <= 0) return;
 
     let maxGasPrice;
     switch(this.maxGasPrice) {
       case "normal":
-        maxGasPrice = this.gasEstimation.gasRangeInGasTokenWei.normal.div(this.gasEstimation.gas);
+        maxGasPrice = gasRangeInGasTokenWei.normal.div(this.gasEstimation.gas);
         break;
       case "high":
-        maxGasPrice = this.gasEstimation.gasRangeInGasTokenWei.high.div(this.gasEstimation.gas);
+        maxGasPrice = gasRangeInGasTokenWei.high.div(this.gasEstimation.gas);
         break;
       case "max":
-        maxGasPrice = this.gasEstimation.gasRangeInGasTokenWei.max.div(this.gasEstimation.gas);
+        maxGasPrice = gasRangeInGasTokenWei.max.div(this.gasEstimation.gas);
         break;
       default:
         maxGasPrice = BigNumber.from(0);
