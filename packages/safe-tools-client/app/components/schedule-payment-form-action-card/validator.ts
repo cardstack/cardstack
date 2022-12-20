@@ -9,6 +9,8 @@ function isNumeric(str: unknown) {
   ); // ...and ensure strings of whitespace fail
 }
 
+export type MaxGasFeeOption = 'normal' | 'high' | 'max';
+
 export interface ValidatableForm {
   selectedPaymentType: 'one-time' | 'monthly' | undefined;
   minPaymentDate: Date;

@@ -2,29 +2,43 @@ import Component from '@glimmer/component';
 import SchedulePaymentFormActionCardUI from './ui';
 import { SelectableToken } from '@cardstack/boxel/components/boxel/input/selectable-token';
 import { inject as service } from '@ember/service';
+import NetworkService from '../../services/network';
 import SafesService from '../../services/safes';
-import ScheduledPaymentsSdkService from '../../services/scheduled-payments-sdk';
+import ScheduledPaymentsSdkService, { GasEstimationResult } from '../../services/scheduled-payments-sdk';
 import TokensService from '../../services/tokens';
+import WalletService from '../../services/wallet';
 import { action } from '@ember/object';
 import { tracked } from '@glimmer/tracking';
 import { Day } from '@cardstack/boxel/components/boxel/input/date';
 import { Time } from '@cardstack/boxel/components/boxel/input/time';
 import withTokenIcons from '../../helpers/with-token-icons';
-import SchedulePaymentFormValidator, { ValidatableForm } from './validator';
+import SchedulePaymentFormValidator, { MaxGasFeeOption, ValidatableForm } from './validator';
+import { use, resource } from 'ember-resources';
+import { TrackedObject } from 'tracked-built-ins';
+import { fromWei } from 'web3-utils';
 import not from 'ember-truth-helpers/helpers/not';
-import { convertAmountToRawAmount } from '@cardstack/cardpay-sdk';
+import { convertAmountToNativeDisplay, convertAmountToRawAmount } from '@cardstack/cardpay-sdk';
 import { taskFor } from 'ember-concurrency-ts';
+import { BigNumber } from 'ethers';
 
 interface Signature {
   Element: HTMLElement;
 }
+interface MaxGasDescriptionsState {
+  isLoading: boolean;
+  isIndeterminate: boolean;
+  value?: Record<MaxGasFeeOption, string>
+  error?: Error
+}
 
 export default class SchedulePaymentFormActionCard extends Component<Signature> implements ValidatableForm {
+  @service declare network: NetworkService;
+  @service declare wallet: WalletService;
   @service declare safes: SafesService;
   @service declare tokens: TokensService;
   @service declare scheduledPaymentsSdk: ScheduledPaymentsSdkService;
   validator = new SchedulePaymentFormValidator(this);
-  executionGas = 1000; // TODO: this should be set by code that populates Max Gas Options
+  gasEstimation?: GasEstimationResult;
 
   get paymentTypeOptions() {
     return [
@@ -147,6 +161,51 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
     return this.validator.isValid;
   }
 
+  @use maxGasDescriptions = resource(() => {
+    const state: MaxGasDescriptionsState = new TrackedObject({
+      isLoading: true,
+      isIndeterminate: false
+    });
+    if (!this.wallet.isConnected) {
+      state.isIndeterminate = true;
+      return state;
+    }
+    let { selectedGasToken } = this;
+    if (!selectedGasToken) {
+      state.isIndeterminate = true;
+      return state;
+    }
+    let paymentTokenAddress = this.paymentToken?.address;
+    if (!paymentTokenAddress) {
+      state.isIndeterminate = true;
+      return state;
+    }
+    if (!this.selectedPaymentType) {
+      state.isIndeterminate = true;
+      return state;
+    }
+    // because networkInfo is tracked, anytime the network switches,
+    // this resource will re-run
+    const scenario = this.selectedPaymentType === 'one-time' ? 'execute_one_time_payment' : 'execute_recurring_payment';
+    (async () => {
+      try {
+        this.gasEstimation = await this.scheduledPaymentsSdk.getScheduledPaymentGasEstimation(scenario, paymentTokenAddress, selectedGasToken.address);
+        const { gasRangeInGasTokenWei, gasRangeInUSD } = this.gasEstimation;
+        state.value = {
+          normal: `Less than ${fromWei(gasRangeInGasTokenWei.normal.toString(), 'ether')} ${selectedGasToken.symbol} (~${convertAmountToNativeDisplay(fromWei(gasRangeInUSD.normal.toString(), 'ether'), 'USD')})`,
+          high: `Less than ${fromWei(gasRangeInGasTokenWei.high.toString(), 'ether')} ${selectedGasToken.symbol} (~${convertAmountToNativeDisplay(fromWei(gasRangeInUSD.high.toString(), 'ether'), 'USD')})`,
+          max: `Capped at ${fromWei(gasRangeInGasTokenWei.max.toString(), 'ether')} ${selectedGasToken.symbol} (~${convertAmountToNativeDisplay(fromWei(gasRangeInUSD.max.toString(), 'ether'), 'USD')})`,
+        };
+      } catch (error) {
+        console.error(error);
+        state.error = error;
+      } finally {
+        state.isLoading = false;
+      }
+    })();
+    return state;
+  });
+
   @action
   async schedulePayment() {
     let { currentSafe } = this.safes;
@@ -154,6 +213,25 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
     if (!this.paymentDate) return;
     if (!this.paymentToken) return;
     if (!this.selectedGasToken) return;
+    if (!this.gasEstimation) return;
+    if (Number(this.gasEstimation.gas) <= 0) return;
+    const { gasRangeInGasTokenWei } = this.gasEstimation;
+    if (Object.keys(gasRangeInGasTokenWei).length <= 0) return;
+
+    let maxGasPrice;
+    switch(this.maxGasPrice) {
+      case "normal":
+        maxGasPrice = gasRangeInGasTokenWei.normal.div(this.gasEstimation.gas);
+        break;
+      case "high":
+        maxGasPrice = gasRangeInGasTokenWei.high.div(this.gasEstimation.gas);
+        break;
+      case "max":
+        maxGasPrice = gasRangeInGasTokenWei.max.div(this.gasEstimation.gas);
+        break;
+      default:
+        maxGasPrice = BigNumber.from(0);
+    }
 
     const array = new Uint8Array(32);
     window.crypto.getRandomValues(array);
@@ -165,8 +243,8 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
       this.paymentToken.address,
       convertAmountToRawAmount(this.paymentAmount, this.paymentToken.decimals),
       this.payeeAddress,
-      this.executionGas,
-      '15000000000', // TODO: this.maxGasPrice,
+      Number(this.gasEstimation.gas),
+      String(maxGasPrice),
       this.selectedGasToken.address,
       salt,
       Math.round(this.paymentDate.getTime() / 1000),
@@ -218,6 +296,7 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
       @maxGasPriceErrorMessage={{this.validator.maxGasPriceErrorMessage}}
       @onSchedulePayment={{this.schedulePayment}}
       @isSubmitEnabled={{this.isValid}}
+      @maxGasDescriptions={{this.maxGasDescriptions.value}}
     />
   </template>
 }

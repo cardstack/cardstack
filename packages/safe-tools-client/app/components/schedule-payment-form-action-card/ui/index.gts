@@ -18,7 +18,7 @@ import eq from 'ember-truth-helpers/helpers/eq';
 import not from 'ember-truth-helpers/helpers/not';
 import set from 'ember-set-helper/helpers/set';
 import './index.css';
-import { ValidatableForm } from '../validator';
+import { MaxGasFeeOption, ValidatableForm } from '../validator';
 
 interface Signature {
   Element: HTMLElement;
@@ -40,6 +40,7 @@ interface Signature {
     onUpdatePaymentToken: (val: SelectableToken) => void;
     gasTokens: SelectableToken[];
     onSelectGasToken: (val: SelectableToken) => void;
+    maxGasDescriptions?: Record<MaxGasFeeOption, string>;
     isGasTokenInvalid: boolean;
     gasTokenErrorMessage: string;
     onUpdateMaxGasPrice: (val: string) => void;
@@ -204,10 +205,10 @@ export default class SchedulePaymentFormActionCardUI extends Component<Signature
             @onBlur={{set this 'hasBlurredGasToken' true}}
           />
         </BoxelField>
-        <BoxelField @label="Max Gas Fee">
+        <BoxelField @label="Max Gas Cost">
           <BoxelToggleButtonGroup
             data-test-max-gas-toggle
-            @groupDescription="The maximum gas fee you are willing to spend for this payment"
+            @groupDescription="The maximum gas cost you are willing to spend for this payment"
             @name="max-gas-fee"
             @errorMessage={{@maxGasPriceErrorMessage}}
             @invalid={{this.isMaxGasPriceInvalid}}
@@ -221,7 +222,7 @@ export default class SchedulePaymentFormActionCardUI extends Component<Signature
                 Normal
               </div>
               <div class="schedule-payment-form-action-card--max-gas-fee-description">
-                Less than $0.10 USD
+                {{@maxGasDescriptions.normal}}
               </div>
             </group.Button>
             <group.Button @value="high">
@@ -229,7 +230,7 @@ export default class SchedulePaymentFormActionCardUI extends Component<Signature
                 High
               </div>
               <div class="schedule-payment-form-action-card--max-gas-fee-description">
-                Less than $1.00 USD
+                {{@maxGasDescriptions.high}}
               </div>
             </group.Button>
             <group.Button @value="max">
@@ -237,7 +238,7 @@ export default class SchedulePaymentFormActionCardUI extends Component<Signature
                 Max
               </div>
               <div class="schedule-payment-form-action-card--max-gas-fee-description">
-                Capped at $10 USD
+                {{@maxGasDescriptions.max}}
               </div>
             </group.Button>
           </BoxelToggleButtonGroup>
