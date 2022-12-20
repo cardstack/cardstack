@@ -1,8 +1,4 @@
-import {
-  getSDK,
-  Web3Provider,
-  ScheduledPaymentModule,
-} from '@cardstack/cardpay-sdk';
+import { getSDK, ScheduledPaymentModule } from '@cardstack/cardpay-sdk';
 import WalletService from '@cardstack/safe-tools-client/services/wallet';
 
 import { action } from '@ember/object';
@@ -20,11 +16,10 @@ export default class SchedulePaymentSDKService extends Service {
   estimatedSafeCreationGas: undefined | BigNumber;
 
   private async getSchedulePaymentsModule(): Promise<ScheduledPaymentModule> {
-    //@ts-expect-error currentProvider does not match Web3Provider,
-    //not worth typing as we should replace the web3 one with ethers soon
-    const ethersProvider = new Web3Provider(this.wallet.web3.currentProvider);
-
-    const module = await getSDK('ScheduledPaymentModule', ethersProvider);
+    const module = await getSDK(
+      'ScheduledPaymentModule',
+      this.wallet.ethersProvider
+    );
 
     return module;
   }
