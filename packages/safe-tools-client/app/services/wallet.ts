@@ -3,6 +3,7 @@ import {
   getSDK,
   isSchedulerSupportedChain,
   convertChainIdToName,
+  Web3Provider,
 } from '@cardstack/cardpay-sdk';
 import NetworkService from '@cardstack/safe-tools-client/services/network';
 import { ChainConnectionManager } from '@cardstack/safe-tools-client/utils/chain-connection-manager';
@@ -32,8 +33,8 @@ export default class Wallet extends Service {
   @tracked nativeTokenBalance: Record<'symbol' | 'amount', string> | undefined;
   @tracked safes = [];
 
-  // TODO: replace with ethers
-  web3 = new Web3();
+  //@ts-expect-error  ethersProvider will be assigned in constructor
+  ethersProvider: Web3Provider;
   chainConnectionManager: ChainConnectionManager;
 
   walletProviders = walletProviders.map((w) =>
@@ -83,7 +84,10 @@ export default class Wallet extends Service {
     }
 
     this.providerId = providerId;
-    this.chainConnectionManager.reconnect(this.web3, this.providerId);
+    this.chainConnectionManager.reconnect(
+      (web3Provider) => (this.ethersProvider = web3Provider),
+      this.providerId
+    );
   }
 
   async switchNetwork(chainId: number) {
@@ -170,7 +174,10 @@ export default class Wallet extends Service {
       return;
     }
 
-    yield this.chainConnectionManager.connect(this.web3, this.providerId);
+    yield this.chainConnectionManager.connect(
+      (web3Provider) => (this.ethersProvider = web3Provider),
+      this.providerId
+    );
     yield timeout(500); // allow time for strategy to verify connected chain -- it might not accept the connection
 
     this.isConnecting = false;
@@ -185,7 +192,7 @@ export default class Wallet extends Service {
   }
 
   @action async fetchNativeTokenBalance() {
-    const assets = await getSDK('Assets', this.web3);
+    const assets = await getSDK('Assets', this.ethersProvider);
     const balance = await assets.getNativeTokenBalance(this.address);
     this.nativeTokenBalance = {
       symbol: getConstantByNetwork('nativeTokenSymbol', this.network.symbol),

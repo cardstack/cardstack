@@ -62,7 +62,7 @@ export default class SafesService extends Service {
   }
 
   @use tokenBalancesResource = resource(() => {
-    if (!this.wallet.web3.currentProvider || !this.currentSafe) {
+    if (!this.wallet.ethersProvider || !this.currentSafe) {
       return {
         error: false,
         isLoading: false,
@@ -73,10 +73,6 @@ export default class SafesService extends Service {
     const state: TokenBalanceResourceState = new TrackedObject({
       isLoading: true,
     });
-
-    //@ts-expect-error currentProvider does not match Web3Provider,
-    //not worth typing as we should replace the web3 one with ethers soon
-    const ethersProvider = new Web3Provider(this.wallet.web3.currentProvider);
 
     const tokenAddresses = getConstantByNetwork(
       'tokenList',
@@ -90,7 +86,7 @@ export default class SafesService extends Service {
         state.value = await this.fetchTokenBalances(
           this.currentSafe.address,
           tokenAddresses,
-          ethersProvider
+          this.wallet.ethersProvider
         );
       } catch (error) {
         console.log(error);

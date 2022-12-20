@@ -366,18 +366,12 @@ model GasEstimationResult {
   @@map("gas_estimation_results")
 }
 
-model GasLimit {
-  id              String                @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  chainId         Int                   @unique @map("chain_id")
-  scenario        GasLimitsScenarioEnum
-  tokenAddress    String?               @map("token_address")
-  gasTokenAddress String?               @map("gas_token_address")
-  gas             Int
-  createdAt       DateTime              @default(now()) @map("created_at") @db.Timestamp(6)
-  updatedAt       DateTime              @default(now()) @map("updated_at") @db.Timestamp(6)
+model RewardRootIndex {
+  rewardProgramId String @map("reward_program_id")
+  paymentCycle    Int    @map("payment_cycle")
 
-  @@unique([chainId, scenario, tokenAddress, gasTokenAddress], map: "unique_chain_and_scenario")
-  @@map("gas_limits")
+  @@unique([rewardProgramId, paymentCycle], map: "reward_root_index_unique_reward_program_id_and_payment_cycle")
+  @@map("reward_root_index")
 }
 
 enum DiscordBotsStatusEnum {
@@ -429,11 +423,4 @@ enum GasEstimationResultsScenarioEnum {
   execute_recurring_payment
 
   @@map("gas_estimation_results_scenario_enum")
-}
-
-enum GasLimitsScenarioEnum {
-  create_safe_with_module
-  execute_scheduled_payment
-
-  @@map("gas_limits_scenario_enum")
 }

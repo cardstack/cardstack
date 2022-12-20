@@ -2,7 +2,6 @@ import {
   type GasEstimationScenario,
   type ChainAddress,
   getSDK,
-  Web3Provider,
   ScheduledPaymentModule,
   getNativeWeiInToken,
 } from '@cardstack/cardpay-sdk';
@@ -32,11 +31,10 @@ export default class SchedulePaymentSDKService extends Service {
   estimatedSafeCreationGas: undefined | BigNumber;
 
   private async getSchedulePaymentsModule(): Promise<ScheduledPaymentModule> {
-    //@ts-expect-error currentProvider does not match Web3Provider,
-    //not worth typing as we should replace the web3 one with ethers soon
-    const ethersProvider = new Web3Provider(this.wallet.web3.currentProvider);
-
-    const module = await getSDK('ScheduledPaymentModule', ethersProvider);
+    const module = await getSDK(
+      'ScheduledPaymentModule',
+      this.wallet.ethersProvider
+    );
 
     return module;
   }
@@ -80,10 +78,7 @@ export default class SchedulePaymentSDKService extends Service {
     );
     const { gasRangeInWei, gasRangeInUSD } = gasEstimationResult;
     const priceWeiInGasToken = String(
-      await getNativeWeiInToken(
-        new Web3Provider(this.wallet.web3.currentProvider),
-        gasTokenAddress
-      )
+      await getNativeWeiInToken(this.wallet.ethersProvider, gasTokenAddress)
     );
     return {
       gas: gasEstimationResult.gas,

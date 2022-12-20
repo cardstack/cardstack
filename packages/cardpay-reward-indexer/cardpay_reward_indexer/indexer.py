@@ -1,3 +1,4 @@
+import json
 import logging
 from datetime import datetime
 
@@ -88,6 +89,15 @@ class Indexer:
         proofs = []
         for payment in payment_list:
             token, amount = self.decode_payment(payment)
+            explanation_data_v = payment.get("explanationData", {})
+            explanation_data = (
+                json.loads(explanation_data_v)
+                if isinstance(explanation_data_v, str)
+                else dict(explanation_data_v)
+            )
+            # explanation_data_v of str represents the new column format
+            # new column format: string (that can be parsed to json)
+            # old column format, map<string, string> (a dictionary)
             i = models.Proof(
                 rootHash=payment["root"],
                 paymentCycle=payment["paymentCycle"],
@@ -100,7 +110,7 @@ class Indexer:
                 validFrom=payment["validFrom"],
                 validTo=payment["validTo"],
                 explanationId=payment.get("explanationId"),
-                explanationData=dict(payment.get("explanationData", {})),
+                explanationData=explanation_data,
             )
             proofs.append(i)
             leafs.append(payment["leaf"])
