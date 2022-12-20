@@ -8,7 +8,7 @@ import Safes from './safes';
 import { PrepaidCard, prepaidCardMeta } from './prepaid-card';
 import { PrepaidCardMarket, prepaidCardMarketMeta } from './prepaid-card-market';
 import { PrepaidCardMarketV2, prepaidCardMarketV2Meta } from './prepaid-card-market-v-2';
-import Assets from './assets';
+import Assets, { AssetsEthers } from './assets';
 import LayerOneOracle from './layer-one-oracle';
 import TokenBridgeHomeSide from './token-bridge-home-side';
 import TokenBridgeForeignSide from './token-bridge-foreign-side';
@@ -18,6 +18,7 @@ import { rewardManagerMeta, RewardManager } from './reward-manager';
 import HubAuth from './hub-auth';
 import { SUPPORTED_ABIS } from '../generated/supported-abis'; // this file is code-generated during postinstall step and the constant is a property tree of version -> contract name -> contract ABI
 import ScheduledPaymentModule from './scheduled-payment-module';
+import JsonRpcProvider from '../providers/json-rpc-provider';
 
 export type SDK =
   | 'Assets'
@@ -116,11 +117,15 @@ export async function getABI(contractName: string, web3: Web3): Promise<AbiItem[
 }
 
 export async function getSDK<T extends SDK>(sdk: T, ...args: any[]): Promise<MapReturnType<T>> {
-  let [web3] = args;
+  let [web3OrEthersProvider] = args;
   let apiClass;
   switch (sdk) {
     case 'Assets':
-      apiClass = Assets;
+      if (web3OrEthersProvider instanceof JsonRpcProvider) {
+        apiClass = AssetsEthers;
+      } else {
+        apiClass = Assets;
+      }
       break;
     case 'HubAuth':
       apiClass = HubAuth;
@@ -129,25 +134,25 @@ export async function getSDK<T extends SDK>(sdk: T, ...args: any[]): Promise<Map
       apiClass = LayerOneOracle;
       break;
     case 'LayerTwoOracle':
-      apiClass = await resolveApiVersion(layerTwoOracleMeta, web3);
+      apiClass = await resolveApiVersion(layerTwoOracleMeta, web3OrEthersProvider);
       break;
     case 'PrepaidCard':
-      apiClass = await resolveApiVersion(prepaidCardMeta, web3);
+      apiClass = await resolveApiVersion(prepaidCardMeta, web3OrEthersProvider);
       break;
     case 'PrepaidCardMarket':
-      apiClass = await resolveApiVersion(prepaidCardMarketMeta, web3);
+      apiClass = await resolveApiVersion(prepaidCardMarketMeta, web3OrEthersProvider);
       break;
     case 'PrepaidCardMarketV2':
-      apiClass = await resolveApiVersion(prepaidCardMarketV2Meta, web3);
+      apiClass = await resolveApiVersion(prepaidCardMarketV2Meta, web3OrEthersProvider);
       break;
     case 'RevenuePool':
-      apiClass = await resolveApiVersion(revenuePoolMeta, web3);
+      apiClass = await resolveApiVersion(revenuePoolMeta, web3OrEthersProvider);
       break;
     case 'RewardPool':
-      apiClass = await resolveApiVersion(rewardPoolMeta, web3);
+      apiClass = await resolveApiVersion(rewardPoolMeta, web3OrEthersProvider);
       break;
     case 'RewardManager':
-      apiClass = await resolveApiVersion(rewardManagerMeta, web3);
+      apiClass = await resolveApiVersion(rewardManagerMeta, web3OrEthersProvider);
       break;
     case 'Safes':
       apiClass = Safes;

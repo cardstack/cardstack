@@ -2,6 +2,8 @@ import {
   HubConfig,
   getWeb3ConfigByNetwork,
   Network,
+  Web3Provider,
+  ExternalProvider,
 } from '@cardstack/cardpay-sdk';
 import config from '@cardstack/safe-tools-client/config/environment';
 import WalletConnectProvider from '@cardstack/wc-provider';
@@ -13,8 +15,6 @@ import { BaseProvider } from '@metamask/providers';
 import WalletConnectQRCodeModal from '@walletconnect/qrcode-modal';
 import { IWalletConnectSession } from '@walletconnect/types';
 import { WalletConnectProvider as TestWalletConnectProvider } from 'eth-testing/lib/providers';
-import Web3 from 'web3';
-import { provider } from 'web3-core';
 
 import { Emitter, SimpleEmitter } from './events';
 import { TypedChannel } from './typed-channel';
@@ -173,18 +173,25 @@ export class ChainConnectionManager {
     }
   }
 
-  async connect(web3: Web3, providerId: WalletProviderId) {
+  async connect(
+    setProvider: (provider: Web3Provider) => void,
+    providerId: WalletProviderId
+  ) {
     await this.setup(providerId);
     if (!this.strategy)
       throw new Error('Failed to setup strategy in layer 1 connection manager');
     if (!this.provider) throw new Error('Missing Provider');
-    web3.setProvider(this.provider as provider);
+    setProvider(new Web3Provider(this.provider as ExternalProvider));
     return await this.strategy.connect();
   }
 
-  async reconnect(web3: Web3, providerId: WalletProviderId, session?: unknown) {
+  async reconnect(
+    setProvider: (provider: Web3Provider) => void,
+    providerId: WalletProviderId,
+    session?: unknown
+  ) {
     await this.setup(providerId, session);
-    web3.setProvider(this.provider as provider);
+    setProvider(new Web3Provider(this.provider as ExternalProvider));
     await this.strategy?.reconnect();
   }
 
