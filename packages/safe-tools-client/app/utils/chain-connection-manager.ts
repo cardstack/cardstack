@@ -3,11 +3,6 @@ import {
   getWeb3ConfigByNetwork,
   Network,
 } from '@cardstack/cardpay-sdk';
-import {
-  type Emitter,
-  SimpleEmitter,
-  type VoidCallback,
-} from '@cardstack/ember-shared';
 import config from '@cardstack/safe-tools-client/config/environment';
 import WalletConnectProvider from '@cardstack/wc-provider';
 import { getOwner, setOwner } from '@ember/application';
@@ -21,7 +16,9 @@ import { WalletConnectProvider as TestWalletConnectProvider } from 'eth-testing/
 import Web3 from 'web3';
 import { provider } from 'web3-core';
 
+import { Emitter, SimpleEmitter } from './events';
 import { TypedChannel } from './typed-channel';
+import { VoidCallback } from './types';
 import { WalletProviderId } from './wallet-providers';
 import CustomStorageWalletConnect, {
   clearWalletConnectStorage,

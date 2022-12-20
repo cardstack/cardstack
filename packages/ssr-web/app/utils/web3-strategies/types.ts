@@ -1,4 +1,4 @@
-import { Emitter } from '@cardstack/ember-shared';
+import { Emitter } from '../events';
 import { TaskGenerator } from 'ember-concurrency';
 
 export type Layer2ChainEvent =

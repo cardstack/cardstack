@@ -1,19 +1,16 @@
 import { SimpleEmitter, UnbindEventListener } from './events';
-import { VoidCallback } from './types';
-
-type EventCallback = (ev: unknown) => unknown;
 
 /**
  *  Mock broadcast channel with a subset of broadcast channel functionality.
  *  Use `test__simulateMessageEvent` to simulate a message event with only the data property
  */
 export class MockBroadcastChannel {
-  postedMessages: Array<unknown> = [];
+  postedMessages: Array<any> = [];
   channelName: string;
   private simpleEmitter = new SimpleEmitter();
   private unbindMap: {
-    message: WeakMap<EventCallback, UnbindEventListener>;
-    messageerror: WeakMap<EventCallback, UnbindEventListener>;
+    message: WeakMap<Function, UnbindEventListener>;
+    messageerror: WeakMap<Function, UnbindEventListener>;
   } = {
     message: new WeakMap(),
     messageerror: new WeakMap(),
@@ -23,31 +20,36 @@ export class MockBroadcastChannel {
     this.channelName = channelName;
   }
 
-  addEventListener(event: keyof BroadcastChannelEventMap, callback: VoidCallback) {
-    const unbind = this.simpleEmitter.on(event, callback);
+  addEventListener(
+    event: keyof BroadcastChannelEventMap,
+    callback: (ev: any) => any
+  ) {
+    let unbind = this.simpleEmitter.on(event, callback);
     this.unbindMap[event].set(callback, unbind);
   }
 
-  removeEventListener(event: keyof BroadcastChannelEventMap, callback: VoidCallback) {
-    const unbind = this.unbindMap[event].get(callback);
+  removeEventListener(
+    event: keyof BroadcastChannelEventMap,
+    callback: (ev: any) => any
+  ) {
+    let unbind = this.unbindMap[event].get(callback);
     if (unbind) {
       unbind();
       this.unbindMap[event].delete(callback);
     }
   }
 
-  postMessage(message: unknown) {
+  postMessage(message: any) {
     this.postedMessages.push(message);
   }
 
-  test__simulateMessageEvent(data: unknown) {
-    const payload = {
+  test__simulateMessageEvent(data: any) {
+    let payload = {
       data,
     };
     this.simpleEmitter.emit('message', payload as MessageEvent);
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
   close() {}
 }
 
@@ -62,8 +64,8 @@ export class MockLocalStorage {
 
   constructor() {
     if (window.TEST__MOCK_LOCAL_STORAGE_INIT) {
-      for (const key in window.TEST__MOCK_LOCAL_STORAGE_INIT) {
-        this.setItem(key, window.TEST__MOCK_LOCAL_STORAGE_INIT[key] as string);
+      for (let key in window.TEST__MOCK_LOCAL_STORAGE_INIT) {
+        this.setItem(key, window.TEST__MOCK_LOCAL_STORAGE_INIT[key]);
       }
     }
   }
@@ -81,7 +83,7 @@ export class MockLocalStorage {
     return Object.keys(this.entries).length;
   }
   clear() {
-    for (const key in this.entries) {
+    for (let key in this.entries) {
       delete this.entries[key];
     }
   }

@@ -1,5 +1,5 @@
 import Component from '@glimmer/component';
-import { Emitter } from '@cardstack/ember-shared';
+import { Emitter } from '@cardstack/web-client/utils/events';
 import { registerDestructor } from '@ember/destroyable';
 
 interface ListenerArgs {

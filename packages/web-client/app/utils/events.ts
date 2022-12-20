@@ -2,7 +2,6 @@
 export type UnbindEventListener = () => void;
 
 export interface Emitter<EmitterEvent = string> {
-  // eslint-disable-next-line @typescript-eslint/ban-types
   on(event: EmitterEvent, cb: Function): UnbindEventListener;
 }
 
@@ -15,7 +14,7 @@ export interface Emitter<EmitterEvent = string> {
  * import {
  *   SimpleEmitter,
  *   UnbindEventListener,
- * } from '@cardstack/ember-shared';
+ * } from '@cardstack/web-client/utils/events';
  * import Service from '@ember/service';
  *
  * export default class ResizedTarget extends Service {
@@ -60,18 +59,16 @@ export interface Emitter<EmitterEvent = string> {
  */
 
 export class SimpleEmitter {
-  // eslint-disable-next-line @typescript-eslint/ban-types
   events: Record<string, Function[]> = {};
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   emit(event: string, ...args: any[]) {
     (this.events[event] || []).forEach((i) => i(...args));
   }
 
-  // eslint-disable-next-line @typescript-eslint/ban-types
   on(event: string, cb: Function): UnbindEventListener {
     (this.events[event] = this.events[event] || []).push(cb);
-    const unbind = () => (this.events[event] = (this.events[event] || []).filter((i) => i !== cb));
+    let unbind = () =>
+      (this.events[event] = (this.events[event] || []).filter((i) => i !== cb));
     return unbind;
   }
 }

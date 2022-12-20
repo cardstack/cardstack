@@ -11,10 +11,10 @@ import SokolWeb3Strategy from '@cardstack/ssr-web/utils/web3-strategies/sokol';
 import { reads } from 'macro-decorators';
 import WalletInfo from '@cardstack/ssr-web/utils/wallet-info';
 import {
-  type Emitter,
+  Emitter,
   SimpleEmitter,
-  type UnbindEventListener,
-} from '@cardstack/ember-shared';
+  UnbindEventListener,
+} from '@cardstack/ssr-web/utils/events';
 import { action } from '@ember/object';
 import HubAuthentication from '@cardstack/ssr-web/services/hub-authentication';
 import { taskFor } from 'ember-concurrency-ts';

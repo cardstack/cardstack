@@ -15,7 +15,10 @@ import BN from 'bn.js';
 import { WalletProvider } from '../wallet-providers';
 import { TransactionReceipt } from 'web3-core';
 import { BridgeValidationResult } from '@cardstack/cardpay-sdk';
-import { SimpleEmitter, UnbindEventListener } from '@cardstack/ember-shared';
+import {
+  SimpleEmitter,
+  UnbindEventListener,
+} from '@cardstack/web-client/utils/events';
 import { fromWei, toWei } from 'web3-utils';
 import {
   BridgeableSymbol,

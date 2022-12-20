@@ -7,7 +7,7 @@ import { task } from 'ember-concurrency-decorators';
 import { rawTimeout } from 'ember-concurrency';
 import { buildWaiter } from '@ember/test-waiters';
 import RSVP, { defer } from 'rsvp';
-import { UnbindEventListener } from '@cardstack/ember-shared';
+import { UnbindEventListener } from '../utils/events';
 
 let waiter = buildWaiter('thread-animation');
 let token: any = null;

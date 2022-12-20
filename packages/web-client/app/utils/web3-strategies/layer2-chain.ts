@@ -8,11 +8,7 @@ import { IConnector } from '@walletconnect/types';
 import WalletConnectProvider from '@cardstack/wc-provider';
 import { task } from 'ember-concurrency-decorators';
 
-import {
-  type Emitter,
-  SimpleEmitter,
-  type UnbindEventListener,
-} from '@cardstack/ember-shared';
+import { Emitter, SimpleEmitter, UnbindEventListener } from '../events';
 import {
   ConvertibleSymbol,
   ConversionFunction,
