@@ -207,7 +207,7 @@ describe('CheckRewardRootsTask', function () {
             id: '0x66997beadcc07eb1dd1abca7bf67187da580106788cdaf69c00ceb65cdb3215d',
             blockNumber: '27253787',
             rootHash: '0xb772f8a1f506f62523ccafc6e6cd80ae826769aa5802bf9d138ce1e59851400b',
-            paymentCycle: '1',
+            paymentCycle: '3',
             rewardProgram: {
               id: '0x0885ce31D73b63b0Fcb1158bf37eCeaD8Ff0fC72',
             },
