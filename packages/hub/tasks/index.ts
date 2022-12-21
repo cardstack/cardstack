@@ -23,6 +23,7 @@ const ALL_KNOWN_TASKS: Record<keyof KnownTasks, true> = {
   'scheduled-payment-on-chain-cancelation-waiter': true,
   'scheduled-payment-on-chain-execution-waiter': true,
   'execute-scheduled-payments': true,
+  'process-reward-root': true,
   boom: true,
 };
 
