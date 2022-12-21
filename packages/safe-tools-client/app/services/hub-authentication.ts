@@ -73,3 +73,9 @@ export default class HubAuthenticationService extends Service {
     );
   }
 }
+
+declare module '@ember/service' {
+  interface Registry {
+    hubAuthentication: HubAuthenticationService;
+  }
+}
