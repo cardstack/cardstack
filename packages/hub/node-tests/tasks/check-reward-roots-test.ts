@@ -216,7 +216,7 @@ describe('CheckRewardRootsTask', function () {
       },
     });
     let task = await getContainer().instantiate(CheckRewardRoots);
-    await task.perform();
+    await task.perform(2);
     expect(getJobIdentifiers()).to.deep.equal(['process-reward-root', 'process-reward-root']);
     expect(getJobPayloads()).to.deep.equal([
       {

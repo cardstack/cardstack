@@ -2,7 +2,7 @@ import { inject } from '@cardstack/di';
 import WorkerClient from '../services/worker-client';
 import { RewardPrograms, RewardRoots } from '../services/subgraph';
 
-const MAX_INDEX_SIZE = 2; // Index max 2 roots per reward program
+const MAX_INDEX_SIZE = 100; // Index max 100 roots per reward program
 
 export default class CheckRewardRoots {
   subgraph = inject('subgraph');

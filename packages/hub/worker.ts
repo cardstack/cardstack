@@ -102,7 +102,7 @@ export class HubWorker {
         '0 5 * * * remove-old-sent-notifications ?max=5',
         '*/5 * * * * print-queued-jobs',
         '*/5 * * * * execute-scheduled-payments',
-        '*/5 * * * * check-reward-roots',
+        '*/10 * * * * check-reward-roots',
       ].join('\n'),
     });
 
