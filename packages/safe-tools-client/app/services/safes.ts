@@ -10,8 +10,8 @@ import WalletService from '@cardstack/safe-tools-client/services/wallet';
 import { action } from '@ember/object';
 import Service, { inject as service } from '@ember/service';
 import { tracked } from '@glimmer/tracking';
-import { BN } from 'bn.js';
 import { use, resource } from 'ember-resources';
+import { BigNumber } from 'ethers';
 import { TrackedObject } from 'tracked-built-ins';
 
 export interface Safe {
@@ -21,7 +21,7 @@ export interface Safe {
 
 export interface TokenBalance {
   symbol: string;
-  balance: typeof BN;
+  balance: BigNumber;
   decimals: number;
   isNativeToken?: boolean;
 }
@@ -139,9 +139,7 @@ export default class SafesService extends Service {
     tokenAddresses: string[],
     provider: Web3Provider
   ): Promise<TokenBalance[]> {
-    const nativeTokenBalance = new BN(
-      (await provider.getBalance(safeAddress)).toString()
-    );
+    const nativeTokenBalance = await provider.getBalance(safeAddress);
 
     const tokenBalances = await getTokenBalancesForSafe(
       provider,
@@ -152,7 +150,7 @@ export default class SafesService extends Service {
     return [
       {
         symbol: getConstantByNetwork('nativeTokenSymbol', this.network.symbol),
-        balance: nativeTokenBalance as unknown as typeof BN,
+        balance: nativeTokenBalance,
         decimals: 18,
         isNativeToken: true,
       },

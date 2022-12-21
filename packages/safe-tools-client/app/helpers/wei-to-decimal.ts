@@ -1,8 +1,8 @@
 import { convertRawAmountToDecimalFormat } from '@cardstack/cardpay-sdk';
 import { helper } from '@ember/component/helper';
-import { BN } from 'bn.js';
+import { BigNumber } from 'ethers';
 
-type PositionalArgs = [typeof BN, number];
+type PositionalArgs = [BigNumber, number];
 
 interface Signature {
   Args: {
