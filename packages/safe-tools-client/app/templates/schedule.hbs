@@ -48,10 +48,21 @@
       {{/if}}
     </cp.Item>
   </Boxel::ControlPanel>
+
+  {{!-- TODO: implement a grid for dashboard panels --}}
+
   <section class='safe-tools__dashboard-schedule-content'>
     <ScheduleCollapsePanel @open={{not this.wallet.isConnected}} />
     <div class='temporary-form-container'>
       <SchedulePaymentFormActionCard />
+
+      <Boxel::ActionContainer
+        class="past-payments-container"
+      as |Section|>
+        <Section @title="Past Payments">
+          <PaymentTransactionsList />
+        </Section>
+      </Boxel::ActionContainer>
     </div>
   </section>
 </section>
@@ -63,3 +74,5 @@
   @networkName={{this.network.name}}
   @tokensToCover={{this.scheduledPaymentsTokensToCover}}
 />
+
+<HubAuthModal />

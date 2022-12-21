@@ -62,7 +62,7 @@ describe('GET /api/scheduled-payment-attempts', async function () {
         feePercentage: '0',
         salt: '54lt',
         payAt: '2022-11-14T18:49:13.000Z',
-        spHash: '0x123',
+        spHash: '0x1234',
         chainId: 1,
         userAddress: stubUserAddress,
         creationTransactionHash: null,
@@ -81,7 +81,7 @@ describe('GET /api/scheduled-payment-attempts', async function () {
     });
 
     // From some other user to ensure we're filtering by user address
-    let spOther = await prisma.scheduledPayment.create({
+    let spOtherUser = await prisma.scheduledPayment.create({
       data: {
         id: shortUuid.uuid(),
         senderSafeAddress: '0xc0ffee254729296a45a3885639AC7E10F9d54979',
@@ -96,7 +96,7 @@ describe('GET /api/scheduled-payment-attempts', async function () {
         feePercentage: '0',
         salt: '54lt',
         payAt: '2022-11-14T18:49:13.000Z',
-        spHash: '0x1234',
+        spHash: '0x12345',
         chainId: 1,
         userAddress: '0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C14',
         creationTransactionHash: null,
@@ -109,7 +109,7 @@ describe('GET /api/scheduled-payment-attempts', async function () {
         startedAt: '2022-11-22T12:14:25.000Z',
         endedAt: '2022-11-22T13:14:25.000Z',
         status: 'succeeded',
-        scheduledPaymentId: spOther.id,
+        scheduledPaymentId: spOtherUser.id,
         transactionHash: '0x123',
       },
     });
@@ -150,8 +150,44 @@ describe('GET /api/scheduled-payment-attempts', async function () {
       },
     });
 
+    // One from another chain to ensure we're filtering by chainId
+    let spOtherChain = await prisma.scheduledPayment.create({
+      data: {
+        id: shortUuid.uuid(),
+        senderSafeAddress: '0xc0ffee254729296a45a3885639AC7E10F9d54979',
+        moduleAddress: '0x7E7d0B97D663e268bB403eb4d72f7C0C7650a6dd',
+        tokenAddress: '0xa455bbB2A81E09E0337c13326BBb302Cb37D7cf6',
+        gasTokenAddress: '0x6A50E3807FB9cD0B07a79F64e561B9873D3b132E',
+        amount: '100',
+        payeeAddress: '0x821f3Ee0FbE6D1aCDAC160b5d120390Fb8D2e9d3',
+        executionGasEstimation: 100000,
+        maxGasPrice: '1000000000',
+        feeFixedUsd: '0',
+        feePercentage: '0',
+        salt: '54lt',
+        payAt: '2022-11-14T18:49:13.000Z',
+        spHash: '0x123456',
+        chainId: 999999,
+        userAddress: stubUserAddress,
+        creationTransactionHash: null,
+      },
+    });
+
+    await prisma.scheduledPaymentAttempt.create({
+      data: {
+        id: shortUuid.uuid(),
+        startedAt: '2022-11-22T12:14:25.000Z',
+        endedAt: '2022-11-22T13:14:25.000Z',
+        status: 'succeeded',
+        scheduledPaymentId: spOtherChain.id,
+        transactionHash: '0x123',
+      },
+    });
+
     await request()
-      .get(`/api/scheduled-payment-attempts?filter[started-at][gt]=2022-10-01&filter[status]=succeeded`)
+      .get(
+        `/api/scheduled-payment-attempts?filter[started-at][gt]=2022-10-01&filter[status]=succeeded&filter[chain-id]=1`
+      )
       .set('Authorization', 'Bearer abc123--def456--ghi789')
       .set('Accept', 'application/vnd.api+json')
       .set('Content-Type', 'application/vnd.api+json')
@@ -203,13 +239,19 @@ describe('GET /api/scheduled-payment-attempts', async function () {
             type: 'scheduled-payments',
             attributes: {
               amount: '100',
+              'chain-id': 1,
+              'execution-gas-estimation': 100000,
               'fee-fixed-usd': '0',
               'fee-percentage': '0',
               'gas-token-address': '0x6A50E3807FB9cD0B07a79F64e561B9873D3b132E',
+              'max-gas-price': '1000000000',
+              'module-address': '0x7E7d0B97D663e268bB403eb4d72f7C0C7650a6dd',
+              'payee-address': '0x821f3Ee0FbE6D1aCDAC160b5d120390Fb8D2e9d3',
               'pay-at': '2022-11-14T18:49:13.000Z',
               'recurring-day-of-month': null,
               'recurring-until': null,
               'sender-safe-address': '0xc0ffee254729296a45a3885639AC7E10F9d54979',
+              'sp-hash': '0x1234',
               'token-address': '0xa455bbB2A81E09E0337c13326BBb302Cb37D7cf6',
             },
           },
