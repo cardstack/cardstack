@@ -27,6 +27,8 @@ import ScheduledPaymentOnChainCreationWaiter from './tasks/scheduled-payment-on-
 import ScheduledPaymentOnChainCancelationWaiter from './tasks/scheduled-payment-on-chain-cancelation-waiter';
 import ScheduledPaymentOnChainExecutionWaiter from './tasks/scheduled-payment-on-chain-execution-waiter';
 import ExecuteScheduledPayments from './tasks/execute-scheduled-payments';
+import ProcessRewardRoot from './tasks/process-reward-root';
+import CheckRewardRoots from './tasks/check-reward-roots';
 
 let dbConfig = config.get('db') as Record<string, any>;
 const log = logger('hub/worker');
@@ -89,6 +91,8 @@ export class HubWorker {
         'scheduled-payment-on-chain-cancelation-waiter': this.instantiateTask(ScheduledPaymentOnChainCancelationWaiter),
         'scheduled-payment-on-chain-execution-waiter': this.instantiateTask(ScheduledPaymentOnChainExecutionWaiter),
         'execute-scheduled-payments': this.instantiateTask(ExecuteScheduledPayments),
+        'process-reward-root': this.instantiateTask(ProcessRewardRoot),
+        'check-reward-roots': this.instantiateTask(CheckRewardRoots),
       },
       // https://github.com/graphile/worker#recurring-tasks-crontab
       // remove old notifications at midnight every day
@@ -98,6 +102,7 @@ export class HubWorker {
         '0 5 * * * remove-old-sent-notifications ?max=5',
         '*/5 * * * * print-queued-jobs',
         '*/5 * * * * execute-scheduled-payments',
+        '*/5 * * * * check-reward-roots',
       ].join('\n'),
     });
 
