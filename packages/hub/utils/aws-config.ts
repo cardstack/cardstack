@@ -3,7 +3,7 @@ import { STSClient, AssumeRoleCommand } from '@aws-sdk/client-sts';
 import Logger from '@cardstack/logger';
 let log = Logger('utils:aws-config');
 
-interface AwsConfigResult {
+export interface AwsConfigResult {
   credentials: any;
   region: string | undefined;
 }
