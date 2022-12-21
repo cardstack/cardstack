@@ -10,6 +10,7 @@ import NetworkService from '@cardstack/safe-tools-client/services/network';
 import WalletService from '@cardstack/safe-tools-client/services/wallet';
 import { type ActionChinState } from '@cardstack/boxel/components/boxel/action-chin/state';
 import { tracked } from '@glimmer/tracking';
+import { noop } from '@cardstack/safe-tools-client/helpers/noop';
 
 import './index.css';
 
@@ -21,10 +22,6 @@ export default class HubAuthModal extends Component {
 
   get isModalOpen() {
     return this.wallet.isConnected && this.hubAuthentication.isAuthenticated === false;
-  }
-
-  onClose() {
-    // noop, needed for the BoxelModal component API
   }
 
   @action async authorize() {
@@ -44,7 +41,7 @@ export default class HubAuthModal extends Component {
     <BoxelModal
       @size='medium'
       @isOpen={{this.isModalOpen}}
-      @onClose={{this.onClose}}
+      @onClose={{noop}}
       data-test-hub-auth-modal
     >
       <BoxelActionContainer
