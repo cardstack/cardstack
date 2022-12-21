@@ -1265,8 +1265,11 @@ export default class ScheduledPaymentModule {
   // and doesn't requiring user to have enough balance of token transfer & gas token
   async estimateGas(
     scenario: GasEstimationScenario,
-    tokenAddress?: string | null,
-    gasTokenAddress?: string | null
+    options: {
+      tokenAddress?: string | null;
+      gasTokenAddress?: string | null;
+      hubUrl?: string | null;
+    }
   ): Promise<GasEstimationResult> {
     let chainId = (await this.ethersProvider.getNetwork()).chainId;
     const network = convertChainIdToName(chainId);
@@ -1275,20 +1278,23 @@ export default class ScheduledPaymentModule {
         attributes: {
           scenario: scenario,
           'chain-id': chainId,
-          'token-address': tokenAddress,
-          'gas-token-address': gasTokenAddress,
+          'token-address': options.tokenAddress,
+          'gas-token-address': options.gasTokenAddress,
         },
       },
     };
-    let gasEstimationResponse = await fetch(`${getConstantByNetwork('hubUrl', network)}/api/gas-estimation`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/vnd.api+json',
-        Accept: 'application/vnd.api+json',
-      },
-      body: JSON.stringify(body),
-    });
-    let gasStationResponse = await getGasPricesInNativeWei(chainId);
+    let gasEstimationResponse = await fetch(
+      `${options.hubUrl || getConstantByNetwork('hubUrl', network)}/api/gas-estimation`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/vnd.api+json',
+          Accept: 'application/vnd.api+json',
+        },
+        body: JSON.stringify(body),
+      }
+    );
+    let gasStationResponse = await getGasPricesInNativeWei(chainId, { hubUrl: options.hubUrl });
     let gas = BigNumber.from((await gasEstimationResponse.json()).data?.attributes?.gas);
     let gasRangeInWei = {
       slow: gas.mul(String(gasStationResponse.slow)),

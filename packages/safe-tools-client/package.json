@@ -66,6 +66,7 @@
     "@types/htmlbars-inline-precompile": "^3.0.0",
     "@types/qunit": "^2.19.3",
     "@types/rsvp": "^4.0.4",
+    "@uniswap/v2-core": "^1.0.1",
     "@walletconnect/client": "^1.6.0",
     "@walletconnect/core": "^1.6.0",
     "@walletconnect/http-connection": "^1.6.0",
@@ -150,6 +151,7 @@
     "@sentry/ember": "^7.28.1",
     "date-fns": "^2.29.3",
     "eslint-plugin-import": "^2.26.0",
+    "msw": "^0.48.1",
     "typescript": "^4.9.3"
   },
   "msw": {

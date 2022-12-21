@@ -166,21 +166,21 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
       isLoading: true,
       isIndeterminate: false
     });
-    if (!this.wallet.isConnected) {
+    let { selectedGasToken, selectedPaymentType, paymentToken } = this;
+    let isWalletConnected = this.wallet.isConnected;
+    if (!isWalletConnected) {
       state.isIndeterminate = true;
       return state;
     }
-    let { selectedGasToken } = this;
     if (!selectedGasToken) {
       state.isIndeterminate = true;
       return state;
     }
-    let paymentTokenAddress = this.paymentToken?.address;
-    if (!paymentTokenAddress) {
+    if (!paymentToken?.address) {
       state.isIndeterminate = true;
       return state;
     }
-    if (!this.selectedPaymentType) {
+    if (!selectedPaymentType) {
       state.isIndeterminate = true;
       return state;
     }
@@ -189,7 +189,7 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
     const scenario = this.selectedPaymentType === 'one-time' ? 'execute_one_time_payment' : 'execute_recurring_payment';
     (async () => {
       try {
-        this.gasEstimation = await this.scheduledPaymentsSdk.getScheduledPaymentGasEstimation(scenario, paymentTokenAddress, selectedGasToken.address);
+        this.gasEstimation = await this.scheduledPaymentsSdk.getScheduledPaymentGasEstimation(scenario, paymentToken.address, selectedGasToken.address);
         const { gasRangeInGasTokenWei, gasRangeInUSD } = this.gasEstimation;
         state.value = {
           normal: `Less than ${fromWei(gasRangeInGasTokenWei.normal.toString(), 'ether')} ${selectedGasToken.symbol} (~${convertAmountToNativeDisplay(fromWei(gasRangeInUSD.normal.toString(), 'ether'), 'USD')})`,

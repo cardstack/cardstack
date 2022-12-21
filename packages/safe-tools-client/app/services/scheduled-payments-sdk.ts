@@ -6,6 +6,7 @@ import {
   getNativeWeiInToken,
   poll,
 } from '@cardstack/cardpay-sdk';
+import config from '@cardstack/safe-tools-client/config/environment';
 import SafesService, {
   Safe,
 } from '@cardstack/safe-tools-client/services/safes';
@@ -54,7 +55,8 @@ export default class SchedulePaymentSDKService extends Service {
     const scheduledPayments = await this.getSchedulePaymentsModule();
 
     const estimatedGas = await scheduledPayments.estimateGas(
-      'create_safe_with_module'
+      'create_safe_with_module',
+      { hubUrl: config.hubUrl }
     );
 
     return {
@@ -96,11 +98,11 @@ export default class SchedulePaymentSDKService extends Service {
   ): Promise<GasEstimationResult> {
     const scheduledPayments = await this.getSchedulePaymentsModule();
 
-    const gasEstimationResult = await scheduledPayments.estimateGas(
-      scenario,
+    const gasEstimationResult = await scheduledPayments.estimateGas(scenario, {
       tokenAddress,
-      gasTokenAddress
-    );
+      gasTokenAddress,
+      hubUrl: config.hubUrl,
+    });
     const { gasRangeInWei, gasRangeInUSD } = gasEstimationResult;
     const priceWeiInGasToken = String(
       await getNativeWeiInToken(this.wallet.ethersProvider, gasTokenAddress)
