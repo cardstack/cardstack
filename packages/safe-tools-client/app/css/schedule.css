@@ -85,4 +85,11 @@
 
 .boxel-action-container.past-payments-container {
   min-width: 75rem;
+  max-width: none;
+}
+
+.horizontal-form-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
 }

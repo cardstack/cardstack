@@ -1,0 +1,29 @@
+.future-payments-list {
+  min-width: 20rem;
+  max-width: 25rem;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.no-payments-section {
+  height: 100%;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.no-payments-section .no-payments-title {
+  font: 700 1.125rem/calc(24 / 18) var(--boxel-font-family);
+  letter-spacing: 0;
+}
+
+.no-payments-section .no-payments-description {
+  margin-top: var(--boxel-sp-xs);
+  color: var(--boxel-purple-400);;
+  letter-spacing: 0;
+  text-align: center;
+}

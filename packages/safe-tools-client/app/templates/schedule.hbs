@@ -54,7 +54,11 @@
   <section class='safe-tools__dashboard-schedule-content'>
     <ScheduleCollapsePanel @open={{not this.wallet.isConnected}} />
     <div class='temporary-form-container'>
-      <SchedulePaymentFormActionCard />
+      <div class='horizontal-form-container'>
+        <SchedulePaymentFormActionCard/>
+        <FuturePaymentsList />
+      </div>
+      
 
       <Boxel::ActionContainer
         class="past-payments-container"
