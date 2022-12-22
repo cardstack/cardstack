@@ -24,7 +24,7 @@ export default class FuturePaymentsList extends Component {
   }
 
   @action
-  async addFund() {
+  async addFunds() {
     //TODO: implement add fund action
   }
 
@@ -33,9 +33,9 @@ export default class FuturePaymentsList extends Component {
       class="future-payments-list"
       as |Section ActionChin|>
       {{#if (lte this.futurePayments.length 0)}}
-        <Section class="no-payments-section">
-          <div class="no-payments-title">Scheduled your first payment</div>
-          <div class="no-payments-description">Your future payment will show up here. This is where you can check on the status of your transactions and view important messages.</div>
+        <Section class="future-payments-list__no-payments-section">
+          <div class="future-payments-list__no-payments-title">Scheduled your first payment</div>
+          <div class="future-payments-list__no-payments-description">Your future payment will show up here. This is where you can check on the status of your transactions and view important messages.</div>
         </Section>
       {{else}}
         <Section @title="Future Payments">
@@ -43,8 +43,8 @@ export default class FuturePaymentsList extends Component {
         </Section>
         <ActionChin @state='default'>
           <:default as |ac|>
-            <ac.ActionButton {{on 'click' this.addFund}}>
-              Add Fund
+            <ac.ActionButton {{on 'click' this.addFunds}}>
+              Add Funds
             </ac.ActionButton>
           </:default>
         </ActionChin>

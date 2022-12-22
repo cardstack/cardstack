@@ -7,7 +7,7 @@
   justify-content: space-between;
 }
 
-.no-payments-section {
+.future-payments-list__no-payments-section {
   height: 100%;
 
   display: flex;
@@ -16,12 +16,12 @@
   align-items: center;
 }
 
-.no-payments-section .no-payments-title {
+.future-payments-list__no-payments-title {
   font: 700 1.125rem/calc(24 / 18) var(--boxel-font-family);
   letter-spacing: 0;
 }
 
-.no-payments-section .no-payments-description {
+.future-payments-list__no-payments-description {
   margin-top: var(--boxel-sp-xs);
   color: var(--boxel-purple-400);;
   letter-spacing: 0;
