@@ -40,22 +40,19 @@
 .safe-tools__dashboard-schedule-content {
   flex: 1;
   padding: var(--boxel-sp-xxl) var(--boxel-sp-lg) 0;
+
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.safe-tools__dashboard-schedule-content > *+* {
+  margin-top: var(--boxel-sp-lg);
 }
 
 .safe-tools__dashboard-schedule-control-panel-safe-info-address {
   color: var(--boxel-purple-300);
   margin-bottom: 2px;
-}
-
-.temporary-form-container {
-  display: flex;
-  justify-content: center;
-  margin-top: var(--boxel-sp-xl);
-  flex-direction: column;
-}
-
-.temporary-form-container > *+* {
-  margin-top: var(--boxel-sp-lg);
 }
 
 .safe-tools__dashboard-dropdown {
@@ -88,7 +85,7 @@
   max-width: none;
 }
 
-.horizontal-form-container {
+.safe-tools__dashboard-schedule-content-form-and-future-list {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
