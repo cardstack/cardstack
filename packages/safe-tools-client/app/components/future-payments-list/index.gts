@@ -8,7 +8,7 @@ import TokensService from '@cardstack/safe-tools-client/services/tokens';
 import { inject as service } from '@ember/service';
 import { on } from '@ember/modifier';
 import { action } from '@ember/object';
-import lte from 'ember-truth-helpers/helpers/lte';
+import lt from 'ember-truth-helpers/helpers/lt';
 
 import './index.css';
 
@@ -32,7 +32,7 @@ export default class FuturePaymentsList extends Component {
     <BoxelActionContainer 
       class="future-payments-list"
       as |Section ActionChin|>
-      {{#if (lte this.futurePayments.length 0)}}
+      {{#if (lt this.futurePayments.length 1)}}
         <Section class="future-payments-list__no-payments-section">
           <div class="future-payments-list__no-payments-title">Scheduled your first payment</div>
           <div class="future-payments-list__no-payments-description">Your future payment will show up here. This is where you can check on the status of your transactions and view important messages.</div>
