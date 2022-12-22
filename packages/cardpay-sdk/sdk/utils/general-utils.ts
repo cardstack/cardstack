@@ -52,7 +52,7 @@ export interface ErrorFragment {
 }
 
 export function isJsonRpcProvider(web3OrEthersProvider: any): web3OrEthersProvider is JsonRpcProvider {
-  return web3OrEthersProvider instanceof JsonRpcProvider;
+  return !!web3OrEthersProvider.getNetwork;
 }
 
 export async function networkName(web3OrEthersProvider: Web3 | JsonRpcProvider): Promise<string> {

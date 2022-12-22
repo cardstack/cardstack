@@ -3,7 +3,7 @@ import '@cardstack/boxel/styles/global.css';
 import './index.css';
 import { type EmptyObject } from '@ember/component/helper';
 import { svgJar } from '@cardstack/boxel/utils/svg-jar';
-import { Participant } from '../participant/model';
+import { type Participant } from '../participant/model';
 
 interface Signature {
   Element: HTMLDivElement;

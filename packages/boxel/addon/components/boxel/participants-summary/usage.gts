@@ -4,7 +4,7 @@ import BoxelParticipantSummary from './index';
 import DarkThemeAndLightTheme from 'dummy/components/doc/dark-theme-and-light-theme';
 import { A } from '@ember/array';
 import { tracked } from '@glimmer/tracking';
-import { Participant } from '../participant/model';
+import { type Participant } from '../participant/model';
 import { fn } from '@ember/helper';
 
 import HaleyOConnellThumb from '@cardstack/boxel/usage-support/images/users/Haley-OConnell.jpg';

@@ -35,7 +35,7 @@ module('Acceptance | wallet connection', function (hooks) {
       return Promise.resolve([
         {
           address: '0x458Bb61A22A0e91855d6D876C88706cfF7bD486E',
-          spModuleAddress: '0xa6b71e26c5e0845f74c812102ca7114b6a896ab2',
+          spModuleAddress: '0xa6B71E26C5e0845f74c812102Ca7114b6a896AB2',
         },
       ]);
     };

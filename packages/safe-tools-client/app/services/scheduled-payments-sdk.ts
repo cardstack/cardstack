@@ -157,7 +157,8 @@ export default class SchedulePaymentSDKService extends Service {
       payAt,
       recurringDayOfMonth,
       recurringUntil,
-      onScheduledPaymentIdReady
+      onScheduledPaymentIdReady,
+      { hubUrl: config.hubUrl }
     );
     console.log(
       `Scheduled payment added in both crank and on chain successfully.`

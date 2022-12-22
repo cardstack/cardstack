@@ -118,7 +118,7 @@
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-prettier": "^4.2.1",
     "eslint-plugin-qunit": "^7.3.1",
-    "eth-testing": "^1.9.0",
+    "eth-testing": "^1.10.0",
     "ethers": "^5.7.2",
     "file-loader": "^6.2.0",
     "loader.js": "^4.7.0",

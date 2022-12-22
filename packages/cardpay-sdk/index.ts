@@ -46,6 +46,7 @@ export { getSDK, getABI } from './sdk/version-resolver';
 
 export { default as ERC20ABI } from './contracts/abi/erc-20';
 export { default as ERC677ABI } from './contracts/abi/erc-677';
+export { default as GnosisSafeABI } from './contracts/abi/gnosis-safe';
 export { default as ForeignBridgeMediatorABI } from './contracts/abi/foreign-bridge-mediator';
 export { default as HomeBridgeMediatorABI } from './contracts/abi/home-bridge-mediator';
 export { default as HttpProvider } from './providers/http-provider';
@@ -61,3 +62,4 @@ export * from './sdk/scheduled-payment/utils';
 export { poll } from './sdk/utils/general-utils';
 export { convertRawAmountToDecimalFormat } from './sdk/currency-utils';
 export { default as ScheduledPaymentModule } from './sdk/scheduled-payment-module';
+export { default as ScheduledPaymentModuleABI } from './contracts/abi/modules/scheduled-payment-module';

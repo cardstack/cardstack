@@ -1,4 +1,8 @@
-import { ERC20ABI } from '@cardstack/cardpay-sdk';
+import {
+  ERC20ABI,
+  GnosisSafeABI,
+  ScheduledPaymentModuleABI,
+} from '@cardstack/cardpay-sdk';
 import SafesService, {
   Safe,
   TokenBalance,
@@ -9,9 +13,11 @@ import {
   click,
   findAll,
   visit,
+  waitFor,
   waitUntil,
 } from '@ember/test-helpers';
 import IUniswapV2Pair from '@uniswap/v2-core/build/IUniswapV2Pair.json';
+import { TransactionReceipt } from 'eth-testing/lib/json-rpc-methods-types';
 import { BigNumber } from 'ethers';
 import { setupWorker, rest } from 'msw';
 import { module, test } from 'qunit';
@@ -27,6 +33,9 @@ declare global {
 }
 const FAKE_WALLET_CONNECT_ACCOUNT =
   '0x57b8a319bea4438092eeb4e27d9048dbb844e234';
+const SAFE_ADDRESS = '0x458Bb61A22A0e91855d6D876C88706cfF7bD486E';
+const SP_MODULE_ADDRESS = '0xa6B71E26C5e0845f74c812102Ca7114b6a896AB2';
+const EXECUTION_GAS = 127864;
 
 module('Acceptance | scheduling', function (hooks) {
   setupApplicationTest(hooks);
@@ -37,6 +46,17 @@ module('Acceptance | scheduling', function (hooks) {
     });
 
     const handlers = [
+      rest.get('/hub-test/api/session', (_req, res, ctx) => {
+        return res(ctx.status(200), ctx.json({}));
+      }),
+      rest.get('/hub-test/api/scheduled-payment-attempts', (_req, res, ctx) => {
+        return res(
+          ctx.status(200),
+          ctx.json({
+            data: [],
+          })
+        );
+      }),
       rest.post('/hub-test/api/gas-estimation', (_req, res, ctx) => {
         return res(
           ctx.status(200),
@@ -50,7 +70,7 @@ module('Acceptance | scheduling', function (hooks) {
                 'token-address': '0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6',
                 'gas-token-address':
                   '0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6',
-                gas: 127864,
+                gas: EXECUTION_GAS,
               },
             },
           })
@@ -73,11 +93,80 @@ module('Acceptance | scheduling', function (hooks) {
           })
         );
       }),
+      rest.post(
+        `https://relay-ethereum.cardstack.com/api/v2/safes/${SAFE_ADDRESS}/transactions/estimate/`,
+        (_req, res, ctx) => {
+          return res(
+            ctx.status(200),
+            ctx.json({
+              baseGas: 1,
+              safeTxGas: 1,
+            })
+          );
+        }
+      ),
+      rest.post('/hub-test/api/scheduled-payments', (_req, res, ctx) => {
+        return res(
+          ctx.status(200),
+          ctx.json({
+            data: {
+              type: 'scheduled-payment',
+              id: 'acc42eb0-340f-42f3-98b3-a568255a9c37',
+            },
+          })
+        );
+      }),
+      rest.post(
+        `https://relay-ethereum.cardstack.com/api/v1/safes/${SAFE_ADDRESS}/transactions/`,
+        (_req, res, ctx) => {
+          return res(
+            ctx.status(200),
+            ctx.json({
+              ethereumTx: {
+                txHash:
+                  '0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef',
+              },
+            })
+          );
+        }
+      ),
+      rest.patch(
+        '/hub-test/api/scheduled-payments/acc42eb0-340f-42f3-98b3-a568255a9c37',
+        (_req, res, ctx) => {
+          return res(
+            ctx.status(200),
+            ctx.json({
+              data: {
+                type: 'scheduled-payment',
+                id: 'acc42eb0-340f-42f3-98b3-a568255a9c37',
+              },
+            })
+          );
+        }
+      ),
+      rest.get(
+        '/hub-test/api/scheduled-payments/acc42eb0-340f-42f3-98b3-a568255a9c37',
+        (_req, res, ctx) => {
+          return res(
+            ctx.status(200),
+            ctx.json({
+              data: {
+                type: 'scheduled-payment',
+                id: 'acc42eb0-340f-42f3-98b3-a568255a9c37',
+              },
+            })
+          );
+        }
+      ),
     ];
     const worker = setupWorker(...handlers);
     worker.start({
       onUnhandledRequest(req, { warning }) {
-        if (req.url.href.match(/trust-wallet.com|relay|\.png|\.svg|\.ttf/)) {
+        if (
+          req.url.href.match(
+            /trust-wallet.com|relay|\.png|\.svg|\.ttf|\/assets\//
+          )
+        ) {
           return;
         }
         warning();
@@ -115,13 +204,44 @@ module('Acceptance | scheduling', function (hooks) {
     const tokensService = this.owner.lookup('service:tokens');
     tokensService.stubGasTokens(exampleGasTokens);
 
-    const safesService = this.owner.lookup('service:safes') as SafesService;
+    const mockSPModuleContract = this.mockWalletConnect.generateContractUtils(
+      ScheduledPaymentModuleABI,
+      SP_MODULE_ADDRESS
+    );
+    mockSPModuleContract.mockCall(
+      'createSpHash(address,uint256,address,((uint256),(uint256)),uint256,uint256,address,string,uint256)',
+      ['0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef']
+    );
 
+    const mockGnosisSafeContract = this.mockWalletConnect.generateContractUtils(
+      GnosisSafeABI,
+      SAFE_ADDRESS
+    );
+    mockGnosisSafeContract.mockCall('VERSION', ['1.3.0']);
+
+    this.mockWalletConnect.lowLevel.mockRequest('eth_signTypedData_v4', [
+      '1b6a2d7aa891e56f1c7a2456e9f9e4444b9bca72bcecb40cbce2b2df89e387415b724a87e93a7b944d9c34e05e87b87c1d7bb00e6b2c4c3f4ccad42e9a9d49dd1b',
+    ]);
+    this.mockWalletConnect.lowLevel.mockRequest('eth_signTypedData_v4', [
+      '1b6a2d7aa891e56f1c7a2456e9f9e4444b9bca72bcecb40cbce2b2df89e387415b724a87e93a7b944d9c34e05e87b87c1d7bb00e6b2c4c3f4ccad42e9a9d49dd1b',
+    ]);
+
+    this.mockWalletConnect.lowLevel.mockRequest(
+      'eth_getTransactionReceipt',
+      {
+        status: true,
+        blockHash:
+          '0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef',
+      } as TransactionReceipt,
+      { persistent: true }
+    );
+
+    const safesService = this.owner.lookup('service:safes') as SafesService;
     safesService.fetchSafes = (): Promise<Safe[]> => {
       return Promise.resolve([
         {
-          address: '0x458Bb61A22A0e91855d6D876C88706cfF7bD486E',
-          spModuleAddress: '0xa6b71e26c5e0845f74c812102ca7114b6a896ab2',
+          address: SAFE_ADDRESS,
+          spModuleAddress: SP_MODULE_ADDRESS,
         },
       ]);
     };
@@ -155,12 +275,12 @@ module('Acceptance | scheduling', function (hooks) {
         FAKE_WALLET_CONNECT_ACCOUNT,
       ]);
       await fillInSchedulePaymentFormWithValidInfo();
-      await waitUntil(
-        () =>
-          findAll(
-            '.schedule-payment-form-action-card--max-gas-fee-description'
-          )[0]?.textContent?.length
-      );
+      await waitFor('[data-test-safe-address-label]');
+      await waitUntil(() => {
+        return findAll(
+          '.schedule-payment-form-action-card--max-gas-fee-description'
+        )[0]?.textContent?.trim().length;
+      });
       // click "Schedule Payment" button
       await click(
         '.schedule-payment-form-action-card [data-test-boxel-action-chin] button'

@@ -949,10 +949,11 @@ export default class ScheduledPaymentModule {
     payAt?: number | null,
     recurringDayOfMonth?: number | null,
     recurringUntil?: number | null,
-    onScheduledPaymentCreate?: (scheduledPaymentId: string) => unknown
+    onScheduledPaymentCreate?: (scheduledPaymentId: string) => unknown,
+    options: { hubUrl?: string } = {}
   ) {
     let hubAuth = await getSDK('HubAuth', this.ethersProvider, undefined, this.signer);
-    let hubRootUrl = await hubAuth.getHubUrl();
+    let hubRootUrl = options.hubUrl || (await hubAuth.getHubUrl());
     let authToken = await hubAuth.authenticate();
 
     let safeAddress: string;
