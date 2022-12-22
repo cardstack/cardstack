@@ -47,6 +47,17 @@ module.exports = {
           { argsIgnorePattern: '^_' },
         ],
         '@typescript-eslint/consistent-type-exports': 'error',
+        '@typescript-eslint/no-restricted-imports': [
+          'error',
+          {
+            paths: [
+              {
+                name: 'bn.js',
+                message: `Please use "import { BigNumber } from 'ethers'" instead.`,
+              },
+            ],
+          },
+        ],
       },
       parserOptions: {
         tsconfigRootDir: __dirname,

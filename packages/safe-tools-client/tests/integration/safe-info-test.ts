@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 import { render } from '@ember/test-helpers';
-import BN from 'bn.js';
 import { setupRenderingTest } from 'ember-qunit';
+import { BigNumber } from 'ethers';
 import hbs from 'htmlbars-inline-precompile';
 import { module, test } from 'qunit';
 
@@ -56,22 +56,22 @@ module('Integration | Component | safe-info', function (hooks) {
       {
         symbol: 'ETH',
         decimals: 18,
-        balance: new BN('1000000000000000000'),
+        balance: BigNumber.from('1000000000000000000'),
       },
       {
         symbol: 'USDC',
         decimals: 6,
-        balance: new BN('100000000'),
+        balance: BigNumber.from('100000000'),
       },
       {
         symbol: 'DAI',
         decimals: 18,
-        balance: new BN('100000000000'), // crypto dust (0.00001 DAI)
+        balance: BigNumber.from('100000000000'), // crypto dust (0.00001 DAI)
       },
       {
         symbol: 'WMATIC',
         decimals: 18,
-        balance: new BN('0'),
+        balance: BigNumber.from('0'),
       },
     ]);
 

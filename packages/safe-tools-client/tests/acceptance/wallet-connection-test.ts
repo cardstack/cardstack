@@ -13,7 +13,7 @@ import {
   waitFor,
 } from '@ember/test-helpers';
 import percySnapshot from '@percy/ember';
-import { BN } from 'bn.js';
+import { BigNumber } from 'ethers';
 import { module, test } from 'qunit';
 
 import {
@@ -44,13 +44,13 @@ module('Acceptance | wallet connection', function (hooks) {
       return Promise.resolve([
         {
           symbol: 'ETH',
-          balance: new BN('1000000000000000000'),
+          balance: BigNumber.from('1000000000000000000'),
           decimals: 18,
           isNativeToken: true,
         } as unknown as TokenBalance,
         {
           symbol: 'USDT',
-          balance: new BN('10000000'),
+          balance: BigNumber.from('10000000'),
           decimals: 6,
         } as unknown as TokenBalance,
       ]);
