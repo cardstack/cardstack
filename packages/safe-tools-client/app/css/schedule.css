@@ -88,5 +88,4 @@
 .safe-tools__dashboard-schedule-content-form-and-future-list {
   display: flex;
   flex-direction: row;
-  justify-content: space-between;
 }

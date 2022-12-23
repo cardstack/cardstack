@@ -5,22 +5,24 @@ import HubAuthenticationService from '@cardstack/safe-tools-client/services/hub-
 import Service, { inject as service } from '@ember/service';
 import { BigNumber } from 'ethers';
 
+export interface ScheduledPayment {
+  amount: BigNumber;
+  feeFixedUSD: string;
+  feePercentage: string;
+  tokenAddress: string;
+  gasTokenAddress: string;
+  payeeAddress: string;
+  payAt: Date;
+  chainId: number;
+}
+
 export interface ScheduledPaymentAttempt {
   startedAt: Date;
   endedAt: Date;
   status: string;
   failureReason: string;
   transactionHash: string;
-  scheduledPayment: {
-    amount: BigNumber;
-    feeFixedUSD: string;
-    feePercentage: string;
-    tokenAddress: string;
-    gasTokenAddress: string;
-    payeeAddress: string;
-    payAt: string;
-    chainId: string;
-  };
+  scheduledPayment: ScheduledPayment;
 }
 
 export interface ScheduledPaymentResponseItem {
@@ -92,10 +94,10 @@ export default class ScheduledPaymentsService extends Service {
       'GET'
     );
 
-    return this.deserializeScheduledPaymentResponse(response);
+    return this.deserializeScheduledPaymentAttemptResponse(response);
   }
 
-  deserializeScheduledPaymentResponse(
+  deserializeScheduledPaymentAttemptResponse(
     response: ScheduledPaymentResponse
   ): ScheduledPaymentAttempt[] {
     return response.data.map((s) => {
@@ -115,9 +117,9 @@ export default class ScheduledPaymentsService extends Service {
           feePercentage: scheduledPayment!['fee-percentage'],
           gasTokenAddress: scheduledPayment!['gas-token-address'],
           tokenAddress: scheduledPayment!['token-address'],
-          chainId: scheduledPayment!['chain-id'],
+          chainId: Number(scheduledPayment!['chain-id']),
           payeeAddress: scheduledPayment!['payee-address'],
-          payAt: scheduledPayment!['pay-at'],
+          payAt: new Date(scheduledPayment!['pay-at']),
         },
       };
     });

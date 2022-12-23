@@ -1,10 +1,13 @@
 .future-payments-list {
-  min-width: 20rem;
-  max-width: 25rem;
+  min-width: 23rem;
+  max-width: 30rem;
+  max-height: 50rem;
 
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+
+  background-color: var(--boxel-purple-100);
 }
 
 .future-payments-list__no-payments-section {
@@ -23,7 +26,20 @@
 
 .future-payments-list__no-payments-description {
   margin-top: var(--boxel-sp-xs);
-  color: var(--boxel-purple-400);;
+  color: var(--boxel-purple-400);
   letter-spacing: 0;
   text-align: center;
+}
+
+.future-payments-list .boxel-action-container-section-title--content {
+  margin-bottom: var(--boxel-sp-xl);
+}
+
+.future-payments-list__payments-section {
+  height: 83%;
+}
+
+.future-payments-list__payments-section-time-brackets {
+  overflow: auto;
+  height: 100%;
 }

@@ -55,7 +55,7 @@
     <ScheduleCollapsePanel @open={{not this.wallet.isConnected}} />
     <div class='safe-tools__dashboard-schedule-content-form-and-future-list'>
       <SchedulePaymentFormActionCard/>
-      <FuturePaymentsList />
+      <FuturePaymentsList @onDepositClick={{set this 'isDepositModalOpen' true}} />
     </div>
     <Boxel::ActionContainer
       class="past-payments-container"
