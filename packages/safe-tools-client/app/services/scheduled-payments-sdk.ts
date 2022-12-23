@@ -4,9 +4,12 @@ import {
   getSDK,
   ScheduledPaymentModule,
   getNativeWeiInToken,
+  poll,
 } from '@cardstack/cardpay-sdk';
+import SafesService, {
+  Safe,
+} from '@cardstack/safe-tools-client/services/safes';
 import WalletService from '@cardstack/safe-tools-client/services/wallet';
-
 import { action } from '@ember/object';
 import Service, { inject as service } from '@ember/service';
 import { TaskGenerator } from 'ember-concurrency';
@@ -27,6 +30,7 @@ export interface GasEstimationResult {
 
 export default class SchedulePaymentSDKService extends Service {
   @service declare wallet: WalletService;
+  @service declare safes: SafesService;
 
   estimatedSafeCreationGas: undefined | BigNumber;
 
@@ -43,7 +47,7 @@ export default class SchedulePaymentSDKService extends Service {
     return { from: this.wallet.address };
   }
 
-  @action async getCreateSafeGasEstimation(): Promise<BigNumber | undefined> {
+  async getCreateSafeGasEstimation(): Promise<BigNumber | undefined> {
     const scheduledPayments = await this.getSchedulePaymentsModule();
 
     const estimatedGas = await scheduledPayments.estimateGas(
@@ -53,13 +57,28 @@ export default class SchedulePaymentSDKService extends Service {
     return estimatedGas.gasRangeInWei.standard;
   }
 
-  @task *createSafe(): TaskGenerator<void> {
-    const scheduledPayments = yield this.getSchedulePaymentsModule();
+  async createSafe(): Promise<{ safeAddress: string }> {
+    const scheduledPayments = await this.getSchedulePaymentsModule();
 
-    yield scheduledPayments.createSafeWithModuleAndGuard(
+    return scheduledPayments.createSafeWithModuleAndGuard(
       undefined,
       undefined,
       this.contractOptions
+    );
+  }
+
+  async waitForSafeToBeIndexed(
+    chainId: number,
+    walletAddress: string,
+    safeAddress: string
+  ): Promise<void> {
+    await poll(
+      () => this.safes.fetchSafes(chainId, walletAddress),
+      (safes: Safe[]) => {
+        return !!safes.find((safe: Safe) => safe.address === safeAddress);
+      },
+      1000,
+      2 * 60 * 1000 // Poll for 2 minutes. If the safe is not indexed by then, show an error message
     );
   }
 

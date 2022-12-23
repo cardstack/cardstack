@@ -6,8 +6,9 @@ import gt from 'ember-truth-helpers/helpers/gt';
 import { on } from '@ember/modifier';
 import truncateMiddle from '@cardstack/safe-tools-client/helpers/truncate-middle';
 import weiToDecimal from '@cardstack/safe-tools-client/helpers/wei-to-decimal';
-import CreateSafeButton from '@cardstack/safe-tools-client/components/create-safe-button';
+import CreateSafe from '@cardstack/safe-tools-client/components/create-safe';
 import { Safe, TokenBalance } from '@cardstack/safe-tools-client/services/safes';
+import { tracked } from '@glimmer/tracking';
 
 import './index.css';
 
@@ -24,6 +25,8 @@ interface Signature {
 }
 
 export default class SafeInfo extends Component<Signature> {
+  @tracked createSafeModalIsOpen = false;
+
   get safesHaveLoadedInitially() {
     return this.args.safes !== undefined;
   }
@@ -73,13 +76,13 @@ export default class SafeInfo extends Component<Signature> {
         To schedule payments, you need to have a safe which contains funds that would be deducted
         automatically when scheduled payments are due.
       </p>
-
-      <CreateSafeButton />
     {{/if}}
 
     {{#if @safesLoadingError}}
       <div class="info">⚠️ {{@safesLoadingError.message}}</div>
     {{/if}}
+
+    <CreateSafe @currentSafe={{@currentSafe}} />
   </template>
 }
 
