@@ -97,6 +97,7 @@ export default class CreateSafeButton extends Component<Signature> {
       ({ safeAddress } = await taskFor(this.createSafe).perform());
     } catch (e) {
       console.log(e) // TODO: Sentry
+      return;
     }
     this.safeCreated = true;
 
