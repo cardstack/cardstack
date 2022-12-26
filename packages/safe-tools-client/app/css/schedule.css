@@ -37,16 +37,17 @@
   width: 100%;
 }
 
-.safe-tools__dashboard-schedule-content {
+.safe-tools__dashboard-container {
   flex: 1;
   padding: var(--boxel-sp-xxl) var(--boxel-sp-lg) 0;
 
   display: flex;
   justify-content: center;
   flex-direction: column;
+  max-width: 75rem;
 }
 
-.safe-tools__dashboard-schedule-content > *+* {
+.safe-tools__dashboard-container > * + * {
   margin-top: var(--boxel-sp-lg);
 }
 
@@ -60,7 +61,9 @@
   align-items: center;
 }
 
-.safe-tools__dashboard-dropdown .ember-power-select-selected-item .boxel-select__item {
+.safe-tools__dashboard-dropdown
+  .ember-power-select-selected-item
+  .boxel-select__item {
   padding-left: 0;
 }
 
@@ -78,14 +81,4 @@
   width: 11px;
   height: 9px;
   margin-top: 5px;
-}
-
-.boxel-action-container.past-payments-container {
-  min-width: 75rem;
-  max-width: none;
-}
-
-.safe-tools__dashboard-schedule-content-form-and-future-list {
-  display: flex;
-  flex-direction: row;
 }

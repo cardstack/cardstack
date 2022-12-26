@@ -91,8 +91,8 @@ export default class FuturePaymentsList extends Component<Signature> {
       as |Section ActionChin|>
       {{#if (lt this.futurePaymentsResource.value.length 1)}}
         <Section class="future-payments-list__no-payments-section" data-test-no-future-payments-list>
-          <div class="future-payments-list__no-payments-title">Scheduled your first payment</div>
-          <div class="future-payments-list__no-payments-description">Your future payment will show up here. This is where you can check on the status of your transactions and view important messages.</div>
+          <div class="future-payments-list__no-payments-title">Schedule your first payment</div>
+          <div class="future-payments-list__no-payments-description">Your future payments will show up here. This is where you can check on the status of your transactions and view important messages.</div>
         </Section>
       {{else}}
         <Section @title="Future Payments" class="future-payments-list__payments-section" data-test-future-payments-list>
