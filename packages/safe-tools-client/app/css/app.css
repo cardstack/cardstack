@@ -9,3 +9,11 @@
 .info {
   font-size: var(--boxel-font-size-sm);
 }
+
+.safe-tools__dashboard-container-row {
+  display: flex;
+}
+
+.boxel-dropdown-trigger {
+  justify-content: space-between;
+}
