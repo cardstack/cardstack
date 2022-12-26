@@ -1,7 +1,7 @@
 .future-payments-list {
   min-width: 23rem;
   max-width: 30rem;
-  max-height: 50rem;
+  height: 50rem;
 
   display: flex;
   flex-direction: column;
