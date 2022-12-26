@@ -62,8 +62,7 @@
   margin-right: var(--boxel-sp);
 }
 
-.payment-transactions-list__wrapper .boxel-dropdown-trigger {
-  justify-content: space-between;
+.past-payments-list {
+  width: 100%;
+  max-width: 100%;
 }
-
-

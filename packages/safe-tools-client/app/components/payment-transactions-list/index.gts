@@ -26,6 +26,7 @@ import TokensService from '@cardstack/safe-tools-client/services/tokens';
 import { subDays } from 'date-fns';
 import { action } from '@ember/object';
 import map from 'ember-composable-helpers/helpers/map';
+import BoxelActionContainer from '@cardstack/boxel/components/boxel/action-container';
 
 type FilterItem = {
   display: string,
@@ -59,7 +60,7 @@ class PaymentTransactionsList extends Component {
   @action setStatusFilter(statusFilter: FilterItem) {
     this.statusFilter = statusFilter;
   }
-  
+
   get paymentAttempts() {
     if (!this.scheduledPaymentAttemptsResource.value) return [];
 
@@ -110,100 +111,103 @@ class PaymentTransactionsList extends Component {
   }
 
   <template>
-    <div class="payment-transactions-list__wrapper">
-      <BoxelDropdown>
-        <:trigger as |bindings|>
-          <BoxelDropdownTrigger
-            @label={{concat 'Date: ' this.dateFilter.display}}
-            {{bindings}}
-            class="payment-transactions-list__filter-trigger"
-            data-test-scheduled-payment-date-filter
-          />
-        </:trigger>
-        <:content as |dd|>
-          <BoxelMenu
-            @closeMenu={{dd.close}}
-            @items={{map (fn this.buildMenuItem this.setDateFilter) this.dateFilters}}
-          />
-        </:content>
-      </BoxelDropdown>
-      <BoxelDropdown>
-        <:trigger as |bindings|>
-          <BoxelDropdownTrigger
-            @label={{concat 'Status: ' this.statusFilter.display}}
-            {{bindings}}
-            class="payment-transactions-list__filter-trigger"
-            data-test-scheduled-payment-status-filter
-          />
-        </:trigger>
-        <:content as |dd|>
-          <BoxelMenu
-            @closeMenu={{dd.close}}
-            @items={{map (fn this.buildMenuItem this.setStatusFilter) this.statusFilters}}
-          />
-        </:content>
-      </BoxelDropdown>
-    </div>
-    <table class="table" data-test-scheduled-payment-attempts>
-      <thead class="table__header">
-        <tr class="table__row">
-          <th class="table__cell">Time</th>
-          <th class="table__cell">Date</th>
-          <th class="table__cell">To</th>
-          <th class="table__cell">Amount</th>
-          <th class="table__cell">Status</th>
-          <th class="table__cell">View details</th>
-          <th></th>
-        </tr>
-      </thead>
+    <BoxelActionContainer class="past-payments-list" as |Section|>
+      <Section @title="Past Payments">
+        <BoxelDropdown>
+          <:trigger as |bindings|>
+            <BoxelDropdownTrigger
+              @label={{concat 'Date: ' this.dateFilter.display}}
+              {{bindings}}
+              class="payment-transactions-list__filter-trigger"
+              data-test-scheduled-payment-date-filter
+            />
+          </:trigger>
+          <:content as |dd|>
+            <BoxelMenu
+              @closeMenu={{dd.close}}
+              @items={{map (fn this.buildMenuItem this.setDateFilter) this.dateFilters}}
+            />
+          </:content>
+        </BoxelDropdown>
+        <BoxelDropdown>
+          <:trigger as |bindings|>
+            <BoxelDropdownTrigger
+              @label={{concat 'Status: ' this.statusFilter.display}}
+              {{bindings}}
+              class="payment-transactions-list__filter-trigger"
+              data-test-scheduled-payment-status-filter
+            />
+          </:trigger>
+          <:content as |dd|>
+            <BoxelMenu
+              @closeMenu={{dd.close}}
+              @items={{map (fn this.buildMenuItem this.setStatusFilter) this.statusFilters}}
+            />
+          </:content>
+        </BoxelDropdown>
 
-      <tbody>
-        {{#each this.paymentAttempts as |paymentAttempt index|}}
-          <tr class="table__row" data-test-scheduled-payment-attempts-item={{index}}>
-            <td class="table__cell" data-test-scheduled-payment-attempts-item-time>
-              {{formatDate paymentAttempt.startedAt "HH:mm:ss"}}
-            </td>
-            <td class="table__cell" data-test-scheduled-payment-attempts-item-date>
-              {{formatDate paymentAttempt.startedAt "dd/MM/yyyy"}}
-            </td>
-            <td class="table__cell blockchain-address transactions-table-item-payee" data-test-scheduled-payment-attempts-item-payee>
-              {{paymentAttempt.scheduledPayment.payeeAddress}}
-            </td>
-            <td class="table__cell" data-test-scheduled-payment-attempts-item-amount>
-              <strong>{{weiToDecimal paymentAttempt.scheduledPayment.amount paymentAttempt.tokenInfo.decimals}} {{paymentAttempt.tokenInfo.symbol}}</strong>
-            </td>
-            <td class="table__cell" data-test-scheduled-payment-attempts-item-status>
-              {{#if (eq paymentAttempt.status 'succeeded')}}
-                🟢 <span class="transactions-table-item-status-text">Confirmed</span>
-              {{else if (eq paymentAttempt.status 'failed')}}
-                🔴 <span class="transactions-table-item-status-text">Failed</span>
-              {{else}}
-                🔵 <span class="transactions-table-item-status-text">Pending</span>
-              {{/if}}
+        <table class="table" data-test-scheduled-payment-attempts>
+          <thead class="table__header">
+            <tr class="table__row">
+              <th class="table__cell">Time</th>
+              <th class="table__cell">Date</th>
+              <th class="table__cell">To</th>
+              <th class="table__cell">Amount</th>
+              <th class="table__cell">Status</th>
+              <th class="table__cell">View details</th>
+              <th></th>
+            </tr>
+          </thead>
 
-              {{#if (eq paymentAttempt.status 'failed')}}
-                <span class="transactions-table-item-status-failure-reason">
-                  ({{paymentAttempt.failureReason}})
-                </span>
-              {{/if}}
-            </td>
-            <td class="table__cell" data-test-scheduled-payment-attempts-blockexplorer>
-              <BlockExplorerButton
-                @networkSymbol={{this.network.symbol}}
-                @transactionHash={{paymentAttempt.transactionHash}}
-                data-test-scheduled-payment-attempts-item-explorer-button
-              />
-            </td>
-          </tr>
-        {{/each}}
-      </tbody>
-    </table>
+          <tbody>
+            {{#each this.paymentAttempts as |paymentAttempt index|}}
+              <tr class="table__row" data-test-scheduled-payment-attempts-item={{index}}>
+                <td class="table__cell" data-test-scheduled-payment-attempts-item-time>
+                  {{formatDate paymentAttempt.startedAt "HH:mm:ss"}}
+                </td>
+                <td class="table__cell" data-test-scheduled-payment-attempts-item-date>
+                  {{formatDate paymentAttempt.startedAt "dd/MM/yyyy"}}
+                </td>
+                <td class="table__cell blockchain-address transactions-table-item-payee" data-test-scheduled-payment-attempts-item-payee>
+                  {{paymentAttempt.scheduledPayment.payeeAddress}}
+                </td>
+                <td class="table__cell" data-test-scheduled-payment-attempts-item-amount>
+                  <strong>{{weiToDecimal paymentAttempt.scheduledPayment.amount paymentAttempt.tokenInfo.decimals}} {{paymentAttempt.tokenInfo.symbol}}</strong>
+                </td>
+                <td class="table__cell" data-test-scheduled-payment-attempts-item-status>
+                  {{#if (eq paymentAttempt.status 'succeeded')}}
+                    🟢 <span class="transactions-table-item-status-text">Confirmed</span>
+                  {{else if (eq paymentAttempt.status 'failed')}}
+                    🔴 <span class="transactions-table-item-status-text">Failed</span>
+                  {{else}}
+                    🔵 <span class="transactions-table-item-status-text">Pending</span>
+                  {{/if}}
 
-    {{#if (eq this.paymentAttempts.length 0)}}
-      <div class="transactions-table-empty-explanation" data-test-scheduled-payment-attempts-empty>
-        No payments found.
-      </div>
-    {{/if}}
+                  {{#if (eq paymentAttempt.status 'failed')}}
+                    <span class="transactions-table-item-status-failure-reason">
+                      ({{paymentAttempt.failureReason}})
+                    </span>
+                  {{/if}}
+                </td>
+                <td class="table__cell" data-test-scheduled-payment-attempts-blockexplorer>
+                  <BlockExplorerButton
+                    @networkSymbol={{this.network.symbol}}
+                    @transactionHash={{paymentAttempt.transactionHash}}
+                    data-test-scheduled-payment-attempts-item-explorer-button
+                  />
+                </td>
+              </tr>
+            {{/each}}
+          </tbody>
+        </table>
+
+        {{#if (eq this.paymentAttempts.length 0)}}
+          <div class="transactions-table-empty-explanation" data-test-scheduled-payment-attempts-empty>
+            No payments found.
+          </div>
+        {{/if}}
+      </Section>
+    </BoxelActionContainer>
   </template>
 }
 
