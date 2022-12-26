@@ -8,7 +8,6 @@ const toUintArray = (proofs: any[]) => {
   return Buffer.from(proofs.reduce((accum: string, o: any) => accum.concat(JSON.stringify(o) + '\n'), ''));
 };
 const mockGetProofs = async (proofs: any[], start: number, end: number) => {
-  //hard coded proof data topaginated response
   if (start > proofs.length) {
     return [];
   } else {
@@ -54,7 +53,7 @@ const mockResponse = (proofs: any[], maxPaginate = 100) => {
     Payload: mockPayload,
   };
 };
-describe('ProcessRewardRootTask', function () {
+describe.only('ProcessRewardRootTask', function () {
   let db: DBClient;
   let s3Mock: AwsStub<ServiceInputTypes, ServiceOutputTypes>;
   let { getContainer } = setupHub(this);
@@ -67,99 +66,226 @@ describe('ProcessRewardRootTask', function () {
     s3Mock = mockClient(S3Client);
   });
 
-  it.only('index parquet file into db', async function () {
+  it('index parquet file into db', async function () {
     const mockProofs = [
       {
         rewardProgramID: '0x0885ce31D73b63b0Fcb1158bf37eCeaD8Ff0fC72',
-        paymentCycle: 27722077,
-        validFrom: 27722077,
-        validTo: 28499677,
+        paymentCycle: 27736956,
+        validFrom: 27736956,
+        validTo: 28514556,
         tokenType: 1,
         payee: '0x159ADe032073d930E85f95AbBAB9995110c43C71',
-        root: '0x2c7f1466e5b1d6958e8cb52dab3cdcd115a52e7171ac5d70c6000648a0163c30',
-        leaf: '0000000000000000000000000885ce31d73b63b0fcb1158bf37ecead8ff0fc720000000000000000000000000000000000000000000000000000000001a7015d0000000000000000000000000000000000000000000000000000000001a7015d0000000000000000000000000000000000000000000000000000000001b2dedd0000000000000000000000000000000000000000000000000000000000000001000000000000000000000000159ade032073d930e85f95abbab9995110c43c7100000000000000000000000000000000000000000000000000000000000000e00000000000000000000000000000000000000000000000000000000000000040000000000000000000000000b0427e9f03eb448d030be3ebc96f423857ceeb2f0000000000000000000000000000000000000000000000008ac7230489e80000',
-        proof: [{ item: '7019252fd21c2f404fb5834aa1a098b64a8c52504b9a83a25fdc732a3834c579' }],
+        root: '0x85a9034e056319d877c4e79d68480cd873858bdd36607c5ce5be40c62c8e5dd2',
+        leaf: '0x0000000000000000000000000885ce31d73b63b0fcb1158bf37ecead8ff0fc720000000000000000000000000000000000000000000000000000000001a73b7c0000000000000000000000000000000000000000000000000000000001a73b7c0000000000000000000000000000000000000000000000000000000001b318fc0000000000000000000000000000000000000000000000000000000000000001000000000000000000000000159ade032073d930e85f95abbab9995110c43c7100000000000000000000000000000000000000000000000000000000000000e00000000000000000000000000000000000000000000000000000000000000040000000000000000000000000b0427e9f03eb448d030be3ebc96f423857ceeb2f0000000000000000000000000000000000000000000000008ac7230489e80000',
+        proof: [{ item: '930827dc0d480d868a190233dec74d8a149be25760ba4fa08d36c6b219209b86' }],
         explanationId: 'flat_payment',
+        explanationData: '{"amount": "10000000000000000000", "token": "0xB0427e9F03Eb448D030bE3EBC96F423857ceEb2f"}',
       },
       {
         rewardProgramID: '0x0885ce31D73b63b0Fcb1158bf37eCeaD8Ff0fC72',
-        paymentCycle: 27722077,
-        validFrom: 27722077,
-        validTo: 28499677,
+        paymentCycle: 27736956,
+        validFrom: 27736956,
+        validTo: 28514556,
         tokenType: 1,
-        payee: '0x691fC14ed06A091e657b70ec9E5Eb72d17396694',
-        root: '0x2c7f1466e5b1d6958e8cb52dab3cdcd115a52e7171ac5d70c6000648a0163c30',
-        leaf: '0000000000000000000000000885ce31d73b63b0fcb1158bf37ecead8ff0fc720000000000000000000000000000000000000000000000000000000001a7015d0000000000000000000000000000000000000000000000000000000001a7015d0000000000000000000000000000000000000000000000000000000001b2dedd0000000000000000000000000000000000000000000000000000000000000001000000000000000000000000691fc14ed06a091e657b70ec9e5eb72d1739669400000000000000000000000000000000000000000000000000000000000000e00000000000000000000000000000000000000000000000000000000000000040000000000000000000000000b0427e9f03eb448d030be3ebc96f423857ceeb2f0000000000000000000000000000000000000000000000008ac7230489e80000',
-        proof: [{ item: '09741092149356a58c47dae710a25e0e05cda00b69e5f18d21c3674e360a83bd' }],
+        payee: '0x388CFef0AB326AEEB4167bab20c189ECab686370',
+        root: '0x85a9034e056319d877c4e79d68480cd873858bdd36607c5ce5be40c62c8e5dd2',
+        leaf: '0x0000000000000000000000000885ce31d73b63b0fcb1158bf37ecead8ff0fc720000000000000000000000000000000000000000000000000000000001a73b7c0000000000000000000000000000000000000000000000000000000001a73b7c0000000000000000000000000000000000000000000000000000000001b318fc0000000000000000000000000000000000000000000000000000000000000001000000000000000000000000388cfef0ab326aeeb4167bab20c189ecab68637000000000000000000000000000000000000000000000000000000000000000e00000000000000000000000000000000000000000000000000000000000000040000000000000000000000000b0427e9f03eb448d030be3ebc96f423857ceeb2f0000000000000000000000000000000000000000000000008ac7230489e80000',
+        proof: [{ item: '66c2bccec52761541e307f888a0da4f44130ae7f8c634dfe0f34c569f3682433' }],
         explanationId: 'flat_payment',
+        explanationData: '{"amount": "10000000000000000000", "token": "0xB0427e9F03Eb448D030bE3EBC96F423857ceEb2f"}',
       },
     ];
     const mockData = mockResponse(mockProofs);
     s3Mock.on(SelectObjectContentCommand).resolves(mockData);
     const rewardProgramId = mockProofs[0].rewardProgramID;
-    const paymentCycle = String(mockProofs[0].paymentCycle);
+    const paymentCycle = mockProofs[0].paymentCycle;
     let task = await getContainer().instantiate(ProcessRewardRoot);
     await task.perform({
       rewardProgramId: rewardProgramId,
-      paymentCycle: paymentCycle,
+      paymentCycle: String(paymentCycle),
     });
     const { rows } = await db.query('SELECT * FROM reward_proofs;');
     expect(rows.length).to.be.equal(2);
     rows.map((o) => {
-      expect(o.reward_program_id).to.be.equal('0x0885ce31D73b63b0Fcb1158bf37eCeaD8Ff0fC72');
-      expect(o.payment_cycle).to.be.equal(27722077);
+      expect(o.reward_program_id).to.be.equal(rewardProgramId);
+      expect(o.payment_cycle).to.be.equal(paymentCycle);
       expect(o.leaf.startsWith('0x')).to.be.true;
       o.proof.map((p: string) => {
         expect(p.startsWith('0x'));
       });
+      expect(o.explanation_id).to.be.equal('flat_payment');
+      expect(o.explanation_data).to.be.deep.equal({
+        amount: '10000000000000000000',
+        token: '0xB0427e9F03Eb448D030bE3EBC96F423857ceEb2f',
+      });
     });
     const { rows: index } = await db.query('SELECT * FROM reward_root_index;');
-    expect(index[0].reward_program_id).to.be.equal('0x0885ce31D73b63b0Fcb1158bf37eCeaD8Ff0fC72');
-    expect(index[0].payment_cycle).to.be.equal(27722077);
+    expect(index[0].reward_program_id).to.be.equal(rewardProgramId);
+    expect(index[0].payment_cycle).to.be.equal(paymentCycle);
   });
-  it.only('fails to index file if reward root has been indexed', async function () {
+  it('fails to index file if reward root has been indexed', async function () {
     const mockProofs = [
       {
         rewardProgramID: '0x0885ce31D73b63b0Fcb1158bf37eCeaD8Ff0fC72',
-        paymentCycle: 27722077,
-        validFrom: 27722077,
-        validTo: 28499677,
+        paymentCycle: 27736956,
+        validFrom: 27736956,
+        validTo: 28514556,
         tokenType: 1,
         payee: '0x159ADe032073d930E85f95AbBAB9995110c43C71',
-        root: '0x2c7f1466e5b1d6958e8cb52dab3cdcd115a52e7171ac5d70c6000648a0163c30',
-        leaf: '0000000000000000000000000885ce31d73b63b0fcb1158bf37ecead8ff0fc720000000000000000000000000000000000000000000000000000000001a7015d0000000000000000000000000000000000000000000000000000000001a7015d0000000000000000000000000000000000000000000000000000000001b2dedd0000000000000000000000000000000000000000000000000000000000000001000000000000000000000000159ade032073d930e85f95abbab9995110c43c7100000000000000000000000000000000000000000000000000000000000000e00000000000000000000000000000000000000000000000000000000000000040000000000000000000000000b0427e9f03eb448d030be3ebc96f423857ceeb2f0000000000000000000000000000000000000000000000008ac7230489e80000',
-        proof: [{ item: '7019252fd21c2f404fb5834aa1a098b64a8c52504b9a83a25fdc732a3834c579' }],
+        root: '0x85a9034e056319d877c4e79d68480cd873858bdd36607c5ce5be40c62c8e5dd2',
+        leaf: '0x0000000000000000000000000885ce31d73b63b0fcb1158bf37ecead8ff0fc720000000000000000000000000000000000000000000000000000000001a73b7c0000000000000000000000000000000000000000000000000000000001a73b7c0000000000000000000000000000000000000000000000000000000001b318fc0000000000000000000000000000000000000000000000000000000000000001000000000000000000000000159ade032073d930e85f95abbab9995110c43c7100000000000000000000000000000000000000000000000000000000000000e00000000000000000000000000000000000000000000000000000000000000040000000000000000000000000b0427e9f03eb448d030be3ebc96f423857ceeb2f0000000000000000000000000000000000000000000000008ac7230489e80000',
+        proof: [{ item: '930827dc0d480d868a190233dec74d8a149be25760ba4fa08d36c6b219209b86' }],
         explanationId: 'flat_payment',
+        explanationData: '{"amount": "10000000000000000000", "token": "0xB0427e9F03Eb448D030bE3EBC96F423857ceEb2f"}',
       },
       {
         rewardProgramID: '0x0885ce31D73b63b0Fcb1158bf37eCeaD8Ff0fC72',
-        paymentCycle: 27722077,
-        validFrom: 27722077,
-        validTo: 28499677,
+        paymentCycle: 27736956,
+        validFrom: 27736956,
+        validTo: 28514556,
         tokenType: 1,
-        payee: '0x691fC14ed06A091e657b70ec9E5Eb72d17396694',
-        root: '0x2c7f1466e5b1d6958e8cb52dab3cdcd115a52e7171ac5d70c6000648a0163c30',
-        leaf: '0000000000000000000000000885ce31d73b63b0fcb1158bf37ecead8ff0fc720000000000000000000000000000000000000000000000000000000001a7015d0000000000000000000000000000000000000000000000000000000001a7015d0000000000000000000000000000000000000000000000000000000001b2dedd0000000000000000000000000000000000000000000000000000000000000001000000000000000000000000691fc14ed06a091e657b70ec9e5eb72d1739669400000000000000000000000000000000000000000000000000000000000000e00000000000000000000000000000000000000000000000000000000000000040000000000000000000000000b0427e9f03eb448d030be3ebc96f423857ceeb2f0000000000000000000000000000000000000000000000008ac7230489e80000',
-        proof: [{ item: '09741092149356a58c47dae710a25e0e05cda00b69e5f18d21c3674e360a83bd' }],
+        payee: '0x388CFef0AB326AEEB4167bab20c189ECab686370',
+        root: '0x85a9034e056319d877c4e79d68480cd873858bdd36607c5ce5be40c62c8e5dd2',
+        leaf: '0x0000000000000000000000000885ce31d73b63b0fcb1158bf37ecead8ff0fc720000000000000000000000000000000000000000000000000000000001a73b7c0000000000000000000000000000000000000000000000000000000001a73b7c0000000000000000000000000000000000000000000000000000000001b318fc0000000000000000000000000000000000000000000000000000000000000001000000000000000000000000388cfef0ab326aeeb4167bab20c189ecab68637000000000000000000000000000000000000000000000000000000000000000e00000000000000000000000000000000000000000000000000000000000000040000000000000000000000000b0427e9f03eb448d030be3ebc96f423857ceeb2f0000000000000000000000000000000000000000000000008ac7230489e80000',
+        proof: [{ item: '66c2bccec52761541e307f888a0da4f44130ae7f8c634dfe0f34c569f3682433' }],
         explanationId: 'flat_payment',
+        explanationData: '{"amount": "10000000000000000000", "token": "0xB0427e9F03Eb448D030bE3EBC96F423857ceEb2f"}',
       },
     ];
     const mockData = mockResponse(mockProofs);
     s3Mock.on(SelectObjectContentCommand).resolves(mockData);
-    const rewardProgramId = '0x0885ce31D73b63b0Fcb1158bf37eCeaD8Ff0fC72';
-    const paymentCycle = 27722077;
-    const sqlString = `INSERT INTO reward_root_index (reward_program_id, payment_cycle) VALUES ('${rewardProgramId}', ${paymentCycle});`;
-    console.log(sqlString);
-    await db.query(sqlString);
+    const rewardProgramId = mockProofs[0].rewardProgramID;
+    const paymentCycle = mockProofs[0].paymentCycle;
+    await db.query(
+      `INSERT INTO reward_root_index (reward_program_id, payment_cycle) VALUES ('${rewardProgramId}', ${paymentCycle});`
+    );
     let task = await getContainer().instantiate(ProcessRewardRoot);
     try {
       await task.perform({
         rewardProgramId: rewardProgramId,
         paymentCycle: String(paymentCycle),
       });
-    } catch (e) {
-      console.log(e);
+    } catch (e: any) {
+      expect(e.routine).to.be.equal('_bt_check_unique');
+      expect(e.detail).to.be.equal(
+        `Key (reward_program_id, payment_cycle)=(${rewardProgramId}, ${paymentCycle}) already exists.`
+      );
     }
   });
-  it('index old parquet file with explanationData column as map<str,str>', async function () {});
+  it('index old parquet file with explanationData column as map<str,str>', async function () {
+    const mockProofs = [
+      {
+        rewardProgramID: '0x0885ce31D73b63b0Fcb1158bf37eCeaD8Ff0fC72',
+        paymentCycle: 27722077,
+        validFrom: 27722077,
+        validTo: 28499677,
+        tokenType: 1,
+        payee: '0x159ADe032073d930E85f95AbBAB9995110c43C71',
+        root: '0x2c7f1466e5b1d6958e8cb52dab3cdcd115a52e7171ac5d70c6000648a0163c30',
+        leaf: '0000000000000000000000000885ce31d73b63b0fcb1158bf37ecead8ff0fc720000000000000000000000000000000000000000000000000000000001a7015d0000000000000000000000000000000000000000000000000000000001a7015d0000000000000000000000000000000000000000000000000000000001b2dedd0000000000000000000000000000000000000000000000000000000000000001000000000000000000000000159ade032073d930e85f95abbab9995110c43c7100000000000000000000000000000000000000000000000000000000000000e00000000000000000000000000000000000000000000000000000000000000040000000000000000000000000b0427e9f03eb448d030be3ebc96f423857ceeb2f0000000000000000000000000000000000000000000000008ac7230489e80000',
+        proof: [{ item: '7019252fd21c2f404fb5834aa1a098b64a8c52504b9a83a25fdc732a3834c579' }],
+        explanationId: 'flat_payment',
+        explanationData: {
+          amount: '10000000000000000000',
+          token: '0xB0427e9F03Eb448D030bE3EBC96F423857ceEb2f',
+        },
+      },
+      {
+        rewardProgramID: '0x0885ce31D73b63b0Fcb1158bf37eCeaD8Ff0fC72',
+        paymentCycle: 27722077,
+        validFrom: 27722077,
+        validTo: 28499677,
+        tokenType: 1,
+        payee: '0x691fC14ed06A091e657b70ec9E5Eb72d17396694',
+        root: '0x2c7f1466e5b1d6958e8cb52dab3cdcd115a52e7171ac5d70c6000648a0163c30',
+        leaf: '0000000000000000000000000885ce31d73b63b0fcb1158bf37ecead8ff0fc720000000000000000000000000000000000000000000000000000000001a7015d0000000000000000000000000000000000000000000000000000000001a7015d0000000000000000000000000000000000000000000000000000000001b2dedd0000000000000000000000000000000000000000000000000000000000000001000000000000000000000000691fc14ed06a091e657b70ec9e5eb72d1739669400000000000000000000000000000000000000000000000000000000000000e00000000000000000000000000000000000000000000000000000000000000040000000000000000000000000b0427e9f03eb448d030be3ebc96f423857ceeb2f0000000000000000000000000000000000000000000000008ac7230489e80000',
+        proof: [{ item: '09741092149356a58c47dae710a25e0e05cda00b69e5f18d21c3674e360a83bd' }],
+        explanationId: 'flat_payment',
+        explanationData: {
+          amount: '10000000000000000000',
+          token: '0xB0427e9F03Eb448D030bE3EBC96F423857ceEb2f',
+        },
+      },
+    ];
+    const mockData = mockResponse(mockProofs);
+    s3Mock.on(SelectObjectContentCommand).resolves(mockData);
+    const rewardProgramId = mockProofs[0].rewardProgramID;
+    const paymentCycle = mockProofs[0].paymentCycle;
+    let task = await getContainer().instantiate(ProcessRewardRoot);
+    await task.perform({
+      rewardProgramId: rewardProgramId,
+      paymentCycle: String(paymentCycle),
+    });
+    const { rows } = await db.query('SELECT * FROM reward_proofs;');
+    expect(rows.length).to.be.equal(2);
+    rows.map((o) => {
+      expect(o.reward_program_id).to.be.equal(rewardProgramId);
+      expect(o.payment_cycle).to.be.equal(paymentCycle);
+      expect(o.leaf.startsWith('0x')).to.be.true;
+      o.proof.map((p: string) => {
+        expect(p.startsWith('0x'));
+      });
+      expect(o.explanation_id).to.be.equal('flat_payment');
+      expect(o.explanation_data).to.be.deep.equal({
+        amount: '10000000000000000000',
+        token: '0xB0427e9F03Eb448D030bE3EBC96F423857ceEb2f',
+      });
+    });
+    const { rows: index } = await db.query('SELECT * FROM reward_root_index;');
+    expect(index[0].reward_program_id).to.be.equal(rewardProgramId);
+    expect(index[0].payment_cycle).to.be.equal(paymentCycle);
+  });
+  it('index old parquet file with no explanationId or explanationData column', async function () {
+    const mockProofs = [
+      {
+        rewardProgramID: '0x0885ce31D73b63b0Fcb1158bf37eCeaD8Ff0fC72',
+        paymentCycle: 27722077,
+        validFrom: 27722077,
+        validTo: 28499677,
+        tokenType: 1,
+        payee: '0x159ADe032073d930E85f95AbBAB9995110c43C71',
+        root: '0x2c7f1466e5b1d6958e8cb52dab3cdcd115a52e7171ac5d70c6000648a0163c30',
+        leaf: '0000000000000000000000000885ce31d73b63b0fcb1158bf37ecead8ff0fc720000000000000000000000000000000000000000000000000000000001a7015d0000000000000000000000000000000000000000000000000000000001a7015d0000000000000000000000000000000000000000000000000000000001b2dedd0000000000000000000000000000000000000000000000000000000000000001000000000000000000000000159ade032073d930e85f95abbab9995110c43c7100000000000000000000000000000000000000000000000000000000000000e00000000000000000000000000000000000000000000000000000000000000040000000000000000000000000b0427e9f03eb448d030be3ebc96f423857ceeb2f0000000000000000000000000000000000000000000000008ac7230489e80000',
+        proof: [{ item: '7019252fd21c2f404fb5834aa1a098b64a8c52504b9a83a25fdc732a3834c579' }],
+      },
+      {
+        rewardProgramID: '0x0885ce31D73b63b0Fcb1158bf37eCeaD8Ff0fC72',
+        paymentCycle: 27722077,
+        validFrom: 27722077,
+        validTo: 28499677,
+        tokenType: 1,
+        payee: '0x691fC14ed06A091e657b70ec9E5Eb72d17396694',
+        root: '0x2c7f1466e5b1d6958e8cb52dab3cdcd115a52e7171ac5d70c6000648a0163c30',
+        leaf: '0000000000000000000000000885ce31d73b63b0fcb1158bf37ecead8ff0fc720000000000000000000000000000000000000000000000000000000001a7015d0000000000000000000000000000000000000000000000000000000001a7015d0000000000000000000000000000000000000000000000000000000001b2dedd0000000000000000000000000000000000000000000000000000000000000001000000000000000000000000691fc14ed06a091e657b70ec9e5eb72d1739669400000000000000000000000000000000000000000000000000000000000000e00000000000000000000000000000000000000000000000000000000000000040000000000000000000000000b0427e9f03eb448d030be3ebc96f423857ceeb2f0000000000000000000000000000000000000000000000008ac7230489e80000',
+        proof: [{ item: '09741092149356a58c47dae710a25e0e05cda00b69e5f18d21c3674e360a83bd' }],
+      },
+    ];
+    const mockData = mockResponse(mockProofs);
+    s3Mock.on(SelectObjectContentCommand).resolves(mockData);
+    const rewardProgramId = mockProofs[0].rewardProgramID;
+    const paymentCycle = mockProofs[0].paymentCycle;
+    let task = await getContainer().instantiate(ProcessRewardRoot);
+    await task.perform({
+      rewardProgramId: rewardProgramId,
+      paymentCycle: String(paymentCycle),
+    });
+    const { rows } = await db.query('SELECT * FROM reward_proofs;');
+    expect(rows.length).to.be.equal(2);
+    rows.map((o) => {
+      expect(o.reward_program_id).to.be.equal(rewardProgramId);
+      expect(o.payment_cycle).to.be.equal(paymentCycle);
+      expect(o.leaf.startsWith('0x')).to.be.true;
+      o.proof.map((p: string) => {
+        expect(p.startsWith('0x'));
+      });
+      expect(o.explanation_id).to.be.null;
+      expect(o.explanation_data).to.be.deep.equal({});
+    });
+    const { rows: index } = await db.query('SELECT * FROM reward_root_index;');
+    expect(index[0].reward_program_id).to.be.equal(rewardProgramId);
+    expect(index[0].payment_cycle).to.be.equal(paymentCycle);
+  });
+  it('expired proofs not indexed', async function () {
+    console.log('TODO');
+  });
 });
