@@ -14,19 +14,19 @@ export interface ScheduledPayment {
   payeeAddress: string;
   payAt: Date;
   chainId: number;
-  executionGasEstimation: string,
-  maxGasPrice: string,
-  salt: string,
-  spHash: string,
-  senderSafeAddress: string,
-  moduleAddress: string,
-  recurringDayOfMonth: number,
-  recurringUntil: Date,
-  creationTransactionHash: string,
-  creationBlockNumber: number,
-  creationTransactionError: string,
-  cancelationTransactionHash: string,
-  cancelationBlockNumber: number
+  executionGasEstimation: string;
+  maxGasPrice: string;
+  salt: string;
+  spHash: string;
+  senderSafeAddress: string;
+  moduleAddress: string;
+  recurringDayOfMonth: number;
+  recurringUntil: Date;
+  creationTransactionHash: string;
+  creationBlockNumber: number;
+  creationTransactionError: string;
+  cancelationTransactionHash: string;
+  cancelationBlockNumber: number;
 }
 
 export interface ScheduledPaymentAttempt {
@@ -94,33 +94,33 @@ export type ScheduledPaymentAttemptStatus =
 
 export interface ScheduledPaymentResponseItem {
   attributes: {
-    'user-address': string,
-    'sender-safe-address': string,
-    'module-address': string,
-    'token-address': string,
-    'gas-token-address': string,
-    amount: string,
-    'payee-address': string,
-    'execution-gas-estimation': string,
-    'max-gas-price': string,
-    'fee-fixed-usd': string,
-    'fee-percentage': string,
-    salt: string,
-    'pay-at': string,
-    'sp-hash': string,
-    'chain-id': string,
-    'recurring-day-of-month': string,
-    'recurring-until': string,
-    'creation-transaction-hash': string,
-    'creation-block-number': string,
-    'creation-transaction-error': string,
-    'cancelation-transaction-hash': string,
-    'cancelation-block-number': string,
-  }
+    'user-address': string;
+    'sender-safe-address': string;
+    'module-address': string;
+    'token-address': string;
+    'gas-token-address': string;
+    amount: string;
+    'payee-address': string;
+    'execution-gas-estimation': string;
+    'max-gas-price': string;
+    'fee-fixed-usd': string;
+    'fee-percentage': string;
+    salt: string;
+    'pay-at': string;
+    'sp-hash': string;
+    'chain-id': string;
+    'recurring-day-of-month': string;
+    'recurring-until': string;
+    'creation-transaction-hash': string;
+    'creation-block-number': string;
+    'creation-transaction-error': string;
+    'cancelation-transaction-hash': string;
+    'cancelation-block-number': string;
+  };
 }
 
 export interface ScheduledPaymentResponse {
-  data: ScheduledPaymentResponseItem[]
+  data: ScheduledPaymentResponseItem[];
 }
 
 export default class ScheduledPaymentsService extends Service {
@@ -223,9 +223,12 @@ export default class ScheduledPaymentsService extends Service {
         creationTransactionHash: s.attributes['creation-transaction-hash'],
         creationBlockNumber: Number(s.attributes['creation-block-number']),
         creationTransactionError: s.attributes['creation-transaction-error'],
-        cancelationTransactionHash: s.attributes['cancelation-transaction-hash'],
-        cancelationBlockNumber: Number(s.attributes['cancelation-block-number']),
-      }
+        cancelationTransactionHash:
+          s.attributes['cancelation-transaction-hash'],
+        cancelationBlockNumber: Number(
+          s.attributes['cancelation-block-number']
+        ),
+      };
     });
   }
 }

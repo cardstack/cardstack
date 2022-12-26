@@ -30,7 +30,7 @@ export default class FuturePaymentsList extends Component<Signature> {
 
   get nextHour(): ScheduledPayment[] {
     if (!this.futurePaymentsResource.value) return [];
-    return this.futurePaymentsResource.value.filter(s => s.payAt >= addHours(new Date(), 1) && s.payAt <= addHours(new Date(), 2));
+    return this.futurePaymentsResource.value.filter((s: ScheduledPayment) => s.payAt >= addHours(new Date(), 1) && s.payAt <= addHours(new Date(), 2));
   }
 
   get nextMonth(): ScheduledPayment[] {
@@ -39,7 +39,7 @@ export default class FuturePaymentsList extends Component<Signature> {
     let nextMonth = addMonths(now, 1);
     let firstDateNextMonth = new Date(nextMonth.getFullYear(), nextMonth.getMonth(), 1, 0, 0, 0, 0);
     let lastDateNextMonth = new Date(nextMonth.getFullYear(), nextMonth.getMonth(), lastDayOfMonth(nextMonth).getDate(), 23, 59, 0, 0);
-    return this.futurePaymentsResource.value.filter(s => s.payAt >= firstDateNextMonth && s.payAt <= lastDateNextMonth);
+    return this.futurePaymentsResource.value.filter((s: ScheduledPayment) => s.payAt >= firstDateNextMonth && s.payAt <= lastDateNextMonth);
   }
 
   get nextFewMonthsPayments(): ScheduledPayment[] {
@@ -47,7 +47,7 @@ export default class FuturePaymentsList extends Component<Signature> {
     let now = new Date();
     let nextMonth = addMonths(now, 1);
     let lastDateNextMonth = new Date(nextMonth.getFullYear(), nextMonth.getMonth(), lastDayOfMonth(nextMonth).getDate(), 23, 59, 0, 0);
-    return this.futurePaymentsResource.value.filter(s => s.payAt > lastDateNextMonth);
+    return this.futurePaymentsResource.value.filter((s: ScheduledPayment) => s.payAt > lastDateNextMonth);
   }
 
   @task *loadFuturePaymentTask(chainId: number): TaskGenerator<ScheduledPayment[]> {
@@ -90,12 +90,12 @@ export default class FuturePaymentsList extends Component<Signature> {
       class="future-payments-list"
       as |Section ActionChin|>
       {{#if (lt this.futurePaymentsResource.value.length 1)}}
-        <Section class="future-payments-list__no-payments-section">
+        <Section class="future-payments-list__no-payments-section" data-test-no-future-payments-list>
           <div class="future-payments-list__no-payments-title">Scheduled your first payment</div>
           <div class="future-payments-list__no-payments-description">Your future payment will show up here. This is where you can check on the status of your transactions and view important messages.</div>
         </Section>
       {{else}}
-        <Section @title="Future Payments" class="future-payments-list__payments-section">
+        <Section @title="Future Payments" class="future-payments-list__payments-section" data-test-future-payments-list>
           <div class="future-payments-list__payments-section-time-brackets">
             <TimeBracket @title={{"next hour"}} @scheduledPayments={{this.nextHour}}/>
             <TimeBracket @title={{"next month"}} @scheduledPayments={{this.nextMonth}}/>

@@ -17,7 +17,7 @@ interface Signature {
 
 export default class TimeBracket extends Component<Signature> {
   <template>
-    <BoxelCardContainer class="time-bracket">
+    <BoxelCardContainer class="time-bracket" data-test-time-bracket={{@title}}>
       <BoxelHeader @header={{@title}} @noBackground={{true}}/>
       {{#each @scheduledPayments as |scheduledPayment|}}
         <ScheduledPaymentCard @scheduledPayment={{scheduledPayment}}/>
