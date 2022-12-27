@@ -195,7 +195,16 @@ module('Acceptance | scheduling', function (hooks) {
             ctx.status(200),
             ctx.json({
               data: {
-                account: null,
+                account: {
+                  safes: [
+                    {
+                      safe: {
+                        id: SAFE_ADDRESS,
+                        spModule: SP_MODULE_ADDRESS,
+                      },
+                    },
+                  ],
+                },
               },
             })
           );
@@ -217,6 +226,11 @@ module('Acceptance | scheduling', function (hooks) {
 
     this.mockWalletConnect.mockConnectedWallet([FAKE_WALLET_CONNECT_ACCOUNT]);
     this.mockWalletConnect.mockChainId(1);
+
+    this.mockWalletConnect.mockBalance(
+      '0x458bb61a22a0e91855d6d876c88706cff7bd486e',
+      '1000000000000000000'
+    );
 
     const USDC_TOKEN_ADDRESS = '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48';
     const mockUsdcContract = this.mockWalletConnect.generateContractUtils(
@@ -282,15 +296,8 @@ module('Acceptance | scheduling', function (hooks) {
     );
 
     const safesService = this.owner.lookup('service:safes') as SafesService;
-    safesService.fetchSafes = (): Promise<Safe[]> => {
-      return Promise.resolve([
-        {
-          address: SAFE_ADDRESS,
-          spModuleAddress: SP_MODULE_ADDRESS,
-        },
-      ]);
-    };
 
+    // mocking this at the provider level is complex because of the total number of calls
     safesService.fetchTokenBalances = (): Promise<TokenBalance[]> => {
       return Promise.resolve([
         {
