@@ -65,20 +65,32 @@ export default class ProcessRewardRoot {
           ')'
         );
       });
-    if (rows.length > 0) {
-      const proofsQuery = `
+    const indexQuery = 'INSERT INTO reward_root_index( reward_program_id, payment_cycle ) VALUES (%L, %L);';
+    const indexSql = pgFormat(indexQuery, file.rewardProgramId, file.paymentCycle);
+    try {
+      if (rows.length > 0) {
+        const proofsQuery = `
       INSERT INTO reward_proofs(
         reward_program_id, payee, leaf, payment_cycle, proof, token_type,  valid_from, valid_to, explanation_id, explanation_data
       ) VALUES %s;
     `;
-      const indexQuery = 'INSERT INTO reward_root_index( reward_program_id, payment_cycle ) VALUES (%L, %L);';
-      const proofsSql = pgFormat(proofsQuery, rows.join());
-      const indexSql = pgFormat(indexQuery, file.rewardProgramId, file.paymentCycle);
-      await this.databaseManager.performTransaction(db, async () => {
+        const proofsSql = pgFormat(proofsQuery, rows.join());
+
+        await this.databaseManager.performTransaction(db, async () => {
+          await db.query(indexSql);
+          const r = await db.query(proofsSql);
+          log.info(`Insert ${r.rowCount} notification_types rows`);
+        });
+      } else {
         await db.query(indexSql);
-        const r = await db.query(proofsSql);
-        log.info(`Insert ${r.rowCount} notification_types rows`);
-      });
+        //will rememeber root  as indexed
+        //although no proofs (cause their expired) are stored in db
+      }
+    } catch (e: any) {
+      if (e.code == '23505') {
+        log.info(`rewardProgramId: ${file.rewardProgramId}, paymentCycle: ${file.paymentCycle} is already indexed`);
+        return;
+      }
     }
   }
 }
