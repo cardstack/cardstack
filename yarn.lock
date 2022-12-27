@@ -2610,6 +2610,20 @@
     resolve "^1.8.1"
     semver "^7.3.2"
 
+"@embroider/macros@^1.9.0":
+  version "1.10.0"
+  resolved "https://registry.yarnpkg.com/@embroider/macros/-/macros-1.10.0.tgz#af3844d5db48f001b85cfb096c76727c72ad6c1e"
+  integrity sha512-LMbfQGk/a+f6xtvAv5fq/wf2LRxETnbgSCLUf/z6ebzmuskOUxrke+uP55chF/loWrARi9g6erFQ7RDOUoBMSg==
+  dependencies:
+    "@embroider/shared-internals" "2.0.0"
+    assert-never "^1.2.1"
+    babel-import-util "^1.1.0"
+    ember-cli-babel "^7.26.6"
+    find-up "^5.0.0"
+    lodash "^4.17.21"
+    resolve "^1.20.0"
+    semver "^7.3.2"
+
 "@embroider/macros@~0.47.2":
   version "0.47.2"
   resolved "https://registry.yarnpkg.com/@embroider/macros/-/macros-0.47.2.tgz#23cbe92cac3c24747f054e1eea2a22538bf7ebd0"
@@ -2653,6 +2667,20 @@
   version "1.8.3"
   resolved "https://registry.yarnpkg.com/@embroider/shared-internals/-/shared-internals-1.8.3.tgz#52d868dc80016e9fe983552c0e516f437bf9b9f9"
   integrity sha512-N5Gho6Qk8z5u+mxLCcMYAoQMbN4MmH+z2jXwQHVs859bxuZTxwF6kKtsybDAASCtd2YGxEmzcc1Ja/wM28824w==
+  dependencies:
+    babel-import-util "^1.1.0"
+    ember-rfc176-data "^0.3.17"
+    fs-extra "^9.1.0"
+    js-string-escape "^1.0.1"
+    lodash "^4.17.21"
+    resolve-package-path "^4.0.1"
+    semver "^7.3.5"
+    typescript-memoize "^1.0.1"
+
+"@embroider/shared-internals@2.0.0", "@embroider/shared-internals@^2.0.0":
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/@embroider/shared-internals/-/shared-internals-2.0.0.tgz#d8205ec6944362aeecfbb51143db352430ced316"
+  integrity sha512-qZ2/xky9mWm5YC6noOa6AiAwgISEQ78YTZNv4SNu2PFgEK/H+Ha/3ddngzGSsnXkVnIHZyxIBzhxETonQYHY9g==
   dependencies:
     babel-import-util "^1.1.0"
     ember-rfc176-data "^0.3.17"
@@ -5982,6 +6010,17 @@
     estree-walker "^2.0.1"
     picomatch "^2.2.2"
 
+"@sentry/browser@7.28.1", "@sentry/browser@^7.28.1":
+  version "7.28.1"
+  resolved "https://registry.yarnpkg.com/@sentry/browser/-/browser-7.28.1.tgz#c8086e26079809aa401a05d9b4a6e4df63a9c965"
+  integrity sha512-N8j93IcrWKWorfJ5D+RSKVAvcR4S5tIcZ/HvFPMrQWnfVa/jtJcrKThdjZYteA0wjmPiy8/D3KA8nB91yulBPA==
+  dependencies:
+    "@sentry/core" "7.28.1"
+    "@sentry/replay" "7.28.1"
+    "@sentry/types" "7.28.1"
+    "@sentry/utils" "7.28.1"
+    tslib "^1.9.3"
+
 "@sentry/browser@7.8.0", "@sentry/browser@^7.8.0":
   version "7.8.0"
   resolved "https://registry.yarnpkg.com/@sentry/browser/-/browser-7.8.0.tgz#0430d327d6a44901f42fdee11a8a983dfcebd7ab"
@@ -6014,6 +6053,15 @@
     "@sentry/utils" "6.19.7"
     tslib "^1.9.3"
 
+"@sentry/core@7.28.1":
+  version "7.28.1"
+  resolved "https://registry.yarnpkg.com/@sentry/core/-/core-7.28.1.tgz#c712ce17469b18b01606108817be24a99ed2116e"
+  integrity sha512-7wvnuvn/mrAfcugWoCG/3pqDIrUgH5t+HisMJMGw0h9Tc33KqrmqMDCQVvjlrr2pWrw/vuUCFdm8CbUHJ832oQ==
+  dependencies:
+    "@sentry/types" "7.28.1"
+    "@sentry/utils" "7.28.1"
+    tslib "^1.9.3"
+
 "@sentry/core@7.8.0":
   version "7.8.0"
   resolved "https://registry.yarnpkg.com/@sentry/core/-/core-7.8.0.tgz#3ab3a4cb4389527e3ca08031a02f010ec52287e8"
@@ -6023,6 +6071,21 @@
     "@sentry/types" "7.8.0"
     "@sentry/utils" "7.8.0"
     tslib "^1.9.3"
+
+"@sentry/ember@^7.28.1":
+  version "7.28.1"
+  resolved "https://registry.yarnpkg.com/@sentry/ember/-/ember-7.28.1.tgz#e05d09ef46d997cd4ca89e27a913610b79143f49"
+  integrity sha512-ldoSmj/UbaTjCkVYm6i+Vz4RuKiKcOURy+TXbQHXwesAeaOYzCe+zXpSH5KKzLw1DJ+1cy5kPTMDlZnrLqGyUA==
+  dependencies:
+    "@embroider/macros" "^1.9.0"
+    "@sentry/browser" "7.28.1"
+    "@sentry/tracing" "7.28.1"
+    "@sentry/types" "7.28.1"
+    "@sentry/utils" "7.28.1"
+    ember-auto-import "^1.12.1 || ^2.4.3"
+    ember-cli-babel "^7.26.11"
+    ember-cli-htmlbars "^6.1.1"
+    ember-cli-typescript "^5.1.1"
 
 "@sentry/ember@^7.8.0":
   version "7.8.0"
@@ -6137,6 +6200,15 @@
     lru_map "^0.3.3"
     tslib "^1.9.3"
 
+"@sentry/replay@7.28.1":
+  version "7.28.1"
+  resolved "https://registry.yarnpkg.com/@sentry/replay/-/replay-7.28.1.tgz#fbdd377923e082423b95e3f128cb9af9451aca70"
+  integrity sha512-Os0PzMjKlwtHwzTU0kfVzGzsi4Vaj3g2arCl4Qnr3b6kYTb9WOFZo/n/v56ss7Z+nZG3K8W5PisoD4MRsRJRig==
+  dependencies:
+    "@sentry/core" "7.28.1"
+    "@sentry/types" "7.28.1"
+    "@sentry/utils" "7.28.1"
+
 "@sentry/tracing@5.30.0":
   version "5.30.0"
   resolved "https://registry.yarnpkg.com/@sentry/tracing/-/tracing-5.30.0.tgz#501d21f00c3f3be7f7635d8710da70d9419d4e1f"
@@ -6146,6 +6218,16 @@
     "@sentry/minimal" "5.30.0"
     "@sentry/types" "5.30.0"
     "@sentry/utils" "5.30.0"
+    tslib "^1.9.3"
+
+"@sentry/tracing@7.28.1":
+  version "7.28.1"
+  resolved "https://registry.yarnpkg.com/@sentry/tracing/-/tracing-7.28.1.tgz#d276e4d17a79190a88112696c73de12c209607a1"
+  integrity sha512-uWspnuz+7FyW8ES5lRaVA7O/YJSzMlSkvBFtgzaoKmdaueokU/sRLwlCsrdgwavG1wpm79df7R1iiSeqhaXDlw==
+  dependencies:
+    "@sentry/core" "7.28.1"
+    "@sentry/types" "7.28.1"
+    "@sentry/utils" "7.28.1"
     tslib "^1.9.3"
 
 "@sentry/tracing@7.8.0":
@@ -6172,6 +6254,11 @@
   version "7.10.0"
   resolved "https://registry.yarnpkg.com/@sentry/types/-/types-7.10.0.tgz#c91d634768336238ac30ed750fa918326c384cbb"
   integrity sha512-1UBwdbS0xXzANzp63g4eNQly/qKIXp0swP5OTKWoADvKBtL4anroLUA/l8ADMtuwFZYtVANc8WRGxM2+YmaXtg==
+
+"@sentry/types@7.28.1":
+  version "7.28.1"
+  resolved "https://registry.yarnpkg.com/@sentry/types/-/types-7.28.1.tgz#9018b4c152b475de9bedd267237393d3c9b1253d"
+  integrity sha512-DvSplMVrVEmOzR2M161V5+B8Up3vR71xMqJOpWTzE9TqtFJRGPtqT/5OBsNJJw1+/j2ssMcnKwbEo9Q2EGeS6g==
 
 "@sentry/types@7.8.0":
   version "7.8.0"
@@ -6205,6 +6292,14 @@
   integrity sha512-/aD2DnfyOhV0Wdbb6VF78vu4fQIZJyuReDpBI7MV/EqcEB6FxUKq2YjinfKZF/exHEPig6Ag/Yt+CRFgvtVFuw==
   dependencies:
     "@sentry/types" "7.10.0"
+    tslib "^1.9.3"
+
+"@sentry/utils@7.28.1":
+  version "7.28.1"
+  resolved "https://registry.yarnpkg.com/@sentry/utils/-/utils-7.28.1.tgz#0a7b6aa4b09e91e4d1aded2a8c8dbaf818cee96e"
+  integrity sha512-75/jzLUO9HH09iC9TslNimGbxOP3jgn89P+q7uR+rp2fJfRExHVeKJZQdK0Ij4/SmE7TJ3Uh2r154N0INZEx1g==
+  dependencies:
+    "@sentry/types" "7.28.1"
     tslib "^1.9.3"
 
 "@sentry/utils@7.8.0":
@@ -13989,6 +14084,42 @@ ember-auto-import@^1.10.1, ember-auto-import@^1.11.2, ember-auto-import@^1.11.3,
     typescript-memoize "^1.0.0-alpha.3"
     walk-sync "^0.3.3"
     webpack "^4.43.0"
+
+"ember-auto-import@^1.12.1 || ^2.4.3":
+  version "2.5.0"
+  resolved "https://registry.yarnpkg.com/ember-auto-import/-/ember-auto-import-2.5.0.tgz#627607648e87d154f75cd3f70c435355ef7cced9"
+  integrity sha512-fKERUmpZLn4RJiCwTjS7D5zJxgnbF4E6GiSp1GYh53K96S+5UBs06r7ScDI52rq34z0+qdSrA6qiDJ3i/lWqKg==
+  dependencies:
+    "@babel/core" "^7.16.7"
+    "@babel/plugin-proposal-class-properties" "^7.16.7"
+    "@babel/plugin-proposal-decorators" "^7.16.7"
+    "@babel/preset-env" "^7.16.7"
+    "@embroider/macros" "^1.0.0"
+    "@embroider/shared-internals" "^2.0.0"
+    babel-loader "^8.0.6"
+    babel-plugin-ember-modules-api-polyfill "^3.5.0"
+    babel-plugin-htmlbars-inline-precompile "^5.2.1"
+    babel-plugin-syntax-dynamic-import "^6.18.0"
+    broccoli-debug "^0.6.4"
+    broccoli-funnel "^3.0.8"
+    broccoli-merge-trees "^4.2.0"
+    broccoli-plugin "^4.0.0"
+    broccoli-source "^3.0.0"
+    css-loader "^5.2.0"
+    debug "^4.3.1"
+    fs-extra "^10.0.0"
+    fs-tree-diff "^2.0.0"
+    handlebars "^4.3.1"
+    js-string-escape "^1.0.1"
+    lodash "^4.17.19"
+    mini-css-extract-plugin "^2.5.2"
+    parse5 "^6.0.1"
+    resolve "^1.20.0"
+    resolve-package-path "^4.0.3"
+    semver "^7.3.4"
+    style-loader "^2.0.0"
+    typescript-memoize "^1.0.0-alpha.3"
+    walk-sync "^3.0.0"
 
 ember-auto-import@^2.2.3, ember-auto-import@^2.4.3:
   version "2.4.3"

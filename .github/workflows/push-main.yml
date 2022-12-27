@@ -416,3 +416,5 @@ jobs:
         with:
           environment: staging
           discord_webhook: ${{ secrets.DISCORD_WEBHOOK }}
+        env:
+          SENTRY_DSN: ${{ secrets.SAFE_TOOLS_CLIENT_SENTRY_DSN }}
