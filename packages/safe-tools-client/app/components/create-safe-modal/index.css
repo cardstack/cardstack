@@ -30,11 +30,6 @@
   min-width: 16px;
 }
 
-.safe-setup-modal__section-icon--small {
-  width: 10px;
-  margin-right: var(--boxel-sp-xxxs);
-}
-
 .setup-safe-modal__section b {
   font-size: var(--boxel-font-size-sm);
 }

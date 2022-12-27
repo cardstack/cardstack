@@ -1,13 +1,12 @@
 import Component from '@glimmer/component';
 import { on } from '@ember/modifier';
 import or from 'ember-truth-helpers/helpers/or';
-
-import { svgJar } from '@cardstack/boxel/utils/svg-jar';
-import cssVar from '@cardstack/boxel/helpers/css-var';
 import BoxelModal from '@cardstack/boxel/components/boxel/modal';
 import BoxelActionContainer from '@cardstack/boxel/components/boxel/action-container'
 import { type ActionChinState } from '@cardstack/boxel/components/boxel/action-chin/state'
 import BoxelLoadingIndicator from '@cardstack/boxel/components/boxel/loading-indicator'
+import SuccessIcon from '@cardstack/safe-tools-client/components/icons/success';
+import FailureIcon from '@cardstack/safe-tools-client/components/icons/failure';
 
 import './index.css';
 
@@ -76,13 +75,7 @@ export default class SetupSafeModal extends Component<Signature> {
           {{else}}
             {{#if @comparingBalanceToGasCostErrorMessage}}
               <div class='safe-setup-modal__section-wallet-info'>
-                {{svgJar
-                  'icon-x-circle-ht'
-                  class='safe-setup-modal__section-icon'
-                  style=(cssVar
-                    icon-color='var(--boxel-red)'
-                  )
-                }}
+                <FailureIcon class='safe-setup-modal__section-icon' />
                 <p>
                   {{@comparingBalanceToGasCostErrorMessage}}
                 </p>
@@ -90,16 +83,17 @@ export default class SetupSafeModal extends Component<Signature> {
             {{else}}
               <b>Estimated gas cost: {{@gasCostDisplay}}</b>
               <div class='safe-setup-modal__section-wallet-info'>
-                {{svgJar
-                  (if this.notEnoughBalance 'icon-x-circle-ht' 'icon-check-circle-ht')
-                  class='safe-setup-modal__section-icon'
-                  style=(cssVar
-                    icon-color=(if this.notEnoughBalance 'var(--boxel-red)' 'var(--boxel-green)')
-                  )
-                }}
-                <p>
-                  Your wallet has {{if this.notEnoughBalance 'in'}}sufficient funds to cover the estimated gas cost.
-                </p>
+                {{#if this.notEnoughBalance}}
+                  <FailureIcon class='safe-setup-modal__section-icon' />
+                  <p>
+                    Your wallet has insufficient funds to cover the estimated gas cost.
+                  </p>
+                {{else}}
+                  <SuccessIcon class='safe-setup-modal__section-icon' />
+                  <p>
+                    Your wallet has sufficient funds to cover the estimated gas cost.
+                  </p>
+                {{/if}}
               </div>
             {{/if}}
           {{/if}}
@@ -116,24 +110,12 @@ export default class SetupSafeModal extends Component<Signature> {
 
               {{#if @provisioningOrIndexingErrorMessage}}
                 <ac.InfoArea data-test-safe-error-info>
-                  {{svgJar
-                    'icon-x-circle-ht'
-                    class='safe-setup-modal__section-icon safe-setup-modal__section-icon--small'
-                    style=(cssVar
-                      icon-color='var(--boxel-red)'
-                    )
-                  }}
+                  <FailureIcon class='safe-setup-modal__section-icon' />
                   {{@provisioningOrIndexingErrorMessage}}
                 </ac.InfoArea>
               {{else}}
                 <ac.InfoArea data-test-safe-success-info>
-                  {{svgJar
-                    'icon-check-circle-ht'
-                    class='safe-setup-modal__section-icon safe-setup-modal__section-icon--small'
-                    style=(cssVar
-                      icon-color='var(--boxel-green)'
-                    )
-                  }}
+                  <SuccessIcon class='safe-setup-modal__section-icon' />
                   Your safe has been created and the module has been enabled. You can now schedule payments.
                 </ac.InfoArea>
               {{/if}}
@@ -152,13 +134,7 @@ export default class SetupSafeModal extends Component<Signature> {
 
               {{#if @provisioningOrIndexingErrorMessage}}
                 <ac.InfoArea data-test-safe-error-info>
-                  {{svgJar
-                    'icon-x-circle-ht'
-                    class='safe-setup-modal__section-icon safe-setup-modal__section-icon--small'
-                    style=(cssVar
-                      icon-color='var(--boxel-red)'
-                    )
-                  }}
+                  <FailureIcon class='safe-setup-modal__section-icon' />
                   {{@provisioningOrIndexingErrorMessage}}
                 </ac.InfoArea>
               {{/if}}
