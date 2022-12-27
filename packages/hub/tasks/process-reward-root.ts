@@ -30,13 +30,23 @@ interface Proof {
 let log = Logger('task:process-reward-root');
 export default class ProcessRewardRoot {
   private databaseManager = inject('database-manager', { as: 'databaseManager' });
+  web3 = inject('web3-http', { as: 'web3' });
   async perform(file: S3FileInfo) {
+    let currentBlockNumber = 0;
+    try {
+      currentBlockNumber = (await this.web3.getInstance().eth.getBlockNumber()) as number;
+    } catch (e) {
+      currentBlockNumber = 0;
+    }
     const s3Config = await awsConfig({ roleChain: [] });
     const s3Client = new S3Client(s3Config);
     const db = await this.databaseManager.getClient();
     const proofs = await queryParquet(s3Client, file);
-    if (proofs.length > 0) {
-      const rows = proofs.map((o) => {
+    const rows = proofs
+      .filter(({ validTo }) => {
+        return currentBlockNumber > validTo;
+      }) //only index non expired proofs
+      .map((o) => {
         return (
           '(' +
           pgFormat(
@@ -55,6 +65,7 @@ export default class ProcessRewardRoot {
           ')'
         );
       });
+    if (rows.length > 0) {
       const proofsQuery = `
       INSERT INTO reward_proofs(
         reward_program_id, payee, leaf, payment_cycle, proof, token_type,  valid_from, valid_to, explanation_id, explanation_data
