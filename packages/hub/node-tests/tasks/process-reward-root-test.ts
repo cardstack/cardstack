@@ -285,7 +285,4 @@ describe.only('ProcessRewardRootTask', function () {
     expect(index[0].reward_program_id).to.be.equal(rewardProgramId);
     expect(index[0].payment_cycle).to.be.equal(paymentCycle);
   });
-  it('expired proofs not indexed', async function () {
-    console.log('TODO');
-  });
 });
