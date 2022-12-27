@@ -2,13 +2,13 @@ import { inject } from '@cardstack/di';
 import WorkerClient from '../services/worker-client';
 import { RewardPrograms, RewardRoots } from '../services/subgraph';
 
-const MAX_INDEX_SIZE = 100; // Index max 100 roots per reward program
+const MAX_INDEX_SIZE_PROGRAM = 100;
 
 export default class CheckRewardRoots {
   subgraph = inject('subgraph');
   databaseManager = inject('database-manager', { as: 'databaseManager' });
   workerClient: WorkerClient = inject('worker-client', { as: 'workerClient' });
-  async perform(max_index_size = MAX_INDEX_SIZE) {
+  async perform(max_index_size_per_program = MAX_INDEX_SIZE_PROGRAM) {
     let db = await this.databaseManager.getClient();
     const r1: RewardPrograms = await this.subgraph.getRewardPrograms();
     const rewardProgramIds = r1?.data?.rewardPrograms.map((o) => o.id);
@@ -20,7 +20,7 @@ export default class CheckRewardRoots {
       const r2: RewardRoots = await this.subgraph.getRewardRoots(
         rewardProgramId,
         last_indexed_block_number,
-        max_index_size
+        max_index_size_per_program
       );
       let files: S3FileInfo[] = r2?.data?.merkleRootSubmissions.map((root) => {
         return {
