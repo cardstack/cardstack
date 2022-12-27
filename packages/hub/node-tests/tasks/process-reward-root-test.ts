@@ -8,6 +8,7 @@ const toUintArray = (proofs: any[]) => {
   return Buffer.from(proofs.reduce((accum: string, o: any) => accum.concat(JSON.stringify(o) + '\n'), ''));
 };
 const mockGetProofs = async (proofs: any[], start: number, end: number) => {
+  // this function simulates pagination
   if (start > proofs.length) {
     return [];
   } else {
@@ -15,6 +16,8 @@ const mockGetProofs = async (proofs: any[], start: number, end: number) => {
   }
 };
 const mockResponse = (proofs: any[], maxPaginate = 100) => {
+  // this function returns succesful aws s3 select response
+  // mockPayload is an async iterable (typically is used for paginated response from aws services)
   const mockPayload = {
     [Symbol.asyncIterator](): any {
       let start = 0;
@@ -67,6 +70,9 @@ describe.only('ProcessRewardRootTask', function () {
   });
 
   it('index parquet file into db', async function () {
+    // the data here represents the json returned in s3 select
+    // we bypass the use of dealing with parquet so we recreate the returned objects so no parquet parsing is required
+    // although we require to to convert the data to UintArray
     const mockProofs = [
       {
         rewardProgramID: '0x0885ce31D73b63b0Fcb1158bf37eCeaD8Ff0fC72',
