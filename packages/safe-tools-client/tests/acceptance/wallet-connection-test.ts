@@ -121,6 +121,7 @@ module('Acceptance | wallet connection', function (hooks) {
 
   module('With Wallet Connect', function () {
     test('connecting wallet', async function (assert) {
+      this.mockWalletConnect.mockMainnet();
       await visit('/schedule');
       await click('.connect-button__button');
 

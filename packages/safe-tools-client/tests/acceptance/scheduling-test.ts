@@ -1,11 +1,9 @@
 import {
-  ERC20ABI,
   GnosisSafeABI,
   ScheduledPaymentModuleABI,
 } from '@cardstack/cardpay-sdk';
 import { Deferred } from '@cardstack/ember-shared';
 import SafesService, {
-  Safe,
   TokenBalance,
 } from '@cardstack/safe-tools-client/services/safes';
 import { MockLocalStorage } from '@cardstack/safe-tools-client/utils/browser-mocks';
@@ -17,7 +15,6 @@ import {
   waitFor,
   waitUntil,
 } from '@ember/test-helpers';
-import IUniswapV2Pair from '@uniswap/v2-core/build/IUniswapV2Pair.json';
 import { TransactionReceipt } from 'eth-testing/lib/json-rpc-methods-types';
 import { BigNumber } from 'ethers';
 import { setupWorker, rest } from 'msw';
@@ -224,44 +221,15 @@ module('Acceptance | scheduling', function (hooks) {
     });
     this.mockLocalStorage.setItem('authToken', 'abc123');
 
+    this.mockWalletConnect.mockMainnet();
     this.mockWalletConnect.mockConnectedWallet([FAKE_WALLET_CONNECT_ACCOUNT]);
-    this.mockWalletConnect.mockChainId(1);
+    // this.mockWalletConnect.mockSafe(SAFE_ADDRESS, {
+    //   nativeBalance: '1000000000000000000',
+    // });
 
     this.mockWalletConnect.mockBalance(
       '0x458bb61a22a0e91855d6d876c88706cff7bd486e',
       '1000000000000000000'
-    );
-
-    const USDC_TOKEN_ADDRESS = '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48';
-    const mockUsdcContract = this.mockWalletConnect.generateContractUtils(
-      ERC20ABI,
-      USDC_TOKEN_ADDRESS
-    );
-    mockUsdcContract.mockCall('decimals', ['6'], undefined, {
-      persistent: true,
-    });
-
-    const WETH_TOKEN_ADDRESS = '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2';
-    const mockWethContract = this.mockWalletConnect.generateContractUtils(
-      ERC20ABI,
-      WETH_TOKEN_ADDRESS
-    );
-    mockWethContract.mockCall('decimals', ['18'], undefined, {
-      persistent: true,
-    });
-
-    const UNISWAP_V2_ADDRESS = '0xb4e16d0168e52d35cacd2c6185b44281ec28c9dc';
-    const mockUniswapContract = this.mockWalletConnect.generateContractUtils(
-      IUniswapV2Pair.abi,
-      UNISWAP_V2_ADDRESS
-    );
-    mockUniswapContract.mockCall(
-      'getReserves',
-      ['1', '1', '10000'],
-      undefined,
-      {
-        persistent: true,
-      }
     );
 
     const mockSPModuleContract = this.mockWalletConnect.generateContractUtils(
