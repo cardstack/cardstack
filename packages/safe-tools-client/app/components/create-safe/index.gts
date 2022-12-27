@@ -35,12 +35,10 @@ export default class CreateSafeButton extends Component<Signature> {
   @tracked isLoadingGasInfo = false;
   @tracked hasEnoughBalance = false;
   @tracked gasCostDisplay =  '';
-  @tracked safeCreated =  false;
   @tracked comparingBalanceToGasCostErrorMessage = '';
 
   @action async openCreateSafeModal() {
     this.comparingBalanceToGasCostErrorMessage = '';
-    this.safeCreated =  false;
     this.isLoadingGasInfo = true;
     this.isModalOpen = true;
     try {
@@ -93,7 +91,6 @@ export default class CreateSafeButton extends Component<Signature> {
       console.log(e) // TODO: Sentry
       return;
     }
-    this.safeCreated = true;
 
     try {
       await taskFor(this.waitForSafeToBeIndexed).perform(this.network.networkInfo.chainId, this.wallet.address, safeAddress);
@@ -136,6 +133,10 @@ export default class CreateSafeButton extends Component<Signature> {
     }
 
     return undefined;
+  }
+
+  get safeCreated() {
+    return taskFor(this.waitForSafeToBeIndexed).last?.isSuccessful;
   }
 
   <template>
