@@ -129,7 +129,7 @@ describe('ProcessRewardRootTask', function () {
     expect(index[0].reward_program_id).to.be.equal(rewardProgramId);
     expect(index[0].payment_cycle).to.be.equal(paymentCycle);
   });
-  it('fails to index file if reward root has been indexed', async function () {
+  it('does not index file that has already been indexed', async function () {
     const mockProofs = [
       {
         rewardProgramID: '0x0885ce31D73b63b0Fcb1158bf37eCeaD8Ff0fC72',
@@ -162,21 +162,21 @@ describe('ProcessRewardRootTask', function () {
     s3Mock.on(SelectObjectContentCommand).resolves(mockData);
     const rewardProgramId = mockProofs[0].rewardProgramID;
     const paymentCycle = mockProofs[0].paymentCycle;
-    await db.query(
-      `INSERT INTO reward_root_index (reward_program_id, payment_cycle) VALUES ('${rewardProgramId}', ${paymentCycle});`
-    );
     let task = await getContainer().instantiate(ProcessRewardRoot);
-    try {
-      await task.perform({
-        rewardProgramId: rewardProgramId,
-        paymentCycle: String(paymentCycle),
-      });
-    } catch (e: any) {
-      expect(e.routine).to.be.equal('_bt_check_unique');
-      expect(e.detail).to.be.equal(
-        `Key (reward_program_id, payment_cycle)=(${rewardProgramId}, ${paymentCycle}) already exists.`
-      );
-    }
+    await task.perform({
+      rewardProgramId: rewardProgramId,
+      paymentCycle: String(paymentCycle),
+    });
+    //duplicate indexing
+    await task.perform({
+      rewardProgramId: rewardProgramId,
+      paymentCycle: String(paymentCycle),
+    });
+    const { rows } = await db.query('SELECT * FROM reward_proofs;');
+    expect(rows.length).to.be.equal(2);
+    const { rows: index } = await db.query('SELECT * FROM reward_root_index;');
+    expect(index[0].reward_program_id).to.be.equal(rewardProgramId);
+    expect(index[0].payment_cycle).to.be.equal(paymentCycle);
   });
   it('index old parquet file with explanationData column as map<str,str>', async function () {
     const mockProofs = [
