@@ -150,6 +150,11 @@ const queryParquet = async (
   } catch (err: any) {
     if (err.name == 'UnsupportedParquetType') {
       return await queryParquet(s3Client, file, `SELECT ${FIELDS_EXCEPT_EXPLANATION_DATA} FROM s3object`);
+    } else if (err.name == 'NoSuchKey') {
+      log.info(
+        `Key rewardProgramID=${file.rewardProgramId}/paymentCycle=${file.paymentCycle}/results.parquet does not exist`
+      );
+      return [];
     } else {
       log.error('error fetching data: ', err);
       throw err;
