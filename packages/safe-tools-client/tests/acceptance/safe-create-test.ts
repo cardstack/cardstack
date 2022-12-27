@@ -167,9 +167,10 @@ module('Acceptance | create safe', function (hooks) {
           'service:scheduled-payments-sdk'
         ) as SchedulePaymentSDKService;
 
-        scheduledPaymentsSdkService.getCreateSafeGasEstimation = (): Promise<
-          BigNumber | undefined
-        > => {
+        scheduledPaymentsSdkService.getCreateSafeGasEstimation = (): Promise<{
+          gasEstimateInNativeToken: BigNumber;
+          gasEstimateInUsd: BigNumber;
+        }> => {
           return Promise.reject('error while fetching gas cost');
         };
       });
