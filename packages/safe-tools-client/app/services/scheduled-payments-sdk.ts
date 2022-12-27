@@ -143,26 +143,30 @@ export default class SchedulePaymentSDKService extends Service {
     recurringUntil: number | null,
     onScheduledPaymentIdReady: (scheduledPaymentId: string) => void
   ): TaskGenerator<void> {
-    const scheduledPayments = yield this.getSchedulePaymentsModule();
-    yield scheduledPayments.schedulePayment(
-      safeAddress,
-      moduleAddress,
-      tokenAddress,
-      amount,
-      payeeAddress,
-      executionGas,
-      maxGasPrice,
-      gasTokenAddress,
-      salt,
-      payAt,
-      recurringDayOfMonth,
-      recurringUntil,
-      onScheduledPaymentIdReady,
-      { hubUrl: config.hubUrl }
-    );
-    console.log(
-      `Scheduled payment added in both crank and on chain successfully.`
-    );
+    try {
+      const scheduledPayments = yield this.getSchedulePaymentsModule();
+      yield scheduledPayments.schedulePayment(
+        safeAddress,
+        moduleAddress,
+        tokenAddress,
+        amount,
+        payeeAddress,
+        executionGas,
+        maxGasPrice,
+        gasTokenAddress,
+        salt,
+        payAt,
+        recurringDayOfMonth,
+        recurringUntil,
+        onScheduledPaymentIdReady,
+        { hubUrl: config.hubUrl }
+      );
+      console.log(
+        `Scheduled payment added in both crank and on chain successfully.`
+      );
+    } catch (err) {
+      console.error(err);
+    }
   }
 }
 

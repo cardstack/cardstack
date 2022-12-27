@@ -47,8 +47,9 @@ interface Signature {
     isMaxGasPriceInvalid: boolean;
     maxGasPriceErrorMessage: string;
     onSchedulePayment: () => void;
-    isSubmitEnabled: boolean;
     onUpdatePayeeAddress: (val: string) => void;
+    isSubmitEnabled: boolean;
+    isSubmitting: boolean;
   }
 }
 
@@ -249,7 +250,7 @@ export default class SchedulePaymentFormActionCardUI extends Component<Signature
           </div>
         </BoxelField>
       </Section>
-        <ActionChin @state='default'>
+        <ActionChin @state={{if @isSubmitting 'in-progress' 'default'}}>
           <:default as |ac|>
             <ac.ActionButton
               @disabled={{not @isSubmitEnabled}}
@@ -259,6 +260,14 @@ export default class SchedulePaymentFormActionCardUI extends Component<Signature
               Schedule Payment
             </ac.ActionButton>
           </:default>
+          <:inProgress as |ac|>
+            <ac.ActionButton
+              @disabled={{true}}
+              data-test-schedule-payment-form-submit-button
+            >
+              Scheduling...
+            </ac.ActionButton>
+          </:inProgress>
         </ActionChin>
     </BoxelActionContainer>    
   </template>

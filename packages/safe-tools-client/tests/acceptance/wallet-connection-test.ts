@@ -135,7 +135,10 @@ module('Acceptance | wallet connection', function (hooks) {
       this.mockWalletConnect.mockConnectedWallet([TEST_ACCOUNT_2]);
       this.mockWalletConnect.mockAccountsChanged([TEST_ACCOUNT_2]);
 
-      await click('.network-connect-modal__close-button'); // FIXME: I don't think this click should be necessary
+      await waitFor('[data-test-hub-auth-modal]');
+      await click('[data-test-hub-auth-modal] button');
+      assert.dom('[data-test-hub-auth-modal]').doesNotExist();
+
       assert
         .dom('[data-test-wallet-address]')
         .hasText(truncateMiddle([TEST_ACCOUNT_2]));

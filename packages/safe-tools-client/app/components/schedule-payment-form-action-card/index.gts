@@ -20,6 +20,8 @@ import not from 'ember-truth-helpers/helpers/not';
 import { convertAmountToNativeDisplay, convertAmountToRawAmount } from '@cardstack/cardpay-sdk';
 import { taskFor } from 'ember-concurrency-ts';
 import { BigNumber } from 'ethers';
+import { task } from 'ember-concurrency-decorators';
+import perform from 'ember-concurrency/helpers/perform';
 
 interface Signature {
   Element: HTMLElement;
@@ -206,8 +208,7 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
     return state;
   });
 
-  @action
-  async schedulePayment() {
+  @task *schedulePaymentTask() {
     let { currentSafe } = this.safes;
     if (!currentSafe) return;
     if (!this.paymentDate) return;
@@ -237,7 +238,7 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
     window.crypto.getRandomValues(array);
     const salt = btoa(String.fromCharCode.apply(null, array));
 
-    await taskFor(this.scheduledPaymentsSdk.schedulePayment).perform(
+    yield taskFor(this.scheduledPaymentsSdk.schedulePayment).perform(
       currentSafe.address,
       currentSafe.spModuleAddress,
       this.paymentToken.address,
@@ -294,9 +295,10 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
       @onUpdateMaxGasPrice={{this.onUpdateMaxGasPrice}}
       @isMaxGasPriceInvalid={{not this.validator.isMaxGasPriceValid}}
       @maxGasPriceErrorMessage={{this.validator.maxGasPriceErrorMessage}}
-      @onSchedulePayment={{this.schedulePayment}}
-      @isSubmitEnabled={{this.isValid}}
+      @onSchedulePayment={{perform this.schedulePaymentTask}}
       @maxGasDescriptions={{this.maxGasDescriptions.value}}
+      @isSubmitEnabled={{this.isValid}}
+      @isSubmitting={{this.schedulePaymentTask.isRunning}}
     />
   </template>
 }

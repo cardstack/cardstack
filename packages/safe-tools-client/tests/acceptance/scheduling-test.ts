@@ -3,6 +3,7 @@ import {
   GnosisSafeABI,
   ScheduledPaymentModuleABI,
 } from '@cardstack/cardpay-sdk';
+import { Deferred } from '@cardstack/ember-shared';
 import SafesService, {
   Safe,
   TokenBalance,
@@ -36,6 +37,13 @@ const FAKE_WALLET_CONNECT_ACCOUNT =
 const SAFE_ADDRESS = '0x458Bb61A22A0e91855d6D876C88706cfF7bD486E';
 const SP_MODULE_ADDRESS = '0xa6B71E26C5e0845f74c812102Ca7114b6a896AB2';
 const EXECUTION_GAS = 127864;
+const SP_CREATION_TX_HASH =
+  '0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef';
+const SP_CREATION_BLOCK_NUMBER = 1000;
+
+let scheduledPaymentCreated = 0;
+let scheduledPaymentPatchedWithTxHash: string | undefined;
+let scheduledPaymentCreationApiDelay: Promise<void> | undefined;
 
 module('Acceptance | scheduling', function (hooks) {
   setupApplicationTest(hooks);
@@ -44,6 +52,7 @@ module('Acceptance | scheduling', function (hooks) {
     this.owner.register('storage:local', this.mockLocalStorage, {
       instantiate: false,
     });
+    scheduledPaymentCreated = 0;
 
     const handlers = [
       rest.get('/hub-test/api/session', (_req, res, ctx) => {
@@ -93,9 +102,15 @@ module('Acceptance | scheduling', function (hooks) {
           })
         );
       }),
+      rest.get(
+        `https://relay-ethereum.cardstack.com/api/v1/tokens`,
+        (_req, res, ctx) => {
+          return res(ctx.status(200), ctx.json({ results: exampleGasTokens }));
+        }
+      ),
       rest.post(
         `https://relay-ethereum.cardstack.com/api/v2/safes/${SAFE_ADDRESS}/transactions/estimate/`,
-        (_req, res, ctx) => {
+        async (_req, res, ctx) => {
           return res(
             ctx.status(200),
             ctx.json({
@@ -105,13 +120,18 @@ module('Acceptance | scheduling', function (hooks) {
           );
         }
       ),
-      rest.post('/hub-test/api/scheduled-payments', (_req, res, ctx) => {
+      rest.post('/hub-test/api/scheduled-payments', async (_req, res, ctx) => {
+        if (scheduledPaymentCreationApiDelay) {
+          await scheduledPaymentCreationApiDelay;
+        }
+        scheduledPaymentCreated++;
         return res(
           ctx.status(200),
           ctx.json({
             data: {
               type: 'scheduled-payment',
               id: 'acc42eb0-340f-42f3-98b3-a568255a9c37',
+              attributes: {},
             },
           })
         );
@@ -123,36 +143,59 @@ module('Acceptance | scheduling', function (hooks) {
             ctx.status(200),
             ctx.json({
               ethereumTx: {
-                txHash:
-                  '0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef',
+                txHash: SP_CREATION_TX_HASH,
               },
             })
           );
         }
       ),
       rest.patch(
-        '/hub-test/api/scheduled-payments/acc42eb0-340f-42f3-98b3-a568255a9c37',
-        (_req, res, ctx) => {
+        '/hub-test/api/scheduled-payments/:scheduledPaymentId',
+        (req, res, ctx) => {
+          const requestBody = req.body as {
+            data: { attributes: Record<string, string> };
+          };
+          scheduledPaymentPatchedWithTxHash =
+            requestBody.data.attributes['creation-transaction-hash'];
           return res(
             ctx.status(200),
             ctx.json({
               data: {
                 type: 'scheduled-payment',
-                id: 'acc42eb0-340f-42f3-98b3-a568255a9c37',
+                id: req.params.scheduledPaymentId,
+                attributes: {},
               },
             })
           );
         }
       ),
       rest.get(
-        '/hub-test/api/scheduled-payments/acc42eb0-340f-42f3-98b3-a568255a9c37',
-        (_req, res, ctx) => {
+        '/hub-test/api/scheduled-payments/:scheduledPaymentId',
+        (req, res, ctx) => {
           return res(
             ctx.status(200),
             ctx.json({
               data: {
                 type: 'scheduled-payment',
-                id: 'acc42eb0-340f-42f3-98b3-a568255a9c37',
+                id: req.params.scheduledPaymentId,
+                attributes: {
+                  'creation-transaction-hash':
+                    scheduledPaymentPatchedWithTxHash,
+                  'creation-block-number': SP_CREATION_BLOCK_NUMBER,
+                },
+              },
+            })
+          );
+        }
+      ),
+      rest.post(
+        'https://api.thegraph.com/subgraphs/name/cardstack/safe-tools-mainnet',
+        (_req, res, ctx) => {
+          return res(
+            ctx.status(200),
+            ctx.json({
+              data: {
+                account: null,
               },
             })
           );
@@ -163,9 +206,7 @@ module('Acceptance | scheduling', function (hooks) {
     worker.start({
       onUnhandledRequest(req, { warning }) {
         if (
-          req.url.href.match(
-            /trust-wallet.com|relay|\.png|\.svg|\.ttf|\/assets\//
-          )
+          req.url.href.match(/trust-wallet.com|\.png|\.svg|\.ttf|\/assets\//)
         ) {
           return;
         }
@@ -182,27 +223,32 @@ module('Acceptance | scheduling', function (hooks) {
       ERC20ABI,
       USDC_TOKEN_ADDRESS
     );
-    mockUsdcContract.mockCall('decimals', ['6']);
-    mockUsdcContract.mockCall('decimals', ['6']);
+    mockUsdcContract.mockCall('decimals', ['6'], undefined, {
+      persistent: true,
+    });
 
     const WETH_TOKEN_ADDRESS = '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2';
     const mockWethContract = this.mockWalletConnect.generateContractUtils(
       ERC20ABI,
       WETH_TOKEN_ADDRESS
     );
-    mockWethContract.mockCall('decimals', ['18']);
-    mockWethContract.mockCall('decimals', ['18']);
+    mockWethContract.mockCall('decimals', ['18'], undefined, {
+      persistent: true,
+    });
 
     const UNISWAP_V2_ADDRESS = '0xb4e16d0168e52d35cacd2c6185b44281ec28c9dc';
     const mockUniswapContract = this.mockWalletConnect.generateContractUtils(
       IUniswapV2Pair.abi,
       UNISWAP_V2_ADDRESS
     );
-    mockUniswapContract.mockCall('getReserves', ['1', '1', '10000']);
-    mockUniswapContract.mockCall('getReserves', ['1', '1', '10000']);
-
-    const tokensService = this.owner.lookup('service:tokens');
-    tokensService.stubGasTokens(exampleGasTokens);
+    mockUniswapContract.mockCall(
+      'getReserves',
+      ['1', '1', '10000'],
+      undefined,
+      {
+        persistent: true,
+      }
+    );
 
     const mockSPModuleContract = this.mockWalletConnect.generateContractUtils(
       ScheduledPaymentModuleABI,
@@ -210,7 +256,7 @@ module('Acceptance | scheduling', function (hooks) {
     );
     mockSPModuleContract.mockCall(
       'createSpHash(address,uint256,address,((uint256),(uint256)),uint256,uint256,address,string,uint256)',
-      ['0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef']
+      [SP_CREATION_TX_HASH]
     );
 
     const mockGnosisSafeContract = this.mockWalletConnect.generateContractUtils(
@@ -230,8 +276,7 @@ module('Acceptance | scheduling', function (hooks) {
       'eth_getTransactionReceipt',
       {
         status: true,
-        blockHash:
-          '0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef',
+        blockHash: SP_CREATION_TX_HASH,
       } as TransactionReceipt,
       { persistent: true }
     );
@@ -282,12 +327,29 @@ module('Acceptance | scheduling', function (hooks) {
         )[0]?.textContent?.trim().length;
       });
       // click "Schedule Payment" button
+      const scheduledPaymentCreationApiDeferred = new Deferred<void>();
+      scheduledPaymentCreationApiDelay =
+        scheduledPaymentCreationApiDeferred.promise;
       await click(
         '.schedule-payment-form-action-card [data-test-boxel-action-chin] button'
       );
-      await this.pauseTest();
-      assert.ok(true, 'temporary');
-      // TODO assert in-progress view
+      assert
+        .dom(
+          '.schedule-payment-form-action-card [data-test-boxel-action-chin] button'
+        )
+        .hasText('Scheduling...');
+      scheduledPaymentCreationApiDeferred.fulfill();
+      await waitUntil(() => scheduledPaymentCreated);
+      assert.ok(
+        scheduledPaymentCreated,
+        'Scheduled Payment created via POST to API'
+      );
+      await waitUntil(() => scheduledPaymentPatchedWithTxHash);
+      assert.strictEqual(
+        scheduledPaymentPatchedWithTxHash,
+        SP_CREATION_TX_HASH,
+        'Scheduled Payment updated via PATCH to API'
+      );
       // TODO simulate wallet approval
       // TODO assert hub API call was made (msw?)
       // TODO assert confirmation?
