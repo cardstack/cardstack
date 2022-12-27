@@ -47,14 +47,20 @@ export default class SchedulePaymentSDKService extends Service {
     return { from: this.wallet.address };
   }
 
-  async getCreateSafeGasEstimation(): Promise<BigNumber | undefined> {
+  async getCreateSafeGasEstimation(): Promise<{
+    gasEstimateInNativeToken: BigNumber;
+    gasEstimateInUsd: BigNumber;
+  }> {
     const scheduledPayments = await this.getSchedulePaymentsModule();
 
     const estimatedGas = await scheduledPayments.estimateGas(
       'create_safe_with_module'
     );
 
-    return estimatedGas.gasRangeInWei.standard;
+    return {
+      gasEstimateInNativeToken: estimatedGas.gasRangeInWei.standard,
+      gasEstimateInUsd: estimatedGas.gasRangeInUSD.standard,
+    };
   }
 
   async createSafe(): Promise<{ safeAddress: string }> {

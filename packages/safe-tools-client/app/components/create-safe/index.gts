@@ -1,6 +1,5 @@
 import { BigNumber } from 'ethers';
-import Web3 from 'web3';
-
+import { weiToDecimal } from '@cardstack/safe-tools-client/helpers/wei-to-decimal';
 import Component from '@glimmer/component';
 import { on } from '@ember/modifier';
 import { tracked } from '@glimmer/tracking';
@@ -45,22 +44,17 @@ export default class CreateSafeButton extends Component<Signature> {
     this.isLoadingGasInfo = true;
     this.isModalOpen = true;
     try {
-      const [gasEstimate, nativeTokenBalance] = await Promise.all([
+      const [ { gasEstimateInNativeToken, gasEstimateInUsd }, nativeTokenBalance] = await Promise.all([
         this.scheduledPaymentsSdk.getCreateSafeGasEstimation(),
         this.wallet.fetchNativeTokenBalance(),
       ]);
 
-      const balance = BigNumber.from(nativeTokenBalance?.amount);
+      const balance = BigNumber.from(nativeTokenBalance.amount);
 
-      this.hasEnoughBalance = !!gasEstimate?.lt(balance);
+      this.hasEnoughBalance = balance.gte(gasEstimateInNativeToken);
 
-      const tokenSymbol = nativeTokenBalance?.symbol || '';
-      const gasEstimateString = Web3.utils.fromWei(
-        gasEstimate?.toString() || ''
-      )
-
-      this.gasCostDisplay = `${gasEstimateString} ${tokenSymbol}`
-
+      const tokenSymbol = nativeTokenBalance.symbol;
+      this.gasCostDisplay = `${weiToDecimal([gasEstimateInNativeToken, 18])} ${tokenSymbol} (~$${weiToDecimal([gasEstimateInUsd, 18, 2])})`;
     } catch (e) {
       this.comparingBalanceToGasCostErrorMessage = "There was an error comparing your wallet balance to the estimated gas cost. Please reload the page and try again. If the problem persists, please contact support.";
       console.log(e) // TODO: Sentry

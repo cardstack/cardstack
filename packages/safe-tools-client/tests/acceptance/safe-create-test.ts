@@ -35,10 +35,14 @@ module('Acceptance | create safe', function (hooks) {
       'service:scheduled-payments-sdk'
     ) as SchedulePaymentSDKService;
 
-    scheduledPaymentsSdkService.getCreateSafeGasEstimation = (): Promise<
-      BigNumber | undefined
-    > => {
-      return Promise.resolve(BigNumber.from('10000000000')); // 10 gwei
+    scheduledPaymentsSdkService.getCreateSafeGasEstimation = (): Promise<{
+      gasEstimateInNativeToken: BigNumber;
+      gasEstimateInUsd: BigNumber;
+    }> => {
+      return Promise.resolve({
+        gasEstimateInNativeToken: BigNumber.from('11870866000000000'),
+        gasEstimateInUsd: BigNumber.from('594514232585000000000'),
+      });
     };
 
     scheduledPaymentsSdkService.createSafe = (): Promise<{
@@ -96,7 +100,7 @@ module('Acceptance | create safe', function (hooks) {
       assert
         .dom('[data-test-setup-safe-modal]')
         .includesText('Set up a Payment Safe')
-        .includesText('Estimated gas cost: 0.00000001 ETH')
+        .includesText('0.012 ETH (~$594.51)')
         .includesText(
           'Your wallet has sufficient funds to cover the estimated gas cost.'
         );
@@ -273,7 +277,7 @@ module('Acceptance | create safe', function (hooks) {
       assert
         .dom('[data-test-setup-safe-modal]')
         .includesText('Set up a Payment Safe')
-        .includesText('Estimated gas cost: 0.00000001 ETH')
+        .includesText('Estimated gas cost: 0.012 ETH (~$594.51)')
         .includesText(
           'Your wallet has insufficient funds to cover the estimated gas cost'
         );
