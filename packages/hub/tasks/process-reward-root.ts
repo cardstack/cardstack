@@ -88,6 +88,7 @@ export default class ProcessRewardRoot {
       }
     } catch (e: any) {
       if (e.code == '23505') {
+        // do not scream errors when indexing
         log.info(`rewardProgramId: ${file.rewardProgramId}, paymentCycle: ${file.paymentCycle} is already indexed`);
         return;
       }
