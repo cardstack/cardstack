@@ -44,7 +44,7 @@ export default class ProcessRewardRoot {
     const proofs = await queryParquet(s3Client, file);
     const rows = proofs
       .filter(({ validTo }) => {
-        return currentBlockNumber > validTo;
+        return validTo > currentBlockNumber;
       }) //only index non expired proofs
       .map((o) => {
         return (
