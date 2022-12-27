@@ -110,7 +110,6 @@ import GasEstimationResultSerializer from './services/serializers/gas-estimation
 import ScheduledPaymentsAttemptsRoute from './routes/scheduled-payment-attempts';
 import ScheduledPaymentAttemptSerializer from './services/serializers/scheduled-payment-attempt-serializer';
 import GasPriceSerializer from './services/serializers/gas-price-serializer';
-import ProcessRewardRoot from './tasks/process-reward-root';
 
 //@ts-ignore polyfilling fetch
 global.fetch = fetch;
@@ -208,7 +207,6 @@ export function createRegistry(): Registry {
   registry.register('gas-estimation-service', GasEstimationService);
   registry.register('gas-estimation-validator', GasEstimationValidator);
   registry.register('gas-estimation-result-serializer', GasEstimationResultSerializer);
-  registry.register('process-reward-root', ProcessRewardRoot);
 
   if (process.env.COMPILER) {
     registry.register(
