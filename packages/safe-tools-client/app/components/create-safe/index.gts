@@ -37,12 +37,24 @@ export default class CreateSafeButton extends Component<Signature> {
   @tracked gasCostDisplay =  '';
   @tracked comparingBalanceToGasCostErrorMessage = '';
 
-  @action async openCreateSafeModal() {
+  @action async onCreateSafeClick() {
+    taskFor(this.openCreateSafeModal).perform();
+  }
+
+  @action closeModal() {
+    this.isModalOpen = false
+  }
+
+  @task *createSafe(): TaskGenerator<{ safeAddress: string }> {
+    return yield this.scheduledPaymentsSdk.createSafe();
+  }
+
+  @task *openCreateSafeModal(): TaskGenerator<void> {
     this.comparingBalanceToGasCostErrorMessage = '';
     this.isLoadingGasInfo = true;
     this.isModalOpen = true;
     try {
-      const [ { gasEstimateInNativeToken, gasEstimateInUsd }, nativeTokenBalance] = await Promise.all([
+      const [ { gasEstimateInNativeToken, gasEstimateInUsd }, nativeTokenBalance] = yield Promise.all([
         this.scheduledPaymentsSdk.getCreateSafeGasEstimation(),
         this.wallet.fetchNativeTokenBalance(),
       ]);
@@ -59,14 +71,6 @@ export default class CreateSafeButton extends Component<Signature> {
     } finally {
       this.isLoadingGasInfo = false;
     }
-  }
-
-  @action closeModal() {
-    this.isModalOpen = false
-  }
-
-  @task *createSafe(): TaskGenerator<{ safeAddress: string }> {
-    return yield this.scheduledPaymentsSdk.createSafe();
   }
 
   @task *waitForSafeToBeIndexed(
@@ -141,7 +145,7 @@ export default class CreateSafeButton extends Component<Signature> {
 
   <template>
     {{#unless this.args.currentSafe}}
-      <BoxelButton @kind='primary' {{on 'click' this.openCreateSafeModal}} data-test-create-safe-button>
+      <BoxelButton @kind='primary' {{on 'click' this.onCreateSafeClick}} data-test-create-safe-button>
         Create Safe
       </BoxelButton>
     {{/unless}}

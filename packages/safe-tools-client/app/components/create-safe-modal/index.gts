@@ -22,7 +22,7 @@ interface Signature {
     isProvisioning: boolean;
     isIndexing: boolean;
     isLoadingGasInfo: boolean;
-    safeCreated: boolean;
+    safeCreated: boolean | undefined;
     comparingBalanceToGasCostErrorMessage: string | undefined;
     provisioningOrIndexingErrorMessage: string | undefined;
   };
