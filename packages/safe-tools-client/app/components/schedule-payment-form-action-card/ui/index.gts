@@ -19,6 +19,7 @@ import not from 'ember-truth-helpers/helpers/not';
 import set from 'ember-set-helper/helpers/set';
 import './index.css';
 import { MaxGasFeeOption, ValidatableForm } from '../validator';
+import { noop } from '@cardstack/safe-tools-client/helpers/noop';
 
 interface Signature {
   Element: HTMLElement;
@@ -262,7 +263,8 @@ export default class SchedulePaymentFormActionCardUI extends Component<Signature
           </:default>
           <:inProgress as |ac|>
             <ac.ActionButton
-              @disabled={{true}}
+              @loading={{true}}
+              {{on 'click' noop}}
               data-test-schedule-payment-form-submit-button
             >
               Scheduling...

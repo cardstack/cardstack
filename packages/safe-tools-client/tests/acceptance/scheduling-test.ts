@@ -333,7 +333,6 @@ module('Acceptance | scheduling', function (hooks) {
           '.schedule-payment-form-action-card--max-gas-fee-description'
         )[0]?.textContent?.trim().length;
       });
-      // click "Schedule Payment" button
       const scheduledPaymentCreationApiDeferred = new Deferred<void>();
       scheduledPaymentCreationApiDelay =
         scheduledPaymentCreationApiDeferred.promise;
