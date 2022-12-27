@@ -71,7 +71,7 @@ export default class SetupSafeModal extends Component<Signature> {
           </ul>
           {{#if @isLoadingGasInfo}}
             <div class='safe-setup-modal__section__section-gas-loading'>
-              <BoxelLoadingIndicator /> <p>Calculating estimated gas cost.</p>
+              <BoxelLoadingIndicator /> <p>Calculating estimated gas cost...</p>
             </div>
           {{else}}
             {{#if @comparingBalanceToGasCostErrorMessage}}
@@ -169,7 +169,7 @@ export default class SetupSafeModal extends Component<Signature> {
               {{#if @isProvisioning}}
                 Provisioning...
               {{else if @isIndexing}}
-                Indexing...
+                Confirming...
               {{/if}}
             </ip.ActionButton>
           </:inProgress>
