@@ -30,7 +30,7 @@
       "symbol": "wxDAI",
       "decimals": 18,
       "logoURI": "https://docs.gnosischain.com/img/tokens/xdai.png",
-      "tags": ["erc20"]
+      "tags": ["erc20", "relayGas"]
     },
     {
       "chainId": 100,
@@ -39,7 +39,7 @@
       "symbol": "CARD.CPXD",
       "decimals": 18,
       "logoURI": "https://raw.githubusercontent.com/cardstack/cardstack/main/packages/web-client/public/images/logos/tokens/card.cpxd.png",
-      "tags": ["erc20"]
+      "tags": ["erc20", "relayGas"]
     },
     {
       "chainId": 100,
@@ -48,7 +48,7 @@
       "symbol": "DAI.CPXD",
       "decimals": 18,
       "logoURI": "https://raw.githubusercontent.com/cardstack/cardstack/main/packages/web-client/public/images/logos/tokens/dai.cpxd.png",
-      "tags": ["erc20"]
+      "tags": ["erc20", "relayGas"]
     }
   ]
 }

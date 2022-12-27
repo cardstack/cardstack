@@ -181,7 +181,7 @@ const constants: {
   mainnet: {
     ...hubUrl,
     ...ethNativeTokens,
-    tokenList: ethTokenList as unknown as TokenList, // TODO: check json to match type
+    tokenList: ethTokenList,
     apiBaseUrl: 'https://api.etherscan.io/api',
     blockExplorer: 'https://etherscan.io',
     bridgeExplorer: 'https://alm-xdai.herokuapp.com/1',
