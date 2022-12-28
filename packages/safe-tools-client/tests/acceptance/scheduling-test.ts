@@ -16,7 +16,7 @@ import { BigNumber } from 'ethers';
 import { setupWorker, rest } from 'msw';
 import { module, test } from 'qunit';
 
-import { setupApplicationTest } from '../helpers';
+import { setupApplicationTest, USDC_TOKEN_ADDRESS } from '../helpers';
 import { exampleGasTokens } from '../support/tokens';
 import { fillInSchedulePaymentFormWithValidInfo } from '../support/ui-test-helpers';
 
@@ -30,13 +30,20 @@ const FAKE_WALLET_CONNECT_ACCOUNT =
 const SAFE_ADDRESS = '0x458Bb61A22A0e91855d6D876C88706cfF7bD486E';
 const SP_MODULE_ADDRESS = '0xa6B71E26C5e0845f74c812102Ca7114b6a896AB2';
 const EXECUTION_GAS = 127864;
-const SP_CREATION_TX_HASH =
+const SP_HASH =
   '0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef';
 const SP_CREATION_BLOCK_NUMBER = 1000;
+const SP_CREATION_TX_HASH =
+  '0x5432101234567890abcdef1234567890abcdef1234567890abcdef1234567890';
 
+interface SpCreationApiPayload {
+  data: {
+    attributes: Record<string, string | number>;
+  };
+}
 let signedHubAuthentication = 0;
 let signedSafeTx = 0;
-let scheduledPaymentCreated = 0;
+let scheduledPaymentCreations: SpCreationApiPayload[] = [];
 let scheduledPaymentPatchedWithTxHash: string | undefined;
 let scheduledPaymentCreationApiDelay: Promise<void> | undefined;
 
@@ -49,7 +56,7 @@ module('Acceptance | scheduling', function (hooks) {
     });
     signedHubAuthentication = 0;
     signedSafeTx = 0;
-    scheduledPaymentCreated = 0;
+    scheduledPaymentCreations = [];
 
     const handlers = [
       rest.get('/hub-test/api/session', (_req, res, ctx) => {
@@ -117,11 +124,11 @@ module('Acceptance | scheduling', function (hooks) {
           );
         }
       ),
-      rest.post('/hub-test/api/scheduled-payments', async (_req, res, ctx) => {
+      rest.post('/hub-test/api/scheduled-payments', async (req, res, ctx) => {
         if (scheduledPaymentCreationApiDelay) {
           await scheduledPaymentCreationApiDelay;
         }
-        scheduledPaymentCreated++;
+        scheduledPaymentCreations.push(await req.json());
         return res(
           ctx.status(200),
           ctx.json({
@@ -228,9 +235,16 @@ module('Acceptance | scheduling', function (hooks) {
       spModuleAddress: SP_MODULE_ADDRESS,
     });
 
+    // one-time
     this.mockWalletConnect.spModuleContract.mockCall(
       'createSpHash(address,uint256,address,((uint256),(uint256)),uint256,uint256,address,string,uint256)',
-      [SP_CREATION_TX_HASH]
+      [SP_HASH]
+    );
+
+    // monthly recurring
+    this.mockWalletConnect.spModuleContract.mockCall(
+      'createSpHash(address,uint256,address,((uint256),(uint256)),uint256,uint256,address,string,uint256,uint256)',
+      [SP_HASH]
     );
 
     this.mockWalletConnect.lowLevel.mockRequest(
@@ -297,7 +311,7 @@ module('Acceptance | scheduling', function (hooks) {
       await this.mockWalletConnect.mockAccountsChanged([
         FAKE_WALLET_CONNECT_ACCOUNT,
       ]);
-      await fillInSchedulePaymentFormWithValidInfo();
+      await fillInSchedulePaymentFormWithValidInfo({ type: 'one-time' });
       await waitFor('[data-test-safe-address-label]');
       await waitUntil(() => {
         return findAll(
@@ -314,7 +328,7 @@ module('Acceptance | scheduling', function (hooks) {
       assert.dom('[data-test-payee-address-input]').isDisabled();
 
       scheduledPaymentCreationApiDeferred.fulfill();
-      await waitUntil(() => scheduledPaymentCreated);
+      await waitUntil(() => scheduledPaymentCreations.length);
       assert.strictEqual(
         signedHubAuthentication,
         1,
@@ -322,9 +336,27 @@ module('Acceptance | scheduling', function (hooks) {
       );
       assert.strictEqual(signedSafeTx, 1, 'signed safe transaction');
       assert.ok(
-        scheduledPaymentCreated,
+        scheduledPaymentCreations.length,
         'Scheduled Payment created via POST to API'
       );
+      assert.strictEqual(
+        scheduledPaymentCreations[0].data.attributes['amount'],
+        '15000000'
+      );
+      assert.ok(!!scheduledPaymentCreations[0].data.attributes['pay-at']);
+      assert.strictEqual(
+        scheduledPaymentCreations[0].data.attributes['payee-address'],
+        '0xb794f5ea0ba39494ce839613fffba74279579268'
+      );
+      assert.strictEqual(
+        scheduledPaymentCreations[0].data.attributes['sp-hash'],
+        SP_HASH
+      );
+      assert.strictEqual(
+        scheduledPaymentCreations[0].data.attributes['token-address'],
+        USDC_TOKEN_ADDRESS
+      );
+
       await waitUntil(() => scheduledPaymentPatchedWithTxHash);
       assert.strictEqual(
         scheduledPaymentPatchedWithTxHash,
@@ -347,6 +379,83 @@ module('Acceptance | scheduling', function (hooks) {
 
   module('recurring', function () {
     // test: does not schedule if invalid
-    // test: schedules if valid
+    test('schedule and then reset', async function (assert) {
+      await visit('/schedule');
+      await click('.connect-button__button');
+      await click('[data-test-wallet-option="wallet-connect"]');
+      await click('[data-test-mainnet-connect-button]');
+      await this.mockWalletConnect.mockAccountsChanged([
+        FAKE_WALLET_CONNECT_ACCOUNT,
+      ]);
+      await fillInSchedulePaymentFormWithValidInfo({ type: 'monthly' });
+      await waitFor('[data-test-safe-address-label]');
+      await waitUntil(() => {
+        return findAll(
+          '.schedule-payment-form-action-card--max-gas-fee-description'
+        )[0]?.textContent?.trim().length;
+      });
+      const scheduledPaymentCreationApiDeferred = new Deferred<void>();
+      scheduledPaymentCreationApiDelay =
+        scheduledPaymentCreationApiDeferred.promise;
+      await click('[data-test-schedule-payment-form-submit-button]');
+      assert
+        .dom('[data-test-schedule-payment-form-submit-button]')
+        .hasText('Scheduling...');
+      assert.dom('[data-test-payee-address-input]').isDisabled();
+
+      scheduledPaymentCreationApiDeferred.fulfill();
+      await waitUntil(() => scheduledPaymentCreations.length);
+      assert.strictEqual(
+        signedHubAuthentication,
+        1,
+        'signed hub authentication'
+      );
+      assert.strictEqual(signedSafeTx, 1, 'signed safe transaction');
+      assert.ok(
+        scheduledPaymentCreations.length,
+        'Scheduled Payment created via POST to API'
+      );
+      assert.strictEqual(
+        scheduledPaymentCreations[0].data.attributes['amount'],
+        '15000000'
+      );
+      assert.strictEqual(
+        scheduledPaymentCreations[0].data.attributes['recurring-day-of-month'],
+        15
+      );
+      assert.ok(
+        !!scheduledPaymentCreations[0].data.attributes['recurring-until']
+      );
+      assert.strictEqual(
+        scheduledPaymentCreations[0].data.attributes['payee-address'],
+        '0xb794f5ea0ba39494ce839613fffba74279579268'
+      );
+      assert.strictEqual(
+        scheduledPaymentCreations[0].data.attributes['sp-hash'],
+        SP_HASH
+      );
+      assert.strictEqual(
+        scheduledPaymentCreations[0].data.attributes['token-address'],
+        USDC_TOKEN_ADDRESS
+      );
+
+      await waitUntil(() => scheduledPaymentPatchedWithTxHash);
+      assert.strictEqual(
+        scheduledPaymentPatchedWithTxHash,
+        SP_CREATION_TX_HASH,
+        'Scheduled Payment updated via PATCH to API'
+      );
+      await waitFor('[data-test-boxel-action-chin-action-status-area]');
+      assert
+        .dom('[data-test-boxel-action-chin-action-status-area]')
+        .containsText('Payment was successfully scheduled');
+      assert.dom('[data-test-payee-address-input]').isDisabled();
+
+      await click('[data-test-schedule-payment-form-reset-button]');
+      assert.dom('[data-test-payee-address-input]').isNotDisabled();
+      assert
+        .dom('[data-test-schedule-payment-form-submit-button]')
+        .hasText('Schedule Payment');
+    });
   });
 });

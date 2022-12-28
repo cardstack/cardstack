@@ -211,10 +211,11 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
   @task *schedulePaymentTask() {
     let { currentSafe } = this.safes;
     if (!currentSafe) return;
-    if (!this.paymentDate) return;
-    if (!this.paymentToken) return;
-    if (!this.selectedGasToken) return;
-    if (!this.gasEstimation) return;
+    if (!this.validator.isValid) return;
+
+    // Redundant to validation check but including it to narrow types for Typescript
+    if (!this.paymentToken || !this.selectedGasToken || !this.gasEstimation) return;
+
     if (Number(this.gasEstimation.gas) <= 0) return;
     const { gasRangeInGasTokenWei } = this.gasEstimation;
     if (Object.keys(gasRangeInGasTokenWei).length <= 0) return;
@@ -248,9 +249,9 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
       String(maxGasPrice),
       this.selectedGasToken.address,
       salt,
-      Math.round(this.paymentDate.getTime() / 1000),
-      null, //TODO: support for recurringDayOfMonth
-      null, //TODO: support for recurringUntil
+      this.selectedPaymentType === 'one-time' ? Math.round(this.paymentDate!.getTime() / 1000) : null,
+      this.selectedPaymentType === 'monthly' ? this.paymentDayOfMonth! : null,
+      this.selectedPaymentType === 'monthly' ? Math.round(this.monthlyUntil!.getTime() / 1000) : null,
       (scheduledPaymentId: string) => {
         console.log(`Scheduled payment created in the crank: ${scheduledPaymentId}.`);
         console.log('Waiting for the transaction to be mined...');
