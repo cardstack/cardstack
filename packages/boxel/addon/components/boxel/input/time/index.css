@@ -38,3 +38,8 @@
   padding: calc(var(--boxel-sp-xxxs) / 2) var(--boxel-sp-xxs);
   text-align: center;
 }
+
+.boxel-input-time__trigger:disabled {
+  --boxel-button-color: transparent;
+  --boxel-button-text-color: rgb(0 0 0 / 50%);
+}

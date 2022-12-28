@@ -33,6 +33,7 @@ interface ComponentArgs {
   value?: Time;
   minuteInterval?: number;
   minValue?: Time; 
+  disabled?: boolean;
   onChange?: (arg0: Time) => void;
 }
 
@@ -364,6 +365,7 @@ export default class BoxelInputTime extends Component<Signature> implements Keyb
         <BoxelDropdownTrigger
           @icon="clock"
           @label={{this.timeString}}
+          @disabled={{@disabled}}
           {{bindings}}
           {{registerElement (set this 'triggerElement')}}
           class="boxel-input-time__trigger"
