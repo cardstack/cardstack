@@ -1,7 +1,7 @@
 import Web3 from 'web3';
 import { ScheduledPayment } from '@prisma/client';
 import { startCase } from 'lodash';
-import { convertChainIdToName, isSchedulerSupportedChain, SchedulerCapableNetworks } from '@cardstack/cardpay-sdk';
+import { convertChainIdToName, isSupportedChain, SchedulerCapableNetworks } from '@cardstack/cardpay-sdk';
 import { inject } from '@cardstack/di';
 const { isAddress } = Web3.utils;
 
@@ -90,7 +90,7 @@ export default class ScheduledPaymentValidator {
     }
 
     if (scheduledPayment.chainId) {
-      if (!isSchedulerSupportedChain(scheduledPayment.chainId)) {
+      if (!isSupportedChain(scheduledPayment.chainId)) {
         errors.chainId.push(`chain is not supported`);
       } else {
         const networkName = convertChainIdToName(scheduledPayment.chainId) as SchedulerCapableNetworks;

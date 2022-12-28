@@ -8,7 +8,6 @@ import polygonTokenList from '../token-lists/polygon-tokenlist.json';
 import sokolTokenList from '../token-lists/sokol-tokenlist.json';
 import gnosisTokenList from '../token-lists/gnosis-tokenlist.json';
 import { type TokenList } from '@uniswap/token-lists';
-import { difference } from 'lodash';
 
 export const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000';
 
@@ -19,12 +18,10 @@ export const CARDWALLET_SCHEME = 'cardwallet';
 export const supportedChains = {
   ethereum: ['mainnet', 'goerli'],
   gnosis: ['gnosis', 'sokol'],
-  polygon: ['polygon', 'mumbai'],
+  polygon: ['polygon'],
 };
 
 export const supportedChainsArray = Object.values(supportedChains).flat();
-// Mumbai is not supported by gnosis team https://docs.gnosis-safe.io/backend/available-services
-export const schedulerSupportedChainsArray = difference(supportedChainsArray, [...supportedChains.gnosis, 'mumbai']);
 
 export type CardPayCapableNetworks = 'sokol' | 'gnosis';
 export type SchedulerCapableNetworks = 'mainnet' | 'goerli' | 'polygon';
