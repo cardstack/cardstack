@@ -1,7 +1,3 @@
-import {
-  GnosisSafeABI,
-  ScheduledPaymentModuleABI,
-} from '@cardstack/cardpay-sdk';
 import { Deferred } from '@cardstack/ember-shared';
 import SafesService, {
   TokenBalance,
@@ -38,6 +34,8 @@ const SP_CREATION_TX_HASH =
   '0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef';
 const SP_CREATION_BLOCK_NUMBER = 1000;
 
+let signedHubAuthentication = 0;
+let signedSafeTx = 0;
 let scheduledPaymentCreated = 0;
 let scheduledPaymentPatchedWithTxHash: string | undefined;
 let scheduledPaymentCreationApiDelay: Promise<void> | undefined;
@@ -49,6 +47,8 @@ module('Acceptance | scheduling', function (hooks) {
     this.owner.register('storage:local', this.mockLocalStorage, {
       instantiate: false,
     });
+    signedHubAuthentication = 0;
+    signedSafeTx = 0;
     scheduledPaymentCreated = 0;
 
     const handlers = [
@@ -223,49 +223,52 @@ module('Acceptance | scheduling', function (hooks) {
 
     this.mockWalletConnect.mockMainnet();
     this.mockWalletConnect.mockConnectedWallet([FAKE_WALLET_CONNECT_ACCOUNT]);
-    // this.mockWalletConnect.mockSafe(SAFE_ADDRESS, {
-    //   nativeBalance: '1000000000000000000',
-    // });
+    this.mockWalletConnect.mockSafe(SAFE_ADDRESS, {
+      nativeBalance: '1000000000000000000',
+      spModuleAddress: SP_MODULE_ADDRESS,
+    });
 
-    this.mockWalletConnect.mockBalance(
-      '0x458bb61a22a0e91855d6d876c88706cff7bd486e',
-      '1000000000000000000'
-    );
-
-    const mockSPModuleContract = this.mockWalletConnect.generateContractUtils(
-      ScheduledPaymentModuleABI,
-      SP_MODULE_ADDRESS
-    );
-    mockSPModuleContract.mockCall(
+    this.mockWalletConnect.spModuleContract.mockCall(
       'createSpHash(address,uint256,address,((uint256),(uint256)),uint256,uint256,address,string,uint256)',
       [SP_CREATION_TX_HASH]
     );
 
-    const mockGnosisSafeContract = this.mockWalletConnect.generateContractUtils(
-      GnosisSafeABI,
-      SAFE_ADDRESS
+    this.mockWalletConnect.lowLevel.mockRequest(
+      'eth_signTypedData_v4',
+      async ([from, data]: [string, string]) => {
+        const typedData = JSON.parse(data);
+        console.log('eth_signTypedData_v4');
+        console.log({ from, typedData });
+        if (typedData['primaryType'] === 'HubAuthentication') {
+          signedHubAuthentication++;
+          return '1b6a2d7aa891e56f1c7a2456e9f9e4444b9bca72bcecb40cbce2b2df89e387415b724a87e93a7b944d9c34e05e87b87c1d7bb00e6b2c4c3f4ccad42e9a9d49dd1b';
+        } else if (typedData['primaryType'] === 'SafeTx') {
+          signedSafeTx++;
+          return '1b6a2d7aa891e56f1c7a2456e9f9e4444b9bca72bcecb40cbce2b2df89e387415b724a87e93a7b944d9c34e05e87b87c1d7bb00e6b2c4c3f4ccad42e9a9d49dd1b';
+        } else {
+          throw new Error(`Unknown typed data: ${typedData['primaryType']}`);
+        }
+      },
+      {
+        persistent: true,
+      }
     );
-    mockGnosisSafeContract.mockCall('VERSION', ['1.3.0']);
-
-    this.mockWalletConnect.lowLevel.mockRequest('eth_signTypedData_v4', [
-      '1b6a2d7aa891e56f1c7a2456e9f9e4444b9bca72bcecb40cbce2b2df89e387415b724a87e93a7b944d9c34e05e87b87c1d7bb00e6b2c4c3f4ccad42e9a9d49dd1b',
-    ]);
-    this.mockWalletConnect.lowLevel.mockRequest('eth_signTypedData_v4', [
-      '1b6a2d7aa891e56f1c7a2456e9f9e4444b9bca72bcecb40cbce2b2df89e387415b724a87e93a7b944d9c34e05e87b87c1d7bb00e6b2c4c3f4ccad42e9a9d49dd1b',
-    ]);
 
     this.mockWalletConnect.lowLevel.mockRequest(
       'eth_getTransactionReceipt',
       {
-        status: true,
-        blockHash: SP_CREATION_TX_HASH,
+        status: '0x1',
+        blockHash: '0x6fd9e2a26ab',
+        blockNumber: '4961488',
+        gasUsed: '21000',
+        transactionHash: SP_CREATION_TX_HASH,
+        from: '',
       } as TransactionReceipt,
       { persistent: true }
     );
 
-    const safesService = this.owner.lookup('service:safes') as SafesService;
-
     // mocking this at the provider level is complex because of the total number of calls
+    const safesService = this.owner.lookup('service:safes') as SafesService;
     safesService.fetchTokenBalances = (): Promise<TokenBalance[]> => {
       return Promise.resolve([
         {
@@ -286,7 +289,7 @@ module('Acceptance | scheduling', function (hooks) {
   module('one-time', function () {
     // test: does not schedule if invalid
 
-    test('schedules if valid', async function (assert) {
+    test('schedule and then reset', async function (assert) {
       await visit('/schedule');
       await click('.connect-button__button');
       await click('[data-test-wallet-option="wallet-connect"]');
@@ -304,16 +307,20 @@ module('Acceptance | scheduling', function (hooks) {
       const scheduledPaymentCreationApiDeferred = new Deferred<void>();
       scheduledPaymentCreationApiDelay =
         scheduledPaymentCreationApiDeferred.promise;
-      await click(
-        '.schedule-payment-form-action-card [data-test-boxel-action-chin] button'
-      );
+      await click('[data-test-schedule-payment-form-submit-button]');
       assert
-        .dom(
-          '.schedule-payment-form-action-card [data-test-boxel-action-chin] button'
-        )
+        .dom('[data-test-schedule-payment-form-submit-button]')
         .hasText('Scheduling...');
+      assert.dom('[data-test-payee-address-input]').isDisabled();
+
       scheduledPaymentCreationApiDeferred.fulfill();
       await waitUntil(() => scheduledPaymentCreated);
+      assert.strictEqual(
+        signedHubAuthentication,
+        1,
+        'signed hub authentication'
+      );
+      assert.strictEqual(signedSafeTx, 1, 'signed safe transaction');
       assert.ok(
         scheduledPaymentCreated,
         'Scheduled Payment created via POST to API'
@@ -324,9 +331,17 @@ module('Acceptance | scheduling', function (hooks) {
         SP_CREATION_TX_HASH,
         'Scheduled Payment updated via PATCH to API'
       );
-      // TODO simulate wallet approval
-      // TODO assert hub API call was made (msw?)
-      // TODO assert confirmation?
+      await waitFor('[data-test-boxel-action-chin-action-status-area]');
+      assert
+        .dom('[data-test-boxel-action-chin-action-status-area]')
+        .containsText('Payment was successfully scheduled');
+      assert.dom('[data-test-payee-address-input]').isDisabled();
+
+      await click('[data-test-schedule-payment-form-reset-button]');
+      assert.dom('[data-test-payee-address-input]').isNotDisabled();
+      assert
+        .dom('[data-test-schedule-payment-form-submit-button]')
+        .hasText('Schedule Payment');
     });
   });
 

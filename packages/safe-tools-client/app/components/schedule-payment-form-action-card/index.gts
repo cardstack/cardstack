@@ -254,9 +254,20 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
       (scheduledPaymentId: string) => {
         console.log(`Scheduled payment created in the crank: ${scheduledPaymentId}.`);
         console.log('Waiting for the transaction to be mined...');
+        this.isSuccessfullyScheduled = true;
       }
     )
   }
+
+  @action resetForm() {
+    this.isSuccessfullyScheduled = false;
+  }
+
+  get isScheduling() {
+    return taskFor(this.schedulePaymentTask).isRunning;
+  }
+
+  @tracked isSuccessfullyScheduled = false;
 
   <template>
     <SchedulePaymentFormActionCardUI
@@ -298,7 +309,9 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
       @onSchedulePayment={{perform this.schedulePaymentTask}}
       @maxGasDescriptions={{this.maxGasDescriptions.value}}
       @isSubmitEnabled={{this.isValid}}
-      @isSubmitting={{this.schedulePaymentTask.isRunning}}
+      @isScheduling={{this.isScheduling}}
+      @isSuccessfullyScheduled={{this.isSuccessfullyScheduled}}
+      @onReset={{this.resetForm}}
     />
   </template>
 }

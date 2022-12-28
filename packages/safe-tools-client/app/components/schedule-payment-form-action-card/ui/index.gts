@@ -1,5 +1,6 @@
 import Component from '@glimmer/component';
 import BoxelActionContainer from '@cardstack/boxel/components/boxel/action-container';
+import BoxelButton from '@cardstack/boxel/components/boxel/button';
 import BoxelField from '@cardstack/boxel/components/boxel/field';
 import BoxelInputDate, { Day } from '@cardstack/boxel/components/boxel/input/date';
 import BoxelInputTime, { Time } from '@cardstack/boxel/components/boxel/input/time';
@@ -49,8 +50,10 @@ interface Signature {
     maxGasPriceErrorMessage: string;
     onSchedulePayment: () => void;
     onUpdatePayeeAddress: (val: string) => void;
+    onReset: () => void;
     isSubmitEnabled: boolean;
-    isSubmitting: boolean;
+    isScheduling: boolean;
+    isSuccessfullyScheduled: boolean;
   }
 }
 
@@ -96,6 +99,20 @@ export default class SchedulePaymentFormActionCardUI extends Component<Signature
     return this.args.isMaxGasPriceInvalid;
   }
 
+  get isFormInteractionDisabled() {
+    return this.args.isScheduling || this.args.isSuccessfullyScheduled;
+  }
+
+  get actionChinState() {
+    if (this.args.isSuccessfullyScheduled) {
+      return 'memorialized';
+    }
+    if (this.args.isScheduling) {
+      return 'in-progress';
+    }
+    return 'default';
+  }
+
   <template>
     <BoxelActionContainer
       class="schedule-payment-form-action-card"
@@ -112,6 +129,7 @@ export default class SchedulePaymentFormActionCardUI extends Component<Signature
               @invalid={{this.isPaymentTypeInvalid}}
               @items={{@paymentTypeOptions}}
               @checkedId={{@selectedPaymentType}}
+              @disabled={{this.isFormInteractionDisabled}}
               @onBlur={{set this 'hasBlurredPaymentType' true}}
             as |item|>
               {{#let item.component as |RadioItem|}}
@@ -131,6 +149,7 @@ export default class SchedulePaymentFormActionCardUI extends Component<Signature
                           @value={{@paymentDate}}
                           @onChange={{@onSetPaymentDate}}
                           @minDate={{@minPaymentDate}}
+                          @disabled={{this.isFormInteractionDisabled}}
                           data-test-input-payment-date
                         />
                       </BoxelField>
@@ -139,6 +158,7 @@ export default class SchedulePaymentFormActionCardUI extends Component<Signature
                           @value={{@paymentDate}}
                           @onChange={{@onSetPaymentTime}}
                           @minValue={{@minPaymentTime}}
+                          @disabled={{this.isFormInteractionDisabled}}
                           data-test-input-specific-payment-time
                         />
                       </BoxelField>
@@ -153,6 +173,7 @@ export default class SchedulePaymentFormActionCardUI extends Component<Signature
                           @icon="calendar"
                           @onChange={{@onSelectPaymentDayOfMonth}}
                           @value={{@paymentDayOfMonth}}
+                          @disabled={{this.isFormInteractionDisabled}}
                           data-test-input-recurring-day-of-month
                         />
                       </BoxelField>
@@ -161,6 +182,7 @@ export default class SchedulePaymentFormActionCardUI extends Component<Signature
                           @value={{@monthlyUntil}}
                           @onChange={{@onSetMonthlyUntil}}
                           @minDate={{@minMonthlyUntil}}
+                          @disabled={{this.isFormInteractionDisabled}}
                           data-test-input-recurring-until
                         />
                       </BoxelField>
@@ -178,6 +200,7 @@ export default class SchedulePaymentFormActionCardUI extends Component<Signature
             @value={{@payeeAddress}}
             @invalid={{this.isPayeeAddressInvalid}}
             @errorMessage={{@payeeAddressErrorMessage}}
+            @disabled={{this.isFormInteractionDisabled}}
             @onInput={{@onUpdatePayeeAddress}}
             @onBlur={{set this 'hasBlurredPayeeAddress' true}}
           />
@@ -191,6 +214,7 @@ export default class SchedulePaymentFormActionCardUI extends Component<Signature
             @errorMessage={{@paymentAmountErrorMessage}}
             @token={{@paymentToken}}
             @tokens={{@paymentTokens}}
+            @disabled={{this.isFormInteractionDisabled}}
             @onChooseToken={{@onUpdatePaymentToken}}
             @onBlurToken={{set this 'hasBlurredPaymentAmount' true}}
           />
@@ -203,6 +227,7 @@ export default class SchedulePaymentFormActionCardUI extends Component<Signature
             @errorMessage={{@gasTokenErrorMessage}}
             @value={{@selectedGasToken}}
             @tokens={{@gasTokens}}
+            @disabled={{this.isFormInteractionDisabled}}
             @onChooseToken={{@onSelectGasToken}}
             @onBlur={{set this 'hasBlurredGasToken' true}}
           />
@@ -215,6 +240,7 @@ export default class SchedulePaymentFormActionCardUI extends Component<Signature
             @errorMessage={{@maxGasPriceErrorMessage}}
             @invalid={{this.isMaxGasPriceInvalid}}
             @value={{@maxGasPrice}}
+            @disabled={{this.isFormInteractionDisabled}}
             @onChange={{@onUpdateMaxGasPrice}}
             @onBlur={{set this 'hasBlurredMaxGasPrice' true}}
             as |group|
@@ -251,7 +277,7 @@ export default class SchedulePaymentFormActionCardUI extends Component<Signature
           </div>
         </BoxelField>
       </Section>
-        <ActionChin @state={{if @isSubmitting 'in-progress' 'default'}}>
+        <ActionChin @state={{this.actionChinState}}>
           <:default as |ac|>
             <ac.ActionButton
               @disabled={{not @isSubmitEnabled}}
@@ -270,6 +296,20 @@ export default class SchedulePaymentFormActionCardUI extends Component<Signature
               Scheduling...
             </ac.ActionButton>
           </:inProgress>
+          <:memorialized as |ac|>
+            <ac.ActionStatusArea>
+              Payment was successfully scheduled
+            </ac.ActionStatusArea>
+            <ac.InfoArea>
+              <BoxelButton
+                @kind="secondary-light"
+                data-test-schedule-payment-form-reset-button
+                {{on 'click' @onReset}}
+              >
+                Schedule Another
+              </BoxelButton>
+            </ac.InfoArea>
+          </:memorialized>
         </ActionChin>
     </BoxelActionContainer>    
   </template>
