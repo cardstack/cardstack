@@ -5,6 +5,8 @@ import JsonRpcProvider from '../providers/json-rpc-provider';
 import ethTokenList from '../token-lists/ethereum-tokenlist.json';
 import goerliTokenList from '../token-lists/goerli-tokenlist.json';
 import polygonTokenList from '../token-lists/polygon-tokenlist.json';
+import sokolTokenList from '../token-lists/sokol-tokenlist.json';
+import gnosisTokenList from '../token-lists/gnosis-tokenlist.json';
 import { type TokenList } from '@uniswap/token-lists';
 import { difference } from 'lodash';
 
@@ -54,6 +56,7 @@ interface SchedulerCapableNetworkConstants {
 }
 
 interface CardPayCapableNetworkConstants {
+  tokenList: TokenList;
   bridgedDaiTokenSymbol: string;
   bridgedCardTokenSymbol: string;
   bridgeExplorer: string;
@@ -128,6 +131,7 @@ const constants: {
     ...testHubUrl,
     ...ethNativeTokens,
     ...bridgedTokens,
+    tokenList: sokolTokenList,
     apiBaseUrl: 'https://blockscout.com/poa/sokol/api',
     blockExplorer: 'https://blockscout.com/poa/sokol',
     bridgeExplorer: 'https://alm-test-amb.herokuapp.com/77',
@@ -144,6 +148,7 @@ const constants: {
   gnosis: {
     ...hubUrl,
     ...bridgedTokens,
+    tokenList: gnosisTokenList,
     apiBaseUrl: 'https://blockscout.com/xdai/mainnet/api',
     blockExplorer: 'https://blockscout.com/xdai/mainnet',
     bridgeExplorer: 'https://alm-xdai.herokuapp.com/100',
@@ -176,7 +181,7 @@ const constants: {
   mainnet: {
     ...hubUrl,
     ...ethNativeTokens,
-    tokenList: ethTokenList as unknown as TokenList, // TODO: check json to match type
+    tokenList: ethTokenList,
     apiBaseUrl: 'https://api.etherscan.io/api',
     blockExplorer: 'https://etherscan.io',
     bridgeExplorer: 'https://alm-xdai.herokuapp.com/1',
