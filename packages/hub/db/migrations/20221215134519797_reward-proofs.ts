@@ -15,6 +15,7 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
     explanation_id: { type: 'string' },
     explanation_data: { type: 'json' },
   });
+  pgm.createIndex(TABLE, ['payee', 'reward_program_id']);
 }
 
 export async function down(pgm: MigrationBuilder): Promise<void> {
