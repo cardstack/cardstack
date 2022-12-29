@@ -1,3 +1,4 @@
+import { SchedulePaymentProgressListener } from '../scheduled-payment-module';
 import { hubRequest, poll } from '../utils/general-utils';
 
 export const GAS_ESTIMATION_SCENARIOS = [
@@ -10,9 +11,11 @@ export type GasEstimationScenario = typeof GAS_ESTIMATION_SCENARIOS[number];
 export async function waitUntilSchedulePaymentTransactionMined(
   hubRootUrl: string,
   scheduledPaymentId: string,
-  authToken: string
+  authToken: string,
+  listener?: SchedulePaymentProgressListener
 ) {
-  return poll(
+  listener?.onBeginWaitingForTransactionConfirmation?.();
+  await poll(
     () => hubRequest(hubRootUrl, `api/scheduled-payments/${scheduledPaymentId}`, authToken, 'GET'),
     (response: any) => {
       let attributes = response.data.attributes;
@@ -24,6 +27,7 @@ export async function waitUntilSchedulePaymentTransactionMined(
     },
     1000
   );
+  listener?.onEndWaitingForTransactionConfirmation?.();
 }
 
 export async function waitUntilCancelPaymentTransactionMined(

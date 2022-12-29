@@ -85,7 +85,24 @@ interface TransactionParams {
 }
 
 export interface SchedulePaymentProgressListener {
+  onBeginHubAuthentication?: () => unknown;
+  onEndHubAuthentication?: () => unknown;
+  onBeginSpHashCreation?: () => unknown;
+  onEndSpHashCreation?: () => unknown;
+  onBeginPrepareScheduledPayment?: () => unknown;
+  onEndPrepareScheduledPayment?: () => unknown;
+  onBeginRegisterPaymentWithHub?: () => unknown;
   onScheduledPaymentIdReady?: (scheduledPaymentId: string) => unknown;
+  onEndRegisterPaymentWithHub?: () => unknown;
+  onBeginSchedulingPaymentOnChain?: () => unknown;
+  onTxHash?: (txHash: string) => unknown;
+  onEndSchedulingPaymentOnChain?: () => unknown;
+  onBeginUpdatingHubWithTxHash?: () => unknown;
+  onEndUpdatingHubWithTxHash?: () => unknown;
+  onBeginWaitingForTransactionConfirmation?: () => unknown;
+  onEndWaitingForTransactionConfirmation?: () => unknown;
+  onBeginRemovePaymentFromHub?: () => unknown;
+  onEndRemovePaymentFromHub?: () => unknown;
 }
 
 interface SchedulePaymentOptions {
@@ -771,11 +788,16 @@ export default class ScheduledPaymentModule {
     moduleAddress: string,
     gasTokenAddress: string,
     spHash: string,
-    txnParams: TransactionParams
+    txnParams: TransactionParams,
+    listener?: SchedulePaymentProgressListener
   ) {
     return new Promise<void>((resolve, reject) => {
+      listener?.onBeginSchedulingPaymentOnChain?.();
       this.schedulePaymentOnChain(safeAddress, moduleAddress, gasTokenAddress, spHash, txnParams, {
         onTxnHash: async (txHash: string) => {
+          listener?.onTxHash?.(txHash);
+          listener?.onEndSchedulingPaymentOnChain?.();
+          listener?.onBeginUpdatingHubWithTxHash?.();
           await hubRequest(hubRootUrl, `api/scheduled-payments/${scheduledPaymentId}`, authToken, 'PATCH', {
             data: {
               attributes: {
@@ -783,6 +805,7 @@ export default class ScheduledPaymentModule {
               },
             },
           });
+          listener?.onEndUpdatingHubWithTxHash?.();
           resolve();
         },
       }).catch(reject);
@@ -960,9 +983,11 @@ export default class ScheduledPaymentModule {
     recurringUntil?: number | null,
     options: SchedulePaymentOptions = {}
   ) {
+    options.listener?.onBeginHubAuthentication?.();
     let hubAuth = await getSDK('HubAuth', this.ethersProvider, options.hubUrl, this.signer);
     let hubRootUrl = await hubAuth.getHubUrl();
     let authToken = await hubAuth.authenticate();
+    options.listener?.onEndHubAuthentication?.();
 
     let safeAddress: string;
 
@@ -971,7 +996,12 @@ export default class ScheduledPaymentModule {
     } else {
       let scheduledPaymentId = safeAddressOrScheduledPaymentId;
 
-      return await waitUntilSchedulePaymentTransactionMined(hubRootUrl, scheduledPaymentId, authToken);
+      return await waitUntilSchedulePaymentTransactionMined(
+        hubRootUrl,
+        scheduledPaymentId,
+        authToken,
+        options.listener
+      );
     }
 
     if (!moduleAddress) throw new Error('moduleAddress must be provided');
@@ -983,6 +1013,7 @@ export default class ScheduledPaymentModule {
     if (!gasTokenAddress) throw new Error('gasTokenAddress must be provided ');
     if (!salt) throw new Error('salt must be provided');
 
+    options.listener?.onBeginSpHashCreation?.();
     let spHash: string = await this.createSpHash(
       moduleAddress,
       tokenAddress,
@@ -996,13 +1027,18 @@ export default class ScheduledPaymentModule {
       recurringDayOfMonth,
       recurringUntil
     );
+    options.listener?.onEndSpHashCreation?.();
 
     let txnParams = await this.generateSchedulePaymentTxParams(safeAddress, moduleAddress, gasTokenAddress, spHash);
 
+    options.listener?.onBeginPrepareScheduledPayment?.();
     let signer = this.signer ? this.signer : this.ethersProvider.getSigner();
     let account = await signer.getAddress();
     let feeFixedUSD = (await getConstant('scheduledPaymentFeeFixedUSD', this.ethersProvider)) ?? 0;
     let feePercentage = (await getConstant('scheduledPaymentFeePercentage', this.ethersProvider)) ?? 0;
+    options.listener?.onEndPrepareScheduledPayment?.();
+
+    options.listener?.onBeginRegisterPaymentWithHub?.();
     let scheduledPaymentResponse = await hubRequest(hubRootUrl, 'api/scheduled-payments', authToken, 'POST', {
       data: {
         attributes: {
@@ -1029,6 +1065,7 @@ export default class ScheduledPaymentModule {
 
     let scheduledPaymentId = scheduledPaymentResponse.data.id;
     options.listener?.onScheduledPaymentIdReady?.(scheduledPaymentId);
+    options.listener?.onEndRegisterPaymentWithHub?.();
 
     try {
       await this.schedulePaymentOnChainAndUpdateCrank(
@@ -1039,21 +1076,24 @@ export default class ScheduledPaymentModule {
         moduleAddress,
         gasTokenAddress,
         spHash,
-        txnParams
+        txnParams,
+        options.listener
       );
     } catch (error) {
       console.log(
         `Error while submitting the transaction to register the scheduled payment on the blockchain: ${error}`
       );
 
+      options.listener?.onBeginRemovePaymentFromHub?.();
       await hubRequest(hubRootUrl, `api/scheduled-payments/${scheduledPaymentId}`, authToken, 'DELETE');
+      options.listener?.onEndRemovePaymentFromHub?.();
 
       console.log(`Scheduled payment removed from the crank.`);
 
       throw error;
     }
 
-    await waitUntilSchedulePaymentTransactionMined(hubRootUrl, scheduledPaymentId, authToken);
+    await waitUntilSchedulePaymentTransactionMined(hubRootUrl, scheduledPaymentId, authToken, options.listener);
   }
 
   async cancelPaymentOnChain(txnHash: string): Promise<SuccessfulTransactionReceipt>;
