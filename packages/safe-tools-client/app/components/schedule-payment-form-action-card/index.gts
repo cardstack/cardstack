@@ -41,6 +41,7 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
   @service declare scheduledPaymentsSdk: ScheduledPaymentsSdkService;
   validator = new SchedulePaymentFormValidator(this);
   gasEstimation?: GasEstimationResult;
+  lastScheduledPaymentId?: string;
 
   get paymentTypeOptions() {
     return [
@@ -238,6 +239,7 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
     const array = new Uint8Array(32);
     window.crypto.getRandomValues(array);
     const salt = btoa(String.fromCharCode.apply(null, array));
+    const self = this;
 
     yield taskFor(this.scheduledPaymentsSdk.schedulePayment).perform(
       currentSafe.address,
@@ -252,10 +254,13 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
       this.selectedPaymentType === 'one-time' ? Math.round(this.paymentDate!.getTime() / 1000) : null,
       this.selectedPaymentType === 'monthly' ? this.paymentDayOfMonth! : null,
       this.selectedPaymentType === 'monthly' ? Math.round(this.monthlyUntil!.getTime() / 1000) : null,
-      (_scheduledPaymentId: string) => {
-        this.isSuccessfullyScheduled = true;
+      {
+        onScheduledPaymentIdReady(scheduledPaymentId: string) {
+          self.lastScheduledPaymentId = scheduledPaymentId;
+        }
       }
     )
+    this.isSuccessfullyScheduled = true;
   }
 
   @action resetForm() {

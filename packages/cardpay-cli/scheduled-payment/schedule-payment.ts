@@ -116,9 +116,13 @@ export default {
       payAt,
       recurringDayOfMonth,
       recurringUntil,
-      (scheduledPaymentId: string) => {
-        console.log(`Scheduled payment created in the crank: ${scheduledPaymentId}.`);
-        console.log('Waiting for the transaction to be mined...');
+      {
+        listener: {
+          onScheduledPaymentIdReady(scheduledPaymentId) {
+            console.log(`Scheduled payment created in the crank: ${scheduledPaymentId}.`);
+            console.log('Waiting for the transaction to be mined...');
+          },
+        },
       }
     );
 

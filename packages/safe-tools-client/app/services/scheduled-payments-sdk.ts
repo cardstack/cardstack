@@ -5,6 +5,7 @@ import {
   ScheduledPaymentModule,
   getNativeWeiInToken,
   poll,
+  SchedulePaymentProgressListener,
 } from '@cardstack/cardpay-sdk';
 import config from '@cardstack/safe-tools-client/config/environment';
 import SafesService, {
@@ -141,10 +142,11 @@ export default class SchedulePaymentSDKService extends Service {
     payAt: number | null,
     recurringDayOfMonth: number | null,
     recurringUntil: number | null,
-    onScheduledPaymentIdReady: (scheduledPaymentId: string) => void
+    listener: SchedulePaymentProgressListener
   ): TaskGenerator<void> {
     try {
-      const scheduledPaymentModule = yield this.getSchedulePaymentModule();
+      const scheduledPaymentModule: ScheduledPaymentModule =
+        yield this.getSchedulePaymentModule();
       yield scheduledPaymentModule.schedulePayment(
         safeAddress,
         moduleAddress,
@@ -158,8 +160,10 @@ export default class SchedulePaymentSDKService extends Service {
         payAt,
         recurringDayOfMonth,
         recurringUntil,
-        onScheduledPaymentIdReady,
-        { hubUrl: config.hubUrl }
+        {
+          hubUrl: config.hubUrl,
+          listener,
+        }
       );
     } catch (err) {
       console.error(err);

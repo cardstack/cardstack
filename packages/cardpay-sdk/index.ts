@@ -61,5 +61,8 @@ export * from './sdk/utils/general-utils';
 export * from './sdk/scheduled-payment/utils';
 export { poll } from './sdk/utils/general-utils';
 export { convertRawAmountToDecimalFormat } from './sdk/currency-utils';
-export { default as ScheduledPaymentModule } from './sdk/scheduled-payment-module';
+export {
+  default as ScheduledPaymentModule,
+  type SchedulePaymentProgressListener,
+} from './sdk/scheduled-payment-module';
 export { default as ScheduledPaymentModuleABI } from './contracts/abi/modules/scheduled-payment-module';

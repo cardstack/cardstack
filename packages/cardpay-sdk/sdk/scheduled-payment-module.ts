@@ -84,6 +84,15 @@ interface TransactionParams {
   signature: Signature;
 }
 
+export interface SchedulePaymentProgressListener {
+  onScheduledPaymentIdReady?: (scheduledPaymentId: string) => unknown;
+}
+
+interface SchedulePaymentOptions {
+  hubUrl?: string;
+  listener?: SchedulePaymentProgressListener;
+}
+
 export default class ScheduledPaymentModule {
   constructor(private ethersProvider: JsonRpcProvider, private signer?: Signer) {
     this.signer = signer ? signer.connect(ethersProvider) : signer;
@@ -934,7 +943,7 @@ export default class ScheduledPaymentModule {
     payAt?: number | null,
     recurringDayOfMonth?: number | null,
     recurringUntil?: number | null,
-    onScheduledPaymentCreate?: (scheduledPaymentId: string) => unknown
+    options?: SchedulePaymentOptions | null
   ): Promise<void>;
   async schedulePayment(
     safeAddressOrScheduledPaymentId: string,
@@ -949,8 +958,7 @@ export default class ScheduledPaymentModule {
     payAt?: number | null,
     recurringDayOfMonth?: number | null,
     recurringUntil?: number | null,
-    onScheduledPaymentCreate?: (scheduledPaymentId: string) => unknown,
-    options: { hubUrl?: string } = {}
+    options: SchedulePaymentOptions = {}
   ) {
     let hubAuth = await getSDK('HubAuth', this.ethersProvider, options.hubUrl, this.signer);
     let hubRootUrl = await hubAuth.getHubUrl();
@@ -1020,7 +1028,7 @@ export default class ScheduledPaymentModule {
     });
 
     let scheduledPaymentId = scheduledPaymentResponse.data.id;
-    if (onScheduledPaymentCreate) onScheduledPaymentCreate(scheduledPaymentId);
+    options.listener?.onScheduledPaymentIdReady?.(scheduledPaymentId);
 
     try {
       await this.schedulePaymentOnChainAndUpdateCrank(
