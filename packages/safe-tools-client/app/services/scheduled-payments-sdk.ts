@@ -35,7 +35,7 @@ export default class SchedulePaymentSDKService extends Service {
 
   estimatedSafeCreationGas: undefined | BigNumber;
 
-  private async getSchedulePaymentsModule(): Promise<ScheduledPaymentModule> {
+  private async getSchedulePaymentModule(): Promise<ScheduledPaymentModule> {
     const module = await getSDK(
       'ScheduledPaymentModule',
       this.wallet.ethersProvider
@@ -52,7 +52,7 @@ export default class SchedulePaymentSDKService extends Service {
     gasEstimateInNativeToken: BigNumber;
     gasEstimateInUsd: BigNumber;
   }> {
-    const scheduledPayments = await this.getSchedulePaymentsModule();
+    const scheduledPayments = await this.getSchedulePaymentModule();
 
     const estimatedGas = await scheduledPayments.estimateGas(
       'create_safe_with_module',
@@ -66,7 +66,7 @@ export default class SchedulePaymentSDKService extends Service {
   }
 
   async createSafe(): Promise<{ safeAddress: string }> {
-    const scheduledPayments = await this.getSchedulePaymentsModule();
+    const scheduledPayments = await this.getSchedulePaymentModule();
 
     return scheduledPayments.createSafeWithModuleAndGuard(
       undefined,
@@ -96,7 +96,7 @@ export default class SchedulePaymentSDKService extends Service {
     tokenAddress: ChainAddress,
     gasTokenAddress: ChainAddress
   ): Promise<GasEstimationResult> {
-    const scheduledPayments = await this.getSchedulePaymentsModule();
+    const scheduledPayments = await this.getSchedulePaymentModule();
 
     const gasEstimationResult = await scheduledPayments.estimateGas(scenario, {
       tokenAddress,
@@ -144,8 +144,8 @@ export default class SchedulePaymentSDKService extends Service {
     onScheduledPaymentIdReady: (scheduledPaymentId: string) => void
   ): TaskGenerator<void> {
     try {
-      const scheduledPayments = yield this.getSchedulePaymentsModule();
-      yield scheduledPayments.schedulePayment(
+      const scheduledPaymentModule = yield this.getSchedulePaymentModule();
+      yield scheduledPaymentModule.schedulePayment(
         safeAddress,
         moduleAddress,
         tokenAddress,
