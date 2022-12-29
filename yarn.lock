@@ -17197,10 +17197,10 @@ eth-sig-util@^3.0.1:
     tweetnacl "^1.0.3"
     tweetnacl-util "^0.15.0"
 
-eth-testing@^1.10.0:
-  version "1.10.0"
-  resolved "https://registry.yarnpkg.com/eth-testing/-/eth-testing-1.10.0.tgz#4d0de42aaff32f103a5a1cabed5e723b6f920c8b"
-  integrity sha512-MkU+8jpjzKrrcMVTp2NevWwjED14pzdYsVx7l6is5WI+Xt60NCPsE0cKY0wwm4axMf57bK1W5/IXRTbkvIuhVA==
+eth-testing@^1.12.0:
+  version "1.12.0"
+  resolved "https://registry.yarnpkg.com/eth-testing/-/eth-testing-1.12.0.tgz#573bea828129f2eed172c6dd3fdea359d8b7f6f6"
+  integrity sha512-YuvWfxIRfer208Ya8ANcGEoQc2Msey9yS/fNx1gKkQ7u6DeYUyosb6YnUzNhgNRPgWTlj5EnMuXUHWjXEyh9Mg==
   dependencies:
     abitype "^0.1.6"
     ethers "^5.5.4"

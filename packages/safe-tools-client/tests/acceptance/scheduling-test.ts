@@ -46,6 +46,7 @@ let signedSafeTx = 0;
 let scheduledPaymentCreations: SpCreationApiPayload[] = [];
 let scheduledPaymentPatchedWithTxHash: string | undefined;
 let scheduledPaymentCreationApiDelay: Promise<void> | undefined;
+let scheduledPaymentCreateSpHashDelay: Promise<void> | undefined;
 
 module('Acceptance | scheduling', function (hooks) {
   setupApplicationTest(hooks);
@@ -254,13 +255,23 @@ module('Acceptance | scheduling', function (hooks) {
     // one-time
     this.mockWalletConnect.spModuleContract.mockCall(
       'createSpHash(address,uint256,address,((uint256),(uint256)),uint256,uint256,address,string,uint256)',
-      [SP_HASH]
+      async (_ethCall) => {
+        if (scheduledPaymentCreateSpHashDelay) {
+          await scheduledPaymentCreateSpHashDelay;
+        }
+        return [SP_HASH];
+      }
     );
 
     // monthly recurring
     this.mockWalletConnect.spModuleContract.mockCall(
       'createSpHash(address,uint256,address,((uint256),(uint256)),uint256,uint256,address,string,uint256,uint256)',
-      [SP_HASH]
+      async () => {
+        if (scheduledPaymentCreateSpHashDelay) {
+          await scheduledPaymentCreateSpHashDelay;
+        }
+        return [SP_HASH];
+      }
     );
 
     this.mockWalletConnect.lowLevel.mockRequest(
@@ -335,10 +346,20 @@ module('Acceptance | scheduling', function (hooks) {
           '.schedule-payment-form-action-card--max-gas-fee-description'
         )[0]?.textContent?.trim().length;
       });
+      const scheduledPaymentCreateSpHashDeferred = new Deferred<void>();
+      scheduledPaymentCreateSpHashDelay =
+        scheduledPaymentCreateSpHashDeferred.promise;
       const scheduledPaymentCreationApiDeferred = new Deferred<void>();
       scheduledPaymentCreationApiDelay =
         scheduledPaymentCreationApiDeferred.promise;
+
       await click('[data-test-schedule-payment-form-submit-button]');
+      assert
+        .dom('[data-test-schedule-payment-form-submit-button]')
+        .hasText('Scheduling...');
+      assert.dom('[data-test-payee-address-input]').isDisabled();
+
+      scheduledPaymentCreateSpHashDeferred.fulfill();
       assert
         .dom('[data-test-schedule-payment-form-submit-button]')
         .hasText('Scheduling...');
@@ -411,16 +432,27 @@ module('Acceptance | scheduling', function (hooks) {
           '.schedule-payment-form-action-card--max-gas-fee-description'
         )[0]?.textContent?.trim().length;
       });
+      const scheduledPaymentCreateSpHashDeferred = new Deferred<void>();
+      scheduledPaymentCreateSpHashDelay =
+        scheduledPaymentCreateSpHashDeferred.promise;
       const scheduledPaymentCreationApiDeferred = new Deferred<void>();
       scheduledPaymentCreationApiDelay =
         scheduledPaymentCreationApiDeferred.promise;
+      await click('[data-test-schedule-payment-form-submit-button]');
       await click('[data-test-schedule-payment-form-submit-button]');
       assert
         .dom('[data-test-schedule-payment-form-submit-button]')
         .hasText('Scheduling...');
       assert.dom('[data-test-payee-address-input]').isDisabled();
 
+      scheduledPaymentCreateSpHashDeferred.fulfill();
+      assert
+        .dom('[data-test-schedule-payment-form-submit-button]')
+        .hasText('Scheduling...');
+      assert.dom('[data-test-payee-address-input]').isDisabled();
+
       scheduledPaymentCreationApiDeferred.fulfill();
+
       await waitUntil(() => scheduledPaymentCreations.length);
       assert.strictEqual(
         signedHubAuthentication,
