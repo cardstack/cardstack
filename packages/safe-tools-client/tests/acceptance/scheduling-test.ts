@@ -13,7 +13,7 @@ import {
 } from '@ember/test-helpers';
 import { TransactionReceipt } from 'eth-testing/lib/json-rpc-methods-types';
 import { BigNumber } from 'ethers';
-import { setupWorker, rest } from 'msw';
+import { setupWorker, rest, SetupWorkerApi } from 'msw';
 import { module, test } from 'qunit';
 
 import { setupApplicationTest, USDC_TOKEN_ADDRESS } from '../helpers';
@@ -49,6 +49,7 @@ let scheduledPaymentCreationApiDelay: Promise<void> | undefined;
 
 module('Acceptance | scheduling', function (hooks) {
   setupApplicationTest(hooks);
+  let mockServiceWorker: SetupWorkerApi;
   hooks.beforeEach(function (this: TestContext) {
     this.mockLocalStorage ||= new MockLocalStorage();
     this.owner.register('storage:local', this.mockLocalStorage, {
@@ -59,8 +60,23 @@ module('Acceptance | scheduling', function (hooks) {
     scheduledPaymentCreations = [];
 
     const handlers = [
-      rest.get('/hub-test/api/session', (_req, res, ctx) => {
-        return res(ctx.status(200), ctx.json({}));
+      rest.get('/hub-test/api/session', (req, res, ctx) => {
+        if (req.headers.get('Authorization')) {
+          return res(ctx.status(200), ctx.json({}));
+        } else {
+          return res(
+            ctx.status(401),
+            ctx.json({ errors: [{ meta: { nonce: 5, version: 1 } }] })
+          );
+        }
+      }),
+      rest.post('/hub-test/api/session', (_req, res, ctx) => {
+        return res(
+          ctx.status(200),
+          ctx.json({
+            data: { attributes: { authToken: 'abc123' } },
+          })
+        );
       }),
       rest.get('/hub-test/api/scheduled-payment-attempts', (_req, res, ctx) => {
         return res(
@@ -215,8 +231,8 @@ module('Acceptance | scheduling', function (hooks) {
         }
       ),
     ];
-    const worker = setupWorker(...handlers);
-    worker.start({
+    mockServiceWorker = setupWorker(...handlers);
+    mockServiceWorker.start({
       onUnhandledRequest(req, { warning }) {
         if (
           req.url.href.match(/trust-wallet.com|\.png|\.svg|\.ttf|\/assets\//)
@@ -249,10 +265,8 @@ module('Acceptance | scheduling', function (hooks) {
 
     this.mockWalletConnect.lowLevel.mockRequest(
       'eth_signTypedData_v4',
-      async ([from, data]: [string, string]) => {
+      async ([_from, data]: [string, string]) => {
         const typedData = JSON.parse(data);
-        console.log('eth_signTypedData_v4');
-        console.log({ from, typedData });
         if (typedData['primaryType'] === 'HubAuthentication') {
           signedHubAuthentication++;
           return '1b6a2d7aa891e56f1c7a2456e9f9e4444b9bca72bcecb40cbce2b2df89e387415b724a87e93a7b944d9c34e05e87b87c1d7bb00e6b2c4c3f4ccad42e9a9d49dd1b';
@@ -298,6 +312,9 @@ module('Acceptance | scheduling', function (hooks) {
         } as unknown as TokenBalance,
       ]);
     };
+  });
+  hooks.afterEach(function () {
+    mockServiceWorker.stop();
   });
 
   module('one-time', function () {

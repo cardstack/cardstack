@@ -806,9 +806,9 @@ export default class ScheduledPaymentModule {
     });
   }
 
-  async cancelScheduledPayment(scheduledPaymentId: string) {
-    let hubAuth = await getSDK('HubAuth', this.ethersProvider, undefined, this.signer);
-    let hubRootUrl = await hubAuth.getHubUrl();
+  async cancelScheduledPayment(scheduledPaymentId: string, hubRootUrl?: string) {
+    let hubAuth = await getSDK('HubAuth', this.ethersProvider, hubRootUrl, this.signer);
+    hubRootUrl = await hubAuth.getHubUrl();
     let authToken = await hubAuth.authenticate();
 
     let scheduledPaymentResponse = await hubRequest(
@@ -952,8 +952,8 @@ export default class ScheduledPaymentModule {
     onScheduledPaymentCreate?: (scheduledPaymentId: string) => unknown,
     options: { hubUrl?: string } = {}
   ) {
-    let hubAuth = await getSDK('HubAuth', this.ethersProvider, undefined, this.signer);
-    let hubRootUrl = options.hubUrl || (await hubAuth.getHubUrl());
+    let hubAuth = await getSDK('HubAuth', this.ethersProvider, options.hubUrl, this.signer);
+    let hubRootUrl = await hubAuth.getHubUrl();
     let authToken = await hubAuth.authenticate();
 
     let safeAddress: string;

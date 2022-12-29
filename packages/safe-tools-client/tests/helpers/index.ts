@@ -62,7 +62,7 @@ function setupApplicationTest(hooks: NestedHooks, options?: SetupTestOptions) {
 
     this.mockWalletConnect = generateTestingUtils({
       providerType: 'WalletConnect',
-      verbose: true,
+      verbose: false,
     }) as CardstackTestingUtils;
 
     this.mockWalletConnect.mockMainnet = () => {

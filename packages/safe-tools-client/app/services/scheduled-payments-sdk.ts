@@ -161,9 +161,6 @@ export default class SchedulePaymentSDKService extends Service {
         onScheduledPaymentIdReady,
         { hubUrl: config.hubUrl }
       );
-      console.log(
-        `Scheduled payment added in both crank and on chain successfully.`
-      );
     } catch (err) {
       console.error(err);
     }

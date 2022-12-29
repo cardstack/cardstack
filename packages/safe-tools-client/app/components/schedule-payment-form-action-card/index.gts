@@ -252,9 +252,7 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
       this.selectedPaymentType === 'one-time' ? Math.round(this.paymentDate!.getTime() / 1000) : null,
       this.selectedPaymentType === 'monthly' ? this.paymentDayOfMonth! : null,
       this.selectedPaymentType === 'monthly' ? Math.round(this.monthlyUntil!.getTime() / 1000) : null,
-      (scheduledPaymentId: string) => {
-        console.log(`Scheduled payment created in the crank: ${scheduledPaymentId}.`);
-        console.log('Waiting for the transaction to be mined...');
+      (_scheduledPaymentId: string) => {
         this.isSuccessfullyScheduled = true;
       }
     )
