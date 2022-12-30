@@ -37,6 +37,7 @@ const SP_CREATION_TX_HASH =
   '0x5432101234567890abcdef1234567890abcdef1234567890abcdef1234567890';
 const SUBMIT_BUTTON = '[data-test-schedule-payment-form-submit-button]';
 const PAYEE_INPUT = '[data-test-payee-address-input]';
+const IN_PROGRESS_MESSAGE = '[data-test-in-progress-message]';
 
 interface SpCreationApiPayload {
   data: {
@@ -364,13 +365,15 @@ module('Acceptance | scheduling', function (hooks) {
       });
 
       await click(SUBMIT_BUTTON);
-      assert.dom(SUBMIT_BUTTON).hasText('Authenticating...');
+      assert.dom(IN_PROGRESS_MESSAGE).hasText('Authenticating...');
       assert.dom(PAYEE_INPUT).isDisabled();
 
       await waitUntil(() =>
-        find(SUBMIT_BUTTON)?.textContent?.includes('Calculating payment hash')
+        find(IN_PROGRESS_MESSAGE)?.textContent?.includes(
+          'Calculating payment hash'
+        )
       );
-      assert.dom(SUBMIT_BUTTON).hasText('Calculating payment hash...');
+      assert.dom(IN_PROGRESS_MESSAGE).hasText('Calculating payment hash...');
       assert.dom(PAYEE_INPUT).isDisabled();
 
       assert.strictEqual(
@@ -381,11 +384,13 @@ module('Acceptance | scheduling', function (hooks) {
       scheduledPaymentCreateSpHashDeferred?.fulfill();
 
       await waitUntil(() =>
-        find(SUBMIT_BUTTON)?.textContent?.includes(
+        find(IN_PROGRESS_MESSAGE)?.textContent?.includes(
           'Registering payment with hub'
         )
       );
-      assert.dom(SUBMIT_BUTTON).hasText('Registering payment with hub...');
+      assert
+        .dom(IN_PROGRESS_MESSAGE)
+        .hasText('Registering payment with hub...');
       assert.dom(PAYEE_INPUT).isDisabled();
 
       scheduledPaymentCreationApiDeferred?.fulfill();
@@ -393,9 +398,9 @@ module('Acceptance | scheduling', function (hooks) {
       await waitUntil(() => scheduledPaymentCreations.length);
 
       await waitUntil(() =>
-        find(SUBMIT_BUTTON)?.textContent?.includes('Recording on hub')
+        find(IN_PROGRESS_MESSAGE)?.textContent?.includes('Recording on hub')
       );
-      assert.dom(SUBMIT_BUTTON).hasText('Recording on hub...');
+      assert.dom(IN_PROGRESS_MESSAGE).hasText('Recording on hub...');
 
       assert.strictEqual(signedSafeTx, 1, 'signed safe transaction');
       assert.ok(
@@ -426,15 +431,17 @@ module('Acceptance | scheduling', function (hooks) {
         'Scheduled Payment updated via PATCH to API'
       );
       await waitUntil(() =>
-        find(SUBMIT_BUTTON)?.textContent?.includes('Confirming transaction')
+        find(IN_PROGRESS_MESSAGE)?.textContent?.includes(
+          'Confirming transaction'
+        )
       );
-      assert.dom(SUBMIT_BUTTON).hasText('Confirming transaction...');
+      assert.dom(IN_PROGRESS_MESSAGE).hasText('Confirming transaction...');
 
       scheduledPaymentGetShouldIncludeBlockNumber = true;
 
-      await waitFor('[data-test-boxel-action-chin-action-status-area]');
+      await waitFor('[data-test-memorialized-status]');
       assert
-        .dom('[data-test-boxel-action-chin-action-status-area]')
+        .dom('[data-test-memorialized-status]')
         .containsText('Payment was successfully scheduled');
       assert.dom(PAYEE_INPUT).isDisabled();
 
@@ -463,13 +470,15 @@ module('Acceptance | scheduling', function (hooks) {
       });
 
       await click(SUBMIT_BUTTON);
-      assert.dom(SUBMIT_BUTTON).hasText('Authenticating...');
+      assert.dom(IN_PROGRESS_MESSAGE).hasText('Authenticating...');
       assert.dom(PAYEE_INPUT).isDisabled();
 
       await waitUntil(() =>
-        find(SUBMIT_BUTTON)?.textContent?.includes('Calculating payment hash')
+        find(IN_PROGRESS_MESSAGE)?.textContent?.includes(
+          'Calculating payment hash'
+        )
       );
-      assert.dom(SUBMIT_BUTTON).hasText('Calculating payment hash...');
+      assert.dom(IN_PROGRESS_MESSAGE).hasText('Calculating payment hash...');
       assert.dom(PAYEE_INPUT).isDisabled();
 
       assert.strictEqual(
@@ -480,11 +489,13 @@ module('Acceptance | scheduling', function (hooks) {
       scheduledPaymentCreateSpHashDeferred?.fulfill();
 
       await waitUntil(() =>
-        find(SUBMIT_BUTTON)?.textContent?.includes(
+        find(IN_PROGRESS_MESSAGE)?.textContent?.includes(
           'Registering payment with hub'
         )
       );
-      assert.dom(SUBMIT_BUTTON).hasText('Registering payment with hub...');
+      assert
+        .dom(IN_PROGRESS_MESSAGE)
+        .hasText('Registering payment with hub...');
       assert.dom(PAYEE_INPUT).isDisabled();
 
       scheduledPaymentCreationApiDeferred?.fulfill();
@@ -492,9 +503,9 @@ module('Acceptance | scheduling', function (hooks) {
       await waitUntil(() => scheduledPaymentCreations.length);
 
       await waitUntil(() =>
-        find(SUBMIT_BUTTON)?.textContent?.includes('Recording on hub')
+        find(IN_PROGRESS_MESSAGE)?.textContent?.includes('Recording on hub')
       );
-      assert.dom(SUBMIT_BUTTON).hasText('Recording on hub...');
+      assert.dom(IN_PROGRESS_MESSAGE).hasText('Recording on hub...');
 
       assert.strictEqual(signedSafeTx, 1, 'signed safe transaction');
       assert.ok(
@@ -528,15 +539,17 @@ module('Acceptance | scheduling', function (hooks) {
         'Scheduled Payment updated via PATCH to API'
       );
       await waitUntil(() =>
-        find(SUBMIT_BUTTON)?.textContent?.includes('Confirming transaction')
+        find(IN_PROGRESS_MESSAGE)?.textContent?.includes(
+          'Confirming transaction'
+        )
       );
-      assert.dom(SUBMIT_BUTTON).hasText('Confirming transaction...');
+      assert.dom(IN_PROGRESS_MESSAGE).hasText('Confirming transaction...');
 
       scheduledPaymentGetShouldIncludeBlockNumber = true;
 
-      await waitFor('[data-test-boxel-action-chin-action-status-area]');
+      await waitFor('[data-test-memorialized-status]');
       assert
-        .dom('[data-test-boxel-action-chin-action-status-area]')
+        .dom('[data-test-memorialized-status]')
         .containsText('Payment was successfully scheduled');
       assert.dom(PAYEE_INPUT).isDisabled();
 

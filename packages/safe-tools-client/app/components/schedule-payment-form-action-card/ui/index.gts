@@ -5,13 +5,14 @@ import BoxelField from '@cardstack/boxel/components/boxel/field';
 import BoxelInputDate, { Day } from '@cardstack/boxel/components/boxel/input/date';
 import BoxelInputTime, { Time } from '@cardstack/boxel/components/boxel/input/time';
 import BoxelInput from '@cardstack/boxel/components/boxel/input';
-import BoxelRadioInput from '@cardstack/boxel/components/boxel/radio-input';
 import BoxelInputSelectableTokenAmount from '@cardstack/boxel/components/boxel/input/selectable-token-amount';
-import RangedNumberPicker from '@cardstack/boxel/components/boxel/input/ranged-number-picker';
-import BoxelTokenSelect from '@cardstack/boxel/components/boxel/input/token-select';
+import BoxelLoadingIndicator from '@cardstack/boxel/components/boxel/loading-indicator';
+import BoxelRadioInput from '@cardstack/boxel/components/boxel/radio-input';
 import BoxelToggleButtonGroup from '@cardstack/boxel/components/boxel/toggle-button-group';
+import BoxelTokenSelect from '@cardstack/boxel/components/boxel/input/token-select';
+import RangedNumberPicker from '@cardstack/boxel/components/boxel/input/ranged-number-picker';
 import { SelectableToken } from '@cardstack/boxel/components/boxel/input/selectable-token';
-import { fn } from '@ember/helper';
+import { concat, fn } from '@ember/helper';
 import { on } from '@ember/modifier';
 import { svgJar } from '@cardstack/boxel/utils/svg-jar';
 import { tracked } from '@glimmer/tracking';
@@ -20,9 +21,10 @@ import not from 'ember-truth-helpers/helpers/not';
 import set from 'ember-set-helper/helpers/set';
 import './index.css';
 import { MaxGasFeeOption, ValidatableForm } from '../validator';
-import { noop } from '@cardstack/safe-tools-client/helpers/noop';
 import BlockExplorerButton from '@cardstack/safe-tools-client/components/block-explorer-button';
 import { SchedulerCapableNetworks, TransactionHash } from '@cardstack/cardpay-sdk';
+import cssVar from '@cardstack/boxel/helpers/css-var';
+import { type WalletProviderId } from '@cardstack/safe-tools-client/utils/wallet-providers';
 
 interface Signature {
   Element: HTMLElement;
@@ -56,6 +58,7 @@ interface Signature {
     isSubmitEnabled: boolean;
     schedulingStatus: string | undefined;
     networkSymbol: SchedulerCapableNetworks;
+    walletProviderId: WalletProviderId | undefined;
     txHash: TransactionHash | undefined;
     isSuccessfullyScheduled: boolean;
   }
@@ -292,24 +295,27 @@ export default class SchedulePaymentFormActionCardUI extends Component<Signature
             </ac.ActionButton>
           </:default>
           <:inProgress as |ac|>
-            <ac.ActionButton
-              @loading={{true}}
-              {{on 'click' noop}}
-              data-test-schedule-payment-form-submit-button
-            >
-              {{@schedulingStatus}}
-            </ac.ActionButton>
-            <ac.InfoArea>
-              {{#if @txHash}}
+            <ac.ActionStatusArea @icon={{concat @walletProviderId "-logo" }} style={{cssVar status-icon-size="2.5rem"}}>
+              <BoxelLoadingIndicator
+                class="schedule-payment-form-action-card__loading-indicator"
+                @color="var(--boxel-light)"
+              />
+              <div class="schedule-payment-form-action-card__in-progress-message" data-test-in-progress-message>
+                {{@schedulingStatus}}
+              </div>
+            </ac.ActionStatusArea>
+            {{#if @txHash}}
+              <ac.InfoArea>
                 <BlockExplorerButton
                   @networkSymbol={{@networkSymbol}}
                   @transactionHash={{@txHash}}
+                  @kind="secondary-dark"
                 />
-              {{/if}}
-            </ac.InfoArea>
+              </ac.InfoArea>
+            {{/if}}
           </:inProgress>
           <:memorialized as |ac|>
-            <ac.ActionStatusArea>
+            <ac.ActionStatusArea data-test-memorialized-status>
               Payment was successfully scheduled
             </ac.ActionStatusArea>
             <ac.InfoArea>

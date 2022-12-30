@@ -344,6 +344,7 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
       @isSubmitEnabled={{this.isValid}}
       @schedulingStatus={{this.schedulingStatus}}
       @networkSymbol={{this.network.symbol}}
+      @walletProviderId={{this.wallet.providerId}}
       @txHash={{this.txHash}}
       @isSuccessfullyScheduled={{this.isSuccessfullyScheduled}}
       @onReset={{this.resetForm}}

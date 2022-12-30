@@ -7,6 +7,7 @@ interface Signature {
   Args: {
     networkSymbol: string;
     transactionHash: TransactionHash;
+    kind?: string;
   }
 }
 
@@ -36,6 +37,7 @@ export default class BlockExplorerButton extends Component<Signature> {
     <BoxelButton
       @as="anchor"
       @size="extra-small"
+      @kind={{@kind}}
       href={{this.blockExplorerUrl}} 
       target="_blank"
       rel="noopener"
