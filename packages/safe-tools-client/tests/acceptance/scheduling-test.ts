@@ -6,7 +6,7 @@ import { MockLocalStorage } from '@cardstack/safe-tools-client/utils/browser-moc
 import {
   TestContext,
   click,
-  findAll,
+  find,
   visit,
   waitFor,
   waitUntil,
@@ -35,6 +35,8 @@ const SP_HASH =
 const SP_CREATION_BLOCK_NUMBER = 1000;
 const SP_CREATION_TX_HASH =
   '0x5432101234567890abcdef1234567890abcdef1234567890abcdef1234567890';
+const SUBMIT_BUTTON = '[data-test-schedule-payment-form-submit-button]';
+const PAYEE_INPUT = '[data-test-payee-address-input]';
 
 interface SpCreationApiPayload {
   data: {
@@ -45,8 +47,11 @@ let signedHubAuthentication = 0;
 let signedSafeTx = 0;
 let scheduledPaymentCreations: SpCreationApiPayload[] = [];
 let scheduledPaymentPatchedWithTxHash: string | undefined;
+let scheduledPaymentCreationApiDeferred: Deferred<void> | undefined;
 let scheduledPaymentCreationApiDelay: Promise<void> | undefined;
+let scheduledPaymentCreateSpHashDeferred: Deferred<void> | undefined;
 let scheduledPaymentCreateSpHashDelay: Promise<void> | undefined;
+let scheduledPaymentGetShouldIncludeBlockNumber = false;
 
 module('Acceptance | scheduling', function (hooks) {
   setupApplicationTest(hooks);
@@ -59,6 +64,14 @@ module('Acceptance | scheduling', function (hooks) {
     signedHubAuthentication = 0;
     signedSafeTx = 0;
     scheduledPaymentCreations = [];
+    scheduledPaymentPatchedWithTxHash = undefined;
+    scheduledPaymentCreateSpHashDeferred = new Deferred<void>();
+    scheduledPaymentCreateSpHashDelay =
+      scheduledPaymentCreateSpHashDeferred.promise;
+    scheduledPaymentCreationApiDeferred = new Deferred<void>();
+    scheduledPaymentCreationApiDelay =
+      scheduledPaymentCreationApiDeferred.promise;
+    scheduledPaymentGetShouldIncludeBlockNumber = false;
 
     const handlers = [
       rest.get('/hub-test/api/session', (req, res, ctx) => {
@@ -202,7 +215,10 @@ module('Acceptance | scheduling', function (hooks) {
                 attributes: {
                   'creation-transaction-hash':
                     scheduledPaymentPatchedWithTxHash,
-                  'creation-block-number': SP_CREATION_BLOCK_NUMBER,
+                  'creation-block-number':
+                    scheduledPaymentGetShouldIncludeBlockNumber
+                      ? SP_CREATION_BLOCK_NUMBER
+                      : null,
                 },
               },
             })
@@ -339,59 +355,67 @@ module('Acceptance | scheduling', function (hooks) {
       await this.mockWalletConnect.mockAccountsChanged([
         FAKE_WALLET_CONNECT_ACCOUNT,
       ]);
+      await waitFor(`[data-test-safe-address-label][title="${SAFE_ADDRESS}"]`);
       await fillInSchedulePaymentFormWithValidInfo({ type: 'one-time' });
-      await waitFor('[data-test-safe-address-label]');
       await waitUntil(() => {
-        return findAll(
-          '.schedule-payment-form-action-card--max-gas-fee-description'
-        )[0]?.textContent?.trim().length;
+        return find(
+          '[data-test-max-gas-fee-normal-description]'
+        )?.textContent?.trim().length;
       });
-      const scheduledPaymentCreateSpHashDeferred = new Deferred<void>();
-      scheduledPaymentCreateSpHashDelay =
-        scheduledPaymentCreateSpHashDeferred.promise;
-      const scheduledPaymentCreationApiDeferred = new Deferred<void>();
-      scheduledPaymentCreationApiDelay =
-        scheduledPaymentCreationApiDeferred.promise;
 
-      await click('[data-test-schedule-payment-form-submit-button]');
-      assert
-        .dom('[data-test-schedule-payment-form-submit-button]')
-        .hasText('Scheduling...');
-      assert.dom('[data-test-payee-address-input]').isDisabled();
+      await click(SUBMIT_BUTTON);
+      assert.dom(SUBMIT_BUTTON).hasText('Authenticating...');
+      assert.dom(PAYEE_INPUT).isDisabled();
 
-      scheduledPaymentCreateSpHashDeferred.fulfill();
-      assert
-        .dom('[data-test-schedule-payment-form-submit-button]')
-        .hasText('Scheduling...');
-      assert.dom('[data-test-payee-address-input]').isDisabled();
+      await waitUntil(() =>
+        find(SUBMIT_BUTTON)?.textContent?.includes('Calculating payment hash')
+      );
+      assert.dom(SUBMIT_BUTTON).hasText('Calculating payment hash...');
+      assert.dom(PAYEE_INPUT).isDisabled();
 
-      scheduledPaymentCreationApiDeferred.fulfill();
-      await waitUntil(() => scheduledPaymentCreations.length);
       assert.strictEqual(
         signedHubAuthentication,
         1,
         'signed hub authentication'
       );
+      scheduledPaymentCreateSpHashDeferred?.fulfill();
+
+      await waitUntil(() =>
+        find(SUBMIT_BUTTON)?.textContent?.includes(
+          'Registering payment with hub'
+        )
+      );
+      assert.dom(SUBMIT_BUTTON).hasText('Registering payment with hub...');
+      assert.dom(PAYEE_INPUT).isDisabled();
+
+      scheduledPaymentCreationApiDeferred?.fulfill();
+
+      await waitUntil(() => scheduledPaymentCreations.length);
+
+      await waitUntil(() =>
+        find(SUBMIT_BUTTON)?.textContent?.includes('Recording on hub')
+      );
+      assert.dom(SUBMIT_BUTTON).hasText('Recording on hub...');
+
       assert.strictEqual(signedSafeTx, 1, 'signed safe transaction');
       assert.ok(
         scheduledPaymentCreations.length,
         'Scheduled Payment created via POST to API'
       );
-      assert.strictEqual(
-        scheduledPaymentCreations[0].data.attributes['amount'],
-        '15000000'
+      const apiPostDataAttributes =
+        scheduledPaymentCreations[0].data.attributes;
+      assert.strictEqual(apiPostDataAttributes['amount'], '15000000');
+      assert.ok(
+        !!apiPostDataAttributes['pay-at'],
+        'pay-at is included in POST to hub'
       );
-      assert.ok(!!scheduledPaymentCreations[0].data.attributes['pay-at']);
       assert.strictEqual(
-        scheduledPaymentCreations[0].data.attributes['payee-address'],
+        apiPostDataAttributes['payee-address'],
         '0xb794f5ea0ba39494ce839613fffba74279579268'
       );
+      assert.strictEqual(apiPostDataAttributes['sp-hash'], SP_HASH);
       assert.strictEqual(
-        scheduledPaymentCreations[0].data.attributes['sp-hash'],
-        SP_HASH
-      );
-      assert.strictEqual(
-        scheduledPaymentCreations[0].data.attributes['token-address'],
+        apiPostDataAttributes['token-address'],
         USDC_TOKEN_ADDRESS
       );
 
@@ -401,17 +425,22 @@ module('Acceptance | scheduling', function (hooks) {
         SP_CREATION_TX_HASH,
         'Scheduled Payment updated via PATCH to API'
       );
+      await waitUntil(() =>
+        find(SUBMIT_BUTTON)?.textContent?.includes('Confirming transaction')
+      );
+      assert.dom(SUBMIT_BUTTON).hasText('Confirming transaction...');
+
+      scheduledPaymentGetShouldIncludeBlockNumber = true;
+
       await waitFor('[data-test-boxel-action-chin-action-status-area]');
       assert
         .dom('[data-test-boxel-action-chin-action-status-area]')
         .containsText('Payment was successfully scheduled');
-      assert.dom('[data-test-payee-address-input]').isDisabled();
+      assert.dom(PAYEE_INPUT).isDisabled();
 
       await click('[data-test-schedule-payment-form-reset-button]');
-      assert.dom('[data-test-payee-address-input]').isNotDisabled();
-      assert
-        .dom('[data-test-schedule-payment-form-submit-button]')
-        .hasText('Schedule Payment');
+      assert.dom(PAYEE_INPUT).isNotDisabled();
+      assert.dom(SUBMIT_BUTTON).hasText('Schedule Payment');
     });
   });
 
@@ -425,49 +454,56 @@ module('Acceptance | scheduling', function (hooks) {
       await this.mockWalletConnect.mockAccountsChanged([
         FAKE_WALLET_CONNECT_ACCOUNT,
       ]);
+      await waitFor(`[data-test-safe-address-label][title="${SAFE_ADDRESS}"]`);
       await fillInSchedulePaymentFormWithValidInfo({ type: 'monthly' });
-      await waitFor('[data-test-safe-address-label]');
       await waitUntil(() => {
-        return findAll(
-          '.schedule-payment-form-action-card--max-gas-fee-description'
-        )[0]?.textContent?.trim().length;
+        return find(
+          '[data-test-max-gas-fee-normal-description]'
+        )?.textContent?.trim().length;
       });
-      const scheduledPaymentCreateSpHashDeferred = new Deferred<void>();
-      scheduledPaymentCreateSpHashDelay =
-        scheduledPaymentCreateSpHashDeferred.promise;
-      const scheduledPaymentCreationApiDeferred = new Deferred<void>();
-      scheduledPaymentCreationApiDelay =
-        scheduledPaymentCreationApiDeferred.promise;
-      await click('[data-test-schedule-payment-form-submit-button]');
-      await click('[data-test-schedule-payment-form-submit-button]');
-      assert
-        .dom('[data-test-schedule-payment-form-submit-button]')
-        .hasText('Scheduling...');
-      assert.dom('[data-test-payee-address-input]').isDisabled();
 
-      scheduledPaymentCreateSpHashDeferred.fulfill();
-      assert
-        .dom('[data-test-schedule-payment-form-submit-button]')
-        .hasText('Scheduling...');
-      assert.dom('[data-test-payee-address-input]').isDisabled();
+      await click(SUBMIT_BUTTON);
+      assert.dom(SUBMIT_BUTTON).hasText('Authenticating...');
+      assert.dom(PAYEE_INPUT).isDisabled();
 
-      scheduledPaymentCreationApiDeferred.fulfill();
+      await waitUntil(() =>
+        find(SUBMIT_BUTTON)?.textContent?.includes('Calculating payment hash')
+      );
+      assert.dom(SUBMIT_BUTTON).hasText('Calculating payment hash...');
+      assert.dom(PAYEE_INPUT).isDisabled();
 
-      await waitUntil(() => scheduledPaymentCreations.length);
       assert.strictEqual(
         signedHubAuthentication,
         1,
         'signed hub authentication'
       );
+      scheduledPaymentCreateSpHashDeferred?.fulfill();
+
+      await waitUntil(() =>
+        find(SUBMIT_BUTTON)?.textContent?.includes(
+          'Registering payment with hub'
+        )
+      );
+      assert.dom(SUBMIT_BUTTON).hasText('Registering payment with hub...');
+      assert.dom(PAYEE_INPUT).isDisabled();
+
+      scheduledPaymentCreationApiDeferred?.fulfill();
+
+      await waitUntil(() => scheduledPaymentCreations.length);
+
+      await waitUntil(() =>
+        find(SUBMIT_BUTTON)?.textContent?.includes('Recording on hub')
+      );
+      assert.dom(SUBMIT_BUTTON).hasText('Recording on hub...');
+
       assert.strictEqual(signedSafeTx, 1, 'signed safe transaction');
       assert.ok(
         scheduledPaymentCreations.length,
         'Scheduled Payment created via POST to API'
       );
-      assert.strictEqual(
-        scheduledPaymentCreations[0].data.attributes['amount'],
-        '15000000'
-      );
+      const apiPostDataAttributes =
+        scheduledPaymentCreations[0].data.attributes;
+      assert.strictEqual(apiPostDataAttributes['amount'], '15000000');
       assert.strictEqual(
         scheduledPaymentCreations[0].data.attributes['recurring-day-of-month'],
         15
@@ -476,15 +512,12 @@ module('Acceptance | scheduling', function (hooks) {
         !!scheduledPaymentCreations[0].data.attributes['recurring-until']
       );
       assert.strictEqual(
-        scheduledPaymentCreations[0].data.attributes['payee-address'],
+        apiPostDataAttributes['payee-address'],
         '0xb794f5ea0ba39494ce839613fffba74279579268'
       );
+      assert.strictEqual(apiPostDataAttributes['sp-hash'], SP_HASH);
       assert.strictEqual(
-        scheduledPaymentCreations[0].data.attributes['sp-hash'],
-        SP_HASH
-      );
-      assert.strictEqual(
-        scheduledPaymentCreations[0].data.attributes['token-address'],
+        apiPostDataAttributes['token-address'],
         USDC_TOKEN_ADDRESS
       );
 
@@ -494,17 +527,22 @@ module('Acceptance | scheduling', function (hooks) {
         SP_CREATION_TX_HASH,
         'Scheduled Payment updated via PATCH to API'
       );
+      await waitUntil(() =>
+        find(SUBMIT_BUTTON)?.textContent?.includes('Confirming transaction')
+      );
+      assert.dom(SUBMIT_BUTTON).hasText('Confirming transaction...');
+
+      scheduledPaymentGetShouldIncludeBlockNumber = true;
+
       await waitFor('[data-test-boxel-action-chin-action-status-area]');
       assert
         .dom('[data-test-boxel-action-chin-action-status-area]')
         .containsText('Payment was successfully scheduled');
-      assert.dom('[data-test-payee-address-input]').isDisabled();
+      assert.dom(PAYEE_INPUT).isDisabled();
 
       await click('[data-test-schedule-payment-form-reset-button]');
-      assert.dom('[data-test-payee-address-input]').isNotDisabled();
-      assert
-        .dom('[data-test-schedule-payment-form-submit-button]')
-        .hasText('Schedule Payment');
+      assert.dom(PAYEE_INPUT).isNotDisabled();
+      assert.dom(SUBMIT_BUTTON).hasText('Schedule Payment');
     });
   });
 });

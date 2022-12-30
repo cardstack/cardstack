@@ -17,7 +17,7 @@ import { use, resource } from 'ember-resources';
 import { TrackedObject } from 'tracked-built-ins';
 import { fromWei } from 'web3-utils';
 import not from 'ember-truth-helpers/helpers/not';
-import { convertAmountToNativeDisplay, convertAmountToRawAmount } from '@cardstack/cardpay-sdk';
+import { convertAmountToNativeDisplay, convertAmountToRawAmount, TransactionHash } from '@cardstack/cardpay-sdk';
 import { taskFor } from 'ember-concurrency-ts';
 import { BigNumber } from 'ethers';
 import { task } from 'ember-concurrency-decorators';
@@ -42,6 +42,9 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
   validator = new SchedulePaymentFormValidator(this);
   gasEstimation?: GasEstimationResult;
   lastScheduledPaymentId?: string;
+
+  @tracked schedulingStatus?: string;
+  @tracked txHash?: TransactionHash;
 
   get paymentTypeOptions() {
     return [
@@ -257,6 +260,30 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
       {
         onScheduledPaymentIdReady(scheduledPaymentId: string) {
           self.lastScheduledPaymentId = scheduledPaymentId;
+        },
+        onTxHash(txHash: TransactionHash) {
+          self.txHash = txHash;
+        },
+        onBeginHubAuthentication() {
+          self.schedulingStatus = "Authenticating..."
+        },
+        onBeginSpHashCreation() {
+          self.schedulingStatus = "Calculating payment hash..."
+        },
+        onBeginRegisterPaymentWithHub() {
+          self.schedulingStatus = "Registering payment with hub..."
+        },
+        onBeginPrepareScheduledPayment() {
+          self.schedulingStatus = "Preparing transaction..."
+        },
+        onBeginSchedulingPaymentOnChain() {
+          self.schedulingStatus = "Scheduling on-chain..."
+        },
+        onBeginUpdatingHubWithTxHash() {
+          self.schedulingStatus = "Recording on hub..."
+        },
+        onBeginWaitingForTransactionConfirmation() {
+          self.schedulingStatus = "Confirming transaction..."
         }
       }
     )
@@ -265,6 +292,8 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
 
   @action resetForm() {
     this.isSuccessfullyScheduled = false;
+    this.schedulingStatus = undefined;
+    this.txHash = undefined;
   }
 
   get isScheduling() {
@@ -313,7 +342,9 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
       @onSchedulePayment={{perform this.schedulePaymentTask}}
       @maxGasDescriptions={{this.maxGasDescriptions.value}}
       @isSubmitEnabled={{this.isValid}}
-      @isScheduling={{this.isScheduling}}
+      @schedulingStatus={{this.schedulingStatus}}
+      @networkSymbol={{this.network.symbol}}
+      @txHash={{this.txHash}}
       @isSuccessfullyScheduled={{this.isSuccessfullyScheduled}}
       @onReset={{this.resetForm}}
     />

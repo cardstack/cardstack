@@ -1,8 +1,6 @@
 import Component from '@glimmer/component';
 import BoxelButton from '@cardstack/boxel/components/boxel/button';
-import { getConstantByNetwork } from '@cardstack/cardpay-sdk';
-
-type TransactionHash = string; // TODO extract to somewhere we can share this, perhaps across projects?
+import { getConstantByNetwork, TransactionHash } from '@cardstack/cardpay-sdk';
 
 interface Signature {
   Element: HTMLAnchorElement | HTMLButtonElement;

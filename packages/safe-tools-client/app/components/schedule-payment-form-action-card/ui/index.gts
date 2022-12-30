@@ -21,6 +21,8 @@ import set from 'ember-set-helper/helpers/set';
 import './index.css';
 import { MaxGasFeeOption, ValidatableForm } from '../validator';
 import { noop } from '@cardstack/safe-tools-client/helpers/noop';
+import BlockExplorerButton from '@cardstack/safe-tools-client/components/block-explorer-button';
+import { SchedulerCapableNetworks, TransactionHash } from '@cardstack/cardpay-sdk';
 
 interface Signature {
   Element: HTMLElement;
@@ -52,7 +54,9 @@ interface Signature {
     onUpdatePayeeAddress: (val: string) => void;
     onReset: () => void;
     isSubmitEnabled: boolean;
-    isScheduling: boolean;
+    schedulingStatus: string | undefined;
+    networkSymbol: SchedulerCapableNetworks;
+    txHash: TransactionHash | undefined;
     isSuccessfullyScheduled: boolean;
   }
 }
@@ -100,14 +104,14 @@ export default class SchedulePaymentFormActionCardUI extends Component<Signature
   }
 
   get isFormInteractionDisabled() {
-    return this.args.isScheduling || this.args.isSuccessfullyScheduled;
+    return !!this.args.schedulingStatus || this.args.isSuccessfullyScheduled;
   }
 
   get actionChinState() {
     if (this.args.isSuccessfullyScheduled) {
       return 'memorialized';
     }
-    if (this.args.isScheduling) {
+    if (this.args.schedulingStatus) {
       return 'in-progress';
     }
     return 'default';
@@ -249,7 +253,7 @@ export default class SchedulePaymentFormActionCardUI extends Component<Signature
               <div class="schedule-payment-form-action-card--max-gas-fee-name">
                 Normal
               </div>
-              <div class="schedule-payment-form-action-card--max-gas-fee-description">
+              <div class="schedule-payment-form-action-card--max-gas-fee-description" data-test-max-gas-fee-normal-description>
                 {{@maxGasDescriptions.normal}}
               </div>
             </group.Button>
@@ -257,7 +261,7 @@ export default class SchedulePaymentFormActionCardUI extends Component<Signature
               <div class="schedule-payment-form-action-card--max-gas-fee-name">
                 High
               </div>
-              <div class="schedule-payment-form-action-card--max-gas-fee-description">
+              <div class="schedule-payment-form-action-card--max-gas-fee-description" data-test-max-gas-fee-high-description>
                 {{@maxGasDescriptions.high}}
               </div>
             </group.Button>
@@ -265,7 +269,7 @@ export default class SchedulePaymentFormActionCardUI extends Component<Signature
               <div class="schedule-payment-form-action-card--max-gas-fee-name">
                 Max
               </div>
-              <div class="schedule-payment-form-action-card--max-gas-fee-description">
+              <div class="schedule-payment-form-action-card--max-gas-fee-description" data-test-max-gas-fee-max-description>
                 {{@maxGasDescriptions.max}}
               </div>
             </group.Button>
@@ -293,8 +297,16 @@ export default class SchedulePaymentFormActionCardUI extends Component<Signature
               {{on 'click' noop}}
               data-test-schedule-payment-form-submit-button
             >
-              Scheduling...
+              {{@schedulingStatus}}
             </ac.ActionButton>
+            <ac.InfoArea>
+              {{#if @txHash}}
+                <BlockExplorerButton
+                  @networkSymbol={{@networkSymbol}}
+                  @transactionHash={{@txHash}}
+                />
+              {{/if}}
+            </ac.InfoArea>
           </:inProgress>
           <:memorialized as |ac|>
             <ac.ActionStatusArea>
