@@ -8,6 +8,7 @@ import { inject } from '@cardstack/di';
 import pgFormat from 'pg-format';
 import awsConfig from '../utils/aws-config';
 import Logger from '@cardstack/logger';
+import config from 'config';
 interface S3FileInfo {
   rewardProgramId: string;
   paymentCycle: string;
@@ -41,7 +42,8 @@ export default class ProcessRewardRoot {
     const s3Config = await awsConfig({ roleChain: [] });
     const s3Client = new S3Client(s3Config);
     const db = await this.databaseManager.getClient();
-    const proofs = await queryParquet(s3Client, file);
+    const bucketName = config.get('aws.rewards.bucketName') as string;
+    const proofs = await queryParquet(s3Client, bucketName, file);
     const rows = proofs
       .filter(({ validTo }) => {
         return validTo > currentBlockNumber;
@@ -107,12 +109,13 @@ const FIELDS_EXCEPT_EXPLANATION_DATA =
 
 const queryParquet = async (
   s3Client: S3Client,
+  bucketName: string,
   file: S3FileInfo,
   expression?: SelectObjectContentCommandInput['Expression']
 ): Promise<Proof[]> => {
   let records: Proof[] = [];
   const params: SelectObjectContentCommandInput = {
-    Bucket: 'cardpay-staging-reward-programs',
+    Bucket: bucketName,
     Key: `rewardProgramID=${file.rewardProgramId}/paymentCycle=${file.paymentCycle}/results.parquet`,
     ExpressionType: 'SQL',
     Expression: expression ?? 'SELECT * FROM S3Object',
@@ -164,7 +167,7 @@ const queryParquet = async (
     }
   } catch (err: any) {
     if (err.name == 'UnsupportedParquetType') {
-      return await queryParquet(s3Client, file, `SELECT ${FIELDS_EXCEPT_EXPLANATION_DATA} FROM s3object`);
+      return await queryParquet(s3Client, bucketName, file, `SELECT ${FIELDS_EXCEPT_EXPLANATION_DATA} FROM s3object`);
     } else if (err.name == 'NoSuchKey') {
       log.info(
         `Key rewardProgramID=${file.rewardProgramId}/paymentCycle=${file.paymentCycle}/results.parquet does not exist`
@@ -178,10 +181,10 @@ const queryParquet = async (
   return records;
 };
 
-export const scanParquet = async (s3Client: S3Client, files: S3FileInfo[]) => {
+export const scanParquet = async (s3Client: S3Client, bucketName: string, files: S3FileInfo[]) => {
   const promises: Promise<Proof[]>[] = [];
   files.forEach((file) => {
-    promises.push(queryParquet(s3Client, file));
+    promises.push(queryParquet(s3Client, bucketName, file));
   });
   const r = (await Promise.all(promises)).flat();
   return r;

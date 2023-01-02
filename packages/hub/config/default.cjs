@@ -14,6 +14,9 @@ module.exports = {
       roleChain: ['prod:storage-bucket-writer-role'],
       invalidationRoleChain: ['prod:cloudfront-distribution-invalidator-role'],
     },
+    rewards: {
+      bucketName: 'cardpay-staging-reward-programs',
+    },
     ses: {
       supportEmail: 'no-reply@stack.cards',
       region: 'us-east-1',
