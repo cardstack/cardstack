@@ -73,7 +73,7 @@ export default class ProcessRewardRoot {
       if (rows.length > 0) {
         const proofsQuery = `
       INSERT INTO reward_proofs(
-        reward_program_id, payee, leaf, payment_cycle, proof, token_type,  valid_from, valid_to, explanation_id, explanation_data
+        reward_program_id, payee, leaf, payment_cycle, proof_bytes, token_type,  valid_from, valid_to, explanation_id, explanation_data
       ) VALUES %s;
     `;
         const proofsSql = pgFormat(proofsQuery, rows.join());
@@ -105,7 +105,7 @@ declare module '@cardstack/hub/tasks' {
 }
 
 const FIELDS_EXCEPT_EXPLANATION_DATA =
-  'rewardProgramID,paymentCycle,validFrom,validTo,tokenType,payee,root,leaf,proof,explanationId';
+  'rewardProgramID,paymentCycle,validFrom,validTo,tokenType,payee,root,leaf,proof_bytes,explanationId';
 
 const queryParquet = async (
   s3Client: S3Client,
