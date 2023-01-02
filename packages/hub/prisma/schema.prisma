@@ -379,7 +379,7 @@ model RewardProof {
   payee           String
   leaf            String   @id
   paymentCycle    Int      @map("payment_cycle")
-  proofs          String[]
+  proofBytes      String[]
   tokenType       Int      @map("token_type")
   validFrom       Int      @map("valid_from")
   validTo         Int      @map("valid_to")

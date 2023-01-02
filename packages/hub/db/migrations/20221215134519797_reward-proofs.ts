@@ -8,7 +8,7 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
     payee: { type: 'string', notNull: true },
     leaf: { type: 'string', unique: true, notNull: true, primaryKey: true },
     payment_cycle: { type: 'integer', notNull: true },
-    proofs: { type: 'text[]', notNull: true },
+    proofBytes: { type: 'text[]', notNull: true },
     token_type: { type: 'integer', notNull: true },
     valid_from: { type: 'integer', notNull: true },
     valid_to: { type: 'integer', notNull: true },
