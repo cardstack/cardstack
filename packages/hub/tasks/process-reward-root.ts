@@ -19,7 +19,7 @@ interface Proof {
   payee: string;
   leaf: string;
   paymentCycle: number;
-  proof: string; // this will be converted to proof array
+  proofBytes: string[];
   tokenType: string;
   validFrom: number;
   validTo: number;
@@ -55,7 +55,7 @@ export default class ProcessRewardRoot {
             o.payee,
             o.leaf,
             o.paymentCycle,
-            o.proof,
+            o.proofBytes,
             o.tokenType,
             o.validFrom,
             o.validTo,
@@ -146,7 +146,9 @@ const queryParquet = async (
               }
               // when proof array serialize to json, it becomes [{item:... }. {item: ...}]
               // need to transform to array of hex strings
-              b.proof = b.proof.length > 0 ? b.proof.map((o: any) => '0x' + o.item) : ['0x'];
+              // - parquet file names column as proof
+              // - database and process names column as proofBytes
+              b.proofBytes = b.proof.length > 0 ? b.proof.map((o: any) => '0x' + o.item) : ['0x'];
               b.leaf = '0x' + b.leaf;
               records.push(b);
             }
