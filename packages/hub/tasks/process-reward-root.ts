@@ -112,7 +112,7 @@ declare module '@cardstack/hub/tasks' {
 }
 
 const FIELDS_EXCEPT_EXPLANATION_DATA =
-  'rewardProgramID,paymentCycle,validFrom,validTo,tokenType,payee,root,leaf,proof_bytes,explanationId';
+  'rewardProgramID,paymentCycle,validFrom,validTo,tokenType,payee,root,leaf,proof,explanationId';
 
 const queryParquet = async (
   s3Client: S3Client,
