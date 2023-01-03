@@ -20,13 +20,13 @@ export interface ScheduledPayment {
   spHash: string;
   senderSafeAddress: string;
   moduleAddress: string;
-  recurringDayOfMonth: number;
-  recurringUntil: Date;
-  creationTransactionHash: string;
-  creationBlockNumber: number;
-  creationTransactionError: string;
-  cancelationTransactionHash: string;
-  cancelationBlockNumber: number;
+  recurringDayOfMonth?: number;
+  recurringUntil?: Date;
+  creationTransactionHash?: string;
+  creationBlockNumber?: number;
+  creationTransactionError?: string;
+  cancelationTransactionHash?: string;
+  cancelationBlockNumber?: number;
 }
 
 export interface ScheduledPaymentAttempt {
