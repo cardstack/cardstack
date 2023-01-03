@@ -59,6 +59,7 @@ async function main() {
 async function getAccessDeniedSecrets(role: string, secrets: string[]): Promise<string[]> {
   let denied: string[] = [];
 
+  const iamClient = new IAMClient({});
   for (const secret of secrets) {
     let actionName: string;
     if (secret.startsWith('arn:aws:secretsmanager:')) {
@@ -74,13 +75,12 @@ async function getAccessDeniedSecrets(role: string, secrets: string[]): Promise<
       PolicySourceArn: `arn:aws:iam::${awsAccountId}:role/${role}`,
       ResourceArns: [secret],
     });
-    const iamClient = new IAMClient({});
     const res = await iamClient.send(command);
     if (res.EvaluationResults![0].EvalDecision != 'allowed') {
       denied.push(secret);
     }
-    iamClient.destroy();
   }
+  iamClient.destroy();
 
   return denied;
 }
