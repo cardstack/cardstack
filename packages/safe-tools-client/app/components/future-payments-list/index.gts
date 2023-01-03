@@ -10,9 +10,12 @@ import { TrackedObject } from 'tracked-built-ins';
 import { taskFor } from 'ember-concurrency-ts';
 import { task, TaskGenerator } from 'ember-concurrency';
 import lt from 'ember-truth-helpers/helpers/lt';
+import gt from 'ember-truth-helpers/helpers/gt';
 import TimeBracket from './time-bracket';
 import { ScheduledPayment } from '@cardstack/safe-tools-client/services/scheduled-payments';
 import { addHours, addMonths, lastDayOfMonth } from 'date-fns';
+import and from 'ember-truth-helpers/helpers/and';
+import not from 'ember-truth-helpers/helpers/not';
 
 import './index.css';
 
@@ -26,7 +29,8 @@ interface Signature {
 export default class FuturePaymentsList extends Component<Signature> {
   @service declare hubAuthentication: HubAuthenticationService;
   @service declare network: NetworkService;
-  @service declare scheduledPaymentsService: ScheduledPaymentsService;
+  // @ts-expect-error loading services/scheduled-payments
+  @service('scheduled-payments') declare scheduledPaymentsService: ScheduledPaymentsService;
 
   get nextHour(): ScheduledPayment[] {
     if (!this.scheduledPayments) return [];
@@ -52,12 +56,16 @@ export default class FuturePaymentsList extends Component<Signature> {
     return this.scheduledPayments.filter((s: ScheduledPayment) => s.payAt > lastDateNextMonth);
   }
 
-  @task *loadFuturePaymentTask(chainId: number): TaskGenerator<ScheduledPayment[]> {
+  @task *loadScheduledPaymentTask(chainId: number): TaskGenerator<ScheduledPayment[]> {
     return yield this.scheduledPaymentsService.fetchScheduledPayments(chainId, new Date());
   }
 
   get scheduledPayments() {
     return this.scheduledPaymentsResource.value;
+  }
+
+  get isScheduledPaymentsLoading() {
+    return this.scheduledPaymentsResource.isLoading;
   }
 
   @use scheduledPaymentsResource = resource(() => {
@@ -70,7 +78,7 @@ export default class FuturePaymentsList extends Component<Signature> {
     }
 
     const state = new TrackedObject({
-      isLoading: false,
+      isLoading: true,
       value: undefined as ScheduledPayment[] | undefined,
       error: undefined,
     });
@@ -79,9 +87,8 @@ export default class FuturePaymentsList extends Component<Signature> {
 
     (async () => {
       try {
-        state.value = await taskFor(this.loadFuturePaymentTask).perform(chainId);
+        state.value = await taskFor(this.loadScheduledPaymentTask).perform(chainId);
       } catch (error) {
-        console.log(error);
         state.error = error;
       } finally {
         state.isLoading = false;
@@ -95,12 +102,12 @@ export default class FuturePaymentsList extends Component<Signature> {
     <BoxelActionContainer 
       class="future-payments-list"
       as |Section ActionChin|>
-      {{#if (lt this.scheduledPayments.length 1)}}
+      {{#if (and (not this.isScheduledPaymentsLoading) (lt this.scheduledPayments.length 1))}}
         <Section class="future-payments-list__no-payments-section" data-test-no-future-payments-list>
           <div class="future-payments-list__no-payments-title">Schedule your first payment</div>
           <div class="future-payments-list__no-payments-description">Your future payments will show up here. This is where you can check on the status of your transactions and view important messages.</div>
         </Section>
-      {{else}}
+      {{else if (and (not this.isScheduledPaymentsLoading) (gt this.scheduledPayments.length 0))}}
         <Section @title="Future Payments" data-test-future-payments-list>
           <div class="future-payments-list__payments-section">
             <div class="future-payments-list__payments-section-time-brackets">
