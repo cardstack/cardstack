@@ -195,7 +195,7 @@ export default class Wallet extends Service {
     this.chainConnectionManager.disconnect();
   }
 
-  @action async fetchNativeTokenBalance() {
+  async fetchNativeTokenBalance() {
     const assets = await getSDK('Assets', this.ethersProvider);
     const balance = await assets.getNativeTokenBalance(this.address);
     this.nativeTokenBalance = {

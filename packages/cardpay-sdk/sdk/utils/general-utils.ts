@@ -439,13 +439,29 @@ export async function hubRequest(
   return response.json();
 }
 
-export async function poll(fn: () => Promise<unknown>, fnCondition: (arg: unknown) => boolean, ms: number) {
-  let result = await fn();
-  while (!fnCondition(result)) {
-    await wait(ms);
-    result = await fn();
-  }
-  return result;
+export async function poll(
+  fn: () => Promise<unknown>,
+  fnCondition: (arg: unknown) => boolean,
+  periodMs: number,
+  timeoutMs: number = 10 * 60 * 1000
+) {
+  let _poll = async (fn: () => Promise<unknown>, fnCondition: (arg: unknown) => boolean, periodMs: number) => {
+    let result = await fn();
+    while (!fnCondition(result)) {
+      await wait(periodMs);
+      result = await fn();
+    }
+    return result;
+  };
+
+  return await Promise.race([
+    _poll(fn, fnCondition, periodMs),
+    new Promise((_resolve, reject) => {
+      setTimeout(() => {
+        reject(new Error(`polling timed out after ${timeoutMs}ms`));
+      }, timeoutMs);
+    }),
+  ]);
 }
 
 export async function wait(ms = 1000) {

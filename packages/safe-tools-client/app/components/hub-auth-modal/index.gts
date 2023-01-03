@@ -59,7 +59,7 @@ export default class HubAuthModal extends Component {
 
         <ActionChin @state={{this.connectionState}}>
           <:default as |a|>
-            <a.ActionButton {{on "click" this.authorize}}>
+            <a.ActionButton {{on "click" this.authorize}} data-test-authenticate-button>
               Authenticate
             </a.ActionButton>
           </:default>
