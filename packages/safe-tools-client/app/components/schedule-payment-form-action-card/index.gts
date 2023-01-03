@@ -153,9 +153,19 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
     this.paymentToken = val;
   }
 
-  @tracked selectedGasToken: SelectableToken | undefined;
+  @tracked _selectedGasToken: SelectableToken | undefined;
+  
   @action onSelectGasToken(val: SelectableToken) {
-    this.selectedGasToken = val;
+    this._selectedGasToken = val;
+  }
+
+  get selectedGasToken(): SelectableToken | undefined {
+    let { value: gasTokens, isLoading } = this.tokens.gasTokens;
+
+    if (isLoading || gasTokens?.find(gt => gt.address === this._selectedGasToken?.address)) {
+      return this._selectedGasToken;
+    }
+    return undefined;
   }
 
   @tracked maxGasPrice: 'normal' | 'high' | 'max' | undefined;

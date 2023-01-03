@@ -1,4 +1,12 @@
-import { click, fillIn, render, TestContext } from '@ember/test-helpers';
+import { TokenDetail } from '@cardstack/cardpay-sdk';
+import TokensService from '@cardstack/safe-tools-client/services/tokens';
+import {
+  click,
+  fillIn,
+  render,
+  TestContext,
+  settled,
+} from '@ember/test-helpers';
 import { format, subDays, addMonths, addHours, subHours } from 'date-fns';
 import { selectChoose } from 'ember-power-select/test-support';
 import { setupRenderingTest } from 'ember-qunit';
@@ -12,13 +20,14 @@ import {
   EXAMPLE_PAYEE,
 } from '../support/ui-test-helpers';
 
+let tokensService: TokensService;
 module(
   'Integration | Component | schedule-payment-form-action-card',
   function (hooks) {
     setupRenderingTest(hooks);
 
     hooks.beforeEach(function (this: TestContext) {
-      const tokensService = this.owner.lookup('service:tokens');
+      tokensService = this.owner.lookup('service:tokens');
       tokensService.stubGasTokens(exampleGasTokens);
     });
 
@@ -225,6 +234,35 @@ module(
       assert
         .dom(`[data-date="${format(disabledDate, 'yyyy-MM-dd')}"]`)
         .isDisabled();
+    });
+
+    test('when the network changes, the selected gas token is updated if necessary', async function (assert) {
+      await render(hbs`
+        <SchedulePaymentFormActionCard />
+      `);
+      await selectChoose('[data-test-gas-token-select]', 'USDC');
+      const exampleGasTokens2: TokenDetail[] = [
+        exampleGasTokens.find((t) => t.symbol === 'USDC') as TokenDetail,
+        {
+          name: 'Monavale',
+          symbol: 'MONA',
+          decimals: 18,
+          address: '0x6968105460f67c3BF751bE7C15f92F5286Fd0CE5',
+          logoURI: 'https://wallet-asset.matic.network/img/tokens/mona.svg',
+        },
+      ];
+      tokensService.stubGasTokens(exampleGasTokens2);
+      await settled();
+      assert.dom('[data-test-gas-token-select]').containsText('USDC');
+      const exampleGasTokens3: TokenDetail[] = [
+        exampleGasTokens.find((t) => t.symbol === 'CARD') as TokenDetail,
+        exampleGasTokens2.find((t) => t.symbol === 'MONA') as TokenDetail,
+      ];
+      tokensService.stubGasTokens(exampleGasTokens3);
+      await settled();
+      assert
+        .dom('[data-test-gas-token-select]')
+        .containsText('Choose a Gas Token');
     });
 
     // TODO: assert state for no network selected/connected
