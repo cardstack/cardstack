@@ -31,7 +31,7 @@ export interface Proof {
   paymentCycle: number;
   tokenAddress: string;
   payee: string;
-  proofArray: string[];
+  proofBytes: string[];
   rewardProgramId: string;
   amount: BN;
   leaf: string;
@@ -87,8 +87,8 @@ export default class RewardPool {
     return (await this.getRewardPool()).methods.claimed(leaf).call();
   }
 
-  async isValid(leaf: string, proofArray: string[]): Promise<boolean> {
-    return (await this.getRewardPool()).methods.valid(leaf, proofArray).call();
+  async isValid(leaf: string, proofBytes: string[]): Promise<boolean> {
+    return (await this.getRewardPool()).methods.valid(leaf, proofBytes).call();
   }
   // TOTAL balance of reward pool -- cumulative across reward program
   async getBalanceForPool(tokenAddress: string): Promise<string> {
@@ -126,9 +126,6 @@ export default class RewardPool {
   ): Promise<WithSymbol<Proof | ClaimableProof>[]> {
     let hubUrl = await getConstant('hubUrl', this.layer2Web3);
     let url = new URL(`${hubUrl}/api/rewards/proofs/${address}`);
-    if (tokenAddress) {
-      url.searchParams.append('token', tokenAddress);
-    }
     if (offset) {
       url.searchParams.append('offset', offset.toString());
     }
@@ -159,10 +156,42 @@ export default class RewardPool {
       const isValid = validFrom <= currentBlock && validTo > currentBlock;
       // filters for known reward tokens
       if (token && rewardTokens.includes(token)) {
-        // filters for proofs has not been claimed
         const explanationTemplate = rewardManager.getClaimExplainer(rule, o.explanationId);
-        if (!knownClaimed) {
-          if (!claimedLeafs.includes(o.leaf)) {
+        if (tokenAddress && tokenAddress == token) {
+          // filters for based upon the tokenAddress if it exists
+          if (!knownClaimed) {
+            // filters for proofs has not been claimed
+            if (!claimedLeafs.includes(o.leaf)) {
+              res.push({
+                ...o,
+                tokenAddress,
+                amount: amount,
+                isValid,
+                explanationTemplate,
+              });
+            }
+          } else {
+            res.push({
+              ...o,
+              tokenAddress,
+              amount: amount,
+              isValid,
+              explanationTemplate,
+            });
+          }
+        } else {
+          // filters for proofs has not been claimed
+          if (!knownClaimed) {
+            if (!claimedLeafs.includes(o.leaf)) {
+              res.push({
+                ...o,
+                tokenAddress: token,
+                amount: amount,
+                isValid,
+                explanationTemplate,
+              });
+            }
+          } else {
             res.push({
               ...o,
               tokenAddress: token,
@@ -171,14 +200,6 @@ export default class RewardPool {
               explanationTemplate,
             });
           }
-        } else {
-          res.push({
-            ...o,
-            tokenAddress: token,
-            amount: amount,
-            isValid,
-            explanationTemplate,
-          });
         }
       }
     });
@@ -192,7 +213,7 @@ export default class RewardPool {
         proofs
           .filter((o) => o.isValid)
           .map(async (proof) => {
-            const gasEstimate = await this.claimGasEstimate(safeAddress, proof.leaf, proof.proofArray, false);
+            const gasEstimate = await this.claimGasEstimate(safeAddress, proof.leaf, proof.proofBytes, false);
             return {
               ...proof,
               gasEstimate,
@@ -416,7 +437,7 @@ export default class RewardPool {
   async claim(
     safeAddress: string,
     leaf: string,
-    proofArray: string[],
+    proofBytes: string[],
     acceptPartialClaim: boolean,
     txnOptions?: TransactionOptions,
     contractOptions?: ContractOptions
@@ -424,7 +445,7 @@ export default class RewardPool {
   async claim(
     safeAddressOrTxnHash: string,
     leaf?: string,
-    proofArray?: string[],
+    proofBytes?: string[],
     acceptPartialClaim?: boolean,
     txnOptions?: TransactionOptions,
     contractOptions?: ContractOptions
@@ -434,8 +455,8 @@ export default class RewardPool {
       return await waitForTransactionConsistency(this.layer2Web3, txnHash);
     }
     let safeAddress = safeAddressOrTxnHash;
-    if (!proofArray) {
-      //proofArray can be empty e.g reward only for single rewardee
+    if (!proofBytes) {
+      //proofBytes can be empty e.g reward only for single rewardee
       throw new Error('proof must be provided');
     }
     if (!leaf) {
@@ -468,7 +489,7 @@ export default class RewardPool {
       throw new Error('payee is not owner of the reward safe');
     }
 
-    if (!(await this.isValid(leaf, proofArray))) {
+    if (!(await this.isValid(leaf, proofBytes))) {
       throw new Error('proof is not valid');
     }
     if (await this.isClaimed(leaf)) {
@@ -500,7 +521,7 @@ The reward program ${rewardProgramId} has balance equals ${fromWei(
     }
     let rewardPoolAddress = await getAddress('rewardPool', this.layer2Web3);
 
-    let payload = (await this.getRewardPool()).methods.claim(leaf, proofArray, acceptPartialClaim).encodeABI();
+    let payload = (await this.getRewardPool()).methods.claim(leaf, proofBytes, acceptPartialClaim).encodeABI();
     let estimate = await gasEstimate(
       this.layer2Web3,
       safeAddress,
@@ -600,8 +621,8 @@ The reward program ${rewardProgramId} has balance equals ${fromWei(
   ): Promise<SuccessfulTransactionReceipt[]> {
     const validProofs = proofs.filter((o) => o.isValid);
     const receipts: SuccessfulTransactionReceipt[] = [];
-    for (const { leaf, proofArray } of validProofs) {
-      const receipt = await this.claim(safeAddress, leaf, proofArray, false, txnOptions, contractOptions);
+    for (const { leaf, proofBytes } of validProofs) {
+      const receipt = await this.claim(safeAddress, leaf, proofBytes, false, txnOptions, contractOptions);
       receipts.push(receipt);
     }
     return receipts;
@@ -631,10 +652,10 @@ The reward program ${rewardProgramId} has balance equals ${fromWei(
   async claimGasEstimate(
     rewardSafeAddress: string,
     leaf: string,
-    proofArray: string[],
+    proofBytes: string[],
     acceptPartialClaim?: boolean
   ): Promise<GasEstimate> {
-    let payload = (await this.getRewardPool()).methods.claim(leaf, proofArray, acceptPartialClaim).encodeABI();
+    let payload = (await this.getRewardPool()).methods.claim(leaf, proofBytes, acceptPartialClaim).encodeABI();
     let o: FullLeaf = this.decodeLeaf(leaf) as FullLeaf;
     if (!o.token) {
       throw new Error('token must be provided');
