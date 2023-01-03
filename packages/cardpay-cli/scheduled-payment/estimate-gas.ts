@@ -36,11 +36,10 @@ export default {
 
     console.log(`Estimate gas for ${scenario} scenario ...`);
 
-    let result = await scheduledPaymentModule.estimateGas(
-      scenario as typeof GAS_ESTIMATION_SCENARIOS[number],
+    let result = await scheduledPaymentModule.estimateGas(scenario as typeof GAS_ESTIMATION_SCENARIOS[number], {
       tokenAddress,
-      gasTokenAddress
-    );
+      gasTokenAddress,
+    });
 
     console.log(`Required gas: ${result.gas}`);
     console.log(`Required gas in ETH (slow): ${fromWei(result.gasRangeInWei.slow.toString(), 'ether')}`);

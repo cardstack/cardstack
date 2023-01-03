@@ -17,9 +17,11 @@ import { use, resource } from 'ember-resources';
 import { TrackedObject } from 'tracked-built-ins';
 import { fromWei } from 'web3-utils';
 import not from 'ember-truth-helpers/helpers/not';
-import { convertAmountToNativeDisplay, convertAmountToRawAmount } from '@cardstack/cardpay-sdk';
+import { convertAmountToNativeDisplay, convertAmountToRawAmount, TransactionHash } from '@cardstack/cardpay-sdk';
 import { taskFor } from 'ember-concurrency-ts';
 import { BigNumber } from 'ethers';
+import { task } from 'ember-concurrency-decorators';
+import perform from 'ember-concurrency/helpers/perform';
 
 interface Signature {
   Element: HTMLElement;
@@ -39,6 +41,10 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
   @service declare scheduledPaymentsSdk: ScheduledPaymentsSdkService;
   validator = new SchedulePaymentFormValidator(this);
   gasEstimation?: GasEstimationResult;
+  lastScheduledPaymentId?: string;
+
+  @tracked schedulingStatus?: string;
+  @tracked txHash?: TransactionHash;
 
   get paymentTypeOptions() {
     return [
@@ -166,21 +172,21 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
       isLoading: true,
       isIndeterminate: false
     });
-    if (!this.wallet.isConnected) {
+    let { selectedGasToken, selectedPaymentType, paymentToken } = this;
+    let isWalletConnected = this.wallet.isConnected;
+    if (!isWalletConnected) {
       state.isIndeterminate = true;
       return state;
     }
-    let { selectedGasToken } = this;
     if (!selectedGasToken) {
       state.isIndeterminate = true;
       return state;
     }
-    let paymentTokenAddress = this.paymentToken?.address;
-    if (!paymentTokenAddress) {
+    if (!paymentToken?.address) {
       state.isIndeterminate = true;
       return state;
     }
-    if (!this.selectedPaymentType) {
+    if (!selectedPaymentType) {
       state.isIndeterminate = true;
       return state;
     }
@@ -189,7 +195,7 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
     const scenario = this.selectedPaymentType === 'one-time' ? 'execute_one_time_payment' : 'execute_recurring_payment';
     (async () => {
       try {
-        this.gasEstimation = await this.scheduledPaymentsSdk.getScheduledPaymentGasEstimation(scenario, paymentTokenAddress, selectedGasToken.address);
+        this.gasEstimation = await this.scheduledPaymentsSdk.getScheduledPaymentGasEstimation(scenario, paymentToken.address, selectedGasToken.address);
         const { gasRangeInGasTokenWei, gasRangeInUSD } = this.gasEstimation;
         state.value = {
           normal: `Less than ${fromWei(gasRangeInGasTokenWei.normal.toString(), 'ether')} ${selectedGasToken.symbol} (~${convertAmountToNativeDisplay(fromWei(gasRangeInUSD.normal.toString(), 'ether'), 'USD')})`,
@@ -206,14 +212,14 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
     return state;
   });
 
-  @action
-  async schedulePayment() {
+  @task *schedulePaymentTask() {
     let { currentSafe } = this.safes;
     if (!currentSafe) return;
-    if (!this.paymentDate) return;
-    if (!this.paymentToken) return;
-    if (!this.selectedGasToken) return;
-    if (!this.gasEstimation) return;
+    if (!this.validator.isValid) return;
+
+    // Redundant to validation check but including it to narrow types for Typescript
+    if (!this.paymentToken || !this.selectedGasToken || !this.gasEstimation) return;
+
     if (Number(this.gasEstimation.gas) <= 0) return;
     const { gasRangeInGasTokenWei } = this.gasEstimation;
     if (Object.keys(gasRangeInGasTokenWei).length <= 0) return;
@@ -236,8 +242,9 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
     const array = new Uint8Array(32);
     window.crypto.getRandomValues(array);
     const salt = btoa(String.fromCharCode.apply(null, array));
+    const self = this;
 
-    await taskFor(this.scheduledPaymentsSdk.schedulePayment).perform(
+    yield taskFor(this.scheduledPaymentsSdk.schedulePayment).perform(
       currentSafe.address,
       currentSafe.spModuleAddress,
       this.paymentToken.address,
@@ -247,15 +254,53 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
       String(maxGasPrice),
       this.selectedGasToken.address,
       salt,
-      Math.round(this.paymentDate.getTime() / 1000),
-      null, //TODO: support for recurringDayOfMonth
-      null, //TODO: support for recurringUntil
-      (scheduledPaymentId: string) => {
-        console.log(`Scheduled payment created in the crank: ${scheduledPaymentId}.`);
-        console.log('Waiting for the transaction to be mined...');
+      this.selectedPaymentType === 'one-time' ? Math.round(this.paymentDate!.getTime() / 1000) : null,
+      this.selectedPaymentType === 'monthly' ? this.paymentDayOfMonth! : null,
+      this.selectedPaymentType === 'monthly' ? Math.round(this.monthlyUntil!.getTime() / 1000) : null,
+      {
+        onScheduledPaymentIdReady(scheduledPaymentId: string) {
+          self.lastScheduledPaymentId = scheduledPaymentId;
+        },
+        onTxHash(txHash: TransactionHash) {
+          self.txHash = txHash;
+        },
+        onBeginHubAuthentication() {
+          self.schedulingStatus = "Authenticating..."
+        },
+        onBeginSpHashCreation() {
+          self.schedulingStatus = "Calculating payment hash..."
+        },
+        onBeginRegisterPaymentWithHub() {
+          self.schedulingStatus = "Registering payment with hub..."
+        },
+        onBeginPrepareScheduledPayment() {
+          self.schedulingStatus = "Preparing transaction..."
+        },
+        onBeginSchedulingPaymentOnChain() {
+          self.schedulingStatus = "Scheduling on-chain..."
+        },
+        onBeginUpdatingHubWithTxHash() {
+          self.schedulingStatus = "Recording on hub..."
+        },
+        onBeginWaitingForTransactionConfirmation() {
+          self.schedulingStatus = "Confirming transaction..."
+        }
       }
     )
+    this.isSuccessfullyScheduled = true;
   }
+
+  @action resetForm() {
+    this.isSuccessfullyScheduled = false;
+    this.schedulingStatus = undefined;
+    this.txHash = undefined;
+  }
+
+  get isScheduling() {
+    return taskFor(this.schedulePaymentTask).isRunning;
+  }
+
+  @tracked isSuccessfullyScheduled = false;
 
   <template>
     <SchedulePaymentFormActionCardUI
@@ -294,9 +339,15 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
       @onUpdateMaxGasPrice={{this.onUpdateMaxGasPrice}}
       @isMaxGasPriceInvalid={{not this.validator.isMaxGasPriceValid}}
       @maxGasPriceErrorMessage={{this.validator.maxGasPriceErrorMessage}}
-      @onSchedulePayment={{this.schedulePayment}}
-      @isSubmitEnabled={{this.isValid}}
+      @onSchedulePayment={{perform this.schedulePaymentTask}}
       @maxGasDescriptions={{this.maxGasDescriptions.value}}
+      @isSubmitEnabled={{this.isValid}}
+      @schedulingStatus={{this.schedulingStatus}}
+      @networkSymbol={{this.network.symbol}}
+      @walletProviderId={{this.wallet.providerId}}
+      @txHash={{this.txHash}}
+      @isSuccessfullyScheduled={{this.isSuccessfullyScheduled}}
+      @onReset={{this.resetForm}}
     />
   </template>
 }

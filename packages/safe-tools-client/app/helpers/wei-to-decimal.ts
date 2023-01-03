@@ -2,7 +2,7 @@ import { convertRawAmountToDecimalFormat } from '@cardstack/cardpay-sdk';
 import { helper } from '@ember/component/helper';
 import { BigNumber } from 'ethers';
 
-type PositionalArgs = [BigNumber, number];
+type PositionalArgs = [BigNumber, number, number?];
 
 interface Signature {
   Args: {
@@ -11,11 +11,15 @@ interface Signature {
   Return: string;
 }
 
-export function weiToDecimal([amount, decimals]: PositionalArgs) {
+export function weiToDecimal([
+  amount,
+  tokenDecimals,
+  decimals = 3,
+]: PositionalArgs) {
   const number = parseFloat(
-    convertRawAmountToDecimalFormat(amount.toString(), decimals)
+    convertRawAmountToDecimalFormat(amount.toString(), tokenDecimals)
   );
-  return String(number % 1 === 0 ? number : number.toFixed(3));
+  return String(number % 1 === 0 ? number : number.toFixed(decimals));
 }
 
 export default helper<Signature>(weiToDecimal);

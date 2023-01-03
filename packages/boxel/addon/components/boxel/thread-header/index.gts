@@ -1,6 +1,6 @@
 import type { TemplateOnlyComponent } from '@ember/component/template-only';
 import BoxelParticipantList from '../participant-list';
-import { Participant } from '../participant/model';
+import { type Participant } from '../participant/model';
 import { on } from '@ember/modifier';
 import { svgJar } from '@cardstack/boxel/utils/svg-jar';
 

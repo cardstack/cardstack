@@ -58,3 +58,15 @@
 .schedule-payment-form-action-card__when-fields {
   padding: var(--boxel-sp-sm) var(--boxel-sp-sm) 0 var(--boxel-sp-sm);
 }
+
+.schedule-payment-form-action-card__loading-indicator {
+  --icon-color: var(--boxel-light);
+
+  margin-right: var(--boxel-sp-xs);
+  flex-grow: 0;
+  flex-shrink: 0;
+}
+
+.schedule-payment-form-action-card__in-progress-message {
+  max-width: 20rem;
+}

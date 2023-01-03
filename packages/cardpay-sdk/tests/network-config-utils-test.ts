@@ -10,12 +10,7 @@ if (!globalThis.fetch) {
 }
 
 import { HubConfigResponse } from '../sdk/hub-config';
-import {
-  getWeb3ConfigByNetwork,
-  isSupportedChain,
-  fetchSupportedGasTokens,
-  isSchedulerSupportedChain,
-} from '../sdk/network-config-utils';
+import { getWeb3ConfigByNetwork, isSupportedChain, fetchSupportedGasTokens } from '../sdk/network-config-utils';
 
 chai.use(chaiAsPromised);
 
@@ -43,11 +38,6 @@ describe('getWeb3ConfigByNetwork', () => {
 
       chai.expect(config).to.eq(mockedConfig.web3.ethereum);
     });
-    it('should return polygon config for mumbai', () => {
-      const config = getWeb3ConfigByNetwork(mockedConfig, 'mumbai');
-
-      chai.expect(config).to.eq(mockedConfig.web3.polygon);
-    });
     it('should return gnosis config for gnosis', () => {
       const config = getWeb3ConfigByNetwork(mockedConfig, 'gnosis');
 
@@ -60,6 +50,9 @@ describe('getWeb3ConfigByNetwork', () => {
     });
     it('should throw an error for non-supported network: kovan', () => {
       chai.expect(() => getWeb3ConfigByNetwork(mockedConfig, 'kovan')).to.throw(`Unsupported network: kovan`);
+    });
+    it('should throw an error for non-supported network: mumbai', () => {
+      chai.expect(() => getWeb3ConfigByNetwork(mockedConfig, 'mumbai')).to.throw(`Unsupported network: mumbai`);
     });
   });
 
@@ -114,32 +107,6 @@ describe('isSupportedChain', () => {
 
   it('should return true for supported polygon network as type', () => {
     chai.expect(isSupportedChain(supportedChainAsType)).to.eq(true);
-  });
-});
-
-describe('isSchedulerSupportedChain', () => {
-  const supportedChainNames = ['mainnet', 'goerli'];
-  const supportedChainIds = [5];
-
-  const unsupportedChains = ['kovan', 'gnosis'];
-  const nonExistingChains = ['foo', 'bar'];
-
-  const supportedChainAsType = 'polygon' as const;
-
-  [...supportedChainNames, ...supportedChainIds].forEach((network) => {
-    it(`should return true for supported network ${network}`, () => {
-      chai.expect(isSchedulerSupportedChain(network)).to.eq(true);
-    });
-  });
-
-  [...unsupportedChains, ...nonExistingChains].forEach((network) => {
-    it(`should return false for non-supported network ${network}`, () => {
-      chai.expect(isSchedulerSupportedChain(network)).to.eq(false);
-    });
-  });
-
-  it('should return true for supported polygon network as type', () => {
-    chai.expect(isSchedulerSupportedChain(supportedChainAsType)).to.eq(true);
   });
 });
 

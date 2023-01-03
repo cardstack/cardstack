@@ -1,5 +1,8 @@
 'use strict';
 
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const pkg = require('../package.json');
+
 module.exports = function (environment) {
   let ENV = {
     modulePrefix: '@cardstack/safe-tools-client',
@@ -20,6 +23,23 @@ module.exports = function (environment) {
     },
 
     hubUrl: process.env.HUB_URL,
+    version: pkg.version,
+    sentryDsn: process.env.SENTRY_DSN,
+    '@sentry/ember': {
+      sentry: {
+        dsn: process.env.SENTRY_DSN,
+        enabled: process.env.SENTRY_DSN !== undefined,
+        environment: process.env.DEPLOY_TARGET || 'development',
+        release:
+          `safe-tools-client${
+            process.env.GITHUB_SHA ? `-${process.env.GITHUB_SHA}` : ''
+          }@` + pkg.version,
+        // Set tracesSampleRate to 1.0 to capture 100%
+        // of transactions for performance monitoring.
+        // We recommend adjusting this value in production,
+        tracesSampleRate: 1.0,
+      },
+    },
   };
 
   if (environment === 'development') {
@@ -42,6 +62,7 @@ module.exports = function (environment) {
 
     ENV.APP.rootElement = '#ember-testing';
     ENV.APP.autoboot = false;
+    ENV.hubUrl = '/hub-test';
   }
 
   if (environment === 'production') {

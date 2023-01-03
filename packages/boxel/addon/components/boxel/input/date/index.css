@@ -7,3 +7,8 @@
   padding-top: 0.2rem;
   padding-bottom: 0.35rem;
 }
+
+.boxel-input-date__trigger:disabled {
+  --boxel-button-color: transparent;
+  --boxel-button-text-color: rgb(0 0 0 / 50%);
+}

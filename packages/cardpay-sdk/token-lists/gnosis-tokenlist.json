@@ -1,0 +1,54 @@
+{
+  "name": "Gnosis Chain Tokens",
+  "version": {
+    "major": 1,
+    "minor": 0,
+    "patch": 0
+  },
+  "logoURI": "https://docs.gnosischain.com/img/tokens/xdai.png",
+  "keywords": ["gnosis chain", "mainnet", "default", "tokens"],
+  "tags": {
+    "stablecoin": {
+      "name": "stablecoin",
+      "description": "Tokens that are fixed to an external asset, e.g. the US dollar"
+    },
+    "erc20": {
+      "name": "erc20",
+      "description": "Tokens are of ERC20 token type"
+    },
+    "relayGas": {
+      "name": "relayGas",
+      "description": "Tokens that can be used to reimburse gas to the Cardstack relay server on this chain"
+    }
+  },
+  "timestamp": "2022-12-27T18:44:00.000Z",
+  "tokens": [
+    {
+      "chainId": 100,
+      "name": "Wrapped xDAI",
+      "address": "0xe91D153E0b41518A2Ce8Dd3D7944Fa863463a97d",
+      "symbol": "wxDAI",
+      "decimals": 18,
+      "logoURI": "https://docs.gnosischain.com/img/tokens/xdai.png",
+      "tags": ["erc20", "relayGas"]
+    },
+    {
+      "chainId": 100,
+      "name": "CARD.CPXD",
+      "address": "0x52031d287Bb58E26A379A7Fec2c84acB54f54fe3",
+      "symbol": "CARD.CPXD",
+      "decimals": 18,
+      "logoURI": "https://raw.githubusercontent.com/cardstack/cardstack/main/packages/web-client/public/images/logos/tokens/card.cpxd.png",
+      "tags": ["erc20", "relayGas"]
+    },
+    {
+      "chainId": 100,
+      "name": "DAI.CPXD",
+      "address": "0x26F2319Fbb44772e0ED58fB7c99cf8da59e2b5BE",
+      "symbol": "DAI.CPXD",
+      "decimals": 18,
+      "logoURI": "https://raw.githubusercontent.com/cardstack/cardstack/main/packages/web-client/public/images/logos/tokens/dai.cpxd.png",
+      "tags": ["erc20", "relayGas"]
+    }
+  ]
+}
