@@ -14,6 +14,7 @@ interface Signature {
     min: number;
     max: number;
     value?: number;
+    disabled?: boolean;
     onChange: (val: number) => void;
     icon?: string;
     placeholder?: string;
@@ -52,6 +53,7 @@ export default class BoxelInputRangedNumberPicker extends Component<Signature> {
       @options={{this.rangedNumbers}}
       @selected={{@value}}
       @placeholder={{this.placeholder}}
+      @disabled={{@disabled}}
       @onChange={{this.setSelectedNumber}}
       @renderInPlace={{true}}
       @dropdownClass="boxel-ranged-number-picker__dropdown"

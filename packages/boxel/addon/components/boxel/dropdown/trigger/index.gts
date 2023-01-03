@@ -11,6 +11,7 @@ interface Signature {
     icon?: string;
     label: string | number | undefined;
     isMissingValue?: boolean
+    disabled?: boolean
   }
 }
 
@@ -18,6 +19,7 @@ export default class BoxelDropdownTrigger extends Component <Signature>{
   <template>
     <BoxelButton
       class={{cn "boxel-dropdown-trigger" boxel-dropdown-trigger--showing-placeholder=@isMissingValue}}
+      @disabled={{@disabled}}
       ...attributes
     >
       {{#if @icon}}

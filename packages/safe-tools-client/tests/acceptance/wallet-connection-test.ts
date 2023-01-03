@@ -35,7 +35,7 @@ module('Acceptance | wallet connection', function (hooks) {
       return Promise.resolve([
         {
           address: '0x458Bb61A22A0e91855d6D876C88706cfF7bD486E',
-          spModuleAddress: '0xa6b71e26c5e0845f74c812102ca7114b6a896ab2',
+          spModuleAddress: '0xa6B71E26C5e0845f74c812102Ca7114b6a896AB2',
         },
       ]);
     };
@@ -121,6 +121,7 @@ module('Acceptance | wallet connection', function (hooks) {
 
   module('With Wallet Connect', function () {
     test('connecting wallet', async function (assert) {
+      this.mockWalletConnect.mockMainnet();
       await visit('/schedule');
       await click('.connect-button__button');
 
@@ -135,7 +136,10 @@ module('Acceptance | wallet connection', function (hooks) {
       this.mockWalletConnect.mockConnectedWallet([TEST_ACCOUNT_2]);
       this.mockWalletConnect.mockAccountsChanged([TEST_ACCOUNT_2]);
 
-      await click('.network-connect-modal__close-button'); // FIXME: I don't think this click should be necessary
+      await waitFor('[data-test-hub-auth-modal]');
+      await click('[data-test-hub-auth-modal] button');
+      assert.dom('[data-test-hub-auth-modal]').doesNotExist();
+
       assert
         .dom('[data-test-wallet-address]')
         .hasText(truncateMiddle([TEST_ACCOUNT_2]));

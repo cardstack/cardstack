@@ -16,6 +16,7 @@ interface ComponentArgs {
   value?: Day;
   onChange: (val: Day) => void;
   minDate?: Day;
+  disabled?: boolean;
 }
 
 interface Signature {
@@ -46,6 +47,7 @@ export default class BoxelInputDate extends Component<Signature> {
         <BoxelDropdownTrigger
           @icon="calendar"
           @label={{this.dateString}}
+          @disabled={{@disabled}}
           {{bindings}}
           {{registerElement (set this 'triggerElement')}}
           class="boxel-input-date__trigger"

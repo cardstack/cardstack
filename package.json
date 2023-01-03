@@ -112,7 +112,8 @@
     "axe-core": "4.1.4",
     "ember-get-config": "2.1.0",
     "@babel/generator": "~7.16.0",
-    "web3-core": "~1.7.3"
+    "web3-core": "~1.7.3",
+    "@ethersproject/abi": "~5.7.0"
   },
   "workspaces": {
     "packages": [

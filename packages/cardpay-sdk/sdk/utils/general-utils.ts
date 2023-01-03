@@ -33,10 +33,13 @@ export interface Transaction {
   data: string;
   operation: Operation;
 }
+
+export type TransactionHash = string;
+
 export interface TransactionOptions {
   nonce?: BN;
   onNonce?: (nonce: BN) => void;
-  onTxnHash?: (txnHash: string) => unknown;
+  onTxnHash?: (txnHash: TransactionHash) => unknown;
 }
 
 export interface RevertError extends Error {
@@ -52,7 +55,7 @@ export interface ErrorFragment {
 }
 
 export function isJsonRpcProvider(web3OrEthersProvider: any): web3OrEthersProvider is JsonRpcProvider {
-  return web3OrEthersProvider instanceof JsonRpcProvider;
+  return !!web3OrEthersProvider.getNetwork;
 }
 
 export async function networkName(web3OrEthersProvider: Web3 | JsonRpcProvider): Promise<string> {
@@ -83,13 +86,13 @@ export async function safeContractCall(
 
 export function waitUntilTransactionMined(
   web3OrEthersProvider: Web3 | JsonRpcProvider,
-  txnHash: string,
+  txnHash: TransactionHash,
   duration = 60 * 10 * 1000
 ): Promise<SuccessfulTransactionReceipt> {
   let endTime = Number(new Date()) + duration;
 
   let transactionReceiptAsync = async function (
-    txnHash: string,
+    txnHash: TransactionHash,
     resolve: (value: SuccessfulTransactionReceipt | Promise<SuccessfulTransactionReceipt>) => void,
     reject: (reason?: any) => void
   ) {
@@ -160,7 +163,7 @@ export function waitUntilBlock(web3: Web3, blockNumber: number, duration = 60 * 
   });
 }
 
-export async function waitUntilOneBlockAfterTxnMined(web3: Web3, txnHash: string) {
+export async function waitUntilOneBlockAfterTxnMined(web3: Web3, txnHash: TransactionHash) {
   let receipt = await waitUntilTransactionMined(web3, txnHash);
   await waitUntilBlock(web3, receipt.blockNumber + 1);
   return receipt;
@@ -205,10 +208,10 @@ interface TransactionQuerySubgraph {
   };
 }
 
-export async function waitForSubgraphIndex(txnHash: string, network: string, duration?: number): Promise<void>;
-export async function waitForSubgraphIndex(txnHash: string, web3: Web3, duration?: number): Promise<void>;
+export async function waitForSubgraphIndex(txnHash: TransactionHash, network: string, duration?: number): Promise<void>;
+export async function waitForSubgraphIndex(txnHash: TransactionHash, web3: Web3, duration?: number): Promise<void>;
 export async function waitForSubgraphIndex(
-  txnHash: string,
+  txnHash: TransactionHash,
   networkOrWeb3: string | Web3,
   duration = 60 * 10 * 1000
 ): Promise<void> {
@@ -263,26 +266,26 @@ async function waitForSafeNonceAdvance(
 
 export async function waitForTransactionConsistency(
   web3: Web3,
-  txnHash: string,
+  txnHash: TransactionHash,
   safeAddress: string,
   currentNonce: number,
   duration?: number
 ): Promise<SuccessfulTransactionReceipt>;
 export async function waitForTransactionConsistency(
   web3: Web3,
-  txnHash: string,
+  txnHash: TransactionHash,
   safeAddress: string,
   currentNonce: BN,
   duration?: number
 ): Promise<SuccessfulTransactionReceipt>;
 export async function waitForTransactionConsistency(
   web3: Web3,
-  txnHash: string,
+  txnHash: TransactionHash,
   duration?: number
 ): Promise<SuccessfulTransactionReceipt>;
 export async function waitForTransactionConsistency(
   web3: Web3,
-  txnHash: string,
+  txnHash: TransactionHash,
   safeAddressOrDuration: string | number | undefined,
   currentNonce?: number | BN | undefined,
   duration = 60 * 10 * 1000

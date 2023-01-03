@@ -163,6 +163,7 @@ module(
       const nextOneHour = addHours(now, 1);
       await click(`[data-test-payment-type="one-time"]`);
       await click(`[data-test-input-specific-payment-time]`);
+
       assert
         .dom(
           `[data-test-boxel-hour-menu] .boxel-menu__item--selected [data-test-boxel-menu-item-text="${format(
@@ -172,8 +173,8 @@ module(
         )
         .exists();
 
-      //No disabled times if the nextOneHour is 00:00
-      if (nextOneHour.getHours() > 0) {
+      //No disabled times if the nextOneHour is 00:00 or 12:00
+      if (nextOneHour.getHours() !== 0 && nextOneHour.getHours() !== 12) {
         assert
           .dom(
             `[data-test-boxel-hour-menu] .boxel-menu__item--disabled [data-test-boxel-menu-item-text="${format(

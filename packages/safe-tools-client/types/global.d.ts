@@ -6,6 +6,7 @@ import menuItem from '@cardstack/boxel/helpers/menu-item';
 import { type svgJar } from '@cardstack/boxel/utils/svg-jar';
 import { MetaMaskInpageProvider } from '@metamask/providers';
 import link from 'ember-link/helpers/link';
+import AndHelper from 'ember-truth-helpers/helpers/and';
 import NotHelper from 'ember-truth-helpers/helpers/not';
 
 declare module '@glint/environment-ember-loose/registry' {
@@ -14,6 +15,7 @@ declare module '@glint/environment-ember-loose/registry' {
     'css-var': typeof cssVar;
     link: typeof link;
     'menu-item': typeof menuItem;
+    and: typeof AndHelper;
     not: typeof NotHelper;
     'page-title': HelperLike<{
       Args: { Positional: [title: string] };
