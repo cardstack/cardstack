@@ -58,31 +58,64 @@ async function main() {
 
 async function getAccessDeniedSecrets(role: string, secrets: string[]): Promise<string[]> {
   let denied: string[] = [];
+  const roleArn = `arn:aws:iam::${awsAccountId}:role/${role}`;
 
-  const iamClient = new IAMClient({});
-  for (const secret of secrets) {
-    let actionName: string;
-    if (secret.startsWith('arn:aws:secretsmanager:')) {
-      actionName = 'secretsmanager:GetSecretValue';
-    } else if (secret.startsWith('arn:aws:ssm:')) {
-      actionName = 'ssm:GetParameters';
-    } else {
-      continue;
-    }
-
-    const command = new SimulatePrincipalPolicyCommand({
-      ActionNames: [actionName],
-      PolicySourceArn: `arn:aws:iam::${awsAccountId}:role/${role}`,
-      ResourceArns: [secret],
-    });
-    const res = await iamClient.send(command);
-    if (res.EvaluationResults![0].EvalDecision != 'allowed') {
+  let decisions = await simulatePrincipalPolicy(
+    'secretsmanager:GetSecretValue',
+    roleArn,
+    secrets.filter((secret) => secret.startsWith('arn:aws:secretsmanager:'))
+  );
+  for (const [secret, decision] of decisions.entries()) {
+    if (decision != 'allowed') {
       denied.push(secret);
     }
   }
-  iamClient.destroy();
+
+  decisions = await simulatePrincipalPolicy(
+    'ssm:GetParameters',
+    roleArn,
+    secrets.filter((secret) => secret.startsWith('arn:aws:ssm:'))
+  );
+  for (const [secret, decision] of decisions.entries()) {
+    if (decision != 'allowed') {
+      denied.push(secret);
+    }
+  }
 
   return denied;
+}
+
+async function simulatePrincipalPolicy(actionName: string, role: string, arns: string[]): Promise<Map<string, string>> {
+  let result = new Map<string, string>();
+  if (arns.length == 0) {
+    return result;
+  }
+
+  const iamClient = new IAMClient({});
+  const command = new SimulatePrincipalPolicyCommand({
+    ActionNames: [actionName],
+    PolicySourceArn: role,
+    ResourceArns: arns,
+  });
+
+  const res = await iamClient.send(command);
+  for (const evalutionResult of res.EvaluationResults!) {
+    const { EvalResourceName, ResourceSpecificResults, EvalDecision } = evalutionResult;
+    if (EvalDecision === 'allowed') {
+      result.set(EvalResourceName!, EvalDecision);
+      continue;
+    }
+
+    for (const resourceSpecificResult of ResourceSpecificResults!) {
+      if (resourceSpecificResult.EvalResourceName === EvalResourceName) {
+        result.set(EvalResourceName!, resourceSpecificResult.EvalResourceDecision!);
+        break;
+      }
+    }
+  }
+
+  iamClient.destroy();
+  return result;
 }
 
 main();
