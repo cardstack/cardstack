@@ -124,8 +124,8 @@ export default class RewardPool {
     offset?: number,
     limit?: number
   ): Promise<WithSymbol<Proof | ClaimableProof>[]> {
-    let tallyServiceURL = await getConstant('tallyServiceURL', this.layer2Web3);
-    let url = new URL(`${tallyServiceURL}/merkle-proofs/${address}`);
+    let hubUrl = await getConstant('hubUrl', this.layer2Web3);
+    let url = new URL(`${hubUrl}/api/rewards/proofs/${address}`);
     if (tokenAddress) {
       url.searchParams.append('token', tokenAddress);
     }
@@ -137,7 +137,7 @@ export default class RewardPool {
     let options = {
       method: 'GET',
       headers: {
-        'Content-Type': 'application/json',
+        'Content-Type': 'application/vnd.api+json',
       },
     };
     let response = await fetch(url.toString(), options);
