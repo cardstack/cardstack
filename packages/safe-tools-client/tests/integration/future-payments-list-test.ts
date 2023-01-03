@@ -5,6 +5,7 @@ import { addMinutes, addMonths, addHours } from 'date-fns';
 import { setupRenderingTest } from 'ember-qunit';
 import hbs from 'htmlbars-inline-precompile';
 import { module, test } from 'qunit';
+import percySnapshot from '@percy/ember';
 
 class WalletServiceStub extends Service {
   isConnected = true;
@@ -87,7 +88,8 @@ module('Integration | Component | future-payments-list', function (hooks) {
     await render(hbs`
       <FuturePaymentsList @onDepositClick={{this.onDepositClick}} />
     `);
-
+    
+    await percySnapshot(assert);
     assert.dom('[data-test-no-future-payments-list]').isVisible();
     assert.dom('[data-test-future-payments-list]').isNotVisible();
   });
@@ -98,6 +100,7 @@ module('Integration | Component | future-payments-list', function (hooks) {
       <FuturePaymentsList @onDepositClick={{this.onDepositClick}} />
     `);
 
+    await percySnapshot(assert);
     assert.dom('[data-test-no-future-payments-list]').isNotVisible();
     assert.dom('[data-test-future-payments-list]').isVisible();
     assert.strictEqual(
