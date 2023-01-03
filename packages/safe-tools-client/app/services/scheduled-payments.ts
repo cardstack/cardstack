@@ -5,6 +5,30 @@ import HubAuthenticationService from '@cardstack/safe-tools-client/services/hub-
 import Service, { inject as service } from '@ember/service';
 import { BigNumber } from 'ethers';
 
+export interface ScheduledPayment {
+  amount: BigNumber;
+  feeFixedUSD: string;
+  feePercentage: string;
+  tokenAddress: string;
+  gasTokenAddress: string;
+  payeeAddress: string;
+  payAt: Date;
+  chainId: number;
+  executionGasEstimation: string;
+  maxGasPrice: string;
+  salt: string;
+  spHash: string;
+  senderSafeAddress: string;
+  moduleAddress: string;
+  recurringDayOfMonth?: number;
+  recurringUntil?: Date;
+  creationTransactionHash?: string;
+  creationBlockNumber?: number;
+  creationTransactionError?: string;
+  cancelationTransactionHash?: string;
+  cancelationBlockNumber?: number;
+}
+
 export interface ScheduledPaymentAttempt {
   startedAt: Date;
   endedAt: Date;
@@ -18,12 +42,12 @@ export interface ScheduledPaymentAttempt {
     tokenAddress: string;
     gasTokenAddress: string;
     payeeAddress: string;
-    payAt: string;
-    chainId: string;
+    payAt: Date;
+    chainId: number;
   };
 }
 
-export interface ScheduledPaymentResponseItem {
+export interface ScheduledPaymentAttemptResponseItem {
   attributes: {
     id: string;
     'started-at': string;
@@ -41,7 +65,7 @@ export interface ScheduledPaymentResponseItem {
   };
 }
 
-export interface ScheduledPaymentData {
+export interface ScheduledPaymentAttemptIncludedData {
   amount: string;
   'fee-fixed-usd': string;
   'fee-percentage': string;
@@ -52,21 +76,52 @@ export interface ScheduledPaymentData {
   'chain-id': string;
 }
 
-export interface ScheduledPaymentResponseIncludedItem {
+export interface ScheduledPaymentAttemptResponseIncludedItem {
   id: string;
   type: string;
-  attributes: ScheduledPaymentData;
+  attributes: ScheduledPaymentAttemptIncludedData;
 }
 
-export interface ScheduledPaymentResponse {
-  data: ScheduledPaymentResponseItem[];
-  included: ScheduledPaymentResponseIncludedItem[];
+export interface ScheduledPaymentAttemptResponse {
+  data: ScheduledPaymentAttemptResponseItem[];
+  included: ScheduledPaymentAttemptResponseIncludedItem[];
 }
 
 export type ScheduledPaymentAttemptStatus =
   | 'succeeded'
   | 'failed'
   | 'inProgress';
+
+export interface ScheduledPaymentResponseItem {
+  attributes: {
+    'user-address': string;
+    'sender-safe-address': string;
+    'module-address': string;
+    'token-address': string;
+    'gas-token-address': string;
+    amount: string;
+    'payee-address': string;
+    'execution-gas-estimation': string;
+    'max-gas-price': string;
+    'fee-fixed-usd': string;
+    'fee-percentage': string;
+    salt: string;
+    'pay-at': string;
+    'sp-hash': string;
+    'chain-id': string;
+    'recurring-day-of-month': string;
+    'recurring-until': string;
+    'creation-transaction-hash': string;
+    'creation-block-number': string;
+    'creation-transaction-error': string;
+    'cancelation-transaction-hash': string;
+    'cancelation-block-number': string;
+  };
+}
+
+export interface ScheduledPaymentResponse {
+  data: ScheduledPaymentResponseItem[];
+}
 
 export default class ScheduledPaymentsService extends Service {
   @service declare hubAuthentication: HubAuthenticationService;
@@ -92,11 +147,11 @@ export default class ScheduledPaymentsService extends Service {
       'GET'
     );
 
-    return this.deserializeScheduledPaymentResponse(response);
+    return this.deserializeScheduledPaymentAttemptResponse(response);
   }
 
-  deserializeScheduledPaymentResponse(
-    response: ScheduledPaymentResponse
+  deserializeScheduledPaymentAttemptResponse(
+    response: ScheduledPaymentAttemptResponse
   ): ScheduledPaymentAttempt[] {
     return response.data.map((s) => {
       const scheduledPaymentId = s.relationships['scheduled-payment'].data.id;
@@ -115,10 +170,64 @@ export default class ScheduledPaymentsService extends Service {
           feePercentage: scheduledPayment!['fee-percentage'],
           gasTokenAddress: scheduledPayment!['gas-token-address'],
           tokenAddress: scheduledPayment!['token-address'],
-          chainId: scheduledPayment!['chain-id'],
+          chainId: Number(scheduledPayment!['chain-id']),
           payeeAddress: scheduledPayment!['payee-address'],
-          payAt: scheduledPayment!['pay-at'],
+          payAt: new Date(scheduledPayment!['pay-at']),
         },
+      };
+    });
+  }
+
+  async fetchScheduledPayments(
+    chainId: number,
+    minPayAt?: Date
+  ): Promise<ScheduledPayment[]> {
+    let queryString = `filter[chain-id]=${chainId}`;
+    if (minPayAt) {
+      queryString += `&filter[payAt][gt]=${Math.round(
+        minPayAt.getTime() / 1000
+      )}`;
+    }
+    const response = await hubRequest(
+      config.hubUrl,
+      `api/scheduled-payments?${queryString}`,
+      this.hubAuthentication.authToken!,
+      'GET'
+    );
+
+    return this.deserializeScheduledPaymentResponse(response);
+  }
+
+  deserializeScheduledPaymentResponse(
+    response: ScheduledPaymentResponse
+  ): ScheduledPayment[] {
+    return response.data.map((s) => {
+      return {
+        userAddress: s.attributes['user-address'],
+        senderSafeAddress: s.attributes['sender-safe-address'],
+        moduleAddress: s.attributes['module-address'],
+        amount: BigNumber.from(s.attributes.amount),
+        feeFixedUSD: s.attributes['fee-fixed-usd'],
+        feePercentage: s.attributes['fee-percentage'],
+        gasTokenAddress: s.attributes['gas-token-address'],
+        tokenAddress: s.attributes['token-address'],
+        chainId: Number(s.attributes['chain-id']),
+        payeeAddress: s.attributes['payee-address'],
+        payAt: new Date(s.attributes['pay-at']),
+        executionGasEstimation: s.attributes['execution-gas-estimation'],
+        maxGasPrice: s.attributes['max-gas-price'],
+        salt: s.attributes['salt'],
+        spHash: s.attributes['sp-hash'],
+        recurringDayOfMonth: Number(s.attributes['recurring-day-of-month']),
+        recurringUntil: new Date(s.attributes['recurring-until']),
+        creationTransactionHash: s.attributes['creation-transaction-hash'],
+        creationBlockNumber: Number(s.attributes['creation-block-number']),
+        creationTransactionError: s.attributes['creation-transaction-error'],
+        cancelationTransactionHash:
+          s.attributes['cancelation-transaction-hash'],
+        cancelationBlockNumber: Number(
+          s.attributes['cancelation-block-number']
+        ),
       };
     });
   }
