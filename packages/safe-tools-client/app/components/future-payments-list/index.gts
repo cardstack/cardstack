@@ -11,7 +11,7 @@ import { taskFor } from 'ember-concurrency-ts';
 import { task, TaskGenerator } from 'ember-concurrency';
 import lt from 'ember-truth-helpers/helpers/lt';
 import gt from 'ember-truth-helpers/helpers/gt';
-import TimeBracket from './time-bracket';
+import ScheduledPaymentTimeBracket from './scheduled-payment-time-bracket';
 import { ScheduledPayment } from '@cardstack/safe-tools-client/services/scheduled-payments';
 import { addHours, addMonths, lastDayOfMonth } from 'date-fns';
 import and from 'ember-truth-helpers/helpers/and';
@@ -111,9 +111,9 @@ export default class FuturePaymentsList extends Component<Signature> {
         <Section @title="Future Payments" data-test-future-payments-list>
           <div class="future-payments-list__payments-section">
             <div class="future-payments-list__payments-section-time-brackets">
-              <TimeBracket @title="next hour" @scheduledPayments={{this.nextHour}}/>
-              <TimeBracket @title="next month" @scheduledPayments={{this.nextMonth}}/>
-              <TimeBracket @title="next few months" @scheduledPayments={{this.nextFewMonthsPayments}}/>
+              <ScheduledPaymentTimeBracket @title="next hour" @scheduledPayments={{this.nextHour}}/>
+              <ScheduledPaymentTimeBracket @title="next month" @scheduledPayments={{this.nextMonth}}/>
+              <ScheduledPaymentTimeBracket @title="next few months" @scheduledPayments={{this.nextFewMonthsPayments}}/>
             </div>
           </div>
         </Section>

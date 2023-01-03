@@ -15,9 +15,9 @@ interface Signature {
   }
 }
 
-export default class TimeBracket extends Component<Signature> {
+export default class ScheduledPaymentTimeBracket extends Component<Signature> {
   <template>
-    <BoxelCardContainer class="time-bracket" data-test-time-bracket={{@title}}>
+    <BoxelCardContainer class="scheduled-payment-time-bracket" data-test-time-bracket={{@title}}>
       <BoxelHeader @header={{@title}} @noBackground={{true}}/>
       {{#each @scheduledPayments as |scheduledPayment|}}
         <ScheduledPaymentCard @scheduledPayment={{scheduledPayment}}/>
@@ -28,6 +28,6 @@ export default class TimeBracket extends Component<Signature> {
 
 declare module '@glint/environment-ember-loose/registry' {
   export default interface Registry {
-    'TimeBracket': typeof TimeBracket;
+    'ScheduledPaymentTimeBracket': typeof ScheduledPaymentTimeBracket;
   }
 }
