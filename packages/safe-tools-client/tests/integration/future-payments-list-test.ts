@@ -1,11 +1,11 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 import Service from '@ember/service';
 import { render, TestContext } from '@ember/test-helpers';
+import percySnapshot from '@percy/ember';
 import { addMinutes, addMonths, addHours } from 'date-fns';
 import { setupRenderingTest } from 'ember-qunit';
 import hbs from 'htmlbars-inline-precompile';
 import { module, test } from 'qunit';
-import percySnapshot from '@percy/ember';
 
 class WalletServiceStub extends Service {
   isConnected = true;
@@ -83,18 +83,20 @@ module('Integration | Component | future-payments-list', function (hooks) {
   });
 
   test('It renders no payments display if no future payments', async function (assert) {
+    assert.expect(2);
     returnEmptyScheduledPayments = true;
     this.set('onDepositClick', () => {});
     await render(hbs`
       <FuturePaymentsList @onDepositClick={{this.onDepositClick}} />
     `);
-    
+
     await percySnapshot(assert);
     assert.dom('[data-test-no-future-payments-list]').isVisible();
     assert.dom('[data-test-future-payments-list]').isNotVisible();
   });
 
   test('It renders future payments list', async function (assert) {
+    assert.expect(5);
     this.set('onDepositClick', () => {});
     await render(hbs`
       <FuturePaymentsList @onDepositClick={{this.onDepositClick}} />
