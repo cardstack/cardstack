@@ -44,12 +44,8 @@ export default class HubAuthenticationService extends Service {
   }
 
   async getHubAuth() {
-<<<<<<< HEAD
-    return await getSDK('HubAuth', this.wallet.ethersProvider, config.hubUrl);
-=======
     const ethersProvider = this.wallet.ethersProvider;
     return await getSDK('HubAuth', ethersProvider, config.hubUrl);
->>>>>>> main
   }
 
   get authToken(): string | null {
