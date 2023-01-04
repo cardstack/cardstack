@@ -50,6 +50,7 @@ interface SchedulerCapableNetworkConstants {
   scheduledPaymentFeePercentage: number;
   uniswapPairInitCodeHash: string;
   publicRpcUrls: string[];
+  safeTransactionServiceUrl: string;
 }
 
 interface CardPayCapableNetworkConstants {
@@ -196,6 +197,7 @@ const constants: {
       'https://rpc.ankr.com/eth',
       'https://eth-mainnet.public.blastapi.io',
     ],
+    safeTransactionServiceUrl: 'https://safe-transaction-mainnet.safe.global',
   },
   goerli: {
     ...testHubUrl,
@@ -211,6 +213,7 @@ const constants: {
     subgraphURL: 'https://api.thegraph.com/subgraphs/name/cardstack/safe-tools-goerli',
     uniswapPairInitCodeHash: '0x96e8ac4277198ff8b6f785478aa9a39f403cb768dd02cbee326c3e7da348845f', //Result of keccak256(type(UniswapV2Pair).creationCode) from deployed UniswapV2Factory
     publicRpcUrls: ['https://eth-goerli.public.blastapi.io', 'https://rpc.ankr.com/eth_goerli'],
+    safeTransactionServiceUrl: 'https://safe-transaction-goerli.safe.global',
   },
   polygon: {
     ...hubUrl,
@@ -232,6 +235,7 @@ const constants: {
       'https://rpc-mainnet.maticvigil.com',
       'https://rpc-mainnet.matic.quiknode.pro',
     ],
+    safeTransactionServiceUrl: 'https://safe-transaction.polygon.gnosis.io',
   },
 };
 
