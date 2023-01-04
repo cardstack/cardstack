@@ -17,6 +17,7 @@ import { Contract, ethers, utils } from 'ethers';
 import { AddressZero } from '@ethersproject/constants';
 import { Interface, LogDescription } from 'ethers/lib/utils';
 import JsonRpcProvider from '../../providers/json-rpc-provider';
+import { BigNumber } from 'ethers';
 
 export interface EventABI {
   topic: string;
@@ -487,11 +488,18 @@ interface BalanceEntry {
   } | null;
 }
 
+interface BalanceSummary {
+  tokenAddress: string;
+  symbol: string;
+  balance: BigNumber;
+  decimals: number;
+}
+
 export async function getTokenBalancesForSafe(
   provider: JsonRpcProvider,
   tokenAddresses: string[],
   safeAddress: string
-) {
+): Promise<BalanceSummary[]> {
   let baseUrl = await getConstant('safeTransactionServiceUrl', provider);
 
   if (!baseUrl) {
@@ -514,10 +522,10 @@ export async function getTokenBalancesForSafe(
           token: { symbol, decimals },
         } = balanceInfo;
 
-        return { tokenAddress, symbol, balance, decimals };
+        return { tokenAddress, symbol, balance: BigNumber.from(balance), decimals };
       } else {
         return null;
       }
     })
-    .filter((e) => !!e); // remove null entries if not found
+    .filter((e) => !!e) as BalanceSummary[];
 }
