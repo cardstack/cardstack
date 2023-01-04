@@ -4,6 +4,9 @@
     "ses": {
       "supportEmail": "support@cardstack.com",
       "region": "eu-west-1"
+    },
+    "rewards": {
+      "bucketName": "cardpay-production-reward-programs"
     }
   },
   "sentry": {
