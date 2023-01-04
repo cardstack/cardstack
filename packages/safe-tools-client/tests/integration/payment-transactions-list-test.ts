@@ -3,9 +3,11 @@ import { type ScheduledPaymentAttemptStatus } from '@cardstack/safe-tools-client
 import Service from '@ember/service';
 import { click, render, TestContext } from '@ember/test-helpers';
 import { subDays, addMinutes, format } from 'date-fns';
-import { setupRenderingTest } from 'ember-qunit';
+
 import hbs from 'htmlbars-inline-precompile';
 import { module, test } from 'qunit';
+
+import { setupRenderingTest } from '../helpers';
 
 class WalletServiceStub extends Service {
   isConnected = true;

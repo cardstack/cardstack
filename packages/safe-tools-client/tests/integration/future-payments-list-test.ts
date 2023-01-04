@@ -3,9 +3,11 @@ import Service from '@ember/service';
 import { render, TestContext } from '@ember/test-helpers';
 import percySnapshot from '@percy/ember';
 import { addMinutes, addMonths, addHours } from 'date-fns';
-import { setupRenderingTest } from 'ember-qunit';
+
 import hbs from 'htmlbars-inline-precompile';
 import { module, test } from 'qunit';
+
+import { setupRenderingTest } from '../helpers';
 
 class WalletServiceStub extends Service {
   isConnected = true;

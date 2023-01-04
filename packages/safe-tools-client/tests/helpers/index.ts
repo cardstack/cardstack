@@ -19,7 +19,15 @@ import { ContractUtils, TestingUtils } from 'eth-testing/lib/testing-utils';
 // test setup functions. This way, you can easily extend the setup that is
 // needed per test type.
 
-type SetupTestOptions = Parameters<typeof upstreamSetupApplicationTest>[1];
+type SetupApplicationTestOptions = Parameters<
+  typeof upstreamSetupApplicationTest
+>[1];
+
+type SetupRenderingTestOptions = Parameters<
+  typeof upstreamSetupRenderingTest
+>[1];
+
+type SetupTestOptions = Parameters<typeof upstreamSetupTest>[1];
 
 // Hardhat default test account 1 (PK 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80)
 export const TEST_ACCOUNT_1 = '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266';
@@ -51,7 +59,10 @@ export const USDC_TOKEN_ADDRESS = '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48';
 const WETH_TOKEN_ADDRESS = '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2';
 const UNISWAP_V2_ADDRESS = '0xb4e16d0168e52d35cacd2c6185b44281ec28c9dc';
 
-function setupApplicationTest(hooks: NestedHooks, options?: SetupTestOptions) {
+function setupApplicationTest(
+  hooks: NestedHooks,
+  options?: SetupApplicationTestOptions
+) {
   upstreamSetupApplicationTest(hooks, options);
 
   hooks.beforeEach(function (this: TestContext) {
@@ -160,10 +171,18 @@ function setupApplicationTest(hooks: NestedHooks, options?: SetupTestOptions) {
   // setupMirage(hooks); // ember-cli-mirage
 }
 
-function setupRenderingTest(hooks: NestedHooks, options: SetupTestOptions) {
+function setupRenderingTest(
+  hooks: NestedHooks,
+  options?: SetupRenderingTestOptions
+) {
   upstreamSetupRenderingTest(hooks, options);
 
-  // Additional setup for rendering tests can be done here.
+  hooks.beforeEach(function (this: TestContext) {
+    this.mockLocalStorage ||= new MockLocalStorage();
+    this.owner.register('storage:local', this.mockLocalStorage, {
+      instantiate: false,
+    });
+  });
 }
 
 function setupTest(hooks: NestedHooks, options: SetupTestOptions) {
