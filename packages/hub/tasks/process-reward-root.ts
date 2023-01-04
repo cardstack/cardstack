@@ -143,13 +143,21 @@ const queryParquet = async (
       throw new Error('payload undefined');
     }
     const events: AsyncIterable<SelectObjectContentEventStream> = s3Data.Payload;
+    let tail: string | undefined;
+    let head: string | undefined;
     for await (const event of events) {
       if (event?.Records) {
         if (event?.Records?.Payload) {
           const record = Buffer.from(event.Records.Payload).toString('utf8');
+
           const os = record.split('\n');
-          os.map((o) => {
-            if (o != '') {
+          // the records cut off at 65000 bytes ie UintArray(65000).
+          // The tail is meant to be the string from the last paginate  that got cutoff
+          tail = event.Records.Payload.length == 65000 ? os.pop() : undefined;
+
+          os.map((x, i) => {
+            if (x != '') {
+              let o = i == 0 && head != undefined ? head + x : x;
               const b: any = JSON.parse(o);
               if (!('explanationData' in b)) {
                 b.explanationData = '{}';
@@ -163,6 +171,7 @@ const queryParquet = async (
               records.push(b);
             }
           });
+          head = tail ?? undefined;
         } else {
           log.info('skipped event, payload: ', event?.Records?.Payload);
         }
