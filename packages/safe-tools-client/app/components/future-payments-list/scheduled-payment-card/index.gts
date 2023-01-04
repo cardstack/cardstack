@@ -7,6 +7,7 @@ import truncateMiddle from '@cardstack/safe-tools-client/helpers/truncate-middle
 import weiToDecimal from '@cardstack/safe-tools-client/helpers/wei-to-decimal';
 import { inject as service } from '@ember/service';
 import TokensService from '@cardstack/safe-tools-client/services/tokens';
+import tokenToUsd from '@cardstack/safe-tools-client/helpers/token-to-usd';
 
 import './index.css';
 
@@ -19,7 +20,7 @@ interface Signature {
 
 export default class ScheduledPaymentCard extends Component<Signature> {
   @service declare tokens: TokensService;
-
+  
   get tokenInfo() {
     let tokens = this.tokens.transactionTokens;
     let token = tokens.find(token => token.address === this.args.scheduledPayment.tokenAddress)
@@ -40,8 +41,7 @@ export default class ScheduledPaymentCard extends Component<Signature> {
           <img class="scheduled-payment-card__token-symbol" src={{this.tokenInfo.logoURI}} />
           <div class="scheduled-payment-card__token-amounts">
             <span class="scheduled-payment-card__token-amount">{{weiToDecimal @scheduledPayment.amount this.tokenInfo.decimals}} {{this.tokenInfo.symbol}}</span>
-            {{!-- TODO: Add the right USD amount --}}
-            <span class="scheduled-payment-card__usd-amount">$ 1000 USD</span> 
+            <span class="scheduled-payment-card__usd-amount">$ {{(tokenToUsd @scheduledPayment.tokenAddress @scheduledPayment.amount)}} USD</span> 
           </div>
         </div>
       </div>

@@ -6,6 +6,7 @@ import {
   getNativeWeiInToken,
   poll,
   SchedulePaymentProgressListener,
+  getUsdConverter,
 } from '@cardstack/cardpay-sdk';
 import config from '@cardstack/safe-tools-client/config/environment';
 import SafesService, {
@@ -16,8 +17,8 @@ import { action } from '@ember/object';
 import Service, { inject as service } from '@ember/service';
 import { TaskGenerator } from 'ember-concurrency';
 import { task } from 'ember-concurrency-decorators';
-
 import { BigNumber } from 'ethers';
+import { hash } from 'rsvp';
 
 const GAS_RANGE_NORMAL_MULTIPLIER = 2;
 const GAS_RANGE_HIGH_MULTIPLIER = 4;
@@ -29,6 +30,9 @@ export interface GasEstimationResult {
   gasRangeInGasTokenWei: GasRange;
   gasRangeInUSD: GasRange;
 }
+
+type ConversionFunction = (amountInWei: BigNumber) => BigNumber | undefined;
+export type UsdConverter = Record<string, ConversionFunction>;
 
 export default class SchedulePaymentSDKService extends Service {
   @service declare wallet: WalletService;
@@ -168,6 +172,26 @@ export default class SchedulePaymentSDKService extends Service {
     } catch (err) {
       console.error(err);
     }
+  }
+
+  async updateUsdConverters(
+    addressesToUpdate: string[]
+  ): Promise<UsdConverter> {
+    if (addressesToUpdate.length === 0) {
+      return {};
+    }
+    if (!this.wallet.isConnected) {
+      throw new Error('Cannot fetch USD conversion without being connected');
+    }
+
+    const usdConverters = {} as Record<string, Promise<ConversionFunction>>;
+    for (const tokenAddress of addressesToUpdate) {
+      usdConverters[tokenAddress] = getUsdConverter(
+        this.wallet.ethersProvider,
+        tokenAddress
+      );
+    }
+    return hash(usdConverters);
   }
 }
 

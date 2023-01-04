@@ -1,9 +1,11 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
+import { UsdConverter } from '@cardstack/safe-tools-client/services/scheduled-payments-sdk';
 import Service from '@ember/service';
 import { render, TestContext } from '@ember/test-helpers';
 import percySnapshot from '@percy/ember';
 import { addMinutes, addMonths, addHours } from 'date-fns';
 import { setupRenderingTest } from 'ember-qunit';
+import { BigNumber } from 'ethers';
 import hbs from 'htmlbars-inline-precompile';
 import { module, test } from 'qunit';
 
@@ -66,6 +68,18 @@ class ScheduledPaymentsStub extends Service {
   };
 }
 
+class ScheduledPaymentsSdkStub extends Service {
+  updateUsdConverters = async (addressesToUpdate: string[]) => {
+    const usdConverters: UsdConverter = {};
+    for (const tokenAddress of addressesToUpdate) {
+      usdConverters[tokenAddress] = (amountInWei: BigNumber) => {
+        return amountInWei.mul(1);
+      };
+    }
+    return usdConverters;
+  };
+}
+
 module('Integration | Component | future-payments-list', function (hooks) {
   setupRenderingTest(hooks);
 
@@ -75,6 +89,10 @@ module('Integration | Component | future-payments-list', function (hooks) {
     this.owner.register(
       'service:hub-authentication',
       HubAuthenticationServiceStub
+    );
+    this.owner.register(
+      'service:scheduled-payments-sdk',
+      ScheduledPaymentsSdkStub
     );
   });
 
