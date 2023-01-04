@@ -128,7 +128,7 @@ yarn db:migrate down
 yarn db:migrate redo
 
 ## Creating database migrations
-yarn db:migrate create <migration-name>`
+yarn migrate create <migration-name>`
 ```
 
 Documentation on how to create migration scripts is available at https://salsita.github.io/node-pg-migrate/#/migrations
