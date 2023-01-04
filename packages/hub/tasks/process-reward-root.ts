@@ -14,6 +14,11 @@ interface S3FileInfo {
   paymentCycle: string;
 }
 
+export interface ProcessRewardRootPayload {
+  s3FileInfo: S3FileInfo;
+  blockNumber: string;
+}
+
 //this is proof returned by parquet in json format
 interface Proof {
   rewardProgramID: string;
@@ -32,7 +37,8 @@ let log = Logger('task:process-reward-root');
 export default class ProcessRewardRoot {
   private databaseManager = inject('database-manager', { as: 'databaseManager' });
   web3 = inject('web3-http', { as: 'web3' });
-  async perform(file: S3FileInfo) {
+  async perform(payload: ProcessRewardRootPayload) {
+    let file: S3FileInfo = payload.s3FileInfo;
     let currentBlockNumber = 0;
     try {
       currentBlockNumber = (await this.web3.getInstance().eth.getBlockNumber()) as number;
@@ -67,8 +73,9 @@ export default class ProcessRewardRoot {
           ')'
         );
       });
-    const indexQuery = 'INSERT INTO reward_root_index( reward_program_id, payment_cycle ) VALUES (%L, %L);';
-    const indexSql = pgFormat(indexQuery, file.rewardProgramId, file.paymentCycle);
+    const indexQuery =
+      'INSERT INTO reward_root_index( reward_program_id, payment_cycle, block_number ) VALUES (%L, %L, %L);';
+    const indexSql = pgFormat(indexQuery, file.rewardProgramId, file.paymentCycle, payload.blockNumber);
     try {
       if (rows.length > 0) {
         const proofsQuery = `

@@ -1,6 +1,7 @@
 import { inject } from '@cardstack/di';
 import WorkerClient from '../services/worker-client';
 import { RewardPrograms, RewardRoots } from '../services/subgraph';
+import { ProcessRewardRootPayload } from '../tasks/process-reward-root';
 
 const MAX_INDEX_SIZE_PROGRAM = 1000;
 
@@ -14,7 +15,7 @@ export default class CheckRewardRoots {
       const r1: RewardPrograms = await this.subgraph.getRewardPrograms();
       const rewardProgramIds = r1?.data?.rewardPrograms.map((o) => o.id);
       for (const rewardProgramId of rewardProgramIds) {
-        const LAST_INDEXED_BLOCK_QUERY = `SELECT COALESCE(MAX(payment_cycle),0) as last_indexed_block_number FROM reward_root_index WHERE reward_program_id='${rewardProgramId}';`;
+        const LAST_INDEXED_BLOCK_QUERY = `SELECT COALESCE(MAX(block_number),0) as last_indexed_block_number FROM reward_root_index WHERE reward_program_id='${rewardProgramId}';`;
         const {
           rows: [{ last_indexed_block_number }],
         } = await db.query(LAST_INDEXED_BLOCK_QUERY);
@@ -23,16 +24,19 @@ export default class CheckRewardRoots {
           last_indexed_block_number,
           max_index_size_per_program
         );
-        let files: S3FileInfo[] = r2?.data?.merkleRootSubmissions.map((root) => {
+        let payloads: ProcessRewardRootPayload[] = r2?.data?.merkleRootSubmissions.map((root) => {
           return {
-            paymentCycle: root.paymentCycle,
-            rewardProgramId: root.rewardProgram.id,
+            blockNumber: root.blockNumber,
+            s3FileInfo: {
+              paymentCycle: root.paymentCycle,
+              rewardProgramId: root.rewardProgram.id,
+            },
           };
         });
-        for (const file of files) {
+        for (const payload of payloads) {
           // Process 1 parquet (rewardProgramId, paymentCycle) file at one time
-          await this.workerClient.addJob('process-reward-root', file, {
-            jobKey: file.rewardProgramId + '-' + file.paymentCycle,
+          await this.workerClient.addJob('process-reward-root', payload, {
+            jobKey: payload.s3FileInfo.rewardProgramId + '-' + payload.s3FileInfo.paymentCycle,
             maxAttempts: 1,
           });
         }
@@ -41,11 +45,6 @@ export default class CheckRewardRoots {
       console.log(e);
     }
   }
-}
-
-interface S3FileInfo {
-  rewardProgramId: string;
-  paymentCycle: string;
 }
 
 declare module '@cardstack/hub/tasks' {

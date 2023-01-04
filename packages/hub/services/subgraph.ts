@@ -159,7 +159,7 @@ export default class Subgraph {
     // this will query up till limits of subgraph which is 100 roots at a time
     const where = `where: {
       rewardProgram: "${rewardProgramId}",
-      paymentCycle_gt: ${lastIndexedBlockNumber}
+      blockNumber_gte: ${lastIndexedBlockNumber}
     }`;
     return (await gqlQuery(
       network,
@@ -167,7 +167,7 @@ export default class Subgraph {
         {
             merkleRootSubmissions(
                 ${where},
-                orderBy: paymentCycle,
+                orderBy: blockNumber,
                 orderDirection: asc,
                 rootHash_not: "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
                 first: ${limit}
