@@ -24,6 +24,7 @@ export default class FieldUsage extends Component {
   @tracked horizontalLabelSize2 = 'default';
   @tracked icon2 = '';
   @cssVariable({ cssClassName: 'boxel-field' }) declare boxelFieldLabelAlign: CSSVariableInfo;
+  @cssVariable({ cssClassName: 'boxel-field' }) declare boxelFieldLabelJustifyContent: CSSVariableInfo;
   
   <template>
     <FreestyleUsage @name="Field">
@@ -36,7 +37,10 @@ export default class FieldUsage extends Component {
           @horizontalLabelSize={{this.horizontalLabelSize}}
           @centeredDisplay={{this.centeredDisplay}}
           @icon={{this.icon}}
-          style={{cssVars boxel-field-label-align=this.boxelFieldLabelAlign.value}}
+          style={{cssVars
+            boxel-field-label-align=this.boxelFieldLabelAlign.value
+            boxel-field-label-justify-content=this.boxelFieldLabelJustifyContent.value
+          }}
         >
           {{this.value}}
         </BoxelField>
@@ -102,6 +106,14 @@ export default class FieldUsage extends Component {
           @value={{this.boxelFieldLabelAlign.value}}
           @defaultValue={{this.boxelFieldLabelAlign.defaults}}
           @onInput={{this.boxelFieldLabelAlign.update}}
+        />
+        <Css.Basic
+          @name="boxel-field-label-justify-content"
+          @type="justify-content"
+          @description="alignment of label children along main axis"
+          @value={{this.boxelFieldLabelJustifyContent.value}}
+          @defaultValue={{this.boxelFieldLabelJustifyContent.defaults}}
+          @onInput={{this.boxelFieldLabelJustifyContent.update}}
         />
       </:cssVars>
     </FreestyleUsage>
