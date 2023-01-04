@@ -1228,7 +1228,8 @@ ALTER TABLE public.reward_proofs OWNER TO postgres;
 
 CREATE TABLE public.reward_root_index (
     reward_program_id text NOT NULL,
-    payment_cycle integer NOT NULL
+    payment_cycle integer NOT NULL,
+    block_number integer NOT NULL
 );
 
 
@@ -2032,6 +2033,7 @@ COPY public.pgmigrations (id, name, run_on) FROM stdin;
 47	20221121080727272_create-gas-estimation-results	2023-01-02 22:54:55.234317
 48	20221215102320386_reward-root-index	2023-01-02 22:54:55.243335
 49	20221215134519797_reward-proofs	2023-01-02 22:54:55.254159
+50	20230104034916208_add-block-number-to-reward-root-index	2023-01-04 12:01:34.963835
 \.
 
 
@@ -2039,7 +2041,7 @@ COPY public.pgmigrations (id, name, run_on) FROM stdin;
 -- Name: pgmigrations_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.pgmigrations_id_seq', 49, true);
+SELECT pg_catalog.setval('public.pgmigrations_id_seq', 50, true);
 
 
 --
