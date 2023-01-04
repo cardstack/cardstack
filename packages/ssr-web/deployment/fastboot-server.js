@@ -32,10 +32,6 @@ let server = new FastBootAppServer({
       btoa: function (str) {
         return Buffer.from(str).toString('base64');
       },
-      atob: function (str) {
-        return Buffer.from(str, 'base64').toString('binary');
-      },
-      // polyfill fetch globally for nodejs environment
       fetch,
       URLSearchParams,
       NodeSentry: Sentry,
