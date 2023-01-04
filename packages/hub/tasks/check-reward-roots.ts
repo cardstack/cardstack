@@ -2,9 +2,11 @@ import { inject } from '@cardstack/di';
 import WorkerClient from '../services/worker-client';
 import { RewardPrograms, RewardRoots } from '../services/subgraph';
 import { ProcessRewardRootPayload } from '../tasks/process-reward-root';
+import Logger from '@cardstack/logger';
 
 const MAX_INDEX_SIZE_PROGRAM = 1000;
 
+let log = Logger('task:check-reward-roots');
 export default class CheckRewardRoots {
   subgraph = inject('subgraph');
   databaseManager = inject('database-manager', { as: 'databaseManager' });
@@ -42,7 +44,8 @@ export default class CheckRewardRoots {
         }
       }
     } catch (e) {
-      console.log(e);
+      log.error('error checking reward roots:', e);
+      throw e;
     }
   }
 }
