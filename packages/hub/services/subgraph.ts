@@ -157,9 +157,13 @@ export default class Subgraph {
 
   async getRewardRoots(rewardProgramId: string, lastIndexedBlockNumber: number, limit = 100) {
     // this will query up till limits of subgraph which is 100 roots at a time
+    // for indexing,
+    // - we have to query by blockNumber this is in case we write an earlier payment cycle in a later block
+    // - we use gte, because there might be merkle root submissions corresponding to different payment cycle in the same block
+    //   redundant jobs (same payment cycle) are fine since they return although they are submitted
     const where = `where: {
       rewardProgram: "${rewardProgramId}",
-      blockNumber_gte: ${lastIndexedBlockNumber}
+      blockNumber_gte: ${lastIndexedBlockNumber} 
     }`;
     return (await gqlQuery(
       network,
