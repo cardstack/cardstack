@@ -283,6 +283,25 @@ export default class SchedulePaymentFormActionCardUI extends Component<Signature
             <span>Cardstack charges $0.25 USD and 0.1% of the transaction as a fee for executing your scheduled payments.</span>
           </div>
         </BoxelField>
+        <BoxelField @label="Execution Fees" style={{cssVar boxel-field-label-align="top"}}>
+          <div>
+            <BoxelField @label="Estimated Gas" @vertical={{true}} style={{cssVar boxel-field-label-justify-content="end"}}>
+              <div class="schedule-payment-form-action-card--fees-value">A</div>
+            </BoxelField>
+            <BoxelField @label="Fixed Fee" @vertical={{true}} style={{cssVar boxel-field-label-justify-content="end"}}>
+              <div class="schedule-payment-form-action-card--fees-value">B</div>
+            </BoxelField>
+            <BoxelField @label="Variable Fee" @vertical={{true}} style={{cssVar boxel-field-label-justify-content="end"}}>
+              <div class="schedule-payment-form-action-card--fees-value">C</div>
+            </BoxelField>
+          </div>
+        </BoxelField>
+        <hr>
+        <BoxelField @label="Total" style={{cssVar boxel-field-label-align="top"}}>
+          <BoxelField @label="Amount + Estimated Fees" @vertical={{true}} style={{cssVar boxel-field-label-justify-content="end"}}>
+            <div class="schedule-payment-form-action-card--fees-value">D</div>
+          </BoxelField>
+        </BoxelField>
       </Section>
         <ActionChin @state={{this.actionChinState}}>
           <:default as |ac|>

@@ -70,3 +70,7 @@
 .schedule-payment-form-action-card__in-progress-message {
   max-width: 20rem;
 }
+
+.schedule-payment-form-action-card--fees-value {
+  text-align: right;
+}

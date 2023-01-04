@@ -1,5 +1,6 @@
 .boxel-field {
   --boxel-field-label-align: normal;
+  --boxel-field-label-justify-content: normal;
   --boxel-field-label-padding-top: 0;
 
   display: grid;
@@ -34,6 +35,7 @@
   text-transform: uppercase;
   display: flex;
   align-items: var(--boxel-field-label-align);
+  justify-content: var(--boxel-field-label-justify-content);
   padding-top: var(--boxel-field-label-padding-top);
 }
 
