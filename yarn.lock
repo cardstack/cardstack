@@ -10286,7 +10286,7 @@ body-parser@1.20.0, body-parser@^1.16.0, body-parser@^1.18.3, body-parser@^1.19.
     type-is "~1.6.18"
     unpipe "1.0.0"
 
-body-parser@1.20.1:
+body-parser@1.20.1, body-parser@^1.20.0:
   version "1.20.1"
   resolved "https://registry.yarnpkg.com/body-parser/-/body-parser-1.20.1.tgz#b1812a8912c195cd371a3ee5e66faa2338a5c668"
   integrity sha512-jWi7abTbYwajOytWCQc37VulmWiRae5RyTpaCyDcS5/lMdtwSz5lOpDE67srw/HYe35f1z3fDQw+3txg7gNtWw==
@@ -14496,6 +14496,20 @@ ember-cli-fastboot-testing@^0.6.0:
     minimist "^1.2.0"
     nock "^13.1.4"
     resolve "^1.10.0"
+    whatwg-fetch "^3.0.0"
+
+ember-cli-fastboot-testing@embermap/ember-cli-fastboot-testing#d4c88d6:
+  version "0.6.0"
+  resolved "https://codeload.github.com/embermap/ember-cli-fastboot-testing/tar.gz/d4c88d628d524f988b2ca23c6049eb31f0ec768f"
+  dependencies:
+    body-parser "^1.20.0"
+    ember-auto-import "^2.4.1"
+    ember-cli-babel "^7.26.11"
+    fastboot "^3.0.3"
+    json-fn "^1.1.1"
+    minimist "^1.2.6"
+    nock "^13.2.4"
+    resolve "^1.22.0"
     whatwg-fetch "^3.0.0"
 
 ember-cli-fastboot@^3.3.2:
@@ -25084,7 +25098,7 @@ noble-secp256k1@^1.2.10:
   resolved "https://registry.yarnpkg.com/noble-secp256k1/-/noble-secp256k1-1.2.14.tgz#39429c941d51211ca40161569cee03e61d72599e"
   integrity sha512-GSCXyoZBUaaPwVWdYncMEmzlSUjF9J/YeEHpklYJCyg8wPuJP3NzDx0BkiwArzINkdX2HJHvUJhL6vVWPOQQcg==
 
-nock@^13.1.4:
+nock@^13.1.4, nock@^13.2.4:
   version "13.2.9"
   resolved "https://registry.yarnpkg.com/nock/-/nock-13.2.9.tgz#4faf6c28175d36044da4cfa68e33e5a15086ad4c"
   integrity sha512-1+XfJNYF1cjGB+TKMWi29eZ0b82QOvQs2YoLNzbpWGqFMtRQHTa57osqdGj4FrFPgkO4D4AZinzUJR9VvW3QUA==
