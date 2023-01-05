@@ -4,14 +4,14 @@ import { RewardPrograms, RewardRoots } from '../services/subgraph';
 import { ProcessRewardRootPayload } from '../tasks/process-reward-root';
 import Logger from '@cardstack/logger';
 
-const MAX_INDEX_SIZE_PROGRAM = 1000;
+const MAX_INDEX_SIZE_PER_PROGRAM = 1000;
 
 let log = Logger('task:check-reward-roots');
 export default class CheckRewardRoots {
   subgraph = inject('subgraph');
   databaseManager = inject('database-manager', { as: 'databaseManager' });
   workerClient: WorkerClient = inject('worker-client', { as: 'workerClient' });
-  async perform(max_index_size_per_program = MAX_INDEX_SIZE_PROGRAM) {
+  async perform() {
     try {
       let db = await this.databaseManager.getClient();
       const r1: RewardPrograms = await this.subgraph.getRewardPrograms();
@@ -24,7 +24,7 @@ export default class CheckRewardRoots {
         const r2: RewardRoots = await this.subgraph.getRewardRoots(
           rewardProgramId,
           last_indexed_block_number,
-          max_index_size_per_program
+          MAX_INDEX_SIZE_PER_PROGRAM
         );
         let payloads: ProcessRewardRootPayload[] = r2?.data?.merkleRootSubmissions.map((root) => {
           return {
