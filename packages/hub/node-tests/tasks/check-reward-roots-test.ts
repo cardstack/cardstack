@@ -110,31 +110,23 @@ describe('CheckRewardRootsTask', function () {
     expect(getJobPayloads()).to.deep.equal([
       {
         blockNumber: '1',
-        s3FileInfo: {
-          paymentCycle: '1',
-          rewardProgramId: '0x0885ce31D73b63b0Fcb1158bf37eCeaD8Ff0fC72',
-        },
+        paymentCycle: '1',
+        rewardProgramId: '0x0885ce31D73b63b0Fcb1158bf37eCeaD8Ff0fC72',
       },
       {
         blockNumber: '3',
-        s3FileInfo: {
-          paymentCycle: '3',
-          rewardProgramId: '0x0885ce31D73b63b0Fcb1158bf37eCeaD8Ff0fC72',
-        },
+        paymentCycle: '3',
+        rewardProgramId: '0x0885ce31D73b63b0Fcb1158bf37eCeaD8Ff0fC72',
       },
       {
         blockNumber: '1',
-        s3FileInfo: {
-          paymentCycle: '1',
-          rewardProgramId: '0xab20c80fcc025451a3fc73bB953aaE1b9f640949',
-        },
+        paymentCycle: '1',
+        rewardProgramId: '0xab20c80fcc025451a3fc73bB953aaE1b9f640949',
       },
       {
         blockNumber: '2',
-        s3FileInfo: {
-          paymentCycle: '2',
-          rewardProgramId: '0xab20c80fcc025451a3fc73bB953aaE1b9f640949',
-        },
+        paymentCycle: '2',
+        rewardProgramId: '0xab20c80fcc025451a3fc73bB953aaE1b9f640949',
       },
     ]);
   });
@@ -188,10 +180,8 @@ describe('CheckRewardRootsTask', function () {
     expect(getJobPayloads()).to.deep.equal([
       {
         blockNumber: '3',
-        s3FileInfo: {
-          paymentCycle: '3',
-          rewardProgramId: '0x0885ce31D73b63b0Fcb1158bf37eCeaD8Ff0fC72',
-        },
+        paymentCycle: '3',
+        rewardProgramId: '0x0885ce31D73b63b0Fcb1158bf37eCeaD8Ff0fC72',
       },
     ]);
   });
@@ -221,10 +211,8 @@ describe('CheckRewardRootsTask', function () {
     expect(getJobPayloads()).to.deep.equal([
       {
         blockNumber: '1',
-        s3FileInfo: {
-          paymentCycle: '2',
-          rewardProgramId: '0x0885ce31D73b63b0Fcb1158bf37eCeaD8Ff0fC72',
-        },
+        paymentCycle: '2',
+        rewardProgramId: '0x0885ce31D73b63b0Fcb1158bf37eCeaD8Ff0fC72',
       },
     ]);
   });
@@ -270,17 +258,13 @@ describe('CheckRewardRootsTask', function () {
     expect(getJobPayloads()).to.deep.equal([
       {
         blockNumber: '1',
-        s3FileInfo: {
-          paymentCycle: '1',
-          rewardProgramId: '0x0885ce31D73b63b0Fcb1158bf37eCeaD8Ff0fC72',
-        },
+        paymentCycle: '1',
+        rewardProgramId: '0x0885ce31D73b63b0Fcb1158bf37eCeaD8Ff0fC72',
       },
       {
         blockNumber: '2',
-        s3FileInfo: {
-          paymentCycle: '2',
-          rewardProgramId: '0x0885ce31D73b63b0Fcb1158bf37eCeaD8Ff0fC72',
-        },
+        paymentCycle: '2',
+        rewardProgramId: '0x0885ce31D73b63b0Fcb1158bf37eCeaD8Ff0fC72',
       },
     ]);
   });
