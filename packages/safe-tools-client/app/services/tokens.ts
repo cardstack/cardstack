@@ -5,6 +5,7 @@ import {
 } from '@cardstack/cardpay-sdk';
 import NetworkService from '@cardstack/safe-tools-client/services/network';
 import Service, { inject as service } from '@ember/service';
+import { tracked } from '@glimmer/tracking';
 import { type TokenInfo } from '@uniswap/token-lists';
 import { use, resource } from 'ember-resources';
 import sortBy from 'lodash/sortBy';
@@ -27,10 +28,11 @@ export default class TokensService extends Service {
     // because networkInfo is tracked, anytime the network switches,
     // this resource will re-run
     const chainId = this.network.networkInfo.chainId;
+    const stubbedGasTokens = this._stubbedGasTokens;
     (async () => {
       try {
         state.value =
-          this._stubbedGasTokens || (await fetchSupportedGasTokens(chainId));
+          stubbedGasTokens || (await fetchSupportedGasTokens(chainId));
       } catch (error) {
         state.error = error;
       } finally {
@@ -54,8 +56,8 @@ export default class TokensService extends Service {
     return [];
   }
 
-  _stubbedGasTokens: TokenDetail[] | undefined;
   _stubbedTransactionTokens: TokenInfo[] | undefined;
+  @tracked _stubbedGasTokens: TokenDetail[] | undefined;
 
   stubGasTokens(val: TokenDetail[]) {
     this._stubbedGasTokens = val;
