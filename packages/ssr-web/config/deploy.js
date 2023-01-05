@@ -10,7 +10,9 @@ module.exports = function (deployTarget) {
     '**/*.{js,png,gif,webp,ico,jpg,map,xml,txt,svg,swf,eot,ttf,woff,woff2,ttc,otf}';
 
   let ENV = {
-    build: {},
+    build: {
+      outputPath: '/tmp/deploy-dist',
+    },
     pipeline: {
       activateOnDeploy: true,
       disabled: {},
