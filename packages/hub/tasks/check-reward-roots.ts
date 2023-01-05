@@ -29,16 +29,14 @@ export default class CheckRewardRoots {
         let payloads: ProcessRewardRootPayload[] = r2?.data?.merkleRootSubmissions.map((root) => {
           return {
             blockNumber: root.blockNumber,
-            s3FileInfo: {
-              paymentCycle: root.paymentCycle,
-              rewardProgramId: root.rewardProgram.id,
-            },
+            paymentCycle: root.paymentCycle,
+            rewardProgramId: root.rewardProgram.id,
           };
         });
         for (const payload of payloads) {
           // Process 1 parquet (rewardProgramId, paymentCycle) file at one time
           await this.workerClient.addJob('process-reward-root', payload, {
-            jobKey: payload.s3FileInfo.rewardProgramId + '-' + payload.s3FileInfo.paymentCycle,
+            jobKey: payload.rewardProgramId + '-' + payload.paymentCycle,
             maxAttempts: 1,
           });
         }
