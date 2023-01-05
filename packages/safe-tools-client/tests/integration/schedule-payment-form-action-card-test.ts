@@ -9,9 +9,11 @@ import {
 } from '@ember/test-helpers';
 import { format, subDays, addMonths, addHours, subHours } from 'date-fns';
 import { selectChoose } from 'ember-power-select/test-support';
-import { setupRenderingTest } from 'ember-qunit';
+
 import hbs from 'htmlbars-inline-precompile';
 import { module, test } from 'qunit';
+
+import { setupRenderingTest } from '../helpers';
 
 import { exampleGasTokens } from '../support/tokens';
 import {
@@ -263,6 +265,24 @@ module(
       assert
         .dom('[data-test-gas-token-select]')
         .containsText('Choose a Gas Token');
+    });
+
+    test('when the network changes, the selected payment token is updated if needed', async function (assert) {
+      await render(hbs`
+        <SchedulePaymentFormActionCard />
+      `);
+      await selectChoose(
+        '[data-test-amount-input] [data-test-boxel-input-group-select-accessory-trigger]',
+        'USDC'
+      );
+      const networkService = this.owner.lookup('service:network');
+      networkService.onChainChanged(137);
+      await settled();
+      assert
+        .dom(
+          '[data-test-amount-input] [data-test-boxel-input-group-select-accessory-trigger]'
+        )
+        .containsText('Choose token');
     });
 
     // TODO: assert state for no network selected/connected

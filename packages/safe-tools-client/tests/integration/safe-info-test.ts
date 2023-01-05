@@ -1,9 +1,11 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 import { render } from '@ember/test-helpers';
-import { setupRenderingTest } from 'ember-qunit';
+
 import { BigNumber } from 'ethers';
 import hbs from 'htmlbars-inline-precompile';
 import { module, test } from 'qunit';
+
+import { setupRenderingTest } from '../helpers';
 
 module('Integration | Component | safe-info', function (hooks) {
   setupRenderingTest(hooks);
