@@ -38,6 +38,8 @@ export default class CheckRewardRoots {
           await this.workerClient.addJob('process-reward-root', payload, {
             jobKey: payload.rewardProgramId + '-' + payload.paymentCycle,
             maxAttempts: 1,
+            queueName: 'process-reward-root-queue',
+            priority: 2,
           });
         }
       }
