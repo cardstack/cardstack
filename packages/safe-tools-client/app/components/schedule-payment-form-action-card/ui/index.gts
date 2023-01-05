@@ -24,6 +24,7 @@ import { MaxGasFeeOption, ValidatableForm } from '../validator';
 import BlockExplorerButton from '@cardstack/safe-tools-client/components/block-explorer-button';
 import { SchedulerCapableNetworks, TransactionHash } from '@cardstack/cardpay-sdk';
 import cssVar from '@cardstack/boxel/helpers/css-var';
+import formatUsd from '@cardstack/safe-tools-client/helpers/format-usd';
 import { type WalletProviderId } from '@cardstack/safe-tools-client/utils/wallet-providers';
 
 interface Signature {
@@ -52,6 +53,7 @@ interface Signature {
     onUpdateMaxGasPrice: (val: string) => void;
     isMaxGasPriceInvalid: boolean;
     maxGasPriceErrorMessage: string;
+    gasEstimateInUsd: number|undefined;
     onSchedulePayment: () => void;
     onUpdatePayeeAddress: (val: string) => void;
     onReset: () => void;
@@ -286,7 +288,7 @@ export default class SchedulePaymentFormActionCardUI extends Component<Signature
         <BoxelField @label="Execution Fees" style={{cssVar boxel-field-label-align="top"}}>
           <div>
             <BoxelField @label="Estimated Gas" @vertical={{true}} style={{cssVar boxel-field-label-justify-content="end"}}>
-              <div class="schedule-payment-form-action-card--fees-value">A</div>
+              <div class="schedule-payment-form-action-card--fees-value">{{if @gasEstimateInUsd (formatUsd @gasEstimateInUsd)}}</div>
             </BoxelField>
             <BoxelField @label="Fixed Fee" @vertical={{true}} style={{cssVar boxel-field-label-justify-content="end"}}>
               <div class="schedule-payment-form-action-card--fees-value">B</div>

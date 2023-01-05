@@ -22,11 +22,11 @@ const GAS_RANGE_NORMAL_MULTIPLIER = 2;
 const GAS_RANGE_HIGH_MULTIPLIER = 4;
 const GAS_RANGE_MAX_MULTIPLIER = 6;
 
-export type GasRange = Record<'normal' | 'high' | 'max', BigNumber>;
-export interface GasEstimationResult {
+export type ExecutionGasRange = Record<'normal' | 'high' | 'max', BigNumber>;
+export interface ExecutionGasEstimationResult {
   gas: BigNumber;
-  gasRangeInGasTokenWei: GasRange;
-  gasRangeInUSD: GasRange;
+  gasRangeInGasTokenWei: ExecutionGasRange;
+  gasRangeInUSD: ExecutionGasRange;
 }
 
 export default class SchedulePaymentSDKService extends Service {
@@ -95,7 +95,7 @@ export default class SchedulePaymentSDKService extends Service {
     scenario: GasEstimationScenario,
     tokenAddress: ChainAddress,
     gasTokenAddress: ChainAddress
-  ): Promise<GasEstimationResult> {
+  ): Promise<ExecutionGasEstimationResult> {
     const scheduledPayments = await this.getSchedulePaymentModule();
 
     const gasEstimationResult = await scheduledPayments.estimateGas(scenario, {

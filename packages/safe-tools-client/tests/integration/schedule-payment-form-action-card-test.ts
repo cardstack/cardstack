@@ -1,5 +1,11 @@
-import { TokenDetail } from '@cardstack/cardpay-sdk';
+import {
+  ChainAddress,
+  GasEstimationScenario,
+  TokenDetail,
+} from '@cardstack/cardpay-sdk';
+import { ExecutionGasEstimationResult } from '@cardstack/safe-tools-client/services/scheduled-payment-sdk';
 import TokensService from '@cardstack/safe-tools-client/services/tokens';
+import Service from '@ember/service';
 import {
   click,
   fillIn,
@@ -10,6 +16,7 @@ import {
 import { format, subDays, addMonths, addHours, subHours } from 'date-fns';
 import { selectChoose } from 'ember-power-select/test-support';
 
+import { BigNumber } from 'ethers';
 import hbs from 'htmlbars-inline-precompile';
 import { module, test } from 'qunit';
 
@@ -22,6 +29,40 @@ import {
   EXAMPLE_PAYEE,
 } from '../support/ui-test-helpers';
 
+class WalletServiceStub extends Service {
+  isConnected = true;
+}
+
+class ScheduledPaymentSDKServiceStub extends Service {
+  async getScheduledPaymentGasEstimation(
+    _scenario: GasEstimationScenario,
+    _tokenAddress: ChainAddress,
+    _gasTokenAddress: ChainAddress
+  ): Promise<ExecutionGasEstimationResult> {
+    const gas = BigNumber.from('15000000000000000');
+    const gasRangeInWei = {
+      standard: BigNumber.from('15000000000000000'),
+    };
+    const gasRangeInUSD = {
+      standard: BigNumber.from('2'),
+    };
+    const priceWeiInGasToken = '100';
+    return {
+      gas,
+      gasRangeInGasTokenWei: {
+        normal: gasRangeInWei.standard.mul(priceWeiInGasToken).mul(2),
+        high: gasRangeInWei.standard.mul(priceWeiInGasToken).mul(4),
+        max: gasRangeInWei.standard.mul(priceWeiInGasToken).mul(6),
+      },
+      gasRangeInUSD: {
+        normal: gasRangeInUSD.standard.mul(2),
+        high: gasRangeInUSD.standard.mul(4),
+        max: gasRangeInUSD.standard.mul(6),
+      },
+    };
+  }
+}
+
 let tokensService: TokensService;
 module(
   'Integration | Component | schedule-payment-form-action-card',
@@ -31,6 +72,11 @@ module(
     hooks.beforeEach(function (this: TestContext) {
       tokensService = this.owner.lookup('service:tokens');
       tokensService.stubGasTokens(exampleGasTokens);
+      this.owner.register('service:wallet', WalletServiceStub);
+      this.owner.register(
+        'service:scheduled-payment-sdk',
+        ScheduledPaymentSDKServiceStub
+      );
     });
 
     test('it initializes the transaction token to undefined', async function (assert) {
@@ -114,6 +160,9 @@ module(
         '[data-test-max-gas-toggle] [data-toggle-group-option="normal"]'
       );
 
+      // TODO: assrt existence of summary data
+      await this.pauseTest();
+
       assert.dom('[data-test-schedule-payment-form-submit-button]').isEnabled();
 
       await fillIn('[data-test-payee-address-input]', 'Not an address');
@@ -122,7 +171,7 @@ module(
         .isDisabled();
     });
 
-    test('it can switch to one-time payment once switches to monthly', async function (assert) {
+    test('it can switch to one-time payment after selecting monthly', async function (assert) {
       await render(hbs`
         <SchedulePaymentFormActionCard />
       `);

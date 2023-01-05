@@ -3,8 +3,8 @@ import SafesService, {
   Safe,
   TokenBalance,
 } from '@cardstack/safe-tools-client/services/safes';
+import SchedulePaymentSDKService from '@cardstack/safe-tools-client/services/scheduled-payment-sdk';
 import ScheduledPaymentsService from '@cardstack/safe-tools-client/services/scheduled-payments';
-import SchedulePaymentSDKService from '@cardstack/safe-tools-client/services/scheduled-payments-sdk';
 import WalletService from '@cardstack/safe-tools-client/services/wallet';
 import { click, visit, waitFor, TestContext } from '@ember/test-helpers';
 import { BigNumber } from 'ethers';
@@ -33,7 +33,7 @@ module('Acceptance | create safe', function (hooks) {
     };
 
     const scheduledPaymentsSdkService = this.owner.lookup(
-      'service:scheduled-payments-sdk'
+      'service:scheduled-payment-sdk'
     ) as SchedulePaymentSDKService;
 
     scheduledPaymentsSdkService.getCreateSafeGasEstimation = (): Promise<{
@@ -142,7 +142,7 @@ module('Acceptance | create safe', function (hooks) {
     module('with error during safe creation', function (hooks) {
       hooks.beforeEach(function (this: TestContext) {
         const scheduledPaymentsSdkService = this.owner.lookup(
-          'service:scheduled-payments-sdk'
+          'service:scheduled-payment-sdk'
         ) as SchedulePaymentSDKService;
 
         scheduledPaymentsSdkService.createSafe = (): Promise<{
@@ -173,7 +173,7 @@ module('Acceptance | create safe', function (hooks) {
     module('with error while fetching gas cost', function (hooks) {
       hooks.beforeEach(function (this: TestContext) {
         const scheduledPaymentsSdkService = this.owner.lookup(
-          'service:scheduled-payments-sdk'
+          'service:scheduled-payment-sdk'
         ) as SchedulePaymentSDKService;
 
         scheduledPaymentsSdkService.getCreateSafeGasEstimation = (): Promise<{
@@ -232,7 +232,7 @@ module('Acceptance | create safe', function (hooks) {
     module('with error during safe indexing', function (hooks) {
       hooks.beforeEach(function (this: TestContext) {
         const scheduledPaymentsSdkService = this.owner.lookup(
-          'service:scheduled-payments-sdk'
+          'service:scheduled-payment-sdk'
         ) as SchedulePaymentSDKService;
 
         scheduledPaymentsSdkService.waitForSafeToBeIndexed =

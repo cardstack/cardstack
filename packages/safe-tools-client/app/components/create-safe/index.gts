@@ -10,7 +10,7 @@ import BoxelButton from '@cardstack/boxel/components/boxel/button';
 import WalletService from '@cardstack/safe-tools-client/services/wallet';
 import NetworkService from '@cardstack/safe-tools-client/services/network';
 import SafesService from '@cardstack/safe-tools-client/services/safes';
-import SchedulePaymentSDKService from '@cardstack/safe-tools-client/services/scheduled-payments-sdk';
+import SchedulePaymentSDKService from '@cardstack/safe-tools-client/services/scheduled-payment-sdk';
 import { Safe } from '@cardstack/safe-tools-client/services/safes';
 import CreateSafeModal from '../create-safe-modal';
 
