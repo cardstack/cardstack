@@ -21,6 +21,7 @@ import {
 } from '../utils/safe-utils';
 import { isTransactionHash, TransactionOptions, waitForTransactionConsistency } from '../utils/general-utils';
 import type { SuccessfulTransactionReceipt } from '../utils/successful-transaction-receipt';
+import { parseExplanationAmount, parseTemplateExplanation } from '../utils/reward-explanation-utils';
 import GnosisSafeABI from '../../contracts/abi/gnosis-safe';
 import { Signer } from 'ethers';
 import { query } from '../utils/graphql';
@@ -37,6 +38,7 @@ export interface Proof {
   isValid: boolean;
   explanationTemplate: string;
   explanationData: any;
+  parsedExplanation?: string;
 }
 
 export interface ClaimableProof extends Proof {
@@ -180,7 +182,9 @@ export default class RewardPool {
         }
       }
     });
-    const proofs = await this.addTokenSymbol(res);
+
+    const proofs = await this.adjustExplanationInfo(await this.addTokenSymbol(res));
+
     if (safeAddress) {
       // if safeAddress is provided, we need to estimate gas of each proof claim
       // when gas estimation is performed, we filter out proofs that are not valid
@@ -910,6 +914,39 @@ but the balance is the reward pool is ${fromWei(rewardPoolBalanceForRewardProgra
   private async getRewardTokens(): Promise<string[]> {
     let cardTokenAddress = await getAddress('cardCpxd', this.layer2Web3);
     return [cardTokenAddress];
+  }
+
+  private async adjustExplanationInfo(proofs: WithSymbol<Proof>[]): Promise<WithSymbol<Proof>[]> {
+    return Promise.all(
+      proofs.map(async (proof) => {
+        // explanationData and token address are needed for getting token info
+        if (!proof.explanationData?.token) return proof;
+
+        const assets = await getSDK('Assets', this.layer2Web3);
+        const { symbol, decimals } = await assets.getTokenInfo(proof.explanationData?.token || '');
+
+        // to keep proof.explanationData unchanged
+        const adjustedData = { ...proof.explanationData };
+
+        if (symbol) {
+          adjustedData.token = symbol;
+        }
+
+        if (adjustedData?.amount) {
+          adjustedData.amount = parseExplanationAmount(adjustedData.amount, decimals);
+        }
+
+        if (adjustedData?.rollover_amount) {
+          adjustedData.rollover_amount = parseExplanationAmount(adjustedData.rollover_amount, decimals);
+        }
+
+        if (adjustedData && proof.explanationTemplate) {
+          proof.parsedExplanation = parseTemplateExplanation(proof.explanationTemplate, adjustedData);
+        }
+
+        return proof;
+      })
+    );
   }
 }
 
