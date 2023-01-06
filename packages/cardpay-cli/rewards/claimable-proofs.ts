@@ -90,7 +90,8 @@ function logProof(o: WithSymbol<Proof> | WithSymbol<ClaimableProof>, rewardPool:
       }
       explanationTemplate: ${o.explanationTemplate ?? 'Not specified'} 
       explanationData: 
-         ${JSON.stringify(o.explanationData, null, 4) ?? 'Not specified'} 
+        ${JSON.stringify(o.explanationData, null, 4) ?? 'Not specified'} 
+      parsedExplanation: ${o.parsedExplanation ?? 'Explanation missing'} 
         `);
 }
 
