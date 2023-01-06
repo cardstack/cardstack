@@ -144,7 +144,8 @@ export default class ScheduledPaymentCard extends Component<Signature> {
       >
         <Section @title="Cancel your scheduled payment">
           <div>
-            <p>You're about to cancel your payment of <strong>{{weiToDecimal @scheduledPayment.amount this.tokenInfo.decimals}} {{this.tokenInfo.symbol}}</strong> scheduled for <strong>{{formatDate @scheduledPayment.payAt "d/M/yyyy"}}</strong>.</p>
+            <p>You're about to cancel your payment of <strong>{{weiToDecimal @scheduledPayment.amount this.tokenInfo.decimals}} {{this.tokenInfo.symbol}}</strong>
+            to <span class="blockchain-address">{{truncateMiddle @scheduledPayment.payeeAddress}}</span>, scheduled for <strong>{{formatDate @scheduledPayment.payAt "d/M/yyyy"}}</strong>.</p>
 
             <p>This action will remove the scheduled payment from the scheduled payment module, and it won't be attempted in the future.</p>
           </div>
