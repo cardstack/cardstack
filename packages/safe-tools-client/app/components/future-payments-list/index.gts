@@ -99,7 +99,7 @@ export default class FuturePaymentsList extends Component<Signature> {
   });
 
   <template>
-    <BoxelActionContainer 
+    <BoxelActionContainer
       class="future-payments-list"
       as |Section ActionChin|>
       {{#if (and (not this.isScheduledPaymentsLoading) (lt this.scheduledPayments.length 1))}}

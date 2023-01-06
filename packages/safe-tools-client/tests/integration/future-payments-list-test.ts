@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
+import SchedulePaymentSDKService from '@cardstack/safe-tools-client/services/scheduled-payments-sdk';
 import Service from '@ember/service';
-import { render, TestContext } from '@ember/test-helpers';
+import { render, click, TestContext } from '@ember/test-helpers';
 import percySnapshot from '@percy/ember';
 import { addMinutes, addMonths, addHours } from 'date-fns';
 import { setupRenderingTest } from 'ember-qunit';
@@ -123,5 +124,57 @@ module('Integration | Component | future-payments-list', function (hooks) {
       ).length,
       1
     );
+  });
+
+  test('can cancel a payment', async function (assert) {
+    const scheduledPaymentsSdkService = this.owner.lookup(
+      'service:scheduled-payments-sdk'
+    ) as SchedulePaymentSDKService;
+
+    scheduledPaymentsSdkService.cancelScheduledPayment = (): Promise<void> => {
+      return Promise.resolve();
+    };
+
+    this.set('onDepositClick', () => {});
+    await render(hbs`
+      <FuturePaymentsList @onDepositClick={{this.onDepositClick}} />
+    `);
+
+    await click('[data-test-scheduled-payment-card-options-button]');
+    await click('[data-test-boxel-menu-item-text="Cancel Payment"]');
+    await click('[data-test-cancel-payment-button]');
+    assert
+      .dom('[data-test-cancel-scheduled-payment-modal]')
+      .includesText(
+        "Your scheduled payment was canceled and removed successfully, and it won't be attempted in the future."
+      );
+    assert.dom('[data-test-cancel-payment-button]').doesNotExist();
+    await click('[data-test-close-cancel-payment-modal]');
+    assert.dom('[data-test-cancel-scheduled-payment-modal]').doesNotExist();
+  });
+
+  test('it shows an error when canceling fails', async function (assert) {
+    const scheduledPaymentsSdkService = this.owner.lookup(
+      'service:scheduled-payments-sdk'
+    ) as SchedulePaymentSDKService;
+
+    scheduledPaymentsSdkService.cancelScheduledPayment = (): Promise<void> => {
+      return Promise.reject('error while canceling payment');
+    };
+
+    this.set('onDepositClick', () => {});
+    await render(hbs`
+      <FuturePaymentsList @onDepositClick={{this.onDepositClick}} />
+    `);
+
+    await click('[data-test-scheduled-payment-card-options-button]');
+    await click('[data-test-boxel-menu-item-text="Cancel Payment"]');
+    await click('[data-test-cancel-payment-button]');
+    assert
+      .dom('[data-test-cancel-scheduled-payment-modal]')
+      .includesText(
+        'There was an error canceling your scheduled payment. Please try again, or contact support if the problem persists.'
+      );
+    assert.dom('[data-test-cancel-payment-button]').exists();
   });
 });
