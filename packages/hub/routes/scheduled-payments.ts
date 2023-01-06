@@ -67,6 +67,7 @@ export default class ScheduledPaymentsRoute {
         payAt: {
           gt: minPayAt,
         },
+        canceledAt: null,
       },
     });
 
