@@ -9,9 +9,11 @@ import pgFormat from 'pg-format';
 import awsConfig from '../utils/aws-config';
 import Logger from '@cardstack/logger';
 import config from 'config';
-interface S3FileInfo {
+
+export interface ProcessRewardRootPayload {
   rewardProgramId: string;
   paymentCycle: string;
+  blockNumber: string;
 }
 
 //this is proof returned by parquet in json format
@@ -32,7 +34,7 @@ let log = Logger('task:process-reward-root');
 export default class ProcessRewardRoot {
   private databaseManager = inject('database-manager', { as: 'databaseManager' });
   web3 = inject('web3-http', { as: 'web3' });
-  async perform(file: S3FileInfo) {
+  async perform(payload: ProcessRewardRootPayload) {
     let currentBlockNumber = 0;
     try {
       currentBlockNumber = (await this.web3.getInstance().eth.getBlockNumber()) as number;
@@ -43,7 +45,7 @@ export default class ProcessRewardRoot {
     const s3Client = new S3Client(s3Config);
     const db = await this.databaseManager.getClient();
     const bucketName = config.get('aws.rewards.bucketName') as string;
-    const proofs = await queryParquet(s3Client, bucketName, file);
+    const proofs = await queryParquet(s3Client, bucketName, payload.rewardProgramId, payload.paymentCycle);
     const rows = proofs
       .filter(({ validTo }) => {
         return validTo > currentBlockNumber;
@@ -67,8 +69,9 @@ export default class ProcessRewardRoot {
           ')'
         );
       });
-    const indexQuery = 'INSERT INTO reward_root_index( reward_program_id, payment_cycle ) VALUES (%L, %L);';
-    const indexSql = pgFormat(indexQuery, file.rewardProgramId, file.paymentCycle);
+    const indexQuery =
+      'INSERT INTO reward_root_index( reward_program_id, payment_cycle, block_number ) VALUES (%L, %L, %L);';
+    const indexSql = pgFormat(indexQuery, payload.rewardProgramId, payload.paymentCycle, payload.blockNumber);
     try {
       if (rows.length > 0) {
         const proofsQuery = `
@@ -91,7 +94,9 @@ export default class ProcessRewardRoot {
     } catch (e: any) {
       if (e.code == '23505') {
         // do not scream errors when indexing
-        log.info(`rewardProgramId: ${file.rewardProgramId}, paymentCycle: ${file.paymentCycle} is already indexed`);
+        log.info(
+          `rewardProgramId: ${payload.rewardProgramId}, paymentCycle: ${payload.paymentCycle} is already indexed`
+        );
         return;
       }
     }
@@ -110,13 +115,14 @@ const FIELDS_EXCEPT_EXPLANATION_DATA =
 const queryParquet = async (
   s3Client: S3Client,
   bucketName: string,
-  file: S3FileInfo,
+  rewardProgramId: string,
+  paymentCycle: string,
   expression?: SelectObjectContentCommandInput['Expression']
 ): Promise<Proof[]> => {
   let records: Proof[] = [];
   const params: SelectObjectContentCommandInput = {
     Bucket: bucketName,
-    Key: `rewardProgramID=${file.rewardProgramId}/paymentCycle=${file.paymentCycle}/results.parquet`,
+    Key: `rewardProgramID=${rewardProgramId}/paymentCycle=${paymentCycle}/results.parquet`,
     ExpressionType: 'SQL',
     Expression: expression ?? 'SELECT * FROM S3Object',
     InputSerialization: {
@@ -136,13 +142,21 @@ const queryParquet = async (
       throw new Error('payload undefined');
     }
     const events: AsyncIterable<SelectObjectContentEventStream> = s3Data.Payload;
+    let tail: string | undefined;
+    let head: string | undefined;
     for await (const event of events) {
       if (event?.Records) {
         if (event?.Records?.Payload) {
           const record = Buffer.from(event.Records.Payload).toString('utf8');
+
           const os = record.split('\n');
-          os.map((o) => {
-            if (o != '') {
+          // the records cut off at 65000 bytes ie UintArray(65000).
+          // The tail is meant to be the string from the last paginate  that got cutoff
+          tail = event.Records.Payload.length == 65000 ? os.pop() : undefined;
+
+          os.map((x, i) => {
+            if (x != '') {
+              let o = i == 0 && head != undefined ? head + x : x;
               const b: any = JSON.parse(o);
               if (!('explanationData' in b)) {
                 b.explanationData = '{}';
@@ -156,6 +170,7 @@ const queryParquet = async (
               records.push(b);
             }
           });
+          head = tail ?? undefined;
         } else {
           log.info('skipped event, payload: ', event?.Records?.Payload);
         }
@@ -167,11 +182,15 @@ const queryParquet = async (
     }
   } catch (err: any) {
     if (err.name == 'UnsupportedParquetType') {
-      return await queryParquet(s3Client, bucketName, file, `SELECT ${FIELDS_EXCEPT_EXPLANATION_DATA} FROM s3object`);
-    } else if (err.name == 'NoSuchKey') {
-      log.info(
-        `Key rewardProgramID=${file.rewardProgramId}/paymentCycle=${file.paymentCycle}/results.parquet does not exist`
+      return await queryParquet(
+        s3Client,
+        bucketName,
+        rewardProgramId,
+        paymentCycle,
+        `SELECT ${FIELDS_EXCEPT_EXPLANATION_DATA} FROM s3object`
       );
+    } else if (err.name == 'NoSuchKey') {
+      log.info(`Key rewardProgramID=${rewardProgramId}/paymentCycle=${paymentCycle}/results.parquet does not exist`);
       return [];
     } else {
       log.error('error fetching data: ', err);
@@ -179,13 +198,4 @@ const queryParquet = async (
     }
   }
   return records;
-};
-
-export const scanParquet = async (s3Client: S3Client, bucketName: string, files: S3FileInfo[]) => {
-  const promises: Promise<Proof[]>[] = [];
-  files.forEach((file) => {
-    promises.push(queryParquet(s3Client, bucketName, file));
-  });
-  const r = (await Promise.all(promises)).flat();
-  return r;
 };
