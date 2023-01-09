@@ -110,6 +110,7 @@
     "web3": "1.5.2",
     "web3-core": "1.7.3",
     "web3-eth-contract": "^1.7.3",
+    "web3-utils": "^1.8.1",
     "web3.storage": "^3.3.4",
     "yargs": "^17.0.0"
   },
