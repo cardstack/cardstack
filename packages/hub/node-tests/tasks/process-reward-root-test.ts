@@ -56,7 +56,7 @@ const mockResponse = (proofs: any[], maxPaginate = 100) => {
     Payload: mockPayload,
   };
 };
-describe.only('ProcessRewardRootTask', function () {
+describe('ProcessRewardRootTask', function () {
   let db: DBClient;
   let s3Mock: AwsStub<ServiceInputTypes, ServiceOutputTypes>;
   let { getContainer } = setupHub(this);
