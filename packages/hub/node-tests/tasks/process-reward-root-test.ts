@@ -164,11 +164,13 @@ describe('ProcessRewardRootTask', function () {
     const rewardProgramId = mockProofs[0].rewardProgramID;
     const paymentCycle = mockProofs[0].paymentCycle;
     let task = await getContainer().instantiate(ProcessRewardRoot);
+    await db.query('BEGIN');
     await task.perform({
       blockNumber: '1',
       rewardProgramId: rewardProgramId,
       paymentCycle: String(paymentCycle),
     });
+    await db.query('COMMIT');
 
     //duplicate indexing
     await db.query('BEGIN');
