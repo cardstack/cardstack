@@ -16,7 +16,7 @@ module('Unit | SchedulePaymentFormActionCard Validator', function (hooks) {
       paymentDayOfMonth: undefined,
       monthlyUntil: undefined,
       payeeAddress: EXAMPLE_PAYEE,
-      paymentAmount: '1.5',
+      paymentAmountRaw: '1.5',
       paymentToken: {
         name: 'Cardstack',
         logoURI: 'card',
@@ -98,16 +98,16 @@ module('Unit | SchedulePaymentFormActionCard Validator', function (hooks) {
     );
   });
 
-  test('is not valid when paymentAmount is unset', function (assert) {
-    exampleForm.paymentAmount = '';
+  test('is not valid when paymentAmountRaw is unset', function (assert) {
+    exampleForm.paymentAmountRaw = '';
     const subject = new Validator(exampleForm);
     assert.false(subject.isValid);
     assert.false(subject.isAmountValid);
     assert.strictEqual(subject.amountErrorMessage, "can't be blank");
   });
 
-  test('is not valid when paymentAmount is not a number', function (assert) {
-    exampleForm.paymentAmount = 'my left foot';
+  test('is not valid when paymentAmountRaw is not a number', function (assert) {
+    exampleForm.paymentAmountRaw = 'my left foot';
     const subject = new Validator(exampleForm);
     assert.false(subject.isValid);
     assert.false(subject.isAmountValid);

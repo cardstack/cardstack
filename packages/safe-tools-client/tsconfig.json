@@ -26,6 +26,10 @@
       "@cardstack/safe-tools-client/tests/*": ["tests/*"],
       "@cardstack/safe-tools-client/*": ["app/*"],
       "@cardstack/boxel/*": ["../boxel/addon/*"],
+      "@glimmer/tracking": [
+        "../../node_modules/ember-cached-decorator-polyfill",
+        "../../node_modules/@glimmer/tracking/dist/types"
+      ],
       "*": ["types/*", "../boxel/types/*"],
       "web3-provider-engine": ["../../types/web3-provider-engine"]
     }

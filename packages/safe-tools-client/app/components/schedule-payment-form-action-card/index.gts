@@ -4,11 +4,11 @@ import { SelectableToken } from '@cardstack/boxel/components/boxel/input/selecta
 import { inject as service } from '@ember/service';
 import NetworkService from '../../services/network';
 import SafesService from '../../services/safes';
-import ScheduledPaymentSdkService, { ExecutionGasEstimationResult } from '../../services/scheduled-payment-sdk';
+import ScheduledPaymentSdkService, { ConfiguredScheduledPaymentFees, ExecutionGasEstimationResult } from '../../services/scheduled-payment-sdk';
 import TokensService from '../../services/tokens';
 import WalletService from '../../services/wallet';
 import { action } from '@ember/object';
-import { tracked } from '@glimmer/tracking';
+import { cached, tracked } from '@glimmer/tracking';
 import { Day } from '@cardstack/boxel/components/boxel/input/date';
 import { Time } from '@cardstack/boxel/components/boxel/input/time';
 import withTokenIcons from '../../helpers/with-token-icons';
@@ -19,13 +19,28 @@ import { fromWei } from 'web3-utils';
 import not from 'ember-truth-helpers/helpers/not';
 import { convertAmountToNativeDisplay, convertAmountToRawAmount, TransactionHash } from '@cardstack/cardpay-sdk';
 import { taskFor } from 'ember-concurrency-ts';
-import { BigNumber } from 'ethers';
+import { BigNumber, utils as ethersUtils } from 'ethers';
 import { task } from 'ember-concurrency-decorators';
 import perform from 'ember-concurrency/helpers/perform';
+import FeeCalculator, { type CurrentFees } from './fee-calculator';
 
 interface Signature {
   Element: HTMLElement;
 }
+
+interface ConfiguredFeesState {
+  isLoading: boolean;
+  value?: ConfiguredScheduledPaymentFees,
+  error?: Error
+}
+
+interface FeesState {
+  isLoading: boolean;
+  isIndeterminate: boolean;
+  value?: CurrentFees,
+  error?: Error
+}
+
 interface MaxGasDescriptionsState {
   isLoading: boolean;
   isIndeterminate: boolean;
@@ -140,7 +155,19 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
   }
 
   @tracked paymentAmount: string = '';
-
+  get paymentAmountRaw() {
+    return this.paymentAmount;
+  }
+  @cached
+  get paymentAmountInTokenUnits(): string {
+    try {
+      let bn = ethersUtils.parseUnits(this.paymentAmount, this.paymentToken?.decimals);
+      let result = bn.toString();
+      return result;
+    } catch(e) {
+      return '0';
+    }
+  }
   get paymentTokens(): SelectableToken[] {
     return this.tokens.transactionTokens;
   }
@@ -183,6 +210,48 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
 
   get isValid(): boolean {
     return this.validator.isValid;
+  }
+
+  @use configuredFees = resource(() => {
+    const state: ConfiguredFeesState = new TrackedObject({
+      isLoading: true,
+    });
+    (async () => {
+      try {
+        const configuredFees = await this.scheduledPaymentSdk.getFees();
+        state.value = configuredFees;
+      } catch (error) {
+        console.error(error);
+        state.error = error;
+      } finally {
+        state.isLoading = false;
+      }
+    })();
+    return state;
+  });
+
+
+  get fees() {
+    const state: FeesState = new TrackedObject({
+      isLoading: true,
+      isIndeterminate: false
+    });
+    let isWalletConnected = this.wallet.isConnected;
+    let { paymentToken, paymentAmountInTokenUnits, selectedGasToken, configuredFees } = this
+    if (!isWalletConnected || !paymentToken?.address || paymentAmountInTokenUnits === '0' || !selectedGasToken || !configuredFees.value) {
+      state.isIndeterminate = true;
+      return state;
+    }
+    if (configuredFees.value) {
+      const feeCalculator = new FeeCalculator(
+        configuredFees.value,
+        paymentAmountInTokenUnits,
+        paymentToken,
+        selectedGasToken
+      );
+      state.value = feeCalculator.calculateFee();  
+    }
+    return state;
   }
 
   @use maxGasDescriptions = resource(() => {
@@ -320,6 +389,10 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
 
   @tracked isSuccessfullyScheduled = false;
 
+  get gasEstimateInGasTokenUnits(): string {
+    return this.gasEstimation?.gasRangeInGasTokenWei.normal.toString() || '';
+  }
+
   get gasEstimateUsd() {
     return parseFloat(this.gasEstimation?.gasRangeInUSD.normal.toString() || '')
   }
@@ -345,7 +418,8 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
       @isPayeeAddressInvalid={{not this.validator.isPayeeAddressValid}}
       @payeeAddressErrorMessage={{this.validator.payeeAddressErrorMessage}}
       @onUpdatePayeeAddress={{this.onUpdatePayeeAddress}}
-      @paymentAmount={{this.paymentAmount}}
+      @paymentAmountRaw={{this.paymentAmount}}
+      @paymentAmountInTokenUnits={{this.paymentAmountInTokenUnits}}
       @onUpdatePaymentAmount={{this.onUpdatePaymentAmount}}
       @isPaymentAmountInvalid={{not this.validator.isAmountValid}}
       @paymentAmountErrorMessage={{this.validator.amountErrorMessage}}
@@ -363,10 +437,13 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
       @maxGasPriceErrorMessage={{this.validator.maxGasPriceErrorMessage}}
       @onSchedulePayment={{perform this.schedulePaymentTask}}
       @maxGasDescriptions={{this.maxGasDescriptions.value}}
+      @gasEstimateInGasTokenUnits={{this.gasEstimateInGasTokenUnits}}
       @gasEstimateInUsd={{this.gasEstimateUsd}}
       @isSubmitEnabled={{this.isValid}}
       @schedulingStatus={{this.schedulingStatus}}
       @networkSymbol={{this.network.symbol}}
+      @configuredFees={{this.configuredFees.value}}
+      @currentFees={{this.fees.value}}
       @walletProviderId={{this.wallet.providerId}}
       @txHash={{this.txHash}}
       @isSuccessfullyScheduled={{this.isSuccessfullyScheduled}}

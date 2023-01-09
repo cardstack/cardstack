@@ -6,6 +6,7 @@ import {
   getNativeWeiInToken,
   poll,
   SchedulePaymentProgressListener,
+  getConstant,
 } from '@cardstack/cardpay-sdk';
 import config from '@cardstack/safe-tools-client/config/environment';
 import SafesService, {
@@ -27,6 +28,10 @@ export interface ExecutionGasEstimationResult {
   gas: BigNumber;
   gasRangeInGasTokenWei: ExecutionGasRange;
   gasRangeInUSD: ExecutionGasRange;
+}
+export interface ConfiguredScheduledPaymentFees {
+  fixedUSD: number | undefined;
+  percentage: number | undefined;
 }
 
 export default class SchedulePaymentSDKService extends Service {
@@ -181,6 +186,17 @@ export default class SchedulePaymentSDKService extends Service {
       config.hubUrl,
       authToken
     );
+  }
+
+  async getFees(): Promise<ConfiguredScheduledPaymentFees> {
+    const [fixedUSD, percentage] = await Promise.all([
+      getConstant('scheduledPaymentFeeFixedUSD', this.wallet.ethersProvider),
+      getConstant('scheduledPaymentFeePercentage', this.wallet.ethersProvider),
+    ]);
+    return {
+      fixedUSD,
+      percentage,
+    };
   }
 }
 

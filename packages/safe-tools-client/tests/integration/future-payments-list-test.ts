@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
+import SchedulePaymentSDKService from '@cardstack/safe-tools-client/services/scheduled-payment-sdk';
 import ScheduledPaymentsService from '@cardstack/safe-tools-client/services/scheduled-payments';
-import SchedulePaymentSDKService from '@cardstack/safe-tools-client/services/scheduled-payments-sdk';
 import Service from '@ember/service';
 import { render, click, TestContext } from '@ember/test-helpers';
 import percySnapshot from '@percy/ember';

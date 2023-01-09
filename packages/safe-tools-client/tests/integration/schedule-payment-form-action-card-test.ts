@@ -3,7 +3,10 @@ import {
   GasEstimationScenario,
   TokenDetail,
 } from '@cardstack/cardpay-sdk';
-import { ExecutionGasEstimationResult } from '@cardstack/safe-tools-client/services/scheduled-payment-sdk';
+import {
+  ConfiguredScheduledPaymentFees,
+  ExecutionGasEstimationResult,
+} from '@cardstack/safe-tools-client/services/scheduled-payment-sdk';
 import TokensService from '@cardstack/safe-tools-client/services/tokens';
 import Service from '@ember/service';
 import {
@@ -13,12 +16,15 @@ import {
   TestContext,
   settled,
 } from '@ember/test-helpers';
+import { tracked } from '@glimmer/tracking';
 import { format, subDays, addMonths, addHours, subHours } from 'date-fns';
+import { task } from 'ember-concurrency';
 import { selectChoose } from 'ember-power-select/test-support';
 
 import { BigNumber } from 'ethers';
 import hbs from 'htmlbars-inline-precompile';
 import { module, test } from 'qunit';
+import { TrackedMap } from 'tracked-built-ins';
 
 import { setupRenderingTest } from '../helpers';
 
@@ -31,6 +37,8 @@ import {
 
 class WalletServiceStub extends Service {
   isConnected = true;
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  async switchNetwork(_chainId: number) {}
 }
 
 class ScheduledPaymentSDKServiceStub extends Service {
@@ -61,6 +69,33 @@ class ScheduledPaymentSDKServiceStub extends Service {
       },
     };
   }
+  async getFees(): Promise<ConfiguredScheduledPaymentFees> {
+    return {
+      fixedUSD: 0.25,
+      percentage: 0.1,
+    };
+  }
+}
+
+class TokenToUsdServiceStub extends Service {
+  @tracked usdConverters = new TrackedMap<
+    string,
+    (amountInWei: BigNumber) => BigNumber
+  >();
+
+  // eslint-disable-next-line require-yield
+  @task({ maxConcurrency: 1, enqueue: true }) *updateUsdConverter(
+    tokenAddress: string
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  ): any {
+    this.usdConverters.set(tokenAddress, (amountInWei: BigNumber) => {
+      return amountInWei.mul(2);
+    });
+  }
+
+  toUsd(tokenAddress: string, amount: BigNumber): BigNumber | undefined {
+    return this.usdConverters.get(tokenAddress)?.(amount);
+  }
 }
 
 let tokensService: TokensService;
@@ -70,13 +105,14 @@ module(
     setupRenderingTest(hooks);
 
     hooks.beforeEach(function (this: TestContext) {
-      tokensService = this.owner.lookup('service:tokens');
-      tokensService.stubGasTokens(exampleGasTokens);
-      this.owner.register('service:wallet', WalletServiceStub);
       this.owner.register(
         'service:scheduled-payment-sdk',
         ScheduledPaymentSDKServiceStub
       );
+      this.owner.register('service:token-to-usd', TokenToUsdServiceStub);
+      tokensService = this.owner.lookup('service:tokens');
+      tokensService.stubGasTokens(exampleGasTokens);
+      this.owner.register('service:wallet', WalletServiceStub);
     });
 
     test('it initializes the transaction token to undefined', async function (assert) {
@@ -133,7 +169,7 @@ module(
         .dom('[data-test-schedule-payment-form-submit-button]')
         .isDisabled();
 
-      await fillIn('[data-test-amount-input] input', '15.0');
+      await fillIn('[data-test-amount-input] input', '15.5');
 
       assert
         .dom('[data-test-schedule-payment-form-submit-button]')

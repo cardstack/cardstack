@@ -5,7 +5,7 @@ import {
 } from '@cardstack/cardpay-sdk';
 import NetworkService from '@cardstack/safe-tools-client/services/network';
 import Service, { inject as service } from '@ember/service';
-import { tracked } from '@glimmer/tracking';
+import { cached, tracked } from '@glimmer/tracking';
 import { type TokenInfo } from '@uniswap/token-lists';
 import { use, resource } from 'ember-resources';
 import sortBy from 'lodash/sortBy';
@@ -42,6 +42,7 @@ export default class TokensService extends Service {
     return state;
   });
 
+  @cached
   get transactionTokens(): TokenInfo[] {
     if (this._stubbedTransactionTokens) {
       return this._stubbedTransactionTokens;
