@@ -1,10 +1,10 @@
 import { setupHub } from '../helpers/server';
 
 describe('GET /api/rewards/proofs', function () {
-  let { getContainer, request } = setupHub(this);
+  let { getPrisma, request } = setupHub(this);
 
   this.beforeEach(async function () {
-    let prismaClient = await (await getContainer().lookup('prisma-manager')).getClient();
+    let prismaClient = await getPrisma();
 
     const proofs = [
       {
