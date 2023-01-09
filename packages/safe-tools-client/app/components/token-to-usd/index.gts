@@ -25,7 +25,6 @@ export default class TokenToUsd extends Component<Signature> {
     super(owner, args);
 
     this.updateInterval = setInterval(() => {
-      console.log('here');
       taskFor(this.tokenToUsdService.updateUsdConverter).perform(args.tokenAddress); 
     }, INTERVAL);
   }
