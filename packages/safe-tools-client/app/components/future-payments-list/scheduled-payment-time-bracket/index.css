@@ -1,0 +1,9 @@
+.scheduled-payment-time-bracket {
+  margin-bottom: var(--boxel-sp-sm);
+  background-color: transparent;
+}
+
+.scheduled-payment-time-bracket .boxel-header {
+  padding: 0;
+  margin-bottom: var(--boxel-sp-xs);
+}

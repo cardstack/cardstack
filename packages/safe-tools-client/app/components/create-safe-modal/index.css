@@ -27,6 +27,7 @@
 
 .safe-setup-modal__section-icon {
   --icon-stroke: var(--boxel-light);
+  min-width: 16px;
 }
 
 .setup-safe-modal__section b {

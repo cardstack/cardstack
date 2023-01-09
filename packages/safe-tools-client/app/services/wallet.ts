@@ -1,10 +1,11 @@
 import {
   getConstantByNetwork,
   getSDK,
-  isSchedulerSupportedChain,
   convertChainIdToName,
   Web3Provider,
+  isSupportedChain,
 } from '@cardstack/cardpay-sdk';
+import HubAuthenticationService from '@cardstack/safe-tools-client/services/hub-authentication';
 import NetworkService from '@cardstack/safe-tools-client/services/network';
 import { ChainConnectionManager } from '@cardstack/safe-tools-client/utils/chain-connection-manager';
 import walletProviders, {
@@ -24,6 +25,7 @@ const ERR_METAMASK_UNKNOWN_NETWORK = 4902; // The requested chain has not been a
 
 export default class Wallet extends Service {
   @service declare network: NetworkService;
+  @service declare hubAuthentication: HubAuthenticationService;
 
   @tracked isConnected = false;
   @tracked providerId: WalletProviderId | undefined;
@@ -57,9 +59,11 @@ export default class Wallet extends Service {
       this.network.chainId,
       owner
     );
+
     this.chainConnectionManager.on('connected', (accounts: string[]) => {
       this.isConnected = true;
       this.address = Web3.utils.toChecksumAddress(accounts[0]);
+      this.hubAuthentication.updateAuthenticationValidity();
     });
 
     this.chainConnectionManager.on('disconnected', () => {
@@ -67,7 +71,7 @@ export default class Wallet extends Service {
     });
 
     this.chainConnectionManager.on('chain-changed', (chainId: number) => {
-      if (!isSchedulerSupportedChain(chainId)) {
+      if (!isSupportedChain(chainId)) {
         // TODO: improve unsupported net handling
         alert('Unsupported network! Choose a supported one and reconnect');
         this.disconnect();
@@ -191,7 +195,7 @@ export default class Wallet extends Service {
     this.chainConnectionManager.disconnect();
   }
 
-  @action async fetchNativeTokenBalance() {
+  async fetchNativeTokenBalance() {
     const assets = await getSDK('Assets', this.ethersProvider);
     const balance = await assets.getNativeTokenBalance(this.address);
     this.nativeTokenBalance = {

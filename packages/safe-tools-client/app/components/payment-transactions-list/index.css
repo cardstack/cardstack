@@ -1,0 +1,68 @@
+.table {
+  width: 100%;
+  border-radius: 4px;
+  border-collapse: collapse;
+  margin: 0 auto;
+  margin-top: 2rem;
+  color: black;
+  font-size: var(--boxel-font-size-sm);
+}
+
+.table__header {
+  text-transform: uppercase;
+  font-weight: normal;
+  font-size: 0.75rem;
+  text-align: left;
+}
+
+.table__row {
+  border-bottom: 1px solid var(--boxel-purple-300);
+}
+
+.table__row:last-of-type {
+  border-bottom: 0;
+}
+
+.table__cell {
+  padding: 1rem 1.5rem;
+}
+
+.transactions-table-item-payee {
+  font-size: var(--boxel-font-size-sm);
+}
+
+.transactions-table-item-status-text {
+  margin-left: var(--boxel-sp-xxs);
+}
+
+.transactions-table-item-status-failure-reason {
+  font-size: var(--boxel-font-size-xs);
+  color: var(--boxel-purple-600);
+}
+
+.transactions-table-empty-explanation {
+  text-align: center;
+}
+
+.payment-transactions-list__filter-trigger {
+  --boxel-input-filter-select-border-color: var(--boxel-form-control-border-color);
+  --boxel-input-filter-select-border-radius: var(--boxel-border-radius-lg);
+
+  border-radius: var(--boxel-input-filter-select-border-radius);
+  border: 1px solid var(--boxel-input-filter-select-border-color);
+  font-family: var(--boxel-font-family);
+  font-size: var(--boxel-font-size-sm);
+  font-weight: 600;
+  height: var(--boxel-form-control-height);
+  position: relative;
+  transition: border-color var(--boxel-transition);
+  padding: var(--boxel-sp-xxs) var(--boxel-sp-sm);
+
+  width: 250px;
+  margin-right: var(--boxel-sp);
+}
+
+.past-payments-list {
+  width: 100%;
+  max-width: 100%;
+}

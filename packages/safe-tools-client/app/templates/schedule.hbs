@@ -48,11 +48,18 @@
       {{/if}}
     </cp.Item>
   </Boxel::ControlPanel>
-  <section class='safe-tools__dashboard-schedule-content'>
+
+  <section class='safe-tools__dashboard-container'>
     <ScheduleCollapsePanel @open={{not this.wallet.isConnected}} />
-    <div class='temporary-form-container'>
-      <SchedulePaymentFormActionCard />
-    </div>
+
+      <div class="safe-tools__dashboard-container-row">
+        <SchedulePaymentFormActionCard />
+        <FuturePaymentsList @onDepositClick={{set this 'isDepositModalOpen' true}} />
+      </div>
+
+      <div class="safe-tools__dashboard-container-row">
+        <PaymentTransactionsList />
+      </div>
   </section>
 </section>
 
@@ -63,3 +70,5 @@
   @networkName={{this.network.name}}
   @tokensToCover={{this.scheduledPaymentsTokensToCover}}
 />
+
+<HubAuthModal />

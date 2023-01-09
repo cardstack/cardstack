@@ -1,0 +1,60 @@
+.future-payments-list {
+  min-width: 20rem;
+  max-width: 25rem;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+
+  background-color: var(--boxel-purple-100);
+}
+
+.future-payments-list__no-payments-section {
+  height: 100%;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.future-payments-list__no-payments-title {
+  font: 700 1.125rem/calc(24 / 18) var(--boxel-font-family);
+  letter-spacing: 0;
+}
+
+.future-payments-list__no-payments-description {
+  margin-top: var(--boxel-sp-xs);
+  color: var(--boxel-purple-400);
+  letter-spacing: 0;
+  text-align: center;
+}
+
+.future-payments-list .boxel-action-container-section-title--content {
+  margin-bottom: var(--boxel-sp-xl);
+}
+
+.future-payments-list .boxel-action-container-section {
+  flex-grow: 1;
+
+  display: flex;
+  flex-direction: column;
+}
+
+.future-payments-list__payments-section {
+  position: relative;
+  flex-grow: 1;
+  margin-top: 0;
+  min-height: 0;
+}
+
+.future-payments-list__payments-section-time-brackets {
+  position: absolute;
+  left: 0; top: 0; right: 0; bottom: 0;
+  overflow: auto;
+  flex-grow: 1;
+}
+
+.future-payments-list__payments-section-time-brackets::-webkit-scrollbar {
+  display: none;
+}

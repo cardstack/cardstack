@@ -1,0 +1,53 @@
+.scheduled-payment-card {
+  padding: var(--boxel-sp-sm) var(--boxel-sp);
+  margin-bottom: var(--boxel-sp-xs);
+}
+
+.scheduled-payment-card .boxel-icon-button {
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+
+.scheduled-payment-card__content {
+  display: flex;
+  flex-direction: column;
+}
+
+.scheduled-payment-card__payment-detail {
+  margin-top: var(--boxel-sp-lg);
+
+  display: flex;
+}
+
+.scheduled-payment-card__token-symbol {
+  margin-right: var(--boxel-sp-xs);
+  vertical-align: bottom;
+  width: var(--boxel-icon-sm);
+  height: var(--boxel-icon-sm);
+}
+
+.scheduled-payment-card__pay-at {
+  font: 700 var(--boxel-font-sm);
+  letter-spacing: var(--boxel-lsp-xl);
+}
+
+.scheduled-payment-card__payee {
+  font: 600 var(--boxel-font-sm);
+  letter-spacing: var(--boxel-lsp-xl);
+  color: var(--boxel-purple-400);
+}
+
+.scheduled-payment-card__token-amounts {
+  display: flex;
+  flex-direction: column;
+}
+
+.scheduled-payment-card__token-amount {
+  font: 700 var(--boxel-font);
+}
+
+.scheduled-payment-card__usd-amount {
+  font: 500 var(--boxel-font-sm);
+  color: var(--boxel-purple-400);
+}

@@ -2,8 +2,8 @@ import {
   getConstantByNetwork,
   Network,
   networks,
-  schedulerSupportedChainsArray,
   SchedulerCapableNetworks,
+  supportedChainsArray,
 } from '@cardstack/cardpay-sdk';
 import WalletService from '@cardstack/safe-tools-client/services/wallet';
 import { getOwner } from '@ember/application';
@@ -48,7 +48,7 @@ export default class NetworkService extends Service {
   }
 
   get supportedList() {
-    return schedulerSupportedChainsArray
+    return supportedChainsArray
       .map((networkSymbol) => ({
         name: getConstantByNetwork('name', networkSymbol),
         chainId: getConstantByNetwork('chainId', networkSymbol),

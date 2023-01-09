@@ -46,7 +46,7 @@
 </Boxel::Dashboard>
 
 <NetworkConnectModal
-  @isOpen={{this.isShowingConnectModal}}
+  @isOpen={{and this.isShowingConnectModal (not this.wallet.isConnected)}}
   @onClose={{set this 'isShowingConnectModal' false}}
-  @isConnected={{false}}
+  @isConnected={{this.wallet.isConnected}}
 />

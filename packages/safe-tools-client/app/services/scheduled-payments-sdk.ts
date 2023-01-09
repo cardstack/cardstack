@@ -4,9 +4,14 @@ import {
   getSDK,
   ScheduledPaymentModule,
   getNativeWeiInToken,
+  poll,
+  SchedulePaymentProgressListener,
 } from '@cardstack/cardpay-sdk';
+import config from '@cardstack/safe-tools-client/config/environment';
+import SafesService, {
+  Safe,
+} from '@cardstack/safe-tools-client/services/safes';
 import WalletService from '@cardstack/safe-tools-client/services/wallet';
-
 import { action } from '@ember/object';
 import Service, { inject as service } from '@ember/service';
 import { TaskGenerator } from 'ember-concurrency';
@@ -27,10 +32,11 @@ export interface GasEstimationResult {
 
 export default class SchedulePaymentSDKService extends Service {
   @service declare wallet: WalletService;
+  @service declare safes: SafesService;
 
   estimatedSafeCreationGas: undefined | BigNumber;
 
-  private async getSchedulePaymentsModule(): Promise<ScheduledPaymentModule> {
+  private async getSchedulePaymentModule(): Promise<ScheduledPaymentModule> {
     const module = await getSDK(
       'ScheduledPaymentModule',
       this.wallet.ethersProvider
@@ -43,23 +49,45 @@ export default class SchedulePaymentSDKService extends Service {
     return { from: this.wallet.address };
   }
 
-  @action async getCreateSafeGasEstimation(): Promise<BigNumber | undefined> {
-    const scheduledPayments = await this.getSchedulePaymentsModule();
+  async getCreateSafeGasEstimation(): Promise<{
+    gasEstimateInNativeToken: BigNumber;
+    gasEstimateInUsd: BigNumber;
+  }> {
+    const scheduledPayments = await this.getSchedulePaymentModule();
 
     const estimatedGas = await scheduledPayments.estimateGas(
-      'create_safe_with_module'
+      'create_safe_with_module',
+      { hubUrl: config.hubUrl }
     );
 
-    return estimatedGas.gasRangeInWei.standard;
+    return {
+      gasEstimateInNativeToken: estimatedGas.gasRangeInWei.standard,
+      gasEstimateInUsd: estimatedGas.gasRangeInUSD.standard,
+    };
   }
 
-  @task *createSafe(): TaskGenerator<void> {
-    const scheduledPayments = yield this.getSchedulePaymentsModule();
+  async createSafe(): Promise<{ safeAddress: string }> {
+    const scheduledPayments = await this.getSchedulePaymentModule();
 
-    yield scheduledPayments.createSafeWithModuleAndGuard(
+    return scheduledPayments.createSafeWithModuleAndGuard(
       undefined,
       undefined,
       this.contractOptions
+    );
+  }
+
+  async waitForSafeToBeIndexed(
+    chainId: number,
+    walletAddress: string,
+    safeAddress: string
+  ): Promise<void> {
+    await poll(
+      () => this.safes.fetchSafes(chainId, walletAddress),
+      (safes: Safe[]) => {
+        return !!safes.find((safe: Safe) => safe.address === safeAddress);
+      },
+      1000,
+      2 * 60 * 1000 // Poll for 2 minutes. If the safe is not indexed by then, show an error message
     );
   }
 
@@ -69,13 +97,13 @@ export default class SchedulePaymentSDKService extends Service {
     tokenAddress: ChainAddress,
     gasTokenAddress: ChainAddress
   ): Promise<GasEstimationResult> {
-    const scheduledPayments = await this.getSchedulePaymentsModule();
+    const scheduledPayments = await this.getSchedulePaymentModule();
 
-    const gasEstimationResult = await scheduledPayments.estimateGas(
-      scenario,
+    const gasEstimationResult = await scheduledPayments.estimateGas(scenario, {
       tokenAddress,
-      gasTokenAddress
-    );
+      gasTokenAddress,
+      hubUrl: config.hubUrl,
+    });
     const { gasRangeInWei, gasRangeInUSD } = gasEstimationResult;
     const priceWeiInGasToken = String(
       await getNativeWeiInToken(this.wallet.ethersProvider, gasTokenAddress)
@@ -114,27 +142,32 @@ export default class SchedulePaymentSDKService extends Service {
     payAt: number | null,
     recurringDayOfMonth: number | null,
     recurringUntil: number | null,
-    onScheduledPaymentIdReady: (scheduledPaymentId: string) => void
+    listener: SchedulePaymentProgressListener
   ): TaskGenerator<void> {
-    const scheduledPayments = yield this.getSchedulePaymentsModule();
-    yield scheduledPayments.schedulePayment(
-      safeAddress,
-      moduleAddress,
-      tokenAddress,
-      amount,
-      payeeAddress,
-      executionGas,
-      maxGasPrice,
-      gasTokenAddress,
-      salt,
-      payAt,
-      recurringDayOfMonth,
-      recurringUntil,
-      onScheduledPaymentIdReady
-    );
-    console.log(
-      `Scheduled payment added in both crank and on chain successfully.`
-    );
+    try {
+      const scheduledPaymentModule: ScheduledPaymentModule =
+        yield this.getSchedulePaymentModule();
+      yield scheduledPaymentModule.schedulePayment(
+        safeAddress,
+        moduleAddress,
+        tokenAddress,
+        amount,
+        payeeAddress,
+        executionGas,
+        maxGasPrice,
+        gasTokenAddress,
+        salt,
+        payAt,
+        recurringDayOfMonth,
+        recurringUntil,
+        {
+          hubUrl: config.hubUrl,
+          listener,
+        }
+      );
+    } catch (err) {
+      console.error(err);
+    }
   }
 }
 

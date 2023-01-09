@@ -87,16 +87,22 @@ export async function gasPriceInToken(provider: JsonRpcProvider, tokenAddress: s
     .div(new BN(rateAdjusted.denominator.toString()));
 }
 
-export async function getGasPricesInNativeWei(chainId: number): Promise<GasPrice> {
+export async function getGasPricesInNativeWei(
+  chainId: number,
+  options: { hubUrl?: string | null } = {}
+): Promise<GasPrice> {
   const network = convertChainIdToName(chainId);
 
-  let gasStationResponse = await fetch(`${getConstantByNetwork('hubUrl', network)}/api/gas-station/${chainId}`, {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/vnd.api+json',
-      Accept: 'application/vnd.api+json',
-    },
-  });
+  let gasStationResponse = await fetch(
+    `${options.hubUrl || getConstantByNetwork('hubUrl', network)}/api/gas-station/${chainId}`,
+    {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/vnd.api+json',
+        Accept: 'application/vnd.api+json',
+      },
+    }
+  );
   let gasPriceJson = await gasStationResponse.json();
 
   return {

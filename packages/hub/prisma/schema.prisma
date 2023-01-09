@@ -369,9 +369,26 @@ model GasEstimationResult {
 model RewardRootIndex {
   rewardProgramId String @map("reward_program_id")
   paymentCycle    Int    @map("payment_cycle")
+  blockNumber     Int    @map("block_number")
 
   @@unique([rewardProgramId, paymentCycle], map: "reward_root_index_unique_reward_program_id_and_payment_cycle")
   @@map("reward_root_index")
+}
+
+model RewardProof {
+  rewardProgramId String   @map("reward_program_id")
+  payee           String
+  leaf            String   @id
+  paymentCycle    Int      @map("payment_cycle")
+  proofBytes      String[] @map("proof_bytes")
+  tokenType       Int      @map("token_type")
+  validFrom       Int      @map("valid_from")
+  validTo         Int      @map("valid_to")
+  explanationId   String?  @map("explanation_id")
+  explanationData Json?    @map("explanation_data") @db.Json
+
+  @@index([payee, rewardProgramId], map: "reward_proofs_payee_reward_program_id_index")
+  @@map("reward_proofs")
 }
 
 enum DiscordBotsStatusEnum {
