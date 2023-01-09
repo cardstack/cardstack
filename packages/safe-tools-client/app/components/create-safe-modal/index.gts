@@ -75,7 +75,7 @@ export default class SetupSafeModal extends Component<Signature> {
           {{else}}
             {{#if @comparingBalanceToGasCostErrorMessage}}
               <div class='safe-setup-modal__section-wallet-info'>
-                <FailureIcon class='safe-setup-modal__section-icon' />
+                <FailureIcon class='action-chin-info-icon' />
                 <p>
                   {{@comparingBalanceToGasCostErrorMessage}}
                 </p>
@@ -84,12 +84,12 @@ export default class SetupSafeModal extends Component<Signature> {
               <b>Estimated gas cost: {{@gasCostDisplay}}</b>
               <div class='safe-setup-modal__section-wallet-info'>
                 {{#if this.notEnoughBalance}}
-                  <FailureIcon class='safe-setup-modal__section-icon' />
+                  <FailureIcon class='action-chin-info-icon' />
                   <p>
                     Your wallet has insufficient funds to cover the estimated gas cost.
                   </p>
                 {{else}}
-                  <SuccessIcon class='safe-setup-modal__section-icon' />
+                  <SuccessIcon class='action-chin-info-icon' />
                   <p>
                     Your wallet has sufficient funds to cover the estimated gas cost.
                   </p>
@@ -110,12 +110,12 @@ export default class SetupSafeModal extends Component<Signature> {
 
               {{#if @provisioningOrIndexingErrorMessage}}
                 <ac.InfoArea data-test-safe-error-info>
-                  <FailureIcon class='safe-setup-modal__section-icon' />
+                  <FailureIcon class='action-chin-info-icon' />
                   {{@provisioningOrIndexingErrorMessage}}
                 </ac.InfoArea>
               {{else}}
                 <ac.InfoArea data-test-safe-success-info>
-                  <SuccessIcon class='safe-setup-modal__section-icon' />
+                  <SuccessIcon class='action-chin-info-icon' />
                   Your safe has been created and the module has been enabled. You can now schedule payments.
                 </ac.InfoArea>
               {{/if}}
@@ -134,7 +134,7 @@ export default class SetupSafeModal extends Component<Signature> {
 
               {{#if @provisioningOrIndexingErrorMessage}}
                 <ac.InfoArea data-test-safe-error-info>
-                  <FailureIcon class='safe-setup-modal__section-icon' />
+                  <FailureIcon class='action-chin-info-icon' />
                   {{@provisioningOrIndexingErrorMessage}}
                 </ac.InfoArea>
               {{/if}}
