@@ -24,6 +24,7 @@ const NOW = new Date(2023, 0, 1);
 
 let returnEmptyScheduledPayments = false;
 let returnScheduledPaymentsUntilTomorrow = false;
+let returnOnlyLaterScheduledPayments = false;
 let dateService: FakeDateService;
 
 class ScheduledPaymentsStub extends Service {
@@ -121,6 +122,12 @@ class ScheduledPaymentsStub extends Service {
       );
     }
 
+    if (returnOnlyLaterScheduledPayments) {
+      return Promise.resolve(
+        scheduledPayments.filter((sp) => sp.payAt >= addDays(endOfThisMonth, 1))
+      );
+    }
+
     return Promise.resolve(scheduledPayments);
   };
 }
@@ -144,6 +151,7 @@ module('Integration | Component | future-payments-list', function (hooks) {
   hooks.afterEach(function () {
     returnEmptyScheduledPayments = false;
     returnScheduledPaymentsUntilTomorrow = false;
+    returnOnlyLaterScheduledPayments = false;
     dateService.reset();
   });
 
@@ -221,5 +229,22 @@ module('Integration | Component | future-payments-list', function (hooks) {
     );
     assert.dom(`[data-test-time-bracket='this month']`).isNotVisible();
     assert.dom(`[data-test-time-bracket='later']`).isNotVisible();
+  });
+
+  test('It renders future payments list, with no ealier time windows than later', async function (assert) {
+    assert.expect(6);
+    returnOnlyLaterScheduledPayments = true;
+    this.set('onDepositClick', () => {});
+    await render(hbs`
+      <FuturePaymentsList @onDepositClick={{this.onDepositClick}} />
+    `);
+
+    await percySnapshot(assert);
+    assert.dom('[data-test-no-future-payments-list]').isNotVisible();
+    assert.dom('[data-test-future-payments-list]').isVisible();
+    assert.dom(`[data-test-time-bracket='today']`).isNotVisible();
+    assert.dom(`[data-test-time-bracket='tomorrow']`).isNotVisible();
+    assert.dom(`[data-test-time-bracket='this month']`).isNotVisible();
+    assert.dom(`[data-test-time-bracket='']`).isVisible(); // Blank title if there is no earlier time windows than "later"
   });
 });

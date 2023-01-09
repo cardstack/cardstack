@@ -69,6 +69,13 @@ export default class FuturePaymentsList extends Component<Signature> {
     return this.scheduledPayments.filter((s: ScheduledPayment) => s.payAt > endOfThisMonth);
   }
 
+  get laterLabel(): string {
+    if (this.today.length <= 0 && this.tomorrow.length <= 0 && this.thisMonth.length <= 0) {
+      return '';
+    }
+    return 'later';
+  }
+
   @task *loadScheduledPaymentTask(chainId: number): TaskGenerator<ScheduledPayment[]> {
     return yield this.scheduledPaymentsService.fetchScheduledPayments(chainId, this.now);
   }
@@ -127,7 +134,7 @@ export default class FuturePaymentsList extends Component<Signature> {
               <ScheduledPaymentTimeBracket @title="today" @scheduledPayments={{this.today}}/>
               <ScheduledPaymentTimeBracket @title="tomorrow" @scheduledPayments={{this.tomorrow}}/>
               <ScheduledPaymentTimeBracket @title="this month" @scheduledPayments={{this.thisMonth}}/>
-              <ScheduledPaymentTimeBracket @title="later" @scheduledPayments={{this.later}}/>
+              <ScheduledPaymentTimeBracket @title={{this.laterLabel}} @scheduledPayments={{this.later}}/>
             </div>
           </div>
         </Section>
