@@ -1,10 +1,8 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
-import { UsdConverter } from '@cardstack/safe-tools-client/services/scheduled-payments-sdk';
 import Service from '@ember/service';
 import { render, TestContext } from '@ember/test-helpers';
 import percySnapshot from '@percy/ember';
 import { addMinutes, addMonths, addHours } from 'date-fns';
-import { BigNumber } from 'ethers';
 
 import hbs from 'htmlbars-inline-precompile';
 import { module, test } from 'qunit';
@@ -51,7 +49,7 @@ class ScheduledPaymentsStub extends Service {
         feeFixedUSD: '0',
         feePercentage: '0',
         gasTokenAddress: '0x123',
-        tokenAddress: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
+        tokenAddress: '0x6B175474E89094C44Da98b954EedeAC495271d0F',
         chainId,
         payeeAddress: '0xeBCC5516d44FFf5E9aBa2AcaeB65BbB49bC3EBe1',
         payAt: addMonths(minPayAt, 1),
@@ -61,24 +59,12 @@ class ScheduledPaymentsStub extends Service {
         feeFixedUSD: '0',
         feePercentage: '0',
         gasTokenAddress: '0x123',
-        tokenAddress: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
+        tokenAddress: '0x6B175474E89094C44Da98b954EedeAC495271d0F',
         chainId,
         payeeAddress: '0xeBCC5516d44FFf5E9aBa2AcaeB65BbB49bC3EBe1',
         payAt: addMonths(minPayAt, 3),
       },
     ]);
-  };
-}
-
-class ScheduledPaymentsSdkStub extends Service {
-  updateUsdConverters = async (addressesToUpdate: string[]) => {
-    const usdConverters: UsdConverter = {};
-    for (const tokenAddress of addressesToUpdate) {
-      usdConverters[tokenAddress] = (amountInWei: BigNumber) => {
-        return amountInWei.mul(1);
-      };
-    }
-    return usdConverters;
   };
 }
 
@@ -91,10 +77,6 @@ module('Integration | Component | future-payments-list', function (hooks) {
     this.owner.register(
       'service:hub-authentication',
       HubAuthenticationServiceStub
-    );
-    this.owner.register(
-      'service:scheduled-payments-sdk',
-      ScheduledPaymentsSdkStub
     );
   });
 
