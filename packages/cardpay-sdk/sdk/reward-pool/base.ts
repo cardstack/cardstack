@@ -151,7 +151,7 @@ export default class RewardPool {
     }
     let rewardManager = await getSDK('RewardManager', this.layer2Web3);
     const rule = await rewardManager.getRuleJson(rewardProgramId);
-    json.map((o: any) => {
+    json.map(({ attributes: o }: any) => {
       let { validFrom, validTo, token, amount }: FullLeaf = this.decodeLeaf(o.leaf) as FullLeaf;
       const isValid = validFrom <= currentBlock && validTo > currentBlock;
       // filters for known reward tokens
