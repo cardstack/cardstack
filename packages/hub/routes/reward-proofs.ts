@@ -1,6 +1,8 @@
 import { inject } from '@cardstack/di';
 import Koa from 'koa';
 import autoBind from 'auto-bind';
+import Logger from '@cardstack/logger';
+let log = Logger('route:reward-proofs');
 export default class RewardProofsRoute {
   prismaManager = inject('prisma-manager', { as: 'prismaManager' });
   constructor() {
@@ -8,18 +10,29 @@ export default class RewardProofsRoute {
   }
 
   async get(ctx: Koa.Context) {
-    let prisma = await this.prismaManager.getClient();
-    let payee = ctx.params.payee;
-    let rewardProgramId = ctx.request.query.rewardProgramId as string;
-    let proofs = await prisma.rewardProof.findMany({
-      where: {
-        payee,
-        rewardProgramId,
-      },
-    });
-    ctx.type = 'application/vnd.api+json';
-    ctx.status = 200;
-    ctx.body = proofs;
+    try {
+      let prisma = await this.prismaManager.getClient();
+      let payee = ctx.params.payee;
+      let rewardProgramId = ctx.request.query.rewardProgramId as string;
+      let proofs = await prisma.rewardProof.findMany({
+        where: {
+          payee,
+          rewardProgramId,
+        },
+      });
+      let data = proofs.map((proof) => {
+        return {
+          id: proof.leaf,
+          type: 'reward-proofs',
+          attributes: proof,
+        };
+      });
+      ctx.type = 'application/vnd.api+json';
+      ctx.status = 200;
+      ctx.body = data;
+    } catch (e) {
+      log.error('Failed to retrieve reward proofs', e);
+    }
   }
 }
 
