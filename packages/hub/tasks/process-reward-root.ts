@@ -98,6 +98,8 @@ export default class ProcessRewardRoot {
           `rewardProgramId: ${payload.rewardProgramId}, paymentCycle: ${payload.paymentCycle} is already indexed`
         );
         return;
+      } else {
+        throw e;
       }
     }
   }

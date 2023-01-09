@@ -56,7 +56,7 @@ const mockResponse = (proofs: any[], maxPaginate = 100) => {
     Payload: mockPayload,
   };
 };
-describe('ProcessRewardRootTask', function () {
+describe.only('ProcessRewardRootTask', function () {
   let db: DBClient;
   let s3Mock: AwsStub<ServiceInputTypes, ServiceOutputTypes>;
   let { getContainer } = setupHub(this);
@@ -107,6 +107,7 @@ describe('ProcessRewardRootTask', function () {
     const paymentCycle = mockProofs[0].paymentCycle;
     let task = await getContainer().instantiate(ProcessRewardRoot);
     await task.perform({
+      blockNumber: '1',
       rewardProgramId: rewardProgramId,
       paymentCycle: String(paymentCycle),
     });
@@ -116,7 +117,7 @@ describe('ProcessRewardRootTask', function () {
       expect(o.reward_program_id).to.be.equal(rewardProgramId);
       expect(o.payment_cycle).to.be.equal(paymentCycle);
       expect(o.leaf.startsWith('0x')).to.be.true;
-      o.proof.map((p: string) => {
+      o.proof_bytes.map((p: string) => {
         expect(p.startsWith('0x'));
       });
       expect(o.explanation_id).to.be.equal('flat_payment');
@@ -164,14 +165,23 @@ describe('ProcessRewardRootTask', function () {
     const paymentCycle = mockProofs[0].paymentCycle;
     let task = await getContainer().instantiate(ProcessRewardRoot);
     await task.perform({
+      blockNumber: '1',
       rewardProgramId: rewardProgramId,
       paymentCycle: String(paymentCycle),
     });
+
     //duplicate indexing
-    await task.perform({
+    await db.query('BEGIN');
+    const res = await task.perform({
+      blockNumber: '1',
       rewardProgramId: rewardProgramId,
       paymentCycle: String(paymentCycle),
     });
+    await db.query('COMMIT');
+    if (res == undefined) {
+      //have to rollback because test db doesn't implement begin, commit, rollback for performTRansaction
+      await db.query('ROLLBACK');
+    }
     const { rows } = await db.query('SELECT * FROM reward_proofs;');
     expect(rows.length).to.be.equal(2);
     const { rows: index } = await db.query('SELECT * FROM reward_root_index;');
@@ -219,6 +229,7 @@ describe('ProcessRewardRootTask', function () {
     const paymentCycle = mockProofs[0].paymentCycle;
     let task = await getContainer().instantiate(ProcessRewardRoot);
     await task.perform({
+      blockNumber: '1',
       rewardProgramId: rewardProgramId,
       paymentCycle: String(paymentCycle),
     });
@@ -228,7 +239,7 @@ describe('ProcessRewardRootTask', function () {
       expect(o.reward_program_id).to.be.equal(rewardProgramId);
       expect(o.payment_cycle).to.be.equal(paymentCycle);
       expect(o.leaf.startsWith('0x')).to.be.true;
-      o.proof.map((p: string) => {
+      o.proof_bytes.map((p: string) => {
         expect(p.startsWith('0x'));
       });
       expect(o.explanation_id).to.be.equal('flat_payment');
@@ -272,6 +283,7 @@ describe('ProcessRewardRootTask', function () {
     const paymentCycle = mockProofs[0].paymentCycle;
     let task = await getContainer().instantiate(ProcessRewardRoot);
     await task.perform({
+      blockNumber: '1',
       rewardProgramId: rewardProgramId,
       paymentCycle: String(paymentCycle),
     });
@@ -281,7 +293,7 @@ describe('ProcessRewardRootTask', function () {
       expect(o.reward_program_id).to.be.equal(rewardProgramId);
       expect(o.payment_cycle).to.be.equal(paymentCycle);
       expect(o.leaf.startsWith('0x')).to.be.true;
-      o.proof.map((p: string) => {
+      o.proof_bytes.map((p: string) => {
         expect(p.startsWith('0x'));
       });
       expect(o.explanation_id).to.be.null;
