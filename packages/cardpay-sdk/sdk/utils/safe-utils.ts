@@ -527,5 +527,5 @@ export async function getTokenBalancesForSafe(
         return null;
       }
     })
-    .filter((e) => !!e) as BalanceSummary[];
+    .filter(Boolean) as BalanceSummary[];
 }
