@@ -28,7 +28,7 @@ class TokenToUsdServiceStub extends Service {
     this.usdConverters = this.usdConverters;
   }
 
-  toUsdFrom(tokenAddress: string, amount: BigNumber): BigNumber | undefined {
+  toUsd(tokenAddress: string, amount: BigNumber): BigNumber | undefined {
     if (returnEmptyUsdConverter) {
       return undefined;
     }

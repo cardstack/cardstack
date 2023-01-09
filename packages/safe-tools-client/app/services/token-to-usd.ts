@@ -40,7 +40,7 @@ export default class TokenToUsdService extends Service {
     }
   }
 
-  toUsdFrom(tokenAddress: string, amount: BigNumber): BigNumber | undefined {
+  toUsd(tokenAddress: string, amount: BigNumber): BigNumber | undefined {
     if (amount.isZero()) {
       return BigNumber.from(0);
     }

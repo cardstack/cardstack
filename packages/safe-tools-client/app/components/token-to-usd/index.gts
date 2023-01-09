@@ -30,7 +30,7 @@ export default class TokenToUsd extends Component<Signature> {
   }
   
   get usdAmount() {
-    return this.tokenToUsdService.toUsdFrom(this.args.tokenAddress, BigNumber.from(this.args.tokenAmount))?.toString();
+    return this.tokenToUsdService.toUsd(this.args.tokenAddress, BigNumber.from(this.args.tokenAmount))?.toString();
   }
 
   willDestroy() {
