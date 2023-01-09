@@ -44,9 +44,9 @@ export default class RewardProofsRoute {
           attributes: proof,
         };
       });
-      ctx.type = 'application/vnd.api+json';
       ctx.status = 200;
       ctx.body = { data };
+      ctx.type = 'application/vnd.api+json';
     } catch (e) {
       log.error('Failed to retrieve reward proofs', e);
     }
