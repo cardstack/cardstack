@@ -11,7 +11,7 @@ import { AbiItem } from 'web3-utils';
 import { getAddress } from '../../contracts/addresses';
 import GnosisSafeProxyFactoryABI from '../../contracts/abi/gnosis-safe-proxy-factory';
 import GnosisSafeABI from '../../contracts/abi/gnosis-safe';
-import { Transaction, isJsonRpcProvider } from './general-utils';
+import { Transaction, isJsonRpcProvider, nonNullable } from './general-utils';
 /* eslint-disable node/no-extraneous-import */
 import { Contract, ethers, utils } from 'ethers';
 import { AddressZero } from '@ethersproject/constants';
@@ -516,16 +516,18 @@ export async function getTokenBalancesForSafe(
     .map((tokenAddress) => {
       let balanceInfo = balances.find((b) => b.tokenAddress?.toLowerCase() === tokenAddress.toLowerCase());
 
+      let balanceSummary;
+
       if (balanceInfo?.token) {
         let {
           balance,
           token: { symbol, decimals },
         } = balanceInfo;
 
-        return { tokenAddress, symbol, balance: BigNumber.from(balance), decimals };
-      } else {
-        return null;
+        balanceSummary = { tokenAddress, symbol, balance: BigNumber.from(balance), decimals };
       }
+
+      return balanceSummary;
     })
-    .filter(Boolean) as BalanceSummary[];
+    .filter(nonNullable);
 }
