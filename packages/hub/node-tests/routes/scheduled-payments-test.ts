@@ -1,6 +1,6 @@
 import { Networkish, TokenDetail } from '@cardstack/cardpay-sdk';
 import { PrismaClient } from '@prisma/client';
-import { subDays } from 'date-fns';
+import { addHours, subDays } from 'date-fns';
 import shortUuid from 'short-uuid';
 import { nowUtc } from '../../utils/dates';
 import { calculateNextPayAt } from '../../utils/scheduled-payments';
@@ -519,6 +519,28 @@ describe('GET /api/scheduled-payments', async function () {
       },
     });
 
+    let sp3 = await prisma.scheduledPayment.create({
+      data: {
+        id: shortUuid.uuid(),
+        senderSafeAddress: '0xc0ffee254729296a45a3885639AC7E10F9d54979',
+        moduleAddress: '0x7E7d0B97D663e268bB403eb4d72f7C0C7650a6dd',
+        tokenAddress: '0xa455bbB2A81E09E0337c13326BBb302Cb37D7cf6',
+        gasTokenAddress: '0x6A50E3807FB9cD0B07a79F64e561B9873D3b132E',
+        amount: '100',
+        payeeAddress: '0x821f3Ee0FbE6D1aCDAC160b5d120390Fb8D2e9d3',
+        executionGasEstimation: 100000,
+        maxGasPrice: '1000000000',
+        feeFixedUsd: '0',
+        feePercentage: '0',
+        salt: '54lt',
+        payAt: addHours(subDays(nowUtc(), 1), 1),
+        spHash: '0x12345',
+        chainId: 1,
+        userAddress: stubUserAddress,
+        creationTransactionHash: null,
+      },
+    });
+
     await request()
       .get(`/api/scheduled-payments?filter[pay-at][gt]=${subDays(nowUtc(), 2).toISOString()}`)
       .set('Authorization', 'Bearer abc123--def456--ghi789')
@@ -526,8 +548,9 @@ describe('GET /api/scheduled-payments', async function () {
       .set('Content-Type', 'application/vnd.api+json')
       .expect(200)
       .then((response) => {
-        expect(response.body.data.length).to.equal(1);
+        expect(response.body.data.length).to.equal(2);
         expect(response.body.data[0].id).to.equal(sp2.id);
+        expect(response.body.data[1].id).to.equal(sp3.id);
       });
   });
 });
