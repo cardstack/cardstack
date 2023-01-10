@@ -99,7 +99,7 @@ module.exports = function (environment) {
     },
     fastboot: {
       hostWhitelist: hostWhitelistByTarget[process.env.SSR_WEB_ENVIRONMENT] ?? [
-        '/.+.card.xyz.localhost:\\d+$/',
+        '/.+.card.xyz.localhost(:\\d+)?$/',
         '/^localhost:\\d+$/',
       ],
     },
@@ -140,7 +140,7 @@ module.exports = function (environment) {
     ENV.APP.autoboot = false;
 
     // mock server during test
-    ENV.hubURL = '';
+    ENV.hubURL = 'http://example.com';
     ENV['ember-cli-mirage'] = {
       enabled: true,
       trackRequests: true,
