@@ -69,6 +69,29 @@ const metaQuery = `
   }
 `;
 
+export interface RewardRoot {
+  id: string;
+  blockNumber: string;
+  rootHash: string;
+  paymentCycle: string;
+  rewardProgram: {
+    id: string;
+  };
+}
+
+export interface RewardRoots {
+  data: {
+    merkleRootSubmissions: RewardRoot[];
+  };
+}
+export interface RewardPrograms {
+  data: {
+    rewardPrograms: {
+      id: string;
+    }[];
+  };
+}
+
 export default class Subgraph {
   // we use the subgraph to wait for the prepaid card provisioning to be mined
   // so that the SDK safe API results are consistent with the new prepaid card
@@ -130,6 +153,55 @@ export default class Subgraph {
       }
     `
     )) as InventorySubgraph;
+  }
+
+  async getRewardRoots(rewardProgramId: string, lastIndexedBlockNumber: number, limit = 100) {
+    // this will query up till limits of subgraph which is 100 roots at a time
+    // for indexing,
+    // - we have to query by blockNumber this is in case we write an earlier payment cycle in a later block
+    // - we use gte, because there might be merkle root submissions corresponding to different payment cycle in the same block
+    //   redundant jobs (same payment cycle) are fine since they return although they are submitted
+    const where = `where: {
+      rewardProgram: "${rewardProgramId}",
+      blockNumber_gte: ${lastIndexedBlockNumber} 
+    }`;
+    return (await gqlQuery(
+      network,
+      `
+        {
+            merkleRootSubmissions(
+                ${where},
+                orderBy: blockNumber,
+                orderDirection: asc,
+                rootHash_not: "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
+                first: ${limit}
+            ){
+                id
+                blockNumber
+                rootHash
+                paymentCycle
+                rewardProgram {
+                    id
+                }
+            }
+        }
+    `
+    )) as RewardRoots;
+  }
+
+  async getRewardPrograms(archivedRewardPrograms = []) {
+    const query = `
+    {
+      rewardPrograms(
+        where: {
+          ${archivedRewardPrograms.length > 0 ? 'id_not_in:' + JSON.stringify(archivedRewardPrograms) : ''}
+        })
+      {
+          id
+      }
+    }
+    `;
+    return (await gqlQuery(network, query)) as RewardPrograms;
   }
 
   async getMeta() {

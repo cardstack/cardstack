@@ -25,9 +25,10 @@
   gap: var(--boxel-sp-xxs);
 }
 
-.safe-setup-modal__section-icon {
+.action-chin-info-icon {
   --icon-stroke: var(--boxel-light);
   min-width: 16px;
+  margin-right: var(--boxel-font-size-sm);
 }
 
 .setup-safe-modal__section b {

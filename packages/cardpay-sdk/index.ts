@@ -64,6 +64,7 @@ export {
 export * from './sdk/network-config-utils';
 export * from './sdk/utils/general-utils';
 export * from './sdk/scheduled-payment/utils';
+export * from './sdk/utils/reward-explanation-utils';
 export { poll } from './sdk/utils/general-utils';
 export { convertRawAmountToDecimalFormat } from './sdk/currency-utils';
 export {

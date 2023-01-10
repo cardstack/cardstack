@@ -168,6 +168,20 @@ export default class SchedulePaymentSDKService extends Service {
       console.error(err);
     }
   }
+
+  async cancelScheduledPayment(
+    scheduledPaymentId: string,
+    authToken: string
+  ): Promise<unknown> {
+    const scheduledPaymentModule: ScheduledPaymentModule =
+      await this.getSchedulePaymentModule();
+
+    return scheduledPaymentModule.cancelScheduledPayment(
+      scheduledPaymentId,
+      config.hubUrl,
+      authToken
+    );
+  }
 }
 
 declare module '@ember/service' {

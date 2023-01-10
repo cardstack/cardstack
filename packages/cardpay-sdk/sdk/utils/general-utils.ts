@@ -483,3 +483,7 @@ export async function resolveDoc(did: string) {
   let content = await urlResponse.json();
   return content;
 }
+
+export function nonNullable<T>(value: T): value is NonNullable<T> {
+  return Boolean(value);
+}
