@@ -6,4 +6,5 @@ export interface FakeDateService extends Service {
   reset(): void;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function setupFakeDateService(hooks: any): void;
