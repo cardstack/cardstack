@@ -7,14 +7,15 @@ import { tracked } from '@glimmer/tracking';
 import { addMilliseconds } from 'date-fns';
 import { task } from 'ember-concurrency';
 import { BigNumber } from 'ethers';
+import { TrackedMap } from 'tracked-built-ins';
 
 const INTERVAL = config.environment === 'test' ? 3000 : 60 * 3000;
 
 export default class TokenToUsdService extends Service {
-  @tracked usdConverters: Record<
+  @tracked usdConverters = new TrackedMap<
     string,
     (amountInWei: BigNumber) => BigNumber
-  > = {};
+  >();
   convertersLastUpdate: Record<string, Date> = {};
   @service declare wallet: WalletService;
   @service declare tokens: TokensService;
@@ -29,13 +30,10 @@ export default class TokenToUsdService extends Service {
       !this.convertersLastUpdate[tokenAddress] ||
       addMilliseconds(this.convertersLastUpdate[tokenAddress], INTERVAL) < now
     ) {
-      this.usdConverters[tokenAddress] = yield getUsdConverter(
-        this.wallet.ethersProvider,
-        tokenAddress
+      this.usdConverters.set(
+        tokenAddress,
+        yield getUsdConverter(this.wallet.ethersProvider, tokenAddress)
       );
-      // eslint-disable-next-line no-self-assign
-      this.usdConverters = this.usdConverters;
-
       this.convertersLastUpdate[tokenAddress] = now;
     }
   }
@@ -44,7 +42,7 @@ export default class TokenToUsdService extends Service {
     if (amount.isZero()) {
       return BigNumber.from(0);
     }
-    return this.usdConverters[tokenAddress]?.(amount);
+    return this.usdConverters.get(tokenAddress)?.(amount);
   }
 }
 

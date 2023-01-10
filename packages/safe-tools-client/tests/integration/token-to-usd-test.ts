@@ -7,32 +7,31 @@ import { setupRenderingTest } from 'ember-qunit';
 import { BigNumber } from 'ethers';
 import hbs from 'htmlbars-inline-precompile';
 import { module, test } from 'qunit';
+import { TrackedMap } from 'tracked-built-ins';
 
 let returnEmptyUsdConverter = false;
 
 class TokenToUsdServiceStub extends Service {
-  @tracked usdConverters: Record<
+  @tracked usdConverters = new TrackedMap<
     string,
     (amountInWei: BigNumber) => BigNumber
-  > = {};
+  >();
 
   // eslint-disable-next-line require-yield
   @task({ maxConcurrency: 1, enqueue: true }) *updateUsdConverter(
     tokenAddress: string
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ): any {
-    this.usdConverters[tokenAddress] = (amountInWei: BigNumber) => {
+    this.usdConverters.set(tokenAddress, (amountInWei: BigNumber) => {
       return amountInWei.mul(2);
-    };
-    // eslint-disable-next-line no-self-assign
-    this.usdConverters = this.usdConverters;
+    });
   }
 
   toUsd(tokenAddress: string, amount: BigNumber): BigNumber | undefined {
     if (returnEmptyUsdConverter) {
       return undefined;
     }
-    return this.usdConverters[tokenAddress]?.(amount);
+    return this.usdConverters.get(tokenAddress)?.(amount);
   }
 }
 

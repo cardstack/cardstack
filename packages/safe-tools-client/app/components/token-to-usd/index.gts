@@ -19,7 +19,7 @@ const INTERVAL = config.environment === 'test' ? 1000 : 60 * 1000;
 
 export default class TokenToUsd extends Component<Signature> {
   @service('token-to-usd') declare tokenToUsdService: TokenToUsdService;
-  updateInterval: NodeJS.Timeout;
+  updateInterval: ReturnType<typeof setInterval>;
 
   constructor(owner: unknown, args: Args) {
     super(owner, args);
