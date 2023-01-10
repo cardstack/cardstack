@@ -1,10 +1,8 @@
 import { inject } from '@cardstack/di';
 import Koa from 'koa';
 import autoBind from 'auto-bind';
-import Logger from '@cardstack/logger';
 import Web3 from 'web3';
 
-let log = Logger('route:reward-proofs');
 export default class RewardProofsRoute {
   prismaManager = inject('prisma-manager', { as: 'prismaManager' });
   constructor() {
@@ -49,7 +47,7 @@ export default class RewardProofsRoute {
       ctx.body = { data };
       ctx.type = 'application/vnd.api+json';
     } catch (e) {
-      log.error('Failed to retrieve reward proofs', e);
+      throw e;
     }
   }
 }
