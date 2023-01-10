@@ -16,7 +16,6 @@ import { action } from '@ember/object';
 import Service, { inject as service } from '@ember/service';
 import { TaskGenerator } from 'ember-concurrency';
 import { task } from 'ember-concurrency-decorators';
-
 import { BigNumber } from 'ethers';
 
 const GAS_RANGE_NORMAL_MULTIPLIER = 2;
