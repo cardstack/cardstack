@@ -20,7 +20,10 @@ export default class ScheduledPaymentTimeBracket extends Component<Signature> {
   <template>
     {{#if (gt @scheduledPayments.length 0)}}
       <BoxelCardContainer class="scheduled-payment-time-bracket" data-test-time-bracket={{@title}}>
-        <BoxelHeader @header={{@title}} @noBackground={{true}}/>
+        {{#if @title}}
+          <BoxelHeader @header={{@title}} @noBackground={{true}}/>
+        {{/if}}
+
         {{#each @scheduledPayments as |scheduledPayment|}}
           <ScheduledPaymentCard @scheduledPayment={{scheduledPayment}}/>
         {{/each}}
