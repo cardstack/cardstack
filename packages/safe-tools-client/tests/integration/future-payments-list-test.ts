@@ -3,7 +3,14 @@ import SchedulePaymentSDKService from '@cardstack/safe-tools-client/services/sch
 import Service from '@ember/service';
 import { render, click, TestContext } from '@ember/test-helpers';
 import percySnapshot from '@percy/ember';
-import { addDays, addHours, addMonths, startOfDay, endOfDay, endOfMonth } from 'date-fns';
+import {
+  addDays,
+  addHours,
+  addMonths,
+  startOfDay,
+  endOfDay,
+  endOfMonth,
+} from 'date-fns';
 import {
   setupFakeDateService,
   FakeDateService,
@@ -115,7 +122,7 @@ class ScheduledPaymentsStub extends Service {
         payeeAddress: '0xeBCC5516d44FFf5E9aBa2AcaeB65BbB49bC3EBe1',
         payAt: addDays(endOfThisMonth, 1),
         recurringDayOfMonth: addDays(endOfThisMonth, 1).getTime(),
-        recurringUntil: addMonths(addDays(endOfThisMonth, 1), 5)
+        recurringUntil: addMonths(addDays(endOfThisMonth, 1), 5),
       },
     ];
 
@@ -188,9 +195,12 @@ module('Integration | Component | future-payments-list', function (hooks) {
       3
     );
     assert.true(
-      document.querySelectorAll(
-        `[data-test-time-bracket='today'] [data-test-scheduled-payment-card]`
-      )[0].querySelector('.scheduled-payment-card__pay-at')?.textContent?.includes('One-time')
+      document
+        .querySelectorAll(
+          `[data-test-time-bracket='today'] [data-test-scheduled-payment-card]`
+        )[0]
+        .querySelector('.scheduled-payment-card__pay-at')
+        ?.textContent?.includes('One-time')
     );
     assert.strictEqual(
       document.querySelectorAll(
@@ -211,9 +221,12 @@ module('Integration | Component | future-payments-list', function (hooks) {
       1
     );
     assert.true(
-      document.querySelectorAll(
-        `[data-test-time-bracket='later'] [data-test-scheduled-payment-card]`
-      )[0].querySelector('.scheduled-payment-card__pay-at')?.textContent?.includes('Recurring')
+      document
+        .querySelectorAll(
+          `[data-test-time-bracket='later'] [data-test-scheduled-payment-card]`
+        )[0]
+        .querySelector('.scheduled-payment-card__pay-at')
+        ?.textContent?.includes('Recurring')
     );
   });
 
