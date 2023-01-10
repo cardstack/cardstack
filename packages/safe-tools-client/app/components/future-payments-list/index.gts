@@ -13,9 +13,10 @@ import lt from 'ember-truth-helpers/helpers/lt';
 import gt from 'ember-truth-helpers/helpers/gt';
 import ScheduledPaymentTimeBracket from './scheduled-payment-time-bracket';
 import { ScheduledPayment } from '@cardstack/safe-tools-client/services/scheduled-payments';
-import { addHours, addMonths, lastDayOfMonth } from 'date-fns';
+import { addDays, startOfDay, endOfDay, endOfMonth } from 'date-fns';
 import and from 'ember-truth-helpers/helpers/and';
 import not from 'ember-truth-helpers/helpers/not';
+import DateService from 'ember-date-service/service/date';
 
 import './index.css';
 
@@ -31,33 +32,52 @@ export default class FuturePaymentsList extends Component<Signature> {
   @service declare network: NetworkService;
   // @ts-expect-error loading services/scheduled-payments
   @service('scheduled-payments') declare scheduledPaymentsService: ScheduledPaymentsService;
-
-  get nextHour(): ScheduledPayment[] {
-    if (!this.scheduledPayments) return [];
-    let now = new Date();
-    let twoHourFromNow = addHours(now, 2);
-    return this.scheduledPayments.filter((s: ScheduledPayment) => s.payAt >= now && s.payAt < twoHourFromNow);
+  @service declare date: DateService;
+  
+  get now(): Date {
+    return new Date(Number(this.date.now()));
   }
 
-  get nextMonth(): ScheduledPayment[] {
+  get today(): ScheduledPayment[] {
     if (!this.scheduledPayments) return [];
-    let now = new Date();
-    let nextMonth = addMonths(now, 1);
-    let firstDateNextMonth = new Date(nextMonth.getFullYear(), nextMonth.getMonth(), 1, 0, 0, 0, 0);
-    let lastDateNextMonth = new Date(nextMonth.getFullYear(), nextMonth.getMonth(), lastDayOfMonth(nextMonth).getDate(), 23, 59, 0, 0);
-    return this.scheduledPayments.filter((s: ScheduledPayment) => s.payAt >= firstDateNextMonth && s.payAt <= lastDateNextMonth);
+    let startOfToday = startOfDay(this.now);
+    let endOfToday = endOfDay(this.now);
+    return this.scheduledPayments.filter((s: ScheduledPayment) => s.payAt >= startOfToday && s.payAt <= endOfToday);
   }
 
-  get nextFewMonthsPayments(): ScheduledPayment[] {
+  get tomorrow(): ScheduledPayment[] {
     if (!this.scheduledPayments) return [];
-    let now = new Date();
-    let nextMonth = addMonths(now, 1);
-    let lastDateNextMonth = new Date(nextMonth.getFullYear(), nextMonth.getMonth(), lastDayOfMonth(nextMonth).getDate(), 23, 59, 0, 0);
-    return this.scheduledPayments.filter((s: ScheduledPayment) => s.payAt > lastDateNextMonth);
+    let tomorrow = addDays(this.now, 1);
+    let startOfTomorrow = startOfDay(tomorrow);
+    let endOfTomorrow = endOfDay(tomorrow);
+    return this.scheduledPayments.filter((s: ScheduledPayment) => s.payAt >= startOfTomorrow && s.payAt <= endOfTomorrow);
+  }
+
+  get thisMonth(): ScheduledPayment[] {
+    if (!this.scheduledPayments) return [];
+    let tomorrow = addDays(this.now, 1);
+    let endOfTomorrow = endOfDay(tomorrow);
+    let endOfThisMonth = endOfMonth(endOfTomorrow);
+    return this.scheduledPayments.filter((s: ScheduledPayment) => s.payAt > endOfTomorrow && s.payAt <= endOfThisMonth);
+  }
+
+  get later(): ScheduledPayment[] {
+    if (!this.scheduledPayments) return [];
+    let tomorrow = addDays(this.now, 1);
+    let endOfTomorrow = endOfDay(tomorrow);
+    let endOfThisMonth = endOfMonth(endOfTomorrow);
+    return this.scheduledPayments.filter((s: ScheduledPayment) => s.payAt > endOfThisMonth);
+  }
+
+  get laterLabel(): string {
+    if (this.today.length <= 0 && this.tomorrow.length <= 0 && this.thisMonth.length <= 0) {
+      return '';
+    }
+    return 'later';
   }
 
   @task *loadScheduledPaymentTask(chainId: number): TaskGenerator<ScheduledPayment[]> {
-    return yield this.scheduledPaymentsService.fetchScheduledPayments(chainId, new Date());
+    return yield this.scheduledPaymentsService.fetchScheduledPayments(chainId, this.now);
   }
 
   get scheduledPayments() {
@@ -111,9 +131,10 @@ export default class FuturePaymentsList extends Component<Signature> {
         <Section @title="Future Payments" data-test-future-payments-list>
           <div class="future-payments-list__payments-section">
             <div class="future-payments-list__payments-section-time-brackets">
-              <ScheduledPaymentTimeBracket @title="next hour" @scheduledPayments={{this.nextHour}}/>
-              <ScheduledPaymentTimeBracket @title="next month" @scheduledPayments={{this.nextMonth}}/>
-              <ScheduledPaymentTimeBracket @title="next few months" @scheduledPayments={{this.nextFewMonthsPayments}}/>
+              <ScheduledPaymentTimeBracket @title="today" @scheduledPayments={{this.today}}/>
+              <ScheduledPaymentTimeBracket @title="tomorrow" @scheduledPayments={{this.tomorrow}}/>
+              <ScheduledPaymentTimeBracket @title="this month" @scheduledPayments={{this.thisMonth}}/>
+              <ScheduledPaymentTimeBracket @title={{this.laterLabel}} @scheduledPayments={{this.later}}/>
             </div>
           </div>
         </Section>
