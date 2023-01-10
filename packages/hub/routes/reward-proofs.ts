@@ -10,45 +10,41 @@ export default class RewardProofsRoute {
   }
 
   async get(ctx: Koa.Context) {
-    try {
-      let prisma = await this.prismaManager.getClient();
-      let payee = ctx.params.payee;
-      if (payee && !Web3.utils.isAddress(payee)) {
-        ctx.status = 422;
-        ctx.body = {
-          status: '422',
-          title: 'Invalid payee address',
-        };
-        return;
-      }
-      let rewardProgramId = ctx.request.query.rewardProgramId as string;
-      if (rewardProgramId && !Web3.utils.isAddress(rewardProgramId)) {
-        ctx.status = 422;
-        ctx.body = {
-          status: '422',
-          title: 'Invalid reward program id',
-        };
-        return;
-      }
-      let proofs = await prisma.rewardProof.findMany({
-        where: {
-          payee,
-          rewardProgramId,
-        },
-      });
-      let data = proofs.map((proof) => {
-        return {
-          id: proof.leaf,
-          type: 'reward-proofs',
-          attributes: proof,
-        };
-      });
-      ctx.status = 200;
-      ctx.body = { data };
-      ctx.type = 'application/vnd.api+json';
-    } catch (e) {
-      throw e;
+    let prisma = await this.prismaManager.getClient();
+    let payee = ctx.params.payee;
+    if (payee && !Web3.utils.isAddress(payee)) {
+      ctx.status = 422;
+      ctx.body = {
+        status: '422',
+        title: 'Invalid payee address',
+      };
+      return;
     }
+    let rewardProgramId = ctx.request.query.rewardProgramId as string;
+    if (rewardProgramId && !Web3.utils.isAddress(rewardProgramId)) {
+      ctx.status = 422;
+      ctx.body = {
+        status: '422',
+        title: 'Invalid reward program id',
+      };
+      return;
+    }
+    let proofs = await prisma.rewardProof.findMany({
+      where: {
+        payee,
+        rewardProgramId,
+      },
+    });
+    let data = proofs.map((proof) => {
+      return {
+        id: proof.leaf,
+        type: 'reward-proofs',
+        attributes: proof,
+      };
+    });
+    ctx.status = 200;
+    ctx.body = { data };
+    ctx.type = 'application/vnd.api+json';
   }
 }
 
