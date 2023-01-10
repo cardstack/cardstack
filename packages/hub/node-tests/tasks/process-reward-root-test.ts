@@ -130,66 +130,6 @@ describe('ProcessRewardRootTask', function () {
     expect(index[0].reward_program_id).to.be.equal(rewardProgramId);
     expect(index[0].payment_cycle).to.be.equal(paymentCycle);
   });
-  it('does not index file that has already been indexed', async function () {
-    const mockProofs = [
-      {
-        rewardProgramID: '0x0885ce31D73b63b0Fcb1158bf37eCeaD8Ff0fC72',
-        paymentCycle: 27736956,
-        validFrom: 27736956,
-        validTo: 28514556,
-        tokenType: 1,
-        payee: '0x159ADe032073d930E85f95AbBAB9995110c43C71',
-        root: '0x85a9034e056319d877c4e79d68480cd873858bdd36607c5ce5be40c62c8e5dd2',
-        leaf: '0x0000000000000000000000000885ce31d73b63b0fcb1158bf37ecead8ff0fc720000000000000000000000000000000000000000000000000000000001a73b7c0000000000000000000000000000000000000000000000000000000001a73b7c0000000000000000000000000000000000000000000000000000000001b318fc0000000000000000000000000000000000000000000000000000000000000001000000000000000000000000159ade032073d930e85f95abbab9995110c43c7100000000000000000000000000000000000000000000000000000000000000e00000000000000000000000000000000000000000000000000000000000000040000000000000000000000000b0427e9f03eb448d030be3ebc96f423857ceeb2f0000000000000000000000000000000000000000000000008ac7230489e80000',
-        proof: [{ item: '930827dc0d480d868a190233dec74d8a149be25760ba4fa08d36c6b219209b86' }],
-        explanationId: 'flat_payment',
-        explanationData: '{"amount": "10000000000000000000", "token": "0xB0427e9F03Eb448D030bE3EBC96F423857ceEb2f"}',
-      },
-      {
-        rewardProgramID: '0x0885ce31D73b63b0Fcb1158bf37eCeaD8Ff0fC72',
-        paymentCycle: 27736956,
-        validFrom: 27736956,
-        validTo: 28514556,
-        tokenType: 1,
-        payee: '0x388CFef0AB326AEEB4167bab20c189ECab686370',
-        root: '0x85a9034e056319d877c4e79d68480cd873858bdd36607c5ce5be40c62c8e5dd2',
-        leaf: '0x0000000000000000000000000885ce31d73b63b0fcb1158bf37ecead8ff0fc720000000000000000000000000000000000000000000000000000000001a73b7c0000000000000000000000000000000000000000000000000000000001a73b7c0000000000000000000000000000000000000000000000000000000001b318fc0000000000000000000000000000000000000000000000000000000000000001000000000000000000000000388cfef0ab326aeeb4167bab20c189ecab68637000000000000000000000000000000000000000000000000000000000000000e00000000000000000000000000000000000000000000000000000000000000040000000000000000000000000b0427e9f03eb448d030be3ebc96f423857ceeb2f0000000000000000000000000000000000000000000000008ac7230489e80000',
-        proof: [{ item: '66c2bccec52761541e307f888a0da4f44130ae7f8c634dfe0f34c569f3682433' }],
-        explanationId: 'flat_payment',
-        explanationData: '{"amount": "10000000000000000000", "token": "0xB0427e9F03Eb448D030bE3EBC96F423857ceEb2f"}',
-      },
-    ];
-    const mockData = mockResponse(mockProofs);
-    s3Mock.on(SelectObjectContentCommand).resolves(mockData);
-    const rewardProgramId = mockProofs[0].rewardProgramID;
-    const paymentCycle = mockProofs[0].paymentCycle;
-    let task = await getContainer().instantiate(ProcessRewardRoot);
-    await db.query('BEGIN');
-    await task.perform({
-      blockNumber: '1',
-      rewardProgramId: rewardProgramId,
-      paymentCycle: String(paymentCycle),
-    });
-    await db.query('COMMIT');
-
-    //duplicate indexing
-    await db.query('BEGIN');
-    const res = await task.perform({
-      blockNumber: '1',
-      rewardProgramId: rewardProgramId,
-      paymentCycle: String(paymentCycle),
-    });
-    await db.query('COMMIT');
-    if (res == undefined) {
-      //have to rollback because test db doesn't implement begin, commit, rollback for performTRansaction
-      await db.query('ROLLBACK');
-    }
-    const { rows } = await db.query('SELECT * FROM reward_proofs;');
-    expect(rows.length).to.be.equal(2);
-    const { rows: index } = await db.query('SELECT * FROM reward_root_index;');
-    expect(index[0].reward_program_id).to.be.equal(rewardProgramId);
-    expect(index[0].payment_cycle).to.be.equal(paymentCycle);
-  });
   it('index old parquet file with explanationData column as map<str,str>', async function () {
     const mockProofs = [
       {

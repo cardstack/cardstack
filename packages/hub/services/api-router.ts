@@ -52,6 +52,7 @@ export default class APIRouter {
   });
   gasStationRoute = inject('gas-station-route', { as: 'gasStationRoute' });
   gasEstimationRoute = inject('gas-estimation-route', { as: 'gasEstimationRoute' });
+  rewardProofsRoute = inject('reward-proofs-route', { as: 'rewardProofsRoute' });
 
   routes() {
     let {
@@ -79,6 +80,7 @@ export default class APIRouter {
       dataIntegrityChecksRoute,
       gasStationRoute,
       gasEstimationRoute,
+      rewardProofsRoute,
     } = this;
     let apiSubrouter = new Router();
     apiSubrouter.get('/boom', boomRoute.get);
@@ -156,6 +158,7 @@ export default class APIRouter {
     apiSubrouter.get('/data-integrity-checks/:check_name', parseBody, dataIntegrityChecksRoute.get);
     apiSubrouter.get('/gas-station/:chain_id', gasStationRoute.get);
     apiSubrouter.post('/gas-estimation', parseBody, gasEstimationRoute.estimate);
+    apiSubrouter.get('/rewards/proofs/:payee', rewardProofsRoute.get);
     apiSubrouter.all('/(.*)', notFound);
 
     let apiRouter = new Router();
