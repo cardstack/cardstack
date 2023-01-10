@@ -20,6 +20,7 @@ import { taskFor } from 'ember-concurrency-ts';
 import HubAuthenticationService from '@cardstack/safe-tools-client/services/hub-authentication';
 import SuccessIcon from '@cardstack/safe-tools-client/components/icons/success';
 import FailureIcon from '@cardstack/safe-tools-client/components/icons/failure';
+import InfoIcon from '@cardstack/safe-tools-client/components/icons/info';
 import BoxelDropdown from '@cardstack/boxel/components/boxel/dropdown';
 
 import BoxelMenu from '@cardstack/boxel/components/boxel/menu';
@@ -192,6 +193,11 @@ export default class ScheduledPaymentCard extends Component<Signature> {
 
               Canceling scheduled payment...
             </i.ActionStatusArea>
+
+            <i.InfoArea>
+              <InfoIcon class='action-chin-info-icon' />
+              Canceling a payment could take up to a couple of minutes, depending on the blockchain network conditions.
+            </i.InfoArea>
           </:inProgress>
         </ActionChin>
       </BoxelActionContainer>
