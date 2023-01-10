@@ -42,13 +42,7 @@
       "env": {
         "NODE_ENV": "test"
       },
-      "args": [
-        "-r",
-        "@cardstack/test-support/prepare-node-tests",
-        "node-tests/**/*-test.js",
-        "--timeout",
-        "600000"
-      ]
+      "args": ["--no-deprecation", "-r", "source-map-support/register", "dist/tests.js", "--timeout", "60000"]
     },
     {
       "type": "node",

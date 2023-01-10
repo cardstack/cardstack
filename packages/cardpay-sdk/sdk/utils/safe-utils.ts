@@ -11,13 +11,13 @@ import { AbiItem } from 'web3-utils';
 import { getAddress } from '../../contracts/addresses';
 import GnosisSafeProxyFactoryABI from '../../contracts/abi/gnosis-safe-proxy-factory';
 import GnosisSafeABI from '../../contracts/abi/gnosis-safe';
-import { Transaction, isJsonRpcProvider } from './general-utils';
+import { Transaction, isJsonRpcProvider, nonNullable } from './general-utils';
 /* eslint-disable node/no-extraneous-import */
 import { Contract, ethers, utils } from 'ethers';
 import { AddressZero } from '@ethersproject/constants';
 import { Interface, LogDescription } from 'ethers/lib/utils';
 import JsonRpcProvider from '../../providers/json-rpc-provider';
-import { ERC20ABI } from '../..';
+import { BigNumber } from 'ethers';
 
 export interface EventABI {
   topic: string;
@@ -477,18 +477,57 @@ export function gasInToken(estimate: Estimate): BN {
 // https://github.com/cardstack/card-protocol-relay-service/blob/master/safe.py#L303-L316
 export const baseGasBuffer: BN = new BN('30');
 
+interface BalanceEntry {
+  tokenAddress: string | null;
+  balance: string;
+  token: {
+    decimals: number;
+    logoUri: string;
+    name: string;
+    symbol: string;
+  } | null;
+}
+
+interface BalanceSummary {
+  tokenAddress: string;
+  symbol: string;
+  balance: BigNumber;
+  decimals: number;
+}
+
 export async function getTokenBalancesForSafe(
   provider: JsonRpcProvider,
   tokenAddresses: string[],
   safeAddress: string
-) {
-  return await Promise.all(
-    tokenAddresses.map(async (tokenAddress: string) => {
-      let token = new Contract(tokenAddress, ERC20ABI, provider);
-      let symbol = await token.symbol();
-      let balance = await token.callStatic.balanceOf(safeAddress);
-      let decimals = await token.decimals();
-      return { tokenAddress, symbol, balance, decimals };
+): Promise<BalanceSummary[]> {
+  let baseUrl = await getConstant('safeTransactionServiceUrl', provider);
+
+  if (!baseUrl) {
+    throw new Error('Could not find safe transaction service url for current network');
+  }
+  let response = await fetch(`${baseUrl}/api/v1/safes/${safeAddress}/balances/`);
+
+  if (!response?.ok) {
+    throw new Error(await response.text());
+  }
+  let balances: BalanceEntry[] = await response.json();
+
+  return tokenAddresses
+    .map((tokenAddress) => {
+      let balanceInfo = balances.find((b) => b.tokenAddress?.toLowerCase() === tokenAddress.toLowerCase());
+
+      let balanceSummary;
+
+      if (balanceInfo?.token) {
+        let {
+          balance,
+          token: { symbol, decimals },
+        } = balanceInfo;
+
+        balanceSummary = { tokenAddress, symbol, balance: BigNumber.from(balance), decimals };
+      }
+
+      return balanceSummary;
     })
-  );
+    .filter(nonNullable);
 }
