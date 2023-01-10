@@ -2,7 +2,8 @@ import { inject } from '@cardstack/di';
 import Koa from 'koa';
 import autoBind from 'auto-bind';
 import Logger from '@cardstack/logger';
-import { isAddress } from 'web3-utils';
+import Web3 from 'web3';
+
 let log = Logger('route:reward-proofs');
 export default class RewardProofsRoute {
   prismaManager = inject('prisma-manager', { as: 'prismaManager' });
@@ -14,7 +15,7 @@ export default class RewardProofsRoute {
     try {
       let prisma = await this.prismaManager.getClient();
       let payee = ctx.params.payee;
-      if (payee && !isAddress(payee)) {
+      if (payee && !Web3.utils.isAddress(payee)) {
         ctx.status = 422;
         ctx.body = {
           status: '422',
@@ -23,7 +24,7 @@ export default class RewardProofsRoute {
         return;
       }
       let rewardProgramId = ctx.request.query.rewardProgramId as string;
-      if (rewardProgramId && !isAddress(rewardProgramId)) {
+      if (rewardProgramId && !Web3.utils.isAddress(rewardProgramId)) {
         ctx.status = 422;
         ctx.body = {
           status: '422',
