@@ -93,12 +93,16 @@ export default class ScheduledPaymentCard extends Component<Signature> {
     return taskFor(this.cancelScheduledPaymentTask).last?.error as Error
   }
 
+  get paymentType() {
+    return this.args.scheduledPayment.recurringDayOfMonth && this.args.scheduledPayment.recurringUntil ? 'Recurring' : 'One-time';
+  }
+
   <template>
     <BoxelCardContainer
       @displayBoundaries={{true}}
       class="scheduled-payment-card">
       <div class="scheduled-payment-card__content" data-test-scheduled-payment-card>
-        <span class="scheduled-payment-card__pay-at">Recurring on {{formatDate @scheduledPayment.payAt "d/M/yyyy"}}</span>
+        <span class="scheduled-payment-card__pay-at">{{this.paymentType}} on {{formatDate @scheduledPayment.payAt "d/M/yyyy"}}</span>
         <span class="scheduled-payment-card__payee">To: {{truncateMiddle @scheduledPayment.payeeAddress}}</span>
         <div class="scheduled-payment-card__payment-detail">
           <img class="scheduled-payment-card__token-symbol" src={{this.tokenInfo.logoURI}} />
