@@ -12,7 +12,8 @@ interface Signature {
   Element: HTMLElement;
   Args: {
     title: string;
-    scheduledPayments: ScheduledPayment[]; 
+    scheduledPayments: ScheduledPayment[];
+    reloadScheduledPayments: () => void;
   }
 }
 
@@ -22,7 +23,7 @@ export default class ScheduledPaymentTimeBracket extends Component<Signature> {
       <BoxelCardContainer class="scheduled-payment-time-bracket" data-test-time-bracket={{@title}}>
         <BoxelHeader @header={{@title}} @noBackground={{true}}/>
         {{#each @scheduledPayments as |scheduledPayment|}}
-          <ScheduledPaymentCard @scheduledPayment={{scheduledPayment}}/>
+          <ScheduledPaymentCard @scheduledPayment={{scheduledPayment}} @reloadScheduledPayments={{@reloadScheduledPayments}} />
         {{/each}}
       </BoxelCardContainer>
     {{/if}}

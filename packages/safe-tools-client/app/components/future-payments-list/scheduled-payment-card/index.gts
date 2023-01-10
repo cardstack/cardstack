@@ -25,7 +25,7 @@ import BoxelDropdown from '@cardstack/boxel/components/boxel/dropdown';
 import BoxelMenu from '@cardstack/boxel/components/boxel/menu';
 import { type ActionChinState } from '@cardstack/boxel/components/boxel/action-chin/state'
 import menuItem from '@cardstack/boxel/helpers/menu-item'
-import { array } from '@ember/helper';
+import { array, fn } from '@ember/helper';
 import set from 'ember-set-helper/helpers/set';
 
 import { TaskGenerator } from 'ember-concurrency';
@@ -38,6 +38,7 @@ interface Signature {
   Element: HTMLElement;
   Args: {
     scheduledPayment: ScheduledPayment;
+    reloadScheduledPayments: () => void;
   }
 }
 
@@ -49,8 +50,9 @@ export default class ScheduledPaymentCard extends Component<Signature> {
   @tracked isCancelPaymentModalOpen = false;
   @tracked cancelationErrorMessage?: string;
 
-  @action closeCancelScheduledPaymentModal() {
+  @action closeCancelScheduledPaymentModal(reload = false) {
     this.isCancelPaymentModalOpen = false;
+    if (reload) this.args.reloadScheduledPayments();
   }
 
   get tokenInfo() {
@@ -105,7 +107,7 @@ export default class ScheduledPaymentCard extends Component<Signature> {
           <img class="scheduled-payment-card__token-symbol" src={{this.tokenInfo.logoURI}} />
           <div class="scheduled-payment-card__token-amounts">
             <span class="scheduled-payment-card__token-amount">{{weiToDecimal @scheduledPayment.amount this.tokenInfo.decimals}} {{this.tokenInfo.symbol}}</span>
-            <span class="scheduled-payment-card__usd-amount">$ <TokenToUsd @tokenAddress={{@scheduledPayment.tokenAddress}} @tokenAmount={{@scheduledPayment.amount}} /> USD</span> 
+            <span class="scheduled-payment-card__usd-amount">$ <TokenToUsd @tokenAddress={{@scheduledPayment.tokenAddress}} @tokenAmount={{@scheduledPayment.amount}} /> USD</span>
           </div>
         </div>
       </div>
@@ -158,7 +160,7 @@ export default class ScheduledPaymentCard extends Component<Signature> {
                 Cancel Payment
               </a.ActionButton>
 
-              <a.CancelButton {{on 'click' this.closeCancelScheduledPaymentModal}} data-test-close-cancel-payment-modal>
+              <a.CancelButton {{on 'click' (fn this.closeCancelScheduledPaymentModal false)}} data-test-close-cancel-payment-modal>
                 Close
               </a.CancelButton>
 
@@ -167,7 +169,7 @@ export default class ScheduledPaymentCard extends Component<Signature> {
                 <span>{{this.cancelationErrorMessage}}</span>
               </a.InfoArea>
             {{else if this.paymentCanceled}}
-              <a.ActionButton {{on "click" this.closeCancelScheduledPaymentModal}} data-test-close-cancel-payment-modal>
+              <a.ActionButton {{on "click" (fn this.closeCancelScheduledPaymentModal true)}} data-test-close-cancel-payment-modal>
                 Close
               </a.ActionButton>
 
@@ -179,7 +181,7 @@ export default class ScheduledPaymentCard extends Component<Signature> {
               <a.ActionButton {{on "click" this.cancelScheduledPayment}} data-test-cancel-payment-button>
                 Cancel Payment
               </a.ActionButton>
-              <a.CancelButton {{on 'click' this.closeCancelScheduledPaymentModal}} data-test-close-cancel-payment-modal>
+              <a.CancelButton {{on 'click' (fn this.closeCancelScheduledPaymentModal false)}} data-test-close-cancel-payment-modal>
                 Close
               </a.CancelButton>
             {{/if}}
