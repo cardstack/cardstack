@@ -17,6 +17,7 @@ import { addDays, startOfDay, endOfDay, endOfMonth } from 'date-fns';
 import and from 'ember-truth-helpers/helpers/and';
 import not from 'ember-truth-helpers/helpers/not';
 import DateService from 'ember-date-service/service/date';
+import { action } from '@ember/object';
 
 import './index.css';
 
@@ -27,13 +28,20 @@ interface Signature {
   }
 }
 
+interface ScheduledPaymentsResourceState extends Record<PropertyKey, unknown> {
+  error?: Error;
+  isLoading?: boolean;
+  value?: ScheduledPayment[];
+  load: () => Promise<void>;
+}
+
 export default class FuturePaymentsList extends Component<Signature> {
   @service declare hubAuthentication: HubAuthenticationService;
   @service declare network: NetworkService;
   // @ts-expect-error loading services/scheduled-payments
   @service('scheduled-payments') declare scheduledPaymentsService: ScheduledPaymentsService;
   @service declare date: DateService;
-  
+
   get now(): Date {
     return new Date(Number(this.date.now()));
   }
@@ -76,10 +84,6 @@ export default class FuturePaymentsList extends Component<Signature> {
     return 'later';
   }
 
-  @task *loadScheduledPaymentTask(chainId: number): TaskGenerator<ScheduledPayment[]> {
-    return yield this.scheduledPaymentsService.fetchScheduledPayments(chainId, this.now);
-  }
-
   get scheduledPayments() {
     return this.scheduledPaymentsResource.value;
   }
@@ -88,33 +92,45 @@ export default class FuturePaymentsList extends Component<Signature> {
     return this.scheduledPaymentsResource.isLoading;
   }
 
+  @action async reloadScheduledPayments() {
+    await this.scheduledPaymentsResource.load();
+  }
+
+  @task *loadScheduledPaymentTask(chainId: number): TaskGenerator<ScheduledPayment[]> {
+    return yield this.scheduledPaymentsService.fetchScheduledPayments(chainId, this.now);
+  }
+
   @use scheduledPaymentsResource = resource(() => {
     if (!this.hubAuthentication.isAuthenticated) {
       return {
         error: false,
         isLoading: false,
         value: [],
+        load: () => Promise.resolve(),
       };
     }
 
-    const state = new TrackedObject({
+    let chainId = this.network.chainId;
+
+    const state: ScheduledPaymentsResourceState = new TrackedObject({
       isLoading: true,
       value: undefined as ScheduledPayment[] | undefined,
       error: undefined,
+      load: async () => {
+        state.isLoading = true;
+
+        try {
+          state.value = await taskFor(this.loadScheduledPaymentTask).perform(chainId);
+        } catch (error) {
+          state.error = error;
+          throw error;
+        } finally {
+          state.isLoading = false;
+        }
+      },
     });
 
-    let chainId = this.network.chainId;
-
-    (async () => {
-      try {
-        state.value = await taskFor(this.loadScheduledPaymentTask).perform(chainId);
-      } catch (error) {
-        state.error = error;
-      } finally {
-        state.isLoading = false;
-      }
-    })();
-
+    state.load();
     return state;
   });
 
@@ -131,10 +147,10 @@ export default class FuturePaymentsList extends Component<Signature> {
         <Section @title="Future Payments" data-test-future-payments-list>
           <div class="future-payments-list__payments-section">
             <div class="future-payments-list__payments-section-time-brackets">
-              <ScheduledPaymentTimeBracket @title="today" @scheduledPayments={{this.today}}/>
-              <ScheduledPaymentTimeBracket @title="tomorrow" @scheduledPayments={{this.tomorrow}}/>
-              <ScheduledPaymentTimeBracket @title="this month" @scheduledPayments={{this.thisMonth}}/>
-              <ScheduledPaymentTimeBracket @title={{this.laterLabel}} @scheduledPayments={{this.later}}/>
+              <ScheduledPaymentTimeBracket @title="today" @scheduledPayments={{this.today}} @reloadScheduledPayments={{this.reloadScheduledPayments}} />
+              <ScheduledPaymentTimeBracket @title="tomorrow" @scheduledPayments={{this.tomorrow}} @reloadScheduledPayments={{this.reloadScheduledPayments}} />
+              <ScheduledPaymentTimeBracket @title="this month" @scheduledPayments={{this.thisMonth}} @reloadScheduledPayments={{this.reloadScheduledPayments}} />
+              <ScheduledPaymentTimeBracket @title={{this.laterLabel}} @scheduledPayments={{this.later}} @reloadScheduledPayments={{this.reloadScheduledPayments}} />
             </div>
           </div>
         </Section>
