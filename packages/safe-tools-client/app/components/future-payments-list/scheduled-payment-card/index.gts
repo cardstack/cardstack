@@ -105,7 +105,7 @@ export default class ScheduledPaymentCard extends Component<Signature> {
     <BoxelCardContainer
       @displayBoundaries={{true}}
       class="scheduled-payment-card">
-      <div class="scheduled-payment-card__content" data-test-scheduled-payment-card>
+      <div class="scheduled-payment-card__content" data-test-scheduled-payment-card data-test-scheduled-payment-card-id={{@scheduledPayment.id}}>
         <span class="scheduled-payment-card__pay-at">{{this.paymentType}} on {{formatDate @scheduledPayment.payAt "d/M/yyyy"}}</span>
         <span class="scheduled-payment-card__payee">To: {{truncateMiddle @scheduledPayment.payeeAddress}}</span>
         <div class="scheduled-payment-card__payment-detail">
