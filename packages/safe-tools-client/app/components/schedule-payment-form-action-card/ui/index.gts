@@ -176,7 +176,7 @@ export default class SchedulePaymentFormActionCardUI extends Component<Signature
                       <BoxelField @label="Day of Month" @vertical={{true}} data-test-recurring-day-of-month>
                         <RangedNumberPicker
                           @min={{1}}
-                          @max={{28}}
+                          @max={{31}}
                           @icon="calendar"
                           @onChange={{@onSelectPaymentDayOfMonth}}
                           @value={{@paymentDayOfMonth}}
