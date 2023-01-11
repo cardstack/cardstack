@@ -54,7 +54,7 @@ export default class ProcessRewardRoot {
         return (
           '(' +
           pgFormat(
-            '%L, %L, %L, %L, ARRAY[%L], %L, %L, %L, %L, %L',
+            '%L, %L, %L, %L, ARRAY[%L]::text[], %L, %L, %L, %L, %L',
             o.rewardProgramID,
             o.payee,
             o.leaf,
