@@ -159,13 +159,11 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
     return this.paymentAmount;
   }
   @cached
-  get paymentAmountInTokenUnits(): string {
+  get paymentAmountInTokenUnits(): BigNumber {
     try {
-      let bn = ethersUtils.parseUnits(this.paymentAmount, this.paymentToken?.decimals);
-      let result = bn.toString();
-      return result;
+      return ethersUtils.parseUnits(this.paymentAmount, this.paymentToken?.decimals);
     } catch(e) {
-      return '0';
+      return BigNumber.from('0');
     }
   }
   get paymentTokens(): SelectableToken[] {
@@ -238,7 +236,7 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
     });
     let isWalletConnected = this.wallet.isConnected;
     let { paymentToken, paymentAmountInTokenUnits, selectedGasToken, configuredFees } = this
-    if (!isWalletConnected || !paymentToken?.address || paymentAmountInTokenUnits === '0' || !selectedGasToken || !configuredFees.value) {
+    if (!isWalletConnected || !paymentToken?.address || paymentAmountInTokenUnits.isZero() || !selectedGasToken || !configuredFees.value) {
       state.isIndeterminate = true;
       return state;
     }
@@ -389,8 +387,8 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
 
   @tracked isSuccessfullyScheduled = false;
 
-  get gasEstimateInGasTokenUnits(): string {
-    return this.gasEstimation?.gasRangeInGasTokenWei.normal.toString() || '';
+  get gasEstimateInGasTokenUnits(): BigNumber {
+    return this.gasEstimation?.gasRangeInGasTokenWei.normal || BigNumber.from('0');
   }
 
   get gasEstimateUsd() {

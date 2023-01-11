@@ -30,6 +30,7 @@ import { type WalletProviderId } from '@cardstack/safe-tools-client/utils/wallet
 import TokenToUsd from '@cardstack/safe-tools-client/components/token-to-usd';
 import { type CurrentFees } from '../fee-calculator';
 import { ConfiguredScheduledPaymentFees } from '@cardstack/safe-tools-client/services/scheduled-payment-sdk';
+import { BigNumber } from 'ethers';
 
 interface Signature {
   Element: HTMLElement;
@@ -48,7 +49,7 @@ interface Signature {
     isPaymentAmountInvalid: boolean;
     paymentAmountErrorMessage: string;
     paymentAmountRaw: string;
-    paymentAmountInTokenUnits: string;
+    paymentAmountInTokenUnits: BigNumber;
     paymentTokens: SelectableToken[];
     onUpdatePaymentToken: (val: SelectableToken) => void;
     gasTokens: SelectableToken[];
@@ -60,7 +61,7 @@ interface Signature {
     isMaxGasPriceInvalid: boolean;
     maxGasPriceErrorMessage: string;
     gasEstimateInUsd: number|undefined;
-    gasEstimateInGasTokenUnits: string|undefined;
+    gasEstimateInGasTokenUnits: BigNumber;
     onSchedulePayment: () => void;
     onUpdatePayeeAddress: (val: string) => void;
     onReset: () => void;
