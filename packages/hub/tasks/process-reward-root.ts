@@ -167,7 +167,7 @@ const queryParquet = async (
               // need to transform to array of hex strings
               // - parquet file names column as proof
               // - database and process names column as proofBytes
-              b.proofBytes = b.proof.length > 0 ? b.proof.map((o: any) => '0x' + o.item) : ['0x'];
+              b.proofBytes = b.proof.length > 0 ? b.proof.map((o: any) => '0x' + o.item) : [];
               b.leaf = '0x' + b.leaf;
               records.push(b);
             }
