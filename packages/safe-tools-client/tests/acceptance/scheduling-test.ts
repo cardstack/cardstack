@@ -101,6 +101,14 @@ module('Acceptance | scheduling', function (hooks) {
           })
         );
       }),
+      rest.get('/hub-test/api/scheduled-payments', (_req, res, ctx) => {
+        return res(
+          ctx.status(200),
+          ctx.json({
+            data: [],
+          })
+        );
+      }),
       rest.post('/hub-test/api/gas-estimation', (_req, res, ctx) => {
         return res(
           ctx.status(200),

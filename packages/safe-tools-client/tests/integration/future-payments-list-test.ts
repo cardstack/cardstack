@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
+import ScheduledPaymentsService from '@cardstack/safe-tools-client/services/scheduled-payments';
 import SchedulePaymentSDKService from '@cardstack/safe-tools-client/services/scheduled-payments-sdk';
 import Service from '@ember/service';
 import { render, click, TestContext } from '@ember/test-helpers';
@@ -15,7 +16,6 @@ import {
   setupFakeDateService,
   FakeDateService,
 } from 'ember-date-service/test-support';
-
 import hbs from 'htmlbars-inline-precompile';
 import { module, test } from 'qunit';
 
@@ -247,14 +247,27 @@ module('Integration | Component | future-payments-list', function (hooks) {
     await click('[data-test-scheduled-payment-card-options-button]');
     await click('[data-test-boxel-menu-item-text="Cancel Payment"]');
     await click('[data-test-cancel-payment-button]');
+
     assert
       .dom('[data-test-cancel-scheduled-payment-modal]')
       .includesText(
         "Your scheduled payment was canceled and removed successfully, and it won't be attempted in the future."
       );
     assert.dom('[data-test-cancel-payment-button]').doesNotExist();
+
+    // On cancel, the handler calls refreshScheduledPayments (to remove the newly canceled payment) which reads stubbed scheduled payment values from this test.
+    // To test if the list reloaded after canceling a payment we simply change the stubbed values to return no payments and assert that the list is empty, which confirms that the list reloaded.
+    const scheduledPaymentsService = this.owner.lookup(
+      'service:scheduled-payments'
+    ) as ScheduledPaymentsService;
+
+    scheduledPaymentsService.fetchScheduledPayments = (): Promise<[]> => {
+      return Promise.resolve([]);
+    };
+
     await click('[data-test-close-cancel-payment-modal]');
     assert.dom('[data-test-cancel-scheduled-payment-modal]').doesNotExist();
+    assert.dom('[data-test-scheduled-payment-card]').doesNotExist(); // Because we stubbed fetchScheduledPayments to return no payments
   });
 
   test('it shows an error when canceling fails', async function (assert) {
