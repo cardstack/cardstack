@@ -21,7 +21,7 @@ import not from 'ember-truth-helpers/helpers/not';
 import or from 'ember-truth-helpers/helpers/or';
 import set from 'ember-set-helper/helpers/set';
 import './index.css';
-import { MaxGasFeeOption, ValidatableForm } from '../validator';
+import { ValidatableForm } from '../validator';
 import BlockExplorerButton from '@cardstack/safe-tools-client/components/block-explorer-button';
 import { SchedulerCapableNetworks, TransactionHash } from '@cardstack/cardpay-sdk';
 import cssVar from '@cardstack/boxel/helpers/css-var';
