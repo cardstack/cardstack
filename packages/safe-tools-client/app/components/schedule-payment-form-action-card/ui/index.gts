@@ -18,6 +18,7 @@ import { svgJar } from '@cardstack/boxel/utils/svg-jar';
 import { tracked } from '@glimmer/tracking';
 import eq from 'ember-truth-helpers/helpers/eq';
 import not from 'ember-truth-helpers/helpers/not';
+import or from 'ember-truth-helpers/helpers/or';
 import set from 'ember-set-helper/helpers/set';
 import './index.css';
 import { MaxGasFeeOption, ValidatableForm } from '../validator';
@@ -29,6 +30,7 @@ import { ConfiguredScheduledPaymentFees } from '@cardstack/safe-tools-client/ser
 import formatUsd from '@cardstack/safe-tools-client/helpers/format-usd';
 import WalletService from '@cardstack/safe-tools-client/services/wallet';
 import { inject as service } from '@ember/service';
+import { MaxGasDescriptionsState } from "..";
 
 interface Signature {
   Element: HTMLElement;
@@ -50,7 +52,7 @@ interface Signature {
     onUpdatePaymentToken: (val: SelectableToken) => void;
     gasTokens: SelectableToken[];
     onSelectGasToken: (val: SelectableToken) => void;
-    maxGasDescriptions?: Record<MaxGasFeeOption, string>;
+    maxGasDescriptions?: MaxGasDescriptionsState;
     isGasTokenInvalid: boolean;
     gasTokenErrorMessage: string;
     onUpdateMaxGasPrice: (val: string) => void;
@@ -66,6 +68,7 @@ interface Signature {
     walletProviderId: WalletProviderId | undefined;
     txHash: TransactionHash | undefined;
     isSuccessfullyScheduled: boolean;
+    scheduleErrorMessage: string | undefined;
   }
 }
 
@@ -258,7 +261,7 @@ export default class SchedulePaymentFormActionCardUI extends Component<Signature
             data-test-max-gas-toggle
             @groupDescription="The maximum gas cost you are willing to spend for this payment"
             @name="max-gas-fee"
-            @errorMessage={{@maxGasPriceErrorMessage}}
+            @errorMessage={{or @maxGasPriceErrorMessage @maxGasDescriptions.error.message}}
             @invalid={{this.isMaxGasPriceInvalid}}
             @value={{@maxGasPrice}}
             @disabled={{this.isFormInteractionDisabled}}
@@ -271,7 +274,7 @@ export default class SchedulePaymentFormActionCardUI extends Component<Signature
                 Normal
               </div>
               <div class="schedule-payment-form-action-card--max-gas-fee-description" data-test-max-gas-fee-normal-description>
-                {{@maxGasDescriptions.normal}}
+                {{@maxGasDescriptions.value.normal}}
               </div>
             </group.Button>
             <group.Button @value="high">
@@ -279,7 +282,7 @@ export default class SchedulePaymentFormActionCardUI extends Component<Signature
                 High
               </div>
               <div class="schedule-payment-form-action-card--max-gas-fee-description" data-test-max-gas-fee-high-description>
-                {{@maxGasDescriptions.high}}
+                {{@maxGasDescriptions.value.high}}
               </div>
             </group.Button>
             <group.Button @value="max">
@@ -287,10 +290,20 @@ export default class SchedulePaymentFormActionCardUI extends Component<Signature
                 Max
               </div>
               <div class="schedule-payment-form-action-card--max-gas-fee-description" data-test-max-gas-fee-max-description>
-                {{@maxGasDescriptions.max}}
+                {{@maxGasDescriptions.value.max}}
               </div>
             </group.Button>
           </BoxelToggleButtonGroup>
+          <div><!-- empty --></div>
+          <div class="schedule-payment-form-action-card--state-details {{if @maxGasDescriptions.error "schedule-payment-form-action-card--state-details__error"}}">
+            {{#if @maxGasDescriptions.isLoading}}
+              <BoxelLoadingIndicator />
+            {{/if}}
+
+            {{#if @maxGasDescriptions.error}}
+              There was an error estimating gas prices: {{@maxGasDescriptions.error.message}}
+            {{/if}}
+          </div>
           <div><!-- empty --></div>
           <div class="schedule-payment-form-action-card--fee-details">
             {{#if @configuredFees}}
@@ -311,6 +324,13 @@ export default class SchedulePaymentFormActionCardUI extends Component<Signature
               >
                 Schedule Payment
               </ac.ActionButton>
+              {{#if @scheduleErrorMessage}}
+                <ac.InfoArea data-test-error-status>
+                  <span class="schedule-payment-form-action-card__error-message">
+                    {{@scheduleErrorMessage}}
+                  </span>
+                </ac.InfoArea>
+              {{/if}}
             {{else}}
               <div class="schedule-payment-form-prerequisite-step" data-test-schedule-form-connect-wallet-cta>
                 <div class="schedule-payment-form-prerequisite-step__icons">

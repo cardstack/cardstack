@@ -35,7 +35,7 @@ interface ConfiguredFeesState {
   error?: Error
 }
 
-interface MaxGasDescriptionsState {
+export interface MaxGasDescriptionsState {
   isLoading: boolean;
   isIndeterminate: boolean;
   value?: Record<MaxGasFeeOption, string>
@@ -55,6 +55,7 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
 
   @tracked schedulingStatus?: string;
   @tracked txHash?: TransactionHash;
+  @tracked scheduleErrorMessage?: string;
 
   get paymentTypeOptions() {
     return [
@@ -227,7 +228,7 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
 
   @use maxGasDescriptions = resource(() => {
     const state: MaxGasDescriptionsState = new TrackedObject({
-      isLoading: true,
+      isLoading: false,
       isIndeterminate: false
     });
     let { selectedGasToken, selectedPaymentType, paymentToken } = this;
@@ -253,6 +254,7 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
     const scenario = this.selectedPaymentType === 'one-time' ? 'execute_one_time_payment' : 'execute_recurring_payment';
     (async () => {
       try {
+        state.isLoading = true;
         this.gasEstimation = await this.scheduledPaymentSdk.getScheduledPaymentGasEstimation(scenario, paymentToken.address, selectedGasToken.address);
         const { gasRangeInGasTokenWei, gasRangeInUSD } = this.gasEstimation;
         state.value = {
@@ -302,53 +304,69 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
     const salt = btoa(String.fromCharCode.apply(null, array));
     const self = this;
 
-    const {paymentAmountTokenQuantity} = this;
-    yield taskFor(this.scheduledPaymentSdk.schedulePayment).perform(
-      currentSafe.address,
-      currentSafe.spModuleAddress,
-      paymentAmountTokenQuantity.address,
-      paymentAmountTokenQuantity.count,
-      this.payeeAddress,
-      Number(this.gasEstimation.gas),
-      String(maxGasPrice),
-      this.selectedGasToken.address,
-      salt,
-      this.selectedPaymentType === 'one-time' ? Math.round(this.paymentDate!.getTime() / 1000) : null,
-      this.selectedPaymentType === 'monthly' ? this.paymentDayOfMonth! : null,
-      this.selectedPaymentType === 'monthly' ? Math.round(this.monthlyUntil!.getTime() / 1000) : null,
-      {
-        onScheduledPaymentIdReady(scheduledPaymentId: string) {
-          self.lastScheduledPaymentId = scheduledPaymentId;
-        },
-        onTxHash(txHash: TransactionHash) {
-          self.txHash = txHash;
-        },
-        onBeginHubAuthentication() {
-          self.schedulingStatus = "Authenticating..."
-        },
-        onBeginSpHashCreation() {
-          self.schedulingStatus = "Calculating payment hash..."
-        },
-        onBeginRegisterPaymentWithHub() {
-          self.schedulingStatus = "Registering payment with hub..."
-        },
-        onBeginPrepareScheduledPayment() {
-          self.schedulingStatus = "Preparing transaction..."
-        },
-        onBeginSchedulingPaymentOnChain() {
-          self.schedulingStatus = "Scheduling on-chain..."
-        },
-        onBeginUpdatingHubWithTxHash() {
-          self.schedulingStatus = "Recording on hub..."
-        },
-        onBeginWaitingForTransactionConfirmation() {
-          self.schedulingStatus = "Confirming transaction..."
-        }
-      }
-    )
+    this.scheduleErrorMessage = undefined;
 
-    this.isSuccessfullyScheduled = true;
-    this.scheduledPaymentsService.reloadScheduledPayments();
+    try {
+      const {paymentAmountTokenQuantity} = this;
+      yield taskFor(this.scheduledPaymentSdk.schedulePayment).perform(
+        currentSafe.address,
+        currentSafe.spModuleAddress,
+        paymentAmountTokenQuantity.address,
+        paymentAmountTokenQuantity.count,
+        this.payeeAddress,
+        Number(this.gasEstimation.gas),
+        String(maxGasPrice),
+        this.selectedGasToken.address,
+        salt,
+        this.selectedPaymentType === 'one-time' ? Math.round(this.paymentDate!.getTime() / 1000) : null,
+        this.selectedPaymentType === 'monthly' ? this.paymentDayOfMonth! : null,
+        this.selectedPaymentType === 'monthly' ? Math.round(this.monthlyUntil!.getTime() / 1000) : null,
+        {
+          onScheduledPaymentIdReady(scheduledPaymentId: string) {
+            self.lastScheduledPaymentId = scheduledPaymentId;
+          },
+          onTxHash(txHash: TransactionHash) {
+            self.txHash = txHash;
+          },
+          onBeginHubAuthentication() {
+            self.schedulingStatus = "Authenticating..."
+          },
+          onBeginSpHashCreation() {
+            self.schedulingStatus = "Calculating payment hash..."
+          },
+          onBeginRegisterPaymentWithHub() {
+            self.schedulingStatus = "Registering payment with hub..."
+          },
+          onBeginPrepareScheduledPayment() {
+            self.schedulingStatus = "Preparing transaction..."
+          },
+          onBeginSchedulingPaymentOnChain() {
+            self.schedulingStatus = "Scheduling on-chain..."
+          },
+          onBeginUpdatingHubWithTxHash() {
+            self.schedulingStatus = "Recording on hub..."
+          },
+          onBeginWaitingForTransactionConfirmation() {
+            self.schedulingStatus = "Confirming transaction..."
+          }
+        }
+      )
+      this.scheduledPaymentsService.reloadScheduledPayments();
+      this.isSuccessfullyScheduled = true;
+    } catch(e) {
+      this.schedulingStatus = undefined;
+      let message = e.message || "An error occurred";
+      try {
+        let parsed = JSON.parse(message);
+        if (parsed.exception) {
+          message = `An error occurred: ${parsed.exception}`;
+        }
+      } catch (e) {
+        // the message wasn't valid JSON
+      }
+      this.scheduleErrorMessage = message;
+
+    }
   }
 
   @action resetForm() {
@@ -401,13 +419,14 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
       @isMaxGasPriceInvalid={{not this.validator.isMaxGasPriceValid}}
       @maxGasPriceErrorMessage={{this.validator.maxGasPriceErrorMessage}}
       @onSchedulePayment={{perform this.schedulePaymentTask}}
-      @maxGasDescriptions={{this.maxGasDescriptions.value}}
+      @maxGasDescriptions={{this.maxGasDescriptions}}
       @isSubmitEnabled={{this.isValid}}
       @schedulingStatus={{this.schedulingStatus}}
       @networkSymbol={{this.network.symbol}}
       @walletProviderId={{this.wallet.providerId}}
       @txHash={{this.txHash}}
       @isSuccessfullyScheduled={{this.isSuccessfullyScheduled}}
+      @scheduleErrorMessage={{this.scheduleErrorMessage}}
       @onReset={{this.resetForm}}
       @configuredFees={{this.configuredFees.value}}
     />
