@@ -1,4 +1,9 @@
-const HTML = require('node-html-parser');
+/* eslint-disable node/no-unsupported-features/es-syntax */
+/* eslint-disable node/no-unpublished-import  */
+
+import HTML from 'node-html-parser';
+import fetch, { Response } from 'node-fetch';
+import { URLSearchParams } from 'url';
 
 class RelayAdmin {
   host: string;
@@ -35,7 +40,7 @@ class RelayAdmin {
       const id = result.querySelector('td.action-checkbox > input.action-select')?.getAttribute('value');
       const username = result.querySelector('th.field-username > a')?.text;
       if (!id || !username) {
-        throw 'error parsing result_list';
+        throw 'getUsers: error parsing result_list';
       }
       users.push({
         id,
@@ -63,10 +68,10 @@ class RelayAdmin {
     for (const result of resultlist) {
       const id = result.querySelector('td.action-checkbox > input.action-select')?.getAttribute('value');
       const name = result.querySelector('th.field-name > a')?.text;
-      const configuration = result.querySelector('th.field-configuration')?.text;
+      const configuration = result.querySelector('td.field-configuration')?.text;
 
       if (!id || !name || !configuration) {
-        throw 'error parsing result_list';
+        throw 'getPriceOracles: error parsing result_list';
       }
 
       priceOracles.push({
@@ -93,21 +98,22 @@ class RelayAdmin {
   async getTokens() {
     let tokens: Token[] = [];
 
-    let res = await this._get('/admin/tokens/priceoracle');
+    let res = await this._get('/admin/tokens/token');
     const resultlist = this.getResultList(await res.text());
 
     for (const result of resultlist) {
       const id = result.querySelector('td.action-checkbox > input.action-select')?.getAttribute('value');
       const relevance = result.querySelector('th.field-relevance > a')?.text;
-      const address = result.querySelector('th.field-address')?.text;
-      const name = result.querySelector('th.field-name')?.text;
-      const symbol = result.querySelector('th.field-symbol')?.text;
-      const decimals = result.querySelector('th.field-decimals')?.text;
-      const fixedEthConversion = result.querySelector('th.field-fixed_eth_conversion')?.text;
-      const gas = result.querySelector('th.field-gas > img')?.getAttribute('alt') == 'True';
+      const address = result.querySelector('td.field-address')?.text;
+      const name = result.querySelector('td.field-name')?.text;
+      const symbol = result.querySelector('td.field-symbol')?.text;
+      const decimals = result.querySelector('td.field-decimals')?.text;
+      const fixedEthConversion = result.querySelector('td.field-fixed_eth_conversion')?.text;
+      const gas = result.querySelector('td.field-gas > img')?.getAttribute('alt') == 'True';
 
       if (!id || !name || !relevance || !address || !symbol || !decimals || !fixedEthConversion) {
-        throw 'error parsing result_list';
+        console.error(id, name, relevance, address, symbol, decimals, fixedEthConversion, gas);
+        throw 'getTokens: error parsing result_list';
       }
 
       tokens.push({
@@ -147,20 +153,55 @@ class RelayAdmin {
 
   async deleteToken(symbol: string) {}
 
-  async getPriceOracleTickers() {}
+  async getPriceOracleTickers(): Promise<PriceOracleTicker[]> {
+    const tokens = await this.getTokens();
+    const oracles = await this.getPriceOracles();
+
+    let priceOracleTickers: PriceOracleTicker[] = [];
+
+    let res = await this._get('/admin/tokens/priceoracleticker');
+    const resultlist = this.getResultList(await res.text());
+
+    for (const result of resultlist) {
+      const id = result.querySelector('td.action-checkbox > input.action-select')?.getAttribute('value');
+      const tokenSymbol = result.querySelector('th.field-token_symbol > a')?.text;
+      const oracleName = result.querySelector('td.field-price_oracle_name')?.text;
+      const ticker = result.querySelector('td.field-ticker')?.text;
+      const inverse = result.querySelector('td.field-gas > img')?.getAttribute('alt') == 'True';
+      const price = result.querySelector('td.field-price')?.text;
+
+      const token = tokens.find((token) => token.symbol == tokenSymbol);
+      const priceOracle = oracles.find((oracle) => oracle.name == oracleName);
+
+      if (!id || !token || !priceOracle || !ticker) {
+        throw 'getPriceOracleTickers: error parsing result_list';
+      }
+
+      priceOracleTickers.push({
+        id,
+        token,
+        priceOracle,
+        ticker,
+        inverse,
+        price: price === '-' ? '' : price,
+      });
+    }
+
+    return priceOracleTickers;
+  }
 
   async addPriceOracleTicker(priceOracleTicker: PriceOracleTicker) {
     const body = new URLSearchParams();
     body.append('_save', 'Save');
-    body.append('price_oracle', priceOracleTicker.priceOracle.id);
-    body.append('token', priceOracleTicker.token.id);
+    body.append('price_oracle', priceOracleTicker.priceOracle.id!);
+    body.append('token', priceOracleTicker.token.id!);
     body.append('ticker', priceOracleTicker.ticker);
 
     if (priceOracleTicker.inverse) {
       body.append('inverse', 'on');
     }
 
-    await this._post(`/admin/tokens/token/add`, body);
+    const res = await this._post(`/admin/tokens/priceoracleticker/add`, body);
   }
 
   async deletePriceOracleTicker() {}
@@ -250,26 +291,27 @@ class RelayAdmin {
 }
 
 interface User {
-  id: string;
+  id?: string;
   username: string;
 }
 
 interface PriceOracleTicker {
-  id: string;
+  id?: string;
   priceOracle: PriceOracle;
   token: Token;
   ticker: string;
   inverse: boolean;
+  price?: string;
 }
 
 interface PriceOracle {
-  id: string;
+  id?: string;
   name: string;
   configuration: any;
 }
 
 interface Token {
-  id: string;
+  id?: string;
   address: string;
   name: string;
   symbol: string;
@@ -282,4 +324,4 @@ interface Token {
   relevance: number;
 }
 
-export { RelayAdmin };
+export { RelayAdmin, Token, PriceOracle, PriceOracleTicker };

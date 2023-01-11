@@ -105,7 +105,8 @@
     "status:subgraph-sokol-blue": "yarn --cwd packages/cardpay-subgraph sokol-blue-status",
     "status:subgraph-xdai-green": "yarn --cwd packages/cardpay-subgraph xdai-green-status",
     "status:subgraph-xdai-blue": "yarn --cwd packages/cardpay-subgraph xdai-blue-status",
-    "waypoint-vars": "node ./scripts/waypoint-vars.js"
+    "waypoint-vars": "node ./scripts/waypoint-vars.js",
+    "update-relay-tokens": "yarn --cwd scripts update-relay-tokens"
   },
   "resolutions": {
     "ember-a11y-testing": "4.0.3",
@@ -130,5 +131,9 @@
   "volta": {
     "node": "14.18.3",
     "yarn": "1.22.17"
+  },
+  "devDependencies": {
+    "node-fetch": "^3.3.0",
+    "node-html-parser": "^6.1.4"
   }
 }

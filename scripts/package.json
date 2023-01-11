@@ -1,0 +1,7 @@
+{
+  "name": "scripts",
+  "type": "module",
+  "scripts": {
+    "update-relay-tokens": "ts-node --esm update-relay-servers-tokens.ts"
+  }
+}
