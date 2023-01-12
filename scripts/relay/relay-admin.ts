@@ -1,6 +1,3 @@
-/* eslint-disable node/no-unsupported-features/es-syntax */
-/* eslint-disable node/no-unpublished-import  */
-
 import HTML from 'node-html-parser';
 import fetch, { Response } from 'node-fetch';
 import { URLSearchParams } from 'url';
@@ -50,7 +47,7 @@ class RelayAdmin {
     return users;
   }
 
-  async addUser(username: string, password: string) {}
+  async addUser(username: string, password: string) {} // eslint-disable-line no-unused-vars
 
   async deleteUser(id: string) {
     const body = new URLSearchParams();
@@ -93,7 +90,7 @@ class RelayAdmin {
     await this._post(`/admin/tokens/priceoracle/add/`, body);
   }
 
-  async deletePriceOracle(name: string) {}
+  async deletePriceOracle(name: string) {} // eslint-disable-line no-unused-vars
 
   async getTokens() {
     let tokens: Token[] = [];
@@ -151,7 +148,7 @@ class RelayAdmin {
     await this._post(`/admin/tokens/token/add`, body);
   }
 
-  async deleteToken(symbol: string) {}
+  async deleteToken(symbol: string) {} // eslint-disable-line no-unused-vars
 
   async getPriceOracleTickers(): Promise<PriceOracleTicker[]> {
     const tokens = await this.getTokens();
@@ -201,7 +198,7 @@ class RelayAdmin {
       body.append('inverse', 'on');
     }
 
-    const res = await this._post(`/admin/tokens/priceoracleticker/add`, body);
+    await this._post(`/admin/tokens/priceoracleticker/add`, body);
   }
 
   async deletePriceOracleTicker() {}
