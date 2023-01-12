@@ -159,18 +159,7 @@ export default class RewardPool {
         const explanationTemplate = rewardManager.getClaimExplainer(rule, o.explanationId);
         if (tokenAddress && tokenAddress == token) {
           // filters for based upon the tokenAddress if it exists
-          if (!knownClaimed) {
-            // filters for proofs has not been claimed
-            if (!claimedLeafs.includes(o.leaf)) {
-              res.push({
-                ...o,
-                tokenAddress,
-                amount: amount,
-                isValid,
-                explanationTemplate,
-              });
-            }
-          } else {
+          if (knownClaimed || !claimedLeafs.includes(o.leaf)) {
             res.push({
               ...o,
               tokenAddress,
@@ -180,18 +169,7 @@ export default class RewardPool {
             });
           }
         } else {
-          // filters for proofs has not been claimed
-          if (!knownClaimed) {
-            if (!claimedLeafs.includes(o.leaf)) {
-              res.push({
-                ...o,
-                tokenAddress: token,
-                amount: amount,
-                isValid,
-                explanationTemplate,
-              });
-            }
-          } else {
+          if (knownClaimed || !claimedLeafs.includes(o.leaf)) {
             res.push({
               ...o,
               tokenAddress: token,
