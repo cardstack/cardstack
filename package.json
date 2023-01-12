@@ -50,7 +50,7 @@
     "build:ssr-web:staging": "cd packages/ssr-web && ember build --environment=production",
     "build:ssr-web:production": "cd packages/ssr-web && ember build --environment=production",
     "build:subgraph": "yarn --cwd packages/cardpay-subgraph build",
-    "check:waypoint-secrets": "ts-node scripts/verify-waypoint-secrets.ts",
+    "check:waypoint-secrets": "ts-node --esm scripts/verify-waypoint-secrets.ts",
     "lint": "npm-run-all --aggregate-output --continue-on-error --parallel lint:*",
     "lint:boxel": "yarn --cwd packages/boxel lint",
     "lint:cardhost": "yarn --cwd packages/cardhost lint",
@@ -106,7 +106,7 @@
     "status:subgraph-xdai-green": "yarn --cwd packages/cardpay-subgraph xdai-green-status",
     "status:subgraph-xdai-blue": "yarn --cwd packages/cardpay-subgraph xdai-blue-status",
     "waypoint-vars": "node ./scripts/waypoint-vars.js",
-    "update-relay-tokens": "yarn --cwd scripts update-relay-tokens"
+    "update-relay-tokens": "ts-node --esm scripts/update-relay-servers-tokens.ts"
   },
   "resolutions": {
     "ember-a11y-testing": "4.0.3",
