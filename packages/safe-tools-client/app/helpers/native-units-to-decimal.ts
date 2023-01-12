@@ -1,6 +1,5 @@
-import { convertRawAmountToDecimalFormat } from '@cardstack/cardpay-sdk';
 import { helper } from '@ember/component/helper';
-import { BigNumber } from 'ethers';
+import { BigNumber, utils as ethersUtils } from 'ethers';
 
 type PositionalArgs = [BigNumber, number, number?];
 
@@ -11,15 +10,13 @@ interface Signature {
   Return: string;
 }
 
-export function weiToDecimal([
+export function nativeUnitsToDecimal([
   amount,
   tokenDecimals,
   decimals = 3,
 ]: PositionalArgs) {
-  const number = parseFloat(
-    convertRawAmountToDecimalFormat(amount.toString(), tokenDecimals)
-  );
+  const number = parseFloat(ethersUtils.formatUnits(amount, tokenDecimals));
   return String(number % 1 === 0 ? number : number.toFixed(decimals));
 }
 
-export default helper<Signature>(weiToDecimal);
+export default helper<Signature>(nativeUnitsToDecimal);

@@ -2,7 +2,7 @@ import config from 'config';
 import { gqlQuery } from '@cardstack/cardpay-sdk';
 
 export interface SKUInventory {
-  askPrice: string; // in terms of the issuing token (wei)
+  askPrice: string; // in terms of the issuing token (e.g. wei)
   sku: {
     id: string;
     faceValue: string; // saved in the subgraph as a BigInt, but this is actually a safe js integer

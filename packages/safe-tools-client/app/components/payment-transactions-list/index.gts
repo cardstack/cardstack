@@ -20,7 +20,7 @@ import { menuItemFunc, MenuItem } from '@cardstack/boxel/helpers/menu-item'
 import formatDate from '@cardstack/safe-tools-client/helpers/format-date';
 import { taskFor } from 'ember-concurrency-ts';
 import { task, TaskGenerator } from 'ember-concurrency';
-import weiToDecimal from '@cardstack/safe-tools-client/helpers/wei-to-decimal';
+import nativeUnitsToDecimal from '@cardstack/safe-tools-client/helpers/native-units-to-decimal';
 import { type TokenInfo } from '@uniswap/token-lists';
 import TokensService from '@cardstack/safe-tools-client/services/tokens';
 import { subDays } from 'date-fns';
@@ -64,7 +64,7 @@ class PaymentTransactionsList extends Component {
   get paymentAttempts() {
     if (!this.scheduledPaymentAttemptsResource.value) return [];
 
-    // Add token info to each scheduled payment attempt so that we can display the token symbol and convert the amount to decimal using weiToDecimal
+    // Add token info to each scheduled payment attempt so that we can display the token symbol and convert the amount to decimal using nativeUnitsToDecimal
     return this.scheduledPaymentAttemptsResource.value.map((scheduledPaymentAttempt) => {
       const tokenInfo = this.tokens.transactionTokens.find((t) => t.address === scheduledPaymentAttempt.scheduledPayment.tokenAddress) as TokenInfo;
       return { ...scheduledPaymentAttempt, tokenInfo };
@@ -172,7 +172,7 @@ class PaymentTransactionsList extends Component {
                   {{paymentAttempt.scheduledPayment.payeeAddress}}
                 </td>
                 <td class="table__cell" data-test-scheduled-payment-attempts-item-amount>
-                  <strong>{{weiToDecimal paymentAttempt.scheduledPayment.amount paymentAttempt.tokenInfo.decimals}} {{paymentAttempt.tokenInfo.symbol}}</strong>
+                  <strong>{{nativeUnitsToDecimal paymentAttempt.scheduledPayment.amount paymentAttempt.tokenInfo.decimals}} {{paymentAttempt.tokenInfo.symbol}}</strong>
                 </td>
                 <td class="table__cell" data-test-scheduled-payment-attempts-item-status>
                   {{#if (eq paymentAttempt.status 'succeeded')}}

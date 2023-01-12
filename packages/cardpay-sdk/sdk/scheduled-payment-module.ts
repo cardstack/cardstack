@@ -4,7 +4,7 @@ import GnosisSafeABI from '../contracts/abi/gnosis-safe';
 import MetaGuardABI from '../contracts/abi/modules/meta-guard';
 import ScheduledPaymentABI from '../contracts/abi/modules/scheduled-payment-module';
 import { getAddress } from '../contracts/addresses';
-import { fromWei, isAddress } from 'web3-utils';
+import { isAddress } from 'web3-utils';
 import {
   deployAndSetUpModule,
   encodeMultiSend,
@@ -164,11 +164,13 @@ export default class ScheduledPaymentModule {
     let token = new Contract(gasTokenAddress, ERC20ABI, this.ethersProvider);
     let symbol = await token.symbol();
     let balance = await token.callStatic.balanceOf(safeAddress);
+    let decimals = await token.callStatic.decimals();
     if (balance.lt(gasCost)) {
       throw new Error(
-        `Safe does not have enough balance to enable scheduled payment module. The gas token ${gasTokenAddress} balance of the safe ${safeAddress} is ${fromWei(
-          balance
-        )}, the the gas cost is ${utils.formatUnits(gasCost, 'wei')} ${symbol}`
+        `Safe does not have enough balance to enable scheduled payment module. The gas token ${gasTokenAddress} balance of the safe ${safeAddress} is ${utils.formatUnits(
+          balance,
+          decimals
+        )}, the the gas cost is ${utils.formatUnits(gasCost, decimals)} ${symbol}`
       );
     }
     if (nonce == null) {
@@ -591,11 +593,13 @@ export default class ScheduledPaymentModule {
     let token = new Contract(gasTokenAddress, ERC20ABI, this.ethersProvider);
     let symbol = await token.callStatic.symbol();
     let balance = await token.callStatic.balanceOf(safeAddress);
+    let decimals = await token.callStatic.decimals();
     if (balance.lt(gasCost)) {
       throw new Error(
-        `Safe does not have enough balance to cancel scheduled payment. The gas token ${gasTokenAddress} balance of the safe ${safeAddress} is ${fromWei(
-          balance
-        )}, the the gas cost is ${utils.formatUnits(gasCost, 'wei')} ${symbol}`
+        `Safe does not have enough balance to cancel scheduled payment. The gas token ${gasTokenAddress} balance of the safe ${safeAddress} is ${utils.formatUnits(
+          balance,
+          decimals
+        )}, the the gas cost is ${utils.formatUnits(gasCost, decimals)} ${symbol}`
       );
     }
     if (nonce == null) {

@@ -90,7 +90,7 @@ export interface TokenInfo {
     symbol: string;
     decimals: number;
   };
-  balance: string; // balance is in wei
+  balance: string; // balance is in native units of the token (e.g. wei)
 }
 
 export interface Options {
