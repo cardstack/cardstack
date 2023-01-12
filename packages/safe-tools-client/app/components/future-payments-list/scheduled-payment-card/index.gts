@@ -112,7 +112,7 @@ export default class ScheduledPaymentCard extends Component<Signature> {
           <img class="scheduled-payment-card__token-symbol" src={{this.tokenInfo.logoURI}} />
           <div class="scheduled-payment-card__token-amounts">
             <span class="scheduled-payment-card__token-amount">{{weiToDecimal @scheduledPayment.amount this.tokenInfo.decimals}} {{this.tokenInfo.symbol}}</span>
-            <span class="scheduled-payment-card__usd-amount">$ <TokenToUsd @tokenAddress={{@scheduledPayment.tokenAddress}} @tokenAmount={{@scheduledPayment.amount}} /> USD</span>
+            <span class="scheduled-payment-card__usd-amount"><TokenToUsd @tokenAddress={{@scheduledPayment.tokenAddress}} @tokenAmount={{@scheduledPayment.amount}} @tokenDecimals={{this.tokenInfo.decimals}}/></span>
           </div>
         </div>
       </div>

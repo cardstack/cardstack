@@ -2,6 +2,7 @@
 import Service from '@ember/service';
 import { render, TestContext, waitUntil } from '@ember/test-helpers';
 import { tracked } from '@glimmer/tracking';
+import { addMilliseconds } from 'date-fns';
 import { task } from 'ember-concurrency';
 import { setupRenderingTest } from 'ember-qunit';
 import { BigNumber } from 'ethers';
@@ -23,7 +24,7 @@ class TokenToUsdServiceStub extends Service {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ): any {
     this.usdConverters.set(tokenAddress, (amountInWei: BigNumber) => {
-      return amountInWei.mul(2);
+      return amountInWei.mul(1000);
     });
   }
 
@@ -48,7 +49,7 @@ module('Integration | Component | token-to-usd', function (hooks) {
 
   test('It converts token amount to usd', async function (assert) {
     await render(hbs`
-      <TokenToUsd @tokenAddress='0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48' @tokenAmount=1000 />
+      <TokenToUsd @tokenAddress='0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48' @tokenAmount='2000000000000000000' @tokenDecimals=18 />
     `);
     await waitUntil(
       () => {
@@ -58,6 +59,25 @@ module('Integration | Component | token-to-usd', function (hooks) {
       },
       { timeout: 5000 }
     );
-    assert.strictEqual(this.element.textContent?.trim(), '2000');
+    assert.strictEqual(this.element.textContent?.trim(), '$ 2000 USD');
+  });
+
+  test('It returns blank string if usd converter is undefined', async function (assert) {
+    returnEmptyUsdConverter = true;
+    await render(hbs`
+      <TokenToUsd @tokenAddress='0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48' @tokenAmount='2000000000000000000' @tokenDecimals=18 />
+    `);
+    const now = new Date();
+    await waitUntil(
+      () => {
+        return (
+          (this.element.textContent &&
+            this.element.textContent?.trim() !== '') ||
+          addMilliseconds(now, 4500) < new Date() // Return true if almost timeout
+        );
+      },
+      { timeout: 5000 }
+    );
+    assert.strictEqual(this.element.textContent?.trim(), '');
   });
 });

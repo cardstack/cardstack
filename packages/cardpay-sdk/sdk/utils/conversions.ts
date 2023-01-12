@@ -136,7 +136,7 @@ export async function getUsdConverter(
     return (amountInWei: BigNumber) => amountInWei;
   }
 
-  let rate = await tokenPairRate(provider, tokenAddress, usdcTokenAddress);
+  let rate = await tokenPairRate(provider, usdcTokenAddress, tokenAddress);
   return (amountInWei: BigNumber) => {
     let rateAdjusted = adjustRate(rate);
     return amountInWei.mul(rateAdjusted.numerator.toString()).div(rateAdjusted.denominator.toString());
