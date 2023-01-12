@@ -9,6 +9,7 @@ import { getConstantByNetwork, SchedulerCapableNetworks } from '../constants';
 import JsonRpcProvider from '../../providers/json-rpc-provider';
 import { networkName } from './general-utils';
 import BN from 'bn.js';
+import { BigNumber } from 'ethers';
 import { BaseProvider } from '@ethersproject/providers';
 import { convertChainIdToName } from '../network-config-utils';
 import { Contract } from 'ethers';
@@ -122,4 +123,22 @@ export async function getNativeWeiInToken(provider: JsonRpcProvider, tokenAddres
   let rate = await tokenPairRate(provider, tokenAddress, wrappedNativeToken);
   let rateAdjusted = adjustRate(rate);
   return new BN(rateAdjusted.numerator.toString()).div(new BN(rateAdjusted.denominator.toString()));
+}
+
+export async function getUsdConverter(
+  provider: JsonRpcProvider,
+  tokenAddress: string
+): Promise<(amountInWei: BigNumber) => BigNumber> {
+  let network = await networkName(provider);
+  let usdcTokenAddress = getAddressByNetwork('usdcToken', network);
+
+  if (usdcTokenAddress === tokenAddress) {
+    return (amountInWei: BigNumber) => amountInWei;
+  }
+
+  let rate = await tokenPairRate(provider, tokenAddress, usdcTokenAddress);
+  return (amountInWei: BigNumber) => {
+    let rateAdjusted = adjustRate(rate);
+    return amountInWei.mul(rateAdjusted.numerator.toString()).div(rateAdjusted.denominator.toString());
+  };
 }

@@ -437,7 +437,7 @@ module('Acceptance | pay', function (hooks) {
   });
 
   test('it handles errors in fetching exchange rates gracefully', async function (this: MirageTestContext, assert) {
-    this.server.get('/exchange-rates', function () {
+    this.server.get(`${config.hubURL}/api/exchange-rates`, function () {
       return new MirageResponse(502, {}, '');
     });
 

@@ -67,7 +67,9 @@ export default class ScheduledPaymentsRoute {
         payAt: {
           gt: minPayAt,
         },
+        canceledAt: null,
       },
+      orderBy: { payAt: 'asc' },
     });
 
     ctx.body = this.scheduledPaymentSerializer.serialize(scheduledPayments);

@@ -6,6 +6,7 @@ import Service, { inject as service } from '@ember/service';
 import { BigNumber } from 'ethers';
 
 export interface ScheduledPayment {
+  id: string;
   amount: BigNumber;
   feeFixedUSD: string;
   feePercentage: string;
@@ -93,6 +94,7 @@ export type ScheduledPaymentAttemptStatus =
   | 'inProgress';
 
 export interface ScheduledPaymentResponseItem {
+  id: string;
   attributes: {
     'user-address': string;
     'sender-safe-address': string;
@@ -203,6 +205,7 @@ export default class ScheduledPaymentsService extends Service {
   ): ScheduledPayment[] {
     return response.data.map((s) => {
       return {
+        id: s.id,
         userAddress: s.attributes['user-address'],
         senderSafeAddress: s.attributes['sender-safe-address'],
         moduleAddress: s.attributes['module-address'],

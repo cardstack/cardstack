@@ -16,7 +16,6 @@ import { action } from '@ember/object';
 import Service, { inject as service } from '@ember/service';
 import { TaskGenerator } from 'ember-concurrency';
 import { task } from 'ember-concurrency-decorators';
-
 import { BigNumber } from 'ethers';
 
 const GAS_RANGE_NORMAL_MULTIPLIER = 2;
@@ -168,6 +167,20 @@ export default class SchedulePaymentSDKService extends Service {
     } catch (err) {
       console.error(err);
     }
+  }
+
+  async cancelScheduledPayment(
+    scheduledPaymentId: string,
+    authToken: string
+  ): Promise<unknown> {
+    const scheduledPaymentModule: ScheduledPaymentModule =
+      await this.getSchedulePaymentModule();
+
+    return scheduledPaymentModule.cancelScheduledPayment(
+      scheduledPaymentId,
+      config.hubUrl,
+      authToken
+    );
   }
 }
 

@@ -2438,6 +2438,15 @@
     "@embroider/shared-internals" "^1.8.3"
     semver "^7.3.5"
 
+"@embroider/addon-shim@^1.6.0":
+  version "1.8.4"
+  resolved "https://registry.yarnpkg.com/@embroider/addon-shim/-/addon-shim-1.8.4.tgz#0e7f32c5506bf0f3eb0840506e31c36c7053763c"
+  integrity sha512-sFhfWC0vI18KxVenmswQ/ShIvBg4juL8ubI+Q3NTSdkCTeaPQ/DIOUF6oR5DCQ8eO/TkIaw+kdG3FkTY6yNJqA==
+  dependencies:
+    "@embroider/shared-internals" "^2.0.0"
+    broccoli-funnel "^3.0.8"
+    semver "^7.3.8"
+
 "@embroider/babel-loader-8@1.8.3":
   version "1.8.3"
   resolved "https://registry.yarnpkg.com/@embroider/babel-loader-8/-/babel-loader-8-1.8.3.tgz#47d009e01eed9f296df28c29eda78e5eaa41e22a"
@@ -10295,7 +10304,7 @@ body-parser@1.20.0, body-parser@^1.16.0, body-parser@^1.18.3, body-parser@^1.19.
     type-is "~1.6.18"
     unpipe "1.0.0"
 
-body-parser@1.20.1:
+body-parser@1.20.1, body-parser@^1.20.0:
   version "1.20.1"
   resolved "https://registry.yarnpkg.com/body-parser/-/body-parser-1.20.1.tgz#b1812a8912c195cd371a3ee5e66faa2338a5c668"
   integrity sha512-jWi7abTbYwajOytWCQc37VulmWiRae5RyTpaCyDcS5/lMdtwSz5lOpDE67srw/HYe35f1z3fDQw+3txg7gNtWw==
@@ -14507,29 +14516,19 @@ ember-cli-fastboot-testing@^0.6.0:
     resolve "^1.10.0"
     whatwg-fetch "^3.0.0"
 
-ember-cli-fastboot@^3.3.0:
-  version "3.3.0"
-  resolved "https://registry.yarnpkg.com/ember-cli-fastboot/-/ember-cli-fastboot-3.3.0.tgz#c0438c17a19bef704d9d62b68b5049fc017c9581"
-  integrity sha512-PgTAFWI47sLIJCl4yN7/v5PhzawSXb5ih/YPQQR6K0CX+5i17XYxKjhKE4Mp0Jtu/huURv7uACFKytmKVkcEZg==
+ember-cli-fastboot-testing@embermap/ember-cli-fastboot-testing#d4c88d6:
+  version "0.6.0"
+  resolved "https://codeload.github.com/embermap/ember-cli-fastboot-testing/tar.gz/d4c88d628d524f988b2ca23c6049eb31f0ec768f"
   dependencies:
-    broccoli-concat "^4.2.5"
-    broccoli-file-creator "^2.1.1"
-    broccoli-funnel "^3.0.8"
-    broccoli-merge-trees "^4.2.0"
-    broccoli-plugin "^4.0.7"
-    chalk "^4.1.2"
-    ember-cli-babel "^7.26.6"
-    ember-cli-lodash-subset "^2.0.1"
-    ember-cli-preprocess-registry "^3.3.0"
-    ember-cli-version-checker "^5.1.2"
-    fastboot "3.3.0"
-    fastboot-express-middleware "3.3.0"
-    fastboot-transform "^0.1.3"
-    fs-extra "^10.0.0"
-    json-stable-stringify "^1.0.1"
-    md5-hex "^3.0.1"
-    recast "^0.19.1"
-    silent-error "^1.1.1"
+    body-parser "^1.20.0"
+    ember-auto-import "^2.4.1"
+    ember-cli-babel "^7.26.11"
+    fastboot "^3.0.3"
+    json-fn "^1.1.1"
+    minimist "^1.2.6"
+    nock "^13.2.4"
+    resolve "^1.22.0"
+    whatwg-fetch "^3.0.0"
 
 ember-cli-fastboot@^3.3.2:
   version "3.3.2"
@@ -14548,6 +14547,30 @@ ember-cli-fastboot@^3.3.2:
     ember-cli-version-checker "^5.1.2"
     fastboot "3.3.2"
     fastboot-express-middleware "3.3.2"
+    fastboot-transform "^0.1.3"
+    fs-extra "^10.0.0"
+    json-stable-stringify "^1.0.1"
+    md5-hex "^3.0.1"
+    recast "^0.19.1"
+    silent-error "^1.1.1"
+
+ember-cli-fastboot@^4.1.0:
+  version "4.1.0"
+  resolved "https://registry.yarnpkg.com/ember-cli-fastboot/-/ember-cli-fastboot-4.1.0.tgz#c0446853fe68f33f53c37509cf21daf932811716"
+  integrity sha512-OQ1+eEVK8OBh0M0KY6Rrxu2JqdAByQlY4SWzR/06cTftcDSKpUL44DTrWPs7Te4bEgQfjbic2g8AUOVw+2YvUA==
+  dependencies:
+    broccoli-concat "^4.2.5"
+    broccoli-file-creator "^2.1.1"
+    broccoli-funnel "^3.0.8"
+    broccoli-merge-trees "^4.2.0"
+    broccoli-plugin "^4.0.7"
+    chalk "^4.1.2"
+    ember-cli-babel "^7.26.6"
+    ember-cli-lodash-subset "^2.0.1"
+    ember-cli-preprocess-registry "^3.3.0"
+    ember-cli-version-checker "^5.1.2"
+    fastboot "4.1.0"
+    fastboot-express-middleware "4.1.0"
     fastboot-transform "^0.1.3"
     fs-extra "^10.0.0"
     json-stable-stringify "^1.0.1"
@@ -15227,6 +15250,13 @@ ember-css-url@v1.0.0-alpha.0:
   integrity sha512-oUyq+kPSYwtYtZ3LnlrRkmxHEjveL7WkC7LjZbkfKV4/kBPni71n16hPV44ydMohfgQ+asnyL01t9lxO3tswfg==
   dependencies:
     "@embroider/addon-shim" "^1.0.0"
+
+ember-date-service@^3.0.1:
+  version "3.0.1"
+  resolved "https://registry.yarnpkg.com/ember-date-service/-/ember-date-service-3.0.1.tgz#9c51a63444539700471249692ffb58b65c197dfa"
+  integrity sha512-nUpQIw7ch/3RVRcaC1AiW+efHvC8hNuvsnqusfhGDA3RtyrzS+bDEZ+82/P3zfSpJg1v7YD+MDIZXDCbmcvdcQ==
+  dependencies:
+    "@embroider/addon-shim" "^1.6.0"
 
 ember-decorators-polyfill@^1.1.5:
   version "1.1.5"
@@ -17997,14 +18027,6 @@ fast-xml-parser@3.19.0:
   resolved "https://registry.yarnpkg.com/fast-xml-parser/-/fast-xml-parser-3.19.0.tgz#cb637ec3f3999f51406dd8ff0e6fc4d83e520d01"
   integrity sha512-4pXwmBplsCPv8FOY1WRakF970TjNGnGnfbOnLqjlYvMiF1SR3yOHyxMR/YCXpPTOspNF5gwudqktIP4VsWkvBg==
 
-fastboot-express-middleware@3.3.0:
-  version "3.3.0"
-  resolved "https://registry.yarnpkg.com/fastboot-express-middleware/-/fastboot-express-middleware-3.3.0.tgz#a3da82533383331bb32c6cd921a0e99705b06740"
-  integrity sha512-iLr4ncGi0gb+40O0D9VOmJ0MI/ROESuolsfNyasDHCdnz7eT+gloT9KG3h6efscCuCQ1IviuE1ynuAVTp9vX8Q==
-  dependencies:
-    chalk "^4.1.2"
-    fastboot "3.3.0"
-
 fastboot-express-middleware@3.3.2:
   version "3.3.2"
   resolved "https://registry.yarnpkg.com/fastboot-express-middleware/-/fastboot-express-middleware-3.3.2.tgz#6d78de06f1db51f47b4f66658c651a61fcf5ca96"
@@ -18012,6 +18034,14 @@ fastboot-express-middleware@3.3.2:
   dependencies:
     chalk "^4.1.2"
     fastboot "3.3.2"
+
+fastboot-express-middleware@4.1.0:
+  version "4.1.0"
+  resolved "https://registry.yarnpkg.com/fastboot-express-middleware/-/fastboot-express-middleware-4.1.0.tgz#c550eb4fee420d4517ad9b3e951d74f7f997b487"
+  integrity sha512-RH/YnAn8S/CuzVsK0SLH5cVDP50R3MedqPFhf69T3z6h7LSFm12VAU2TKkqtW/N7qDs00CK1Clus2CwuzXVtWA==
+  dependencies:
+    chalk "^4.1.2"
+    fastboot "4.1.0"
 
 fastboot-transform@^0.1.3:
   version "0.1.3"
@@ -18021,10 +18051,10 @@ fastboot-transform@^0.1.3:
     broccoli-stew "^1.5.0"
     convert-source-map "^1.5.1"
 
-fastboot@3.3.0:
-  version "3.3.0"
-  resolved "https://registry.yarnpkg.com/fastboot/-/fastboot-3.3.0.tgz#e0b1cafb3fb6e89095acade221ccfbfe327b3462"
-  integrity sha512-WXgR/uKM/r6TCb99Q97vuxH16bhF1scF4LL7Uckel5dNqvvlNVpKEeuggOJafx/JtfIyrldfo7Cn9Xpaoltp7A==
+fastboot@3.3.2, fastboot@^3.0.3:
+  version "3.3.2"
+  resolved "https://registry.yarnpkg.com/fastboot/-/fastboot-3.3.2.tgz#bf1ac7b01937846b63423a88138e13eb50406d2e"
+  integrity sha512-2NKTW32GvEsDyBrdw1trW1JsbS+9/7sAQuKwkht12mNitimRrSKVLP2AxsM/HSXQE+aiET4XCfKdyeIy0kQbKQ==
   dependencies:
     chalk "^4.1.2"
     cookie "^0.4.1"
@@ -18034,10 +18064,10 @@ fastboot@3.3.0:
     simple-dom "^1.4.0"
     source-map-support "^0.5.21"
 
-fastboot@3.3.2, fastboot@^3.0.3:
-  version "3.3.2"
-  resolved "https://registry.yarnpkg.com/fastboot/-/fastboot-3.3.2.tgz#bf1ac7b01937846b63423a88138e13eb50406d2e"
-  integrity sha512-2NKTW32GvEsDyBrdw1trW1JsbS+9/7sAQuKwkht12mNitimRrSKVLP2AxsM/HSXQE+aiET4XCfKdyeIy0kQbKQ==
+fastboot@4.1.0:
+  version "4.1.0"
+  resolved "https://registry.yarnpkg.com/fastboot/-/fastboot-4.1.0.tgz#4c2f62841d80b0a246e38adb3c35b626e2f42087"
+  integrity sha512-NoUUiWhLS4JfrYiHmbRjqqWmzttO+6hVyt+CawsZCg79ljTGAIhPThy8cxg11yiDNiaM9EY3kocWZrCMUM7o4g==
   dependencies:
     chalk "^4.1.2"
     cookie "^0.4.1"
@@ -25093,7 +25123,7 @@ noble-secp256k1@^1.2.10:
   resolved "https://registry.yarnpkg.com/noble-secp256k1/-/noble-secp256k1-1.2.14.tgz#39429c941d51211ca40161569cee03e61d72599e"
   integrity sha512-GSCXyoZBUaaPwVWdYncMEmzlSUjF9J/YeEHpklYJCyg8wPuJP3NzDx0BkiwArzINkdX2HJHvUJhL6vVWPOQQcg==
 
-nock@^13.1.4:
+nock@^13.1.4, nock@^13.2.4:
   version "13.2.9"
   resolved "https://registry.yarnpkg.com/nock/-/nock-13.2.9.tgz#4faf6c28175d36044da4cfa68e33e5a15086ad4c"
   integrity sha512-1+XfJNYF1cjGB+TKMWi29eZ0b82QOvQs2YoLNzbpWGqFMtRQHTa57osqdGj4FrFPgkO4D4AZinzUJR9VvW3QUA==
@@ -28830,6 +28860,13 @@ semver@^7.0.0, semver@^7.1.1, semver@^7.1.3, semver@^7.2.1, semver@^7.3.2, semve
   version "7.3.7"
   resolved "https://registry.yarnpkg.com/semver/-/semver-7.3.7.tgz#12c5b649afdbf9049707796e22a4028814ce523f"
   integrity sha512-QlYTucUYOews+WeEujDoEGziz4K6c47V/Bd+LjSSYcA94p+DmINdf7ncaUinThfvZyu13lN9OY1XDxt8C0Tw0g==
+  dependencies:
+    lru-cache "^6.0.0"
+
+semver@^7.3.8:
+  version "7.3.8"
+  resolved "https://registry.yarnpkg.com/semver/-/semver-7.3.8.tgz#07a78feafb3f7b32347d725e33de7e2a2df67798"
+  integrity sha512-NB1ctGL5rlHrPJtFDVIVzTyQylMLu9N9VICA6HSFJo8MCGVTMW6gfpicwKmmK/dAjTOrqu5l63JJOpDSrAis3A==
   dependencies:
     lru-cache "^6.0.0"
 

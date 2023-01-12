@@ -838,10 +838,12 @@ export default class ScheduledPaymentModule {
     });
   }
 
-  async cancelScheduledPayment(scheduledPaymentId: string, hubRootUrl?: string) {
+  async cancelScheduledPayment(scheduledPaymentId: string, hubRootUrl?: string, authToken?: string) {
     let hubAuth = await getSDK('HubAuth', this.ethersProvider, hubRootUrl, this.signer);
     hubRootUrl = await hubAuth.getHubUrl();
-    let authToken = await hubAuth.authenticate();
+    if (!authToken) {
+      authToken = await hubAuth.authenticate();
+    }
 
     let scheduledPaymentResponse = await hubRequest(
       hubRootUrl,

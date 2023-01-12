@@ -3,6 +3,7 @@ import SafesService, {
   Safe,
   TokenBalance,
 } from '@cardstack/safe-tools-client/services/safes';
+import ScheduledPaymentsService from '@cardstack/safe-tools-client/services/scheduled-payments';
 import SchedulePaymentSDKService from '@cardstack/safe-tools-client/services/scheduled-payments-sdk';
 import WalletService from '@cardstack/safe-tools-client/services/wallet';
 import { click, visit, waitFor, TestContext } from '@ember/test-helpers';
@@ -70,6 +71,14 @@ module('Acceptance | create safe', function (hooks) {
           isNativeToken: true,
         } as unknown as TokenBalance,
       ]);
+    };
+
+    const scheduledPaymentsService = this.owner.lookup(
+      'service:scheduled-payments'
+    ) as ScheduledPaymentsService;
+
+    scheduledPaymentsService.fetchScheduledPayments = (): Promise<[]> => {
+      return Promise.resolve([]);
     };
   });
 

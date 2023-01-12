@@ -29,6 +29,10 @@
   border-radius: 0 0 var(--boxel-border-radius) var(--boxel-border-radius);
 }
 
+.boxel-menu__item:only-child {
+  border-radius: var(--boxel-border-radius);
+}
+
 .boxel-menu__item > a {
   width: 100%;
   padding: var(--boxel-sp-xs) var(--boxel-sp);
