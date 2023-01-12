@@ -24,6 +24,7 @@ import { task } from 'ember-concurrency-decorators';
 import perform from 'ember-concurrency/helpers/perform';
 import ScheduledPaymentsService from '@cardstack/safe-tools-client/services/scheduled-payments';
 import TokenQuantity from '@cardstack/safe-tools-client/utils/token-quantity';
+import * as Sentry from '@sentry/browser';
 
 interface Signature {
   Element: HTMLElement;
@@ -365,12 +366,20 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
       try {
         let parsed = JSON.parse(e.message);
 
-        let errorKey = Object.keys(knownErrorPatterns).find((key) => { return parsed.exception.includes(key) });
-        if (errorKey) {
-          message = knownErrorPatterns[errorKey];
+        if (parsed.exception.includes('InsufficientFunds')) {
+          // This means the relayer is out of funds and can't pay for the transaction
+          Sentry.captureException(`Relayer is out of funds on ${this.network.chainId} network`);
+          message = "We are currently experiencing a problem with our transaction relayer system. We are working on a fix. Please try again later. If the problem persists, please contact support."
+        } else {
+          let errorKey = Object.keys(knownErrorPatterns).find((key) => { return parsed.exception.includes(key) });
+          if (parsed.ex)
+          if (errorKey) {
+            message = knownErrorPatterns[errorKey];
+          }
         }
       } catch (e) {
         // the message wasn't valid JSON
+        Sentry.captureException(e.message);
       }
 
       this.scheduleErrorMessage = message;
