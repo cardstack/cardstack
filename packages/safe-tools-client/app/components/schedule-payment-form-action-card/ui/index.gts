@@ -215,7 +215,7 @@ export default class SchedulePaymentFormActionCardUI extends Component<Signature
         <BoxelField @label="Amount">
           <BoxelInputSelectableTokenAmount
             data-test-amount-input
-            @value={{@paymentAmount}}
+            @value={{@paymentAmountRaw}}
             @onInput={{@onUpdatePaymentAmount}}
             @invalid={{this.isPaymentAmountInvalid}}
             @errorMessage={{@paymentAmountErrorMessage}}

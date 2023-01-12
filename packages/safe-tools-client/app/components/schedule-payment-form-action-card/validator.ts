@@ -20,7 +20,7 @@ export interface ValidatableForm {
   minMonthlyUntil: Date;
   monthlyUntil: Date | undefined;
   payeeAddress: string;
-  paymentAmount: string;
+  paymentAmountRaw: string;
   paymentToken: SelectableToken | undefined;
   selectedGasToken: SelectableToken | undefined;
   maxGasPrice: 'normal' | 'high' | 'max' | undefined;
@@ -85,14 +85,14 @@ export default class SchedulePaymentFormValidator {
 
   get isAmountValid(): boolean {
     return this.amountErrorMessage === '';
-    return isNumeric(this.form.paymentAmount) && !!this.form.paymentToken;
+    return isNumeric(this.form.paymentAmountRaw) && !!this.form.paymentToken;
   }
 
   get amountErrorMessage(): string {
-    if (this.form.paymentAmount === '') {
+    if (this.form.paymentAmountRaw === '') {
       return "can't be blank";
     }
-    if (!isNumeric(this.form.paymentAmount)) {
+    if (!isNumeric(this.form.paymentAmountRaw)) {
       return 'must be numeric';
     }
     if (!this.form.paymentToken) {
