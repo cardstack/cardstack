@@ -2,14 +2,14 @@ import Component from '@glimmer/component';
 import { inject as service } from '@ember/service';
 import { BigNumber } from 'ethers';
 import TokenToUsdService from '@cardstack/safe-tools-client/services/token-to-usd';
-import TokensService from '@cardstack/safe-tools-client/services/tokens';
 import config from '@cardstack/safe-tools-client/config/environment';
 import { taskFor } from 'ember-concurrency-ts';
 import weiToDecimal from '@cardstack/safe-tools-client/helpers/wei-to-decimal';
 
 type Args = {
   tokenAddress: string;
-  tokenAmount: BigNumber
+  tokenAmount: BigNumber;
+  tokenDecimals: number;
 }
 
 interface Signature {
@@ -21,7 +21,6 @@ const INTERVAL = config.environment === 'test' ? 1000 : 60 * 1000;
 
 export default class TokenToUsd extends Component<Signature> {
   @service('token-to-usd') declare tokenToUsdService: TokenToUsdService;
-  @service declare tokens: TokensService;
   updateInterval: ReturnType<typeof setInterval>;
 
   constructor(owner: unknown, args: Args) {
@@ -41,7 +40,7 @@ export default class TokenToUsd extends Component<Signature> {
 
   <template>
     {{#if this.usdAmount}}
-      $ {{(weiToDecimal this.usdAmount 18)}} USD
+      $ {{(weiToDecimal this.usdAmount @tokenDecimals)}} USD
     {{/if}}
   </template>
 }
