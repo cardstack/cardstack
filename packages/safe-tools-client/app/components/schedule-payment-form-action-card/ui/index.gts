@@ -16,7 +16,6 @@ import { concat, fn } from '@ember/helper';
 import { on } from '@ember/modifier';
 import { svgJar } from '@cardstack/boxel/utils/svg-jar';
 import { tracked } from '@glimmer/tracking';
-import and from 'ember-truth-helpers/helpers/and';
 import eq from 'ember-truth-helpers/helpers/eq';
 import not from 'ember-truth-helpers/helpers/not';
 import set from 'ember-set-helper/helpers/set';
@@ -27,10 +26,10 @@ import { SchedulerCapableNetworks, TransactionHash } from '@cardstack/cardpay-sd
 import cssVar from '@cardstack/boxel/helpers/css-var';
 import formatUsd from '@cardstack/safe-tools-client/helpers/format-usd';
 import { type WalletProviderId } from '@cardstack/safe-tools-client/utils/wallet-providers';
-import TokenToUsd from '@cardstack/safe-tools-client/components/token-to-usd';
-import { type CurrentFees } from '../fee-calculator';
+import tokenQuantityToUsd from '@cardstack/safe-tools-client/helpers/token-quantity-to-usd';
 import { ConfiguredScheduledPaymentFees } from '@cardstack/safe-tools-client/services/scheduled-payment-sdk';
-import { BigNumber } from 'ethers';
+import { type CurrentFees } from '../fee-calculator';
+import TokenQuantity from '../../../utils/token-quantity';
 
 interface Signature {
   Element: HTMLElement;
@@ -49,7 +48,7 @@ interface Signature {
     isPaymentAmountInvalid: boolean;
     paymentAmountErrorMessage: string;
     paymentAmountRaw: string;
-    paymentAmountInTokenUnits: BigNumber;
+    paymentAmountTokenQuantity: TokenQuantity | undefined;
     paymentTokens: SelectableToken[];
     onUpdatePaymentToken: (val: SelectableToken) => void;
     gasTokens: SelectableToken[];
@@ -61,7 +60,7 @@ interface Signature {
     isMaxGasPriceInvalid: boolean;
     maxGasPriceErrorMessage: string;
     gasEstimateInUsd: number|undefined;
-    gasEstimateInGasTokenUnits: BigNumber;
+    gasEstimateTokenQuantity: TokenQuantity | undefined;
     onSchedulePayment: () => void;
     onUpdatePayeeAddress: (val: string) => void;
     onReset: () => void;
@@ -297,54 +296,44 @@ export default class SchedulePaymentFormActionCardUI extends Component<Signature
             {{/if}}
           </div>
         </BoxelField>
-        <BoxelField @label="Execution Plam" style={{cssVar boxel-field-label-align="top"}}>
-          <div>
-            <BoxelField @label="Recipient Will Receive" @vertical={{true}} style={{cssVar boxel-field-label-justify-content="end"}}>
-              <div class="schedule-payment-form-action-card--fees-value">
-                {{#if (and @paymentAmountInTokenUnits @paymentToken)}}
-                  {{@paymentAmountInTokenUnits}} {{@paymentToken.symbol}}
-                  <TokenToUsd
-                    @tokenAddress={{@paymentToken.address}}
-                    @tokenAmount={{@paymentAmountInTokenUnits}}
-                  />
-                {{/if}}
-              </div>
-            </BoxelField>
-            <BoxelField @label="Estimated Gas" @vertical={{true}} style={{cssVar boxel-field-label-justify-content="end"}}>
-              <div class="schedule-payment-form-action-card--fees-value">
-                {{#if @gasEstimateInGasTokenUnits}}
-                  {{@gasEstimateInGasTokenUnits}} {{@selectedGasToken.symbol}}
-                  <TokenToUsd
-                    @tokenAddress={{@selectedGasToken.address}}
-                    @tokenAmount={{@gasEstimateInGasTokenUnits}}
-                  />
-                {{/if}}
-              </div>
-            </BoxelField>
-            <BoxelField @label="Fixed Fee" @vertical={{true}} style={{cssVar boxel-field-label-justify-content="end"}}>
-              <div class="schedule-payment-form-action-card--fees-value">
-                {{#if (and @currentFees @selectedGasToken)}}
-                  {{@currentFees.fixedFeeInGasTokenUnits}} {{@selectedGasToken.symbol}}
-                  <TokenToUsd
-                    @tokenAddress={{@selectedGasToken.address}}
-                    @tokenAmount={{@currentFees.fixedFeeInGasTokenUnits}}
-                  />
-                {{/if}}
-              </div>
-            </BoxelField>
-            <BoxelField @label="Variable Fee" @vertical={{true}} style={{cssVar boxel-field-label-justify-content="end"}}>
-              <div class="schedule-payment-form-action-card--fees-value">
-                {{#if (and @currentFees @paymentToken)}}
-                  {{@currentFees.variableFeeInPaymentTokenUnits}} {{@paymentToken.symbol}}
-                  <TokenToUsd
-                    @tokenAddress={{@paymentToken.address}}
-                    @tokenAmount={{@currentFees.variableFeeInPaymentTokenUnits}}
-                  />
-                {{/if}}
-              </div>
-            </BoxelField>
-          </div>
-        </BoxelField>
+        {{#if @isSubmitEnabled}}
+          <BoxelField @label="Execution Plan" style={{cssVar boxel-field-label-align="top"}}>
+            <div>
+              <BoxelField @label="Recipient Will Receive" @vertical={{true}} style={{cssVar boxel-field-label-justify-content="end"}}>
+                <div class="schedule-payment-form-action-card--fees-value">
+                  {{#if @paymentAmountTokenQuantity}}
+                    {{@paymentAmountTokenQuantity.displayable}}
+                    {{tokenQuantityToUsd @paymentAmountTokenQuantity}}
+                  {{/if}}
+                </div>
+              </BoxelField>
+              <BoxelField @label="Estimated Gas" @vertical={{true}} style={{cssVar boxel-field-label-justify-content="end"}}>
+                <div class="schedule-payment-form-action-card--fees-value">
+                  {{#if @gasEstimateTokenQuantity}}
+                    {{@gasEstimateTokenQuantity.displayable}}
+                    {{tokenQuantityToUsd @gasEstimateTokenQuantity}}
+                  {{/if}}
+                </div>
+              </BoxelField>
+              <BoxelField @label="Fixed Fee" @vertical={{true}} style={{cssVar boxel-field-label-justify-content="end"}}>
+                <div class="schedule-payment-form-action-card--fees-value">
+                  {{#if @currentFees.fixedFee}}
+                    {{@currentFees.fixedFee.displayable}}
+                    {{tokenQuantityToUsd @currentFees.fixedFee}}
+                  {{/if}}
+                </div>
+              </BoxelField>
+              <BoxelField @label="Variable Fee" @vertical={{true}} style={{cssVar boxel-field-label-justify-content="end"}}>
+                <div class="schedule-payment-form-action-card--fees-value">
+                  {{#if @currentFees.variableFee}}
+                    {{@currentFees.variableFee.displayable}}
+                    {{tokenQuantityToUsd @currentFees.variableFee}}
+                  {{/if}}
+                </div>
+              </BoxelField>
+            </div>
+          </BoxelField>
+        {{/if}}
       </Section>
         <ActionChin @state={{this.actionChinState}}>
           <:default as |ac|>

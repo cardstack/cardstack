@@ -128,17 +128,17 @@ export async function getNativeWeiInToken(provider: JsonRpcProvider, tokenAddres
 export async function getUsdConverter(
   provider: JsonRpcProvider,
   tokenAddress: string
-): Promise<(amountInWei: BigNumber) => BigNumber> {
+): Promise<(amountInSmallestUnit: BigNumber) => BigNumber> {
   let network = await networkName(provider);
   let usdcTokenAddress = getAddressByNetwork('usdcToken', network);
 
   if (usdcTokenAddress === tokenAddress) {
-    return (amountInWei: BigNumber) => amountInWei;
+    return (amountInSmallestUnit: BigNumber) => amountInSmallestUnit;
   }
 
   let rate = await tokenPairRate(provider, tokenAddress, usdcTokenAddress);
-  return (amountInWei: BigNumber) => {
+  return (amountInSmallestUnit: BigNumber) => {
     let rateAdjusted = adjustRate(rate);
-    return amountInWei.mul(rateAdjusted.numerator.toString()).div(rateAdjusted.denominator.toString());
+    return amountInSmallestUnit.mul(rateAdjusted.numerator.toString()).div(rateAdjusted.denominator.toString());
   };
 }

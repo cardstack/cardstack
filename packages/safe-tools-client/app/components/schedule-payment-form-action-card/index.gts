@@ -23,6 +23,7 @@ import { BigNumber, utils as ethersUtils } from 'ethers';
 import { task } from 'ember-concurrency-decorators';
 import perform from 'ember-concurrency/helpers/perform';
 import FeeCalculator, { type CurrentFees } from './fee-calculator';
+import TokenQuantity from '../../utils/token-quantity';
 
 interface Signature {
   Element: HTMLElement;
@@ -166,6 +167,12 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
       return BigNumber.from('0');
     }
   }
+  get paymentAmountTokenQuantity() {
+    if (!this.paymentToken) {
+      return undefined;
+    }
+    return new TokenQuantity(this.paymentToken, this.paymentAmountInTokenUnits)
+  }
   get paymentTokens(): SelectableToken[] {
     return this.tokens.transactionTokens;
   }
@@ -214,6 +221,10 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
     const state: ConfiguredFeesState = new TrackedObject({
       isLoading: true,
     });
+    let isWalletConnected = this.wallet.isConnected;
+    if (!isWalletConnected) {
+      return state;
+    }
     (async () => {
       try {
         const configuredFees = await this.scheduledPaymentSdk.getFees();
@@ -235,16 +246,15 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
       isIndeterminate: false
     });
     let isWalletConnected = this.wallet.isConnected;
-    let { paymentToken, paymentAmountInTokenUnits, selectedGasToken, configuredFees } = this
-    if (!isWalletConnected || !paymentToken?.address || paymentAmountInTokenUnits.isZero() || !selectedGasToken || !configuredFees.value) {
+    let { paymentAmountTokenQuantity, selectedGasToken, configuredFees } = this
+    if (!isWalletConnected || !paymentAmountTokenQuantity || paymentAmountTokenQuantity.count.isZero() || !selectedGasToken || !configuredFees.value) {
       state.isIndeterminate = true;
       return state;
     }
     if (configuredFees.value) {
       const feeCalculator = new FeeCalculator(
         configuredFees.value,
-        paymentAmountInTokenUnits,
-        paymentToken,
+        paymentAmountTokenQuantity,
         selectedGasToken
       );
       state.value = feeCalculator.calculateFee();  
@@ -280,7 +290,7 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
     const scenario = this.selectedPaymentType === 'one-time' ? 'execute_one_time_payment' : 'execute_recurring_payment';
     (async () => {
       try {
-        this.gasEstimation = await this.scheduledPaymentSdk.getScheduledPaymentGasEstimation(scenario, paymentToken.address, selectedGasToken.address);
+        this.gasEstimation = await this.scheduledPaymentSdk.getScheduledPaymentGasEstimation(scenario, paymentToken, selectedGasToken);
         const { gasRangeInGasTokenWei, gasRangeInUSD } = this.gasEstimation;
         state.value = {
           normal: `Less than ${fromWei(gasRangeInGasTokenWei.normal.toString(), 'ether')} ${selectedGasToken.symbol} (~${convertAmountToNativeDisplay(fromWei(gasRangeInUSD.normal.toString(), 'ether'), 'USD')})`,
@@ -391,6 +401,13 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
     return this.gasEstimation?.gasRangeInGasTokenWei.normal || BigNumber.from('0');
   }
 
+  get gasEstimateTokenQuantity(): TokenQuantity|undefined {
+    if (!this.selectedGasToken) {
+      return undefined;
+    }
+    return new TokenQuantity(this.selectedGasToken, this.gasEstimateInGasTokenUnits);
+  }
+
   get gasEstimateUsd() {
     return parseFloat(this.gasEstimation?.gasRangeInUSD.normal.toString() || '')
   }
@@ -417,7 +434,7 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
       @payeeAddressErrorMessage={{this.validator.payeeAddressErrorMessage}}
       @onUpdatePayeeAddress={{this.onUpdatePayeeAddress}}
       @paymentAmountRaw={{this.paymentAmount}}
-      @paymentAmountInTokenUnits={{this.paymentAmountInTokenUnits}}
+      @paymentAmountTokenQuantity={{this.paymentAmountTokenQuantity}}
       @onUpdatePaymentAmount={{this.onUpdatePaymentAmount}}
       @isPaymentAmountInvalid={{not this.validator.isAmountValid}}
       @paymentAmountErrorMessage={{this.validator.amountErrorMessage}}
@@ -435,7 +452,7 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
       @maxGasPriceErrorMessage={{this.validator.maxGasPriceErrorMessage}}
       @onSchedulePayment={{perform this.schedulePaymentTask}}
       @maxGasDescriptions={{this.maxGasDescriptions.value}}
-      @gasEstimateInGasTokenUnits={{this.gasEstimateInGasTokenUnits}}
+      @gasEstimateTokenQuantity={{this.gasEstimateTokenQuantity}}
       @gasEstimateInUsd={{this.gasEstimateUsd}}
       @isSubmitEnabled={{this.isValid}}
       @schedulingStatus={{this.schedulingStatus}}

@@ -19,6 +19,8 @@ import { TaskGenerator } from 'ember-concurrency';
 import { task } from 'ember-concurrency-decorators';
 import { BigNumber } from 'ethers';
 
+import { SelectableToken } from '../../../boxel/addon/components/boxel/input/selectable-token';
+
 const GAS_RANGE_NORMAL_MULTIPLIER = 2;
 const GAS_RANGE_HIGH_MULTIPLIER = 4;
 const GAS_RANGE_MAX_MULTIPLIER = 6;
@@ -98,19 +100,19 @@ export default class SchedulePaymentSDKService extends Service {
   @action
   async getScheduledPaymentGasEstimation(
     scenario: GasEstimationScenario,
-    tokenAddress: ChainAddress,
-    gasTokenAddress: ChainAddress
+    token: SelectableToken,
+    gasToken: SelectableToken
   ): Promise<ExecutionGasEstimationResult> {
     const scheduledPayments = await this.getSchedulePaymentModule();
 
     const gasEstimationResult = await scheduledPayments.estimateGas(scenario, {
-      tokenAddress,
-      gasTokenAddress,
+      tokenAddress: token.address,
+      gasTokenAddress: gasToken.address,
       hubUrl: config.hubUrl,
     });
     const { gasRangeInWei, gasRangeInUSD } = gasEstimationResult;
     const priceWeiInGasToken = String(
-      await getNativeWeiInToken(this.wallet.ethersProvider, gasTokenAddress)
+      await getNativeWeiInToken(this.wallet.ethersProvider, gasToken.address)
     );
     return {
       gas: gasEstimationResult.gas,

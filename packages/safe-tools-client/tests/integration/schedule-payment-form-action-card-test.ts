@@ -1,3 +1,4 @@
+import { SelectableToken } from '@cardstack/boxel/components/boxel/input/selectable-token';
 import {
   ChainAddress,
   GasEstimationScenario,
@@ -44,12 +45,12 @@ class WalletServiceStub extends Service {
 class ScheduledPaymentSDKServiceStub extends Service {
   async getScheduledPaymentGasEstimation(
     _scenario: GasEstimationScenario,
-    _tokenAddress: ChainAddress,
-    _gasTokenAddress: ChainAddress
+    _token: SelectableToken,
+    _gasToken: SelectableToken
   ): Promise<ExecutionGasEstimationResult> {
-    const gas = BigNumber.from('15000000000000000');
+    const gas = BigNumber.from('15000');
     const gasRangeInWei = {
-      standard: BigNumber.from('15000000000000000'),
+      standard: BigNumber.from('15000'),
     };
     const gasRangeInUSD = {
       standard: BigNumber.from('2'),
@@ -88,8 +89,9 @@ class TokenToUsdServiceStub extends Service {
     tokenAddress: string
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ): any {
-    this.usdConverters.set(tokenAddress, (amountInWei: BigNumber) => {
-      return amountInWei.mul(2);
+    this.usdConverters.set(tokenAddress, (amountInSmallestUnit: BigNumber) => {
+      const convertedNum = amountInSmallestUnit.mul(2);
+      return BigNumber.from(convertedNum);
     });
   }
 

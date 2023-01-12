@@ -14,7 +14,7 @@ const INTERVAL = config.environment === 'test' ? 3000 : 60 * 3000;
 export default class TokenToUsdService extends Service {
   @tracked usdConverters = new TrackedMap<
     string,
-    (amountInWei: BigNumber) => BigNumber
+    (amountInSmallestUnit: BigNumber) => BigNumber
   >();
   convertersLastUpdate: Record<string, Date> = {};
   @service declare wallet: WalletService;
@@ -38,11 +38,14 @@ export default class TokenToUsdService extends Service {
     }
   }
 
-  toUsd(tokenAddress: string, amount: BigNumber): BigNumber | undefined {
-    if (amount.isZero()) {
+  toUsd(
+    tokenAddress: string,
+    amountInSmallestUnit: BigNumber
+  ): BigNumber | undefined {
+    if (amountInSmallestUnit.isZero()) {
       return BigNumber.from(0);
     }
-    return this.usdConverters.get(tokenAddress)?.(amount);
+    return this.usdConverters.get(tokenAddress)?.(amountInSmallestUnit);
   }
 }
 
