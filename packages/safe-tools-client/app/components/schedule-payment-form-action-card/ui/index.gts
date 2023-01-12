@@ -31,6 +31,7 @@ import formatUsd from '@cardstack/safe-tools-client/helpers/format-usd';
 import WalletService from '@cardstack/safe-tools-client/services/wallet';
 import { inject as service } from '@ember/service';
 import { MaxGasDescriptionsState } from "..";
+import FailureIcon from '@cardstack/safe-tools-client/components/icons/failure';
 
 interface Signature {
   Element: HTMLElement;
@@ -274,7 +275,13 @@ export default class SchedulePaymentFormActionCardUI extends Component<Signature
                 Normal
               </div>
               <div class="schedule-payment-form-action-card--max-gas-fee-description" data-test-max-gas-fee-normal-description>
-                {{@maxGasDescriptions.value.normal}}
+                {{#if @maxGasDescriptions.isLoading}}
+                  Loading gas price...
+                {{else if @maxGasDescriptions.error}}
+                  <span class="schedule-payment-form-action-card-error">Can't estimate gas price</span>
+                {{else}}
+                  {{@maxGasDescriptions.value.normal}}
+                {{/if}}
               </div>
             </group.Button>
             <group.Button @value="high">
@@ -282,7 +289,13 @@ export default class SchedulePaymentFormActionCardUI extends Component<Signature
                 High
               </div>
               <div class="schedule-payment-form-action-card--max-gas-fee-description" data-test-max-gas-fee-high-description>
-                {{@maxGasDescriptions.value.high}}
+                {{#if @maxGasDescriptions.isLoading}}
+                  Loading gas price...
+                {{else if @maxGasDescriptions.error}}
+                  <span class="schedule-payment-form-action-card-error">Can't estimate gas price</span>
+                {{else}}
+                  {{@maxGasDescriptions.value.high}}
+                {{/if}}
               </div>
             </group.Button>
             <group.Button @value="max">
@@ -290,18 +303,20 @@ export default class SchedulePaymentFormActionCardUI extends Component<Signature
                 Max
               </div>
               <div class="schedule-payment-form-action-card--max-gas-fee-description" data-test-max-gas-fee-max-description>
-                {{@maxGasDescriptions.value.max}}
+                {{#if @maxGasDescriptions.isLoading}}
+                  Loading gas price...
+                {{else if @maxGasDescriptions.error}}
+                  <span class="schedule-payment-form-action-card-error">Can't estimate gas price</span>
+                {{else}}
+                  {{@maxGasDescriptions.value.max}}
+                {{/if}}
               </div>
             </group.Button>
           </BoxelToggleButtonGroup>
           <div><!-- empty --></div>
-          <div class="schedule-payment-form-action-card--state-details {{if @maxGasDescriptions.error "schedule-payment-form-action-card--state-details__error"}}">
-            {{#if @maxGasDescriptions.isLoading}}
-              <BoxelLoadingIndicator />
-            {{/if}}
-
+          <div class="schedule-payment-form-action-card--state-details {{if @maxGasDescriptions.error "schedule-payment-form-action-card-error"}}">
             {{#if @maxGasDescriptions.error}}
-              There was an error estimating gas prices: {{@maxGasDescriptions.error.message}}
+              There was an error estimating gas prices. Please reload the page and try again. If the error persists, please contact support.
             {{/if}}
           </div>
           <div><!-- empty --></div>
@@ -326,6 +341,7 @@ export default class SchedulePaymentFormActionCardUI extends Component<Signature
               </ac.ActionButton>
               {{#if @scheduleErrorMessage}}
                 <ac.InfoArea data-test-error-status>
+                  <FailureIcon class='action-chin-info-icon' />
                   <span class="schedule-payment-form-action-card__error-message">
                     {{@scheduleErrorMessage}}
                   </span>

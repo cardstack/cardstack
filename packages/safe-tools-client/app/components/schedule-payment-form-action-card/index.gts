@@ -355,15 +355,24 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
       this.isSuccessfullyScheduled = true;
     } catch(e) {
       this.schedulingStatus = undefined;
-      let message = e.message || "An error occurred";
+
+      const knownErrorPatterns: Record<string, string> = {
+        'NotEnoughFundsForMultisigTx': 'Your safe does not have enough funds to pay for the transaction. Please add more funds to your safe and try again.',
+      }
+
+      let message = "An error occurred. Please reload the page and try again. If the problem persists, please contact support.";
+
       try {
-        let parsed = JSON.parse(message);
-        if (parsed.exception) {
-          message = `An error occurred: ${parsed.exception}`;
+        let parsed = JSON.parse(e.message);
+
+        let errorKey = Object.keys(knownErrorPatterns).find((key) => { return parsed.exception.includes(key) });
+        if (errorKey) {
+          message = knownErrorPatterns[errorKey];
         }
       } catch (e) {
         // the message wasn't valid JSON
       }
+
       this.scheduleErrorMessage = message;
 
     }

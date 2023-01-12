@@ -43,7 +43,8 @@
   color: var(--boxel-purple-400);
   display: flex;
 }
-.schedule-payment-form-action-card--state-details__error {
+
+.schedule-payment-form-action-card-error {
   color: var(--boxel-red);
 }
 
