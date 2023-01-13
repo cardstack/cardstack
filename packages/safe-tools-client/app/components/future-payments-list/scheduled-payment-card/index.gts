@@ -1,7 +1,7 @@
 import Component from '@glimmer/component';
 import BoxelCardContainer from '@cardstack/boxel/components/boxel/card-container';
 import BoxelIconButton from '@cardstack/boxel/components/boxel/icon-button';
-import ScheduledPaymentsSdkService from '@cardstack/safe-tools-client/services/scheduled-payments-sdk';
+import ScheduledPaymentSdkService from '@cardstack/safe-tools-client/services/scheduled-payment-sdk';
 import BoxelLoadingIndicator from '@cardstack/boxel/components/boxel/loading-indicator';
 import BoxelActionContainer from '@cardstack/boxel/components/boxel/action-container';
 import BoxelModal from '@cardstack/boxel/components/boxel/modal';
@@ -42,7 +42,7 @@ interface Signature {
 }
 
 export default class ScheduledPaymentCard extends Component<Signature> {
-  @service declare scheduledPaymentsSdk: ScheduledPaymentsSdkService;
+  @service declare scheduledPaymentSdk: ScheduledPaymentSdkService;
   @service declare scheduledPayments: ScheduledPaymentsService;
   @service declare hubAuthentication: HubAuthenticationService;
   @service declare tokens: TokensService;
@@ -78,7 +78,7 @@ export default class ScheduledPaymentCard extends Component<Signature> {
     authToken: string
   ): TaskGenerator<void> {
     try {
-      yield this.scheduledPaymentsSdk.cancelScheduledPayment(scheduledPaymentId, authToken);
+      yield this.scheduledPaymentSdk.cancelScheduledPayment(scheduledPaymentId, authToken);
     } catch (e) {
       this.cancelationErrorMessage = "There was an error canceling your scheduled payment. Please try again, or contact support if the problem persists.";
       Sentry.captureException(e);

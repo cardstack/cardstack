@@ -186,6 +186,6 @@ export default class SchedulePaymentSDKService extends Service {
 
 declare module '@ember/service' {
   interface Registry {
-    scheduledPaymentsSdk: SchedulePaymentSDKService;
+    scheduledPaymentSdk: SchedulePaymentSDKService;
   }
 }

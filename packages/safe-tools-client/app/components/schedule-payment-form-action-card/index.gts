@@ -4,7 +4,7 @@ import { SelectableToken } from '@cardstack/boxel/components/boxel/input/selecta
 import { inject as service } from '@ember/service';
 import NetworkService from '../../services/network';
 import SafesService from '../../services/safes';
-import ScheduledPaymentsSdkService, { GasEstimationResult } from '../../services/scheduled-payments-sdk';
+import ScheduledPaymentSdkService, { GasEstimationResult } from '../../services/scheduled-payment-sdk';
 import TokensService from '../../services/tokens';
 import WalletService from '../../services/wallet';
 import { action } from '@ember/object';
@@ -39,7 +39,7 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
   @service declare wallet: WalletService;
   @service declare safes: SafesService;
   @service declare tokens: TokensService;
-  @service declare scheduledPaymentsSdk: ScheduledPaymentsSdkService;
+  @service declare scheduledPaymentSdk: ScheduledPaymentSdkService;
   @service('scheduled-payments') declare scheduledPaymentsService: ScheduledPaymentsService;
   validator = new SchedulePaymentFormValidator(this);
   gasEstimation?: GasEstimationResult;
@@ -215,7 +215,7 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
     const scenario = this.selectedPaymentType === 'one-time' ? 'execute_one_time_payment' : 'execute_recurring_payment';
     (async () => {
       try {
-        this.gasEstimation = await this.scheduledPaymentsSdk.getScheduledPaymentGasEstimation(scenario, paymentToken.address, selectedGasToken.address);
+        this.gasEstimation = await this.scheduledPaymentSdk.getScheduledPaymentGasEstimation(scenario, paymentToken.address, selectedGasToken.address);
         const { gasRangeInGasTokenWei, gasRangeInUSD } = this.gasEstimation;
         state.value = {
           normal: `Less than ${fromWei(gasRangeInGasTokenWei.normal.toString(), 'ether')} ${selectedGasToken.symbol} (~${convertAmountToNativeDisplay(fromWei(gasRangeInUSD.normal.toString(), 'ether'), 'USD')})`,
@@ -264,7 +264,7 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
     const salt = btoa(String.fromCharCode.apply(null, array));
     const self = this;
 
-    yield taskFor(this.scheduledPaymentsSdk.schedulePayment).perform(
+    yield taskFor(this.scheduledPaymentSdk.schedulePayment).perform(
       currentSafe.address,
       currentSafe.spModuleAddress,
       this.paymentToken.address,
