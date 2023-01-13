@@ -4,7 +4,7 @@ import { SelectableToken } from '@cardstack/boxel/components/boxel/input/selecta
 import { inject as service } from '@ember/service';
 import NetworkService from '../../services/network';
 import SafesService from '../../services/safes';
-import ScheduledPaymentSdkService, { GasEstimationResult } from '../../services/scheduled-payment-sdk';
+import ScheduledPaymentSdkService, { ConfiguredScheduledPaymentFees, GasEstimationResult } from '../../services/scheduled-payment-sdk';
 import TokensService from '../../services/tokens';
 import WalletService from '../../services/wallet';
 import { action } from '@ember/object';
@@ -28,6 +28,13 @@ import TokenQuantity from '@cardstack/safe-tools-client/utils/token-quantity';
 interface Signature {
   Element: HTMLElement;
 }
+
+interface ConfiguredFeesState {
+  isLoading: boolean;
+  value?: ConfiguredScheduledPaymentFees,
+  error?: Error
+}
+
 interface MaxGasDescriptionsState {
   isLoading: boolean;
   isIndeterminate: boolean;
@@ -195,6 +202,28 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
   get isValid(): boolean {
     return this.validator.isValid;
   }
+
+  @use configuredFees = resource(() => {
+    const state: ConfiguredFeesState = new TrackedObject({
+      isLoading: true,
+    });
+    let isWalletConnected = this.wallet.isConnected;
+    if (!isWalletConnected) {
+      return state;
+    }
+    (async () => {
+      try {
+        const configuredFees = await this.scheduledPaymentSdk.getFees();
+        state.value = configuredFees;
+      } catch (error) {
+        console.error(error);
+        state.error = error;
+      } finally {
+        state.isLoading = false;
+      }
+    })();
+    return state;
+  });
 
   @use maxGasDescriptions = resource(() => {
     const state: MaxGasDescriptionsState = new TrackedObject({
@@ -380,6 +409,7 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
       @txHash={{this.txHash}}
       @isSuccessfullyScheduled={{this.isSuccessfullyScheduled}}
       @onReset={{this.resetForm}}
+      @configuredFees={{this.configuredFees.value}}
     />
   </template>
 }

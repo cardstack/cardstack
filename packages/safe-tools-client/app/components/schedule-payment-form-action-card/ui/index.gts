@@ -25,6 +25,8 @@ import BlockExplorerButton from '@cardstack/safe-tools-client/components/block-e
 import { SchedulerCapableNetworks, TransactionHash } from '@cardstack/cardpay-sdk';
 import cssVar from '@cardstack/boxel/helpers/css-var';
 import { type WalletProviderId } from '@cardstack/safe-tools-client/utils/wallet-providers';
+import { ConfiguredScheduledPaymentFees } from '@cardstack/safe-tools-client/services/scheduled-payment-sdk';
+import formatUsd from '@cardstack/safe-tools-client/helpers/format-usd';
 
 interface Signature {
   Element: HTMLElement;
@@ -52,6 +54,7 @@ interface Signature {
     onUpdateMaxGasPrice: (val: string) => void;
     isMaxGasPriceInvalid: boolean;
     maxGasPriceErrorMessage: string;
+    configuredFees: ConfiguredScheduledPaymentFees | undefined;
     onSchedulePayment: () => void;
     onUpdatePayeeAddress: (val: string) => void;
     onReset: () => void;
@@ -285,8 +288,10 @@ export default class SchedulePaymentFormActionCardUI extends Component<Signature
           </BoxelToggleButtonGroup>
           <div><!-- empty --></div>
           <div class="schedule-payment-form-action-card--fee-details">
-            {{svgJar "info" width="17px" height="17px" class="schedule-payment-form-action-card--fee-info-icon"}}
-            <span>Cardstack charges $0.25 USD and 0.1% of the transaction as a fee for executing your scheduled payments.</span>
+            {{#if @configuredFees}}
+              {{svgJar "info" width="17px" height="17px" class="schedule-payment-form-action-card--fee-info-icon"}}
+              <span>Cardstack charges {{if @configuredFees.fixedUSD (formatUsd @configuredFees.fixedUSD)}} and {{@configuredFees.percentage}}% of the transaction as a fee for executing your scheduled payments.</span>
+            {{/if}}
           </div>
         </BoxelField>
       </Section>

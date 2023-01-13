@@ -6,6 +6,7 @@ import {
   getNativeWeiInToken,
   poll,
   SchedulePaymentProgressListener,
+  getConstant,
 } from '@cardstack/cardpay-sdk';
 import config from '@cardstack/safe-tools-client/config/environment';
 import SafesService, {
@@ -27,6 +28,11 @@ export interface GasEstimationResult {
   gas: BigNumber;
   gasRangeInGasTokenWei: GasRange;
   gasRangeInUSD: GasRange;
+}
+
+export interface ConfiguredScheduledPaymentFees {
+  fixedUSD: number | undefined;
+  percentage: number | undefined;
 }
 
 export default class SchedulePaymentSDKService extends Service {
@@ -66,9 +72,9 @@ export default class SchedulePaymentSDKService extends Service {
   }
 
   async createSafe(): Promise<{ safeAddress: string }> {
-    const scheduledPayments = await this.getSchedulePaymentModule();
+    const scheduledPaymentModule = await this.getSchedulePaymentModule();
 
-    return scheduledPayments.createSafeWithModuleAndGuard(
+    return scheduledPaymentModule.createSafeWithModuleAndGuard(
       undefined,
       undefined,
       this.contractOptions
@@ -96,13 +102,16 @@ export default class SchedulePaymentSDKService extends Service {
     tokenAddress: ChainAddress,
     gasTokenAddress: ChainAddress
   ): Promise<GasEstimationResult> {
-    const scheduledPayments = await this.getSchedulePaymentModule();
+    const scheduledPaymentModule = await this.getSchedulePaymentModule();
 
-    const gasEstimationResult = await scheduledPayments.estimateGas(scenario, {
-      tokenAddress,
-      gasTokenAddress,
-      hubUrl: config.hubUrl,
-    });
+    const gasEstimationResult = await scheduledPaymentModule.estimateGas(
+      scenario,
+      {
+        tokenAddress,
+        gasTokenAddress,
+        hubUrl: config.hubUrl,
+      }
+    );
     const { gasRangeInWei, gasRangeInUSD } = gasEstimationResult;
     const priceWeiInGasToken = String(
       await getNativeWeiInToken(this.wallet.ethersProvider, gasTokenAddress)
@@ -181,6 +190,17 @@ export default class SchedulePaymentSDKService extends Service {
       config.hubUrl,
       authToken
     );
+  }
+
+  async getFees(): Promise<ConfiguredScheduledPaymentFees> {
+    const [fixedUSD, percentage] = await Promise.all([
+      getConstant('scheduledPaymentFeeFixedUSD', this.wallet.ethersProvider),
+      getConstant('scheduledPaymentFeePercentage', this.wallet.ethersProvider),
+    ]);
+    return {
+      fixedUSD,
+      percentage,
+    };
   }
 }
 

@@ -1,5 +1,7 @@
 import { TokenDetail } from '@cardstack/cardpay-sdk';
+import { ConfiguredScheduledPaymentFees } from '@cardstack/safe-tools-client/services/scheduled-payment-sdk';
 import TokensService from '@cardstack/safe-tools-client/services/tokens';
+import Service from '@ember/service';
 import {
   click,
   fillIn,
@@ -22,6 +24,21 @@ import {
   EXAMPLE_PAYEE,
 } from '../support/ui-test-helpers';
 
+class WalletServiceStub extends Service {
+  isConnected = true;
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  async switchNetwork(_chainId: number) {}
+}
+
+class ScheduledPaymentSDKServiceStub extends Service {
+  async getFees(): Promise<ConfiguredScheduledPaymentFees> {
+    return {
+      fixedUSD: 0.25,
+      percentage: 0.1,
+    };
+  }
+}
+
 let tokensService: TokensService;
 module(
   'Integration | Component | schedule-payment-form-action-card',
@@ -29,8 +46,13 @@ module(
     setupRenderingTest(hooks);
 
     hooks.beforeEach(function (this: TestContext) {
+      this.owner.register(
+        'service:scheduled-payment-sdk',
+        ScheduledPaymentSDKServiceStub
+      );
       tokensService = this.owner.lookup('service:tokens');
       tokensService.stubGasTokens(exampleGasTokens);
+      this.owner.register('service:wallet', WalletServiceStub);
     });
 
     test('it initializes the transaction token to undefined', async function (assert) {
@@ -283,6 +305,15 @@ module(
           '[data-test-amount-input] [data-test-boxel-input-group-select-accessory-trigger]'
         )
         .containsText('Choose token');
+    });
+
+    test('configured fees for the current network are shown under max gas options', async function (assert) {
+      await render(hbs`
+        <SchedulePaymentFormActionCard />
+      `);
+      assert
+        .dom('.schedule-payment-form-action-card--fee-details')
+        .containsText('Cardstack charges $0.25 USD and 0.1%');
     });
 
     // TODO: assert state for no network selected/connected
