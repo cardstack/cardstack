@@ -352,6 +352,7 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
       @payeeAddressErrorMessage={{this.validator.payeeAddressErrorMessage}}
       @onUpdatePayeeAddress={{this.onUpdatePayeeAddress}}
       @paymentAmountRaw={{this.paymentAmountRaw}}
+      @paymentAmountTokenQuantity={{this.paymentAmountTokenQuantity}}
       @onUpdatePaymentAmount={{this.onUpdatePaymentAmount}}
       @isPaymentAmountInvalid={{not this.validator.isAmountValid}}
       @paymentAmountErrorMessage={{this.validator.amountErrorMessage}}
@@ -370,6 +371,7 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
       @onSchedulePayment={{perform this.schedulePaymentTask}}
       @maxGasDescriptions={{this.maxGasDescriptions.value}}
       @isSubmitEnabled={{this.isValid}}
+      @isShowingExecutionPlan={{this.isValid}}
       @schedulingStatus={{this.schedulingStatus}}
       @networkSymbol={{this.network.symbol}}
       @walletProviderId={{this.wallet.providerId}}

@@ -25,6 +25,8 @@ import BlockExplorerButton from '@cardstack/safe-tools-client/components/block-e
 import { SchedulerCapableNetworks, TransactionHash } from '@cardstack/cardpay-sdk';
 import cssVar from '@cardstack/boxel/helpers/css-var';
 import { type WalletProviderId } from '@cardstack/safe-tools-client/utils/wallet-providers';
+import TokenQuantity from '@cardstack/safe-tools-client/utils/token-quantity';
+import tokenQuantityToUsd from '@cardstack/safe-tools-client/helpers/token-quantity-to-usd';
 
 interface Signature {
   Element: HTMLElement;
@@ -42,6 +44,7 @@ interface Signature {
     onUpdatePaymentAmount: (val: string) => void;
     isPaymentAmountInvalid: boolean;
     paymentAmountErrorMessage: string;
+    paymentAmountTokenQuantity: TokenQuantity | undefined;
     paymentTokens: SelectableToken[];
     onUpdatePaymentToken: (val: SelectableToken) => void;
     gasTokens: SelectableToken[];
@@ -56,6 +59,7 @@ interface Signature {
     onUpdatePayeeAddress: (val: string) => void;
     onReset: () => void;
     isSubmitEnabled: boolean;
+    isShowingExecutionPlan: boolean;
     schedulingStatus: string | undefined;
     networkSymbol: SchedulerCapableNetworks;
     walletProviderId: WalletProviderId | undefined;
@@ -283,6 +287,20 @@ export default class SchedulePaymentFormActionCardUI extends Component<Signature
             <span>Cardstack charges $0.25 USD and 0.1% of the transaction as a fee for executing your scheduled payments.</span>
           </div>
         </BoxelField>
+        {{#if @isShowingExecutionPlan}}
+          <BoxelField @label="Execution Plan" style={{cssVar boxel-field-label-align="top"}}>
+            <div>
+              <BoxelField @label="Recipient Will Receive" @vertical={{true}} style={{cssVar boxel-field-label-justify-content="end"}}>
+                <div class="schedule-payment-form-action-card--fees-value">
+                  {{#if @paymentAmountTokenQuantity}}
+                    {{@paymentAmountTokenQuantity.displayable}}
+                    {{tokenQuantityToUsd @paymentAmountTokenQuantity}}
+                  {{/if}}
+                </div>
+              </BoxelField>
+            </div>
+          </BoxelField>
+        {{/if}}
       </Section>
         <ActionChin @state={{this.actionChinState}}>
           <:default as |ac|>
