@@ -184,6 +184,12 @@ export default class SchedulePaymentFormActionCardUI extends Component<Signature
                           data-test-input-recurring-day-of-month
                         />
                       </BoxelField>
+
+                      <div class="schedule-payment-form-action-card__recurring-explanation">
+                        {{svgJar "info" width="12px" height="12px"}}
+                        <span> To perform payments on the last day of the month, choose 31st.</span>
+                      </div>
+
                       <BoxelField @label="Until" @vertical={{true}} data-test-recurring-until>
                         <BoxelInputDate
                           @value={{@monthlyUntil}}
@@ -329,7 +335,7 @@ export default class SchedulePaymentFormActionCardUI extends Component<Signature
             </ac.InfoArea>
           </:memorialized>
         </ActionChin>
-    </BoxelActionContainer>    
+    </BoxelActionContainer>
   </template>
 }
 
