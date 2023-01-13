@@ -484,7 +484,7 @@ export default class ScheduledPaymentModule {
               value: FEE_BASE.mul(new BN(feeFixedUSD)).toString(),
             },
             percentage: {
-              value: FEE_BASE.mul(new BN(feePercentage)).toString(),
+              value: FEE_BASE.mul(new BN(feePercentage / 100)).toString(),
             },
           },
           maxGasPrice,
@@ -506,7 +506,7 @@ export default class ScheduledPaymentModule {
               value: FEE_BASE.mul(new BN(feeFixedUSD)).toString(),
             },
             percentage: {
-              value: FEE_BASE.mul(new BN(feePercentage)).toString(),
+              value: FEE_BASE.mul(new BN(feePercentage / 100)).toString(),
             },
           },
           maxGasPrice,
@@ -664,7 +664,7 @@ export default class ScheduledPaymentModule {
             value: FEE_BASE.mul(new BN(feeFixedUSD)).toString(),
           },
           percentage: {
-            value: FEE_BASE.mul(new BN(feePercentage)).toString(),
+            value: FEE_BASE.mul(new BN(feePercentage / 100)).toString(),
           },
         },
         executionGas,
@@ -686,7 +686,7 @@ export default class ScheduledPaymentModule {
             value: FEE_BASE.mul(new BN(feeFixedUSD)).toString(),
           },
           percentage: {
-            value: FEE_BASE.mul(new BN(feePercentage)).toString(),
+            value: FEE_BASE.mul(new BN(feePercentage / 100)).toString(),
           },
         },
         executionGas,
@@ -1244,7 +1244,7 @@ export default class ScheduledPaymentModule {
               value: FEE_BASE.mul(new BN(feeFixedUSD)).toString(),
             },
             percentage: {
-              value: FEE_BASE.mul(new BN(feePercentage)).toString(),
+              value: FEE_BASE.mul(new BN(feePercentage / 100)).toString(),
             },
           },
           executionGas,
@@ -1268,7 +1268,7 @@ export default class ScheduledPaymentModule {
               value: FEE_BASE.mul(new BN(feeFixedUSD)).toString(),
             },
             percentage: {
-              value: FEE_BASE.mul(new BN(feePercentage)).toString(),
+              value: FEE_BASE.mul(new BN(feePercentage / 100)).toString(),
             },
           },
           executionGas,
