@@ -2,6 +2,7 @@ import { Deferred } from '@cardstack/ember-shared';
 import SafesService, {
   TokenBalance,
 } from '@cardstack/safe-tools-client/services/safes';
+import { ScheduledPaymentResponseItem } from '@cardstack/safe-tools-client/services/scheduled-payments';
 import { MockLocalStorage } from '@cardstack/safe-tools-client/utils/browser-mocks';
 import {
   TestContext,
@@ -11,6 +12,7 @@ import {
   waitFor,
   waitUntil,
 } from '@ember/test-helpers';
+import { addDays } from 'date-fns';
 import { TransactionReceipt } from 'eth-testing/lib/json-rpc-methods-types';
 import { BigNumber } from 'ethers';
 import { setupWorker, rest, SetupWorkerApi } from 'msw';
@@ -53,6 +55,7 @@ let scheduledPaymentCreationApiDelay: Promise<void> | undefined;
 let scheduledPaymentCreateSpHashDeferred: Deferred<void> | undefined;
 let scheduledPaymentCreateSpHashDelay: Promise<void> | undefined;
 let scheduledPaymentGetShouldIncludeBlockNumber = false;
+let scheduledPaymentsToReturnFromTheApi: ScheduledPaymentResponseItem[] = [];
 
 module('Acceptance | scheduling', function (hooks) {
   setupApplicationTest(hooks);
@@ -73,6 +76,7 @@ module('Acceptance | scheduling', function (hooks) {
     scheduledPaymentCreationApiDelay =
       scheduledPaymentCreationApiDeferred.promise;
     scheduledPaymentGetShouldIncludeBlockNumber = false;
+    scheduledPaymentsToReturnFromTheApi = [];
 
     const handlers = [
       rest.get('/hub-test/api/session', (req, res, ctx) => {
@@ -105,7 +109,7 @@ module('Acceptance | scheduling', function (hooks) {
         return res(
           ctx.status(200),
           ctx.json({
-            data: [],
+            data: scheduledPaymentsToReturnFromTheApi,
           })
         );
       }),
@@ -432,6 +436,22 @@ module('Acceptance | scheduling', function (hooks) {
         USDC_TOKEN_ADDRESS
       );
 
+      scheduledPaymentsToReturnFromTheApi = [
+        {
+          id: '123',
+          // @ts-expect-error intentionally omitting attributes because they are not needed for this test
+          attributes: {
+            'pay-at': addDays(Date.now(), 1).toISOString(),
+            amount: String(
+              scheduledPaymentCreations[0].data.attributes['amount']
+            ),
+            'token-address': String(
+              scheduledPaymentCreations[0].data.attributes['token-address']
+            ),
+          },
+        },
+      ];
+
       await waitUntil(() => scheduledPaymentPatchedWithTxHash);
       assert.strictEqual(
         scheduledPaymentPatchedWithTxHash,
@@ -456,6 +476,10 @@ module('Acceptance | scheduling', function (hooks) {
       await click('[data-test-schedule-payment-form-reset-button]');
       assert.dom(PAYEE_INPUT).isNotDisabled();
       assert.dom(SUBMIT_BUTTON).hasText('Schedule Payment');
+
+      // Make sure the newly created payment appears in the list of future scheduled payments
+      await waitFor('[data-test-scheduled-payment-card-id="123"]');
+      assert.dom('[data-test-scheduled-payment-card-id="123"]').exists();
     });
   });
 

@@ -2,8 +2,15 @@
 import { hubRequest } from '@cardstack/cardpay-sdk';
 import config from '@cardstack/safe-tools-client/config/environment';
 import HubAuthenticationService from '@cardstack/safe-tools-client/services/hub-authentication';
+import NetworkService from '@cardstack/safe-tools-client/services/network';
+import { action } from '@ember/object';
 import Service, { inject as service } from '@ember/service';
+import { task, TaskGenerator } from 'ember-concurrency';
+import { taskFor } from 'ember-concurrency-ts';
+import DateService from 'ember-date-service/service/date';
+import { use, resource } from 'ember-resources';
 import { BigNumber } from 'ethers';
+import { TrackedObject } from 'tracked-built-ins';
 
 export interface ScheduledPayment {
   id: string;
@@ -125,8 +132,17 @@ export interface ScheduledPaymentResponse {
   data: ScheduledPaymentResponseItem[];
 }
 
+interface ScheduledPaymentsResourceState extends Record<PropertyKey, unknown> {
+  error?: Error;
+  isLoading?: boolean;
+  value?: ScheduledPayment[];
+  load: () => Promise<void>;
+}
+
 export default class ScheduledPaymentsService extends Service {
   @service declare hubAuthentication: HubAuthenticationService;
+  @service declare network: NetworkService;
+  @service declare date: DateService;
 
   async fetchScheduledPaymentAttempts(
     chainId: number,
@@ -197,41 +213,119 @@ export default class ScheduledPaymentsService extends Service {
       'GET'
     );
 
-    return this.deserializeScheduledPaymentResponse(response);
+    return this.deserializeScheduledPaymentResponse(
+      response
+    ) as ScheduledPayment[];
   }
+
+  async fetchScheduledPayment(
+    scheduledPaymentId: number
+  ): Promise<ScheduledPayment> {
+    const response = await hubRequest(
+      config.hubUrl,
+      `api/scheduled-payments/${scheduledPaymentId}`,
+      this.hubAuthentication.authToken!,
+      'GET'
+    );
+
+    return this.deserializeScheduledPaymentResponse(
+      response
+    ) as ScheduledPayment;
+  }
+
+  @action async reloadScheduledPayments() {
+    await this.scheduledPaymentsResource.load();
+  }
+
+  @task *loadScheduledPaymentTask(
+    chainId: number
+  ): TaskGenerator<ScheduledPayment[]> {
+    return yield this.fetchScheduledPayments(
+      chainId,
+      new Date(this.date.now())
+    );
+  }
+
+  @use scheduledPaymentsResource = resource(() => {
+    if (!this.hubAuthentication.isAuthenticated) {
+      return {
+        error: false,
+        isLoading: false,
+        value: [],
+        load: () => Promise.resolve(),
+      };
+    }
+
+    const chainId = this.network.chainId;
+
+    const state: ScheduledPaymentsResourceState = new TrackedObject({
+      isLoading: true,
+      value: undefined as ScheduledPayment[] | undefined,
+      error: undefined,
+      load: async () => {
+        state.isLoading = true;
+
+        try {
+          state.value = await taskFor(this.loadScheduledPaymentTask).perform(
+            chainId
+          );
+        } catch (error) {
+          state.error = error;
+          throw error;
+        } finally {
+          state.isLoading = false;
+        }
+      },
+    });
+
+    state.load();
+    return state;
+  });
 
   deserializeScheduledPaymentResponse(
     response: ScheduledPaymentResponse
-  ): ScheduledPayment[] {
-    return response.data.map((s) => {
+  ): ScheduledPayment | ScheduledPayment[] {
+    const deserialize = (data: ScheduledPaymentResponseItem) => {
       return {
-        id: s.id,
-        userAddress: s.attributes['user-address'],
-        senderSafeAddress: s.attributes['sender-safe-address'],
-        moduleAddress: s.attributes['module-address'],
-        amount: BigNumber.from(s.attributes.amount),
-        feeFixedUSD: s.attributes['fee-fixed-usd'],
-        feePercentage: s.attributes['fee-percentage'],
-        gasTokenAddress: s.attributes['gas-token-address'],
-        tokenAddress: s.attributes['token-address'],
-        chainId: Number(s.attributes['chain-id']),
-        payeeAddress: s.attributes['payee-address'],
-        payAt: new Date(s.attributes['pay-at']),
-        executionGasEstimation: s.attributes['execution-gas-estimation'],
-        maxGasPrice: s.attributes['max-gas-price'],
-        salt: s.attributes['salt'],
-        spHash: s.attributes['sp-hash'],
-        recurringDayOfMonth: Number(s.attributes['recurring-day-of-month']),
-        recurringUntil: new Date(s.attributes['recurring-until']),
-        creationTransactionHash: s.attributes['creation-transaction-hash'],
-        creationBlockNumber: Number(s.attributes['creation-block-number']),
-        creationTransactionError: s.attributes['creation-transaction-error'],
+        id: data.id,
+        userAddress: data.attributes['user-address'],
+        senderSafeAddress: data.attributes['sender-safe-address'],
+        moduleAddress: data.attributes['module-address'],
+        amount: BigNumber.from(data.attributes.amount),
+        feeFixedUSD: data.attributes['fee-fixed-usd'],
+        feePercentage: data.attributes['fee-percentage'],
+        gasTokenAddress: data.attributes['gas-token-address'],
+        tokenAddress: data.attributes['token-address'],
+        chainId: Number(data.attributes['chain-id']),
+        payeeAddress: data.attributes['payee-address'],
+        payAt: new Date(data.attributes['pay-at']),
+        executionGasEstimation: data.attributes['execution-gas-estimation'],
+        maxGasPrice: data.attributes['max-gas-price'],
+        salt: data.attributes['salt'],
+        spHash: data.attributes['sp-hash'],
+        recurringDayOfMonth: Number(data.attributes['recurring-day-of-month']),
+        recurringUntil: new Date(data.attributes['recurring-until']),
+        creationTransactionHash: data.attributes['creation-transaction-hash'],
+        creationBlockNumber: Number(data.attributes['creation-block-number']),
+        creationTransactionError: data.attributes['creation-transaction-error'],
         cancelationTransactionHash:
-          s.attributes['cancelation-transaction-hash'],
+          data.attributes['cancelation-transaction-hash'],
         cancelationBlockNumber: Number(
-          s.attributes['cancelation-block-number']
+          data.attributes['cancelation-block-number']
         ),
       };
-    });
+    };
+
+    if (Array.isArray(response.data)) {
+      return response.data.map(deserialize);
+    } else {
+      return deserialize(response.data);
+    }
+  }
+}
+
+declare module '@ember/service' {
+  interface Registry {
+    'scheduled-payments': ScheduledPaymentsService;
   }
 }
