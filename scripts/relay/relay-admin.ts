@@ -47,7 +47,15 @@ class RelayAdmin {
     return users;
   }
 
-  async addUser(username: string, password: string) {} // eslint-disable-line no-unused-vars
+  async addUser(username: string, password: string) {
+    const body = new URLSearchParams();
+    body.append('username', username);
+    body.append('password1', password);
+    body.append('password2', password);
+    body.append('_save', 'Save');
+
+    await this._post(`/admin/auth/user/add`, body);
+  }
 
   async deleteUser(id: string) {
     const body = new URLSearchParams();
@@ -90,7 +98,12 @@ class RelayAdmin {
     await this._post(`/admin/tokens/priceoracle/add/`, body);
   }
 
-  async deletePriceOracle(name: string) {} // eslint-disable-line no-unused-vars
+  async deletePriceOracle(id: string) {
+    const body = new URLSearchParams();
+    body.append('post', 'yes');
+
+    await this._post(`/admin/tokens/priceoracle/${id}/delete/`, body);
+  }
 
   async getTokens() {
     let tokens: Token[] = [];
@@ -148,7 +161,12 @@ class RelayAdmin {
     await this._post(`/admin/tokens/token/add`, body);
   }
 
-  async deleteToken(symbol: string) {} // eslint-disable-line no-unused-vars
+  async deleteToken(id: string) {
+    const body = new URLSearchParams();
+    body.append('post', 'yes');
+
+    await this._post(`/admin/tokens/token/${id}/delete/`, body);
+  }
 
   async getPriceOracleTickers(): Promise<PriceOracleTicker[]> {
     const tokens = await this.getTokens();
@@ -201,7 +219,12 @@ class RelayAdmin {
     await this._post(`/admin/tokens/priceoracleticker/add`, body);
   }
 
-  async deletePriceOracleTicker() {}
+  async deletePriceOracleTicker(id: string) {
+    const body = new URLSearchParams();
+    body.append('post', 'yes');
+
+    await this._post(`/admin/tokens/priceoracleticker/${id}/delete/`, body);
+  }
 
   async _get(endpoint: string): Promise<Response> {
     const url = this.host + endpoint.replace(/^\/*/, '/').replace(/\/*$/, '/');

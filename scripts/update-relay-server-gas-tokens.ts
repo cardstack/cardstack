@@ -1,7 +1,3 @@
-/* eslint-disable node/no-unsupported-features/es-syntax */
-/* eslint-disable node/no-unpublished-import  */
-/* eslint-disable node/no-missing-import */
-
 import { RelayAdmin, Token, PriceOracleTicker } from './relay/relay-admin.js';
 import { readFileSync } from 'fs';
 
@@ -40,9 +36,12 @@ async function main() {
     const tokenlist = JSON.parse(tokenlistFile);
 
     let tokens = await client.getTokens();
+    const gastokens: TokenListJsonToken[] = tokenlist.tokens.filter((token: TokenListJsonToken) =>
+      token.tags.includes('relayGas')
+    );
+
     let tokensToAdd: Token[] = [];
-    tokenlist.tokens
-      .filter((token: TokenListJsonToken) => token.tags.includes('relayGas'))
+    gastokens
       .filter((token: TokenListJsonToken) => !tokens.find((t) => t.symbol === token.symbol))
       .forEach((token: TokenListJsonToken) => {
         tokensToAdd.push({
@@ -66,6 +65,17 @@ async function main() {
 
     tokens = await client.getTokens();
 
+    let tokensToDelete = tokens.filter((token) => !gastokens.find((t) => t.symbol === token.symbol));
+    for (const token of tokensToDelete) {
+      if (!DRY_RUN) {
+        await client.deleteToken(token.id);
+      } else {
+        console.log(`token to be deleted: ${token.symbol}`);
+      }
+    }
+
+    tokens = await client.getTokens();
+
     let oracles = await client.getPriceOracles();
     const uniswapv3 = oracles.find((oracle) => oracle.name == 'uniswapv3');
     if (uniswapv3 === undefined) {
@@ -73,9 +83,13 @@ async function main() {
     }
 
     let tickers = await client.getPriceOracleTickers();
+    tickers = tickers.filter((ticker) => ticker.priceOracle.name === 'uniswapv3');
+
     let tickersToAdd: PriceOracleTicker[] = [];
     tokens
-      .filter((token) => !tickers.find((ticker) => ticker.token.symbol === token.symbol))
+      .filter(
+        (token) => !tickers.find((ticker) => ticker.token.symbol === token.symbol && ticker.ticker === token.address)
+      )
       .forEach((token) => {
         tickersToAdd.push({
           token,
@@ -89,12 +103,31 @@ async function main() {
       if (!DRY_RUN) {
         await client.addPriceOracleTicker(ticker);
       } else {
-        console.log(`ticker to be added: ${ticker.token.symbol}`);
+        console.log(`ticker to be added: ${ticker.token.symbol} - ${ticker.ticker}`);
       }
     }
 
     tickers = await client.getPriceOracleTickers();
-    const tickersMissingPrice = tickers.filter((ticker) => !ticker.price).map((ticker) => ticker.token.symbol);
+    let tickersToDelete = tickers
+      .filter((ticker) => ticker.priceOracle.name === 'uniswapv3')
+      .filter(
+        (ticker) => !tokens.find((token) => token.symbol === ticker.token.symbol && token.address === ticker.ticker)
+      );
+
+    for (const ticker of tickersToDelete) {
+      if (!DRY_RUN) {
+        await client.deletePriceOracleTicker(ticker.id);
+      } else {
+        console.log(`ticker to be deleted: ${ticker.token.symbol} - ${ticker.ticker}`);
+      }
+    }
+
+    tickers = await client.getPriceOracleTickers();
+    tickers = tickers.filter((ticker) => ticker.priceOracle.name === 'uniswapv3');
+
+    const tickersMissingPrice = tickers
+      .filter((ticker) => !ticker.price)
+      .map((ticker) => `${ticker.token.symbol} - ${ticker.ticker}`);
     if (tickersMissingPrice.length > 0) {
       console.log('Following tickers are unable to compute the price(s):\n' + tickersMissingPrice.join('\n'));
     }
