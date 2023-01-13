@@ -26,7 +26,6 @@ import { SchedulerCapableNetworks, TransactionHash } from '@cardstack/cardpay-sd
 import cssVar from '@cardstack/boxel/helpers/css-var';
 import { type WalletProviderId } from '@cardstack/safe-tools-client/utils/wallet-providers';
 import TokenQuantity from '@cardstack/safe-tools-client/utils/token-quantity';
-import tokenQuantityToUsd from '@cardstack/safe-tools-client/helpers/token-quantity-to-usd';
 
 interface Signature {
   Element: HTMLElement;
@@ -294,7 +293,6 @@ export default class SchedulePaymentFormActionCardUI extends Component<Signature
                 <div class="schedule-payment-form-action-card--fees-value">
                   {{#if @paymentAmountTokenQuantity}}
                     {{@paymentAmountTokenQuantity.displayable}}
-                    {{tokenQuantityToUsd @paymentAmountTokenQuantity}}
                   {{/if}}
                 </div>
               </BoxelField>
