@@ -3,8 +3,8 @@ import { readFileSync } from 'fs';
 
 if (process.argv.length < 6) {
   console.error(
-    'usage: yarn update-relay-tokens [tokenlist.json] [host] [username] [password]\n' +
-      'example: yarn update-relay-tokens ../packages/cardpay-sdk/token-lists/goerli-tokenlist.json https://relay-goerli.staging.stack.cards user123 password123'
+    'usage: yarn update-relay-gas-tokens [tokenlist.json] [host] [username] [password]\n' +
+      'example: yarn update-gas-relay-tokens ../packages/cardpay-sdk/token-lists/goerli-tokenlist.json https://relay-goerli.staging.stack.cards user123 password123'
   );
   throw 'not enough arguments';
 }
