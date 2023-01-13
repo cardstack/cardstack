@@ -5,6 +5,8 @@ import TokenToUsdService from '@cardstack/safe-tools-client/services/token-to-us
 import config from '@cardstack/safe-tools-client/config/environment';
 import { taskFor } from 'ember-concurrency-ts';
 import weiToDecimal from '@cardstack/safe-tools-client/helpers/wei-to-decimal';
+import BoxelLoadingIndicator from '@cardstack/boxel/components/boxel/loading-indicator';
+import './index.css';
 
 type Args = {
   tokenAddress: string;
@@ -41,6 +43,13 @@ export default class TokenToUsd extends Component<Signature> {
   <template>
     {{#if this.usdAmount}}
       $ {{(weiToDecimal this.usdAmount @tokenDecimals)}} USD
+    {{else}}
+      <div class="token-to-usd-loading">
+        <BoxelLoadingIndicator class="token-to-usd-loading-indicator" @color="var(--boxel-purple-400)" />
+        <div class="network-connect-modal__waiting-status">
+          Converting to USD...
+        </div>
+      </div>
     {{/if}}
   </template>
 }

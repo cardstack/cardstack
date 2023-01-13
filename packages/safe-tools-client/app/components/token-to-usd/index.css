@@ -1,0 +1,7 @@
+.token-to-usd-loading {
+  display: flex;
+}
+
+.token-to-usd-loading-indicator {
+  margin-right: var(--boxel-sp-xs);
+}

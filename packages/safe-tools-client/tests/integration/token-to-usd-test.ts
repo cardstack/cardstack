@@ -54,7 +54,9 @@ module('Integration | Component | token-to-usd', function (hooks) {
     await waitUntil(
       () => {
         return (
-          this.element.textContent && this.element.textContent?.trim() !== ''
+          this.element.textContent &&
+          this.element.textContent?.trim() !== '' &&
+          !this.element.textContent?.trim().includes('Converting')
         );
       },
       { timeout: 5000 }
@@ -72,12 +74,16 @@ module('Integration | Component | token-to-usd', function (hooks) {
       () => {
         return (
           (this.element.textContent &&
-            this.element.textContent?.trim() !== '') ||
+            this.element.textContent?.trim() !== '' &&
+            !this.element.textContent?.trim().includes('Converting')) ||
           addMilliseconds(now, 4500) < new Date() // Return true if almost timeout
         );
       },
       { timeout: 5000 }
     );
-    assert.strictEqual(this.element.textContent?.trim(), '');
+    assert.strictEqual(
+      this.element.textContent?.trim(),
+      'Converting to USD...'
+    );
   });
 });
