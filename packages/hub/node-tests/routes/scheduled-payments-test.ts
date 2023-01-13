@@ -544,8 +544,31 @@ describe('GET /api/scheduled-payments', async function () {
       },
     });
 
+    // To test filtering by chainId (99 in the record, 1 in the query filter)
+    await prisma.scheduledPayment.create({
+      data: {
+        id: shortUuid.uuid(),
+        senderSafeAddress: '0xc0ffee254729296a45a3885639AC7E10F9d54979',
+        moduleAddress: '0x7E7d0B97D663e268bB403eb4d72f7C0C7650a6dd',
+        tokenAddress: '0xa455bbB2A81E09E0337c13326BBb302Cb37D7cf6',
+        gasTokenAddress: '0x6A50E3807FB9cD0B07a79F64e561B9873D3b132E',
+        amount: '100',
+        payeeAddress: '0x821f3Ee0FbE6D1aCDAC160b5d120390Fb8D2e9d3',
+        executionGasEstimation: 100000,
+        maxGasPrice: '1000000000',
+        feeFixedUsd: '0',
+        feePercentage: '0',
+        salt: '54lt',
+        payAt: addHours(subDays(nowUtc(), 1), 1),
+        spHash: cryptoRandomString({ length: 10 }),
+        chainId: 99,
+        userAddress: stubUserAddress,
+        creationTransactionHash: null,
+      },
+    });
+
     await request()
-      .get(`/api/scheduled-payments?filter[pay-at][gt]=${subDays(nowUtc(), 2).toISOString()}`)
+      .get(`/api/scheduled-payments?filter[pay-at][gt]=${subDays(nowUtc(), 2).toISOString()}&filter[chain-id]=1`)
       .set('Authorization', 'Bearer abc123--def456--ghi789')
       .set('Accept', 'application/vnd.api+json')
       .set('Content-Type', 'application/vnd.api+json')
@@ -810,7 +833,7 @@ describe('PATCH /api/scheduled-payments/:id', async function () {
             'fee-percentage': '0',
             salt: '54lt',
             'pay-at': '2021-01-01T00:00:00.000Z',
-            'sp-hash': '0x123',
+            'sp-hash': scheduledPayment.spHash,
             'chain-id': 1,
             'user-address': stubUserAddress,
             'creation-transaction-hash': null,
