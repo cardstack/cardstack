@@ -132,7 +132,7 @@ export default class SchedulePaymentSDKService extends Service {
     safeAddress: ChainAddress,
     moduleAddress: ChainAddress,
     tokenAddress: ChainAddress,
-    amount: string,
+    amount: BigNumber,
     payeeAddress: ChainAddress,
     executionGas: number,
     maxGasPrice: string,
@@ -150,7 +150,7 @@ export default class SchedulePaymentSDKService extends Service {
         safeAddress,
         moduleAddress,
         tokenAddress,
-        amount,
+        amount.toString(),
         payeeAddress,
         executionGas,
         maxGasPrice,
@@ -186,6 +186,6 @@ export default class SchedulePaymentSDKService extends Service {
 
 declare module '@ember/service' {
   interface Registry {
-    scheduledPaymentsSdk: SchedulePaymentSDKService;
+    scheduledPaymentSdk: SchedulePaymentSDKService;
   }
 }

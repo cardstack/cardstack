@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
+import SchedulePaymentSDKService from '@cardstack/safe-tools-client/services/scheduled-payment-sdk';
 import ScheduledPaymentsService from '@cardstack/safe-tools-client/services/scheduled-payments';
-import SchedulePaymentSDKService from '@cardstack/safe-tools-client/services/scheduled-payments-sdk';
 import Service from '@ember/service';
 import { render, click, TestContext } from '@ember/test-helpers';
 import percySnapshot from '@percy/ember';
@@ -35,7 +35,8 @@ let returnScheduledPaymentsUntilTomorrow = false;
 let returnOnlyLaterScheduledPayments = false;
 let dateService: FakeDateService;
 
-class ScheduledPaymentsStub extends Service {
+class ScheduledPaymentsStub extends ScheduledPaymentsService {
+  // @ts-expect-error - we're overriding this method for testing purposes
   fetchScheduledPayments = (chainId: number, minPayAt?: Date) => {
     if (returnEmptyScheduledPayments || !minPayAt) {
       return Promise.resolve([]);
@@ -231,11 +232,11 @@ module('Integration | Component | future-payments-list', function (hooks) {
   });
 
   test('can cancel a payment', async function (assert) {
-    const scheduledPaymentsSdkService = this.owner.lookup(
-      'service:scheduled-payments-sdk'
+    const scheduledPaymentSdkService = this.owner.lookup(
+      'service:scheduled-payment-sdk'
     ) as SchedulePaymentSDKService;
 
-    scheduledPaymentsSdkService.cancelScheduledPayment = (): Promise<void> => {
+    scheduledPaymentSdkService.cancelScheduledPayment = (): Promise<void> => {
       return Promise.resolve();
     };
 
@@ -271,11 +272,11 @@ module('Integration | Component | future-payments-list', function (hooks) {
   });
 
   test('it shows an error when canceling fails', async function (assert) {
-    const scheduledPaymentsSdkService = this.owner.lookup(
-      'service:scheduled-payments-sdk'
+    const scheduledPaymentSdkService = this.owner.lookup(
+      'service:scheduled-payment-sdk'
     ) as SchedulePaymentSDKService;
 
-    scheduledPaymentsSdkService.cancelScheduledPayment = (): Promise<void> => {
+    scheduledPaymentSdkService.cancelScheduledPayment = (): Promise<void> => {
       return Promise.reject('error while canceling payment');
     };
 

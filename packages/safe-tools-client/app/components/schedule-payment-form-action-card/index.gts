@@ -4,7 +4,7 @@ import { SelectableToken } from '@cardstack/boxel/components/boxel/input/selecta
 import { inject as service } from '@ember/service';
 import NetworkService from '../../services/network';
 import SafesService from '../../services/safes';
-import ScheduledPaymentsSdkService, { GasEstimationResult } from '../../services/scheduled-payments-sdk';
+import ScheduledPaymentSdkService, { GasEstimationResult } from '../../services/scheduled-payment-sdk';
 import TokensService from '../../services/tokens';
 import WalletService from '../../services/wallet';
 import { action } from '@ember/object';
@@ -17,11 +17,13 @@ import { use, resource } from 'ember-resources';
 import { TrackedObject } from 'tracked-built-ins';
 import { fromWei } from 'web3-utils';
 import not from 'ember-truth-helpers/helpers/not';
-import { convertAmountToNativeDisplay, convertAmountToRawAmount, TransactionHash } from '@cardstack/cardpay-sdk';
+import { convertAmountToNativeDisplay, TransactionHash } from '@cardstack/cardpay-sdk';
 import { taskFor } from 'ember-concurrency-ts';
 import { BigNumber } from 'ethers';
 import { task } from 'ember-concurrency-decorators';
 import perform from 'ember-concurrency/helpers/perform';
+import ScheduledPaymentsService from '@cardstack/safe-tools-client/services/scheduled-payments';
+import TokenQuantity from '@cardstack/safe-tools-client/utils/token-quantity';
 
 interface Signature {
   Element: HTMLElement;
@@ -38,7 +40,8 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
   @service declare wallet: WalletService;
   @service declare safes: SafesService;
   @service declare tokens: TokensService;
-  @service declare scheduledPaymentsSdk: ScheduledPaymentsSdkService;
+  @service declare scheduledPaymentSdk: ScheduledPaymentSdkService;
+  @service('scheduled-payments') declare scheduledPaymentsService: ScheduledPaymentsService;
   validator = new SchedulePaymentFormValidator(this);
   gasEstimation?: GasEstimationResult;
   lastScheduledPaymentId?: string;
@@ -139,7 +142,7 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
     this.payeeAddress = val;
   }
 
-  @tracked paymentAmount: string = '';
+  @tracked paymentAmountRaw: string = '';
 
   get paymentTokens(): SelectableToken[] {
     return this.tokens.transactionTokens;
@@ -155,10 +158,18 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
   }
 
   @action onUpdatePaymentAmount(val: string) {
-    this.paymentAmount = val;
+    this.paymentAmountRaw = val;
   }
   @action onUpdatePaymentToken(val: SelectableToken) {
     this._paymentToken = val;
+  }
+
+  get paymentAmountTokenQuantity() {
+    const { paymentToken } = this;
+    if (!paymentToken) {
+      return undefined;
+    }
+    return TokenQuantity.fromInput(paymentToken, this.paymentAmountRaw);
   }
 
   @tracked _selectedGasToken: SelectableToken | undefined;
@@ -213,7 +224,7 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
     const scenario = this.selectedPaymentType === 'one-time' ? 'execute_one_time_payment' : 'execute_recurring_payment';
     (async () => {
       try {
-        this.gasEstimation = await this.scheduledPaymentsSdk.getScheduledPaymentGasEstimation(scenario, paymentToken.address, selectedGasToken.address);
+        this.gasEstimation = await this.scheduledPaymentSdk.getScheduledPaymentGasEstimation(scenario, paymentToken.address, selectedGasToken.address);
         const { gasRangeInGasTokenWei, gasRangeInUSD } = this.gasEstimation;
         state.value = {
           normal: `Less than ${fromWei(gasRangeInGasTokenWei.normal.toString(), 'ether')} ${selectedGasToken.symbol} (~${convertAmountToNativeDisplay(fromWei(gasRangeInUSD.normal.toString(), 'ether'), 'USD')})`,
@@ -236,7 +247,7 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
     if (!this.validator.isValid) return;
 
     // Redundant to validation check but including it to narrow types for Typescript
-    if (!this.paymentToken || !this.selectedGasToken || !this.gasEstimation) return;
+    if (!this.paymentAmountTokenQuantity || !this.selectedGasToken || !this.gasEstimation) return;
 
     if (Number(this.gasEstimation.gas) <= 0) return;
     const { gasRangeInGasTokenWei } = this.gasEstimation;
@@ -262,11 +273,12 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
     const salt = btoa(String.fromCharCode.apply(null, array));
     const self = this;
 
-    yield taskFor(this.scheduledPaymentsSdk.schedulePayment).perform(
+    const {paymentAmountTokenQuantity} = this;
+    yield taskFor(this.scheduledPaymentSdk.schedulePayment).perform(
       currentSafe.address,
       currentSafe.spModuleAddress,
-      this.paymentToken.address,
-      convertAmountToRawAmount(this.paymentAmount, this.paymentToken.decimals),
+      paymentAmountTokenQuantity.address,
+      paymentAmountTokenQuantity.count,
       this.payeeAddress,
       Number(this.gasEstimation.gas),
       String(maxGasPrice),
@@ -305,7 +317,9 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
         }
       }
     )
+
     this.isSuccessfullyScheduled = true;
+    this.scheduledPaymentsService.reloadScheduledPayments();
   }
 
   @action resetForm() {
@@ -341,7 +355,7 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
       @isPayeeAddressInvalid={{not this.validator.isPayeeAddressValid}}
       @payeeAddressErrorMessage={{this.validator.payeeAddressErrorMessage}}
       @onUpdatePayeeAddress={{this.onUpdatePayeeAddress}}
-      @paymentAmount={{this.paymentAmount}}
+      @paymentAmountRaw={{this.paymentAmountRaw}}
       @onUpdatePaymentAmount={{this.onUpdatePaymentAmount}}
       @isPaymentAmountInvalid={{not this.validator.isAmountValid}}
       @paymentAmountErrorMessage={{this.validator.amountErrorMessage}}

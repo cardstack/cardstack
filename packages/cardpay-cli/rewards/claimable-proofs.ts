@@ -80,7 +80,7 @@ function displayProofs(proofs: WithSymbol<Proof | ClaimableProof>[], rewardPool:
 
 function logProof(o: WithSymbol<Proof> | WithSymbol<ClaimableProof>, rewardPool: RewardPool) {
   console.log(`
-      proof: ${fromProofArray(o.proofArray)}
+      proof: ${fromProofBytes(o.proofBytes)}
       leaf: ${o.leaf}
       balance: ${fromWei(o.amount)} ${o.tokenSymbol}
       token: ${o.tokenAddress} (${o.tokenSymbol})
@@ -95,7 +95,8 @@ function logProof(o: WithSymbol<Proof> | WithSymbol<ClaimableProof>, rewardPool:
         `);
 }
 
-const fromProofArray = (arr: string[]): string => {
+const fromProofBytes = (arr: string[]): string => {
+  //proofBytes is an array of hex encoded strings
   return (
     '0x' +
     arr.reduce((proof, s) => {

@@ -71,7 +71,7 @@ export async function gasPriceInToken(provider: JsonRpcProvider, tokenAddress: s
   let network = await networkName(provider);
   let chainId = (await provider.getNetwork()).chainId;
 
-  // Gas station will return current gas price in native token in wei.
+  // Gas station will return current gas price in native units of the token.
   let gasPriceInNativeTokenInWei = new BN((await getGasPricesInNativeWei(chainId)).standard.toString());
 
   // We use the wrapped native token address because the native token doesn't have an address in Uniswap.

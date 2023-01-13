@@ -21,7 +21,7 @@ export const parseTemplateExplanation = (template: string, data?: any) => {
 
 /**
  * parseExplanationAmount
- * @param amount amount number in WEI as defined in explanationData.
+ * @param amount amount number in native units of the token as defined in explanationData.
  * @param tokenDecimals places to shift the decimal point.
  * @param resultDecimals decimal places to keep in the result
  * @returns formatted string with amount converted to readable string.

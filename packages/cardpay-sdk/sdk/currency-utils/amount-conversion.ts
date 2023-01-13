@@ -53,7 +53,7 @@ export const convertRawAmountToDecimalFormat = (value: BigNumberish, decimals = 
   new BigNumber(value).dividedBy(new BigNumber(10).pow(decimals)).toFixed();
 
 /**
- * Converts wei to ether - Returns `number / 10**18`.
+ * Converts wei to ether - Returns `number / 10**18`. NOTE: the assumption of 18 decimals here can be incorrect in some situations. Use with care.
  */
 export const fromWei = (number: BigNumberish): string => convertRawAmountToDecimalFormat(number, 18);
 

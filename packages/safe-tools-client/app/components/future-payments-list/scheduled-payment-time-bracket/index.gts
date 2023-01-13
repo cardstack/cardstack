@@ -13,7 +13,6 @@ interface Signature {
   Args: {
     title: string;
     scheduledPayments: ScheduledPayment[];
-    reloadScheduledPayments: () => void;
   }
 }
 
@@ -26,7 +25,7 @@ export default class ScheduledPaymentTimeBracket extends Component<Signature> {
         {{/if}}
 
         {{#each @scheduledPayments as |scheduledPayment|}}
-          <ScheduledPaymentCard @scheduledPayment={{scheduledPayment}} @reloadScheduledPayments={{@reloadScheduledPayments}} />
+          <ScheduledPaymentCard @scheduledPayment={{scheduledPayment}} />
         {{/each}}
       </BoxelCardContainer>
     {{/if}}

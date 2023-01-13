@@ -1,5 +1,5 @@
 import { BigNumber } from 'ethers';
-import { weiToDecimal } from '@cardstack/safe-tools-client/helpers/wei-to-decimal';
+import { nativeUnitsToDecimal } from '@cardstack/safe-tools-client/helpers/native-units-to-decimal';
 import Component from '@glimmer/component';
 import { on } from '@ember/modifier';
 import { tracked } from '@glimmer/tracking';
@@ -10,7 +10,7 @@ import BoxelButton from '@cardstack/boxel/components/boxel/button';
 import WalletService from '@cardstack/safe-tools-client/services/wallet';
 import NetworkService from '@cardstack/safe-tools-client/services/network';
 import SafesService from '@cardstack/safe-tools-client/services/safes';
-import SchedulePaymentSDKService from '@cardstack/safe-tools-client/services/scheduled-payments-sdk';
+import SchedulePaymentSDKService from '@cardstack/safe-tools-client/services/scheduled-payment-sdk';
 import { Safe } from '@cardstack/safe-tools-client/services/safes';
 import CreateSafeModal from '../create-safe-modal';
 
@@ -28,7 +28,7 @@ export default class CreateSafeButton extends Component<Signature> {
   @service declare wallet: WalletService;
   @service declare network: NetworkService;
   @service declare safes: SafesService;
-  @service declare scheduledPaymentsSdk: SchedulePaymentSDKService;
+  @service declare scheduledPaymentSdk: SchedulePaymentSDKService;
 
   @tracked isModalOpen = false;
 
@@ -46,7 +46,7 @@ export default class CreateSafeButton extends Component<Signature> {
   }
 
   @task *createSafe(): TaskGenerator<{ safeAddress: string }> {
-    return yield this.scheduledPaymentsSdk.createSafe();
+    return yield this.scheduledPaymentSdk.createSafe();
   }
 
   @task *openCreateSafeModal(): TaskGenerator<void> {
@@ -55,7 +55,7 @@ export default class CreateSafeButton extends Component<Signature> {
     this.isModalOpen = true;
     try {
       const [ { gasEstimateInNativeToken, gasEstimateInUsd }, nativeTokenBalance] = yield Promise.all([
-        this.scheduledPaymentsSdk.getCreateSafeGasEstimation(),
+        this.scheduledPaymentSdk.getCreateSafeGasEstimation(),
         this.wallet.fetchNativeTokenBalance(),
       ]);
 
@@ -64,7 +64,7 @@ export default class CreateSafeButton extends Component<Signature> {
       this.hasEnoughBalance = balance.gte(gasEstimateInNativeToken);
 
       const tokenSymbol = nativeTokenBalance.symbol;
-      this.gasCostDisplay = `${weiToDecimal([gasEstimateInNativeToken, 18])} ${tokenSymbol} (~$${weiToDecimal([gasEstimateInUsd, 18, 2])})`;
+      this.gasCostDisplay = `${nativeUnitsToDecimal([gasEstimateInNativeToken, 18])} ${tokenSymbol} (~$${nativeUnitsToDecimal([gasEstimateInUsd, 18, 2])})`;
     } catch (e) {
       this.comparingBalanceToGasCostErrorMessage = "There was an error comparing your wallet balance to the estimated gas cost. Please reload the page and try again. If the problem persists, please contact support.";
       console.log(e) // TODO: Sentry
@@ -78,7 +78,7 @@ export default class CreateSafeButton extends Component<Signature> {
     walletAddress: string,
     safeAddress: string
   ): TaskGenerator<void> {
-    yield this.scheduledPaymentsSdk.waitForSafeToBeIndexed(chainId, walletAddress, safeAddress);
+    yield this.scheduledPaymentSdk.waitForSafeToBeIndexed(chainId, walletAddress, safeAddress);
   }
 
   @action async handleSafeCreation() {
