@@ -7,6 +7,8 @@ on:
       - ".github/workflows/pr-boxel.yml"
       - "package.json"
       - "yarn.lock"
+  push:
+    branches: [just-waypoint-things]
 
 permissions:
   contents: read
@@ -21,98 +23,23 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: volta-cli/action@v4
-      - uses: ./.github/actions/setup-node-modules-cache
-        with:
-          yarn_lock_md5: ${{ hashFiles('yarn.lock') }}
-
-
-  check-if-requires-preview:
-    name: Check if a preview deploy is required
-    runs-on: ubuntu-latest
-    outputs:
-      boxel-files-changed: ${{ steps.boxel-files-that-changed.outputs.any_changed }}
-    steps:
-      - uses: actions/checkout@v3
-      - name: Get boxel files that changed
-        id: boxel-files-that-changed
-        uses: tj-actions/changed-files@v1.1.2
-        with:
-          files: |
-            ^packages/boxel
-
-  deploy-boxel-preview:
-    name: Deploy a preview to S3
-    runs-on: ubuntu-latest
-    # github.event.pull_request.head.repo.full_name == github.repository: true if pr is from the original repo, false if it's from a fork
-    # github.head_ref: the branch that the pull request is from. only appears on pull_request events
-    if: github.event.pull_request.head.repo.full_name == github.repository && github.head_ref && needs.check-if-requires-preview.outputs.boxel-files-changed == 'true'
-    needs: check-if-requires-preview
-    env:
-      S3_PREVIEW_INDEX_BUCKET_NAME: boxel-preview.cardstack.com
-      S3_PREVIEW_ASSET_BUCKET_NAME: boxel-preview-assets.cardstack.com
-      S3_PREVIEW_ASSET_BUCKET_ENDPOINT: https://s3.us-east-1.amazonaws.com/boxel-preview-assets.cardstack.com
-      S3_PREVIEW_REGION: us-east-1
-    steps:
-      - uses: actions/checkout@v3
-      - uses: volta-cli/action@v4
-      - uses: ./.github/actions/setup-node-modules-cache
-        with:
-          yarn_lock_md5: ${{ hashFiles('yarn.lock') }}
-      - name: Install dependencies
-        run: yarn --prefer-offline --frozen-lockfile
-      - name: Set PR branch name
-        run: echo "PR_BRANCH_NAME=${{ github.head_ref }}" >> $GITHUB_ENV
-      - name: Test with percy
-        run: yarn test:boxel:percy
+      # FIXME remove
+      - name: Set up file
         env:
-          PERCY_TOKEN: ${{ secrets.PERCY_TOKEN_BOXEL }}
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          role-to-assume: arn:aws:iam::680542703984:role/boxel
-          aws-region: us-east-1
-      - name: Deploy preview
-        run: yarn deploy:boxel:preview
-
-  comment-on-boxel-pr:
-    name: Comment on PR
-    runs-on: ubuntu-latest
-    # github.event.pull_request.head.repo.full_name == github.repository: true if pr is from the original repo, false if it's from a fork
-    # github.head_ref: the branch that the pull request is from. only appears on pull_request events
-    if: github.event.pull_request.head.repo.full_name == github.repository && github.head_ref
-    needs: deploy-boxel-preview
-    env:
-      S3_PREVIEW_WEBSITE_URL: https://boxel.stack.cards
-    steps:
-      - uses: actions/checkout@v3
-      - uses: volta-cli/action@v4
-      - uses: ./.github/actions/setup-node-modules-cache
-        with:
-          yarn_lock_md5: ${{ hashFiles('yarn.lock') }}
-      - name: Install dependencies
-        run: yarn --prefer-offline --frozen-lockfile
-      - name: Find pull request number for branch
-        uses: ./.github/actions/find-pr-number
-        id: fpr
-        env:
-          BOXEL_PREVIEW_GITHUB_TOKEN: ${{ secrets.BOXEL_PREVIEW_GITHUB_TOKEN }}
-        with:
-          branch: ${{ github.head_ref }}
-      - name: Set env var for message
+          STAGING_WAYPOINT_SERVER_TOKEN: ${{ secrets.STAGING_WAYPOINT_SERVER_TOKEN }}
+          STAGING_WAYPOINT_SERVER_ADDR: ${{ secrets.STAGING_WAYPOINT_SERVER_ADDR }}
+          PRODUCTION_WAYPOINT_SERVER_TOKEN: ${{ secrets.PRODUCTION_WAYPOINT_SERVER_TOKEN }}
+          PRODUCTION_WAYPOINT_SERVER_ADDR: ${{ secrets.PRODUCTION_WAYPOINT_SERVER_ADDR }}
         run: |
-          echo "COMMENT_TEXT=### :sparkles: Preview Boxel changes [here](${{ env.S3_PREVIEW_WEBSITE_URL }}/${{ github.head_ref }})" >> $GITHUB_ENV
-      # finding a comment in given PR that contains the identifier string
-      - name: Find comment that contains identifier
-        uses: peter-evans/find-comment@v2
-        id: fc
+          echo $STAGING_WAYPOINT_SERVER_TOKEN >> x.txt
+          echo $STAGING_WAYPOINT_SERVER_ADDR >> x.txt
+          echo $PRODUCTION_WAYPOINT_SERVER_TOKEN >> x.txt
+          echo $PRODUCTION_WAYPOINT_SERVER_ADDR >> x.txt
+      - name: Setup upterm session
+        uses: lhotari/action-upterm@v1
         with:
-          body-includes: ${{ env.COMMENT_TEXT }}
-          issue-number: ${{ steps.fpr.outputs.pr-number }}
-      - name: Create new comment if none exists
-        uses: peter-evans/create-or-update-comment@v2
-        if: steps.fc.outputs.comment-id == ''
+          limit-access-to-actor: true
+      - uses: volta-cli/action@v4
+      - uses: ./.github/actions/setup-node-modules-cache
         with:
-          issue-number: ${{ steps.fpr.outputs.pr-number }}
-          body: |
-            ${{ env.COMMENT_TEXT }}
+          yarn_lock_md5: ${{ hashFiles('yarn.lock') }}
