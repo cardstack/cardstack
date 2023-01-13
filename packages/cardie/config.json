@@ -18,6 +18,14 @@
         "name": "card-protocol-relay-service",
         "alias": "relay",
         "default_branch": "master"
+      },
+      {
+        "name": "boxel-motion",
+        "alias": "boxel-host"
+      },
+      {
+        "name": "boxel-motion",
+        "alias": "boxel-realm-server"
       }
     ]
   }
