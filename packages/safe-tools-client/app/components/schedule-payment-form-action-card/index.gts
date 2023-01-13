@@ -22,6 +22,7 @@ import { taskFor } from 'ember-concurrency-ts';
 import { BigNumber } from 'ethers';
 import { task } from 'ember-concurrency-decorators';
 import perform from 'ember-concurrency/helpers/perform';
+import ScheduledPaymentsService from '@cardstack/safe-tools-client/services/scheduled-payments';
 
 interface Signature {
   Element: HTMLElement;
@@ -39,6 +40,7 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
   @service declare safes: SafesService;
   @service declare tokens: TokensService;
   @service declare scheduledPaymentSdk: ScheduledPaymentSdkService;
+  @service('scheduled-payments') declare scheduledPaymentsService: ScheduledPaymentsService;
   validator = new SchedulePaymentFormValidator(this);
   gasEstimation?: GasEstimationResult;
   lastScheduledPaymentId?: string;
@@ -305,7 +307,9 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
         }
       }
     )
+
     this.isSuccessfullyScheduled = true;
+    this.scheduledPaymentsService.reloadScheduledPayments();
   }
 
   @action resetForm() {

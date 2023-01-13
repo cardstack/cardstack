@@ -70,3 +70,13 @@
 .schedule-payment-form-action-card__in-progress-message {
   max-width: 20rem;
 }
+
+.schedule-payment-form-action-card__recurring-explanation {
+  font: var(--boxel-font-xs);
+  color: var(--boxel-purple-400);
+  margin: var(--boxel-sp-xs) 0 var(--boxel-sp-sm) 0;
+}
+
+.schedule-payment-form-action-card__recurring-explanation svg {
+  margin-right: var(--boxel-sp-xxxs);
+}
