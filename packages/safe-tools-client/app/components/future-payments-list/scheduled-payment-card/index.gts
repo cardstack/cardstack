@@ -8,7 +8,7 @@ import BoxelModal from '@cardstack/boxel/components/boxel/modal';
 import { ScheduledPayment } from '@cardstack/safe-tools-client/services/scheduled-payments';
 import formatDate from '@cardstack/safe-tools-client/helpers/format-date';
 import truncateMiddle from '@cardstack/safe-tools-client/helpers/truncate-middle';
-import weiToDecimal from '@cardstack/safe-tools-client/helpers/wei-to-decimal';
+import nativeUnitsToDecimal from '@cardstack/safe-tools-client/helpers/native-units-to-decimal';
 import { inject as service } from '@ember/service';
 import TokensService from '@cardstack/safe-tools-client/services/tokens';
 import TokenToUsd from '@cardstack/safe-tools-client/components/token-to-usd';
@@ -111,7 +111,7 @@ export default class ScheduledPaymentCard extends Component<Signature> {
         <div class="scheduled-payment-card__payment-detail">
           <img class="scheduled-payment-card__token-symbol" src={{this.tokenInfo.logoURI}} />
           <div class="scheduled-payment-card__token-amounts">
-            <span class="scheduled-payment-card__token-amount">{{weiToDecimal @scheduledPayment.amount this.tokenInfo.decimals}} {{this.tokenInfo.symbol}}</span>
+            <span class="scheduled-payment-card__token-amount">{{nativeUnitsToDecimal @scheduledPayment.amount this.tokenInfo.decimals}} {{this.tokenInfo.symbol}}</span>
             <span class="scheduled-payment-card__usd-amount">$ <TokenToUsd @tokenAddress={{@scheduledPayment.tokenAddress}} @tokenAmount={{@scheduledPayment.amount}} /> USD</span>
           </div>
         </div>
@@ -151,7 +151,7 @@ export default class ScheduledPaymentCard extends Component<Signature> {
       >
         <Section @title="Cancel your scheduled payment">
           <div>
-            <p>You're about to cancel your payment of <strong>{{weiToDecimal @scheduledPayment.amount this.tokenInfo.decimals}} {{this.tokenInfo.symbol}}</strong>
+            <p>You're about to cancel your payment of <strong>{{nativeUnitsToDecimal @scheduledPayment.amount this.tokenInfo.decimals}} {{this.tokenInfo.symbol}}</strong>
             to <span class="blockchain-address">{{truncateMiddle @scheduledPayment.payeeAddress}}</span>, scheduled for <strong>{{formatDate @scheduledPayment.payAt "d/M/yyyy"}}</strong>.</p>
 
             <p>This action will remove the scheduled payment from the scheduled payment module, and it won't be attempted in the future.</p>

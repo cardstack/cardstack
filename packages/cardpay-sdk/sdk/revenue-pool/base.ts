@@ -33,7 +33,7 @@ const TIMEOUT = 1000 * 60 * 5;
 interface RevenueTokenBalance {
   tokenSymbol: string;
   tokenAddress: string;
-  balance: string; // balance is in wei
+  balance: string; // balance is in native units of the token (e.g. wei)
 }
 
 export default class RevenuePool {

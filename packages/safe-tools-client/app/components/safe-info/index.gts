@@ -5,7 +5,7 @@ import or from 'ember-truth-helpers/helpers/or';
 import gt from 'ember-truth-helpers/helpers/gt';
 import { on } from '@ember/modifier';
 import truncateMiddle from '@cardstack/safe-tools-client/helpers/truncate-middle';
-import weiToDecimal from '@cardstack/safe-tools-client/helpers/wei-to-decimal';
+import nativeUnitsToDecimal from '@cardstack/safe-tools-client/helpers/native-units-to-decimal';
 import CreateSafe from '@cardstack/safe-tools-client/components/create-safe';
 import { Safe, TokenBalance } from '@cardstack/safe-tools-client/services/safes';
 
@@ -52,7 +52,7 @@ export default class SafeInfo extends Component<Signature> {
     {{#if @currentSafe}}
       <div>
         {{#each @tokenBalances as |tokenBalance|}}
-          {{#let (weiToDecimal tokenBalance.balance tokenBalance.decimals)
+          {{#let (nativeUnitsToDecimal tokenBalance.balance tokenBalance.decimals)
             as |balanceDecimalValue|
           }}
             {{!-- Don't show zero balances and crypto dust --}}

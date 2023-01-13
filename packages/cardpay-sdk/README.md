@@ -2,7 +2,7 @@
 This is a package that provides an SDK to use the Cardpay protocol.
 
 ### Special Considerations <!-- omit in toc -->
- One item to note that all token amounts that are provided to the API must strings and be in units of `wei`. All token amounts returned by the API will also be in units of `wei`. You can use `Web3.utils.toWei()` and `Web3.utils.fromWei()` to convert to and from units of `wei`. Because ethereum numbers can be so large, it is unsafe to represent these natively in Javascript, and in fact it is very common for a smart contract to return numbers that are simply too large to be represented natively in Javascript. For this reason, within Javascript the only safe way to natively handle numbers coming from Ethereum is as a `string`. If you need to perform math on a number coming from Ethereum use the `BN` library.
+ One item to note that all token amounts that are provided to the API must strings and be in native units of the token (usually `wei`) unless otherwise noted. All token amounts returned by the API will also be in native units (again, this usually means `wei`). You can use `Web3.utils.toWei()` and `Web3.utils.fromWei()` to convert to and from units of `wei`. Because ethereum numbers can be so large, it is unsafe to represent these natively in Javascript, and in fact it is very common for a smart contract to return numbers that are simply too large to be represented natively in Javascript. For this reason, within Javascript the only safe way to natively handle numbers coming from Ethereum is as a `string`. If you need to perform math on a number coming from Ethereum use the `BigNumber` feature of the ethers library.
 
 - [Function Parameters](#function-parameters)
   - [TransactionOptions](#transactionoptions)
@@ -131,14 +131,14 @@ let assetAPI = await getSDK('Assets', web3);
 ```
 
 ### `Assets.getNativeTokenBalance`
-This call returns the balance in native token for the specified address. So in Ethereum mainnet, this would be the ether balance. In Gnosis Chain this would be the DAI token balance. This call returns a promise for the native token amount as a string in units of `wei`. If no address is provided, then the balance of the first address in the wallet will be retrieved.
+This call returns the balance in native token for the specified address. So in Ethereum mainnet, this would be the ether balance. In Gnosis Chain this would be the XDAI token balance. This call returns a promise for the native token amount as a string in native units (usually `wei`). If no address is provided, then the balance of the first address in the wallet will be retrieved.
 ```js
 let assetsAPI = await getSDK('Assets', web3);
 let etherBalance = await assetsAPI.getNativeTokenBalance(walletAddress);
 ```
 
 ### `Assets.getBalanceForToken`
-This call returns the balance in for an ERC-20 token from the specified address. This call returns a promise for the token amount as a string in units of `wei`. If no token holder address is provided, then the balance of the first address in the wallet will be retrieved.
+This call returns the balance in for an ERC-20 token from the specified address. This call returns a promise for the token amount as a string in native units of the token (usually) `wei`). If no token holder address is provided, then the balance of the first address in the wallet will be retrieved.
 ```js
 let assetsAPI = await getSDK('Assets', web3);
 let cardBalance = await assetsAPI.getBalanceForToken(cardTokenAddress, walletAddress);
@@ -170,7 +170,7 @@ let tokenBridge = await getSDK('TokenBridgeForeignSide', web3);
 ### `TokenBridgeForeignSide.unlockTokens`
 This call will perform an ERC-20 `approve` action on the tokens to grant the Token Bridge contract the ability bridge your tokens. This method is invoked with:
 - The contract address of the token that you are unlocking. Note that the token address must be a supported stable coin token. Use the `TokenBridgeForeignSide.getSupportedTokens` method to get a list of supported tokens.
-- The amount of tokens to unlock. This amount should be in units of `wei` and as string.
+- The amount of tokens to unlock. This amount should be in native units of the token (e.g. `wei`) and as string.
 - You can optionally provide an object that specifies the nonce, onNonce callback, and/or onTxnHash callback as a third argument.
 - You can optionally provide an object that specifies the from address, gas limit, and/or gas price as a fourth argument.
 
@@ -188,7 +188,7 @@ This call will invoke the token bridge contract to relay tokens that have been u
 This method is invoked with the following parameters:
 - The layer 1 contract address of the token that you are unlocking. Note that the token address must be a supported stable coin token. Use the `TokenBridgeForeignSide.getSupportedTokens` method to get a list of supported tokens.
 - The address of the layer 2 account that should own the resulting safe
-- The amount of tokens to unlock. This amount should be in units of `wei` and as a string.
+- The amount of tokens to unlock. This amount should be in native units of the token (e.g. `wei`) and as a string.
 - You can optionally provide an object that specifies the nonce, onNonce callback, and/or onTxnHash callback as a fourth argument.
 - You can optionally provide an object that specifies the from address, gas limit, and/or gas price as a fifth argument.
 
@@ -227,7 +227,7 @@ let tokenBridge = await getSDK('TokenBridgeHomeSide', web3);
 ```
 
 ### `TokenBridgeHomeSide.withdrawalLimits`
-This call will return the minimum and maximum withdrawal limits as a string in units of `wei` for bridging a token to layer 1. This method is invoked with the layer 2 CPXD token address of the CPXD token being withdrawn.
+This call will return the minimum and maximum withdrawal limits as a string in token units (we assume 18 decimals, i.e. `wei`) for bridging a token to layer 1. This method is invoked with the layer 2 CPXD token address of the CPXD token being withdrawn.
 
 ```js
 let { min, max } = await tokenBridge.getWithdrawalLimits(daiTokenAddress);
@@ -245,7 +245,7 @@ This method is invoked with the following parameters:
 - The layer 2 safe address that contains the tokens to be relayed to layer 1
 - The layer 2 token address of the tokens to be relayed
 - The address of the layer 1 recipient that will receive the tokens in layer 1
-- The amount of tokens to relay as a string in units of `wei`. Note that in addition to the amount of tokens being relayed, the safe will also be changed the layer 2 gas costs for performing the relay as well (the gas cost will be charged in the same tokens as is being relayed). So the safe must have a balance that includes both the amount being relayed as well as the layer 2 gas charged in order to perform the relay.
+- The amount of tokens to relay as a string in native units of the token (e.g. `wei`). Note that in addition to the amount of tokens being relayed, the safe will also be changed the layer 2 gas costs for performing the relay as well (the gas cost will be charged in the same tokens as is being relayed). So the safe must have a balance that includes both the amount being relayed as well as the layer 2 gas charged in order to perform the relay.
 
 ```js
 let result = await tokenBridge.relayTokens(
@@ -379,13 +379,13 @@ The parameters to this function are:
 - The safe address to send the tokens from
 - The token address of the tokens being sent
 - The recipient of the tokens
-- The amount of tokens that are being sent string in units of `wei`
+- The amount of tokens that are being sent string in native units of the token (e.g. `wei`)
 
 ```ts
 let result = await safes.sendTokensGasEstimate(depotSafeAddress, daiCpxdAddress, aliceAddress, toWei("10"));
 ```
 
-This method returns a promise for the amount of the tokens specified as the token address in the parameters that are estimated to be used to pay for gas as a string in units of `wei`.
+This method returns a promise for the amount of the tokens specified as the token address in the parameters that are estimated to be used to pay for gas as a string in native units of the token (e.g. `wei`).
 
 
 ### `Safes.sendTokens`
@@ -395,7 +395,7 @@ This method is invoked with the following parameters:
 - the address of the gnosis safe
 - the address of the token contract
 - the address of the recipient
-- optionally,  amount of tokens to send as a string in units of `wei`
+- optionally,  amount of tokens to send as a string in native units of the token (e.g. `wei`)
 - optionally the address of a safe owner. If no address is supplied, then the default account in your web3 provider's wallet will be used.
 
 `amount` is an optional param. When `amount` is included, one must ensure that there is sufficient balance leftover to pay for gas of the transaction, .i.e `safeBalance < amount - estimatedGasCost`. The scenario which this occurs is when the user specifies `amount` that is close to `safeBalance`. The client should make this check.  When `amount` is excluded, the whole balance of the safe is withdrawn which is automatically taxed for gas, .i.e the gas deduction occurs internally within the sdk function. It is recommended when the client expects to withdraw the "max" balance that it doesn't specify `amount`. 
@@ -531,7 +531,7 @@ let result = await prepaidCard.transfer(prepaidCardAddress, newOwner);
 This method returns a promise for a web3 transaction receipt.
 
 ### `PrepaidCard.priceForFaceValue`
-This call will return the price in terms of the specified token of how much it costs to have a face value in the specified units of SPEND (**§**). This takes into account both the exchange rate of the specified token as well as gas fees that are deducted from the face value when creating a prepaid card. Note though, that the face value of the prepaid card in SPEND will drift based on the exchange rate of the underlying token used to create the prepaid card. (However, this drift should be very slight since we are using *stable* coins to purchase prepaid cards (emphasis on "stable"). Since the units of SPEND are very small relative to wei (**§** 1 === $0.01 USD), the face value input is a number type. This API returns the amount of tokens required to achieve a particular face value as a string in units of `wei` of the specified token.
+This call will return the price in terms of the specified token of how much it costs to have a face value in the specified units of SPEND (**§**). This takes into account both the exchange rate of the specified token as well as gas fees that are deducted from the face value when creating a prepaid card. Note though, that the face value of the prepaid card in SPEND will drift based on the exchange rate of the underlying token used to create the prepaid card. (However, this drift should be very slight since we are using *stable* coins to purchase prepaid cards (emphasis on "stable"). Since the units of SPEND are very small relative to wei (**§** 1 === $0.01 USD), the face value input is a number type. This API returns the amount of tokens required to achieve a particular face value as a string in native units of the specified token (e.g. `wei`).
 ```js
 // You must send 'amountInDai' to the prepaidCardManager contract
 // to achieve a prepaid card with §5000 face value
@@ -541,7 +541,7 @@ let amountInDAI = await prepaidCard.priceForFaceValue(daiCpxdAddress, 5000);
 Note that if you are creating multiple cards or splitting cards, use this API to ensure the amount to provision for each prepaid card you want to create in order to achieve teh desired face values for each of the prepaid cards created.
 
 ### `PrepaidCard.gasFee`
-This call will return the gas fee in terms of the specified token for the creation of a prepaid card. All prepaid cards will be seeded with some `CARD.CPXD` in order to pay our gnosis safe relayer for gas. In order to offset these costs, a small fee will be charged when creating or splitting a prepaid card. The gas fee that is charged is returned as a string value in units of `wei` of the specified token. This is the same fee that is accounted for in the `PrepaidCard.priceForFaceValue` API.
+This call will return the gas fee in terms of the specified token for the creation of a prepaid card. All prepaid cards will be seeded with some `CARD.CPXD` in order to pay our gnosis safe relayer for gas. In order to offset these costs, a small fee will be charged when creating or splitting a prepaid card. The gas fee that is charged is returned as a string value in native units of the specified token (e.g. `wei`). This is the same fee that is accounted for in the `PrepaidCard.priceForFaceValue` API.
 ```js
 let gasFeeInDai = await prepaidCard.gasFee(daiCpxdAddress);
 ```
@@ -601,7 +601,7 @@ let {
   issuingToken,
   faceValue,
   customizationDID,
-  askPrice // as wei in the units of the issuing token
+  askPrice // in the native units of the issuing token (e.g. wei)
 } = await prepaidCardMarket.getSKUInfo(sku1000SPENDCards);
 ```
 
@@ -651,7 +651,7 @@ This call sets the ask price for the prepaid cards the belong to the specified S
 The arguments are:
 - The prepaid card that is used to pay for the gas for issuing the transaction
 - The SKU whose ask price you are setting
-- The ask price as a string in units of `wei` of the SKU's issuing token
+- The ask price as a string in the native units of the SKU's issuing token (e.g. `wei`)
 - Optionally the address of the market contract (the default Cardstack market contract will be used if not provided)
 - You can optionally provide an object that specifies the "from" address. The gas price and gas limit will be calculated by the card protocol and are not configurable.
 
@@ -706,7 +706,7 @@ where the result is a promise for an array of objects in the following shape:
 interface RevenueTokenBalance {
   tokenSymbol: string;
   tokenAddress: string;
-  balance: string; // balance is in wei
+  balance: string; // balance is in native token units (e.g. `wei`)
 }
 ```
 
@@ -716,7 +716,7 @@ This call will return the gas estimate for claiming revenue.
 The parameters to this function are:
 - The merchant's safe address
 - The token address of the tokens the merchant is claiming
-- The amount of tokens that are being claimed as a string in units of `wei`
+- The amount of tokens that are being claimed as a string in native units of the token (e.g. `wei`)
 
 ```ts
 let result = await revenuePool.claim(merchantSafeAddress, tokenAddress, claimAmountInWei);
@@ -730,7 +730,7 @@ This call will transfer unclaimed merchant revenue from the revenue pool into th
 The parameters to this function are:
 - The merchant's safe address
 - The token address of the tokens the merchant is claiming
-- The amount of tokens that are being claimed as a string in units of `wei`
+- The amount of tokens that are being claimed as a string in native units of the token (e.g. `wei`)
 
 `amount` is an optional param. When `amount` is excluded, the entire `revenueBalance` of a merchant safe is claimed.
 
@@ -995,7 +995,7 @@ The `registerRewardeeGasEstimate` returns a gas estimate for the prepaid card se
 ```ts
 interface GasEstimate {
   gasToken: string 
-  amount: string; // tokens in unit of wei
+  amount: string; // in native units of the gas token (e.g. wei)
 }
 ```
 
@@ -1051,7 +1051,7 @@ let web3 = new Web3(myProvider); // Layer 2 web3 instance
 let layerTwoOracle = await getSDK('LayerTwoOracle', web3);
 ```
 ### `LayerTwoOracle.convertToSpend`
-This call will convert an amount in the specified token to a SPEND amount. This function returns a number representing the SPEND amount. The input to this function is the token amount as a string in units of `wei`.
+This call will convert an amount in the specified token to a SPEND amount. This function returns a number representing the SPEND amount. The input to this function is the token amount as a string in the native units of the token (e.g. `wei`).
 ```js
 let spendAmount = await layerTwoOracle.convertFromSpend(daicpxdAddress, toWei(10)); // convert 10 DAI to SPEND
 console.log(`SPEND value ${spendAmount}`);
@@ -1063,7 +1063,7 @@ let weiAmount = await layerTwoOracle.convertFromSpend(daicpxdAddress, 10000); //
 console.log(`DAI value ${fromWei(weiAmount)}`);
 ```
 ### `LayerTwoOracle.getUSDPrice`
-This call will return the USD value for the specified amount of the specified token. If we do not have an exchange rate for the token, then an exception will be thrown. This API requires that the token amount be specified in `wei` (10<sup>18</sup> `wei` = 1 token) as a string, and will return a floating point value in units of USD. You can easily convert a token value to wei by using the `Web3.utils.toWei()` function.
+This call will return the USD value for the specified amount of the specified token. If we do not have an exchange rate for the token, then an exception will be thrown. This API requires that the token amount be specified in `wei` (10<sup>18</sup> `wei` = 1 token) as a string, and will return a floating point value in units of USD. You can easily convert a token value to wei by using the `Web3.utils.toWei()` function. Currently, we assume 18 decimals so only tokens conforming to this can be supported.
 
 ```js
 let layerTwoOracle = await getSDK('LayerTwoOracle', web3);
@@ -1071,7 +1071,7 @@ let usdPrice = await layerTwoOracleRate.getUSDPrice("DAI", amountInWei);
 console.log(`USD value: $${usdPrice.toFixed(2)} USD`);
 ```
 ### LayerTwoOracle.getUSDConverter
-This returns a function that converts an amount of a token in wei to USD. Similar to `LayerTwoOracle.getUSDPrice`, an exception will be thrown if we don't have the exchange rate for the token. The returned function accepts a string that represents an amount in wei and returns a number that represents the USD value of that amount of the token.
+This returns a function that converts an amount of a token in wei to USD. Similar to `LayerTwoOracle.getUSDPrice`, an exception will be thrown if we don't have the exchange rate for the token. The returned function accepts a string that represents an amount in wei and returns a number that represents the USD value of that amount of the token. Currently, we assume 18 decimals so only tokens conforming to this can be supported.
 
 ```js
 let layerTwoOracle = await getSDK('LayerTwoOracle', web3);
@@ -1079,7 +1079,7 @@ let converter = await layerTwoOracle.getUSDConverter("DAI");
 console.log(`USD value: $${converter(amountInWei)} USD`);
 ```
 ### `LayerTwoOracle.getETHPrice`
-This call will return the ETH value for the specified amount of the specified token. If we do not have an exchange rate for the token, then an exception will be thrown. This API requires that the token amount be specified in `wei` (10<sup>18</sup> `wei` = 1 token) as a string, and will return a string that represents the ETH value in units of `wei` as well. You can easily convert a token value to wei by using the `Web3.utils.toWei()` function. You can also easily convert units of `wei` back into `ethers` by using the `Web3.utils.fromWei()` function.
+This call will return the ETH value for the specified amount of the specified token. If we do not have an exchange rate for the token, then an exception will be thrown. This API requires that the token amount be specified in `wei` (10<sup>18</sup> `wei` = 1 token) as a string, and will return a string that represents the ETH value in units of `wei` as well. You can easily convert a token value to wei by using the `Web3.utils.toWei()` function. You can also easily convert units of `wei` back into `ethers` by using the `Web3.utils.fromWei()` function. Currently, we assume 18 decimals so only tokens conforming to this can be supported.
 
 ```js
 let layerTwoOracle = await getSDK('LayerTwoOracle', web3);

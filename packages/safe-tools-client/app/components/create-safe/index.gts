@@ -1,5 +1,5 @@
 import { BigNumber } from 'ethers';
-import { weiToDecimal } from '@cardstack/safe-tools-client/helpers/wei-to-decimal';
+import { nativeUnitsToDecimal } from '@cardstack/safe-tools-client/helpers/native-units-to-decimal';
 import Component from '@glimmer/component';
 import { on } from '@ember/modifier';
 import { tracked } from '@glimmer/tracking';
@@ -64,7 +64,7 @@ export default class CreateSafeButton extends Component<Signature> {
       this.hasEnoughBalance = balance.gte(gasEstimateInNativeToken);
 
       const tokenSymbol = nativeTokenBalance.symbol;
-      this.gasCostDisplay = `${weiToDecimal([gasEstimateInNativeToken, 18])} ${tokenSymbol} (~$${weiToDecimal([gasEstimateInUsd, 18, 2])})`;
+      this.gasCostDisplay = `${nativeUnitsToDecimal([gasEstimateInNativeToken, 18])} ${tokenSymbol} (~$${nativeUnitsToDecimal([gasEstimateInUsd, 18, 2])})`;
     } catch (e) {
       this.comparingBalanceToGasCostErrorMessage = "There was an error comparing your wallet balance to the estimated gas cost. Please reload the page and try again. If the problem persists, please contact support.";
       console.log(e) // TODO: Sentry
