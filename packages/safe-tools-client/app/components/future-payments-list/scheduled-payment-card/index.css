@@ -50,7 +50,6 @@
 .scheduled-payment-card__usd-amount {
   font: 500 var(--boxel-font-sm);
   color: var(--boxel-purple-400);
-  margin-top: var(--boxel-sp-xxxs);
 }
 
 .cancel-scheduled-payment .boxel-action-container-section > div {

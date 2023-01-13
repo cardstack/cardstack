@@ -132,7 +132,7 @@ export async function getUsdConverter(
   let network = await networkName(provider);
   let usdcTokenAddress = getAddressByNetwork('usdcToken', network);
 
-  if (usdcTokenAddress === tokenAddress) {
+  if (usdcTokenAddress.toLowerCase() === tokenAddress.toLowerCase()) {
     return (amountInWei: BigNumber) => amountInWei;
   }
 
