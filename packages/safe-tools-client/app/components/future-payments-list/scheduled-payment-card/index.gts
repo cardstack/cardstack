@@ -22,13 +22,12 @@ import SuccessIcon from '@cardstack/safe-tools-client/components/icons/success';
 import FailureIcon from '@cardstack/safe-tools-client/components/icons/failure';
 import InfoIcon from '@cardstack/safe-tools-client/components/icons/info';
 import BoxelDropdown from '@cardstack/boxel/components/boxel/dropdown';
-
 import BoxelMenu from '@cardstack/boxel/components/boxel/menu';
 import { type ActionChinState } from '@cardstack/boxel/components/boxel/action-chin/state'
 import menuItem from '@cardstack/boxel/helpers/menu-item'
 import { array, fn } from '@ember/helper';
 import set from 'ember-set-helper/helpers/set';
-
+import ScheduledPaymentsService from '@cardstack/safe-tools-client/services/scheduled-payments';
 import { TaskGenerator } from 'ember-concurrency';
 import { task } from 'ember-concurrency-decorators';
 import * as Sentry from '@sentry/browser';
@@ -39,26 +38,27 @@ interface Signature {
   Element: HTMLElement;
   Args: {
     scheduledPayment: ScheduledPayment;
-    reloadScheduledPayments: () => void;
   }
 }
 
 export default class ScheduledPaymentCard extends Component<Signature> {
   @service declare scheduledPaymentsSdk: ScheduledPaymentsSdkService;
+  @service declare scheduledPayments: ScheduledPaymentsService;
   @service declare hubAuthentication: HubAuthenticationService;
   @service declare tokens: TokensService;
   @tracked optionsMenuOpened = false;
   @tracked isCancelPaymentModalOpen = false;
   @tracked cancelationErrorMessage?: string;
 
-  @action closeCancelScheduledPaymentModal(reload = false) {
+  @action closeCancelScheduledPaymentModal(reload: boolean) {
     this.isCancelPaymentModalOpen = false;
-    if (reload) this.args.reloadScheduledPayments();
+    if (reload) this.scheduledPayments.reloadScheduledPayments();
   }
 
   get tokenInfo() {
     let tokens = this.tokens.transactionTokens;
-    let token = tokens.find(token => token.address === this.args.scheduledPayment.tokenAddress)
+    let token = tokens.find(token => token.address === this.args.scheduledPayment.tokenAddress);
+
     if (!token) {
       throw new Error('unknown transfer token');
     }
@@ -105,7 +105,7 @@ export default class ScheduledPaymentCard extends Component<Signature> {
     <BoxelCardContainer
       @displayBoundaries={{true}}
       class="scheduled-payment-card">
-      <div class="scheduled-payment-card__content" data-test-scheduled-payment-card>
+      <div class="scheduled-payment-card__content" data-test-scheduled-payment-card data-test-scheduled-payment-card-id={{@scheduledPayment.id}}>
         <span class="scheduled-payment-card__pay-at">{{this.paymentType}} on {{formatDate @scheduledPayment.payAt "d/M/yyyy"}}</span>
         <span class="scheduled-payment-card__payee">To: {{truncateMiddle @scheduledPayment.payeeAddress}}</span>
         <div class="scheduled-payment-card__payment-detail">

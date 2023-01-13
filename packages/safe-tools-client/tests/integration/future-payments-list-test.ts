@@ -35,7 +35,8 @@ let returnScheduledPaymentsUntilTomorrow = false;
 let returnOnlyLaterScheduledPayments = false;
 let dateService: FakeDateService;
 
-class ScheduledPaymentsStub extends Service {
+class ScheduledPaymentsStub extends ScheduledPaymentsService {
+  // @ts-expect-error - we're overriding this method for testing purposes
   fetchScheduledPayments = (chainId: number, minPayAt?: Date) => {
     if (returnEmptyScheduledPayments || !minPayAt) {
       return Promise.resolve([]);
