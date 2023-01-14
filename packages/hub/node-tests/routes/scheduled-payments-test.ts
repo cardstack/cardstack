@@ -6,6 +6,7 @@ import { nowUtc } from '../../utils/dates';
 import { calculateNextPayAt } from '../../utils/scheduled-payments';
 import { registry, setupHub } from '../helpers/server';
 import { setupStubWorkerClient } from '../helpers/stub-worker-client';
+import cryptoRandomString from 'crypto-random-string';
 
 class StubAuthenticationUtils {
   validateAuthToken(encryptedAuthToken: string) {
@@ -214,6 +215,8 @@ describe('POST /api/scheduled-payments', async function () {
   });
 
   it('persists a one time scheduled payment', async function () {
+    let spHash = cryptoRandomString({ length: 10 });
+
     await request()
       .post('/api/scheduled-payments')
       .send({
@@ -232,7 +235,7 @@ describe('POST /api/scheduled-payments', async function () {
             'fee-percentage': 0.1,
             salt: '54lt',
             'pay-at': '2021-01-01T00:00:00.000Z',
-            'sp-hash': '0x123',
+            'sp-hash': spHash,
             'chain-id': 1,
             userAddress: stubUserAddress,
           },
@@ -262,7 +265,7 @@ describe('POST /api/scheduled-payments', async function () {
             'fee-percentage': '0.1',
             salt: '54lt',
             'pay-at': '2021-01-01T00:00:00.000Z',
-            'sp-hash': '0x123',
+            'sp-hash': spHash,
             'chain-id': 1,
             'user-address': stubUserAddress,
             'creation-transaction-hash': null,
@@ -280,7 +283,7 @@ describe('POST /api/scheduled-payments', async function () {
 
   it('persists a recurring scheduled payment', async function () {
     let calculatedPayAt = calculateNextPayAt(new Date(), 1);
-
+    let spHash = cryptoRandomString({ length: 10 });
     let responsePayAt: string;
 
     await request()
@@ -303,7 +306,7 @@ describe('POST /api/scheduled-payments', async function () {
             'pay-at': null,
             'recurring-day-of-month': 1,
             'recurring-until': '2022-12-31T00:00:00.000Z',
-            'sp-hash': '0x123',
+            'sp-hash': spHash,
             'chain-id': 1,
             userAddress: stubUserAddress,
           },
@@ -335,7 +338,7 @@ describe('POST /api/scheduled-payments', async function () {
             'fee-percentage': '0.1',
             salt: '54lt',
             'pay-at': null, // manipulated in response - we check it in then()
-            'sp-hash': '0x123',
+            'sp-hash': spHash,
             'chain-id': 1,
             'user-address': stubUserAddress,
             'creation-transaction-hash': null,
@@ -404,7 +407,7 @@ describe('GET /api/scheduled-payments', async function () {
         feePercentage: '0',
         salt: '54lt',
         payAt: '2022-11-14T18:49:13.000Z',
-        spHash: '0x123',
+        spHash: cryptoRandomString({ length: 10 }),
         chainId: 1,
         userAddress: stubUserAddress,
         creationTransactionHash: null,
@@ -427,7 +430,7 @@ describe('GET /api/scheduled-payments', async function () {
         feePercentage: '0',
         salt: '54lt',
         payAt: '2022-11-14T18:49:13.000Z',
-        spHash: '0x1234',
+        spHash: cryptoRandomString({ length: 10 }),
         chainId: 1,
         userAddress: '0x821f3Ee0FbE6D1aCDAC160b5d120390Fb8D2e9d3',
         creationTransactionHash: null,
@@ -458,7 +461,7 @@ describe('GET /api/scheduled-payments', async function () {
               'fee-percentage': '0',
               salt: '54lt',
               'pay-at': '2022-11-14T18:49:13.000Z',
-              'sp-hash': '0x123',
+              'sp-hash': sp1.spHash,
               'chain-id': 1,
               'user-address': stubUserAddress,
               'creation-transaction-hash': null,
@@ -490,7 +493,7 @@ describe('GET /api/scheduled-payments', async function () {
         feePercentage: '0',
         salt: '54lt',
         payAt: subDays(nowUtc(), 3),
-        spHash: '0x123',
+        spHash: cryptoRandomString({ length: 10 }),
         chainId: 1,
         userAddress: stubUserAddress,
         creationTransactionHash: null,
@@ -512,7 +515,7 @@ describe('GET /api/scheduled-payments', async function () {
         feePercentage: '0',
         salt: '54lt',
         payAt: subDays(nowUtc(), 1),
-        spHash: '0x1234',
+        spHash: cryptoRandomString({ length: 10 }),
         chainId: 1,
         userAddress: stubUserAddress,
         creationTransactionHash: null,
@@ -534,15 +537,38 @@ describe('GET /api/scheduled-payments', async function () {
         feePercentage: '0',
         salt: '54lt',
         payAt: addHours(subDays(nowUtc(), 1), 1),
-        spHash: '0x12345',
+        spHash: cryptoRandomString({ length: 10 }),
         chainId: 1,
         userAddress: stubUserAddress,
         creationTransactionHash: null,
       },
     });
 
+    // To test filtering by chainId (99 in the record, 1 in the query filter)
+    await prisma.scheduledPayment.create({
+      data: {
+        id: shortUuid.uuid(),
+        senderSafeAddress: '0xc0ffee254729296a45a3885639AC7E10F9d54979',
+        moduleAddress: '0x7E7d0B97D663e268bB403eb4d72f7C0C7650a6dd',
+        tokenAddress: '0xa455bbB2A81E09E0337c13326BBb302Cb37D7cf6',
+        gasTokenAddress: '0x6A50E3807FB9cD0B07a79F64e561B9873D3b132E',
+        amount: '100',
+        payeeAddress: '0x821f3Ee0FbE6D1aCDAC160b5d120390Fb8D2e9d3',
+        executionGasEstimation: 100000,
+        maxGasPrice: '1000000000',
+        feeFixedUsd: '0',
+        feePercentage: '0',
+        salt: '54lt',
+        payAt: addHours(subDays(nowUtc(), 1), 1),
+        spHash: cryptoRandomString({ length: 10 }),
+        chainId: 99,
+        userAddress: stubUserAddress,
+        creationTransactionHash: null,
+      },
+    });
+
     await request()
-      .get(`/api/scheduled-payments?filter[pay-at][gt]=${subDays(nowUtc(), 2).toISOString()}`)
+      .get(`/api/scheduled-payments?filter[pay-at][gt]=${subDays(nowUtc(), 2).toISOString()}&filter[chain-id]=1`)
       .set('Authorization', 'Bearer abc123--def456--ghi789')
       .set('Accept', 'application/vnd.api+json')
       .set('Content-Type', 'application/vnd.api+json')
@@ -589,7 +615,7 @@ describe('GET /api/scheduled-payments/:id', async function () {
   it('returns a scheduled payment', async function () {
     let scheduledPayment = await prisma.scheduledPayment.create({
       data: {
-        id: '73994d4b-bb3a-4d73-969f-6fa24da16fb4',
+        id: shortUuid.uuid(),
         senderSafeAddress: '0xc0ffee254729296a45a3885639AC7E10F9d54979',
         moduleAddress: '0x7E7d0B97D663e268bB403eb4d72f7C0C7650a6dd',
         tokenAddress: '0xa455bbB2A81E09E0337c13326BBb302Cb37D7cf6',
@@ -602,7 +628,7 @@ describe('GET /api/scheduled-payments/:id', async function () {
         feePercentage: '0',
         salt: '54lt',
         payAt: '2021-01-01T00:00:00.000Z',
-        spHash: '0x123',
+        spHash: cryptoRandomString({ length: 10 }),
         chainId: 1,
         userAddress: stubUserAddress,
         creationTransactionHash: null,
@@ -632,7 +658,7 @@ describe('GET /api/scheduled-payments/:id', async function () {
             'fee-percentage': '0',
             salt: '54lt',
             'pay-at': '2021-01-01T00:00:00.000Z',
-            'sp-hash': '0x123',
+            'sp-hash': scheduledPayment.spHash,
             'chain-id': 1,
             'user-address': stubUserAddress,
             'creation-transaction-hash': null,
@@ -698,7 +724,7 @@ describe('PATCH /api/scheduled-payments/:id', async function () {
         feePercentage: 0,
         salt: '54lt',
         payAt: '2021-01-01T00:00:00.000Z',
-        spHash: '0x123',
+        spHash: cryptoRandomString({ length: 10 }),
         chainId: 1,
         userAddress: stubUserAddress,
         creationTransactionHash: null,
@@ -735,7 +761,7 @@ describe('PATCH /api/scheduled-payments/:id', async function () {
             'fee-percentage': '0',
             salt: '54lt',
             'pay-at': '2021-01-01T00:00:00.000Z',
-            'sp-hash': '0x123',
+            'sp-hash': scheduledPayment.spHash,
             'chain-id': 1,
             'user-address': stubUserAddress,
             'creation-transaction-hash': '0x123',
@@ -770,7 +796,7 @@ describe('PATCH /api/scheduled-payments/:id', async function () {
         feePercentage: 0,
         salt: '54lt',
         payAt: '2021-01-01T00:00:00.000Z',
-        spHash: '0x123',
+        spHash: cryptoRandomString({ length: 10 }),
         chainId: 1,
         userAddress: stubUserAddress,
         creationTransactionHash: null,
@@ -807,7 +833,7 @@ describe('PATCH /api/scheduled-payments/:id', async function () {
             'fee-percentage': '0',
             salt: '54lt',
             'pay-at': '2021-01-01T00:00:00.000Z',
-            'sp-hash': '0x123',
+            'sp-hash': scheduledPayment.spHash,
             'chain-id': 1,
             'user-address': stubUserAddress,
             'creation-transaction-hash': null,
@@ -874,7 +900,7 @@ describe('DELETE /api/scheduled-payments/:id', async function () {
         feePercentage: 0,
         salt: '54lt',
         payAt: '2021-01-01T00:00:00.000Z',
-        spHash: '0x123',
+        spHash: cryptoRandomString({ length: 10 }),
         chainId: 1,
         userAddress: stubUserAddress,
         creationTransactionHash: null,
