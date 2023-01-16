@@ -35,6 +35,17 @@
     {
       "type": "node",
       "request": "launch",
+      "name": "Hub: Run worker",
+      "cwd": "${workspaceRoot}/packages/hub",
+      "console": "integratedTerminal",
+      "args": ["--no-deprecation", "--experimental-repl-await", "./dist/hub.js", "worker"],
+      "env": {
+        "REWARDS_INDEXER_ENABLED": "true"
+      }
+    },
+    {
+      "type": "node",
+      "request": "launch",
       "name": "Hub: Hub Node tests",
       "program": "${workspaceRoot}/node_modules/.bin/_mocha",
       "cwd": "${workspaceRoot}/packages/hub",
