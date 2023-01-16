@@ -10,9 +10,10 @@ import { taskFor } from 'ember-concurrency-ts';
 import { BigNumber } from 'ethers';
 
 type NamedArgs = {
-  tokenAddress: string;
-  tokenAmount: BigNumber;
-  tokenDecimals: number;
+  tokenAddress?: string;
+  tokenAmount?: BigNumber;
+  tokenDecimals?: number;
+  tokenQuantity?: TokenQuantity;
 };
 
 interface Signature {
@@ -29,15 +30,30 @@ export default class TokenToUsdHelper extends Helper<Signature> {
   updateInterval: ReturnType<typeof setInterval> | undefined;
   tokenAddress: ChainAddress | undefined;
 
-  compute(_positional: never[], named: NamedArgs): string {
-    this.ensureTimer(named.tokenAddress);
+  compute(_positional: never, named: NamedArgs): string {
+    let tokenAddress: ChainAddress,
+      tokenAmount: BigNumber,
+      tokenDecimals: number;
+    const tokenQuantity = named.tokenQuantity;
+    if (tokenQuantity) {
+      tokenAddress = tokenQuantity.address;
+      tokenAmount = tokenQuantity.count;
+      tokenDecimals = tokenQuantity.decimals;
+    } else {
+      named = named as NamedArgs;
+      tokenAddress = named.tokenAddress as string;
+      tokenAmount = named.tokenAmount as BigNumber;
+      tokenDecimals = named.tokenDecimals as number;
+    }
+
+    this.ensureTimer(tokenAddress);
     const usdcAmount = this.computeUsdcAmount(
-      named.tokenAddress,
-      named.tokenAmount,
-      named.tokenDecimals
+      tokenAddress,
+      tokenAmount,
+      tokenDecimals
     );
     if (usdcAmount) {
-      return `$ ${nativeUnitsToDecimal([usdcAmount, named.tokenDecimals])} USD`;
+      return `$ ${nativeUnitsToDecimal([usdcAmount, tokenDecimals, 2])}`;
     }
     return 'Converting to USD...';
   }
