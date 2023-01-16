@@ -129,20 +129,20 @@ describe('ScheduledPaymentValidator', function () {
     };
 
     let errors = await subject.validate(scheduledPayment);
-    expect(errors.feePercentage).deep.equal(['fee percentage must be between 0 and 1']);
+    expect(errors.feePercentage).deep.equal(['fee percentage must be between 0 and 100']);
   });
 
-  it('validates scheduled payment with fee percentage greater than 1', async function () {
+  it('validates scheduled payment with fee percentage greater than 100', async function () {
     let subject = await getContainer().lookup('scheduled-payment-validator');
 
     const scheduledPayment: Partial<ScheduledPayment> = {
       chainId: 1, //Mainnet
       feeFixedUsd: new Decimal(0.25),
-      feePercentage: new Decimal(2),
+      feePercentage: new Decimal(101),
     };
 
     let errors = await subject.validate(scheduledPayment);
-    expect(errors.feePercentage).deep.equal(['fee percentage must be between 0 and 1']);
+    expect(errors.feePercentage).deep.equal(['fee percentage must be between 0 and 100']);
   });
 
   it('validates scheduled payment with invalid gas token', async function () {
