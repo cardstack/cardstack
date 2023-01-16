@@ -258,12 +258,7 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
     if (!this.selectedGasToken) {
       return undefined;
     }
-    let gasTokenToUsdcRate = this.tokenToUsdService.toUsdc(new TokenQuantity(this.selectedGasToken, BigNumber.from(1)));
-    if (gasTokenToUsdcRate) {
-      return FixedNumber.from(1).divUnsafe(FixedNumber.from(gasTokenToUsdcRate.toString()));
-    } else {
-      return undefined;
-    }
+    return this.tokenToUsdService.getUsdcToTokenRate(this.selectedGasToken);
   }
 
   get fees() {

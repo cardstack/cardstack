@@ -14,6 +14,8 @@ import { task } from 'ember-concurrency';
 import { BigNumber, FixedNumber } from 'ethers';
 import { TrackedMap } from 'tracked-built-ins';
 
+import { SelectableToken } from '../../../boxel/addon/components/boxel/input/selectable-token';
+
 const INTERVAL = config.environment === 'test' ? 3000 : 60 * 3000;
 
 export default class TokenToUsdService extends Service {
@@ -23,7 +25,6 @@ export default class TokenToUsdService extends Service {
   >();
   ratesLastUpdate: Record<ChainAddress, Date> = {};
   @service declare wallet: WalletService;
-  @service declare tokens: TokensService;
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   @task({ maxConcurrency: 1, enqueue: true }) *updateUsdcRate(
@@ -49,6 +50,19 @@ export default class TokenToUsdService extends Service {
       return undefined;
     }
     return applyRateToAmount(rate, tokenQuantity.count);
+  }
+
+  getTokenToUsdcRate(token: SelectableToken): FixedNumber | undefined {
+    return this.usdcTokenRates.get(token.address);
+  }
+
+  getUsdcToTokenRate(token: SelectableToken): FixedNumber | undefined {
+    const gasTokenToUsdcRate = this.usdcTokenRates.get(token.address);
+    if (gasTokenToUsdcRate) {
+      return FixedNumber.from(1).divUnsafe(gasTokenToUsdcRate);
+    } else {
+      return undefined;
+    }
   }
 }
 

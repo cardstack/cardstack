@@ -1,5 +1,4 @@
 import {
-  applyRateToAmount,
   ChainAddress,
   GasEstimationScenario,
   TokenDetail,
@@ -8,8 +7,8 @@ import {
   ConfiguredScheduledPaymentFees,
   GasEstimationResult,
 } from '@cardstack/safe-tools-client/services/scheduled-payment-sdk';
+import TokenToUsdService from '@cardstack/safe-tools-client/services/token-to-usd';
 import TokensService from '@cardstack/safe-tools-client/services/tokens';
-import TokenQuantity from '@cardstack/safe-tools-client/utils/token-quantity';
 import Service from '@ember/service';
 import {
   click,
@@ -20,7 +19,6 @@ import {
   settled,
   waitUntil,
 } from '@ember/test-helpers';
-import { tracked } from '@glimmer/tracking';
 import { format, subDays, addMonths, addHours, subHours } from 'date-fns';
 import { task } from 'ember-concurrency-decorators';
 import { selectChoose } from 'ember-power-select/test-support';
@@ -28,7 +26,6 @@ import { BigNumber, FixedNumber } from 'ethers';
 
 import hbs from 'htmlbars-inline-precompile';
 import { module, test } from 'qunit';
-import { TrackedMap } from 'tracked-built-ins';
 
 import { setupRenderingTest } from '../helpers';
 
@@ -75,31 +72,13 @@ class ScheduledPaymentSDKServiceStub extends Service {
   }
 }
 
-let returnEmptyUsdConverter = false;
-
-class TokenToUsdServiceStub extends Service {
-  @tracked usdcTokenRates = new TrackedMap<
-    ChainAddress, // token address
-    FixedNumber // token to usd rate
-  >();
-
+class TokenToUsdServiceStub extends TokenToUsdService {
   // eslint-disable-next-line require-yield
   @task({ maxConcurrency: 1, enqueue: true }) *updateUsdcRate(
     tokenAddress: ChainAddress
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ): any {
     this.usdcTokenRates.set(tokenAddress, FixedNumber.from(1));
-  }
-
-  toUsdc(tokenQuantity: TokenQuantity): BigNumber | undefined {
-    if (returnEmptyUsdConverter) {
-      return undefined;
-    }
-    const rate = this.usdcTokenRates.get(tokenQuantity.address);
-    if (!rate) {
-      return undefined;
-    }
-    return applyRateToAmount(rate, tokenQuantity.count);
   }
 }
 
@@ -118,10 +97,6 @@ module(
       tokensService.stubGasTokens(exampleGasTokens);
       this.owner.register('service:token-to-usd', TokenToUsdServiceStub);
       this.owner.register('service:wallet', WalletServiceStub);
-    });
-
-    hooks.afterEach(function () {
-      returnEmptyUsdConverter = false;
     });
 
     test('it initializes the transaction token to undefined', async function (assert) {
