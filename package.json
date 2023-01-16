@@ -58,7 +58,7 @@
     "lint:ssr-web": "yarn --cwd packages/ssr-web lint",
     "lint:web-client": "yarn --cwd packages/web-client lint",
     "lint:safe-tools-client": "yarn --cwd packages/safe-tools-client lint",
-    "lint:deps": "node scripts/find-bad-deps.js",
+    "lint:deps": "node scripts/find-bad-deps.cjs",
     "lint:js": "eslint . --cache --ignore-path .gitignore --ext=js,ts",
     "lint:js:pkg": "sh -c 'eslint packages/${0} --cache --ignore-path .gitignore --ext=js,ts'",
     "lint:typecheck": "./scripts/typecheck-all.sh",
