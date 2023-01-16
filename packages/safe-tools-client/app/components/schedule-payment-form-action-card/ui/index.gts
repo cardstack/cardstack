@@ -27,43 +27,48 @@ import cssVar from '@cardstack/boxel/helpers/css-var';
 import { type WalletProviderId } from '@cardstack/safe-tools-client/utils/wallet-providers';
 import { ConfiguredScheduledPaymentFees } from '@cardstack/safe-tools-client/services/scheduled-payment-sdk';
 import formatUsd from '@cardstack/safe-tools-client/helpers/format-usd';
+import { type CurrentFees } from '../fee-calculator';
+import TokenQuantity from '@cardstack/safe-tools-client/utils/token-quantity';
+import tokenQuantityToUsd from '@cardstack/safe-tools-client/helpers/token-quantity-to-usd';
 
 interface Signature {
   Element: HTMLElement;
   Args: ValidatableForm & {
-    paymentTypeOptions: { id: string, text: string }[];
-    onSelectPaymentType: (paymentTypeId: string) => void;
+    configuredFees: ConfiguredScheduledPaymentFees | undefined;
+    currentFees: CurrentFees | undefined;
+    gasTokenErrorMessage: string;
+    gasTokens: SelectableToken[];
+    isGasTokenInvalid: boolean;
+    isMaxGasPriceInvalid: boolean;
+    isPayeeAddressInvalid: boolean;
+    isPaymentAmountInvalid: boolean;
     isPaymentTypeInvalid: boolean;
-    paymentTypeErrorMessage: string;
+    isSuccessfullyScheduled: boolean;
+    isValid: boolean;
+    maxGasDescriptions?: Record<MaxGasFeeOption, string>;
+    maxGasPriceErrorMessage: string;
+    networkSymbol: SchedulerCapableNetworks;
+    onReset: () => void;
+    onSchedulePayment: () => void;
+    onSelectGasToken: (val: SelectableToken) => void;
+    onSelectPaymentDayOfMonth: (val: number) => void;
+    onSelectPaymentType: (paymentTypeId: string) => void;
+    onSetMonthlyUntil: (date: Date) => void;
     onSetPaymentDate: (day: Day) => void;
     onSetPaymentTime: (time: Time) => void;
-    onSelectPaymentDayOfMonth: (val: number) => void;
-    onSetMonthlyUntil: (date: Date) => void;
-    isPayeeAddressInvalid: boolean;
-    payeeAddressErrorMessage: string;
+    onUpdateMaxGasPrice: (val: string) => void;
+    onUpdatePayeeAddress: (val: string) => void;
     onUpdatePaymentAmount: (val: string) => void;
-    isPaymentAmountInvalid: boolean;
+    onUpdatePaymentToken: (val: SelectableToken) => void;
+    payeeAddressErrorMessage: string;
     paymentAmountErrorMessage: string;
     paymentTokens: SelectableToken[];
-    onUpdatePaymentToken: (val: SelectableToken) => void;
-    gasTokens: SelectableToken[];
-    onSelectGasToken: (val: SelectableToken) => void;
-    maxGasDescriptions?: Record<MaxGasFeeOption, string>;
-    isGasTokenInvalid: boolean;
-    gasTokenErrorMessage: string;
-    onUpdateMaxGasPrice: (val: string) => void;
-    isMaxGasPriceInvalid: boolean;
-    maxGasPriceErrorMessage: string;
-    configuredFees: ConfiguredScheduledPaymentFees | undefined;
-    onSchedulePayment: () => void;
-    onUpdatePayeeAddress: (val: string) => void;
-    onReset: () => void;
-    isSubmitEnabled: boolean;
+    paymentAmountTokenQuantity: TokenQuantity | undefined;
+    paymentTypeErrorMessage: string;
+    paymentTypeOptions: { id: string, text: string }[];
     schedulingStatus: string | undefined;
-    networkSymbol: SchedulerCapableNetworks;
-    walletProviderId: WalletProviderId | undefined;
     txHash: TransactionHash | undefined;
-    isSuccessfullyScheduled: boolean;
+    walletProviderId: WalletProviderId | undefined;
   }
 }
 
@@ -294,52 +299,79 @@ export default class SchedulePaymentFormActionCardUI extends Component<Signature
             {{/if}}
           </div>
         </BoxelField>
+        {{#if @isValid}}
+          <BoxelField @label="Execution Plan" style={{cssVar boxel-field-label-align="top"}}>
+            <div>
+              <BoxelField @label="Recipient Will Receive" data-test-summary-recipient-receives @vertical={{true}} style={{cssVar boxel-field-label-justify-content="end"}}>
+                <div class="schedule-payment-form-action-card--fees-value">
+                  {{#if @paymentAmountTokenQuantity}}
+                    {{@paymentAmountTokenQuantity.displayable}}
+                  {{/if}}
+                </div>
+              </BoxelField>
+              <BoxelField @label="Fixed Fee" data-test-summary-fixed-fee @vertical={{true}} style={{cssVar boxel-field-label-justify-content="end"}}>
+                <div class="schedule-payment-form-action-card--fees-value">
+                  {{#if @currentFees.fixedFee}}
+                    {{@currentFees.fixedFee.displayable}}
+                  {{/if}}
+                </div>
+              </BoxelField>
+              <BoxelField @label="Variable Fee" data-test-summary-variable-fee @vertical={{true}} style={{cssVar boxel-field-label-justify-content="end"}}>
+                <div class="schedule-payment-form-action-card--fees-value">
+                  {{#if @currentFees.variableFee}}
+                    {{@currentFees.variableFee.displayable}}
+                  {{/if}}
+                </div>
+              </BoxelField>
+            </div>
+          </BoxelField>
+        {{/if}}
       </Section>
-        <ActionChin @state={{this.actionChinState}}>
-          <:default as |ac|>
-            <ac.ActionButton
-              @disabled={{not @isSubmitEnabled}}
-              data-test-schedule-payment-form-submit-button
-              {{on 'click' @onSchedulePayment}}
-            >
-              Schedule Payment
-            </ac.ActionButton>
-          </:default>
-          <:inProgress as |ac|>
-            <ac.ActionStatusArea @icon={{concat @walletProviderId "-logo" }} style={{cssVar status-icon-size="2.5rem"}}>
-              <BoxelLoadingIndicator
-                class="schedule-payment-form-action-card__loading-indicator"
-                @color="var(--boxel-light)"
-              />
-              <div class="schedule-payment-form-action-card__in-progress-message" data-test-in-progress-message>
-                {{@schedulingStatus}}
-              </div>
-            </ac.ActionStatusArea>
-            {{#if @txHash}}
-              <ac.InfoArea>
-                <BlockExplorerButton
-                  @networkSymbol={{@networkSymbol}}
-                  @transactionHash={{@txHash}}
-                  @kind="secondary-dark"
-                />
-              </ac.InfoArea>
-            {{/if}}
-          </:inProgress>
-          <:memorialized as |ac|>
-            <ac.ActionStatusArea data-test-memorialized-status>
-              Payment was successfully scheduled
-            </ac.ActionStatusArea>
+      <ActionChin @state={{this.actionChinState}}>
+        <:default as |ac|>
+          <ac.ActionButton
+            @disabled={{not @isValid}}
+            data-test-schedule-payment-form-submit-button
+            {{on 'click' @onSchedulePayment}}
+          >
+            Schedule Payment
+          </ac.ActionButton>
+        </:default>
+        <:inProgress as |ac|>
+          <ac.ActionStatusArea @icon={{concat @walletProviderId "-logo" }} style={{cssVar status-icon-size="2.5rem"}}>
+            <BoxelLoadingIndicator
+              class="schedule-payment-form-action-card__loading-indicator"
+              @color="var(--boxel-light)"
+            />
+            <div class="schedule-payment-form-action-card__in-progress-message" data-test-in-progress-message>
+              {{@schedulingStatus}}
+            </div>
+          </ac.ActionStatusArea>
+          {{#if @txHash}}
             <ac.InfoArea>
-              <BoxelButton
-                @kind="secondary-light"
-                data-test-schedule-payment-form-reset-button
-                {{on 'click' @onReset}}
-              >
-                Schedule Another
-              </BoxelButton>
+              <BlockExplorerButton
+                @networkSymbol={{@networkSymbol}}
+                @transactionHash={{@txHash}}
+                @kind="secondary-dark"
+              />
             </ac.InfoArea>
-          </:memorialized>
-        </ActionChin>
+          {{/if}}
+        </:inProgress>
+        <:memorialized as |ac|>
+          <ac.ActionStatusArea data-test-memorialized-status>
+            Payment was successfully scheduled
+          </ac.ActionStatusArea>
+          <ac.InfoArea>
+            <BoxelButton
+              @kind="secondary-light"
+              data-test-schedule-payment-form-reset-button
+              {{on 'click' @onReset}}
+            >
+              Schedule Another
+            </BoxelButton>
+          </ac.InfoArea>
+        </:memorialized>
+      </ActionChin>
     </BoxelActionContainer>
   </template>
 }

@@ -80,3 +80,8 @@
 .schedule-payment-form-action-card__recurring-explanation svg {
   margin-right: var(--boxel-sp-xxxs);
 }
+
+.schedule-payment-form-action-card--fees-value {
+  text-align: right;
+  font-weight: bold;
+}
