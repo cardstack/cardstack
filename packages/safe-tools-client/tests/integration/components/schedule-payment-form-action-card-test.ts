@@ -399,13 +399,18 @@ module(
       assert
         .dom('[data-test-summary-recipient-receives]')
         .containsText('15.0 WETH');
-      assert.dom('[data-test-summary-variable-fee]').containsText('0.015 WETH');
+      assert
+        .dom('[data-test-summary-recipient-receives]')
+        .containsText('$ 15.00');
       await waitUntil(() => {
         return find('[data-test-summary-fixed-fee]')?.textContent?.includes(
           '0.25 USDC'
         );
       });
       assert.dom('[data-test-summary-fixed-fee]').containsText('0.25 USDC');
+      assert.dom('[data-test-summary-fixed-fee]').containsText('$ 0.25');
+      assert.dom('[data-test-summary-variable-fee]').containsText('0.015 WETH');
+      assert.dom('[data-test-summary-variable-fee]').containsText('$ 0.01');
     });
 
     // TODO: assert state for no network selected/connected

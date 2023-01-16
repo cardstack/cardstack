@@ -119,3 +119,8 @@
   text-align: right;
   font-weight: bold;
 }
+
+.schedule-payment-form-action-card__fee-usd-estimate {
+  font-weight: normal;
+  font-size: var(--boxel-font-size-sm);
+}
