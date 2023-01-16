@@ -1,42 +1,27 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
-import { applyRateToAmount, ChainAddress } from '@cardstack/cardpay-sdk';
-import TokenQuantity from '@cardstack/safe-tools-client/utils/token-quantity';
-import Service from '@ember/service';
+import { ChainAddress } from '@cardstack/cardpay-sdk';
+import TokenToUsdService from '@cardstack/safe-tools-client/services/token-to-usd';
 import { render, TestContext, waitUntil } from '@ember/test-helpers';
-import { tracked } from '@glimmer/tracking';
 import { addMilliseconds } from 'date-fns';
 import { task } from 'ember-concurrency';
 import { setupRenderingTest } from 'ember-qunit';
-import { BigNumber, FixedNumber } from 'ethers';
+import { FixedNumber } from 'ethers';
 import hbs from 'htmlbars-inline-precompile';
 import { module, test } from 'qunit';
-import { TrackedMap } from 'tracked-built-ins';
 
-let returnEmptyUsdConverter = false;
+let returnUndefinedConversionRate = false;
 
-class TokenToUsdServiceStub extends Service {
-  @tracked usdcTokenRates = new TrackedMap<
-    ChainAddress, // token address
-    FixedNumber // token to usd rate
-  >();
-
+class TokenToUsdServiceStub extends TokenToUsdService {
   // eslint-disable-next-line require-yield
   @task({ maxConcurrency: 1, enqueue: true }) *updateUsdcRate(
     tokenAddress: ChainAddress
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ): any {
-    this.usdcTokenRates.set(tokenAddress, FixedNumber.from(1000));
-  }
-
-  toUsdc(tokenQuantity: TokenQuantity): BigNumber | undefined {
-    if (returnEmptyUsdConverter) {
-      return undefined;
+    if (returnUndefinedConversionRate) {
+      this.usdcTokenRates.delete(tokenAddress);
+    } else {
+      this.usdcTokenRates.set(tokenAddress, FixedNumber.from(1000));
     }
-    const rate = this.usdcTokenRates.get(tokenQuantity.address);
-    if (!rate) {
-      return undefined;
-    }
-    return applyRateToAmount(rate, tokenQuantity.count);
   }
 }
 
@@ -48,7 +33,7 @@ module('Integration | Component | token-to-usd', function (hooks) {
   });
 
   hooks.afterEach(function () {
-    returnEmptyUsdConverter = false;
+    returnUndefinedConversionRate = false;
   });
 
   test('It converts token amount to usd', async function (assert) {
@@ -69,7 +54,7 @@ module('Integration | Component | token-to-usd', function (hooks) {
   });
 
   test('It returns blank string if usd converter is undefined', async function (assert) {
-    returnEmptyUsdConverter = true;
+    returnUndefinedConversionRate = true;
     await render(hbs`
       <TokenToUsd @tokenAddress='0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48' @tokenAmount='2000000000000000000' @tokenDecimals=18 />
     `);
