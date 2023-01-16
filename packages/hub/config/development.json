@@ -23,8 +23,5 @@
   },
   "db": {
     "prismaLog": ["query", "info", "warn", "error"]
-  },
-  "rewardsIndexer": {
-    "enabled": true
   }
 }
