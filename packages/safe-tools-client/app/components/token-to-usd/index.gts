@@ -4,7 +4,7 @@ import { BigNumber } from 'ethers';
 import TokenToUsdService from '@cardstack/safe-tools-client/services/token-to-usd';
 import config from '@cardstack/safe-tools-client/config/environment';
 import { taskFor } from 'ember-concurrency-ts';
-import weiToDecimal from '@cardstack/safe-tools-client/helpers/wei-to-decimal';
+import nativeUnitsToDecimal from '@cardstack/safe-tools-client/helpers/native-units-to-decimal';
 
 type Args = {
   tokenAddress: string;
@@ -40,7 +40,7 @@ export default class TokenToUsd extends Component<Signature> {
 
   <template>
     {{#if this.usdAmount}}
-      $ {{(weiToDecimal this.usdAmount @tokenDecimals)}} USD
+      $ {{(nativeUnitsToDecimal this.usdAmount @tokenDecimals)}} USD
     {{else}}
       Converting to USD...
     {{/if}}
