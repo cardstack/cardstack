@@ -2,7 +2,9 @@ import { SelectableToken } from '@cardstack/boxel/components/boxel/input/selecta
 import { countDecimalPlaces } from '@cardstack/cardpay-sdk';
 import { ConfiguredScheduledPaymentFees } from '@cardstack/safe-tools-client/services/scheduled-payment-sdk';
 import TokenQuantity from '@cardstack/safe-tools-client/utils/token-quantity';
-import { BigNumber } from 'ethers';
+import { BigNumber, FixedNumber } from 'ethers';
+
+const USDC_DECIMALS = 6;
 
 export interface CurrentFees {
   fixedFeeInUSD: number | undefined;
@@ -16,7 +18,7 @@ export default class FeeCalculator {
     private configuredFees: ConfiguredScheduledPaymentFees,
     private paymentTokenQuantity: TokenQuantity,
     private gasToken: SelectableToken,
-    private usdToGasTokenRate: BigNumber
+    private usdcToGasTokenRate: FixedNumber | undefined
   ) {}
 
   calculateFee(): CurrentFees {
@@ -31,14 +33,19 @@ export default class FeeCalculator {
 
   private calculateFixedFee() {
     const fixedFeeUSDNum = this.configuredFees.fixedUSD;
+    const { usdcToGasTokenRate } = this;
     let amount: BigNumber;
-    if (fixedFeeUSDNum) {
-      const dp = countDecimalPlaces(fixedFeeUSDNum);
-      const numerator = fixedFeeUSDNum * 10 ** dp;
-      const denominator = 10 ** dp;
-      amount = BigNumber.from(this.usdToGasTokenRate)
-        .mul(numerator)
-        .div(denominator);
+    if (fixedFeeUSDNum && usdcToGasTokenRate) {
+      const fixedFeeUSDCFixedNum = FixedNumber.from(
+        fixedFeeUSDNum.toString()
+      ).mulUnsafe(FixedNumber.from(10 ** USDC_DECIMALS));
+      amount = BigNumber.from(
+        usdcToGasTokenRate
+          .mulUnsafe(fixedFeeUSDCFixedNum)
+          .round(0)
+          .toString()
+          .split('.')[0]
+      );
     } else {
       amount = BigNumber.from(0);
     }
@@ -47,23 +54,13 @@ export default class FeeCalculator {
 
   private calculateVariableFee() {
     const { configuredFees, paymentTokenQuantity } = this;
-    console.log(
-      `calculateVariableFee(${configuredFees}, ${paymentTokenQuantity})`
-    );
     const variableFeeRate = (configuredFees.percentage || 0) / 100;
-    console.log(`variableFeeRate = ${variableFeeRate}`);
-    const variableFeeInPaymentTokenFloat = Math.round(
-      paymentTokenQuantity.count.toNumber() * variableFeeRate
-    );
-    console.log(
-      `variableFeeInPaymentTokenFloat = ${variableFeeInPaymentTokenFloat}`
-    );
-    const variableFeeInPaymentTokenBigNumber = BigNumber.from(
-      variableFeeInPaymentTokenFloat
-    );
-    console.log(
-      `variableFeeInPaymentTokenBigNumber = ${variableFeeInPaymentTokenBigNumber}`
-    );
+    const variableFeeRateDecimals = countDecimalPlaces(variableFeeRate);
+    const numerator = variableFeeRate * 10 ** variableFeeRateDecimals;
+    const denominator = 10 ** variableFeeRateDecimals;
+    const variableFeeInPaymentTokenBigNumber = paymentTokenQuantity.count
+      .mul(numerator)
+      .div(denominator);
     return new TokenQuantity(
       paymentTokenQuantity.token,
       configuredFees.percentage

@@ -114,3 +114,8 @@
   font-weight: 600;
   color: var(--boxel-yellow);
 }
+
+.schedule-payment-form-action-card__fees-value {
+  text-align: right;
+  font-weight: bold;
+}

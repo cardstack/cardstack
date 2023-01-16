@@ -1,20 +1,35 @@
-import { TokenDetail } from '@cardstack/cardpay-sdk';
-import { ConfiguredScheduledPaymentFees } from '@cardstack/safe-tools-client/services/scheduled-payment-sdk';
+import {
+  applyRateToAmount,
+  ChainAddress,
+  GasEstimationScenario,
+  TokenDetail,
+} from '@cardstack/cardpay-sdk';
+import {
+  ConfiguredScheduledPaymentFees,
+  GasEstimationResult,
+} from '@cardstack/safe-tools-client/services/scheduled-payment-sdk';
 import TokensService from '@cardstack/safe-tools-client/services/tokens';
 import WalletService from '@cardstack/safe-tools-client/services/wallet';
+import TokenQuantity from '@cardstack/safe-tools-client/utils/token-quantity';
 import Service from '@ember/service';
 import {
   click,
   fillIn,
+  find,
   render,
   TestContext,
   settled,
+  waitUntil,
 } from '@ember/test-helpers';
+import { tracked } from '@glimmer/tracking';
 import { format, subDays, addMonths, addHours, subHours } from 'date-fns';
+import { task } from 'ember-concurrency-decorators';
 import { selectChoose } from 'ember-power-select/test-support';
+import { BigNumber, FixedNumber } from 'ethers';
 
 import hbs from 'htmlbars-inline-precompile';
 import { module, test } from 'qunit';
+import { TrackedMap } from 'tracked-built-ins';
 
 import { setupRenderingTest } from '../helpers';
 
@@ -23,6 +38,7 @@ import {
   chooseTime,
   chooseTomorrow,
   EXAMPLE_PAYEE,
+  fillInSchedulePaymentFormWithValidInfo,
 } from '../support/ui-test-helpers';
 
 class ConnectedWalletServiceStub extends WalletService {
@@ -42,6 +58,49 @@ class ScheduledPaymentSDKServiceStub extends Service {
       percentage: 0.1,
     };
   }
+
+  async getScheduledPaymentGasEstimation(
+    _scenario: GasEstimationScenario,
+    _tokenAddress: ChainAddress,
+    _gasTokenAddress: ChainAddress
+  ): Promise<GasEstimationResult> {
+    return {
+      gas: BigNumber.from(127864),
+      gasRangeInGasTokenWei: {
+        normal: BigNumber.from('20000000000000000000'),
+        high: BigNumber.from('40000000000000000000'),
+        max: BigNumber.from('80000000000000000000'),
+      },
+      gasRangeInUSD: {
+        normal: BigNumber.from('20000000000000000000'),
+        high: BigNumber.from('40000000000000000000'),
+        max: BigNumber.from('80000000000000000000'),
+      },
+    };
+  }
+}
+
+class TokenToUsdServiceStub extends Service {
+  @tracked usdcTokenRates = new TrackedMap<
+    ChainAddress, // token address
+    FixedNumber // token to usd rate
+  >();
+
+  // eslint-disable-next-line require-yield
+  @task({ maxConcurrency: 1, enqueue: true }) *updateUsdcRate(
+    tokenAddress: ChainAddress
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  ): any {
+    this.usdcTokenRates.set(tokenAddress, FixedNumber.from(1));
+  }
+
+  toUsdc(tokenQuantity: TokenQuantity): BigNumber | undefined {
+    const rate = this.usdcTokenRates.get(tokenQuantity.address);
+    if (!rate) {
+      return undefined;
+    }
+    return applyRateToAmount(rate, tokenQuantity.count);
+  }
 }
 
 let tokensService: TokensService;
@@ -58,6 +117,7 @@ module(
         );
         tokensService = this.owner.lookup('service:tokens');
         tokensService.stubGasTokens(exampleGasTokens);
+        this.owner.register('service:token-to-usd', TokenToUsdServiceStub);
         this.owner.register('service:wallet', ConnectedWalletServiceStub);
       });
 
@@ -65,6 +125,7 @@ module(
         await render(hbs`
           <SchedulePaymentFormActionCard />
         `);
+
         assert
           .dom(
             '.boxel-input-selectable-token-amount [data-test-boxel-input-group-select-accessory-trigger]'
@@ -342,6 +403,25 @@ module(
           .dom('.schedule-payment-form-action-card input')
           .hasAttribute('disabled');
       });
+    });
+
+    test('calculated fees are shown under at the bottom of the form once valid', async function (assert) {
+      await render(hbs`
+        <SchedulePaymentFormActionCard />
+      `);
+      await fillInSchedulePaymentFormWithValidInfo({
+        paymentTokenName: 'WETH',
+      });
+      assert
+        .dom('[data-test-summary-recipient-receives]')
+        .containsText('15.0 WETH');
+      assert.dom('[data-test-summary-variable-fee]').containsText('0.015 WETH');
+      await waitUntil(() => {
+        return find('[data-test-summary-fixed-fee]')?.textContent?.includes(
+          '0.25 USDC'
+        );
+      });
+      assert.dom('[data-test-summary-fixed-fee]').containsText('0.25 USDC');
     });
 
     // TODO: assert state for no network selected/connected
