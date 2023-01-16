@@ -1,4 +1,5 @@
 /node_modules
+/scripts/node_modules
 /packages/*/node_modules
 /packages/ember-shared/*/node_modules
 /packages/*/dist

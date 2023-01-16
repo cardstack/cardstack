@@ -1,6 +1,6 @@
-const HCL = require('js-hcl-parser');
-const fs = require('fs');
-const { execSync } = require('child_process');
+import HCL from 'js-hcl-parser';
+import fs from 'fs';
+import { execSync } from 'child_process';
 
 interface RelevantWaypointConfig {
   executionRoleName: string;
