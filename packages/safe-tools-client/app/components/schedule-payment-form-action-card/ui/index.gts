@@ -27,6 +27,7 @@ import cssVar from '@cardstack/boxel/helpers/css-var';
 import { type WalletProviderId } from '@cardstack/safe-tools-client/utils/wallet-providers';
 import { ConfiguredScheduledPaymentFees } from '@cardstack/safe-tools-client/services/scheduled-payment-sdk';
 import formatUsd from '@cardstack/safe-tools-client/helpers/format-usd';
+import tokenToUsd from '@cardstack/safe-tools-client/helpers/token-to-usd';
 import { type CurrentFees } from '../fee-calculator';
 import TokenQuantity from '@cardstack/safe-tools-client/utils/token-quantity';
 
@@ -304,21 +305,24 @@ export default class SchedulePaymentFormActionCardUI extends Component<Signature
               <BoxelField @label="Recipient Will Receive" data-test-summary-recipient-receives @vertical={{true}} style={{cssVar boxel-field-label-justify-content="end"}}>
                 <div class="schedule-payment-form-action-card--fees-value">
                   {{#if @paymentAmountTokenQuantity}}
-                    {{@paymentAmountTokenQuantity.displayable}}
+                    <div>{{@paymentAmountTokenQuantity.displayable}}</div>
+                    <div class="schedule-payment-form-action-card--fee-usd-estimate">{{tokenToUsd tokenQuantity=@paymentAmountTokenQuantity}}</div>
                   {{/if}}
                 </div>
               </BoxelField>
               <BoxelField @label="Fixed Fee" data-test-summary-fixed-fee @vertical={{true}} style={{cssVar boxel-field-label-justify-content="end"}}>
                 <div class="schedule-payment-form-action-card--fees-value">
                   {{#if @currentFees.fixedFee}}
-                    {{@currentFees.fixedFee.displayable}}
+                    <div>{{@currentFees.fixedFee.displayable}}</div>
+                    <div class="schedule-payment-form-action-card--fee-usd-estimate">{{tokenToUsd tokenQuantity=@currentFees.fixedFee}}</div>
                   {{/if}}
                 </div>
               </BoxelField>
               <BoxelField @label="Variable Fee" data-test-summary-variable-fee @vertical={{true}} style={{cssVar boxel-field-label-justify-content="end"}}>
                 <div class="schedule-payment-form-action-card--fees-value">
                   {{#if @currentFees.variableFee}}
-                    {{@currentFees.variableFee.displayable}}
+                    <div>{{@currentFees.variableFee.displayable}}</div>
+                    <div class="schedule-payment-form-action-card--fee-usd-estimate">{{tokenToUsd tokenQuantity=@currentFees.variableFee}}</div>
                   {{/if}}
                 </div>
               </BoxelField>
