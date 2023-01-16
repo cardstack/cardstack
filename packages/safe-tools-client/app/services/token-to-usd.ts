@@ -4,7 +4,6 @@ import {
   getUsdcToTokenRate,
 } from '@cardstack/cardpay-sdk';
 import config from '@cardstack/safe-tools-client/config/environment';
-import TokensService from '@cardstack/safe-tools-client/services/tokens';
 import WalletService from '@cardstack/safe-tools-client/services/wallet';
 import TokenQuantity from '@cardstack/safe-tools-client/utils/token-quantity';
 import Service, { inject as service } from '@ember/service';

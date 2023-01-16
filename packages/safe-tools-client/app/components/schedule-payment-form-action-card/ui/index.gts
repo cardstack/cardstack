@@ -29,7 +29,6 @@ import { ConfiguredScheduledPaymentFees } from '@cardstack/safe-tools-client/ser
 import formatUsd from '@cardstack/safe-tools-client/helpers/format-usd';
 import { type CurrentFees } from '../fee-calculator';
 import TokenQuantity from '@cardstack/safe-tools-client/utils/token-quantity';
-import tokenQuantityToUsd from '@cardstack/safe-tools-client/helpers/token-quantity-to-usd';
 
 interface Signature {
   Element: HTMLElement;
