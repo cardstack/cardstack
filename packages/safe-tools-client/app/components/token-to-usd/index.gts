@@ -4,10 +4,12 @@ import { BigNumber } from 'ethers';
 import TokenToUsdService from '@cardstack/safe-tools-client/services/token-to-usd';
 import config from '@cardstack/safe-tools-client/config/environment';
 import { taskFor } from 'ember-concurrency-ts';
+import nativeUnitsToDecimal from '@cardstack/safe-tools-client/helpers/native-units-to-decimal';
 
 type Args = {
   tokenAddress: string;
-  tokenAmount: BigNumber
+  tokenAmount: BigNumber;
+  tokenDecimals: number;
 }
 
 interface Signature {
@@ -23,14 +25,13 @@ export default class TokenToUsd extends Component<Signature> {
 
   constructor(owner: unknown, args: Args) {
     super(owner, args);
-
     this.updateInterval = setInterval(() => {
       taskFor(this.tokenToUsdService.updateUsdConverter).perform(args.tokenAddress); 
     }, INTERVAL);
   }
   
   get usdAmount() {
-    return this.tokenToUsdService.toUsd(this.args.tokenAddress, BigNumber.from(this.args.tokenAmount))?.toString();
+    return this.tokenToUsdService.toUsd(this.args.tokenAddress, BigNumber.from(this.args.tokenAmount));
   }
 
   willDestroy() {
@@ -38,7 +39,11 @@ export default class TokenToUsd extends Component<Signature> {
   }
 
   <template>
-    {{this.usdAmount}}
+    {{#if this.usdAmount}}
+      $ {{(nativeUnitsToDecimal this.usdAmount @tokenDecimals)}} USD
+    {{else}}
+      Converting to USD...
+    {{/if}}
   </template>
 }
 
