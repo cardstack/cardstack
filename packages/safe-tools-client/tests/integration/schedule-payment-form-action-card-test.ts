@@ -1,4 +1,5 @@
 import { TokenDetail } from '@cardstack/cardpay-sdk';
+import { Safe } from '@cardstack/safe-tools-client/services/safes';
 import { ConfiguredScheduledPaymentFees } from '@cardstack/safe-tools-client/services/scheduled-payment-sdk';
 import TokensService from '@cardstack/safe-tools-client/services/tokens';
 import Service from '@ember/service';
@@ -39,6 +40,22 @@ class ScheduledPaymentSDKServiceStub extends Service {
   }
 }
 
+let returnEmptySafes = false;
+class SafeServiceStub extends Service {
+  get safes(): Safe[] | undefined {
+    let safes;
+    if (!returnEmptySafes) {
+      safes = [
+        {
+          address: '0x1A',
+          spModuleAddress: '0x1A',
+        },
+      ];
+    }
+    return safes;
+  }
+}
+
 let tokensService: TokensService;
 module(
   'Integration | Component | schedule-payment-form-action-card',
@@ -50,6 +67,7 @@ module(
         'service:scheduled-payment-sdk',
         ScheduledPaymentSDKServiceStub
       );
+      this.owner.register('service:safes', SafeServiceStub);
       tokensService = this.owner.lookup('service:tokens');
       tokensService.stubGasTokens(exampleGasTokens);
       this.owner.register('service:wallet', WalletServiceStub);
@@ -314,6 +332,23 @@ module(
       assert
         .dom('.schedule-payment-form-action-card--fee-details')
         .containsText('Cardstack charges $0.25 USD and 0.1%');
+    });
+
+    test(`it shows up the create safe instruction if get empty safes`, async function (assert) {
+      returnEmptySafes = true;
+      await render(hbs`
+        <SchedulePaymentFormActionCard />
+      `);
+
+      assert
+        .dom('.scheduled-payment-form-action-card__empty-safe-stage-icon')
+        .isVisible();
+      assert
+        .dom(
+          '.scheduled-payment-form-action-card__empty-safe-stage-description'
+        )
+        .isVisible();
+      returnEmptySafes = false;
     });
 
     // TODO: assert state for no network selected/connected

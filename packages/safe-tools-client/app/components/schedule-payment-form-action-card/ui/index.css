@@ -80,3 +80,13 @@
 .schedule-payment-form-action-card__recurring-explanation svg {
   margin-right: var(--boxel-sp-xxxs);
 }
+
+.scheduled-payment-form-action-card__empty-safe-stage-icon {
+  --icon-color: var(--boxel-cyan);
+  margin-right: var(--boxel-sp-sm);
+}
+
+.scheduled-payment-form-action-card__empty-safe-stage-description {
+  color: var(--boxel-yellow);
+  font-size: var(--boxel-font-sm);
+}
