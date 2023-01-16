@@ -120,7 +120,8 @@
     "packages": [
       "packages/*",
       "packages/ember-shared/*",
-      "packages/firebase-functions/**"
+      "packages/firebase-functions/**",
+      "scripts"
     ],
     "nohoist": [
       "**/@types/loader-utils",
@@ -131,9 +132,5 @@
   "volta": {
     "node": "14.18.3",
     "yarn": "1.22.17"
-  },
-  "devDependencies": {
-    "node-fetch": "^3.3.0",
-    "node-html-parser": "^6.1.4"
   }
 }
