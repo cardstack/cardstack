@@ -101,7 +101,9 @@ export default class ScheduledPaymentValidator {
         }
 
         let feePercentage = this.cardpay.getConstantByNetwork('scheduledPaymentFeePercentage', networkName) ?? 0;
-        if (Number(scheduledPayment.feePercentage) < feePercentage) {
+        if (Number(scheduledPayment.feePercentage) < 0 || Number(scheduledPayment.feePercentage) > 100) {
+          errors.feePercentage.push(`fee percentage must be between 0 and 100`);
+        } else if (Number(scheduledPayment.feePercentage) < feePercentage) {
           errors.feePercentage.push(`fee percentage must be greater than or equal ${feePercentage}`);
         }
 
