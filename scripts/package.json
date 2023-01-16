@@ -3,7 +3,8 @@
   "version": "0.0.0",
   "license": "MIT",
   "type": "module",
-  "devDependencies": {
+  "dependencies": {
+    "js-hcl-parser": "^1.0.1",
     "node-fetch": "^3.3.0",
     "node-html-parser": "^6.1.4"
   }
