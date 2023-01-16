@@ -5,7 +5,7 @@ import HubAuthenticationService from '@cardstack/safe-tools-client/services/hub-
 import NetworkService from '@cardstack/safe-tools-client/services/network';
 import { action } from '@ember/object';
 import Service, { inject as service } from '@ember/service';
-import { task, TaskGenerator } from 'ember-concurrency';
+import { didCancel, task, TaskGenerator } from 'ember-concurrency';
 import { taskFor } from 'ember-concurrency-ts';
 import DateService from 'ember-date-service/service/date';
 import { use, resource } from 'ember-resources';
@@ -270,8 +270,10 @@ export default class ScheduledPaymentsService extends Service {
             chainId
           );
         } catch (error) {
-          state.error = error;
-          throw error;
+          if (!didCancel(error)) {
+            state.error = error;
+            throw error;
+          }
         } finally {
           state.isLoading = false;
         }
