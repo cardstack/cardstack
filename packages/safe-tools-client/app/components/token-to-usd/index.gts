@@ -5,6 +5,8 @@ import TokenToUsdService from '@cardstack/safe-tools-client/services/token-to-us
 import config from '@cardstack/safe-tools-client/config/environment';
 import { taskFor } from 'ember-concurrency-ts';
 import nativeUnitsToDecimal from '@cardstack/safe-tools-client/helpers/native-units-to-decimal';
+import TokenQuantity from '@cardstack/safe-tools-client/utils/token-quantity';
+import { SelectableToken } from '@cardstack/boxel/components/boxel/input/selectable-token';
 
 type Args = {
   tokenAddress: string;
@@ -26,12 +28,19 @@ export default class TokenToUsd extends Component<Signature> {
   constructor(owner: unknown, args: Args) {
     super(owner, args);
     this.updateInterval = setInterval(() => {
-      taskFor(this.tokenToUsdService.updateUsdConverter).perform(args.tokenAddress); 
+      taskFor(this.tokenToUsdService.updateUsdcRate).perform(args.tokenAddress); 
     }, INTERVAL);
   }
   
-  get usdAmount() {
-    return this.tokenToUsdService.toUsd(this.args.tokenAddress, BigNumber.from(this.args.tokenAmount));
+  get usdcAmount() {
+    let token: SelectableToken = {
+      address: this.args.tokenAddress,
+      name: 'unknown',
+      symbol: 'unknown',
+      decimals: this.args.tokenDecimals
+    };
+    let tokenQuantity = new TokenQuantity(token, BigNumber.from(this.args.tokenAmount));
+    return this.tokenToUsdService.toUsdc(tokenQuantity);
   }
 
   willDestroy() {
@@ -39,8 +48,8 @@ export default class TokenToUsd extends Component<Signature> {
   }
 
   <template>
-    {{#if this.usdAmount}}
-      $ {{(nativeUnitsToDecimal this.usdAmount @tokenDecimals)}} USD
+    {{#if this.usdcAmount}}
+      $ {{(nativeUnitsToDecimal this.usdcAmount @tokenDecimals)}} USD
     {{else}}
       Converting to USD...
     {{/if}}
