@@ -32,7 +32,7 @@
   },
   "iap": {
     "google": {
-      "serviceAccount": {"__name": "HUB_GOOGLE_IAP_SERVICE_ACCOUNT", "__format": "json"}
+      "serviceAccount": { "__name": "HUB_GOOGLE_IAP_SERVICE_ACCOUNT", "__format": "json" }
     }
   },
   "mailchimp": {
@@ -84,8 +84,8 @@
     "sku": "CARD_DROP_SKU",
     "email": {
       "rateLimit": {
-        "count": {"__name": "HUB_EMAIL_CARD_DROP_RATE_LIMIT_COUNT", "__format": "number"},
-        "periodMinutes": {"__name": "HUB_EMAIL_CARD_DROP_RATE_LIMIT_PERIOD_MINUTES", "__format": "number"}
+        "count": { "__name": "HUB_EMAIL_CARD_DROP_RATE_LIMIT_COUNT", "__format": "number" },
+        "periodMinutes": { "__name": "HUB_EMAIL_CARD_DROP_RATE_LIMIT_PERIOD_MINUTES", "__format": "number" }
       }
     }
   },
@@ -120,5 +120,8 @@
     "gnosis": "GNOSIS_GAS_STATION_URL",
     "ethereum": "ETHEREUM_GAS_STATION_URL",
     "polygon": "POLYGON_GAS_STATION_URL"
+  },
+  "rewardsIndexer": {
+    "enabled": "REWARDS_INDEXER_ENABLED"
   }
 }

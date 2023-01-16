@@ -40,5 +40,8 @@
   "cardDrop": {
     "sku": "0x81225830f5bfadbe142da2e9175e9fd52b01806e636c84299bcd8d1aae7dea8b",
     "verificationUrl": "https://hub.cardstack.com/email-card-drop/verify"
+  },
+  "rewardsIndexer": {
+    "enabled": true
   }
 }

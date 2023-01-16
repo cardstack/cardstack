@@ -20,5 +20,8 @@
   },
   "webClient": {
     "url": "https://app-staging.stack.cards"
+  },
+  "rewardsIndexer": {
+    "enabled": true
   }
 }
