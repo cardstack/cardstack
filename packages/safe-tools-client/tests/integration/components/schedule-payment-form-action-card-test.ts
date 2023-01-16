@@ -28,15 +28,15 @@ import { BigNumber, FixedNumber } from 'ethers';
 import hbs from 'htmlbars-inline-precompile';
 import { module, test } from 'qunit';
 
-import { setupRenderingTest } from '../helpers';
+import { setupRenderingTest } from '../../helpers';
 
-import { exampleGasTokens } from '../support/tokens';
+import { exampleGasTokens } from '../../support/tokens';
 import {
   chooseTime,
   chooseTomorrow,
   EXAMPLE_PAYEE,
   fillInSchedulePaymentFormWithValidInfo,
-} from '../support/ui-test-helpers';
+} from '../../support/ui-test-helpers';
 
 class ConnectedWalletServiceStub extends WalletService {
   isConnected = true;

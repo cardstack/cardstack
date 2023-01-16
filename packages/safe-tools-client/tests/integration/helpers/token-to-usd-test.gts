@@ -1,12 +1,12 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 import { ChainAddress } from '@cardstack/cardpay-sdk';
+import tokenToUsd from '@cardstack/safe-tools-client/helpers/token-to-usd';
 import TokenToUsdService from '@cardstack/safe-tools-client/services/token-to-usd';
 import { render, TestContext, waitUntil } from '@ember/test-helpers';
 import { addMilliseconds } from 'date-fns';
 import { task } from 'ember-concurrency';
 import { setupRenderingTest } from 'ember-qunit';
-import { FixedNumber } from 'ethers';
-import hbs from 'htmlbars-inline-precompile';
+import { BigNumber, FixedNumber } from 'ethers';
 import { module, test } from 'qunit';
 
 let returnUndefinedConversionRate = false;
@@ -25,7 +25,7 @@ class TokenToUsdServiceStub extends TokenToUsdService {
   }
 }
 
-module('Integration | Component | token-to-usd', function (hooks) {
+module('Integration | Helper | token-to-usd', function (hooks) {
   setupRenderingTest(hooks);
 
   hooks.beforeEach(function (this: TestContext) {
@@ -37,9 +37,10 @@ module('Integration | Component | token-to-usd', function (hooks) {
   });
 
   test('It converts token amount to usd', async function (assert) {
-    await render(hbs`
-      <TokenToUsd @tokenAddress='0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48' @tokenAmount='2000000000000000000' @tokenDecimals=18 />
-    `);
+    let tokenAmount = BigNumber.from('2000000000000000000');
+    await render(<template>
+      {{tokenToUsd tokenAddress='0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48' tokenAmount=tokenAmount tokenDecimals=18 }}
+    </template>);
     await waitUntil(
       () => {
         return (
@@ -55,9 +56,10 @@ module('Integration | Component | token-to-usd', function (hooks) {
 
   test('It returns blank string if usd converter is undefined', async function (assert) {
     returnUndefinedConversionRate = true;
-    await render(hbs`
-      <TokenToUsd @tokenAddress='0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48' @tokenAmount='2000000000000000000' @tokenDecimals=18 />
-    `);
+    let tokenAmount = BigNumber.from('2000000000000000000');
+    await render(<template>
+      {{tokenToUsd tokenAddress='0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48' tokenAmount=tokenAmount tokenDecimals=18 }}
+    </template>);
     const now = new Date();
     await waitUntil(
       () => {

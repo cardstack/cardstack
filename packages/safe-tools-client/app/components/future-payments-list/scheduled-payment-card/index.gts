@@ -11,7 +11,7 @@ import truncateMiddle from '@cardstack/safe-tools-client/helpers/truncate-middle
 import nativeUnitsToDecimal from '@cardstack/safe-tools-client/helpers/native-units-to-decimal';
 import { inject as service } from '@ember/service';
 import TokensService from '@cardstack/safe-tools-client/services/tokens';
-import TokenToUsd from '@cardstack/safe-tools-client/components/token-to-usd';
+import tokenToUsd from '@cardstack/safe-tools-client/helpers/token-to-usd';
 import { on } from '@ember/modifier';
 import { action } from '@ember/object';
 import { tracked } from '@glimmer/tracking';
@@ -112,7 +112,7 @@ export default class ScheduledPaymentCard extends Component<Signature> {
           <img class="scheduled-payment-card__token-symbol" src={{this.tokenInfo.logoURI}} />
           <div class="scheduled-payment-card__token-amounts">
             <span class="scheduled-payment-card__token-amount">{{nativeUnitsToDecimal @scheduledPayment.amount this.tokenInfo.decimals}} {{this.tokenInfo.symbol}}</span>
-            <span class="scheduled-payment-card__usd-amount"><TokenToUsd @tokenAddress={{@scheduledPayment.tokenAddress}} @tokenAmount={{@scheduledPayment.amount}} @tokenDecimals={{this.tokenInfo.decimals}}/></span>
+            <span class="scheduled-payment-card__usd-amount">{{tokenToUsd tokenAddress=@scheduledPayment.tokenAddress tokenAmount=@scheduledPayment.amount tokenDecimals=this.tokenInfo.decimals }}</span>
           </div>
         </div>
       </div>

@@ -5,7 +5,7 @@ import { BigNumber } from 'ethers';
 import hbs from 'htmlbars-inline-precompile';
 import { module, test } from 'qunit';
 
-import { setupRenderingTest } from '../helpers';
+import { setupRenderingTest } from '../../helpers';
 
 module('Integration | Component | safe-info', function (hooks) {
   setupRenderingTest(hooks);
