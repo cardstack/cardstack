@@ -1,5 +1,5 @@
-const hcl = require('hcl2-parser');
-const fs = require('fs');
+import hcl from 'hcl2-parser';
+import fs from 'fs';
 
 // messy data structure produced by naive parsing from hcl2-parser library
 interface WaypointHcl {

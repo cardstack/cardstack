@@ -1,4 +1,4 @@
-import { WaypointConfig, WaypointDeployAwsEcsPlugin } from './waypoint-hcl';
+import { WaypointConfig, WaypointDeployAwsEcsPlugin } from './waypoint-hcl/index.js';
 import { IAMClient, SimulatePrincipalPolicyCommand } from '@aws-sdk/client-iam';
 import { STSClient, GetCallerIdentityCommand } from '@aws-sdk/client-sts';
 

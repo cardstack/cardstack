@@ -6,6 +6,7 @@
   "dependencies": {
     "@aws-sdk/client-iam": "^3.231.0",
     "@aws-sdk/client-sts": "^3.231.0",
+    "hcl2-parser": "^1.0.3",
     "js-hcl-parser": "^1.0.1",
     "node-fetch": "^3.3.0",
     "node-html-parser": "^6.1.4"
