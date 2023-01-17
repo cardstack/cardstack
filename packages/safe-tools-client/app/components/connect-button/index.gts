@@ -40,7 +40,7 @@ export default class ConnectButton extends Component<Signature> {
           connect-button__button--connected=(or @isConnected @isInitializing)
         }}
         {{on "click" @onConnect}}
-        data-test-connect-button
+        data-test-connect-wallet-button-modal-sidebar
       >
         {{#if @isInitializing}}
           {{!-- just show the spinner --}}
