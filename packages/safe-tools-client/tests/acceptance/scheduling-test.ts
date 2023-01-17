@@ -1,4 +1,3 @@
-import { delay } from '@cardstack/cardpay-sdk';
 import { Deferred } from '@cardstack/ember-shared';
 import SafesService, {
   TokenBalance,
@@ -12,7 +11,6 @@ import {
   visit,
   waitFor,
   waitUntil,
-  settled,
 } from '@ember/test-helpers';
 import { addDays } from 'date-fns';
 import { TransactionReceipt } from 'eth-testing/lib/json-rpc-methods-types';
