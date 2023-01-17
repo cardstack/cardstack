@@ -323,6 +323,11 @@ export default class SchedulePaymentFormActionCardUI extends Component<Signature
                     )
                   }}
                   {{svgJar
+                    'connect-arrows'
+                    width="30px"
+                    height="30px"
+                  }}
+                  {{svgJar
                     'cardstack'
                     width="30px"
                     height="30px"

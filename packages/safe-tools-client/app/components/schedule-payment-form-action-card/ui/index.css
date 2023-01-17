@@ -86,12 +86,12 @@
 }
 
 .schedule-payment-form-prerequisite-step__icons svg {
-  margin-left: var(--boxel-sp-xxxs);
+  margin-left: var(--boxel-sp-sm);
 }
 
 .schedule-payment-form-prerequisite-step__text {
   margin: auto;
-  margin-left: var(--boxel-sp-sm);
+  margin-left: var(--boxel-sp);
   font: var(--boxel-font-sm);
   text-transform: uppercase;
   font-weight: 600;
