@@ -15,10 +15,8 @@ import withTokenIcons from '../../helpers/with-token-icons';
 import SchedulePaymentFormValidator, { MaxGasFeeOption, ValidatableForm } from './validator';
 import { use, resource } from 'ember-resources';
 import { TrackedObject } from 'tracked-built-ins';
-import { fromWei } from 'web3-utils';
 import and from 'ember-truth-helpers/helpers/and';
 import not from 'ember-truth-helpers/helpers/not';
-import { convertAmountToNativeDisplay, TransactionHash } from '@cardstack/cardpay-sdk';
 import { taskFor } from 'ember-concurrency-ts';
 import { BigNumber, FixedNumber } from 'ethers';
 import { task } from 'ember-concurrency-decorators';
@@ -50,7 +48,7 @@ interface FeesState {
 export interface MaxGasDescriptionsState {
   isLoading: boolean;
   isIndeterminate: boolean;
-  value?: Record<MaxGasFeeOption, string>
+  value?: Record<MaxGasFeeOption, TokenQuantity>
   error?: Error
 }
 
@@ -317,11 +315,11 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
       try {
         state.isLoading = true;
         this.gasEstimation = await this.scheduledPaymentSdk.getScheduledPaymentGasEstimation(scenario, paymentToken.address, selectedGasToken.address);
-        const { gasRangeInGasTokenWei, gasRangeInUSD } = this.gasEstimation;
+        const { gasRangeInGasTokenWei } = this.gasEstimation;
         state.value = {
-          normal: `Less than ${fromWei(gasRangeInGasTokenWei.normal.toString(), 'ether')} ${selectedGasToken.symbol} (~${convertAmountToNativeDisplay(fromWei(gasRangeInUSD.normal.toString(), 'ether'), 'USD')})`,
-          high: `Less than ${fromWei(gasRangeInGasTokenWei.high.toString(), 'ether')} ${selectedGasToken.symbol} (~${convertAmountToNativeDisplay(fromWei(gasRangeInUSD.high.toString(), 'ether'), 'USD')})`,
-          max: `Capped at ${fromWei(gasRangeInGasTokenWei.max.toString(), 'ether')} ${selectedGasToken.symbol} (~${convertAmountToNativeDisplay(fromWei(gasRangeInUSD.max.toString(), 'ether'), 'USD')})`,
+          normal: new TokenQuantity(selectedGasToken, gasRangeInGasTokenWei.normal),
+          high: new TokenQuantity(selectedGasToken, gasRangeInGasTokenWei.high),
+          max: new TokenQuantity(selectedGasToken, gasRangeInGasTokenWei.max),
         };
       } catch (error) {
         console.error(error);
@@ -332,6 +330,17 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
     })();
     return state;
   });
+
+  get gasEstimateInGasTokenUnits(): BigNumber {
+    return this.gasEstimation?.gasRangeInGasTokenWei.normal || BigNumber.from('0');
+  }
+
+  get gasEstimateTokenQuantity(): TokenQuantity|undefined {
+    if (!this.selectedGasToken) {
+      return undefined;
+    }
+    return new TokenQuantity(this.selectedGasToken, this.gasEstimateInGasTokenUnits);
+  }
 
   @task *schedulePaymentTask() {
     let { currentSafe } = this.safes;
@@ -499,6 +508,7 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
       @maxGasPriceErrorMessage={{this.validator.maxGasPriceErrorMessage}}
       @onSchedulePayment={{perform this.schedulePaymentTask}}
       @maxGasDescriptions={{this.maxGasDescriptions}}
+      @gasEstimateTokenQuantity={{this.gasEstimateTokenQuantity}}
       @isValid={{and this.isValid (not this.maxGasDescriptions.isLoading)}}
       @schedulingStatus={{this.schedulingStatus}}
       @networkSymbol={{this.network.symbol}}

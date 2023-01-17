@@ -64,14 +64,14 @@ class ScheduledPaymentSDKServiceStub extends Service {
     return {
       gas: BigNumber.from(127864),
       gasRangeInGasTokenWei: {
-        normal: BigNumber.from('20000000000000000000'),
-        high: BigNumber.from('40000000000000000000'),
-        max: BigNumber.from('80000000000000000000'),
+        normal: BigNumber.from('20000000'),
+        high: BigNumber.from('40000000'),
+        max: BigNumber.from('80000000'),
       },
       gasRangeInUSD: {
-        normal: BigNumber.from('20000000000000000000'),
-        high: BigNumber.from('40000000000000000000'),
-        max: BigNumber.from('80000000000000000000'),
+        normal: BigNumber.from('20000000'),
+        high: BigNumber.from('40000000'),
+        max: BigNumber.from('80000000'),
       },
     };
   }

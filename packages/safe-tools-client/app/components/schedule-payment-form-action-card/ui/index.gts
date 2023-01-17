@@ -41,6 +41,7 @@ interface Signature {
   Args: ValidatableForm & {
     configuredFees: ConfiguredScheduledPaymentFees | undefined;
     currentFees: CurrentFees | undefined;
+    gasEstimateTokenQuantity: TokenQuantity | undefined;
     gasTokenErrorMessage: string;
     gasTokens: SelectableToken[];
     isGasTokenInvalid: boolean;
@@ -285,7 +286,7 @@ export default class SchedulePaymentFormActionCardUI extends Component<Signature
                 {{else if @maxGasDescriptions.error}}
                   <span class="schedule-payment-form-action-card-error">Can't estimate gas price</span>
                 {{else}}
-                  {{@maxGasDescriptions.value.normal}}
+                  Less than {{@maxGasDescriptions.value.normal.displayable}} (~{{tokenToUsd tokenQuantity=@maxGasDescriptions.value.normal}})
                 {{/if}}
               </div>
             </group.Button>
@@ -299,7 +300,7 @@ export default class SchedulePaymentFormActionCardUI extends Component<Signature
                 {{else if @maxGasDescriptions.error}}
                   <span class="schedule-payment-form-action-card-error">Can't estimate gas price</span>
                 {{else}}
-                  {{@maxGasDescriptions.value.high}}
+                  Less than {{@maxGasDescriptions.value.high.displayable}} (~{{tokenToUsd tokenQuantity=@maxGasDescriptions.value.high}})
                 {{/if}}
               </div>
             </group.Button>
@@ -313,7 +314,7 @@ export default class SchedulePaymentFormActionCardUI extends Component<Signature
                 {{else if @maxGasDescriptions.error}}
                   <span class="schedule-payment-form-action-card-error">Can't estimate gas price</span>
                 {{else}}
-                  {{@maxGasDescriptions.value.max}}
+                  Capped at {{@maxGasDescriptions.value.max.displayable}} (~{{tokenToUsd tokenQuantity=@maxGasDescriptions.value.max}})
                 {{/if}}
               </div>
             </group.Button>
@@ -340,6 +341,14 @@ export default class SchedulePaymentFormActionCardUI extends Component<Signature
                   {{#if @paymentAmountTokenQuantity}}
                     <div>{{@paymentAmountTokenQuantity.displayable}}</div>
                     <div class="schedule-payment-form-action-card__fee-usd-estimate">{{tokenToUsd tokenQuantity=@paymentAmountTokenQuantity}}</div>
+                  {{/if}}
+                </div>
+              </BoxelField>
+              <BoxelField @label="Estimated Gas" @vertical={{true}} style={{cssVar boxel-field-label-justify-content="end"}}>
+                <div class="schedule-payment-form-action-card__fees-value">
+                  {{#if @gasEstimateTokenQuantity}}
+                    {{@gasEstimateTokenQuantity.displayable}}
+                    <div class="schedule-payment-form-action-card__fee-usd-estimate">{{tokenToUsd tokenQuantity=@gasEstimateTokenQuantity}}</div>
                   {{/if}}
                 </div>
               </BoxelField>
