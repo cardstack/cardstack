@@ -6,6 +6,10 @@
   margin-top: var(--boxel-sp-sm);
 }
 
+.boxel-control-panel__item-body > *:last-child {
+  margin-bottom: var(--boxel-sp-lg);;
+}
+
 .safe-tools__dashboard-schedule {
   background-color: var(--boxel-dashboard-background-color);
 
@@ -59,6 +63,10 @@
 .safe-tools__dashboard-dropdown {
   display: inline-flex;
   align-items: center;
+}
+
+.safe-tools__dashboard-network-dropdown {
+  margin-bottom: var(--boxel-sp-lg);
 }
 
 .safe-tools__dashboard-dropdown

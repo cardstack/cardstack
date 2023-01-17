@@ -102,7 +102,7 @@ module('Acceptance | create safe', function (hooks) {
       await visit('/schedule');
       await click('.connect-button__button');
       await click('[data-test-wallet-option="metamask"]');
-      await click('[data-test-mainnet-connect-button]');
+      await click('[data-test-connect-wallet-button-modal]');
       await click('[data-test-authenticate-button]');
       await click('[data-test-create-safe-button]');
 
@@ -156,7 +156,7 @@ module('Acceptance | create safe', function (hooks) {
         await visit('/schedule');
         await click('.connect-button__button');
         await click('[data-test-wallet-option="metamask"]');
-        await click('[data-test-mainnet-connect-button]');
+        await click('[data-test-connect-wallet-button-modal]');
         await click('[data-test-authenticate-button]');
         await click('[data-test-create-safe-button]');
         await click('[data-test-provision-safe-button]');
@@ -188,7 +188,7 @@ module('Acceptance | create safe', function (hooks) {
         await visit('/schedule');
         await click('.connect-button__button');
         await click('[data-test-wallet-option="metamask"]');
-        await click('[data-test-mainnet-connect-button]');
+        await click('[data-test-connect-wallet-button-modal]');
         await click('[data-test-authenticate-button]');
         await click('[data-test-create-safe-button]');
 
@@ -217,7 +217,7 @@ module('Acceptance | create safe', function (hooks) {
         await visit('/schedule');
         await click('.connect-button__button');
         await click('[data-test-wallet-option="metamask"]');
-        await click('[data-test-mainnet-connect-button]');
+        await click('[data-test-connect-wallet-button-modal]');
         await click('[data-test-authenticate-button]');
         await click('[data-test-create-safe-button]');
 
@@ -245,7 +245,7 @@ module('Acceptance | create safe', function (hooks) {
         await visit('/schedule');
         await click('.connect-button__button');
         await click('[data-test-wallet-option="metamask"]');
-        await click('[data-test-mainnet-connect-button]');
+        await click('[data-test-connect-wallet-button-modal]');
         await click('[data-test-authenticate-button]');
         await click('[data-test-create-safe-button]');
         await click('[data-test-provision-safe-button]');
@@ -280,7 +280,7 @@ module('Acceptance | create safe', function (hooks) {
       await visit('/schedule');
       await click('.connect-button__button');
       await click('[data-test-wallet-option="metamask"]');
-      await click('[data-test-mainnet-connect-button]');
+      await click('[data-test-connect-wallet-button-modal]');
       await click('[data-test-authenticate-button]');
       await click('[data-test-create-safe-button]');
 

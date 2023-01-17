@@ -6,7 +6,7 @@ import { on } from '@ember/modifier';
 import focusTrap from 'ember-focus-trap/modifiers/focus-trap';
 import not from 'ember-truth-helpers/helpers/not';
 import WalletService from '@cardstack/safe-tools-client/services/wallet';
-
+import NetworkService from '@cardstack/safe-tools-client/services/network';
 import cssVar from '@cardstack/boxel/helpers/css-var';
 import { svgJar } from '@cardstack/boxel/utils/svg-jar';
 import BoxelActionContainer from '@cardstack/boxel/components/boxel/action-container';
@@ -30,6 +30,7 @@ interface Signature {
 
 class NetworkConnectModal extends Component<Signature> {
   @service declare wallet: WalletService;
+  @service declare network: NetworkService;
 
   @tracked chosenProviderId: string | undefined;
 
@@ -134,7 +135,7 @@ class NetworkConnectModal extends Component<Signature> {
 
           <ActionChin @state={{this.connectionState}}>
             <:default as |a|>
-              <a.ActionButton {{on "click" (fn this.wallet.connect this.chosenProviderId @onClose)}} data-test-mainnet-connect-button disabled={{not this.chosenProviderId}}>
+              <a.ActionButton {{on "click" (fn this.wallet.connect this.chosenProviderId @onClose)}} data-test-connect-wallet-button-modal data-test-connect-wallet-button-modal-chain-id={{this.network.chainId}} disabled={{not this.chosenProviderId}}>
                 Connect Wallet
               </a.ActionButton>
             </:default>

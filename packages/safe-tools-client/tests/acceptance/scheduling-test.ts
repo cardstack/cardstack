@@ -364,7 +364,7 @@ module('Acceptance | scheduling', function (hooks) {
       await visit('/schedule');
       await click('.connect-button__button');
       await click('[data-test-wallet-option="wallet-connect"]');
-      await click('[data-test-mainnet-connect-button]');
+      await click('[data-test-connect-wallet-button-modal]');
       await this.mockWalletConnect.mockAccountsChanged([
         FAKE_WALLET_CONNECT_ACCOUNT,
       ]);
@@ -489,7 +489,7 @@ module('Acceptance | scheduling', function (hooks) {
       await visit('/schedule');
       await click('.connect-button__button');
       await click('[data-test-wallet-option="wallet-connect"]');
-      await click('[data-test-mainnet-connect-button]');
+      await click('[data-test-connect-wallet-button-modal]');
       await this.mockWalletConnect.mockAccountsChanged([
         FAKE_WALLET_CONNECT_ACCOUNT,
       ]);
