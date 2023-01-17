@@ -80,13 +80,20 @@
 .schedule-payment-form-action-card__recurring-explanation svg {
   margin-right: var(--boxel-sp-xxxs);
 }
-
-.scheduled-payment-form-action-card__empty-safe-stage-icon {
-  --icon-color: var(--boxel-cyan);
-  margin-right: var(--boxel-sp-sm);
+.schedule-payment-form-prerequisite-step {
+  display: flex;
+  justify-content: center;
 }
 
-.scheduled-payment-form-action-card__empty-safe-stage-description {
+.schedule-payment-form-prerequisite-step__icons svg {
+  margin-left: var(--boxel-sp-sm);
+}
+
+.schedule-payment-form-prerequisite-step__text {
+  margin: auto;
+  margin-left: var(--boxel-sp);
+  font: var(--boxel-font-sm);
+  text-transform: uppercase;
+  font-weight: 600;
   color: var(--boxel-yellow);
-  font-size: var(--boxel-font-sm);
 }

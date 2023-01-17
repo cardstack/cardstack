@@ -88,7 +88,11 @@ module('Acceptance | wallet connection', function (hooks) {
       assert.dom(
         '.boxel-radio-option__input boxel-radio-option__input--hidden-radio boxel-radio-option__input--checked'
       );
-      await click('[data-test-mainnet-connect-button]');
+      assert
+        .dom('[data-test-schedule-form-connect-wallet-cta]')
+        .includesText('Step 1 - First connect your wallet');
+
+      await click('[data-test-connect-wallet-button-modal]');
 
       assert
         .dom('[data-test-wallet-address]')
@@ -117,12 +121,13 @@ module('Acceptance | wallet connection', function (hooks) {
       assert
         .dom('[data-test-wallet-address]')
         .doesNotContainText(truncateMiddle([TEST_ACCOUNT_1]));
+      assert.dom('[data-test-schedule-form-connect-wallet-cta]').doesNotExist();
 
       await click('[data-test-disconnect-button]');
 
       assert.dom('[data-test-wallet-address]').doesNotExist();
 
-      assert.dom('[data-test-connect-button]').exists();
+      assert.dom('[data-test-connect-wallet-button-modal-sidebar]').exists();
       assert.dom('[data-test-disconnect-button]').doesNotExist();
       assert.dom('[data-test-safe-address-label]').doesNotExist();
     });
@@ -140,7 +145,7 @@ module('Acceptance | wallet connection', function (hooks) {
         '.boxel-radio-option__input boxel-radio-option__input--hidden-radio boxel-radio-option__input--checked'
       );
 
-      await click('[data-test-mainnet-connect-button]');
+      await click('[data-test-connect-wallet-button-modal]');
 
       this.mockWalletConnect.mockConnectedWallet([TEST_ACCOUNT_2]);
       this.mockWalletConnect.mockAccountsChanged([TEST_ACCOUNT_2]);
@@ -162,7 +167,10 @@ module('Acceptance | wallet connection', function (hooks) {
   module('Remembering the selected chain', function () {
     test('Defaults to mainnet', async function (assert) {
       await visit('/schedule');
-      assert.dom('[data-test-selected-network]').hasText('Ethereum Mainnet');
+      await click('[data-test-connect-wallet-button-modal-sidebar]');
+      assert
+        .dom('[data-test-connect-wallet-button-modal]')
+        .hasAttribute('data-test-connect-wallet-button-modal-chain-id', '1');
     });
     module('with localstorage', function (hooks) {
       hooks.beforeEach(function (this: TestContext) {
@@ -170,8 +178,11 @@ module('Acceptance | wallet connection', function (hooks) {
       });
       test('Uses localstorage value for other', async function (assert) {
         await visit('/schedule');
+        await click('[data-test-connect-wallet-button-modal-sidebar]');
 
-        assert.dom('[data-test-selected-network]').hasText('Goerli');
+        assert
+          .dom('[data-test-connect-wallet-button-modal]')
+          .hasAttribute('data-test-connect-wallet-button-modal-chain-id', '5');
       });
     });
   });

@@ -201,7 +201,7 @@ export async function connectMetaMask(assert: Assert) {
   assert.dom(
     '.boxel-radio-option__input boxel-radio-option__input--hidden-radio boxel-radio-option__input--checked'
   );
-  await click('[data-test-mainnet-connect-button]');
+  await click('[data-test-connect-wallet-button-modal]');
 
   assert
     .dom('.safe-tools__dashboard-schedule-control-panel-wallet-address')

@@ -10,7 +10,6 @@ import BoxelLoadingIndicator from '@cardstack/boxel/components/boxel/loading-ind
 import BoxelRadioInput from '@cardstack/boxel/components/boxel/radio-input';
 import BoxelToggleButtonGroup from '@cardstack/boxel/components/boxel/toggle-button-group';
 import BoxelTokenSelect from '@cardstack/boxel/components/boxel/input/token-select';
-import BoxelIconButton from '@cardstack/boxel/components/boxel/icon-button';
 import RangedNumberPicker from '@cardstack/boxel/components/boxel/input/ranged-number-picker';
 import { SelectableToken } from '@cardstack/boxel/components/boxel/input/selectable-token';
 import { concat, fn } from '@ember/helper';
@@ -18,6 +17,7 @@ import { on } from '@ember/modifier';
 import { svgJar } from '@cardstack/boxel/utils/svg-jar';
 import { tracked } from '@glimmer/tracking';
 import eq from 'ember-truth-helpers/helpers/eq';
+import and from 'ember-truth-helpers/helpers/and';
 import not from 'ember-truth-helpers/helpers/not';
 import set from 'ember-set-helper/helpers/set';
 import './index.css';
@@ -28,6 +28,8 @@ import cssVar from '@cardstack/boxel/helpers/css-var';
 import { type WalletProviderId } from '@cardstack/safe-tools-client/utils/wallet-providers';
 import { ConfiguredScheduledPaymentFees } from '@cardstack/safe-tools-client/services/scheduled-payment-sdk';
 import formatUsd from '@cardstack/safe-tools-client/helpers/format-usd';
+import WalletService from '@cardstack/safe-tools-client/services/wallet';
+import { inject as service } from '@ember/service';
 
 interface Signature {
   Element: HTMLElement;
@@ -75,6 +77,7 @@ export default class SchedulePaymentFormActionCardUI extends Component<Signature
   @tracked hasBlurredPaymentAmount = false;
   @tracked hasBlurredGasToken = false;
   @tracked hasBlurredMaxGasPrice = false;
+  @service declare wallet: WalletService;
 
   get isPaymentTypeInvalid() {
     if (!this.hasBlurredPaymentType) {
@@ -112,6 +115,8 @@ export default class SchedulePaymentFormActionCardUI extends Component<Signature
   }
 
   get isFormInteractionDisabled() {
+    if (!this.wallet.isConnected || this.args.isSafesEmpty) return true;
+
     return !!this.args.schedulingStatus || this.args.isSuccessfullyScheduled;
   }
 
@@ -299,7 +304,7 @@ export default class SchedulePaymentFormActionCardUI extends Component<Signature
       </Section>
       <ActionChin @state={{this.actionChinState}}>
         <:default as |ac|>
-          {{#if (not @isSafesEmpty)}}
+          {{#if (and this.wallet.isConnected (not @isSafesEmpty))}}
             <ac.ActionButton
               @disabled={{not @isSubmitEnabled}}
               data-test-schedule-payment-form-submit-button
@@ -307,19 +312,64 @@ export default class SchedulePaymentFormActionCardUI extends Component<Signature
             >
               Schedule Payment
             </ac.ActionButton>
+          {{else if (not this.wallet.isConnected)}}
+            <div class="schedule-payment-form-prerequisite-step" data-test-schedule-form-connect-wallet-cta>
+              <div class="schedule-payment-form-prerequisite-step__icons">
+                {{svgJar
+                  'wallet'
+                  width="30px"
+                  height="30px"
+                  style=(cssVar
+                    icon-color='var(--boxel-teal)'
+                  )
+                }}
+                {{svgJar
+                  'connect-arrows'
+                  width="30px"
+                  height="30px"
+                }}
+                {{svgJar
+                  'cardstack'
+                  width="30px"
+                  height="30px"
+                }}
+              </div>
+              <div class="schedule-payment-form-prerequisite-step__text">
+                Step 1 - First connect your wallet
+              </div>
+            </div>
           {{else}}
-            <ac.ActionStatusArea style={{cssVar status-icon-size="2.5rem"}}>
-              <div class="scheduled-payment-form-action-card__empty-safe-stage-icon">
-                {{svgJar "network" width="24px" height="24px"}}
+            <div class="schedule-payment-form-prerequisite-step" data-test-schedule-form-connect-wallet-cta>
+              <div class="schedule-payment-form-prerequisite-step__icons">
+                {{svgJar
+                  'network'
+                  width="30px"
+                  height="30px"
+                  style=(cssVar
+                    icon-color='var(--boxel-cyan)'
+                  )
+                }}
+                {{svgJar
+                  'plus'
+                  width="16px"
+                  height="30px"
+                  style=(cssVar
+                    icon-color='var(--boxel-yellow)'
+                  )
+                }}
+                {{svgJar
+                  'safe'
+                  width="30px"
+                  height="30px"
+                  style=(cssVar
+                    icon-color='var(--boxel-cyan)'
+                  )
+                }}
               </div>
-              <div class="scheduled-payment-form-action-card__empty-safe-stage-icon">
-                {{svgJar "plus" width="14px" height="14px"}}
+              <div class="schedule-payment-form-prerequisite-step__text">
+                Step 2 - Create a payments safe
               </div>
-              <div class="scheduled-payment-form-action-card__empty-safe-stage-icon">
-              {{svgJar "safe" width="24px" height="24px"}}
-              </div>
-              <span class="scheduled-payment-form-action-card__empty-safe-stage-description">STEP 2 - CREATE A PAYMENTS SAFE</span>
-            </ac.ActionStatusArea>
+            </div>
           {{/if}}
         </:default>
         <:inProgress as |ac|>

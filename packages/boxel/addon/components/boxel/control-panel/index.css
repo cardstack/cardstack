@@ -6,7 +6,7 @@
 
 .boxel-control-panel__item {
   border-bottom: 1px solid var(--boxel-purple-500);
-  padding: var(--boxel-sp-sm) var(--boxel-sp-sm) var(--boxel-sp-xxl) var(--boxel-sp-sm);
+  padding: 0 var(--boxel-sp-sm);
 }
 
 .boxel-control-panel__item:last-child {
@@ -18,7 +18,7 @@
   display: grid;
   grid-template-columns: var(--boxel-sp-lg) 1fr;
   align-items: center;
-  padding: var(--boxel-sp-sm) 0 var(--boxel-sp) 0;
+  padding: var(--boxel-sp) 0 var(--boxel-sp) 0;
   color: var(--boxel-light);
   font: 600 var(--boxel-font-xs);
   letter-spacing: var(--boxel-lsp-xl);

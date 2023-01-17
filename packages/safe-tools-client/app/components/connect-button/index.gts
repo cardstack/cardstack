@@ -7,6 +7,8 @@ import { on } from '@ember/modifier';
 import truncateMiddle from '@cardstack/safe-tools-client/helpers/truncate-middle';
 import WalletService from '@cardstack/safe-tools-client/services/wallet';
 
+import './index.css';
+
 interface Signature {
   Element: HTMLDivElement;
   Args: {
@@ -40,7 +42,7 @@ export default class ConnectButton extends Component<Signature> {
           connect-button__button--connected=(or @isConnected @isInitializing)
         }}
         {{on "click" @onConnect}}
-        data-test-connect-button
+        data-test-connect-wallet-button-modal-sidebar
       >
         {{#if @isInitializing}}
           {{!-- just show the spinner --}}
