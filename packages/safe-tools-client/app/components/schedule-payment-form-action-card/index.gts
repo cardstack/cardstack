@@ -4,7 +4,7 @@ import { SelectableToken } from '@cardstack/boxel/components/boxel/input/selecta
 import { inject as service } from '@ember/service';
 import NetworkService from '../../services/network';
 import SafesService from '../../services/safes';
-import ScheduledPaymentSdkService, { ConfiguredScheduledPaymentFees, GasEstimationResult } from '../../services/scheduled-payment-sdk';
+import ScheduledPaymentSdkService, { ConfiguredScheduledPaymentFees, ServiceGasEstimationResult } from '../../services/scheduled-payment-sdk';
 import TokensService from '../../services/tokens';
 import WalletService from '../../services/wallet';
 import { action } from '@ember/object';
@@ -15,8 +15,13 @@ import withTokenIcons from '../../helpers/with-token-icons';
 import SchedulePaymentFormValidator, { MaxGasFeeOption, ValidatableForm } from './validator';
 import { use, resource } from 'ember-resources';
 import { TrackedObject } from 'tracked-built-ins';
+<<<<<<< HEAD
 import and from 'ember-truth-helpers/helpers/and';
 import not from 'ember-truth-helpers/helpers/not';
+=======
+import not from 'ember-truth-helpers/helpers/not';
+import { TransactionHash } from '@cardstack/cardpay-sdk';
+>>>>>>> aae2329a6 (Some clean up of gas estimate UI)
 import { taskFor } from 'ember-concurrency-ts';
 import { BigNumber, FixedNumber } from 'ethers';
 import { task } from 'ember-concurrency-decorators';
@@ -63,7 +68,7 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
   @service declare scheduledPaymentSdk: ScheduledPaymentSdkService;
   @service('scheduled-payments') declare scheduledPaymentsService: ScheduledPaymentsService;
   validator = new SchedulePaymentFormValidator(this);
-  gasEstimation?: GasEstimationResult;
+  gasEstimation?: ServiceGasEstimationResult;
   lastScheduledPaymentId?: string;
 
   @tracked schedulingStatus?: string;

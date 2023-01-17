@@ -5,7 +5,7 @@ import {
 } from '@cardstack/cardpay-sdk';
 import {
   ConfiguredScheduledPaymentFees,
-  GasEstimationResult,
+  ServiceGasEstimationResult,
 } from '@cardstack/safe-tools-client/services/scheduled-payment-sdk';
 import TokenToUsdService from '@cardstack/safe-tools-client/services/token-to-usd';
 import TokensService from '@cardstack/safe-tools-client/services/tokens';
@@ -60,15 +60,10 @@ class ScheduledPaymentSDKServiceStub extends Service {
     _scenario: GasEstimationScenario,
     _tokenAddress: ChainAddress,
     _gasTokenAddress: ChainAddress
-  ): Promise<GasEstimationResult> {
+  ): Promise<ServiceGasEstimationResult> {
     return {
       gas: BigNumber.from(127864),
       gasRangeInGasTokenWei: {
-        normal: BigNumber.from('20000000'),
-        high: BigNumber.from('40000000'),
-        max: BigNumber.from('80000000'),
-      },
-      gasRangeInUSD: {
         normal: BigNumber.from('20000000'),
         high: BigNumber.from('40000000'),
         max: BigNumber.from('80000000'),
@@ -387,6 +382,16 @@ module(
         assert
           .dom('[data-test-summary-recipient-receives]')
           .containsText('$ 15.00');
+
+        await waitUntil(() => {
+          return find(
+            '[data-test-summary-estimated-gas]'
+          )?.textContent?.includes('20.0 USDC');
+        });
+        assert
+          .dom('[data-test-summary-estimated-gas]')
+          .containsText('20.0 USDC');
+        assert.dom('[data-test-summary-estimated-gas]').containsText('$ 20.00');
         await waitUntil(() => {
           return find('[data-test-summary-fixed-fee]')?.textContent?.includes(
             '0.25 USDC'

@@ -344,7 +344,7 @@ export default class SchedulePaymentFormActionCardUI extends Component<Signature
                   {{/if}}
                 </div>
               </BoxelField>
-              <BoxelField @label="Estimated Gas" @vertical={{true}} style={{cssVar boxel-field-label-justify-content="end"}}>
+              <BoxelField @label="Estimated Gas" data-test-summary-estimated-gas @vertical={{true}} style={{cssVar boxel-field-label-justify-content="end"}}>
                 <div class="schedule-payment-form-action-card__fees-value">
                   {{#if @gasEstimateTokenQuantity}}
                     {{@gasEstimateTokenQuantity.displayable}}
