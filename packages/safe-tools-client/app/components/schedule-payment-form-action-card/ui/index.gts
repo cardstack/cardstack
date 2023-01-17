@@ -69,7 +69,7 @@ interface Signature {
     payeeAddressErrorMessage: string;
     paymentAmountErrorMessage: string;
     paymentTokens: SelectableToken[];
-    paymentAmountTokenQuantity: TokenQuantity | undefined;
+    paymentTokenQuantity: TokenQuantity | undefined;
     paymentTypeErrorMessage: string;
     paymentTypeOptions: { id: string, text: string }[];
     schedulingStatus: string | undefined;
@@ -338,9 +338,9 @@ export default class SchedulePaymentFormActionCardUI extends Component<Signature
             <div>
               <BoxelField @label="Recipient Will Receive" data-test-summary-recipient-receives @vertical={{true}} style={{cssVar boxel-field-label-justify-content="end"}}>
                 <div class="schedule-payment-form-action-card__fees-value">
-                  {{#if @paymentAmountTokenQuantity}}
-                    <div>{{@paymentAmountTokenQuantity.displayable}}</div>
-                    <div class="schedule-payment-form-action-card__fee-usd-estimate">{{tokenToUsd tokenQuantity=@paymentAmountTokenQuantity}}</div>
+                  {{#if @paymentTokenQuantity}}
+                    <div>{{@paymentTokenQuantity.displayable}}</div>
+                    <div class="schedule-payment-form-action-card__fee-usd-estimate">{{tokenToUsd tokenQuantity=@paymentTokenQuantity}}</div>
                   {{/if}}
                 </div>
               </BoxelField>

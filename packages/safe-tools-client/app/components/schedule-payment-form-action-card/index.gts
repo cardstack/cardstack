@@ -202,7 +202,7 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
     this._paymentToken = val;
   }
 
-  get paymentAmountTokenQuantity() {
+  get paymentTokenQuantity() {
     const { paymentToken } = this;
     if (!paymentToken) {
       return undefined;
@@ -269,15 +269,15 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
       isIndeterminate: false
     });
     let isWalletConnected = this.wallet.isConnected;
-    let { paymentAmountTokenQuantity, selectedGasToken, configuredFees } = this
-    if (!isWalletConnected || !paymentAmountTokenQuantity || paymentAmountTokenQuantity.count.isZero() || !selectedGasToken || !configuredFees.value) {
+    let { paymentTokenQuantity, selectedGasToken, configuredFees } = this
+    if (!isWalletConnected || !paymentTokenQuantity || paymentTokenQuantity.count.isZero() || !selectedGasToken || !configuredFees.value) {
       state.isIndeterminate = true;
       return state;
     }
     if (configuredFees.value) {
       const feeCalculator = new FeeCalculator(
         configuredFees.value,
-        paymentAmountTokenQuantity,
+        paymentTokenQuantity,
         selectedGasToken,
         this.usdcToGasTokenRate
       );
@@ -349,7 +349,7 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
     if (!this.validator.isValid) return;
 
     // Redundant to validation check but including it to narrow types for Typescript
-    if (!this.paymentAmountTokenQuantity || !this.selectedGasToken || !this.gasEstimation) return;
+    if (!this.paymentTokenQuantity || !this.selectedGasToken || !this.gasEstimation) return;
 
     if (Number(this.gasEstimation.gas) <= 0) return;
     const { gasRangeInGasTokenWei } = this.gasEstimation;
@@ -378,12 +378,12 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
     this.scheduleErrorMessage = undefined;
 
     try {
-      const {paymentAmountTokenQuantity} = this;
+      const {paymentTokenQuantity} = this;
       yield taskFor(this.scheduledPaymentSdk.schedulePayment).perform(
         currentSafe.address,
         currentSafe.spModuleAddress,
-        paymentAmountTokenQuantity.address,
-        paymentAmountTokenQuantity.count,
+        paymentTokenQuantity.address,
+        paymentTokenQuantity.count,
         this.payeeAddress,
         Number(this.gasEstimation.gas),
         String(maxGasPrice),
@@ -495,7 +495,7 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
       @isPaymentAmountInvalid={{not this.validator.isAmountValid}}
       @paymentAmountErrorMessage={{this.validator.amountErrorMessage}}
       @paymentToken={{this.paymentToken}}
-      @paymentAmountTokenQuantity={{this.paymentAmountTokenQuantity}}
+      @paymentTokenQuantity={{this.paymentTokenQuantity}}
       @paymentTokens={{this.paymentTokens}}
       @onUpdatePaymentToken={{this.onUpdatePaymentToken}}
       @selectedGasToken={{this.selectedGasToken}}
