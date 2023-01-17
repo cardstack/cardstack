@@ -60,17 +60,18 @@ app "hub" {
         GNOSIS_HUB_SP_MODULE_ADDRESS                  = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_gnosis_hub_sp_module_address-OnJ0YE"
         ETHEREUM_HUB_SP_MODULE_ADDRESS                = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_ethereum_hub_sp_module_address-aDErRZ"
         POLYGON_HUB_SP_MODULE_ADDRESS                 = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_polygon_hub_sp_module_address-BHTgw2"
+
         # The below is a distribution in the production AWS account
-        HUB_STORAGE_CLOUDFRONT_DISTRIBUTION           = "arn:aws:secretsmanager:us-east-1:680542703984:secret:hub_storage_cloudfront_distribution-Frtsb3"
-        DISCORD_ON_CALL_INTERNAL_WEBHOOK              = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_discord_on_call_internal_webhook-4ylxfM"
-        PAGERDUTY_TOKEN                               = "arn:aws:secretsmanager:us-east-1:680542703984:secret:PAGERDUTY_TOKEN-kTxFxL"
-        MAILCHIMP_API_KEY                             = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_MAILCHIMP_API_KEY-lkxsEk"
-        CRYPTOCOMPARE_API_KEY                         = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_CRYPTOCOMPARE_API_KEY-3Sk0nr"
-        HUB_PRIVATE_KEY                               = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_hub_private_key-fJhPUj"
-        GNOSIS_GAS_STATION_URL                        = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_gnosis_gas_station_url-0xbRlJ"
-        ETHEREUM_GAS_STATION_URL                      = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_ethereum_gas_station_url-AlItsC"
-        POLYGON_GAS_STATION_URL                       = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_polygon_gas_station_url-cUpbHc"
-        CHECKLY_WEBHOOK_SECRET                        = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_hub_checkly_webhook_secret-etKeUa"
+        HUB_STORAGE_CLOUDFRONT_DISTRIBUTION = "arn:aws:secretsmanager:us-east-1:680542703984:secret:hub_storage_cloudfront_distribution-Frtsb3"
+        DISCORD_ON_CALL_INTERNAL_WEBHOOK    = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_discord_on_call_internal_webhook-4ylxfM"
+        PAGERDUTY_TOKEN                     = "arn:aws:secretsmanager:us-east-1:680542703984:secret:PAGERDUTY_TOKEN-kTxFxL"
+        MAILCHIMP_API_KEY                   = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_MAILCHIMP_API_KEY-lkxsEk"
+        CRYPTOCOMPARE_API_KEY               = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_CRYPTOCOMPARE_API_KEY-3Sk0nr"
+        HUB_PRIVATE_KEY                     = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_hub_private_key-fJhPUj"
+        GNOSIS_GAS_STATION_URL              = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_gnosis_gas_station_url-0xbRlJ"
+        ETHEREUM_GAS_STATION_URL            = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_ethereum_gas_station_url-AlItsC"
+        POLYGON_GAS_STATION_URL             = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_polygon_gas_station_url-cUpbHc"
+        CHECKLY_WEBHOOK_SECRET              = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_hub_checkly_webhook_secret-etKeUa"
       }
     }
 
@@ -124,24 +125,25 @@ app "hub-worker" {
       disable_alb         = true
 
       secrets = {
-        LAYER1_RPC_NODE_HTTPS_URL           = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_evm_infura_https_url-aCpG9I"
-        LAYER1_RPC_NODE_WSS_URL             = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_evm_infura_wss_url-eirZPn"
-        LAYER2_RPC_NODE_HTTPS_URL           = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_evm_full_node_url-NBKUCq"
-        LAYER2_RPC_NODE_WSS_URL             = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_evm_full_node_wss_url-4RtEaG"
-        HUB_AUTH_SECRET                     = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_hub_auth_secret-50oF6K"
-        GNOSIS_RPC_NODE_HTTPS_URL           = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_evm_gnosis_https_url-U4pZOp"
-        GNOSIS_RPC_NODE_WSS_URL             = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_evm_gnosis_wss_url-mwHYYq"
-        ETHEREUM_RPC_NODE_HTTPS_URL         = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_evm_ethereum_infura_https_url-okgckW"
-        ETHEREUM_RPC_NODE_WSS_URL           = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_evm_ethereum_infura_wss_url-hXLd7Q"
-        POLYGON_RPC_NODE_HTTPS_URL          = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_evm_polygon_infura_https_url-wIF3tU"
-        POLYGON_RPC_NODE_WSS_URL            = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_evm_polygon_infura_wss_url-UvdYiF"
-        HUB_PRIVATE_KEY                     = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_hub_private_key-fJhPUj"
-        GNOSIS_GAS_STATION_URL              = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_gnosis_gas_station_url-0xbRlJ"
-        ETHEREUM_GAS_STATION_URL            = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_ethereum_gas_station_url-AlItsC"
-        POLYGON_GAS_STATION_URL             = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_polygon_gas_station_url-cUpbHc"
-        GNOSIS_HUB_SP_MODULE_ADDRESS        = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_gnosis_hub_sp_module_address-OnJ0YE"
-        ETHEREUM_HUB_SP_MODULE_ADDRESS      = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_ethereum_hub_sp_module_address-aDErRZ"
-        POLYGON_HUB_SP_MODULE_ADDRESS       = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_polygon_hub_sp_module_address-BHTgw2"
+        LAYER1_RPC_NODE_HTTPS_URL      = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_evm_infura_https_url-aCpG9I"
+        LAYER1_RPC_NODE_WSS_URL        = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_evm_infura_wss_url-eirZPn"
+        LAYER2_RPC_NODE_HTTPS_URL      = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_evm_full_node_url-NBKUCq"
+        LAYER2_RPC_NODE_WSS_URL        = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_evm_full_node_wss_url-4RtEaG"
+        HUB_AUTH_SECRET                = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_hub_auth_secret-50oF6K"
+        GNOSIS_RPC_NODE_HTTPS_URL      = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_evm_gnosis_https_url-U4pZOp"
+        GNOSIS_RPC_NODE_WSS_URL        = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_evm_gnosis_wss_url-mwHYYq"
+        ETHEREUM_RPC_NODE_HTTPS_URL    = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_evm_ethereum_infura_https_url-okgckW"
+        ETHEREUM_RPC_NODE_WSS_URL      = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_evm_ethereum_infura_wss_url-hXLd7Q"
+        POLYGON_RPC_NODE_HTTPS_URL     = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_evm_polygon_infura_https_url-wIF3tU"
+        POLYGON_RPC_NODE_WSS_URL       = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_evm_polygon_infura_wss_url-UvdYiF"
+        HUB_PRIVATE_KEY                = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_hub_private_key-fJhPUj"
+        GNOSIS_GAS_STATION_URL         = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_gnosis_gas_station_url-0xbRlJ"
+        ETHEREUM_GAS_STATION_URL       = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_ethereum_gas_station_url-AlItsC"
+        POLYGON_GAS_STATION_URL        = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_polygon_gas_station_url-cUpbHc"
+        GNOSIS_HUB_SP_MODULE_ADDRESS   = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_gnosis_hub_sp_module_address-OnJ0YE"
+        ETHEREUM_HUB_SP_MODULE_ADDRESS = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_ethereum_hub_sp_module_address-aDErRZ"
+        POLYGON_HUB_SP_MODULE_ADDRESS  = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_polygon_hub_sp_module_address-BHTgw2"
+
         # The below is a distribution in the production AWS account
         HUB_STORAGE_CLOUDFRONT_DISTRIBUTION = "arn:aws:secretsmanager:us-east-1:680542703984:secret:hub_storage_cloudfront_distribution-Frtsb3"
         DISCORD_ON_CALL_INTERNAL_WEBHOOK    = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_discord_on_call_internal_webhook-4ylxfM"
@@ -342,8 +344,8 @@ app "cardie" {
       disable_alb         = true
 
       secrets = {
-        DISCORD_TOKEN = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_discord_token-g5tbvH"
-        GITHUB_TOKEN  = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_github_token-sJaf5H"
+        DISCORD_TOKEN = "arn:aws:ssm:us-east-1:680542703984:parameter/staging/cardie/DISCORD_TOKEN"
+        GITHUB_TOKEN  = "arn:aws:ssm:us-east-1:680542703984:parameter/staging/cardie/GITHUB_TOKEN"
       }
     }
 
@@ -480,7 +482,6 @@ app "ssr-web" {
 app "reward-submit-lambda" {
   path = "./packages/reward-root-submitter"
 
-
   build {
     use "docker" {
       dockerfile = "Dockerfile"
@@ -496,10 +497,10 @@ app "reward-submit-lambda" {
   }
 
   deploy {
-  use "aws-lambda" {
-    region = "us-east-1"
+    use "aws-lambda" {
+      region = "us-east-1"
+    }
   }
-}
 
   url {
     auto_hostname = false
