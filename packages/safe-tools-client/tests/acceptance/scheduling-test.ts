@@ -370,12 +370,7 @@ module('Acceptance | scheduling', function (hooks) {
       ]);
       await waitFor(`[data-test-safe-address-label][title="${SAFE_ADDRESS}"]`);
       await fillInSchedulePaymentFormWithValidInfo({ type: 'one-time' });
-      await waitUntil(() => {
-        return find(
-          '[data-test-max-gas-fee-normal-description]'
-        )?.textContent?.trim().length;
-      });
-
+      await waitFor(`${SUBMIT_BUTTON}:not(:disabled)`);
       await click(SUBMIT_BUTTON);
       assert.dom(IN_PROGRESS_MESSAGE).hasText('Authenticating...');
       assert.dom(PAYEE_INPUT).isDisabled();
@@ -494,12 +489,10 @@ module('Acceptance | scheduling', function (hooks) {
         FAKE_WALLET_CONNECT_ACCOUNT,
       ]);
       await waitFor(`[data-test-safe-address-label][title="${SAFE_ADDRESS}"]`);
+
       await fillInSchedulePaymentFormWithValidInfo({ type: 'monthly' });
-      await waitUntil(() => {
-        return find(
-          '[data-test-max-gas-fee-normal-description]'
-        )?.textContent?.trim().length;
-      });
+
+      await waitFor(`${SUBMIT_BUTTON}:not(:disabled)`);
 
       await click(SUBMIT_BUTTON);
       assert.dom(IN_PROGRESS_MESSAGE).hasText('Authenticating...');

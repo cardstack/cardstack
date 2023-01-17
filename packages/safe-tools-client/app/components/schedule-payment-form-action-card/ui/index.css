@@ -13,7 +13,8 @@
   --boxel-field-label-align: center;
 }
 
-.schedule-payment-form-action-card .boxel-field.schedule-payment-form-action-card__frequency {
+.schedule-payment-form-action-card
+  .boxel-field.schedule-payment-form-action-card__frequency {
   --boxel-field-label-align: top;
   --boxel-field-label-padding-top: var(--boxel-sp-lg);
 }
@@ -33,6 +34,18 @@
   font: var(--boxel-font-xs);
   color: var(--boxel-purple-400);
   display: flex;
+}
+
+.schedule-payment-form-action-card--state-details {
+  padding-top: var(--boxel-sp);
+  padding-right: var(--boxel-sp);
+  font: var(--boxel-font-xs);
+  color: var(--boxel-purple-400);
+  display: flex;
+}
+
+.schedule-payment-form-action-card-error {
+  color: var(--boxel-red);
 }
 
 .schedule-payment-form-action-card--fee-info-icon {
@@ -65,6 +78,10 @@
   margin-right: var(--boxel-sp-xs);
   flex-grow: 0;
   flex-shrink: 0;
+}
+
+.schedule-payment-form-action-card__error-message {
+  color: var(--boxel-red);
 }
 
 .schedule-payment-form-action-card__in-progress-message {

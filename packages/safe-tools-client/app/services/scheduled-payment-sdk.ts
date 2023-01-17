@@ -152,30 +152,26 @@ export default class SchedulePaymentSDKService extends Service {
     recurringUntil: number | null,
     listener: SchedulePaymentProgressListener
   ): TaskGenerator<void> {
-    try {
-      const scheduledPaymentModule: ScheduledPaymentModule =
-        yield this.getSchedulePaymentModule();
-      yield scheduledPaymentModule.schedulePayment(
-        safeAddress,
-        moduleAddress,
-        tokenAddress,
-        amount.toString(),
-        payeeAddress,
-        executionGas,
-        maxGasPrice,
-        gasTokenAddress,
-        salt,
-        payAt,
-        recurringDayOfMonth,
-        recurringUntil,
-        {
-          hubUrl: config.hubUrl,
-          listener,
-        }
-      );
-    } catch (err) {
-      console.error(err);
-    }
+    const scheduledPaymentModule: ScheduledPaymentModule =
+      yield this.getSchedulePaymentModule();
+    yield scheduledPaymentModule.schedulePayment(
+      safeAddress,
+      moduleAddress,
+      tokenAddress,
+      amount.toString(),
+      payeeAddress,
+      executionGas,
+      maxGasPrice,
+      gasTokenAddress,
+      salt,
+      payAt,
+      recurringDayOfMonth,
+      recurringUntil,
+      {
+        hubUrl: config.hubUrl,
+        listener,
+      }
+    );
   }
 
   async cancelScheduledPayment(
