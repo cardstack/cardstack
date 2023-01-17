@@ -354,7 +354,7 @@ export default class SchedulePaymentFormActionCardUI extends Component<Signature
                   width="16px"
                   height="30px"
                   style=(cssVar
-                    icon-color='var(--boxel-yellow)'
+                    icon-color='var(--boxel-cyan)'
                   )
                 }}
                 {{svgJar
