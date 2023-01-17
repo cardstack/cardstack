@@ -1,4 +1,5 @@
 import {
+  ChainAddress,
   fetchSupportedGasTokens,
   getConstantByNetwork,
   TokenDetail,
@@ -65,6 +66,10 @@ export default class TokensService extends Service {
 
   stubTransactionTokens(val: TokenInfo[]) {
     this._stubbedTransactionTokens = val;
+  }
+
+  tokenFromAddress(address: ChainAddress): TokenInfo | undefined {
+    return this.transactionTokens.find((t) => t.address === address);
   }
 }
 

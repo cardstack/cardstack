@@ -3,6 +3,7 @@ import { ChainAddress } from '@cardstack/cardpay-sdk';
 import SchedulePaymentSDKService from '@cardstack/safe-tools-client/services/scheduled-payment-sdk';
 import ScheduledPaymentsService from '@cardstack/safe-tools-client/services/scheduled-payments';
 import TokenToUsdService from '@cardstack/safe-tools-client/services/token-to-usd';
+import TokenQuantity from '@cardstack/safe-tools-client/utils/token-quantity';
 import Service from '@ember/service';
 import { render, click, TestContext } from '@ember/test-helpers';
 import percySnapshot from '@percy/ember';
@@ -19,7 +20,7 @@ import {
   setupFakeDateService,
   FakeDateService,
 } from 'ember-date-service/test-support';
-import { FixedNumber } from 'ethers';
+import { BigNumber, FixedNumber } from 'ethers';
 import hbs from 'htmlbars-inline-precompile';
 import { module, test } from 'qunit';
 
@@ -62,77 +63,109 @@ class ScheduledPaymentsStub extends ScheduledPaymentsService {
     const endOfTomorrow = endOfDay(addDays(minPayAt, 1));
     const endOfThisMonth = endOfMonth(minPayAt);
 
+    const USDC_TOKEN = {
+      address: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
+      name: 'USD Coin',
+      symbol: 'USDC',
+      decimals: 6,
+      logoURI:
+        'https://assets-cdn.trustwallet.com/blockchains/ethereum/assets/0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48/logo.png',
+    };
+
+    const DAI_TOKEN = {
+      address: '0x6B175474E89094C44Da98b954EedeAC495271d0F',
+      name: 'Dai',
+      symbol: 'DAI',
+      decimals: 18,
+      logoURI:
+        'https://assets-cdn.trustwallet.com/blockchains/ethereum/assets/0x6B175474E89094C44Da98b954EedeAC495271d0F/logo.png',
+    };
+
     // 3 SPs are today
     // 2 Sps are tomorrow
     // 1 Sp is this month
     // 1 Sp is later
     const scheduledPayments = [
       {
-        amount: '10000000',
+        paymentTokenQuantity: new TokenQuantity(
+          USDC_TOKEN,
+          BigNumber.from('10000000')
+        ),
         feeFixedUSD: '0',
         feePercentage: '0',
         gasTokenAddress: '0x123',
-        tokenAddress: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
         chainId,
         payeeAddress: '0xeBCC5516d44FFf5E9aBa2AcaeB65BbB49bC3EBe1',
         payAt: startOfToday,
       },
       {
-        amount: '10000000',
+        paymentTokenQuantity: new TokenQuantity(
+          USDC_TOKEN,
+          BigNumber.from('10000000')
+        ),
         feeFixedUSD: '0',
         feePercentage: '0',
         gasTokenAddress: '0x123',
-        tokenAddress: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
         chainId,
         payeeAddress: '0xeBCC5516d44FFf5E9aBa2AcaeB65BbB49bC3EBe1',
         payAt: addHours(startOfToday, 2),
       },
       {
-        amount: '11000000',
+        paymentTokenQuantity: new TokenQuantity(
+          DAI_TOKEN,
+          BigNumber.from('11000000')
+        ),
         feeFixedUSD: '0',
         feePercentage: '0',
         gasTokenAddress: '0x123',
-        tokenAddress: '0x6B175474E89094C44Da98b954EedeAC495271d0F',
         chainId,
         payeeAddress: '0xeBCC5516d44FFf5E9aBa2AcaeB65BbB49bC3EBe1',
         payAt: endOfToday,
       },
       {
-        amount: '11000000',
+        paymentTokenQuantity: new TokenQuantity(
+          DAI_TOKEN,
+          BigNumber.from('11000000')
+        ),
         feeFixedUSD: '0',
         feePercentage: '0',
         gasTokenAddress: '0x123',
-        tokenAddress: '0x6B175474E89094C44Da98b954EedeAC495271d0F',
         chainId,
         payeeAddress: '0xeBCC5516d44FFf5E9aBa2AcaeB65BbB49bC3EBe1',
         payAt: startOfTomorrow,
       },
       {
-        amount: '11000000',
+        paymentTokenQuantity: new TokenQuantity(
+          USDC_TOKEN,
+          BigNumber.from('11000000')
+        ),
         feeFixedUSD: '0',
         feePercentage: '0',
         gasTokenAddress: '0x123',
-        tokenAddress: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
         chainId,
         payeeAddress: '0xeBCC5516d44FFf5E9aBa2AcaeB65BbB49bC3EBe1',
         payAt: endOfTomorrow,
       },
       {
-        amount: '11000000',
+        paymentTokenQuantity: new TokenQuantity(
+          USDC_TOKEN,
+          BigNumber.from('11000000')
+        ),
         feeFixedUSD: '0',
         feePercentage: '0',
         gasTokenAddress: '0x123',
-        tokenAddress: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
         chainId,
         payeeAddress: '0xeBCC5516d44FFf5E9aBa2AcaeB65BbB49bC3EBe1',
         payAt: endOfThisMonth,
       },
       {
-        amount: '11000000',
+        paymentTokenQuantity: new TokenQuantity(
+          USDC_TOKEN,
+          BigNumber.from('11000000')
+        ),
         feeFixedUSD: '0',
         feePercentage: '0',
         gasTokenAddress: '0x123',
-        tokenAddress: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
         chainId,
         payeeAddress: '0xeBCC5516d44FFf5E9aBa2AcaeB65BbB49bC3EBe1',
         payAt: addDays(endOfThisMonth, 1),
