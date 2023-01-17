@@ -1,128 +1,121 @@
-import HCL from 'js-hcl-parser';
-import fs from 'fs';
-import { execSync } from 'child_process';
+import { WaypointConfig, WaypointDeployAwsEcsPlugin } from './waypoint-hcl/index.js';
+import { IAMClient, SimulatePrincipalPolicyCommand } from '@aws-sdk/client-iam';
+import { STSClient, GetCallerIdentityCommand } from '@aws-sdk/client-sts';
 
-interface RelevantWaypointConfig {
-  executionRoleName: string;
-  secretArns: string[];
-}
+let awsAccountId: string = '';
+let WAYPOINT_CONFIG_PATH = process.env.WAYPOINT_CONFIG_PATH || 'waypoint.hcl';
 
-interface RelevantWaypointConfigByApp {
-  [app: string]: RelevantWaypointConfig;
-}
-
-let waypointConfigFile = process.argv[2];
-let errors = [];
-let waypointConfig = parseWaypointConfig(waypointConfigFile);
-let appSlugs = Object.keys(waypointConfig);
-for (const appSlug of appSlugs) {
-  let appConfig = waypointConfig[appSlug];
-  if (appConfig.secretArns.length === 0) {
-    continue;
-  }
-
-  let valid = true;
-  let allowedSecretArns: string[] = [];
-
+async function main() {
   try {
-    allowedSecretArns = [
-      ...queryAttachedPoliciesForAllowedSecretAccess(appConfig),
-      ...queryRolePoliciesForAllowedSecretAccess(appConfig),
-    ];
-  } catch (err: any) {
-    errors.push({ app: appSlug, error: err.message });
-    valid = false;
-  }
+    const stsClient = new STSClient({});
+    const command = new GetCallerIdentityCommand({});
+    const res = await stsClient.send(command);
 
-  if (valid) {
-    let missingSecretArns = [];
-    for (const neededSecretArn of appConfig.secretArns) {
-      if (!allowedSecretArns.includes(neededSecretArn)) {
-        missingSecretArns.push(neededSecretArn);
+    awsAccountId = res.Account!;
+
+    if (process.argv.length >= 3) {
+      WAYPOINT_CONFIG_PATH = process.argv[2];
+    }
+
+    let wc = new WaypointConfig(WAYPOINT_CONFIG_PATH);
+    for (const [app, config] of wc.apps) {
+      let deploy = config.deploy;
+      if (deploy == undefined) {
+        throw `missing 'deploy' block for app '${app}'`;
       }
-    }
 
-    if (missingSecretArns.length > 0) {
-      valid = false;
-      errors.push({
-        app: appSlug,
-        error: `The role '${
-          appConfig.executionRoleName
-        }' is missing access to the following secrets:\n${missingSecretArns.join('\n')}\n`,
-      });
-    }
-  }
+      // skip if app does not deploy using ecs
+      if (deploy.uses['aws-ecs'] == undefined) {
+        continue;
+      }
 
-  console.log(`${valid ? '✓' : '✗'} ${appSlug}`);
-}
+      let ecs = deploy.uses['aws-ecs'] as WaypointDeployAwsEcsPlugin;
+      if (ecs.execution_role_name == undefined) {
+        throw `missing 'execution_role_name' for app '${app}'`;
+      }
 
-if (errors.length > 0) {
-  errors.forEach((error) => console.error(`app: ${error.app}\nerror: ${error.error}`));
-  throw new Error(errors.join('\n'));
-}
+      // skip if app does not have a 'secret' block
+      if (ecs.secrets == undefined) {
+        continue;
+      }
 
-console.log(`Task policy access to secrets configured in ${waypointConfigFile} has been confirmed.`);
+      const denied = await getAccessDeniedSecrets(ecs.execution_role_name, Object.values(ecs.secrets));
 
-function parseWaypointConfig(waypointConfigFile: string): RelevantWaypointConfigByApp {
-  let hclInput = fs.readFileSync(waypointConfigFile, 'utf8');
-  let waypointJson = JSON.parse(HCL.parse(hclInput));
-  let appSlugs = waypointJson.app.map((app: any) => Object.keys(app)[0]);
-  let result = {} as RelevantWaypointConfigByApp;
-  for (const appSlug of appSlugs) {
-    let deployNode = waypointJson.app.find((a: any) => a[appSlug])[appSlug][0].deploy[0];
-    if (deployNode.use[0]['aws-ecs']) {
-      let secretsNode = deployNode.use[0]['aws-ecs'][0].secrets?.[0];
-      result[appSlug] = {
-        executionRoleName: deployNode.use[0]['aws-ecs'][0]['execution_role_name'],
-        secretArns: secretsNode ? Object.values(secretsNode) : [],
-      };
-    }
-  }
-  return result;
-}
-
-function execute(command: string, options: any) {
-  return execSync(command, options ?? {})
-    .toString()
-    .trim();
-}
-
-function queryAttachedPoliciesForAllowedSecretAccess(appConfig: RelevantWaypointConfig) {
-  const policiesCmd = `aws iam list-attached-role-policies --role-name ${appConfig.executionRoleName} | grep PolicyArn | grep secrets | awk '{ print $2 }' | sed 's/[",]//g'`;
-  let secretsPolicyArn = execute(policiesCmd, { env: { ...process.env, PAGER: '' } });
-
-  if (secretsPolicyArn == '') return [];
-
-  const policyVersionsCmd = `aws iam list-policy-versions --policy-arn ${secretsPolicyArn} --query 'Versions[?IsDefaultVersion].VersionId' | grep v | awk '{ print $1 }' | sed 's/[",]//g'`;
-  let defaultVersion = execute(policyVersionsCmd, { env: { ...process.env, PAGER: '' } });
-
-  const policyDocumentCmd = `aws iam get-policy-version --policy-arn ${secretsPolicyArn} --version-id ${defaultVersion} --query 'PolicyVersion.Document.Statement[0].Resource'`;
-  let allowedSecretArns = execute(policyDocumentCmd, { env: { ...process.env, PAGER: '' } });
-
-  return JSON.parse(allowedSecretArns);
-}
-
-function queryRolePoliciesForAllowedSecretAccess(appConfig: RelevantWaypointConfig) {
-  let allowedSecretArns: string[] = [];
-
-  const policiesCmd = `aws iam list-role-policies --role-name ${appConfig.executionRoleName} --query 'PolicyNames'`;
-  const policiesNames = JSON.parse(execute(policiesCmd, { env: { ...process.env, PAGER: '' } }));
-
-  for (const policyName of policiesNames) {
-    const statementsCmd = `aws iam get-role-policy --role-name ${appConfig.executionRoleName} --policy-name ${policyName} --query 'PolicyDocument.Statement'`;
-    const statements = JSON.parse(execute(statementsCmd, { env: { ...process.env, PAGER: '' } }));
-    for (const statement of statements) {
-      if (
-        statement.Action.includes('ssm:GetParameters') &&
-        statement.Action.includes('secretsmanager:GetSecretValue')
-      ) {
-        const arnRegex = new RegExp('arn:aws:secretsmanager:[^:]+:[^:]+:secret:[^:]+');
-        allowedSecretArns = allowedSecretArns.concat(
-          statement.Resource.filter((resource: string) => arnRegex.test(resource))
+      console.log(`${denied.length == 0 ? '✓' : '✗'} ${app}`);
+      if (denied.length > 0) {
+        process.exitCode = 1;
+        console.log(
+          `Role ${ecs.execution_role_name} does not have access to:\n` +
+            `${denied.map((arn) => `  - ${arn}`).join('\n')}`
         );
       }
     }
+  } catch (err) {
+    console.error(err);
+    process.exitCode = 1;
+  }
+}
+
+async function getAccessDeniedSecrets(role: string, secrets: string[]): Promise<string[]> {
+  let denied: string[] = [];
+  const roleArn = `arn:aws:iam::${awsAccountId}:role/${role}`;
+
+  let decisions = await simulatePrincipalPolicy(
+    'secretsmanager:GetSecretValue',
+    roleArn,
+    secrets.filter((secret) => secret.startsWith('arn:aws:secretsmanager:'))
+  );
+  for (const [secret, decision] of decisions.entries()) {
+    if (decision != 'allowed') {
+      denied.push(secret);
+    }
   }
 
-  return allowedSecretArns;
+  decisions = await simulatePrincipalPolicy(
+    'ssm:GetParameters',
+    roleArn,
+    secrets.filter((secret) => secret.startsWith('arn:aws:ssm:'))
+  );
+  for (const [secret, decision] of decisions.entries()) {
+    if (decision != 'allowed') {
+      denied.push(secret);
+    }
+  }
+
+  return denied;
 }
+
+async function simulatePrincipalPolicy(actionName: string, role: string, arns: string[]): Promise<Map<string, string>> {
+  let result = new Map<string, string>();
+  if (arns.length == 0) {
+    return result;
+  }
+
+  const iamClient = new IAMClient({});
+  const command = new SimulatePrincipalPolicyCommand({
+    ActionNames: [actionName],
+    PolicySourceArn: role,
+    ResourceArns: arns,
+  });
+
+  const res = await iamClient.send(command);
+  for (const evalutionResult of res.EvaluationResults!) {
+    const { EvalResourceName, ResourceSpecificResults, EvalDecision } = evalutionResult;
+    if (EvalDecision === 'allowed') {
+      result.set(EvalResourceName!, EvalDecision);
+      continue;
+    }
+
+    for (const resourceSpecificResult of ResourceSpecificResults!) {
+      if (resourceSpecificResult.EvalResourceName === EvalResourceName) {
+        result.set(EvalResourceName!, resourceSpecificResult.EvalResourceDecision!);
+        break;
+      }
+    }
+  }
+
+  iamClient.destroy();
+  return result;
+}
+
+main();

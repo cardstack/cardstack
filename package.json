@@ -28,7 +28,6 @@
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-prettier": "^4.0.0",
     "glob": "^7.1.7",
-    "hcl2-parser": "^1.0.3",
     "lerna": "4.0.0",
     "patch-package": "^6.4.7",
     "postinstall-postinstall": "^2.1.0",
