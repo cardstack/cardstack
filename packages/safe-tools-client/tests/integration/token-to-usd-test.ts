@@ -1,11 +1,13 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
+import { applyRateToAmount, ChainAddress } from '@cardstack/cardpay-sdk';
+import TokenQuantity from '@cardstack/safe-tools-client/utils/token-quantity';
 import Service from '@ember/service';
 import { render, TestContext, waitUntil } from '@ember/test-helpers';
 import { tracked } from '@glimmer/tracking';
 import { addMilliseconds } from 'date-fns';
 import { task } from 'ember-concurrency';
 import { setupRenderingTest } from 'ember-qunit';
-import { BigNumber } from 'ethers';
+import { BigNumber, FixedNumber } from 'ethers';
 import hbs from 'htmlbars-inline-precompile';
 import { module, test } from 'qunit';
 import { TrackedMap } from 'tracked-built-ins';
@@ -13,26 +15,28 @@ import { TrackedMap } from 'tracked-built-ins';
 let returnEmptyUsdConverter = false;
 
 class TokenToUsdServiceStub extends Service {
-  @tracked usdConverters = new TrackedMap<
-    string,
-    (amountInWei: BigNumber) => BigNumber
+  @tracked usdcTokenRates = new TrackedMap<
+    ChainAddress, // token address
+    FixedNumber // token to usd rate
   >();
 
   // eslint-disable-next-line require-yield
-  @task({ maxConcurrency: 1, enqueue: true }) *updateUsdConverter(
-    tokenAddress: string
+  @task({ maxConcurrency: 1, enqueue: true }) *updateUsdcRate(
+    tokenAddress: ChainAddress
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ): any {
-    this.usdConverters.set(tokenAddress, (amountInWei: BigNumber) => {
-      return amountInWei.mul(1000);
-    });
+    this.usdcTokenRates.set(tokenAddress, FixedNumber.from(1000));
   }
 
-  toUsd(tokenAddress: string, amount: BigNumber): BigNumber | undefined {
+  toUsdc(tokenQuantity: TokenQuantity): BigNumber | undefined {
     if (returnEmptyUsdConverter) {
       return undefined;
     }
-    return this.usdConverters.get(tokenAddress)?.(amount);
+    const rate = this.usdcTokenRates.get(tokenQuantity.address);
+    if (!rate) {
+      return undefined;
+    }
+    return applyRateToAmount(rate, tokenQuantity.count);
   }
 }
 

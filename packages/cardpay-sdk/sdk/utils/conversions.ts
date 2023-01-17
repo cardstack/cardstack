@@ -9,7 +9,7 @@ import { getConstantByNetwork, SchedulerCapableNetworks } from '../constants';
 import JsonRpcProvider from '../../providers/json-rpc-provider';
 import { networkName } from './general-utils';
 import BN from 'bn.js';
-import { BigNumber } from 'ethers';
+import { BigNumber, FixedNumber } from 'ethers';
 import { BaseProvider } from '@ethersproject/providers';
 import { convertChainIdToName } from '../network-config-utils';
 import { Contract } from 'ethers';
@@ -125,20 +125,26 @@ export async function getNativeWeiInToken(provider: JsonRpcProvider, tokenAddres
   return new BN(rateAdjusted.numerator.toString()).div(new BN(rateAdjusted.denominator.toString()));
 }
 
-export async function getUsdConverter(
-  provider: JsonRpcProvider,
-  tokenAddress: string
-): Promise<(amountInWei: BigNumber) => BigNumber> {
+export async function getUsdcToTokenRate(provider: JsonRpcProvider, tokenAddress: string): Promise<FixedNumber> {
   let network = await networkName(provider);
   let usdcTokenAddress = getAddressByNetwork('usdcToken', network);
 
   if (usdcTokenAddress.toLowerCase() === tokenAddress.toLowerCase()) {
-    return (amountInWei: BigNumber) => amountInWei;
+    return FixedNumber.from(1);
   }
 
   let rate = await tokenPairRate(provider, usdcTokenAddress, tokenAddress);
-  return (amountInWei: BigNumber) => {
-    let rateAdjusted = adjustRate(rate);
-    return amountInWei.mul(rateAdjusted.numerator.toString()).div(rateAdjusted.denominator.toString());
-  };
+  let numerator = FixedNumber.from(rate.numerator.toString());
+  let denominator = FixedNumber.from(rate.denominator.toString());
+  let scalar = FixedNumber.from(rate.scalar.toString());
+  const rateAdjusted = numerator.divUnsafe(denominator).mulUnsafe(scalar);
+  return rateAdjusted;
+}
+
+export function applyRateToAmount(rate: FixedNumber, amount: BigNumber): BigNumber {
+  if (amount.isZero()) {
+    return BigNumber.from(0);
+  }
+  const convertedAmount = FixedNumber.from(amount.toString()).mulUnsafe(rate);
+  return BigNumber.from(convertedAmount.round(0).toString().split('.')[0]);
 }
