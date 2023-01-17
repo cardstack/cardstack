@@ -16,6 +16,7 @@ import SchedulePaymentFormValidator, { MaxGasFeeOption, ValidatableForm } from '
 import { use, resource } from 'ember-resources';
 import { TrackedObject } from 'tracked-built-ins';
 import { fromWei } from 'web3-utils';
+import and from 'ember-truth-helpers/helpers/and';
 import not from 'ember-truth-helpers/helpers/not';
 import { convertAmountToNativeDisplay, TransactionHash } from '@cardstack/cardpay-sdk';
 import { taskFor } from 'ember-concurrency-ts';
@@ -438,7 +439,7 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
       @maxGasPriceErrorMessage={{this.validator.maxGasPriceErrorMessage}}
       @onSchedulePayment={{perform this.schedulePaymentTask}}
       @maxGasDescriptions={{this.maxGasDescriptions}}
-      @isSubmitEnabled={{this.isValid}}
+      @isSubmitEnabled={{and this.isValid (not this.maxGasDescriptions.isLoading)}}
       @schedulingStatus={{this.schedulingStatus}}
       @networkSymbol={{this.network.symbol}}
       @walletProviderId={{this.wallet.providerId}}
