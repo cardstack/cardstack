@@ -113,6 +113,8 @@ export default class SchedulePaymentFormActionCardUI extends Component<Signature
   }
 
   get isFormInteractionDisabled() {
+    if (!this.wallet.isConnected) return true;
+
     return !!this.args.schedulingStatus || this.args.isSuccessfullyScheduled;
   }
 
