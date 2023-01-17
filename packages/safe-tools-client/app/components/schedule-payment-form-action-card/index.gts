@@ -15,13 +15,9 @@ import withTokenIcons from '../../helpers/with-token-icons';
 import SchedulePaymentFormValidator, { MaxGasFeeOption, ValidatableForm } from './validator';
 import { use, resource } from 'ember-resources';
 import { TrackedObject } from 'tracked-built-ins';
-<<<<<<< HEAD
 import and from 'ember-truth-helpers/helpers/and';
 import not from 'ember-truth-helpers/helpers/not';
-=======
-import not from 'ember-truth-helpers/helpers/not';
 import { TransactionHash } from '@cardstack/cardpay-sdk';
->>>>>>> aae2329a6 (Some clean up of gas estimate UI)
 import { taskFor } from 'ember-concurrency-ts';
 import { BigNumber, FixedNumber } from 'ethers';
 import { task } from 'ember-concurrency-decorators';
