@@ -70,6 +70,8 @@ export default class TokenToUsdHelper extends Helper<Signature> {
       this.updateInterval = setInterval(() => {
         taskFor(this.tokenToUsdService.updateUsdcRate).perform(tokenAddress);
       }, INTERVAL);
+      // the first execution above will happen after a delay of INTERVAL so we kick it off immediately as well
+      taskFor(this.tokenToUsdService.updateUsdcRate).perform(tokenAddress);
     }
   }
 

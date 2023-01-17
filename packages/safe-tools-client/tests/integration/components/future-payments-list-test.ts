@@ -1,6 +1,8 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
+import { ChainAddress } from '@cardstack/cardpay-sdk';
 import SchedulePaymentSDKService from '@cardstack/safe-tools-client/services/scheduled-payment-sdk';
 import ScheduledPaymentsService from '@cardstack/safe-tools-client/services/scheduled-payments';
+import TokenToUsdService from '@cardstack/safe-tools-client/services/token-to-usd';
 import Service from '@ember/service';
 import { render, click, TestContext } from '@ember/test-helpers';
 import percySnapshot from '@percy/ember';
@@ -12,10 +14,12 @@ import {
   endOfDay,
   endOfMonth,
 } from 'date-fns';
+import { task } from 'ember-concurrency-decorators';
 import {
   setupFakeDateService,
   FakeDateService,
 } from 'ember-date-service/test-support';
+import { FixedNumber } from 'ethers';
 import hbs from 'htmlbars-inline-precompile';
 import { module, test } from 'qunit';
 
@@ -34,6 +38,16 @@ let returnEmptyScheduledPayments = false;
 let returnScheduledPaymentsUntilTomorrow = false;
 let returnOnlyLaterScheduledPayments = false;
 let dateService: FakeDateService;
+
+class TokenToUsdServiceStub extends TokenToUsdService {
+  // eslint-disable-next-line require-yield
+  @task({ maxConcurrency: 1, enqueue: true }) *updateUsdcRate(
+    tokenAddress: ChainAddress
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  ): any {
+    this.usdcTokenRates.set(tokenAddress, FixedNumber.from(1000));
+  }
+}
 
 class ScheduledPaymentsStub extends ScheduledPaymentsService {
   // @ts-expect-error - we're overriding this method for testing purposes
@@ -157,6 +171,7 @@ module('Integration | Component | future-payments-list', function (hooks) {
 
     dateService = this.owner.lookup('service:date') as FakeDateService;
     await dateService.setNow(NOW.getTime());
+    this.owner.register('service:token-to-usd', TokenToUsdServiceStub);
   });
 
   hooks.afterEach(function () {
