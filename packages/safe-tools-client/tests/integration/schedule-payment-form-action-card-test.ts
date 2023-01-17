@@ -334,7 +334,7 @@ module(
         .containsText('Cardstack charges $0.25 USD and 0.1%');
     });
 
-    test(`it shows up the create safe instruction if get empty safes`, async function (assert) {
+    test(`it displays the create safe instruction if user has no safes`, async function (assert) {
       returnEmptySafes = true;
       await render(hbs`
         <SchedulePaymentFormActionCard />
