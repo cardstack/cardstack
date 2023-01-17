@@ -299,7 +299,7 @@ export default class SchedulePaymentFormActionCardUI extends Component<Signature
       </Section>
       <ActionChin @state={{this.actionChinState}}>
         <:default as |ac|>
-          {{#if @isSafesEmpty}}
+          {{#if (not @isSafesEmpty)}}
             <ac.ActionButton
               @disabled={{not @isSubmitEnabled}}
               data-test-schedule-payment-form-submit-button

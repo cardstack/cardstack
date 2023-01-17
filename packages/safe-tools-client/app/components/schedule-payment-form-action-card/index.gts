@@ -362,7 +362,7 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
   }
 
   get isSafesEmpty() {
-    return this.safes.safes || this.safes.safes?.length <= 0
+    return this.safes.safes == undefined || this.safes.safes?.length <= 0;
   }
 
   @tracked isSuccessfullyScheduled = false;
