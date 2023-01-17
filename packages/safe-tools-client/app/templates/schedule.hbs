@@ -25,6 +25,7 @@
       />
     </cp.Item>
     <cp.Item @title='Network' @icon='network'>
+      {{#if this.wallet.isConnected}}
         <Boxel::Select
         class='safe-tools__dashboard-dropdown'
             @selected={{this.network}}
@@ -34,6 +35,7 @@
           >
           <div class={{itemCssClass}} data-test-selected-network>{{network.name}}</div>
         </Boxel::Select>
+      {{/if}}
     </cp.Item>
     <cp.Item @title='Safe' @icon='safe'>
       {{#if this.wallet.isConnected}}
@@ -54,11 +56,16 @@
 
       <div class="safe-tools__dashboard-container-row">
         <SchedulePaymentFormActionCard />
-        <FuturePaymentsList @onDepositClick={{set this 'isDepositModalOpen' true}} />
+
+        {{#if this.wallet.isConnected}}
+          <FuturePaymentsList @onDepositClick={{set this 'isDepositModalOpen' true}} />
+        {{/if}}
       </div>
 
       <div class="safe-tools__dashboard-container-row">
-        <PaymentTransactionsList />
+        {{#if this.wallet.isConnected}}
+          <PaymentTransactionsList />
+        {{/if}}
       </div>
   </section>
 </section>

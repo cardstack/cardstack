@@ -162,7 +162,10 @@ module('Acceptance | wallet connection', function (hooks) {
   module('Remembering the selected chain', function () {
     test('Defaults to mainnet', async function (assert) {
       await visit('/schedule');
-      assert.dom('[data-test-selected-network]').hasText('Ethereum Mainnet');
+      await click('[data-test-connect-wallet-button-modal-sidebar]');
+      assert
+        .dom('[data-test-connect-wallet-button-modal]')
+        .hasAttribute('data-test-connect-wallet-button-modal-chain-id', '1');
     });
     module('with localstorage', function (hooks) {
       hooks.beforeEach(function (this: TestContext) {
@@ -170,8 +173,11 @@ module('Acceptance | wallet connection', function (hooks) {
       });
       test('Uses localstorage value for other', async function (assert) {
         await visit('/schedule');
+        await click('[data-test-connect-wallet-button-modal-sidebar]');
 
-        assert.dom('[data-test-selected-network]').hasText('Goerli');
+        assert
+          .dom('[data-test-connect-wallet-button-modal]')
+          .hasAttribute('data-test-connect-wallet-button-modal-chain-id', '5');
       });
     });
   });
