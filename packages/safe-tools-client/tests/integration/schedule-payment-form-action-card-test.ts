@@ -1,7 +1,9 @@
 import { TokenDetail } from '@cardstack/cardpay-sdk';
 import { ConfiguredScheduledPaymentFees } from '@cardstack/safe-tools-client/services/scheduled-payment-sdk';
 import TokensService from '@cardstack/safe-tools-client/services/tokens';
+import WalletService from '@cardstack/safe-tools-client/services/wallet';
 import Service from '@ember/service';
+
 import {
   click,
   fillIn,
@@ -24,7 +26,7 @@ import {
   EXAMPLE_PAYEE,
 } from '../support/ui-test-helpers';
 
-class WalletServiceStub extends Service {
+class WalletServiceStub extends WalletService {
   isConnected = true;
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   async switchNetwork(_chainId: number) {}
@@ -40,6 +42,7 @@ class ScheduledPaymentSDKServiceStub extends Service {
 }
 
 let tokensService: TokensService;
+
 module(
   'Integration | Component | schedule-payment-form-action-card',
   function (hooks) {

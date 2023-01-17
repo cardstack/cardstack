@@ -88,7 +88,11 @@ module('Acceptance | wallet connection', function (hooks) {
       assert.dom(
         '.boxel-radio-option__input boxel-radio-option__input--hidden-radio boxel-radio-option__input--checked'
       );
-      await click('[data-test-mainnet-connect-button]');
+      assert
+        .dom('[data-test-schedule-form-connect-wallet-cta]')
+        .includesText('Step 1 - First connect your wallet');
+
+      await click('[data-test-connect-wallet-button-modal]');
 
       assert
         .dom('[data-test-wallet-address]')
@@ -117,12 +121,13 @@ module('Acceptance | wallet connection', function (hooks) {
       assert
         .dom('[data-test-wallet-address]')
         .doesNotContainText(truncateMiddle([TEST_ACCOUNT_1]));
+      assert.dom('[data-test-schedule-form-connect-wallet-cta]').doesNotExist();
 
       await click('[data-test-disconnect-button]');
 
       assert.dom('[data-test-wallet-address]').doesNotExist();
 
-      assert.dom('[data-test-connect-button]').exists();
+      assert.dom('[data-test-connect-wallet-button-modal-sidebar]').exists();
       assert.dom('[data-test-disconnect-button]').doesNotExist();
       assert.dom('[data-test-safe-address-label]').doesNotExist();
     });
@@ -140,7 +145,7 @@ module('Acceptance | wallet connection', function (hooks) {
         '.boxel-radio-option__input boxel-radio-option__input--hidden-radio boxel-radio-option__input--checked'
       );
 
-      await click('[data-test-mainnet-connect-button]');
+      await click('[data-test-connect-wallet-button-modal]');
 
       this.mockWalletConnect.mockConnectedWallet([TEST_ACCOUNT_2]);
       this.mockWalletConnect.mockAccountsChanged([TEST_ACCOUNT_2]);

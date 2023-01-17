@@ -80,3 +80,20 @@
 .schedule-payment-form-action-card__recurring-explanation svg {
   margin-right: var(--boxel-sp-xxxs);
 }
+
+.schedule-payment-form-prerequisite-step {
+  display: flex;
+}
+
+.schedule-payment-form-prerequisite-step__icons svg {
+  margin-left: var(--boxel-sp-xxxs);
+}
+
+.schedule-payment-form-prerequisite-step__text {
+  margin: auto;
+  margin-left: var(--boxel-sp-sm);
+  font: var(--boxel-font-sm);
+  text-transform: uppercase;
+  font-weight: 600;
+  color: var(--boxel-yellow);
+}

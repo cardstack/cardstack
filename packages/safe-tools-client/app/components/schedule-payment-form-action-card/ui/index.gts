@@ -27,6 +27,8 @@ import cssVar from '@cardstack/boxel/helpers/css-var';
 import { type WalletProviderId } from '@cardstack/safe-tools-client/utils/wallet-providers';
 import { ConfiguredScheduledPaymentFees } from '@cardstack/safe-tools-client/services/scheduled-payment-sdk';
 import formatUsd from '@cardstack/safe-tools-client/helpers/format-usd';
+import WalletService from '@cardstack/safe-tools-client/services/wallet';
+import { inject as service } from '@ember/service';
 
 interface Signature {
   Element: HTMLElement;
@@ -73,6 +75,7 @@ export default class SchedulePaymentFormActionCardUI extends Component<Signature
   @tracked hasBlurredPaymentAmount = false;
   @tracked hasBlurredGasToken = false;
   @tracked hasBlurredMaxGasPrice = false;
+  @service declare wallet: WalletService;
 
   get isPaymentTypeInvalid() {
     if (!this.hasBlurredPaymentType) {
@@ -295,15 +298,39 @@ export default class SchedulePaymentFormActionCardUI extends Component<Signature
           </div>
         </BoxelField>
       </Section>
+
         <ActionChin @state={{this.actionChinState}}>
           <:default as |ac|>
-            <ac.ActionButton
-              @disabled={{not @isSubmitEnabled}}
-              data-test-schedule-payment-form-submit-button
-              {{on 'click' @onSchedulePayment}}
-            >
-              Schedule Payment
-            </ac.ActionButton>
+            {{#if this.wallet.isConnected}}
+              <ac.ActionButton
+                @disabled={{not @isSubmitEnabled}}
+                data-test-schedule-payment-form-submit-button
+                {{on 'click' @onSchedulePayment}}
+              >
+                Schedule Payment
+              </ac.ActionButton>
+            {{else}}
+              <div class="schedule-payment-form-prerequisite-step" data-test-schedule-form-connect-wallet-cta>
+                <div class="schedule-payment-form-prerequisite-step__icons">
+                  {{svgJar
+                    'wallet'
+                    width="30px"
+                    height="30px"
+                    style=(cssVar
+                      icon-color='var(--boxel-teal)'
+                    )
+                  }}
+                  {{svgJar
+                    'cardstack'
+                    width="30px"
+                    height="30px"
+                  }}
+                </div>
+                <div class="schedule-payment-form-prerequisite-step__text">
+                  Step 1 - First connect your wallet
+                </div>
+              </div>
+            {{/if}}
           </:default>
           <:inProgress as |ac|>
             <ac.ActionStatusArea @icon={{concat @walletProviderId "-logo" }} style={{cssVar status-icon-size="2.5rem"}}>
