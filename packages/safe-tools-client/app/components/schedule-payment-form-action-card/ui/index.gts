@@ -35,6 +35,7 @@ import FailureIcon from '@cardstack/safe-tools-client/components/icons/failure';
 import tokenToUsd from '@cardstack/safe-tools-client/helpers/token-to-usd';
 import { type CurrentFees } from '../fee-calculator';
 import TokenQuantity from '@cardstack/safe-tools-client/utils/token-quantity';
+import MaxGasToggleButton from './max-gas-toggle-button';
 
 interface Signature {
   Element: HTMLElement;
@@ -276,48 +277,9 @@ export default class SchedulePaymentFormActionCardUI extends Component<Signature
             @onBlur={{set this 'hasBlurredMaxGasPrice' true}}
             as |group|
           >
-            <group.Button @value="normal">
-              <div class="schedule-payment-form-action-card__max-gas-fee-name">
-                Normal
-              </div>
-              <div class="schedule-payment-form-action-card--max-gas-fee-description" data-test-max-gas-fee-normal-description>
-                {{#if @maxGasDescriptions.isLoading}}
-                  Loading gas price...
-                {{else if @maxGasDescriptions.error}}
-                  <span class="schedule-payment-form-action-card-error">Can't estimate gas price</span>
-                {{else if @maxGasDescriptions.value}}
-                  Less than {{@maxGasDescriptions.value.normal.displayable}} (~{{tokenToUsd tokenQuantity=@maxGasDescriptions.value.normal}})
-                {{/if}}
-              </div>
-            </group.Button>
-            <group.Button @value="high">
-              <div class="schedule-payment-form-action-card__max-gas-fee-name">
-                High
-              </div>
-              <div class="schedule-payment-form-action-card--max-gas-fee-description" data-test-max-gas-fee-high-description>
-                {{#if @maxGasDescriptions.isLoading}}
-                  Loading gas price...
-                {{else if @maxGasDescriptions.error}}
-                  <span class="schedule-payment-form-action-card-error">Can't estimate gas price</span>
-                {{else if @maxGasDescriptions.value}}
-                  Less than {{@maxGasDescriptions.value.high.displayable}} (~{{tokenToUsd tokenQuantity=@maxGasDescriptions.value.high}})
-                {{/if}}
-              </div>
-            </group.Button>
-            <group.Button @value="max">
-              <div class="schedule-payment-form-action-card__max-gas-fee-name">
-                Max
-              </div>
-              <div class="schedule-payment-form-action-card--max-gas-fee-description" data-test-max-gas-fee-max-description>
-                {{#if @maxGasDescriptions.isLoading}}
-                  Loading gas price...
-                {{else if @maxGasDescriptions.error}}
-                  <span class="schedule-payment-form-action-card-error">Can't estimate gas price</span>
-                {{else if @maxGasDescriptions.value}}
-                  Capped at {{@maxGasDescriptions.value.max.displayable}} (~{{tokenToUsd tokenQuantity=@maxGasDescriptions.value.max}})
-                {{/if}}
-              </div>
-            </group.Button>
+            <MaxGasToggleButton @group={{group}} @name="normal" @maxGasDescriptions={{@maxGasDescriptions}} />
+            <MaxGasToggleButton @group={{group}} @name="high" @maxGasDescriptions={{@maxGasDescriptions}} />
+            <MaxGasToggleButton @group={{group}} @name="max" @maxGasDescriptions={{@maxGasDescriptions}} />
           </BoxelToggleButtonGroup>
           <div><!-- empty --></div>
           <div class="schedule-payment-form-action-card__state-details {{if @maxGasDescriptions.error "schedule-payment-form-action-card-error"}}">
