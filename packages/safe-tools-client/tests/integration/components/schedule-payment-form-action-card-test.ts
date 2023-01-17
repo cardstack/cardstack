@@ -399,6 +399,11 @@ module(
       assert
         .dom('[data-test-summary-recipient-receives]')
         .containsText('15.0 WETH');
+      await waitUntil(() => {
+        return find(
+          '[data-test-summary-recipient-receives]'
+        )?.textContent?.includes('$ 15.00');
+      });
       assert
         .dom('[data-test-summary-recipient-receives]')
         .containsText('$ 15.00');
