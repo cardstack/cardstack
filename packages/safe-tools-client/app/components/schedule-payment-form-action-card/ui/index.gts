@@ -285,7 +285,7 @@ export default class SchedulePaymentFormActionCardUI extends Component<Signature
                   Loading gas price...
                 {{else if @maxGasDescriptions.error}}
                   <span class="schedule-payment-form-action-card-error">Can't estimate gas price</span>
-                {{else}}
+                {{else if @maxGasDescriptions.value}}
                   Less than {{@maxGasDescriptions.value.normal.displayable}} (~{{tokenToUsd tokenQuantity=@maxGasDescriptions.value.normal}})
                 {{/if}}
               </div>
@@ -299,7 +299,7 @@ export default class SchedulePaymentFormActionCardUI extends Component<Signature
                   Loading gas price...
                 {{else if @maxGasDescriptions.error}}
                   <span class="schedule-payment-form-action-card-error">Can't estimate gas price</span>
-                {{else}}
+                {{else if @maxGasDescriptions.value}}
                   Less than {{@maxGasDescriptions.value.high.displayable}} (~{{tokenToUsd tokenQuantity=@maxGasDescriptions.value.high}})
                 {{/if}}
               </div>
@@ -313,7 +313,7 @@ export default class SchedulePaymentFormActionCardUI extends Component<Signature
                   Loading gas price...
                 {{else if @maxGasDescriptions.error}}
                   <span class="schedule-payment-form-action-card-error">Can't estimate gas price</span>
-                {{else}}
+                {{else if @maxGasDescriptions.value}}
                   Capped at {{@maxGasDescriptions.value.max.displayable}} (~{{tokenToUsd tokenQuantity=@maxGasDescriptions.value.max}})
                 {{/if}}
               </div>
