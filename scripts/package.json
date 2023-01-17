@@ -7,5 +7,6 @@
     "js-hcl-parser": "^1.0.1",
     "node-fetch": "^3.3.0",
     "node-html-parser": "^6.1.4"
-  }
+  },
+  "private": true
 }
