@@ -30,12 +30,9 @@ import { ConfiguredScheduledPaymentFees } from '@cardstack/safe-tools-client/ser
 import formatUsd from '@cardstack/safe-tools-client/helpers/format-usd';
 import WalletService from '@cardstack/safe-tools-client/services/wallet';
 import { inject as service } from '@ember/service';
-<<<<<<< HEAD
 import { MaxGasDescriptionsState } from "..";
 import FailureIcon from '@cardstack/safe-tools-client/components/icons/failure';
-=======
 import tokenToUsd from '@cardstack/safe-tools-client/helpers/token-to-usd';
->>>>>>> 1363b40df (Show USD conversions for summary items)
 import { type CurrentFees } from '../fee-calculator';
 import TokenQuantity from '@cardstack/safe-tools-client/utils/token-quantity';
 
@@ -279,7 +276,7 @@ export default class SchedulePaymentFormActionCardUI extends Component<Signature
             as |group|
           >
             <group.Button @value="normal">
-              <div class="schedule-payment-form-action-card--max-gas-fee-name">
+              <div class="schedule-payment-form-action-card__max-gas-fee-name">
                 Normal
               </div>
               <div class="schedule-payment-form-action-card--max-gas-fee-description" data-test-max-gas-fee-normal-description>
@@ -293,7 +290,7 @@ export default class SchedulePaymentFormActionCardUI extends Component<Signature
               </div>
             </group.Button>
             <group.Button @value="high">
-              <div class="schedule-payment-form-action-card--max-gas-fee-name">
+              <div class="schedule-payment-form-action-card__max-gas-fee-name">
                 High
               </div>
               <div class="schedule-payment-form-action-card--max-gas-fee-description" data-test-max-gas-fee-high-description>
@@ -307,7 +304,7 @@ export default class SchedulePaymentFormActionCardUI extends Component<Signature
               </div>
             </group.Button>
             <group.Button @value="max">
-              <div class="schedule-payment-form-action-card--max-gas-fee-name">
+              <div class="schedule-payment-form-action-card__max-gas-fee-name">
                 Max
               </div>
               <div class="schedule-payment-form-action-card--max-gas-fee-description" data-test-max-gas-fee-max-description>
@@ -322,15 +319,15 @@ export default class SchedulePaymentFormActionCardUI extends Component<Signature
             </group.Button>
           </BoxelToggleButtonGroup>
           <div><!-- empty --></div>
-          <div class="schedule-payment-form-action-card--state-details {{if @maxGasDescriptions.error "schedule-payment-form-action-card-error"}}">
+          <div class="schedule-payment-form-action-card__state-details {{if @maxGasDescriptions.error "schedule-payment-form-action-card-error"}}">
             {{#if @maxGasDescriptions.error}}
               There was an error estimating gas prices. Please reload the page and try again. If the error persists, please contact support.
             {{/if}}
           </div>
           <div><!-- empty --></div>
-          <div class="schedule-payment-form-action-card--fee-details">
+          <div class="schedule-payment-form-action-card__fee-details">
             {{#if @configuredFees}}
-              {{svgJar "info" width="17px" height="17px" class="schedule-payment-form-action-card--fee-info-icon"}}
+              {{svgJar "info" width="17px" height="17px" class="schedule-payment-form-action-card__fee-info-icon"}}
               <span>Cardstack charges {{if @configuredFees.fixedUSD (formatUsd @configuredFees.fixedUSD)}} and {{@configuredFees.percentage}}% of the transaction as a fee for executing your scheduled payments.</span>
             {{/if}}
           </div>
