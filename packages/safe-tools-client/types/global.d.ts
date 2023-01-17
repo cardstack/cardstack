@@ -8,6 +8,7 @@ import { MetaMaskInpageProvider } from '@metamask/providers';
 import link from 'ember-link/helpers/link';
 import AndHelper from 'ember-truth-helpers/helpers/and';
 import NotHelper from 'ember-truth-helpers/helpers/not';
+import lte from 'ember-truth-helpers/helpers/lte';
 
 declare module '@glint/environment-ember-loose/registry' {
   // eslint-disable-next-line @typescript-eslint/no-empty-interface
@@ -26,6 +27,7 @@ declare module '@glint/environment-ember-loose/registry' {
       Return: () => void;
     }>;
     'svg-jar': typeof svgJar;
+    lte: typeof lte;
   }
 }
 

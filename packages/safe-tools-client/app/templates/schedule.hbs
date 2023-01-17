@@ -24,7 +24,7 @@
         @onConnect={{set this.application 'isShowingConnectModal' true}}
       />
     </cp.Item>
-    <cp.Item @title='Network' @icon='network'>
+    <cp.Item @title='Network' @icon='network' @isActive={{(and this.wallet.isConnected (lte this.safes.safes 0))}}>
       {{#if this.wallet.isConnected}}
         <Boxel::Select
         class='safe-tools__dashboard-dropdown safe-tools__dashboard-network-dropdown'
@@ -37,7 +37,7 @@
         </Boxel::Select>
       {{/if}}
     </cp.Item>
-    <cp.Item @title='Safe' @icon='safe'>
+    <cp.Item @title='Safe' @icon='safe' @isActive={{(and this.wallet.isConnected (lte this.safes.safes 0))}}>
       {{#if this.wallet.isConnected}}
         <SafeInfo
           @safes={{this.safes.safes}}
