@@ -267,34 +267,34 @@ export default class SchedulePaymentFormActionCardUI extends Component<Signature
             as |group|
           >
             <group.Button @value="normal">
-              <div class="schedule-payment-form-action-card--max-gas-fee-name">
+              <div class="schedule-payment-form-action-card__max-gas-fee-name">
                 Normal
               </div>
-              <div class="schedule-payment-form-action-card--max-gas-fee-description" data-test-max-gas-fee-normal-description>
+              <div class="schedule-payment-form-action-card__max-gas-fee-description" data-test-max-gas-fee-normal-description>
                 {{@maxGasDescriptions.normal}}
               </div>
             </group.Button>
             <group.Button @value="high">
-              <div class="schedule-payment-form-action-card--max-gas-fee-name">
+              <div class="schedule-payment-form-action-card__max-gas-fee-name">
                 High
               </div>
-              <div class="schedule-payment-form-action-card--max-gas-fee-description" data-test-max-gas-fee-high-description>
+              <div class="schedule-payment-form-action-card__max-gas-fee-description" data-test-max-gas-fee-high-description>
                 {{@maxGasDescriptions.high}}
               </div>
             </group.Button>
             <group.Button @value="max">
-              <div class="schedule-payment-form-action-card--max-gas-fee-name">
+              <div class="schedule-payment-form-action-card__max-gas-fee-name">
                 Max
               </div>
-              <div class="schedule-payment-form-action-card--max-gas-fee-description" data-test-max-gas-fee-max-description>
+              <div class="schedule-payment-form-action-card__max-gas-fee-description" data-test-max-gas-fee-max-description>
                 {{@maxGasDescriptions.max}}
               </div>
             </group.Button>
           </BoxelToggleButtonGroup>
           <div><!-- empty --></div>
-          <div class="schedule-payment-form-action-card--fee-details">
+          <div class="schedule-payment-form-action-card__fee-details">
             {{#if @configuredFees}}
-              {{svgJar "info" width="17px" height="17px" class="schedule-payment-form-action-card--fee-info-icon"}}
+              {{svgJar "info" width="17px" height="17px" class="schedule-payment-form-action-card__fee-info-icon"}}
               <span>Cardstack charges {{if @configuredFees.fixedUSD (formatUsd @configuredFees.fixedUSD)}} and {{@configuredFees.percentage}}% of the transaction as a fee for executing your scheduled payments.</span>
             {{/if}}
           </div>
@@ -303,26 +303,26 @@ export default class SchedulePaymentFormActionCardUI extends Component<Signature
           <BoxelField @label="Execution Plan" style={{cssVar boxel-field-label-align="top"}}>
             <div>
               <BoxelField @label="Recipient Will Receive" data-test-summary-recipient-receives @vertical={{true}} style={{cssVar boxel-field-label-justify-content="end"}}>
-                <div class="schedule-payment-form-action-card--fees-value">
+                <div class="schedule-payment-form-action-card__fees-value">
                   {{#if @paymentAmountTokenQuantity}}
                     <div>{{@paymentAmountTokenQuantity.displayable}}</div>
-                    <div class="schedule-payment-form-action-card--fee-usd-estimate">{{tokenToUsd tokenQuantity=@paymentAmountTokenQuantity}}</div>
+                    <div class="schedule-payment-form-action-card__fee-usd-estimate">{{tokenToUsd tokenQuantity=@paymentAmountTokenQuantity}}</div>
                   {{/if}}
                 </div>
               </BoxelField>
               <BoxelField @label="Fixed Fee" data-test-summary-fixed-fee @vertical={{true}} style={{cssVar boxel-field-label-justify-content="end"}}>
-                <div class="schedule-payment-form-action-card--fees-value">
+                <div class="schedule-payment-form-action-card__fees-value">
                   {{#if @currentFees.fixedFee}}
                     <div>{{@currentFees.fixedFee.displayable}}</div>
-                    <div class="schedule-payment-form-action-card--fee-usd-estimate">{{tokenToUsd tokenQuantity=@currentFees.fixedFee}}</div>
+                    <div class="schedule-payment-form-action-card__fee-usd-estimate">{{tokenToUsd tokenQuantity=@currentFees.fixedFee}}</div>
                   {{/if}}
                 </div>
               </BoxelField>
               <BoxelField @label="Variable Fee" data-test-summary-variable-fee @vertical={{true}} style={{cssVar boxel-field-label-justify-content="end"}}>
-                <div class="schedule-payment-form-action-card--fees-value">
+                <div class="schedule-payment-form-action-card__fees-value">
                   {{#if @currentFees.variableFee}}
                     <div>{{@currentFees.variableFee.displayable}}</div>
-                    <div class="schedule-payment-form-action-card--fee-usd-estimate">{{tokenToUsd tokenQuantity=@currentFees.variableFee}}</div>
+                    <div class="schedule-payment-form-action-card__fee-usd-estimate">{{tokenToUsd tokenQuantity=@currentFees.variableFee}}</div>
                   {{/if}}
                 </div>
               </BoxelField>

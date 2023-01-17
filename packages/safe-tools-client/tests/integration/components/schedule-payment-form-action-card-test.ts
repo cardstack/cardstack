@@ -356,7 +356,7 @@ module(
         <SchedulePaymentFormActionCard />
       `);
       assert
-        .dom('.schedule-payment-form-action-card--fee-details')
+        .dom('.schedule-payment-form-action-card__fee-details')
         .containsText('Cardstack charges $0.25 USD and 0.1%');
     });
 
