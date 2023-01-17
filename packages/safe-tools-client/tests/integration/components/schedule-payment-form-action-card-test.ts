@@ -365,8 +365,39 @@ module(
           <SchedulePaymentFormActionCard />
         `);
         assert
-          .dom('.schedule-payment-form-action-card--fee-details')
+          .dom('.schedule-payment-form-action-card__fee-details')
           .containsText('Cardstack charges $0.25 USD and 0.1%');
+      });
+
+      test('calculated fees are shown under at the bottom of the form once valid', async function (assert) {
+        await render(hbs`
+          <SchedulePaymentFormActionCard />
+        `);
+        await fillInSchedulePaymentFormWithValidInfo({
+          paymentTokenName: 'WETH',
+        });
+        assert
+          .dom('[data-test-summary-recipient-receives]')
+          .containsText('15.0 WETH');
+        await waitUntil(() => {
+          return find(
+            '[data-test-summary-recipient-receives]'
+          )?.textContent?.includes('$ 15.00');
+        });
+        assert
+          .dom('[data-test-summary-recipient-receives]')
+          .containsText('$ 15.00');
+        await waitUntil(() => {
+          return find('[data-test-summary-fixed-fee]')?.textContent?.includes(
+            '0.25 USDC'
+          );
+        });
+        assert.dom('[data-test-summary-fixed-fee]').containsText('0.25 USDC');
+        assert.dom('[data-test-summary-fixed-fee]').containsText('$ 0.25');
+        assert
+          .dom('[data-test-summary-variable-fee]')
+          .containsText('0.015 WETH');
+        assert.dom('[data-test-summary-variable-fee]').containsText('$ 0.01');
       });
     });
 
@@ -388,37 +419,5 @@ module(
           .hasAttribute('disabled');
       });
     });
-
-    test('calculated fees are shown under at the bottom of the form once valid', async function (assert) {
-      await render(hbs`
-        <SchedulePaymentFormActionCard />
-      `);
-      await fillInSchedulePaymentFormWithValidInfo({
-        paymentTokenName: 'WETH',
-      });
-      assert
-        .dom('[data-test-summary-recipient-receives]')
-        .containsText('15.0 WETH');
-      await waitUntil(() => {
-        return find(
-          '[data-test-summary-recipient-receives]'
-        )?.textContent?.includes('$ 15.00');
-      });
-      assert
-        .dom('[data-test-summary-recipient-receives]')
-        .containsText('$ 15.00');
-      await waitUntil(() => {
-        return find('[data-test-summary-fixed-fee]')?.textContent?.includes(
-          '0.25 USDC'
-        );
-      });
-      assert.dom('[data-test-summary-fixed-fee]').containsText('0.25 USDC');
-      assert.dom('[data-test-summary-fixed-fee]').containsText('$ 0.25');
-      assert.dom('[data-test-summary-variable-fee]').containsText('0.015 WETH');
-      assert.dom('[data-test-summary-variable-fee]').containsText('$ 0.01');
-    });
-
-    // TODO: assert state for no network selected/connected
-    // TODO: assert state for no safe present
   }
 );
