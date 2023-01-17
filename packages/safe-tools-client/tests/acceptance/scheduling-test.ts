@@ -1,3 +1,4 @@
+import { delay } from '@cardstack/cardpay-sdk';
 import { Deferred } from '@cardstack/ember-shared';
 import SafesService, {
   TokenBalance,
@@ -11,6 +12,7 @@ import {
   visit,
   waitFor,
   waitUntil,
+  settled,
 } from '@ember/test-helpers';
 import { addDays } from 'date-fns';
 import { TransactionReceipt } from 'eth-testing/lib/json-rpc-methods-types';
@@ -376,6 +378,9 @@ module('Acceptance | scheduling', function (hooks) {
         )?.textContent?.trim().length;
       });
 
+      await settled();
+      await delay(500); // This shouldn't be necessary but is for some reason
+      assert.dom(SUBMIT_BUTTON).isNotDisabled();
       await click(SUBMIT_BUTTON);
       assert.dom(IN_PROGRESS_MESSAGE).hasText('Authenticating...');
       assert.dom(PAYEE_INPUT).isDisabled();
@@ -500,6 +505,10 @@ module('Acceptance | scheduling', function (hooks) {
           '[data-test-max-gas-fee-normal-description]'
         )?.textContent?.trim().length;
       });
+
+      await settled();
+      await delay(500); // This shouldn't be necessary but is for some reason
+      assert.dom(SUBMIT_BUTTON).isNotDisabled();
 
       await click(SUBMIT_BUTTON);
       assert.dom(IN_PROGRESS_MESSAGE).hasText('Authenticating...');
