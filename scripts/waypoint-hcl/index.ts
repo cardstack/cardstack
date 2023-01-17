@@ -22,21 +22,6 @@ interface WaypointHclDeployStanza {
 
 interface WaypointHclUseStanza {}
 
-interface WaypointHclAwsEcsStanza extends WaypointHclUseStanza {
-  cluster?: string;
-  service_port?: number;
-  execution_role_name?: string;
-
-  alb?: {
-    subnets?: string[];
-    certificate?: string;
-  }[];
-
-  secrets?: {
-    [key: string]: string;
-  };
-}
-
 class WaypointConfig {
   apps: Map<string, WaypointApp>;
 
@@ -97,11 +82,6 @@ interface WaypointDeployAwsEcsPlugin extends WaypointDeployPlugin {
   secrets: {
     [key: string]: string;
   };
-}
-
-interface WaypointDeployAwsEcsPluginAlbConfig {
-  subnets?: string[];
-  certificate?: string;
 }
 
 export { WaypointConfig, WaypointDeployAwsEcsPlugin };
