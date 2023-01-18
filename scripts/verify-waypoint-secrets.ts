@@ -4,6 +4,7 @@ import { STSClient, GetCallerIdentityCommand } from '@aws-sdk/client-sts';
 
 let awsAccountId: string = '';
 let WAYPOINT_CONFIG_PATH = process.env.WAYPOINT_CONFIG_PATH || 'waypoint.hcl';
+let iamClient: IAMClient;
 
 async function main() {
   try {
@@ -12,6 +13,7 @@ async function main() {
     const res = await stsClient.send(command);
 
     awsAccountId = res.Account!;
+    iamClient = new IAMClient({});
 
     if (process.argv.length >= 3) {
       WAYPOINT_CONFIG_PATH = process.argv[2];
@@ -50,6 +52,8 @@ async function main() {
         );
       }
     }
+
+    iamClient.destroy();
   } catch (err) {
     console.error(err);
     process.exitCode = 1;
@@ -91,7 +95,6 @@ async function simulatePrincipalPolicy(actionName: string, role: string, arns: s
     return result;
   }
 
-  const iamClient = new IAMClient({});
   const command = new SimulatePrincipalPolicyCommand({
     ActionNames: [actionName],
     PolicySourceArn: role,
@@ -114,7 +117,6 @@ async function simulatePrincipalPolicy(actionName: string, role: string, arns: s
     }
   }
 
-  iamClient.destroy();
   return result;
 }
 
