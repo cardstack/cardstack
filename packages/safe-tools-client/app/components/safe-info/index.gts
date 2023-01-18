@@ -8,6 +8,7 @@ import truncateMiddle from '@cardstack/safe-tools-client/helpers/truncate-middle
 import nativeUnitsToDecimal from '@cardstack/safe-tools-client/helpers/native-units-to-decimal';
 import CreateSafe from '@cardstack/safe-tools-client/components/create-safe';
 import { Safe, TokenBalance } from '@cardstack/safe-tools-client/services/safes';
+import not from 'ember-truth-helpers/helpers/not';
 
 import './index.css';
 
@@ -16,7 +17,9 @@ interface Signature {
   Args: {
     currentSafe: Safe | undefined;
     safes: Safe[] | undefined;
+    isLoadingSafes: boolean | undefined;
     tokenBalances: TokenBalance[] | undefined;
+    isLoadingTokenBalances: boolean;
     safesLoadingError: Error | undefined;
     onDepositClick: () => void;
     onSelectSafe: (safe: Safe) => void;
@@ -32,7 +35,9 @@ export default class SafeInfo extends Component<Signature> {
   }
 
   <template>
-    {{#if (gt @safes.length 1)}}
+    {{#if @isLoadingSafes}}
+      <div class='info'>Loading safes...</div>
+    {{else if (gt @safes.length 1)}}
       <BoxelSelect
         class='safe-tools__dashboard-dropdown'
         @selected={{@currentSafe}}
@@ -50,24 +55,28 @@ export default class SafeInfo extends Component<Signature> {
     {{/if}}
 
     {{#if @currentSafe}}
-      <div>
-        {{#each @tokenBalances as |tokenBalance|}}
-          {{#let (nativeUnitsToDecimal tokenBalance.balance tokenBalance.decimals)
-            as |balanceDecimalValue|
-          }}
-            {{!-- Don't show zero balances and crypto dust --}}
-            {{#if (or tokenBalance.isNativeToken (gt tokenBalance.balance 0.0001))}}
-              <div class='safe-tools_safe-info-balance' data-test-token-balance={{tokenBalance.symbol}}>
-                {{balanceDecimalValue}} {{tokenBalance.symbol}}
-              </div>
-            {{/if}}
-          {{/let}}
-        {{/each}}
-      </div>
+      {{#if @isLoadingTokenBalances}}
+        <div class='info'>Loading token balances...</div>
+      {{else}}
+        <div>
+          {{#each @tokenBalances as |tokenBalance|}}
+            {{#let (nativeUnitsToDecimal tokenBalance.balance tokenBalance.decimals)
+              as |balanceDecimalValue|
+            }}
+              {{!-- Don't show zero balances and crypto dust --}}
+              {{#if (or tokenBalance.isNativeToken (gt tokenBalance.balance 0.0001))}}
+                <div class='safe-tools_safe-info-balance' data-test-token-balance={{tokenBalance.symbol}}>
+                  {{balanceDecimalValue}} {{tokenBalance.symbol}}
+                </div>
+              {{/if}}
+            {{/let}}
+          {{/each}}
+        </div>
 
-      <BoxelButton @kind='primary' {{on 'click' @onDepositClick}}>
-        Add Funds
-      </BoxelButton>
+        <BoxelButton @kind='primary' {{on 'click' @onDepositClick}}>
+          Add Funds
+        </BoxelButton>
+      {{/if}}
     {{else if this.safesHaveLoadedInitially}}
       <p class='info'>
         To schedule payments, you need to have a safe which contains funds that would be deducted
@@ -78,8 +87,10 @@ export default class SafeInfo extends Component<Signature> {
     {{#if @safesLoadingError}}
       <div class="info">⚠️ {{@safesLoadingError.message}}</div>
     {{/if}}
-
-    <CreateSafe @currentSafe={{@currentSafe}} />
+    
+    {{#if (not @isLoadingSafes)}}
+      <CreateSafe @currentSafe={{@currentSafe}} />
+    {{/if}}
   </template>
 }
 
