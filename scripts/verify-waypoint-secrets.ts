@@ -13,7 +13,7 @@ async function main() {
     const res = await stsClient.send(command);
 
     awsAccountId = res.Account!;
-    iamClient = new IAMClient({});
+    iamClient = new IAMClient({ retryMode: 'adaptive' });
 
     if (process.argv.length >= 3) {
       WAYPOINT_CONFIG_PATH = process.argv[2];
