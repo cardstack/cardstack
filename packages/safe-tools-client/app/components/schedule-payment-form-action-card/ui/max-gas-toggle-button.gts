@@ -19,7 +19,7 @@ export default class MaxGasToggleButton extends Component<Signature> {
       <div class="schedule-payment-form-action-card__max-gas-fee-name">
         {{titleize @name}}
       </div>
-      <div class="schedule-payment-form-action-card--max-gas-fee-description" data-test-max-gas-fee-description={{@name}}>
+      <div class="schedule-payment-form-action-card__max-gas-fee-description" data-test-max-gas-fee-description={{@name}}>
         {{#if @maxGasDescriptions.isLoading}}
           Loading gas price...
         {{else if @maxGasDescriptions.error}}
