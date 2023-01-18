@@ -52,6 +52,8 @@ async function main() {
         );
       }
     }
+
+    iamClient.destroy();
   } catch (err) {
     console.error(err);
     process.exitCode = 1;
@@ -115,7 +117,6 @@ async function simulatePrincipalPolicy(actionName: string, role: string, arns: s
     }
   }
 
-  iamClient.destroy();
   return result;
 }
 
