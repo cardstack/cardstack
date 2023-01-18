@@ -1,8 +1,11 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import { hubRequest } from '@cardstack/cardpay-sdk';
+import { SelectableToken } from '@cardstack/boxel/components/boxel/input/selectable-token';
+import { ChainAddress, hubRequest } from '@cardstack/cardpay-sdk';
 import config from '@cardstack/safe-tools-client/config/environment';
 import HubAuthenticationService from '@cardstack/safe-tools-client/services/hub-authentication';
 import NetworkService from '@cardstack/safe-tools-client/services/network';
+import TokensService from '@cardstack/safe-tools-client/services/tokens';
+import TokenQuantity from '@cardstack/safe-tools-client/utils/token-quantity';
 import { action } from '@ember/object';
 import Service, { inject as service } from '@ember/service';
 import { didCancel, task, TaskGenerator } from 'ember-concurrency';
@@ -14,10 +17,9 @@ import { TrackedObject } from 'tracked-built-ins';
 
 export interface ScheduledPayment {
   id: string;
-  amount: BigNumber;
   feeFixedUSD: string;
   feePercentage: string;
-  tokenAddress: string;
+  paymentTokenQuantity: TokenQuantity;
   gasTokenAddress: string;
   payeeAddress: string;
   payAt: Date;
@@ -70,6 +72,15 @@ export interface ScheduledPaymentAttemptResponseItem {
         id: string;
       };
     };
+  };
+}
+
+function buildUnknownToken(tokenAddress: ChainAddress): SelectableToken {
+  return {
+    address: tokenAddress,
+    name: 'Unknown',
+    symbol: 'UNKNOWN',
+    decimals: 18, // guessing
   };
 }
 
@@ -142,6 +153,7 @@ interface ScheduledPaymentsResourceState extends Record<PropertyKey, unknown> {
 export default class ScheduledPaymentsService extends Service {
   @service declare hubAuthentication: HubAuthenticationService;
   @service declare network: NetworkService;
+  @service declare tokens: TokensService;
   @service declare date: DateService;
 
   async fetchScheduledPaymentAttempts(
@@ -288,16 +300,22 @@ export default class ScheduledPaymentsService extends Service {
     response: ScheduledPaymentResponse
   ): ScheduledPayment | ScheduledPayment[] {
     const deserialize = (data: ScheduledPaymentResponseItem) => {
+      const paymentTokenAddress = data.attributes['token-address'];
+      const paymentToken =
+        this.tokens.tokenFromAddress(paymentTokenAddress) ||
+        buildUnknownToken(paymentTokenAddress);
       return {
         id: data.id,
         userAddress: data.attributes['user-address'],
         senderSafeAddress: data.attributes['sender-safe-address'],
         moduleAddress: data.attributes['module-address'],
-        amount: BigNumber.from(data.attributes.amount),
+        paymentTokenQuantity: new TokenQuantity(
+          paymentToken,
+          BigNumber.from(data.attributes['amount'])
+        ),
         feeFixedUSD: data.attributes['fee-fixed-usd'],
         feePercentage: data.attributes['fee-percentage'],
         gasTokenAddress: data.attributes['gas-token-address'],
-        tokenAddress: data.attributes['token-address'],
         chainId: Number(data.attributes['chain-id']),
         payeeAddress: data.attributes['payee-address'],
         payAt: new Date(data.attributes['pay-at']),

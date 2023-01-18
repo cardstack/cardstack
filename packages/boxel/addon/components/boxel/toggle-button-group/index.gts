@@ -16,6 +16,8 @@ import optional from 'ember-composable-helpers/helpers/optional';
 import '@cardstack/boxel/styles/global.css';
 import './index.css';
 
+export type ButtonYieldedByToggleButtonGroup = WithBoundArgs<typeof Button, 'disabled'|'chosenValue'|'name'|'onChange'|'onBlur'>;
+
 interface Signature {
   Element: HTMLFieldSetElement;
   Args: {
@@ -29,7 +31,7 @@ interface Signature {
     value?: string;
   };
   Blocks: {
-    'default': [{ Button: WithBoundArgs<typeof Button, 'disabled'|'chosenValue'|'name'|'onChange'|'onBlur'> }],
+    'default': [{ Button: ButtonYieldedByToggleButtonGroup }],
   }
 }
 

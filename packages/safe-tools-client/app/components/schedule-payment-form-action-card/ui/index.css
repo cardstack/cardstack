@@ -19,16 +19,16 @@
   --boxel-field-label-padding-top: var(--boxel-sp-lg);
 }
 
-.schedule-payment-form-action-card--max-gas-fee-name {
+.schedule-payment-form-action-card__max-gas-fee-name {
   font-weight: bold;
 }
 
-.schedule-payment-form-action-card--max-gas-fee-description {
+.schedule-payment-form-action-card__max-gas-fee-description {
   font: var(--boxel-font-xs);
   color: var(--boxel-purple-400);
 }
 
-.schedule-payment-form-action-card--fee-details {
+.schedule-payment-form-action-card__fee-details {
   padding-top: var(--boxel-sp);
   padding-right: var(--boxel-sp);
   font: var(--boxel-font-xs);
@@ -36,7 +36,7 @@
   display: flex;
 }
 
-.schedule-payment-form-action-card--state-details {
+.schedule-payment-form-action-card__state-details {
   padding-top: var(--boxel-sp);
   padding-right: var(--boxel-sp);
   font: var(--boxel-font-xs);
@@ -48,7 +48,7 @@
   color: var(--boxel-red);
 }
 
-.schedule-payment-form-action-card--fee-info-icon {
+.schedule-payment-form-action-card__fee-info-icon {
   margin: 0 var(--boxel-sp-xxxs);
 }
 
@@ -113,4 +113,14 @@
   text-transform: uppercase;
   font-weight: 600;
   color: var(--boxel-yellow);
+}
+
+.schedule-payment-form-action-card__fees-value {
+  text-align: right;
+  font-weight: bold;
+}
+
+.schedule-payment-form-action-card__fee-usd-estimate {
+  font-weight: normal;
+  font-size: var(--boxel-font-size-sm);
 }

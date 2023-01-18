@@ -8,10 +8,9 @@ import BoxelModal from '@cardstack/boxel/components/boxel/modal';
 import { ScheduledPayment } from '@cardstack/safe-tools-client/services/scheduled-payments';
 import formatDate from '@cardstack/safe-tools-client/helpers/format-date';
 import truncateMiddle from '@cardstack/safe-tools-client/helpers/truncate-middle';
-import nativeUnitsToDecimal from '@cardstack/safe-tools-client/helpers/native-units-to-decimal';
 import { inject as service } from '@ember/service';
 import TokensService from '@cardstack/safe-tools-client/services/tokens';
-import TokenToUsd from '@cardstack/safe-tools-client/components/token-to-usd';
+import tokenToUsd from '@cardstack/safe-tools-client/helpers/token-to-usd';
 import { on } from '@ember/modifier';
 import { action } from '@ember/object';
 import { tracked } from '@glimmer/tracking';
@@ -53,16 +52,6 @@ export default class ScheduledPaymentCard extends Component<Signature> {
   @action closeCancelScheduledPaymentModal(reload: boolean) {
     this.isCancelPaymentModalOpen = false;
     if (reload) this.scheduledPayments.reloadScheduledPayments();
-  }
-
-  get tokenInfo() {
-    let tokens = this.tokens.transactionTokens;
-    let token = tokens.find(token => token.address === this.args.scheduledPayment.tokenAddress);
-
-    if (!token) {
-      throw new Error('unknown transfer token');
-    }
-    return token;
   }
 
   get cancelPaymentState(): ActionChinState {
@@ -109,10 +98,10 @@ export default class ScheduledPaymentCard extends Component<Signature> {
         <span class="scheduled-payment-card__pay-at">{{this.paymentType}} on {{formatDate @scheduledPayment.payAt "d/M/yyyy"}}</span>
         <span class="scheduled-payment-card__payee">To: {{truncateMiddle @scheduledPayment.payeeAddress}}</span>
         <div class="scheduled-payment-card__payment-detail">
-          <img class="scheduled-payment-card__token-symbol" src={{this.tokenInfo.logoURI}} />
+          <img class="scheduled-payment-card__token-symbol" src={{@scheduledPayment.paymentTokenQuantity.token.logoURI}} />
           <div class="scheduled-payment-card__token-amounts">
-            <span class="scheduled-payment-card__token-amount">{{nativeUnitsToDecimal @scheduledPayment.amount this.tokenInfo.decimals}} {{this.tokenInfo.symbol}}</span>
-            <span class="scheduled-payment-card__usd-amount"><TokenToUsd @tokenAddress={{@scheduledPayment.tokenAddress}} @tokenAmount={{@scheduledPayment.amount}} @tokenDecimals={{this.tokenInfo.decimals}}/></span>
+            <span class="scheduled-payment-card__token-amount">{{@scheduledPayment.paymentTokenQuantity.displayable}}</span>
+            <span class="scheduled-payment-card__usd-amount">{{tokenToUsd tokenQuantity=@scheduledPayment.paymentTokenQuantity }}</span>
           </div>
         </div>
       </div>
@@ -151,7 +140,7 @@ export default class ScheduledPaymentCard extends Component<Signature> {
       >
         <Section @title="Cancel your scheduled payment">
           <div>
-            <p>You're about to cancel your payment of <strong>{{nativeUnitsToDecimal @scheduledPayment.amount this.tokenInfo.decimals}} {{this.tokenInfo.symbol}}</strong>
+            <p>You're about to cancel your payment of <strong>{{@scheduledPayment.paymentTokenQuantity.displayable}}</strong>
             to <span class="blockchain-address">{{truncateMiddle @scheduledPayment.payeeAddress}}</span>, scheduled for <strong>{{formatDate @scheduledPayment.payAt "d/M/yyyy"}}</strong>.</p>
 
             <p>This action will remove the scheduled payment from the scheduled payment module, and it won't be attempted in the future.</p>

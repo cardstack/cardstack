@@ -136,7 +136,9 @@ export async function getUsdcToTokenRate(provider: JsonRpcProvider, tokenAddress
   let rate = await tokenPairRate(provider, usdcTokenAddress, tokenAddress);
   let numerator = FixedNumber.from(rate.numerator.toString());
   let denominator = FixedNumber.from(rate.denominator.toString());
-  let scalar = FixedNumber.from(rate.scalar.toString());
+  let scalar = FixedNumber.from(rate.scalar.numerator.toString()).divUnsafe(
+    FixedNumber.from(rate.scalar.denominator.toString())
+  );
   const rateAdjusted = numerator.divUnsafe(denominator).mulUnsafe(scalar);
   return rateAdjusted;
 }

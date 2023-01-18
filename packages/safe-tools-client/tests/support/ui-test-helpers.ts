@@ -53,12 +53,15 @@ async function chooseDayOfMonth(selector: string, dayNumber: number) {
 }
 
 interface FormFillOptions {
-  type: 'one-time' | 'monthly';
+  type?: 'one-time' | 'monthly';
+  paymentTokenName?: string;
 }
 
 export async function fillInSchedulePaymentFormWithValidInfo(
-  options: FormFillOptions = { type: 'one-time' }
+  options: FormFillOptions = {}
 ) {
+  options.paymentTokenName = options.paymentTokenName || 'USDC';
+  options.type = options.type || 'one-time';
   if (options.type === 'one-time') {
     await click('[data-test-payment-type="one-time"]');
     await chooseTomorrow('[data-test-boxel-input-date-trigger]');
@@ -78,7 +81,7 @@ export async function fillInSchedulePaymentFormWithValidInfo(
   // Choose USDC for the transaction token
   await selectChoose(
     '[data-test-amount-input] [data-test-boxel-input-group-select-accessory-trigger]',
-    'USDC'
+    options.paymentTokenName
   );
 
   // Choose USDC for the gas token

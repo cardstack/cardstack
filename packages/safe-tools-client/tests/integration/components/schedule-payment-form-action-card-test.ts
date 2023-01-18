@@ -1,29 +1,42 @@
-import { TokenDetail } from '@cardstack/cardpay-sdk';
-import { ConfiguredScheduledPaymentFees } from '@cardstack/safe-tools-client/services/scheduled-payment-sdk';
+import {
+  ChainAddress,
+  GasEstimationScenario,
+  TokenDetail,
+} from '@cardstack/cardpay-sdk';
+import {
+  ConfiguredScheduledPaymentFees,
+  ServiceGasEstimationResult,
+} from '@cardstack/safe-tools-client/services/scheduled-payment-sdk';
+import TokenToUsdService from '@cardstack/safe-tools-client/services/token-to-usd';
 import TokensService from '@cardstack/safe-tools-client/services/tokens';
 import WalletService from '@cardstack/safe-tools-client/services/wallet';
 import Service from '@ember/service';
 import {
   click,
   fillIn,
+  find,
   render,
   TestContext,
   settled,
+  waitUntil,
 } from '@ember/test-helpers';
 import { format, subDays, addMonths, addHours, subHours } from 'date-fns';
+import { task } from 'ember-concurrency-decorators';
 import { selectChoose } from 'ember-power-select/test-support';
+import { BigNumber, FixedNumber } from 'ethers';
 
 import hbs from 'htmlbars-inline-precompile';
 import { module, test } from 'qunit';
 
-import { setupRenderingTest } from '../helpers';
+import { setupRenderingTest } from '../../helpers';
 
-import { exampleGasTokens } from '../support/tokens';
+import { exampleGasTokens } from '../../support/tokens';
 import {
   chooseTime,
   chooseTomorrow,
   EXAMPLE_PAYEE,
-} from '../support/ui-test-helpers';
+  fillInSchedulePaymentFormWithValidInfo,
+} from '../../support/ui-test-helpers';
 
 class ConnectedWalletServiceStub extends WalletService {
   isConnected = true;
@@ -42,6 +55,31 @@ class ScheduledPaymentSDKServiceStub extends Service {
       percentage: 0.1,
     };
   }
+
+  async getScheduledPaymentGasEstimation(
+    _scenario: GasEstimationScenario,
+    _tokenAddress: ChainAddress,
+    _gasTokenAddress: ChainAddress
+  ): Promise<ServiceGasEstimationResult> {
+    return {
+      gas: BigNumber.from(127864),
+      gasRangeInGasTokenWei: {
+        normal: BigNumber.from('20000000'),
+        high: BigNumber.from('40000000'),
+        max: BigNumber.from('80000000'),
+      },
+    };
+  }
+}
+
+class TokenToUsdServiceStub extends TokenToUsdService {
+  // eslint-disable-next-line require-yield
+  @task({ maxConcurrency: 1, enqueue: true }) *updateUsdcRate(
+    tokenAddress: ChainAddress
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  ): any {
+    this.usdcTokenRates.set(tokenAddress, FixedNumber.from(1));
+  }
 }
 
 let tokensService: TokensService;
@@ -58,6 +96,7 @@ module(
         );
         tokensService = this.owner.lookup('service:tokens');
         tokensService.stubGasTokens(exampleGasTokens);
+        this.owner.register('service:token-to-usd', TokenToUsdServiceStub);
         this.owner.register('service:wallet', ConnectedWalletServiceStub);
       });
 
@@ -65,6 +104,7 @@ module(
         await render(hbs`
           <SchedulePaymentFormActionCard />
         `);
+
         assert
           .dom(
             '.boxel-input-selectable-token-amount [data-test-boxel-input-group-select-accessory-trigger]'
@@ -320,8 +360,49 @@ module(
           <SchedulePaymentFormActionCard />
         `);
         assert
-          .dom('.schedule-payment-form-action-card--fee-details')
+          .dom('.schedule-payment-form-action-card__fee-details')
           .containsText('Cardstack charges $0.25 USD and 0.1%');
+      });
+
+      test('calculated fees are shown under at the bottom of the form once valid', async function (assert) {
+        await render(hbs`
+          <SchedulePaymentFormActionCard />
+        `);
+        await fillInSchedulePaymentFormWithValidInfo({
+          paymentTokenName: 'WETH',
+        });
+        assert
+          .dom('[data-test-summary-recipient-receives]')
+          .containsText('15.0 WETH');
+        await waitUntil(() => {
+          return find(
+            '[data-test-summary-recipient-receives]'
+          )?.textContent?.includes('$ 15.00');
+        });
+        assert
+          .dom('[data-test-summary-recipient-receives]')
+          .containsText('$ 15.00');
+
+        await waitUntil(() => {
+          return find(
+            '[data-test-summary-estimated-gas]'
+          )?.textContent?.includes('20.0 USDC');
+        });
+        assert
+          .dom('[data-test-summary-estimated-gas]')
+          .containsText('20.0 USDC');
+        assert.dom('[data-test-summary-estimated-gas]').containsText('$ 20.00');
+        await waitUntil(() => {
+          return find('[data-test-summary-fixed-fee]')?.textContent?.includes(
+            '0.25 USDC'
+          );
+        });
+        assert.dom('[data-test-summary-fixed-fee]').containsText('0.25 USDC');
+        assert.dom('[data-test-summary-fixed-fee]').containsText('$ 0.25');
+        assert
+          .dom('[data-test-summary-variable-fee]')
+          .containsText('0.015 WETH');
+        assert.dom('[data-test-summary-variable-fee]').containsText('$ 0.01');
       });
     });
 
@@ -343,8 +424,5 @@ module(
           .hasAttribute('disabled');
       });
     });
-
-    // TODO: assert state for no network selected/connected
-    // TODO: assert state for no safe present
   }
 );
