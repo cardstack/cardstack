@@ -79,6 +79,16 @@ module('Acceptance | scheduling', function (hooks) {
     scheduledPaymentsToReturnFromTheApi = [];
 
     const handlers = [
+      rest.get('/hub-test/api/config', (_req, res, ctx) => {
+        return res(
+          ctx.status(200),
+          ctx.json({
+            web3: {
+              schedulerToolNetworks: ['mainnet', 'polygon'],
+            },
+          })
+        );
+      }),
       rest.get('/hub-test/api/session', (req, res, ctx) => {
         if (req.headers.get('Authorization')) {
           return res(ctx.status(200), ctx.json({}));

@@ -11,19 +11,22 @@ import { action } from '@ember/object';
 import Service, { inject as service } from '@ember/service';
 import { tracked } from '@glimmer/tracking';
 
+import HubConfigService from './hub-config';
+
 interface NetworkInfo {
   chainId: number;
   name: string;
   symbol: Network;
 }
+
 const DEFAULT_NETWORK = 'mainnet' as const; // TODO: add default based on env
 const LOCALSTORAGE_NETWORK_KEY = 'cardstack-cached-network';
 
 export default class NetworkService extends Service {
   storage: Storage;
 
-  // @ts-expect-error "Property 'wallet' has no initializer and is not definitely assigned in the constructor" - ignore this error because Ember will inject the service
-  @service wallet: WalletService;
+  @service declare wallet: WalletService;
+  @service declare hubConfig: HubConfigService;
 
   @tracked networkInfo: NetworkInfo;
 
@@ -47,14 +50,24 @@ export default class NetworkService extends Service {
     };
   }
 
-  get supportedList() {
-    return supportedChainsArray
-      .map((networkSymbol) => ({
-        name: getConstantByNetwork('name', networkSymbol),
-        chainId: getConstantByNetwork('chainId', networkSymbol),
-        symbol: networkSymbol,
-      }))
-      .filter(({ name }) => name !== this.name);
+  get supportedNetworks() {
+    // Initially return all the scheduler-capable networks the SDK supports, and then
+    // narrow it down after retrieving the networks supported by the hub.
+    const allSupportedNetworks = supportedChainsArray.map((networkSymbol) => ({
+      name: getConstantByNetwork('name', networkSymbol),
+      chainId: getConstantByNetwork('chainId', networkSymbol),
+      symbol: networkSymbol as Network,
+    }));
+    const remoteConfigState = this.hubConfig.remoteConfig;
+    const remoteConfig = remoteConfigState.value;
+    if (!remoteConfig) {
+      return allSupportedNetworks;
+    }
+    const hubSchedulerNetworkSymbols = remoteConfig.web3.schedulerNetworks;
+    const hubSupportedNetworks = allSupportedNetworks.filter((network) =>
+      hubSchedulerNetworkSymbols.includes(network.symbol)
+    );
+    return hubSupportedNetworks;
   }
 
   @action async onSelect(networkInfo: NetworkInfo) {
