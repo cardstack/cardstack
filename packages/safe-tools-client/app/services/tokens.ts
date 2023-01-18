@@ -1,7 +1,7 @@
 import {
-  ChainAddress,
   fetchSupportedGasTokens,
   getConstantByNetwork,
+  ChainAddress,
   TokenDetail,
 } from '@cardstack/cardpay-sdk';
 import NetworkService from '@cardstack/safe-tools-client/services/network';

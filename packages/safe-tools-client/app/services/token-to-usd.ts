@@ -2,6 +2,7 @@ import {
   applyRateToAmount,
   ChainAddress,
   getUsdcToTokenRate,
+  TokenDetail,
 } from '@cardstack/cardpay-sdk';
 import config from '@cardstack/safe-tools-client/config/environment';
 import WalletService from '@cardstack/safe-tools-client/services/wallet';
@@ -12,8 +13,6 @@ import { addMilliseconds } from 'date-fns';
 import { task } from 'ember-concurrency';
 import { BigNumber, FixedNumber } from 'ethers';
 import { TrackedMap } from 'tracked-built-ins';
-
-import { SelectableToken } from '../../../boxel/addon/components/boxel/input/selectable-token';
 
 const INTERVAL = config.environment === 'test' ? 3000 : 60 * 3000;
 
@@ -51,11 +50,11 @@ export default class TokenToUsdService extends Service {
     return applyRateToAmount(rate, tokenQuantity.count);
   }
 
-  getTokenToUsdcRate(token: SelectableToken): FixedNumber | undefined {
+  getTokenToUsdcRate(token: TokenDetail): FixedNumber | undefined {
     return this.usdcTokenRates.get(token.address);
   }
 
-  getUsdcToTokenRate(token: SelectableToken): FixedNumber | undefined {
+  getUsdcToTokenRate(token: TokenDetail): FixedNumber | undefined {
     const gasTokenToUsdcRate = this.usdcTokenRates.get(token.address);
     if (gasTokenToUsdcRate) {
       return FixedNumber.from(1).divUnsafe(gasTokenToUsdcRate);

@@ -1,9 +1,9 @@
-import { SelectableToken } from '@cardstack/boxel/components/boxel/input/selectable-token';
 import {
   getSafesWithSpModuleEnabled,
   Web3Provider,
   getTokenBalancesForSafe,
   getConstantByNetwork,
+  TokenDetail,
 } from '@cardstack/cardpay-sdk';
 import NetworkService from '@cardstack/safe-tools-client/services/network';
 import WalletService from '@cardstack/safe-tools-client/services/wallet';
@@ -85,7 +85,7 @@ export default class SafesService extends Service {
     const tokenAddresses = getConstantByNetwork(
       'tokenList',
       this.network.symbol
-    ).tokens.map((t: SelectableToken) => t.address);
+    ).tokens.map((t: TokenDetail) => t.address);
 
     (async () => {
       try {

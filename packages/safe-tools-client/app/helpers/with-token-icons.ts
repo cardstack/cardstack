@@ -1,4 +1,3 @@
-import { SelectableToken } from '@cardstack/boxel/components/boxel/input/selectable-token';
 import { TokenDetail } from '@cardstack/cardpay-sdk';
 import { helper } from '@ember/component/helper';
 
@@ -8,7 +7,7 @@ interface Signature {
   Args: {
     Positional: PostionalArgs;
   };
-  Return: SelectableToken[];
+  Return: TokenDetail[];
 }
 
 const SYMBOLS_TO_ICONS: Record<string, string> = {
