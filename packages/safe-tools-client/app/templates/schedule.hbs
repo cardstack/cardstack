@@ -41,9 +41,11 @@
       {{#if this.wallet.isConnected}}
         <SafeInfo
           @safes={{this.safes.safes}}
+          @isLoadingSafes={{this.safes.isLoadingSafes}}
           @currentSafe={{this.safes.currentSafe}}
           @onSelectSafe={{this.safes.onSelectSafe}}
           @tokenBalances={{this.safes.tokenBalances}}
+          @isLoadingTokenBalances={{this.safes.isLoadingTokenBalances}}
           @onDepositClick={{set this 'isDepositModalOpen' true}}
           @safesLoadingError={{this.safes.safesResource.error}}
         />
