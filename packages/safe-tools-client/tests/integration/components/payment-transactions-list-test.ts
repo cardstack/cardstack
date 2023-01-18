@@ -7,7 +7,7 @@ import { subDays, addMinutes, format } from 'date-fns';
 import hbs from 'htmlbars-inline-precompile';
 import { module, test } from 'qunit';
 
-import { setupRenderingTest } from '../helpers';
+import { setupRenderingTest } from '../../helpers';
 
 class WalletServiceStub extends Service {
   isConnected = true;

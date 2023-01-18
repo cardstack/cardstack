@@ -208,8 +208,8 @@ const constants: {
     name: 'Goerli',
     relayServiceURL: 'https://relay-goerli.staging.stack.cards/api',
     chainId: 5,
-    scheduledPaymentFeeFixedUSD: 0,
-    scheduledPaymentFeePercentage: 0,
+    scheduledPaymentFeeFixedUSD: 0.25,
+    scheduledPaymentFeePercentage: 0.1,
     subgraphURL: 'https://api.thegraph.com/subgraphs/name/cardstack/safe-tools-goerli',
     uniswapPairInitCodeHash: '0x96e8ac4277198ff8b6f785478aa9a39f403cb768dd02cbee326c3e7da348845f', //Result of keccak256(type(UniswapV2Pair).creationCode) from deployed UniswapV2Factory
     publicRpcUrls: ['https://eth-goerli.public.blastapi.io', 'https://rpc.ankr.com/eth_goerli'],

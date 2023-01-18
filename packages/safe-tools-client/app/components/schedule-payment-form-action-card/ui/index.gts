@@ -19,9 +19,10 @@ import { tracked } from '@glimmer/tracking';
 import eq from 'ember-truth-helpers/helpers/eq';
 import and from 'ember-truth-helpers/helpers/and';
 import not from 'ember-truth-helpers/helpers/not';
+import or from 'ember-truth-helpers/helpers/or';
 import set from 'ember-set-helper/helpers/set';
 import './index.css';
-import { MaxGasFeeOption, ValidatableForm } from '../validator';
+import { ValidatableForm } from '../validator';
 import BlockExplorerButton from '@cardstack/safe-tools-client/components/block-explorer-button';
 import { SchedulerCapableNetworks, TransactionHash } from '@cardstack/cardpay-sdk';
 import cssVar from '@cardstack/boxel/helpers/css-var';
@@ -30,44 +31,54 @@ import { ConfiguredScheduledPaymentFees } from '@cardstack/safe-tools-client/ser
 import formatUsd from '@cardstack/safe-tools-client/helpers/format-usd';
 import WalletService from '@cardstack/safe-tools-client/services/wallet';
 import { inject as service } from '@ember/service';
+import { MaxGasDescriptionsState } from "..";
+import FailureIcon from '@cardstack/safe-tools-client/components/icons/failure';
+import tokenToUsd from '@cardstack/safe-tools-client/helpers/token-to-usd';
+import { type CurrentFees } from '../fee-calculator';
+import TokenQuantity from '@cardstack/safe-tools-client/utils/token-quantity';
+import MaxGasToggleButton from './max-gas-toggle-button';
 
 interface Signature {
   Element: HTMLElement;
   Args: ValidatableForm & {
-    paymentTypeOptions: { id: string, text: string }[];
-    onSelectPaymentType: (paymentTypeId: string) => void;
+    configuredFees: ConfiguredScheduledPaymentFees | undefined;
+    currentFees: CurrentFees | undefined;
+    gasEstimateTokenQuantity: TokenQuantity | undefined;
+    gasTokenErrorMessage: string;
+    gasTokens: SelectableToken[];
+    isGasTokenInvalid: boolean;
+    isMaxGasPriceInvalid: boolean;
+    isPayeeAddressInvalid: boolean;
+    isPaymentAmountInvalid: boolean;
     isPaymentTypeInvalid: boolean;
-    paymentTypeErrorMessage: string;
+    isSuccessfullyScheduled: boolean;
+    isValid: boolean;
+    maxGasDescriptions?: MaxGasDescriptionsState;
+    maxGasPriceErrorMessage: string;
+    networkSymbol: SchedulerCapableNetworks;
+    onReset: () => void;
+    onSchedulePayment: () => void;
+    onSelectGasToken: (val: SelectableToken) => void;
+    onSelectPaymentDayOfMonth: (val: number) => void;
+    onSelectPaymentType: (paymentTypeId: string) => void;
+    onSetMonthlyUntil: (date: Date) => void;
     onSetPaymentDate: (day: Day) => void;
     onSetPaymentTime: (time: Time) => void;
-    onSelectPaymentDayOfMonth: (val: number) => void;
-    onSetMonthlyUntil: (date: Date) => void;
-    isPayeeAddressInvalid: boolean;
-    payeeAddressErrorMessage: string;
+    onUpdateMaxGasPrice: (val: string) => void;
+    onUpdatePayeeAddress: (val: string) => void;
     onUpdatePaymentAmount: (val: string) => void;
-    isPaymentAmountInvalid: boolean;
+    onUpdatePaymentToken: (val: SelectableToken) => void;
+    payeeAddressErrorMessage: string;
     paymentAmountErrorMessage: string;
     paymentTokens: SelectableToken[];
-    onUpdatePaymentToken: (val: SelectableToken) => void;
-    gasTokens: SelectableToken[];
-    onSelectGasToken: (val: SelectableToken) => void;
-    maxGasDescriptions?: Record<MaxGasFeeOption, string>;
-    isGasTokenInvalid: boolean;
-    gasTokenErrorMessage: string;
-    onUpdateMaxGasPrice: (val: string) => void;
-    isMaxGasPriceInvalid: boolean;
-    maxGasPriceErrorMessage: string;
-    configuredFees: ConfiguredScheduledPaymentFees | undefined;
-    onSchedulePayment: () => void;
-    onUpdatePayeeAddress: (val: string) => void;
-    onReset: () => void;
-    isSubmitEnabled: boolean;
+    paymentTokenQuantity: TokenQuantity | undefined;
+    paymentTypeErrorMessage: string;
+    paymentTypeOptions: { id: string, text: string }[];
     schedulingStatus: string | undefined;
-    networkSymbol: SchedulerCapableNetworks;
-    walletProviderId: WalletProviderId | undefined;
     txHash: TransactionHash | undefined;
-    isSuccessfullyScheduled: boolean;
     isSafesEmpty: boolean;
+    scheduleErrorMessage: string | undefined;
+    walletProviderId: WalletProviderId | undefined;
   }
 }
 
@@ -260,7 +271,7 @@ export default class SchedulePaymentFormActionCardUI extends Component<Signature
             data-test-max-gas-toggle
             @groupDescription="The maximum gas cost you are willing to spend for this payment"
             @name="max-gas-fee"
-            @errorMessage={{@maxGasPriceErrorMessage}}
+            @errorMessage={{or @maxGasPriceErrorMessage @maxGasDescriptions.error.message}}
             @invalid={{this.isMaxGasPriceInvalid}}
             @value={{@maxGasPrice}}
             @disabled={{this.isFormInteractionDisabled}}
@@ -268,50 +279,81 @@ export default class SchedulePaymentFormActionCardUI extends Component<Signature
             @onBlur={{set this 'hasBlurredMaxGasPrice' true}}
             as |group|
           >
-            <group.Button @value="normal">
-              <div class="schedule-payment-form-action-card--max-gas-fee-name">
-                Normal
-              </div>
-              <div class="schedule-payment-form-action-card--max-gas-fee-description" data-test-max-gas-fee-normal-description>
-                {{@maxGasDescriptions.normal}}
-              </div>
-            </group.Button>
-            <group.Button @value="high">
-              <div class="schedule-payment-form-action-card--max-gas-fee-name">
-                High
-              </div>
-              <div class="schedule-payment-form-action-card--max-gas-fee-description" data-test-max-gas-fee-high-description>
-                {{@maxGasDescriptions.high}}
-              </div>
-            </group.Button>
-            <group.Button @value="max">
-              <div class="schedule-payment-form-action-card--max-gas-fee-name">
-                Max
-              </div>
-              <div class="schedule-payment-form-action-card--max-gas-fee-description" data-test-max-gas-fee-max-description>
-                {{@maxGasDescriptions.max}}
-              </div>
-            </group.Button>
+            <MaxGasToggleButton @group={{group}} @name="normal" @maxGasDescriptions={{@maxGasDescriptions}} />
+            <MaxGasToggleButton @group={{group}} @name="high" @maxGasDescriptions={{@maxGasDescriptions}} />
+            <MaxGasToggleButton @group={{group}} @name="max" @maxGasDescriptions={{@maxGasDescriptions}} />
           </BoxelToggleButtonGroup>
           <div><!-- empty --></div>
-          <div class="schedule-payment-form-action-card--fee-details">
+          <div class="schedule-payment-form-action-card__state-details {{if @maxGasDescriptions.error "schedule-payment-form-action-card-error"}}">
+            {{#if @maxGasDescriptions.error}}
+              There was an error estimating gas prices. Please reload the page and try again. If the error persists, please contact support.
+            {{/if}}
+          </div>
+          <div><!-- empty --></div>
+          <div class="schedule-payment-form-action-card__fee-details">
             {{#if @configuredFees}}
-              {{svgJar "info" width="17px" height="17px" class="schedule-payment-form-action-card--fee-info-icon"}}
+              {{svgJar "info" width="17px" height="17px" class="schedule-payment-form-action-card__fee-info-icon"}}
               <span>Cardstack charges {{if @configuredFees.fixedUSD (formatUsd @configuredFees.fixedUSD)}} and {{@configuredFees.percentage}}% of the transaction as a fee for executing your scheduled payments.</span>
             {{/if}}
           </div>
         </BoxelField>
+        {{#if @isValid}}
+          <BoxelField @label="Execution Plan" style={{cssVar boxel-field-label-align="top"}}>
+            <div>
+              <BoxelField @label="Recipient Will Receive" data-test-summary-recipient-receives @vertical={{true}} style={{cssVar boxel-field-label-justify-content="end"}}>
+                <div class="schedule-payment-form-action-card__fees-value">
+                  {{#if @paymentTokenQuantity}}
+                    <div>{{@paymentTokenQuantity.displayable}}</div>
+                    <div class="schedule-payment-form-action-card__fee-usd-estimate">{{tokenToUsd tokenQuantity=@paymentTokenQuantity}}</div>
+                  {{/if}}
+                </div>
+              </BoxelField>
+              <BoxelField @label="Estimated Gas" data-test-summary-estimated-gas @vertical={{true}} style={{cssVar boxel-field-label-justify-content="end"}}>
+                <div class="schedule-payment-form-action-card__fees-value">
+                  {{#if @gasEstimateTokenQuantity}}
+                    {{@gasEstimateTokenQuantity.displayable}}
+                    <div class="schedule-payment-form-action-card__fee-usd-estimate">{{tokenToUsd tokenQuantity=@gasEstimateTokenQuantity}}</div>
+                  {{/if}}
+                </div>
+              </BoxelField>
+              <BoxelField @label="Fixed Fee" data-test-summary-fixed-fee @vertical={{true}} style={{cssVar boxel-field-label-justify-content="end"}}>
+                <div class="schedule-payment-form-action-card__fees-value">
+                  {{#if @currentFees.fixedFee}}
+                    <div>{{@currentFees.fixedFee.displayable}}</div>
+                    <div class="schedule-payment-form-action-card__fee-usd-estimate">{{tokenToUsd tokenQuantity=@currentFees.fixedFee}}</div>
+                  {{/if}}
+                </div>
+              </BoxelField>
+              <BoxelField @label="Variable Fee" data-test-summary-variable-fee @vertical={{true}} style={{cssVar boxel-field-label-justify-content="end"}}>
+                <div class="schedule-payment-form-action-card__fees-value">
+                  {{#if @currentFees.variableFee}}
+                    <div>{{@currentFees.variableFee.displayable}}</div>
+                    <div class="schedule-payment-form-action-card__fee-usd-estimate">{{tokenToUsd tokenQuantity=@currentFees.variableFee}}</div>
+                  {{/if}}
+                </div>
+              </BoxelField>
+            </div>
+          </BoxelField>
+        {{/if}}
       </Section>
       <ActionChin @state={{this.actionChinState}}>
         <:default as |ac|>
           {{#if (and this.wallet.isConnected (not @isSafesEmpty))}}
             <ac.ActionButton
-              @disabled={{not @isSubmitEnabled}}
+              @disabled={{not @isValid}}
               data-test-schedule-payment-form-submit-button
               {{on 'click' @onSchedulePayment}}
             >
               Schedule Payment
             </ac.ActionButton>
+            {{#if @scheduleErrorMessage}}
+              <ac.InfoArea data-test-error-status>
+                <FailureIcon class='action-chin-info-icon' />
+                <span class="schedule-payment-form-action-card__error-message">
+                  {{@scheduleErrorMessage}}
+                </span>
+              </ac.InfoArea>
+            {{/if}}
           {{else if (not this.wallet.isConnected)}}
             <div class="schedule-payment-form-prerequisite-step" data-test-schedule-form-connect-wallet-cta>
               <div class="schedule-payment-form-prerequisite-step__icons">
@@ -396,6 +438,15 @@ export default class SchedulePaymentFormActionCardUI extends Component<Signature
           <ac.ActionStatusArea data-test-memorialized-status>
             Payment was successfully scheduled
           </ac.ActionStatusArea>
+          {{#if @txHash}}
+            <ac.InfoArea>
+              <BlockExplorerButton
+                @networkSymbol={{@networkSymbol}}
+                @transactionHash={{@txHash}}
+                @kind="secondary-dark"
+              />
+            </ac.InfoArea>
+          {{/if}}
           <ac.InfoArea>
             <BoxelButton
               @kind="secondary-light"

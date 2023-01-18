@@ -4,7 +4,7 @@ import { SelectableToken } from '@cardstack/boxel/components/boxel/input/selecta
 import { inject as service } from '@ember/service';
 import NetworkService from '../../services/network';
 import SafesService from '../../services/safes';
-import ScheduledPaymentSdkService, { ConfiguredScheduledPaymentFees, GasEstimationResult } from '../../services/scheduled-payment-sdk';
+import ScheduledPaymentSdkService, { ConfiguredScheduledPaymentFees, ServiceGasEstimationResult } from '../../services/scheduled-payment-sdk';
 import TokensService from '../../services/tokens';
 import WalletService from '../../services/wallet';
 import { action } from '@ember/object';
@@ -15,15 +15,19 @@ import withTokenIcons from '../../helpers/with-token-icons';
 import SchedulePaymentFormValidator, { MaxGasFeeOption, ValidatableForm } from './validator';
 import { use, resource } from 'ember-resources';
 import { TrackedObject } from 'tracked-built-ins';
-import { fromWei } from 'web3-utils';
+import and from 'ember-truth-helpers/helpers/and';
 import not from 'ember-truth-helpers/helpers/not';
-import { convertAmountToNativeDisplay, TransactionHash } from '@cardstack/cardpay-sdk';
+import { TransactionHash } from '@cardstack/cardpay-sdk';
 import { taskFor } from 'ember-concurrency-ts';
-import { BigNumber } from 'ethers';
+import { BigNumber, FixedNumber } from 'ethers';
 import { task } from 'ember-concurrency-decorators';
 import perform from 'ember-concurrency/helpers/perform';
 import ScheduledPaymentsService from '@cardstack/safe-tools-client/services/scheduled-payments';
+import TokenToUsdService from '@cardstack/safe-tools-client/services/token-to-usd';
 import TokenQuantity from '@cardstack/safe-tools-client/utils/token-quantity';
+import * as Sentry from '@sentry/browser';
+import FeeCalculator, { type CurrentFees } from './fee-calculator';
+import config from '@cardstack/safe-tools-client/config/environment';
 
 interface Signature {
   Element: HTMLElement;
@@ -35,26 +39,53 @@ interface ConfiguredFeesState {
   error?: Error
 }
 
-interface MaxGasDescriptionsState {
+interface FeesState {
   isLoading: boolean;
   isIndeterminate: boolean;
-  value?: Record<MaxGasFeeOption, string>
+  value?: CurrentFees,
   error?: Error
 }
+
+export interface MaxGasDescriptionsState {
+  isLoading: boolean;
+  isIndeterminate: boolean;
+  value?: Record<MaxGasFeeOption, TokenQuantity>
+  error?: Error
+}
+
+const INTERVAL = config.environment === 'test' ? 1000 : 60 * 1000;
 
 export default class SchedulePaymentFormActionCard extends Component<Signature> implements ValidatableForm {
   @service declare network: NetworkService;
   @service declare wallet: WalletService;
   @service declare safes: SafesService;
   @service declare tokens: TokensService;
+  @service('token-to-usd') declare tokenToUsdService: TokenToUsdService;
   @service declare scheduledPaymentSdk: ScheduledPaymentSdkService;
   @service('scheduled-payments') declare scheduledPaymentsService: ScheduledPaymentsService;
   validator = new SchedulePaymentFormValidator(this);
-  gasEstimation?: GasEstimationResult;
+  gasEstimation?: ServiceGasEstimationResult;
   lastScheduledPaymentId?: string;
 
   @tracked schedulingStatus?: string;
   @tracked txHash?: TransactionHash;
+  @tracked scheduleErrorMessage?: string;
+
+  updateInterval: ReturnType<typeof setInterval>;
+
+  constructor(owner: unknown, args: {}) {
+    super(owner, args);
+
+    this.updateInterval = setInterval(() => {
+      if (this.selectedGasToken) {
+        taskFor(this.tokenToUsdService.updateUsdcRate).perform(this.selectedGasToken.address); 
+      }
+    }, INTERVAL);
+  }
+
+  willDestroy() {
+    clearInterval(this.updateInterval);
+  }
 
   get paymentTypeOptions() {
     return [
@@ -171,7 +202,7 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
     this._paymentToken = val;
   }
 
-  get paymentAmountTokenQuantity() {
+  get paymentTokenQuantity() {
     const { paymentToken } = this;
     if (!paymentToken) {
       return undefined;
@@ -225,9 +256,39 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
     return state;
   });
 
+  get usdcToGasTokenRate(): FixedNumber | undefined {
+    if (!this.selectedGasToken) {
+      return undefined;
+    }
+    return this.tokenToUsdService.getUsdcToTokenRate(this.selectedGasToken);
+  }
+
+  get fees() {
+    const state: FeesState = new TrackedObject({
+      isLoading: true,
+      isIndeterminate: false
+    });
+    let isWalletConnected = this.wallet.isConnected;
+    let { paymentTokenQuantity, selectedGasToken, configuredFees } = this
+    if (!isWalletConnected || !paymentTokenQuantity || paymentTokenQuantity.count.isZero() || !selectedGasToken || !configuredFees.value) {
+      state.isIndeterminate = true;
+      return state;
+    }
+    if (configuredFees.value) {
+      const feeCalculator = new FeeCalculator(
+        configuredFees.value,
+        paymentTokenQuantity,
+        selectedGasToken,
+        this.usdcToGasTokenRate
+      );
+      state.value = feeCalculator.calculateFee();  
+    }
+    return state;
+  }
+
   @use maxGasDescriptions = resource(() => {
     const state: MaxGasDescriptionsState = new TrackedObject({
-      isLoading: true,
+      isLoading: false,
       isIndeterminate: false
     });
     let { selectedGasToken, selectedPaymentType, paymentToken } = this;
@@ -253,12 +314,13 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
     const scenario = this.selectedPaymentType === 'one-time' ? 'execute_one_time_payment' : 'execute_recurring_payment';
     (async () => {
       try {
+        state.isLoading = true;
         this.gasEstimation = await this.scheduledPaymentSdk.getScheduledPaymentGasEstimation(scenario, paymentToken.address, selectedGasToken.address);
-        const { gasRangeInGasTokenWei, gasRangeInUSD } = this.gasEstimation;
+        const { gasRangeInGasTokenWei } = this.gasEstimation;
         state.value = {
-          normal: `Less than ${fromWei(gasRangeInGasTokenWei.normal.toString(), 'ether')} ${selectedGasToken.symbol} (~${convertAmountToNativeDisplay(fromWei(gasRangeInUSD.normal.toString(), 'ether'), 'USD')})`,
-          high: `Less than ${fromWei(gasRangeInGasTokenWei.high.toString(), 'ether')} ${selectedGasToken.symbol} (~${convertAmountToNativeDisplay(fromWei(gasRangeInUSD.high.toString(), 'ether'), 'USD')})`,
-          max: `Capped at ${fromWei(gasRangeInGasTokenWei.max.toString(), 'ether')} ${selectedGasToken.symbol} (~${convertAmountToNativeDisplay(fromWei(gasRangeInUSD.max.toString(), 'ether'), 'USD')})`,
+          normal: new TokenQuantity(selectedGasToken, gasRangeInGasTokenWei.normal),
+          high: new TokenQuantity(selectedGasToken, gasRangeInGasTokenWei.high),
+          max: new TokenQuantity(selectedGasToken, gasRangeInGasTokenWei.max),
         };
       } catch (error) {
         console.error(error);
@@ -270,13 +332,24 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
     return state;
   });
 
+  get gasEstimateInGasTokenUnits(): BigNumber {
+    return this.gasEstimation?.gasRangeInGasTokenWei.normal || BigNumber.from('0');
+  }
+
+  get gasEstimateTokenQuantity(): TokenQuantity|undefined {
+    if (!this.selectedGasToken) {
+      return undefined;
+    }
+    return new TokenQuantity(this.selectedGasToken, this.gasEstimateInGasTokenUnits);
+  }
+
   @task *schedulePaymentTask() {
     let { currentSafe } = this.safes;
     if (!currentSafe) return;
     if (!this.validator.isValid) return;
 
     // Redundant to validation check but including it to narrow types for Typescript
-    if (!this.paymentAmountTokenQuantity || !this.selectedGasToken || !this.gasEstimation) return;
+    if (!this.paymentTokenQuantity || !this.selectedGasToken || !this.gasEstimation) return;
 
     if (Number(this.gasEstimation.gas) <= 0) return;
     const { gasRangeInGasTokenWei } = this.gasEstimation;
@@ -302,53 +375,86 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
     const salt = btoa(String.fromCharCode.apply(null, array));
     const self = this;
 
-    const {paymentAmountTokenQuantity} = this;
-    yield taskFor(this.scheduledPaymentSdk.schedulePayment).perform(
-      currentSafe.address,
-      currentSafe.spModuleAddress,
-      paymentAmountTokenQuantity.address,
-      paymentAmountTokenQuantity.count,
-      this.payeeAddress,
-      Number(this.gasEstimation.gas),
-      String(maxGasPrice),
-      this.selectedGasToken.address,
-      salt,
-      this.selectedPaymentType === 'one-time' ? Math.round(this.paymentDate!.getTime() / 1000) : null,
-      this.selectedPaymentType === 'monthly' ? this.paymentDayOfMonth! : null,
-      this.selectedPaymentType === 'monthly' ? Math.round(this.monthlyUntil!.getTime() / 1000) : null,
-      {
-        onScheduledPaymentIdReady(scheduledPaymentId: string) {
-          self.lastScheduledPaymentId = scheduledPaymentId;
-        },
-        onTxHash(txHash: TransactionHash) {
-          self.txHash = txHash;
-        },
-        onBeginHubAuthentication() {
-          self.schedulingStatus = "Authenticating..."
-        },
-        onBeginSpHashCreation() {
-          self.schedulingStatus = "Calculating payment hash..."
-        },
-        onBeginRegisterPaymentWithHub() {
-          self.schedulingStatus = "Registering payment with hub..."
-        },
-        onBeginPrepareScheduledPayment() {
-          self.schedulingStatus = "Preparing transaction..."
-        },
-        onBeginSchedulingPaymentOnChain() {
-          self.schedulingStatus = "Scheduling on-chain..."
-        },
-        onBeginUpdatingHubWithTxHash() {
-          self.schedulingStatus = "Recording on hub..."
-        },
-        onBeginWaitingForTransactionConfirmation() {
-          self.schedulingStatus = "Confirming transaction..."
-        }
-      }
-    )
+    this.scheduleErrorMessage = undefined;
 
-    this.isSuccessfullyScheduled = true;
-    this.scheduledPaymentsService.reloadScheduledPayments();
+    try {
+      const {paymentTokenQuantity} = this;
+      yield taskFor(this.scheduledPaymentSdk.schedulePayment).perform(
+        currentSafe.address,
+        currentSafe.spModuleAddress,
+        paymentTokenQuantity.address,
+        paymentTokenQuantity.count,
+        this.payeeAddress,
+        Number(this.gasEstimation.gas),
+        String(maxGasPrice),
+        this.selectedGasToken.address,
+        salt,
+        this.selectedPaymentType === 'one-time' ? Math.round(this.paymentDate!.getTime() / 1000) : null,
+        this.selectedPaymentType === 'monthly' ? this.paymentDayOfMonth! : null,
+        this.selectedPaymentType === 'monthly' ? Math.round(this.monthlyUntil!.getTime() / 1000) : null,
+        {
+          onScheduledPaymentIdReady(scheduledPaymentId: string) {
+            self.lastScheduledPaymentId = scheduledPaymentId;
+          },
+          onTxHash(txHash: TransactionHash) {
+            self.txHash = txHash;
+          },
+          onBeginHubAuthentication() {
+            self.schedulingStatus = "Authenticating..."
+          },
+          onBeginSpHashCreation() {
+            self.schedulingStatus = "Calculating payment hash..."
+          },
+          onBeginRegisterPaymentWithHub() {
+            self.schedulingStatus = "Registering payment with hub..."
+          },
+          onBeginPrepareScheduledPayment() {
+            self.schedulingStatus = "Preparing transaction..."
+          },
+          onBeginSchedulingPaymentOnChain() {
+            self.schedulingStatus = "Scheduling on-chain..."
+          },
+          onBeginUpdatingHubWithTxHash() {
+            self.schedulingStatus = "Recording on hub..."
+          },
+          onBeginWaitingForTransactionConfirmation() {
+            self.schedulingStatus = "Confirming transaction..."
+          }
+        }
+      )
+      this.scheduledPaymentsService.reloadScheduledPayments();
+      this.isSuccessfullyScheduled = true;
+    } catch(e) {
+      this.schedulingStatus = undefined;
+
+      const knownErrorPatterns: Record<string, string> = {
+        'NotEnoughFundsForMultisigTx': 'Your safe does not have enough funds to pay for the transaction. Please add more funds to your safe and try again.',
+      }
+
+      let message = "An error occurred. Please reload the page and try again. If the problem persists, please contact support.";
+
+      try {
+        let parsed = JSON.parse(e.message);
+
+        if (parsed.exception.includes('InsufficientFunds')) {
+          // This means the relayer is out of funds and can't pay for the transaction
+          Sentry.captureException(`Relayer is out of funds on ${this.network.chainId} network`);
+          message = "We are currently experiencing a problem with our transaction relayer system. We are working on a fix. Please try again later. If the problem persists, please contact support."
+        } else {
+          let errorKey = Object.keys(knownErrorPatterns).find((key) => { return parsed.exception.includes(key) });
+          if (parsed.ex)
+          if (errorKey) {
+            message = knownErrorPatterns[errorKey];
+          }
+        }
+      } catch (e) {
+        // the message wasn't valid JSON
+        Sentry.captureException(e.message);
+      }
+
+      this.scheduleErrorMessage = message;
+
+    }
   }
 
   @action resetForm() {
@@ -393,6 +499,7 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
       @isPaymentAmountInvalid={{not this.validator.isAmountValid}}
       @paymentAmountErrorMessage={{this.validator.amountErrorMessage}}
       @paymentToken={{this.paymentToken}}
+      @paymentTokenQuantity={{this.paymentTokenQuantity}}
       @paymentTokens={{this.paymentTokens}}
       @onUpdatePaymentToken={{this.onUpdatePaymentToken}}
       @selectedGasToken={{this.selectedGasToken}}
@@ -405,16 +512,19 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
       @isMaxGasPriceInvalid={{not this.validator.isMaxGasPriceValid}}
       @maxGasPriceErrorMessage={{this.validator.maxGasPriceErrorMessage}}
       @onSchedulePayment={{perform this.schedulePaymentTask}}
-      @maxGasDescriptions={{this.maxGasDescriptions.value}}
-      @isSubmitEnabled={{this.isValid}}
+      @maxGasDescriptions={{this.maxGasDescriptions}}
+      @gasEstimateTokenQuantity={{this.gasEstimateTokenQuantity}}
+      @isValid={{and this.isValid (not this.maxGasDescriptions.isLoading)}}
       @schedulingStatus={{this.schedulingStatus}}
       @networkSymbol={{this.network.symbol}}
       @walletProviderId={{this.wallet.providerId}}
       @txHash={{this.txHash}}
       @isSuccessfullyScheduled={{this.isSuccessfullyScheduled}}
+      @scheduleErrorMessage={{this.scheduleErrorMessage}}
       @onReset={{this.resetForm}}
       @configuredFees={{this.configuredFees.value}}
       @isSafesEmpty={{this.isSafesEmpty}}
+      @currentFees={{this.fees.value}}
     />
   </template>
 }

@@ -24,10 +24,9 @@ const GAS_RANGE_HIGH_MULTIPLIER = 4;
 const GAS_RANGE_MAX_MULTIPLIER = 6;
 
 export type GasRange = Record<'normal' | 'high' | 'max', BigNumber>;
-export interface GasEstimationResult {
+export interface ServiceGasEstimationResult {
   gas: BigNumber;
   gasRangeInGasTokenWei: GasRange;
-  gasRangeInUSD: GasRange;
 }
 
 export interface ConfiguredScheduledPaymentFees {
@@ -101,7 +100,7 @@ export default class SchedulePaymentSDKService extends Service {
     scenario: GasEstimationScenario,
     tokenAddress: ChainAddress,
     gasTokenAddress: ChainAddress
-  ): Promise<GasEstimationResult> {
+  ): Promise<ServiceGasEstimationResult> {
     const scheduledPaymentModule = await this.getSchedulePaymentModule();
 
     const gasEstimationResult = await scheduledPaymentModule.estimateGas(
@@ -112,7 +111,7 @@ export default class SchedulePaymentSDKService extends Service {
         hubUrl: config.hubUrl,
       }
     );
-    const { gasRangeInWei, gasRangeInUSD } = gasEstimationResult;
+    const { gasRangeInWei } = gasEstimationResult;
     const priceWeiInGasToken = String(
       await getNativeWeiInToken(this.wallet.ethersProvider, gasTokenAddress)
     );
@@ -128,11 +127,6 @@ export default class SchedulePaymentSDKService extends Service {
         max: gasRangeInWei.standard
           .mul(priceWeiInGasToken)
           .mul(GAS_RANGE_MAX_MULTIPLIER),
-      },
-      gasRangeInUSD: {
-        normal: gasRangeInUSD.standard.mul(GAS_RANGE_NORMAL_MULTIPLIER),
-        high: gasRangeInUSD.standard.mul(GAS_RANGE_HIGH_MULTIPLIER),
-        max: gasRangeInUSD.standard.mul(GAS_RANGE_MAX_MULTIPLIER),
       },
     };
   }
@@ -152,30 +146,26 @@ export default class SchedulePaymentSDKService extends Service {
     recurringUntil: number | null,
     listener: SchedulePaymentProgressListener
   ): TaskGenerator<void> {
-    try {
-      const scheduledPaymentModule: ScheduledPaymentModule =
-        yield this.getSchedulePaymentModule();
-      yield scheduledPaymentModule.schedulePayment(
-        safeAddress,
-        moduleAddress,
-        tokenAddress,
-        amount.toString(),
-        payeeAddress,
-        executionGas,
-        maxGasPrice,
-        gasTokenAddress,
-        salt,
-        payAt,
-        recurringDayOfMonth,
-        recurringUntil,
-        {
-          hubUrl: config.hubUrl,
-          listener,
-        }
-      );
-    } catch (err) {
-      console.error(err);
-    }
+    const scheduledPaymentModule: ScheduledPaymentModule =
+      yield this.getSchedulePaymentModule();
+    yield scheduledPaymentModule.schedulePayment(
+      safeAddress,
+      moduleAddress,
+      tokenAddress,
+      amount.toString(),
+      payeeAddress,
+      executionGas,
+      maxGasPrice,
+      gasTokenAddress,
+      salt,
+      payAt,
+      recurringDayOfMonth,
+      recurringUntil,
+      {
+        hubUrl: config.hubUrl,
+        listener,
+      }
+    );
   }
 
   async cancelScheduledPayment(

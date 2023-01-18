@@ -49,8 +49,16 @@ export default class SafesService extends Service {
     return this.safesResource.value;
   }
 
+  get isLoadingSafes(): boolean | undefined {
+    return this.safesResource.isLoading;
+  }
+
   get tokenBalances(): TokenBalance[] | undefined {
     return this.tokenBalancesResource.value;
+  }
+
+  get isLoadingTokenBalances(): boolean {
+    return this.tokenBalancesResource.isLoading;
   }
 
   get currentSafe(): Safe | undefined {

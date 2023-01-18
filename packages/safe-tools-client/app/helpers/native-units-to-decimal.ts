@@ -13,10 +13,14 @@ interface Signature {
 export function nativeUnitsToDecimal([
   amount,
   tokenDecimals,
-  decimals = 3,
+  decimals = undefined,
 ]: PositionalArgs) {
   const number = parseFloat(ethersUtils.formatUnits(amount, tokenDecimals));
-  return String(number % 1 === 0 ? number : number.toFixed(decimals));
+  if (decimals) {
+    return number.toFixed(decimals);
+  } else {
+    return String(number % 1 === 0 ? number : number.toFixed(3));
+  }
 }
 
 export default helper<Signature>(nativeUnitsToDecimal);
