@@ -20,6 +20,18 @@ jobs:
       - uses: ./.github/actions/setup-node-modules-cache
         with:
           yarn_lock_md5: ${{ hashFiles('yarn.lock') }}
+      - name: Set up env
+        env:
+          INPUT_ENVIRONMENT: ${{ github.event.inputs.environment }}
+        run: |
+          if [ "$INPUT_ENVIRONMENT" = "production" ]; then
+            echo "HUB_URL=https://hub.cardstack.com" >> $GITHUB_ENV
+          elif [ "$INPUT_ENVIRONMENT" = "staging" ]; then
+            echo "HUB_URL=https://hub-staging.stack.cards" >> $GITHUB_ENV
+          else
+            echo "unrecognized environment"
+            exit 1;
+          fi
 
       - name: Deploy safe-tools-client
         uses: ./.github/actions/deploy-safe-tools-client
