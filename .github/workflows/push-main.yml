@@ -418,3 +418,4 @@ jobs:
           discord_webhook: ${{ secrets.DISCORD_WEBHOOK }}
         env:
           SENTRY_DSN: ${{ secrets.SAFE_TOOLS_CLIENT_SENTRY_DSN }}
+          HUB_URL: https://hub-staging.stack.cards
