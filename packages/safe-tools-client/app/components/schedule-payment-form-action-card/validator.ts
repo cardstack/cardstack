@@ -1,4 +1,4 @@
-import { SelectableToken } from '@cardstack/boxel/components/boxel/input/selectable-token';
+import { TokenDetail } from '@cardstack/cardpay-sdk';
 import { isAddress } from 'web3-utils';
 
 function isNumeric(str: unknown) {
@@ -21,8 +21,8 @@ export interface ValidatableForm {
   monthlyUntil: Date | undefined;
   payeeAddress: string;
   paymentAmountRaw: string;
-  paymentToken: SelectableToken | undefined;
-  selectedGasToken: SelectableToken | undefined;
+  paymentToken: TokenDetail | undefined;
+  selectedGasToken: TokenDetail | undefined;
   maxGasPrice: 'normal' | 'high' | 'max' | undefined;
 }
 

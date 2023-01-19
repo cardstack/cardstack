@@ -1,13 +1,12 @@
 import {
-  ChainAddress,
   fetchSupportedGasTokens,
   getConstantByNetwork,
+  ChainAddress,
   TokenDetail,
 } from '@cardstack/cardpay-sdk';
 import NetworkService from '@cardstack/safe-tools-client/services/network';
 import Service, { inject as service } from '@ember/service';
 import { tracked } from '@glimmer/tracking';
-import { type TokenInfo } from '@uniswap/token-lists';
 import { use, resource } from 'ember-resources';
 import sortBy from 'lodash/sortBy';
 import { TrackedObject } from 'tracked-built-ins';
@@ -32,8 +31,17 @@ export default class TokensService extends Service {
     const stubbedGasTokens = this._stubbedGasTokens;
     (async () => {
       try {
-        state.value =
-          stubbedGasTokens || (await fetchSupportedGasTokens(chainId));
+        if (stubbedGasTokens) {
+          state.value = stubbedGasTokens;
+        } else {
+          let gasTokens = await fetchSupportedGasTokens(chainId);
+          const { transactionTokens } = this;
+          gasTokens = gasTokens.map(
+            (gt) =>
+              transactionTokens.find((tt) => tt.address === gt.address) || gt
+          );
+          state.value = gasTokens;
+        }
       } catch (error) {
         state.error = error;
       } finally {
@@ -43,7 +51,7 @@ export default class TokensService extends Service {
     return state;
   });
 
-  get transactionTokens(): TokenInfo[] {
+  get transactionTokens(): TokenDetail[] {
     if (this._stubbedTransactionTokens) {
       return this._stubbedTransactionTokens;
     }
@@ -57,18 +65,18 @@ export default class TokensService extends Service {
     return [];
   }
 
-  _stubbedTransactionTokens: TokenInfo[] | undefined;
+  _stubbedTransactionTokens: TokenDetail[] | undefined;
   @tracked _stubbedGasTokens: TokenDetail[] | undefined;
 
   stubGasTokens(val: TokenDetail[]) {
     this._stubbedGasTokens = val;
   }
 
-  stubTransactionTokens(val: TokenInfo[]) {
+  stubTransactionTokens(val: TokenDetail[]) {
     this._stubbedTransactionTokens = val;
   }
 
-  tokenFromAddress(address: ChainAddress): TokenInfo | undefined {
+  tokenFromAddress(address: ChainAddress): TokenDetail | undefined {
     return this.transactionTokens.find((t) => t.address === address);
   }
 }

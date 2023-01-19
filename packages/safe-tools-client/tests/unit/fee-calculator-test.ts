@@ -1,4 +1,4 @@
-import { SelectableToken } from '@cardstack/boxel/components/boxel/input/selectable-token';
+import { TokenDetail } from '@cardstack/cardpay-sdk';
 import FeeCalculator, {
   CurrentFees,
 } from '@cardstack/safe-tools-client/components/schedule-payment-form-action-card/fee-calculator';
@@ -11,8 +11,8 @@ module('Unit | FeeCalculator', (hooks) => {
   let feeCalculator: FeeCalculator;
   let configuredFees: ConfiguredScheduledPaymentFees;
   let paymentTokenQuantity: TokenQuantity;
-  let gasToken: SelectableToken;
-  let paymentToken: SelectableToken;
+  let gasToken: TokenDetail;
+  let paymentToken: TokenDetail;
   let usdcToGasTokenRate: FixedNumber;
 
   hooks.beforeEach(() => {

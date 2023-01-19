@@ -1,6 +1,5 @@
 import Component from '@glimmer/component';
 import SchedulePaymentFormActionCardUI from './ui';
-import { SelectableToken } from '@cardstack/boxel/components/boxel/input/selectable-token';
 import { inject as service } from '@ember/service';
 import NetworkService from '../../services/network';
 import SafesService from '../../services/safes';
@@ -17,7 +16,7 @@ import { use, resource } from 'ember-resources';
 import { TrackedObject } from 'tracked-built-ins';
 import and from 'ember-truth-helpers/helpers/and';
 import not from 'ember-truth-helpers/helpers/not';
-import { TransactionHash } from '@cardstack/cardpay-sdk';
+import { TokenDetail, TransactionHash } from '@cardstack/cardpay-sdk';
 import { taskFor } from 'ember-concurrency-ts';
 import { BigNumber, FixedNumber } from 'ethers';
 import { task } from 'ember-concurrency-decorators';
@@ -182,11 +181,11 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
 
   @tracked paymentAmountRaw: string = '';
 
-  get paymentTokens(): SelectableToken[] {
+  get paymentTokens(): TokenDetail[] {
     return this.tokens.transactionTokens;
   }
-  @tracked _paymentToken: SelectableToken | undefined;
-  get paymentToken(): SelectableToken | undefined {
+  @tracked _paymentToken: TokenDetail | undefined;
+  get paymentToken(): TokenDetail | undefined {
     const { transactionTokens } = this.tokens;
 
     if (transactionTokens.find(gt => gt.address === this._paymentToken?.address)) {
@@ -198,7 +197,7 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
   @action onUpdatePaymentAmount(val: string) {
     this.paymentAmountRaw = val;
   }
-  @action onUpdatePaymentToken(val: SelectableToken) {
+  @action onUpdatePaymentToken(val: TokenDetail) {
     this._paymentToken = val;
   }
 
@@ -210,13 +209,13 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
     return TokenQuantity.fromInput(paymentToken, this.paymentAmountRaw);
   }
 
-  @tracked _selectedGasToken: SelectableToken | undefined;
+  @tracked _selectedGasToken: TokenDetail | undefined;
   
-  @action onSelectGasToken(val: SelectableToken) {
+  @action onSelectGasToken(val: TokenDetail) {
     this._selectedGasToken = val;
   }
 
-  get selectedGasToken(): SelectableToken | undefined {
+  get selectedGasToken(): TokenDetail | undefined {
     let { value: gasTokens, isLoading } = this.tokens.gasTokens;
 
     if (isLoading || gasTokens?.find(gt => gt.address === this._selectedGasToken?.address)) {

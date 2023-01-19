@@ -1,5 +1,4 @@
-import { SelectableToken } from '@cardstack/boxel/components/boxel/input/selectable-token';
-import { ChainAddress } from '@cardstack/cardpay-sdk';
+import { ChainAddress, TokenDetail } from '@cardstack/cardpay-sdk';
 import config from '@cardstack/safe-tools-client/config/environment';
 import { nativeUnitsToDecimal } from '@cardstack/safe-tools-client/helpers/native-units-to-decimal';
 import TokenToUsdService from '@cardstack/safe-tools-client/services/token-to-usd';
@@ -39,7 +38,7 @@ export default class TokenToUsdHelper extends Helper<Signature> {
           'Must provide tokenQuantity or tokenAddress/tokenDecimals/tokenAmount to token-to-usd helper'
         );
       }
-      const token: SelectableToken = {
+      const token: TokenDetail = {
         address: tokenAddress,
         name: 'unknown',
         symbol: 'unknown',

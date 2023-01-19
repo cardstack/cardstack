@@ -1,11 +1,11 @@
-import { SelectableToken } from '@cardstack/boxel/components/boxel/input/selectable-token';
+import { TokenDetail } from '@cardstack/cardpay-sdk';
 import { BigNumber, utils as ethersUtils } from 'ethers';
 
 export default class TokenQuantity {
   // Count is the number of tokens, denominated in the smallest unit of the token. e.g. wei for Ethereum
-  constructor(public token: SelectableToken, public count: BigNumber) {}
+  constructor(public token: TokenDetail, public count: BigNumber) {}
 
-  static fromInput(token: SelectableToken, decimalString: string) {
+  static fromInput(token: TokenDetail, decimalString: string) {
     let count;
     try {
       count = ethersUtils.parseUnits(decimalString, token.decimals);

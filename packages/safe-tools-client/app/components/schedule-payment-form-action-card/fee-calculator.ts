@@ -1,5 +1,4 @@
-import { SelectableToken } from '@cardstack/boxel/components/boxel/input/selectable-token';
-import { countDecimalPlaces } from '@cardstack/cardpay-sdk';
+import { countDecimalPlaces, TokenDetail } from '@cardstack/cardpay-sdk';
 import { ConfiguredScheduledPaymentFees } from '@cardstack/safe-tools-client/services/scheduled-payment-sdk';
 import TokenQuantity from '@cardstack/safe-tools-client/utils/token-quantity';
 import { BigNumber, FixedNumber } from 'ethers';
@@ -17,7 +16,7 @@ export default class FeeCalculator {
   constructor(
     private configuredFees: ConfiguredScheduledPaymentFees,
     private paymentTokenQuantity: TokenQuantity,
-    private gasToken: SelectableToken,
+    private gasToken: TokenDetail,
     private usdcToGasTokenRate: FixedNumber | undefined
   ) {}
 

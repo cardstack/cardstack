@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import { SelectableToken } from '@cardstack/boxel/components/boxel/input/selectable-token';
-import { ChainAddress, hubRequest } from '@cardstack/cardpay-sdk';
+import { ChainAddress, hubRequest, TokenDetail } from '@cardstack/cardpay-sdk';
 import config from '@cardstack/safe-tools-client/config/environment';
 import HubAuthenticationService from '@cardstack/safe-tools-client/services/hub-authentication';
 import NetworkService from '@cardstack/safe-tools-client/services/network';
@@ -75,7 +74,7 @@ export interface ScheduledPaymentAttemptResponseItem {
   };
 }
 
-function buildUnknownToken(tokenAddress: ChainAddress): SelectableToken {
+function buildUnknownToken(tokenAddress: ChainAddress): TokenDetail {
   return {
     address: tokenAddress,
     name: 'Unknown',
