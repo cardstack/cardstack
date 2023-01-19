@@ -437,16 +437,14 @@ export default class SchedulePaymentFormActionCardUI extends Component<Signature
           <ac.ActionStatusArea data-test-memorialized-status>
             Payment was successfully scheduled
           </ac.ActionStatusArea>
-          {{#if @txHash}}
-            <ac.InfoArea>
+          <ac.InfoArea>
+            {{#if @txHash}}
               <BlockExplorerButton
                 @networkSymbol={{@networkSymbol}}
                 @transactionHash={{@txHash}}
-                @kind="secondary-dark"
+                @kind="secondary-light"
               />
-            </ac.InfoArea>
-          {{/if}}
-          <ac.InfoArea>
+            {{/if}}
             <BoxelButton
               @kind="secondary-light"
               data-test-schedule-payment-form-reset-button

@@ -90,9 +90,10 @@
   grid-area: info;
 
   /*
-  some defaults so that people can simply enter text
+  some defaults so that people can simply enter text or buttons
   if they want to supply more complex content they should be able to overwrite it
   */
+  column-gap: var(--boxel-sp-xs);
   display: flex;
   align-items: center;
   justify-content: center;
