@@ -3,7 +3,6 @@ import {
   getSDK,
   convertChainIdToName,
   Web3Provider,
-  isSupportedChain,
 } from '@cardstack/cardpay-sdk';
 import HubAuthenticationService from '@cardstack/safe-tools-client/services/hub-authentication';
 import NetworkService from '@cardstack/safe-tools-client/services/network';
@@ -71,7 +70,7 @@ export default class Wallet extends Service {
     });
 
     this.chainConnectionManager.on('chain-changed', (chainId: number) => {
-      if (!isSupportedChain(chainId)) {
+      if (!this.network.isSupportedNetwork(chainId)) {
         // TODO: improve unsupported net handling
         alert('Unsupported network! Choose a supported one and reconnect');
         this.disconnect();

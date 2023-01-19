@@ -1,7 +1,6 @@
 import {
   getConstantByNetwork,
   Network,
-  networks,
   SchedulerCapableNetworks,
   supportedChainsArray,
 } from '@cardstack/cardpay-sdk';
@@ -70,6 +69,12 @@ export default class NetworkService extends Service {
     return hubSupportedNetworks;
   }
 
+  isSupportedNetwork(chainId: number): boolean {
+    return this.supportedNetworks.some(
+      (n: NetworkInfo) => n.chainId === chainId
+    );
+  }
+
   @action async onSelect(networkInfo: NetworkInfo) {
     await this.wallet.switchNetwork(networkInfo.chainId);
 
@@ -80,10 +85,14 @@ export default class NetworkService extends Service {
   }
 
   @action onChainChanged(chainId: number) {
-    const symbol = networks[chainId];
-    const name = getConstantByNetwork('name', symbol);
-
-    this.onSelect({ chainId, symbol, name } as NetworkInfo);
+    const networkInfo = this.supportedNetworks.find(
+      (n: NetworkInfo) => n.chainId === chainId
+    );
+    if (networkInfo) {
+      this.onSelect(networkInfo);
+    } else {
+      throw new Error(`Unsupported network: ${networkInfo}`);
+    }
   }
 
   get chainId() {
