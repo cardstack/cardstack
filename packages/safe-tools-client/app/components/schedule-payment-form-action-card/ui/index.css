@@ -1,7 +1,6 @@
 .schedule-payment-form-action-card {
   min-width: 50rem;
   max-width: none;
-  margin-right: var(--boxel-sp-lg);
   flex-grow: 1;
 
   display: flex;
