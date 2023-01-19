@@ -97,9 +97,9 @@
 .schedule-payment-form-action-card__recurring-explanation svg {
   margin-right: var(--boxel-sp-xxxs);
 }
-
 .schedule-payment-form-prerequisite-step {
   display: flex;
+  justify-content: center;
 }
 
 .schedule-payment-form-prerequisite-step__icons svg {

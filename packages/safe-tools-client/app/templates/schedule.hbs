@@ -37,7 +37,7 @@
         </Boxel::Select>
       {{/if}}
     </cp.Item>
-    <cp.Item @title='Safe' @icon='safe'>
+    <cp.Item @title='Safe' @icon='safe' @isActive={{(and this.wallet.isConnected (lte this.safes.safes 0))}}>
       {{#if this.wallet.isConnected}}
         <SafeInfo
           @safes={{this.safes.safes}}

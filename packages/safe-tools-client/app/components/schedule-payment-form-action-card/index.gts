@@ -467,6 +467,10 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
     return taskFor(this.schedulePaymentTask).isRunning;
   }
 
+  get isSafesEmpty() {
+    return this.safes.safes == undefined || this.safes.safes?.length <= 0;
+  }
+
   @tracked isSuccessfullyScheduled = false;
 
   <template>
@@ -519,6 +523,7 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
       @scheduleErrorMessage={{this.scheduleErrorMessage}}
       @onReset={{this.resetForm}}
       @configuredFees={{this.configuredFees.value}}
+      @isSafesEmpty={{this.isSafesEmpty}}
       @currentFees={{this.fees.value}}
     />
   </template>

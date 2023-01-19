@@ -17,6 +17,7 @@ import { on } from '@ember/modifier';
 import { svgJar } from '@cardstack/boxel/utils/svg-jar';
 import { tracked } from '@glimmer/tracking';
 import eq from 'ember-truth-helpers/helpers/eq';
+import and from 'ember-truth-helpers/helpers/and';
 import not from 'ember-truth-helpers/helpers/not';
 import or from 'ember-truth-helpers/helpers/or';
 import set from 'ember-set-helper/helpers/set';
@@ -75,6 +76,7 @@ interface Signature {
     paymentTypeOptions: { id: string, text: string }[];
     schedulingStatus: string | undefined;
     txHash: TransactionHash | undefined;
+    isSafesEmpty: boolean;
     scheduleErrorMessage: string | undefined;
     walletProviderId: WalletProviderId | undefined;
   }
@@ -124,7 +126,7 @@ export default class SchedulePaymentFormActionCardUI extends Component<Signature
   }
 
   get isFormInteractionDisabled() {
-    if (!this.wallet.isConnected) return true;
+    if (!this.wallet.isConnected || this.args.isSafesEmpty) return true;
 
     return !!this.args.schedulingStatus || this.args.isSuccessfullyScheduled;
   }
@@ -336,7 +338,7 @@ export default class SchedulePaymentFormActionCardUI extends Component<Signature
       </Section>
       <ActionChin @state={{this.actionChinState}}>
         <:default as |ac|>
-          {{#if this.wallet.isConnected}}
+          {{#if (and this.wallet.isConnected (not @isSafesEmpty))}}
             <ac.ActionButton
               @disabled={{not @isValid}}
               data-test-schedule-payment-form-submit-button
@@ -352,7 +354,7 @@ export default class SchedulePaymentFormActionCardUI extends Component<Signature
                 </span>
               </ac.InfoArea>
             {{/if}}
-          {{else}}
+          {{else if (not this.wallet.isConnected)}}
             <div class="schedule-payment-form-prerequisite-step" data-test-schedule-form-connect-wallet-cta>
               <div class="schedule-payment-form-prerequisite-step__icons">
                 {{svgJar
@@ -376,6 +378,38 @@ export default class SchedulePaymentFormActionCardUI extends Component<Signature
               </div>
               <div class="schedule-payment-form-prerequisite-step__text">
                 Step 1 - First connect your wallet
+              </div>
+            </div>
+          {{else}}
+            <div class="schedule-payment-form-prerequisite-step" data-test-schedule-form-connect-wallet-cta>
+              <div class="schedule-payment-form-prerequisite-step__icons">
+                {{svgJar
+                  'network'
+                  width="30px"
+                  height="30px"
+                  style=(cssVar
+                    icon-color='var(--boxel-cyan)'
+                  )
+                }}
+                {{svgJar
+                  'plus'
+                  width="16px"
+                  height="30px"
+                  style=(cssVar
+                    icon-color='var(--boxel-cyan)'
+                  )
+                }}
+                {{svgJar
+                  'safe'
+                  width="30px"
+                  height="30px"
+                  style=(cssVar
+                    icon-color='var(--boxel-cyan)'
+                  )
+                }}
+              </div>
+              <div class="schedule-payment-form-prerequisite-step__text">
+                Step 2 - Create a payments safe
               </div>
             </div>
           {{/if}}

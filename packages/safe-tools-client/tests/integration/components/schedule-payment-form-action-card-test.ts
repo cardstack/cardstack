@@ -3,6 +3,7 @@ import {
   GasEstimationScenario,
   TokenDetail,
 } from '@cardstack/cardpay-sdk';
+import { Safe } from '@cardstack/safe-tools-client/services/safes';
 import {
   ConfiguredScheduledPaymentFees,
   ServiceGasEstimationResult,
@@ -82,6 +83,22 @@ class TokenToUsdServiceStub extends TokenToUsdService {
   }
 }
 
+let returnEmptySafes = false;
+class SafeServiceStub extends Service {
+  get safes(): Safe[] | undefined {
+    let safes;
+    if (!returnEmptySafes) {
+      safes = [
+        {
+          address: '0x1A',
+          spModuleAddress: '0x1A',
+        },
+      ];
+    }
+    return safes;
+  }
+}
+
 let tokensService: TokensService;
 module(
   'Integration | Component | schedule-payment-form-action-card',
@@ -94,6 +111,7 @@ module(
           'service:scheduled-payment-sdk',
           ScheduledPaymentSDKServiceStub
         );
+        this.owner.register('service:safes', SafeServiceStub);
         tokensService = this.owner.lookup('service:tokens');
         tokensService.stubGasTokens(exampleGasTokens);
         this.owner.register('service:token-to-usd', TokenToUsdServiceStub);
@@ -362,6 +380,24 @@ module(
         assert
           .dom('.schedule-payment-form-action-card__fee-details')
           .containsText('Cardstack charges $0.25 USD and 0.1%');
+      });
+
+      test(`it displays the create safe instruction if user has no safes`, async function (assert) {
+        returnEmptySafes = true;
+        await render(hbs`
+          <SchedulePaymentFormActionCard />
+        `);
+
+        assert
+          .dom('.schedule-payment-form-prerequisite-step__icons')
+          .isVisible();
+        assert
+          .dom('.schedule-payment-form-prerequisite-step__text')
+          .isVisible();
+        assert
+          .dom('.schedule-payment-form-prerequisite-step__text')
+          .containsText('Step 2');
+        returnEmptySafes = false;
       });
 
       test('calculated fees are shown under at the bottom of the form once valid', async function (assert) {
