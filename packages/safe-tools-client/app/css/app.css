@@ -12,6 +12,7 @@
 
 .safe-tools__dashboard-container-row {
   display: flex;
+  column-gap: var(--boxel-sp-lg);
 }
 
 .boxel-dropdown-trigger {
