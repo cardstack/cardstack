@@ -40,6 +40,7 @@ module.exports = function (environment) {
         tracesSampleRate: 1.0,
       },
     },
+    walletConnectProjectId: process.env.WALLET_CONNECT_PROJ_ID,
   };
 
   if (environment === 'development') {

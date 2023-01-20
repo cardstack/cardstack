@@ -14,4 +14,5 @@ declare const config: {
   APP: Record<string, unknown>;
   hubUrl: string;
   infuraId: string;
+  walletConnectProjectId: string;
 };
