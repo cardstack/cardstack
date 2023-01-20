@@ -478,13 +478,13 @@ module('Acceptance | scheduling', function (hooks) {
         .containsText('Payment was successfully scheduled');
       assert.dom(PAYEE_INPUT).isDisabled();
 
-      await click('[data-test-schedule-payment-form-reset-button]');
-      assert.dom(PAYEE_INPUT).isNotDisabled();
-      assert.dom(SUBMIT_BUTTON).hasText('Schedule Payment');
-
       // Make sure the newly created payment appears in the list of future scheduled payments
       await waitFor('[data-test-scheduled-payment-card-id="123"]');
       assert.dom('[data-test-scheduled-payment-card-id="123"]').exists();
+
+      await click('[data-test-schedule-payment-form-reset-button]');
+      assert.dom(PAYEE_INPUT).isNotDisabled();
+      assert.dom(SUBMIT_BUTTON).hasText('Schedule Payment');
     });
   });
 
