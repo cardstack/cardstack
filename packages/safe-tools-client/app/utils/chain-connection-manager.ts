@@ -451,16 +451,6 @@ class WalletConnectConnectionStrategy extends ConnectionStrategy {
 
   async setup() {
     const { chainId } = this;
-    // in case we've disconnected, we should clear wallet connect's local storage data as well
-    // As per https://github.com/WalletConnect/walletconnect-monorepo/issues/258 there is no way
-    // for us to tell if this is valid before we connect, but we don't want to connect to something
-    // if we have disconnected from it in the first place (since we cleared our local storage identification of provider)
-    if (
-      this.connectionManager.getProviderIdForChain(chainId) !== this.providerId
-    ) {
-      //TODO: handle disconnect state
-      // clearWalletConnectStorage(chainId);
-    }
 
     if (!this.provider) {
       this.provider = await WConnetUniversalProvider.init({
@@ -559,7 +549,8 @@ class WalletConnectConnectionStrategy extends ConnectionStrategy {
   }
 
   async disconnect() {
-    return await this.provider?.disconnect();
+    await this.provider?.disconnect();
+    this.onDisconnect();
   }
 
   async reconnect() {
