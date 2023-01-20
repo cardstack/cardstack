@@ -90,3 +90,7 @@
   height: 9px;
   margin-top: 5px;
 }
+
+.boxel-select__dropdown .safe-tools__current-network-option:before {
+  content:  "\2713  "; /* checkmark */
+}

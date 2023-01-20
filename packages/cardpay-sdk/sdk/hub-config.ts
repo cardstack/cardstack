@@ -11,6 +11,7 @@ export interface Web3HubConfig {
   ethereum: RpcNodeUrl;
   gnosis: RpcNodeUrl;
   polygon: RpcNodeUrl;
+  schedulerNetworks: string[];
 }
 
 export interface RpcNodeUrl {

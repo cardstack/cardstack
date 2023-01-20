@@ -32,6 +32,7 @@ describe('GET /api/config', function () {
               layer2Network: 'sokol',
               layer2RpcNodeHttpsUrl: 'https://humorme.test/abc123/',
               layer2RpcNodeWssUrl: 'wss://humorme.test/abc123/',
+              schedulerNetworks: ['goerli'],
             },
           },
         },
