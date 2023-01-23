@@ -40,3 +40,4 @@ jobs:
           discord_webhook: ${{ secrets.DISCORD_WEBHOOK }}
         env:
           SENTRY_DSN: ${{ secrets.SAFE_TOOLS_CLIENT_SENTRY_DSN }}
+          WALLET_CONNECT_PROJ_ID: ${{ secrets.SAFE_TOOLS_WALLET_CONNECT_PROJ_ID }}
