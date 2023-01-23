@@ -1,3 +1,4 @@
+import cryptoRandomString from 'crypto-random-string';
 import { subMinutes } from 'date-fns';
 import shortUuid from 'short-uuid';
 import { CREATION_WITHOUT_TX_HASH_ALLOWED_MINUTES } from '../../services/data-integrity-checks/scheduled-payments';
@@ -50,7 +51,7 @@ describe('GET /api/data-integrity-checks/scheduled-payments', async function () 
         feePercentage: '0',
         salt: '54lt',
         payAt: nowUtc(),
-        spHash: '0x123',
+        spHash: cryptoRandomString({ length: 10 }),
         chainId: 1,
         userAddress: '0x57022DA74ec3e6d8274918C732cf8864be7da833',
         creationTransactionHash: null,
