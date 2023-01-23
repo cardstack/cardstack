@@ -711,7 +711,7 @@ describe('PATCH /api/scheduled-payments/:id', async function () {
   it('updates a scheduled payment when creation transaction hash is provided', async function () {
     let scheduledPayment = await prisma.scheduledPayment.create({
       data: {
-        id: '73994d4b-bb3a-4d73-969f-6fa24da16fb4',
+        id: shortUuid.uuid(),
         senderSafeAddress: '0xc0ffee254729296a45a3885639AC7E10F9d54979',
         moduleAddress: '0x7E7d0B97D663e268bB403eb4d72f7C0C7650a6dd',
         tokenAddress: '0xa455bbB2A81E09E0337c13326BBb302Cb37D7cf6',
@@ -783,7 +783,7 @@ describe('PATCH /api/scheduled-payments/:id', async function () {
   it('updates a scheduled payment when cancelation transaction hash is provided', async function () {
     let scheduledPayment = await prisma.scheduledPayment.create({
       data: {
-        id: '73994d4b-bb3a-4d73-969f-6fa24da16fb4',
+        id: shortUuid.uuid(),
         senderSafeAddress: '0xc0ffee254729296a45a3885639AC7E10F9d54979',
         moduleAddress: '0x7E7d0B97D663e268bB403eb4d72f7C0C7650a6dd',
         tokenAddress: '0xa455bbB2A81E09E0337c13326BBb302Cb37D7cf6',
@@ -887,7 +887,7 @@ describe('DELETE /api/scheduled-payments/:id', async function () {
   it('deletes a scheduled payment', async function () {
     let scheduledPayment = await prisma.scheduledPayment.create({
       data: {
-        id: '73994d4b-bb3a-4d73-969f-6fa24da16fb4',
+        id: shortUuid.uuid(),
         senderSafeAddress: '0xc0ffee254729296a45a3885639AC7E10F9d54979',
         moduleAddress: '0x7E7d0B97D663e268bB403eb4d72f7C0C7650a6dd',
         tokenAddress: '0xa455bbB2A81E09E0337c13326BBb302Cb37D7cf6',
