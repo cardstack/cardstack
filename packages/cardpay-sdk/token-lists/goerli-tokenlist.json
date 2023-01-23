@@ -67,6 +67,24 @@
       "address": "0xb0f7554a44cC178e935Ea10c79e7c042D1840044",
       "logoURI": "https://wallet-asset.matic.network/img/tokens/usdt.svg",
       "tags": ["erc20", "relayGas", "stablecoin"]
+    },
+    {
+      "chainId": 5,
+      "name": "Cardstack Test Token",
+      "symbol": "CTST",
+      "decimals": 18,
+      "address": "0x95093b8836ED53B4594EC748995E45b0Cd2b1389",
+      "logoURI": "https://assets-cdn.trustwallet.com/blockchains/ethereum/assets/0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2/logo.png",
+      "tags": ["erc20"]
+    },
+    {
+      "chainId": 5,
+      "name": "Cardstack Test Stablecoin",
+      "symbol": "CTSC",
+      "decimals": 6,
+      "address": "0xB0b4eD7E54641f96C134D27921764711Cb303e96",
+      "logoURI": "https://assets-cdn.trustwallet.com/blockchains/ethereum/assets/0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2/logo.png",
+      "tags": ["erc20", "stablecoin", "relayGas"]
     }
   ]
 }

@@ -1357,9 +1357,9 @@ export default class ScheduledPaymentModule {
       fast: gas.mul(String(gasStationResponse.fast)),
     };
 
-    let usdcToken = await getAddress('usdcToken', this.ethersProvider);
-    if (!usdcToken) throw Error('USDC token not found');
-    let priceWeiInUSD = String(await getNativeWeiInToken(this.ethersProvider, usdcToken));
+    let usdStableCoinToken = await getAddress('usdStableCoinToken', this.ethersProvider);
+    if (!usdStableCoinToken) throw Error('USD Stable Coin token not found');
+    let priceWeiInUSD = String(await getNativeWeiInToken(this.ethersProvider, usdStableCoinToken));
     let gasRangeInUSD = {
       slow: gasRangeInWei.slow.mul(priceWeiInUSD),
       standard: gasRangeInWei.standard.mul(priceWeiInUSD),

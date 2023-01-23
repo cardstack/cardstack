@@ -127,13 +127,13 @@ export async function getNativeWeiInToken(provider: JsonRpcProvider, tokenAddres
 
 export async function getUsdcToTokenRate(provider: JsonRpcProvider, tokenAddress: string): Promise<FixedNumber> {
   let network = await networkName(provider);
-  let usdcTokenAddress = getAddressByNetwork('usdcToken', network);
+  let usdStableCoinToken = getAddressByNetwork('usdStableCoinToken', network);
 
-  if (usdcTokenAddress.toLowerCase() === tokenAddress.toLowerCase()) {
+  if (usdStableCoinToken.toLowerCase() === tokenAddress.toLowerCase()) {
     return FixedNumber.from(1);
   }
 
-  let rate = await tokenPairRate(provider, usdcTokenAddress, tokenAddress);
+  let rate = await tokenPairRate(provider, usdStableCoinToken, tokenAddress);
   let numerator = FixedNumber.from(rate.numerator.toString());
   let denominator = FixedNumber.from(rate.denominator.toString());
   let scalar = FixedNumber.from(rate.scalar.numerator.toString()).divUnsafe(
