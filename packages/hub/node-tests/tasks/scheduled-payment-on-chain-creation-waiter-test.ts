@@ -1,4 +1,6 @@
 import { expect } from 'chai';
+import cryptoRandomString from 'crypto-random-string';
+import shortUuid from 'short-uuid';
 import ScheduledPaymentOnChainCreationWaiter from '../../tasks/scheduled-payment-on-chain-creation-waiter';
 import { registry, setupHub } from '../helpers/server';
 
@@ -42,7 +44,7 @@ describe('ScheduledPaymentOnChainCreationWaiterTask', function () {
     let task = await getContainer().instantiate(ScheduledPaymentOnChainCreationWaiter);
     let scheduledPayment = await prisma.scheduledPayment.create({
       data: {
-        id: '73994d4b-bb3a-4d73-969f-6fa24da16fb4',
+        id: shortUuid.uuid(),
         senderSafeAddress: '0xc0ffee254729296a45a3885639AC7E10F9d54979',
         moduleAddress: '0x7E7d0B97D663e268bB403eb4d72f7C0C7650a6dd',
         tokenAddress: '0xa455bbB2A81E09E0337c13326BBb302Cb37D7cf6',
@@ -55,7 +57,7 @@ describe('ScheduledPaymentOnChainCreationWaiterTask', function () {
         feePercentage: 0,
         salt: '54lt',
         payAt: new Date(),
-        spHash: '0x123',
+        spHash: cryptoRandomString({ length: 10 }),
         chainId: 1,
         userAddress: '0x57022DA74ec3e6d8274918C732cf8864be7da833',
         creationTransactionHash: '0xc13d7905be5c989378a945487cd2a1193627ae606009e28e296d48ddaec66162',
@@ -81,7 +83,7 @@ describe('ScheduledPaymentOnChainCreationWaiterTask', function () {
     let task = await getContainer().instantiate(ScheduledPaymentOnChainCreationWaiter);
     let scheduledPayment = await prisma.scheduledPayment.create({
       data: {
-        id: '73994d4b-bb3a-4d73-969f-6fa24da16fb4',
+        id: shortUuid.uuid(),
         senderSafeAddress: '0xc0ffee254729296a45a3885639AC7E10F9d54979',
         moduleAddress: '0x7E7d0B97D663e268bB403eb4d72f7C0C7650a6dd',
         tokenAddress: '0xa455bbB2A81E09E0337c13326BBb302Cb37D7cf6',
@@ -94,7 +96,7 @@ describe('ScheduledPaymentOnChainCreationWaiterTask', function () {
         feePercentage: 0,
         salt: '54lt',
         payAt: new Date(),
-        spHash: '0x123',
+        spHash: cryptoRandomString({ length: 10 }),
         chainId: 1,
         userAddress: '0x57022DA74ec3e6d8274918C732cf8864be7da833',
         creationTransactionHash: '0xc13d7905be5c989378a945487cd2a1193627ae606009e28e296d48ddaec66162',
@@ -118,7 +120,7 @@ describe('ScheduledPaymentOnChainCreationWaiterTask', function () {
     let task = await getContainer().instantiate(ScheduledPaymentOnChainCreationWaiter);
     let scheduledPayment = await prisma.scheduledPayment.create({
       data: {
-        id: '73994d4b-bb3a-4d73-969f-6fa24da16fb4',
+        id: shortUuid.uuid(),
         senderSafeAddress: '0xc0ffee254729296a45a3885639AC7E10F9d54979',
         moduleAddress: '0x7E7d0B97D663e268bB403eb4d72f7C0C7650a6dd',
         tokenAddress: '0xa455bbB2A81E09E0337c13326BBb302Cb37D7cf6',
@@ -131,7 +133,7 @@ describe('ScheduledPaymentOnChainCreationWaiterTask', function () {
         feePercentage: 0,
         salt: '54lt',
         payAt: new Date(),
-        spHash: '0x123',
+        spHash: cryptoRandomString({ length: 10 }),
         chainId: 1,
         userAddress: '0x57022DA74ec3e6d8274918C732cf8864be7da833',
         creationTransactionHash: '0xc13d7905be5c989378a945487cd2a1193627ae606009e28e296d48ddaec66162',

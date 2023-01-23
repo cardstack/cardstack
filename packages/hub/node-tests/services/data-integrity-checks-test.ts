@@ -9,6 +9,7 @@ import DataIntegrityChecksScheduledPayments, {
   CANCELATION_UNMINED_ALLOWED_MINUTES,
 } from '../../services/data-integrity-checks/scheduled-payments';
 import shortUuid from 'short-uuid';
+import cryptoRandomString from 'crypto-random-string';
 
 describe('data integrity checks', function () {
   let prisma: ExtendedPrismaClient;
@@ -42,7 +43,7 @@ describe('data integrity checks', function () {
           feePercentage: '0',
           salt: '54lt',
           payAt: nowUtc(),
-          spHash: '0x123',
+          spHash: cryptoRandomString({ length: 10 }),
           chainId: 1,
           userAddress: '0x57022DA74ec3e6d8274918C732cf8864be7da833',
           creationTransactionHash: null,
@@ -65,7 +66,7 @@ describe('data integrity checks', function () {
           feePercentage: '0',
           salt: '54lt',
           payAt: nowUtc(),
-          spHash: '0x1234',
+          spHash: cryptoRandomString({ length: 10 }),
           chainId: 1,
           userAddress: '0x57022DA74ec3e6d8274918C732cf8864be7da833',
           creationTransactionHash: '0x123',
@@ -98,7 +99,7 @@ describe('data integrity checks', function () {
           feePercentage: '0',
           salt: '54lt',
           payAt: nowUtc(),
-          spHash: '0x123',
+          spHash: cryptoRandomString({ length: 10 }),
           chainId: 1,
           userAddress: '0x57022DA74ec3e6d8274918C732cf8864be7da833',
           cancelationTransactionHash: null,
@@ -121,7 +122,7 @@ describe('data integrity checks', function () {
           feePercentage: '0',
           salt: '54lt',
           payAt: nowUtc(),
-          spHash: '0x1234',
+          spHash: cryptoRandomString({ length: 10 }),
           chainId: 1,
           userAddress: '0x57022DA74ec3e6d8274918C732cf8864be7da833',
           cancelationTransactionHash: '0x123',
@@ -154,7 +155,7 @@ describe('data integrity checks', function () {
           feePercentage: '0',
           salt: '54lt',
           payAt: subMinutes(nowUtc(), 61),
-          spHash: '0x123',
+          spHash: cryptoRandomString({ length: 10 }),
           chainId: 1,
           userAddress: '0x57022DA74ec3e6d8274918C732cf8864be7da833',
           creationTransactionHash: '0x123',
@@ -186,7 +187,7 @@ describe('data integrity checks', function () {
           feePercentage: '0',
           salt: '54lt',
           payAt: subMinutes(nowUtc(), 60 * 24),
-          spHash: '0x123',
+          spHash: cryptoRandomString({ length: 10 }),
           chainId: 1,
           userAddress: '0x57022DA74ec3e6d8274918C732cf8864be7da833',
           creationTransactionHash: '0x123',
@@ -229,7 +230,7 @@ describe('data integrity checks', function () {
           feePercentage: '0',
           salt: '54lt',
           payAt: subMinutes(nowUtc(), 60 * 24),
-          spHash: '0x123',
+          spHash: cryptoRandomString({ length: 10 }),
           chainId: 1,
           userAddress: '0x57022DA74ec3e6d8274918C732cf8864be7da833',
           creationTransactionHash: '0x123',
