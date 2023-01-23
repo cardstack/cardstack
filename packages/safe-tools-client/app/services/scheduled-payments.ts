@@ -213,9 +213,7 @@ export default class ScheduledPaymentsService extends Service {
   ): Promise<ScheduledPayment[]> {
     let queryString = `filter[chain-id]=${chainId}`;
     if (minPayAt) {
-      queryString += `&filter[payAt][gt]=${Math.round(
-        minPayAt.getTime() / 1000
-      )}`;
+      queryString += `&filter[pay-at][gt]=${new Date().toISOString()}`;
     }
     const response = await hubRequest(
       config.hubUrl,
