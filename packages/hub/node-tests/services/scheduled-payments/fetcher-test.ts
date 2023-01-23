@@ -4,7 +4,7 @@ import { setupHub } from '../../helpers/server';
 import crypto from 'crypto';
 import { addDays, addMinutes, addMonths, subDays, subHours, subMinutes, subMonths } from 'date-fns';
 import { ScheduledPayment, ScheduledPaymentAttemptStatusEnum } from '@prisma/client';
-import { convertDateToUTC } from '../../../utils/dates';
+import { nowUtc } from '../../../utils/dates';
 import { ExtendedPrismaClient } from '../../../services/prisma-manager';
 
 describe('fetching scheduled payments that are due', function () {
@@ -17,7 +17,7 @@ describe('fetching scheduled payments that are due', function () {
 
   this.beforeEach(async function () {
     subject = await getContainer().lookup('scheduled-payment-fetcher');
-    now = convertDateToUTC(new Date());
+    now = subMinutes(nowUtc(), 1);
     validForDays = subject.validForDays;
     prisma = await getPrisma();
   });
@@ -219,6 +219,26 @@ describe('fetching scheduled payments that are due', function () {
 
       expect((await subject.fetchScheduledPayments(3)).map((sp) => sp.id)).to.deep.equal([sp1.id, sp2.id, sp3.id]);
     });
+  });
+
+  it('does not fetch a payment with when payAt is exactly now', async function () {
+    // See why in ScheduledPaymentService.fetchScheduledPayments (safety measure agains block time manipulation)
+
+    await createScheduledPayment({
+      payAt: nowUtc(),
+    });
+    let payments = await subject.fetchScheduledPayments();
+    expect(payments).to.be.empty;
+  });
+
+  it('fetches a payment when payAt is now but with subtracted 1 minute buffer', async function () {
+    // See why buffer is needed in ScheduledPaymentService.fetchScheduledPayments (safety measure agains block time manipulation)
+
+    await createScheduledPayment({
+      payAt: subMinutes(nowUtc(), 1),
+    });
+    let payments = await subject.fetchScheduledPayments();
+    expect(payments).length(1);
   });
 
   describe('both types of scheduled payments', function () {
