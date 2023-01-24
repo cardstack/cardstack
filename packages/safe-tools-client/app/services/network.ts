@@ -70,7 +70,7 @@ export default class NetworkService extends Service {
   }
 
   get supportedNetworksName() {
-    return this.supportedNetworks.map(network => network.name);
+    return this.supportedNetworks.map((network) => network.name);
   }
 
   isSupportedNetwork(chainId: number): boolean {
