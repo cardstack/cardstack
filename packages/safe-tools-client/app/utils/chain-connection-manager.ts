@@ -515,7 +515,6 @@ class WalletConnectConnectionStrategy extends ConnectionStrategy {
       await this.provider?.connect({
         namespaces: {
           [EIP155]: {
-            // @ts-expect-error wc types are not up-to-date
             methods: [
               'eth_sendTransaction',
               'eth_signTransaction',
