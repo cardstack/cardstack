@@ -435,6 +435,8 @@ const wcWeb3Modal = new Web3Modal({
   themeBackground: 'themeColor',
 });
 
+const EIP155 = 'eip155';
+
 class WalletConnectConnectionStrategy extends ConnectionStrategy {
   providerId: WalletProviderId = 'wallet-connect';
   provider?: WalletConnectProviderish;
@@ -512,7 +514,7 @@ class WalletConnectConnectionStrategy extends ConnectionStrategy {
 
       await this.provider?.connect({
         namespaces: {
-          eip155: {
+          [EIP155]: {
             // @ts-expect-error wc types are not up-to-date
             methods: [
               'eth_sendTransaction',
@@ -522,7 +524,7 @@ class WalletConnectConnectionStrategy extends ConnectionStrategy {
               'eth_signTypedData',
               'eth_signTypedData_v4',
             ],
-            chains: [`eip155:${chainId}`],
+            chains: [`${EIP155}:${chainId}`],
             events: ['chainChanged', 'accountsChanged'],
             rpcMap: {
               [chainId]: rpcNodeHttpsUrl,
