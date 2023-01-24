@@ -2,7 +2,8 @@ import { helper } from '@ember/component/helper';
 
 type PositionalArgs = [];
 type NamedArgs = {
-  elementId: string;
+  elementId?: string;
+  value?: string;
   onCopy?: () => void;
 };
 
@@ -17,7 +18,7 @@ interface Signature {
 export function copyToClipboard(
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   _params: PositionalArgs,
-  { elementId, onCopy }: NamedArgs
+  { elementId, value, onCopy }: NamedArgs
 ): () => void {
   return function () {
     let sourceInput = document.querySelector(`#${elementId}`) as
@@ -26,6 +27,9 @@ export function copyToClipboard(
     if (sourceInput) {
       sourceInput.select();
       document.execCommand('copy');
+      onCopy?.();
+    } else if (value) {
+      navigator.clipboard.writeText(value);
       onCopy?.();
     } else {
       console.warn(`copyToClipboard: element not found with id ${elementId}`);

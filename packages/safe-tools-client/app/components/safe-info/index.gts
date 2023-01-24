@@ -1,6 +1,7 @@
 import Component from '@glimmer/component';
 import BoxelSelect from '@cardstack/boxel/components/boxel/select';
 import BoxelButton from '@cardstack/boxel/components/boxel/button';
+import BoxelIconButton from '@cardstack/boxel/components/boxel/icon-button';
 import or from 'ember-truth-helpers/helpers/or';
 import gt from 'ember-truth-helpers/helpers/gt';
 import { on } from '@ember/modifier';
@@ -9,6 +10,11 @@ import nativeUnitsToDecimal from '@cardstack/safe-tools-client/helpers/native-un
 import CreateSafe from '@cardstack/safe-tools-client/components/create-safe';
 import { Safe, TokenBalance } from '@cardstack/safe-tools-client/services/safes';
 import not from 'ember-truth-helpers/helpers/not';
+import cssVar from '@cardstack/boxel/helpers/css-var';
+import { tracked } from '@glimmer/tracking';
+import { action } from '@ember/object';
+import { later } from '@ember/runloop';
+import copyToClipboard from '@cardstack/boxel/helpers/copy-to-clipboard';
 
 import './index.css';
 
@@ -27,6 +33,15 @@ interface Signature {
 }
 
 export default class SafeInfo extends Component<Signature> {
+  @tracked isShowingCopiedConfirmation = 0;
+
+  @action flashCopiedConfirmation() {
+    this.isShowingCopiedConfirmation = 1;
+    later(() => {
+      this.isShowingCopiedConfirmation = 0;
+    } , 1000)
+  }
+
   get safesHaveLoadedInitially() {
     return this.args.safes !== undefined;
   }
@@ -38,16 +53,36 @@ export default class SafeInfo extends Component<Signature> {
     {{#if @isLoadingSafes}}
       <div class='info'>Loading safes...</div>
     {{else if (gt @safes.length 1)}}
-      <BoxelSelect
-        class='safe-tools__dashboard-dropdown'
-        @selected={{@currentSafe}}
-        @onChange={{@onSelectSafe}}
-        @options={{this.safes}}
-        @dropdownClass="boxel-select-usage-dropdown"
-        data-test-safe-dropdown
-        as |safe itemCssClass|>
-        <div class="{{itemCssClass}} blockchain-address">{{truncateMiddle safe.address}}</div>
-      </BoxelSelect>
+      <div class='safe-tools_safe-info-address'>
+        <BoxelSelect
+          class='safe-tools__dashboard-dropdown'
+          @selected={{@currentSafe}}
+          @onChange={{@onSelectSafe}}
+          @options={{this.safes}}
+          @dropdownClass="boxel-select-usage-dropdown"
+          data-test-safe-dropdown
+          as |safe itemCssClass|>
+          <div class="{{itemCssClass}} blockchain-address">{{truncateMiddle safe.address}}</div>
+        </BoxelSelect>
+        <BoxelIconButton
+          @icon="copy"
+          aria-label="Copy to Clipboard"
+          style={{cssVar
+              boxel-icon-button-width=0
+              boxel-icon-button-height="100%"
+              icon-color="var(--boxel-light)"
+            }}
+          {{on "click"
+                (copyToClipboard
+                  value=@currentSafe.address
+                  onCopy=this.flashCopiedConfirmation
+                )
+              }}
+        />
+        <div class='safe-tools-safe-info-address-copied' style={{
+          cssVar safe-info-address-copied-opacity=this.isShowingCopiedConfirmation
+        }}>Copied!</div>
+      </div>
     {{else}}
       <div class='safe-tools__dashboard-schedule-control-panel-address' title={{@currentSafe.address}} data-test-safe-address-label>
         {{truncateMiddle (or @currentSafe.address '')}}

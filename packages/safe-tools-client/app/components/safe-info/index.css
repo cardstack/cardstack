@@ -2,3 +2,33 @@
   font-weight: bold;
   color: var(--boxel-highlight);
 }
+
+.safe-tools_safe-info-address {
+  display: flex;
+  align-items: center;
+
+  position: relative;
+}
+
+.safe-tools_safe-info-address .safe-tools__dashboard-dropdown {
+  margin-right: var(--boxel-sp-xs);
+}
+
+.safe-tools-safe-info-address-copied {
+  --safe-info-address-copied-opacity: 0;
+
+  content: attr(data-hover);
+  opacity: var(--safe-info-address-copied-opacity);
+  background-color: var(--boxel-light);
+  color: var(--boxel-dark);
+  font-size: var(--boxel-font-size-sm);
+  text-align: center;
+  border-radius: var(--boxel-sp-sm);
+  padding: var(--boxel-sp-sm);
+  transition: opacity 1s ease-in-out;
+
+  position: absolute;
+  z-index: 1;
+  right: 0;
+  top: 110%;
+}
