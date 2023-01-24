@@ -94,3 +94,37 @@
 .boxel-select__dropdown .safe-tools__current-network-option:before {
   content:  "\2713  "; /* checkmark */
 }
+
+.safe-tools__current-network {
+  display: flex;
+  position: relative;
+}
+
+.safe-tools__current-network-text {
+  font-weight: 600;
+  font-size: var(--boxel-font-size-sm);
+  margin-right: var(--boxel-sp-xs);
+}
+
+.safe-tools__current-network .boxel-icon-button::after {
+  content: attr(data-hover);
+  opacity: 0;
+  width: 140px;
+  background-color: var(--boxel-light);
+  color: var(--boxel-dark);
+  font-size: var(--boxel-font-size-sm);
+  text-align: center;
+  border-radius: var(--boxel-sp-sm);
+  padding: var(--boxel-sp-sm);
+  transition: opacity 1s ease-in-out;
+
+  position: absolute;
+  z-index: 1;
+  left: 0;
+  top: 110%;
+}
+
+.safe-tools__current-network .boxel-icon-button:hover::after {
+  opacity: 1;
+  visibility: visible;
+}

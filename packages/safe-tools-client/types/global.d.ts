@@ -11,6 +11,7 @@ import AndHelper from 'ember-truth-helpers/helpers/and';
 import EqHelper from 'ember-truth-helpers/helpers/eq';
 import LteHelper from 'ember-truth-helpers/helpers/lte';
 import NotHelper from 'ember-truth-helpers/helpers/not';
+import arrayJoin from '@cardstack/safe-tools-client/helpers/array-join';
 
 declare module '@glint/environment-ember-loose/registry' {
   // eslint-disable-next-line @typescript-eslint/no-empty-interface
@@ -32,6 +33,7 @@ declare module '@glint/environment-ember-loose/registry' {
     }>;
     'svg-jar': typeof svgJar;
     lte: typeof LteHelper;
+    'array-join': typeof arrayJoin;
   }
 }
 
