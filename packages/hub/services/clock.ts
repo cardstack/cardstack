@@ -1,4 +1,5 @@
 import { format } from 'date-fns';
+import { nowUtc } from '../utils/dates';
 
 export class Clock {
   hrNow() {
@@ -9,6 +10,9 @@ export class Clock {
   }
   dateStringNow() {
     return format(this.now(), 'yyyy-MM-dd');
+  }
+  utcNow() {
+    return nowUtc();
   }
 }
 
