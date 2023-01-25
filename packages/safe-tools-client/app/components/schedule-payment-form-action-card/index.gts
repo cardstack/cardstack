@@ -441,7 +441,6 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
           message = "We are currently experiencing a problem with our transaction relayer system. We are working on a fix. Please try again later. If the problem persists, please contact support."
         } else {
           let errorKey = Object.keys(knownErrorPatterns).find((key) => { return parsed.exception.includes(key) });
-          if (parsed.ex)
           if (errorKey) {
             message = knownErrorPatterns[errorKey];
           }
