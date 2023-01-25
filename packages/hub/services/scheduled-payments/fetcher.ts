@@ -1,6 +1,7 @@
 import { inject } from '@cardstack/di';
 import { ScheduledPayment } from '@prisma/client';
 import { startOfDay, subDays } from 'date-fns';
+import { Prisma } from '@prisma/client';
 
 export default class ScheduledPaymentsFetcherService {
   prismaManager = inject('prisma-manager', { as: 'prismaManager' });
@@ -19,11 +20,13 @@ export default class ScheduledPaymentsFetcherService {
 
   // In the case of scheduled payments that failed and need to be retried, the query will return only the scheduled payments
   // where enough time has passed since the last failed payment attempt. We allow maximum 8 failed attempts, and the time
-  // between attempts is hardcoded in the query (5 minutes, 1 hour, 5 hours, 12 hours, 12 hours, 12 hours, 12 hours, 12 hours)
+  // between attempts is defined in the calculateRetryBackoffsInMinutes method.
+
   async fetchScheduledPayments(limit = 10): Promise<ScheduledPayment[]> {
     let prisma = await this.prismaManager.getClient();
     let now = this.clock.utcNow();
     let nowString = now.toISOString(); // We use ISO string to make sure we operate on UTC dates only. Otherwise Prisma will use local time zone.
+    let retryBackoffsInMinutes = this.calculateRetryBackoffsInMinutes();
 
     let results: [{ id: string; started_at: Date }] = await prisma.$queryRaw`SELECT 
         scheduled_payments.id AS id,
@@ -47,8 +50,10 @@ export default class ScheduledPaymentsFetcherService {
           AND scheduled_payments.creation_block_number > 0
           AND scheduled_payments.pay_at > ${startOfDay(subDays(now, this.validForDays)).toISOString()}::timestamp
           AND scheduled_payments.pay_at <= ${nowString}::timestamp
-          AND COALESCE(failed_attempts_count, 0) < 8
-          AND ${nowString}::timestamp >= (COALESCE(last_failed_payment_attempt.started_at, to_timestamp(0)) + (interval '1 minute' * (ARRAY[0, 5, 60, 360, 720, 720, 720, 720])[COALESCE(failed_attempts_count + 1, 1)]))
+          AND COALESCE(failed_attempts_count, 0) < ${retryBackoffsInMinutes.length}
+          AND ${nowString}::timestamp >= (COALESCE(last_failed_payment_attempt.started_at, to_timestamp(0)) + (interval '1 minute' * (ARRAY[${Prisma.join(
+      retryBackoffsInMinutes
+    )}])[COALESCE(failed_attempts_count + 1, 1)]))
           AND (
             (
               scheduled_payments.recurring_day_of_month IS NULL
@@ -96,6 +101,14 @@ export default class ScheduledPaymentsFetcherService {
         LIMIT ${limit};`;
 
     return prisma.scheduledPayment.findMany({ where: { id: { in: results.map((result) => result.id) } } });
+  }
+
+  calculateRetryBackoffsInMinutes() {
+    let fixedPart = [0, 5, 60, 360]; // Retry immediately, then after 5 minutes, 1 hour, 6 hours
+    let fixedPartSum = fixedPart.reduce((a, b) => a + b, 0);
+    let variablePartChunksCount = Math.floor((this.validForDays * 24 * 60 - fixedPartSum) / 720);
+    let variablePart = Array(variablePartChunksCount).fill(720); // Then every 12 hours until we reach the end of validForDays
+    return [...fixedPart, ...variablePart];
   }
 }
 

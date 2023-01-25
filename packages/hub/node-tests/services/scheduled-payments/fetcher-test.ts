@@ -301,7 +301,7 @@ describe('fetching scheduled payments that are due', function () {
       let sp2 = await createScheduledPayment({ payAt: subDays(now, 3) });
       expect((await subject.fetchScheduledPayments()).map((sp) => sp.id)).to.deep.equal([sp1.id, sp2.id]);
 
-      for await (let i of [1, 2, 3, 4, 5, 6, 7, 8]) {
+      for await (let i of Array(subject.calculateRetryBackoffsInMinutes().length).keys()) {
         await createScheduledPaymentAttempt(
           sp1,
           addMinutes(subDays(now, 3), i),
@@ -310,8 +310,13 @@ describe('fetching scheduled payments that are due', function () {
         );
       }
 
-      // sp1 has 8 attempts, which is max, so we don't expect it to be fetched again
+      // sp1 had reached max attempts, so we don't expect it to be fetched again
       expect((await subject.fetchScheduledPayments()).map((sp) => sp.id)).to.deep.equal([sp2.id]);
+    });
+
+    it('calculates exponential backoff values correctly', async function () {
+      // validForDays is hardcoded to 3 days
+      expect(subject.calculateRetryBackoffsInMinutes()).to.deep.equal([0, 5, 60, 360, 720, 720, 720, 720, 720]);
     });
   });
 });
