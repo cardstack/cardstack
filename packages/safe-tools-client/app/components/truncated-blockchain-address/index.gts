@@ -43,6 +43,8 @@ export default class TruncatedBlockchainAddress extends Component<Signature> {
         <div class='blockchain-address'>{{truncateMiddle @address}}</div>
         <BoxelIconButton
           @icon="copy"
+          @width="14px"
+          @height="14px"
           aria-label="Copy to Clipboard"
           style={{cssVar
             boxel-icon-button-width="auto"
