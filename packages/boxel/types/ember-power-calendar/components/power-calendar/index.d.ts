@@ -7,6 +7,7 @@ interface DaysComponentSignature {
   Args: {
     weekdayFormat: string;
     minDate: any;
+    maxDate: any;
   };
 }
 

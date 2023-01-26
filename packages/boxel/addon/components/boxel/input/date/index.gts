@@ -16,6 +16,7 @@ interface ComponentArgs {
   value?: Day;
   onChange: (val: Day) => void;
   minDate?: Day;
+  maxDate?: Day;
   disabled?: boolean;
 }
 
@@ -66,6 +67,7 @@ export default class BoxelInputDate extends Component<Signature> {
             @center={{this.center}}
             @onCenterChange={{fn (mut this.center)}}
             @minDate={{@minDate}}
+            @maxDate={{@maxDate}}
           />
         </div>
       </:content>

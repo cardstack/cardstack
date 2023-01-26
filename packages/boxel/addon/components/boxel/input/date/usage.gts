@@ -13,6 +13,7 @@ export default class BoxelInputDateUsage extends Component {
     this.value = val;
   }
   minDate = new Date(2022, 7, 4) as Day;
+  maxDate = new Date(2024, 7, 4) as Day;
   
   <template>
     <FreestyleUsage @name="InputDate">
@@ -24,6 +25,7 @@ export default class BoxelInputDateUsage extends Component {
           @value={{this.value}}
           @onChange={{this.onChange}}
           @minDate={{this.minDate}}
+          @maxDate={{this.maxDate}}
         />
       </:example>
       <:api as |Args|>
@@ -37,6 +39,11 @@ export default class BoxelInputDateUsage extends Component {
           @name="minDate"
           @description="An object conforming to the Day interface exported from the Boxel::Date component"
           @value={{this.minDate}}
+        />
+        <Args.Object
+          @name="maxDate"
+          @description="An object conforming to the Day interface exported from the Boxel::Date component"
+          @value={{this.maxDate}}
         />
         <Args.Action
           @name="onChange"

@@ -3,6 +3,7 @@ import { ScheduledPayment } from '@prisma/client';
 import { startCase } from 'lodash';
 import { convertChainIdToName, isSupportedChain, SchedulerCapableNetworks } from '@cardstack/cardpay-sdk';
 import { inject } from '@cardstack/di';
+import { addMonths, isAfter } from 'date-fns';
 const { isAddress } = Web3.utils;
 
 type ScheduledPaymentAttribute =
@@ -86,6 +87,19 @@ export default class ScheduledPaymentValidator {
     for (let attribute of addressAttributes) {
       if (scheduledPayment[attribute] && !isAddress(scheduledPayment[attribute] as string)) {
         errors[attribute].push(`${startCase(attribute).toLowerCase()} is not a valid address`);
+      }
+    }
+
+    let aYearFromNow = addMonths(new Date(), 12);
+    if (scheduledPayment.payAt) {
+      if (isAfter(scheduledPayment.payAt, aYearFromNow)) {
+        errors['payAt'].push(`payment date cannot be further than 1 year in the future`);
+      }
+    }
+
+    if (scheduledPayment.recurringUntil) {
+      if (isAfter(scheduledPayment.recurringUntil, aYearFromNow)) {
+        errors['recurringUntil'].push(`recurring payment end date cannot be further than 1 year in the future`);
       }
     }
 
