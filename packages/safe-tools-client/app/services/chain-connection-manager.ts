@@ -1,32 +1,31 @@
 import {
   HubConfig,
   getWeb3ConfigByNetwork,
-  Network,
   Web3Provider,
   ExternalProvider,
 } from '@cardstack/cardpay-sdk';
 import config from '@cardstack/safe-tools-client/config/environment';
-import { setOwner } from '@ember/application';
+import { getOwner } from '@ember/application';
 import { action } from '@ember/object';
-import Owner from '@ember/owner';
+import Service, { inject as service } from '@ember/service';
 import detectEthereumProvider from '@metamask/detect-provider';
 import { BaseProvider } from '@metamask/providers';
 import WConnetUniversalProvider from '@walletconnect/universal-provider';
 import { getSdkError } from '@walletconnect/utils';
 import { Web3Modal } from '@web3modal/standalone';
 
-import { Emitter, SimpleEmitter } from './events';
-import { TypedChannel } from './typed-channel';
-import { VoidCallback } from './types';
-import { WalletProviderId } from './wallet-providers';
+import { Emitter, SimpleEmitter } from '../utils/events';
+import { TypedChannel } from '../utils/typed-channel';
+import { VoidCallback } from '../utils/types';
+import { WalletProviderId } from '../utils/wallet-providers';
+
+import NetworkService from './network';
 
 const GET_PROVIDER_STORAGE_KEY = (chainId: number) =>
   `cardstack-chain-${chainId}-provider`;
 
 interface ConnectionStrategyOptions {
-  chainId: number;
-  networkSymbol: Network;
-  connectionManager: ChainConnectionManager;
+  connectionManager: ChainConnectionService;
 }
 
 type ConnectionManagerWalletEvent =
@@ -74,23 +73,21 @@ type ConnectionEvent = ConnectEvent | DisconnectEvent;
  *
  * This class does not, at the moment, store any state used directly by the UI besides providerId.
  */
-export class ChainConnectionManager {
+export default class ChainConnectionService extends Service {
+  @service declare network: NetworkService;
+
   storage: Storage;
 
   broadcastChannel: TypedChannel<ConnectionEvent>;
   strategy: ConnectionStrategy | undefined;
-  chainId: number;
-  networkSymbol: Network;
   simpleEmitter = new SimpleEmitter();
 
-  constructor(networkSymbol: Network, chainId: number, owner: Owner) {
-    setOwner(this, owner);
+  constructor(args: object) {
+    super(args);
 
     this.storage =
-      (owner.lookup('storage:local') as Storage) || window.localStorage;
-
-    this.networkSymbol = networkSymbol;
-    this.chainId = chainId;
+      (getOwner(this).lookup('storage:local') as Storage) ||
+      window.localStorage;
 
     // we want to ensure that users don't get confused by different tabs having
     // different wallets connected so we communicate connections and disconnections across tabs
@@ -123,17 +120,21 @@ export class ChainConnectionManager {
     return this.strategy?.providerId;
   }
 
+  get chainId() {
+    return this.network.chainId;
+  }
+
+  get networkSymbol() {
+    return this.network.symbol;
+  }
+
   reset() {
     this.strategy?.destroy();
     this.strategy = undefined;
   }
 
   private async setup(providerId: WalletProviderId) {
-    this.strategy = this.createStrategy(
-      this.chainId,
-      this.networkSymbol,
-      providerId
-    );
+    this.strategy = this.createStrategy(providerId);
     this.strategy.on('connected', this.onConnect);
     this.strategy.on('disconnected', this.onDisconnect);
     this.strategy.on('chain-changed', this.onChainChanged);
@@ -141,22 +142,14 @@ export class ChainConnectionManager {
     await this.strategy.setup();
   }
 
-  createStrategy(
-    chainId: number,
-    networkSymbol: Network,
-    providerId: WalletProviderId
-  ) {
+  createStrategy(providerId: WalletProviderId) {
     if (providerId === 'metamask') {
       return new MetaMaskConnectionStrategy({
         connectionManager: this,
-        chainId,
-        networkSymbol,
       });
     } else if (providerId === 'wallet-connect') {
       return new WalletConnectConnectionStrategy({
         connectionManager: this,
-        chainId,
-        networkSymbol,
       });
     } else {
       throw new Error(`Unrecognised wallet provider id: ${providerId}`);
@@ -171,8 +164,11 @@ export class ChainConnectionManager {
     if (!this.strategy)
       throw new Error('Failed to setup strategy in layer 1 connection manager');
     if (!this.provider) throw new Error('Missing Provider');
+    const isConnected = await this.strategy.connect();
+
     setProvider(new Web3Provider(this.provider as ExternalProvider));
-    return await this.strategy.connect();
+
+    return isConnected;
   }
 
   async reconnect(
@@ -180,8 +176,9 @@ export class ChainConnectionManager {
     providerId: WalletProviderId
   ) {
     await this.setup(providerId);
-    setProvider(new Web3Provider(this.provider as ExternalProvider));
     await this.strategy?.reconnect();
+
+    setProvider(new Web3Provider(this.provider as ExternalProvider));
   }
 
   disconnect() {
@@ -258,16 +255,11 @@ export abstract class ConnectionStrategy
   // concrete classes may optionally implement these methods
   abstract destroy(): void;
 
-  // networkSymbol and chainId are initialized in the constructor
-  networkSymbol: Network;
-  chainId: number;
-  connectionManager: ChainConnectionManager;
+  connectionManager: ChainConnectionService;
   provider?: WalletConnectProviderish | BaseProvider;
 
   constructor(options: ConnectionStrategyOptions) {
     this.connectionManager = options.connectionManager;
-    this.chainId = options.chainId;
-    this.networkSymbol = options.networkSymbol;
     this.simpleEmitter = new SimpleEmitter();
   }
 
@@ -412,7 +404,9 @@ class MetaMaskConnectionStrategy extends ConnectionStrategy {
       this.emitChainIdChange();
     } else {
       // if we didn't find accounts, then the stored provider key is not useful, delete it
-      this.connectionManager.removeProviderFromStorage(this.chainId);
+      this.connectionManager.removeProviderFromStorage(
+        this.connectionManager.chainId
+      );
     }
   }
 
@@ -452,7 +446,7 @@ class WalletConnectConnectionStrategy extends ConnectionStrategy {
   }
 
   async setup() {
-    const { chainId } = this;
+    const { chainId } = this.connectionManager;
 
     if (!this.provider) {
       this.provider = await WConnetUniversalProvider.init({
@@ -501,7 +495,7 @@ class WalletConnectConnectionStrategy extends ConnectionStrategy {
   }
 
   async connect() {
-    const { chainId } = this;
+    const { chainId, networkSymbol } = this.connectionManager;
 
     try {
       const hubConfigApi = new HubConfig(config.hubUrl);
@@ -509,7 +503,7 @@ class WalletConnectConnectionStrategy extends ConnectionStrategy {
 
       const { rpcNodeHttpsUrl } = getWeb3ConfigByNetwork(
         hubConfigResponse,
-        this.networkSymbol
+        networkSymbol
       );
 
       await this.provider?.connect({
@@ -533,8 +527,8 @@ class WalletConnectConnectionStrategy extends ConnectionStrategy {
       });
 
       const accounts = (await this.provider?.enable()) || [];
-
       this.onConnect(accounts);
+
       return true;
     } catch (e) {
       const userRejectedCode = getSdkError('USER_REJECTED').code;
