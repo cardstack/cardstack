@@ -6,7 +6,7 @@
           class='safe-tools__dashboard-schedule-control-panel-address'
           data-test-wallet-address
         >
-          {{truncate-middle this.wallet.address}}
+          <TruncatedBlockchainAddress @address={{this.wallet.address}} @isCopyable={{true}} @copyIconColor='var(--boxel-purple-300)'/>
         </div>
         <div
           class='safe-tools__dashboard-schedule-control-panel-connected-status'

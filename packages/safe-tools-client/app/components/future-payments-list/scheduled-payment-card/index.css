@@ -33,9 +33,19 @@
 }
 
 .scheduled-payment-card__payee {
+  display: flex;
+
   font: 600 var(--boxel-font-sm);
   letter-spacing: var(--boxel-lsp-xl);
   color: var(--boxel-purple-400);
+}
+
+.scheduled-payment-card__payee-to {
+  margin-right: var(--boxel-sp-xs);
+}
+
+.scheduled-payment-card__payee .boxel-icon-button {
+  position: initial;
 }
 
 .scheduled-payment-card__token-amounts {

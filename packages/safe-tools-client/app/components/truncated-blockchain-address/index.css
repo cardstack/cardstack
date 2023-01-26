@@ -1,0 +1,31 @@
+.truncated-blockchain-address {
+  display: flex;
+
+  position: relative;
+  margin-right: var(--boxel-sp-xs);
+}
+
+.truncated-blockchain-address .blockchain-address {
+  cursor: default;
+  margin-right: var(--boxel-sp-xs);
+}
+
+.truncated-blockchain-address-copied {
+  --truncated-blockchain-address-copied-opacity: 0;
+
+  content: attr(data-hover);
+  opacity: var(--truncated-blockchain-address-copied-opacity);
+  background-color: var(--boxel-light);
+  box-shadow: 0 0 0 1px var(--boxel-light-500);
+  color: var(--boxel-dark);
+  font-size: var(--boxel-font-size-sm);
+  text-align: center;
+  border-radius: var(--boxel-sp-sm);
+  padding: var(--boxel-sp-sm);
+  transition: opacity 1s ease-in-out;
+
+  position: absolute;
+  z-index: 1;
+  right: 0;
+  top: 110%;
+}
