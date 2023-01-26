@@ -25,7 +25,7 @@
       />
     </cp.Item>
     <cp.Item @title='Network' @icon='network'>
-      {{#if (and this.wallet.isConnected (eq this.wallet.providerId "metamask"))}}
+      {{#if (or (not this.wallet.isConnected) (and this.wallet.isConnected (eq this.wallet.providerId "metamask")))}}
         <Boxel::Select
           class='safe-tools__dashboard-dropdown safe-tools__dashboard-network-dropdown'
           @selected={{this.network}}
@@ -46,7 +46,7 @@
               boxel-icon-button-height=0
               icon-color='var(--boxel-light)'
             }}
-            data-hover="To switch networks, disconnect"
+            data-hover="Disconnect to swtich network"
           />
         </div>
       {{/if}}
