@@ -25,7 +25,7 @@
       />
     </cp.Item>
     <cp.Item @title='Network' @icon='network'>
-      {{#if this.wallet.isConnected}}
+      {{#if (and this.wallet.isConnected (eq this.wallet.providerId "metamask"))}}
         <Boxel::Select
           class='safe-tools__dashboard-dropdown safe-tools__dashboard-network-dropdown'
           @selected={{this.network}}
@@ -35,6 +35,20 @@
         >
           <div class={{cn itemCssClass safe-tools__current-network-option=(eq this.network.symbol network.symbol)}} data-test-selected-network>{{network.name}}</div>
         </Boxel::Select>
+      {{else if this.wallet.isConnected}}
+        <div class="safe-tools__current-network">
+          <span class="safe-tools__current-network-text">{{this.network.networkInfo.name}}</span>
+          <Boxel::IconButton
+            @icon="info"
+            aria-label="Current Network"
+            style={{css-var
+              boxel-icon-button-width=0
+              boxel-icon-button-height=0
+              icon-color='var(--boxel-light)'
+            }}
+            data-hover="You can change the network from your wallet. Supported networks: {{(array-join this.network.supportedNetworksName ',')}}"
+          />
+        </div>
       {{/if}}
     </cp.Item>
     <cp.Item @title='Safe' @icon='safe' @isActive={{(and this.wallet.isConnected (lte this.safes.safes 0))}}>
