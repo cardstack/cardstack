@@ -69,6 +69,10 @@ export default class NetworkService extends Service {
     return hubSupportedNetworks;
   }
 
+  get supportedNetworksName() {
+    return this.supportedNetworks.map((network) => network.name);
+  }
+
   isSupportedNetwork(chainId: number): boolean {
     return this.supportedNetworks.some(
       (n: NetworkInfo) => n.chainId === chainId

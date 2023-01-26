@@ -3,7 +3,7 @@
   color: var(--boxel-highlight);
 }
 
-.safe-tools__dashboard-dropdown .truncated-blockchain-address {
+.safe-tools__dashboard-dropdown .copyable-blockchain-address {
   font-weight: 600;
   font-size: var(--boxel-font-size-sm);
 }

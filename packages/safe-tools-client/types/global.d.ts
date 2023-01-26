@@ -5,6 +5,7 @@ import type cn from '@cardstack/boxel/helpers/cn';
 import type cssVar from '@cardstack/boxel/helpers/css-var';
 import menuItem from '@cardstack/boxel/helpers/menu-item';
 import { type svgJar } from '@cardstack/boxel/utils/svg-jar';
+import arrayJoin from '@cardstack/safe-tools-client/helpers/array-join';
 import { MetaMaskInpageProvider } from '@metamask/providers';
 import link from 'ember-link/helpers/link';
 import AndHelper from 'ember-truth-helpers/helpers/and';
@@ -34,6 +35,7 @@ declare module '@glint/environment-ember-loose/registry' {
     'svg-jar': typeof svgJar;
     lte: typeof LteHelper;
     or: typeof or;
+    'array-join': typeof arrayJoin;
   }
 }
 

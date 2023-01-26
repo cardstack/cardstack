@@ -1,6 +1,6 @@
 {
   "name": "scripts",
-  "version": "1.0.28",
+  "version": "1.0.30",
   "license": "MIT",
   "type": "module",
   "dependencies": {
