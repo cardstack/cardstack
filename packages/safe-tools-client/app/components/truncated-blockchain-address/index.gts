@@ -41,7 +41,7 @@ export default class TruncatedBlockchainAddress extends Component<Signature> {
 
   <template>
     {{#if @isCopyable}}
-      <div class='truncated-blockchain-address' {{didInsert this.registerListener}}>
+      <div class='copyable-blockchain-address' {{didInsert this.registerListener}}>
         <div class='blockchain-address'>{{truncateMiddle @address}}</div>
         <BoxelIconButton
           @icon="copy"
@@ -60,8 +60,8 @@ export default class TruncatedBlockchainAddress extends Component<Signature> {
               )
             }}
         />
-        <div class='truncated-blockchain-address-copied' style={{
-          cssVar truncated-blockchain-address-copied-opacity=this.isShowingCopiedConfirmation
+        <div class='blockchain-address-copied' style={{
+          cssVar blockchain-address-copied-opacity=this.isShowingCopiedConfirmation
         }}>Copied!</div>
       </div>
     {{else}}

@@ -1,20 +1,20 @@
-.truncated-blockchain-address {
+.copyable-blockchain-address {
   display: flex;
 
   position: relative;
   margin-right: var(--boxel-sp-xs);
 }
 
-.truncated-blockchain-address .blockchain-address {
+.copyable-blockchain-address .blockchain-address {
   cursor: default;
   margin-right: var(--boxel-sp-xs);
 }
 
-.truncated-blockchain-address-copied {
-  --truncated-blockchain-address-copied-opacity: 0;
+.blockchain-address-copied {
+  --blockchain-address-copied-opacity: 0;
 
   content: attr(data-hover);
-  opacity: var(--truncated-blockchain-address-copied-opacity);
+  opacity: var(--blockchain-address-copied-opacity);
   background-color: var(--boxel-light);
   box-shadow: 0 0 0 1px var(--boxel-light-500);
   color: var(--boxel-dark);
