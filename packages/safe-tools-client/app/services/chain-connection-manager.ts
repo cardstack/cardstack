@@ -549,9 +549,9 @@ class WalletConnectConnectionStrategy extends ConnectionStrategy {
   }
 
   async reconnect() {
-    // if the qr code modal ever pops up when the application is loading, it's time to revisit this code
-    // this typically should not open the modal if CustomStorageWalletConnect is initialized with a
-    // valid session from localStorage
-    await this.provider?.enable();
+    if (this.provider?.session) {
+      const accounts = (await this.provider?.enable()) || [];
+      this.onConnect(accounts);
+    }
   }
 }
