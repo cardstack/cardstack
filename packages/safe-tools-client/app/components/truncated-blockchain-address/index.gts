@@ -8,6 +8,8 @@ import { action } from '@ember/object';
 import { later } from '@ember/runloop';
 import copyToClipboard from '@cardstack/boxel/helpers/copy-to-clipboard';
 import didInsert from '@ember/render-modifiers/modifiers/did-insert';
+import { task } from 'ember-concurrency-decorators';
+import perform from 'ember-concurrency/helpers/perform';
 
 import './index.css';
 
@@ -30,7 +32,7 @@ export default class TruncatedBlockchainAddress extends Component<Signature> {
     });
   }
 
-  @action flashCopiedConfirmation() {
+  @task *flashCopiedConfirmation() {
     this.isShowingCopiedConfirmation = 1;
     later(() => {
       this.isShowingCopiedConfirmation = 0;
@@ -54,7 +56,7 @@ export default class TruncatedBlockchainAddress extends Component<Signature> {
           {{on "click"
               (copyToClipboard
                 value=@address
-                onCopy=this.flashCopiedConfirmation
+                onCopy=(perform this.flashCopiedConfirmation)
               )
             }}
         />
