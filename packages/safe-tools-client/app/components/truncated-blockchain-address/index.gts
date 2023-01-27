@@ -41,6 +41,7 @@ export default class TruncatedBlockchainAddress extends Component<Signature> {
 
   <template>
     {{#if @isCopyable}}
+      {{!@glint-expect-error "Passing this function should be valid but it is not as of 1.0.0-beta.1"}}
       <div class='copyable-blockchain-address' {{didInsert this.registerListener}}>
         <div class='blockchain-address'>{{truncateMiddle @address}}</div>
         <BoxelIconButton
