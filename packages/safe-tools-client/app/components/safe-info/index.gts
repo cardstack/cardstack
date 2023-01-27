@@ -56,7 +56,7 @@ export default class SafeInfo extends Component<Signature> {
       </BoxelSelect>
     {{else if @currentSafe.address}}
       <div class='safe-tools__dashboard-schedule-control-panel-address' title={{@currentSafe.address}} data-test-safe-address-label>
-        <TruncatedBlockchainAddress @address={{(or @currentSafe.address '')}} @isCopyable={{true}}/>
+        <TruncatedBlockchainAddress @address={{(or @currentSafe.address '')}} @isCopyable={{true}} @copyIconColor='var(--boxel-light)'/>
       </div>
     {{/if}}
 

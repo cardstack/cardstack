@@ -135,7 +135,8 @@ module('Acceptance | create safe', function (hooks) {
         );
 
       await click('[data-test-create-safe-close-button]');
-      assert.dom('[data-test-safe-address-label]').hasText('0x123');
+
+      assert.dom('[data-test-safe-address-label] .blockchain-address').hasText('0x123');
       assert.dom('[data-test-create-safe-button]').doesNotExist();
     });
 
