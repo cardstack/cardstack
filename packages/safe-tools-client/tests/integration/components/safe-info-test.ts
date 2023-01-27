@@ -25,7 +25,9 @@ module('Integration | Component | safe-info', function (hooks) {
         />
       `);
 
-    assert.dom('[data-test-safe-address-label] .blockchain-address').hasText('0x5f62...5478');
+    assert
+      .dom('[data-test-safe-address-label] .blockchain-address')
+      .hasText('0x5f62...5478');
     assert.dom('[data-test-safe-dropdown]').doesNotExist();
   });
 
@@ -44,9 +46,13 @@ module('Integration | Component | safe-info', function (hooks) {
         />
       `);
 
-    assert.dom('[data-test-safe-address-label] .blockchain-address').doesNotExist();
+    assert
+      .dom('[data-test-safe-address-label] .blockchain-address')
+      .doesNotExist();
     assert.dom('[data-test-safe-dropdown]').exists();
-    assert.dom('.ember-power-select-trigger .blockchain-address').hasText('0x5f62...5478');
+    assert
+      .dom('.ember-power-select-trigger .blockchain-address')
+      .hasText('0x5f62...5478');
   });
 
   test('It renders token balances without zero or dust amounts', async function (assert) {

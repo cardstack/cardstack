@@ -98,7 +98,9 @@ module('Acceptance | wallet connection', function (hooks) {
         .dom('[data-test-wallet-address] .blockchain-address')
         .hasText(truncateMiddle([TEST_ACCOUNT_1]));
 
-      assert.dom('[data-test-safe-address-label] .blockchain-address').hasText('0x458B...486E');
+      assert
+        .dom('[data-test-safe-address-label] .blockchain-address')
+        .hasText('0x458B...486E');
       assert.dom('[data-test-token-balance="ETH"]').hasText('1 ETH');
       assert.dom('[data-test-token-balance="USDT"]').hasText('10 USDT');
 
@@ -158,7 +160,9 @@ module('Acceptance | wallet connection', function (hooks) {
         .dom('[data-test-wallet-address] .blockchain-address')
         .hasText(truncateMiddle([TEST_ACCOUNT_2]));
 
-      assert.dom('[data-test-safe-address-label] .blockchain-address').hasText('0x458B...486E');
+      assert
+        .dom('[data-test-safe-address-label] .blockchain-address')
+        .hasText('0x458B...486E');
       assert.dom('[data-test-token-balance="ETH"]').hasText('1 ETH');
       assert.dom('[data-test-token-balance="USDT"]').hasText('10 USDT');
     });
