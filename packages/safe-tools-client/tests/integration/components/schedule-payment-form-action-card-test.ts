@@ -64,7 +64,7 @@ class ScheduledPaymentSDKServiceStub extends Service {
   ): Promise<ServiceGasEstimationResult> {
     return {
       gas: BigNumber.from(127864),
-      gasRangeInGasTokenWei: {
+      gasRangeInGasTokenUnits: {
         normal: BigNumber.from('20000000'),
         high: BigNumber.from('40000000'),
         max: BigNumber.from('80000000'),

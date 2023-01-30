@@ -314,12 +314,12 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
     (async () => {
       try {
         state.isLoading = true;
-        this.gasEstimation = await this.scheduledPaymentSdk.getScheduledPaymentGasEstimation(scenario, paymentToken.address, selectedGasToken.address);
-        const { gasRangeInGasTokenWei } = this.gasEstimation;
+        this.gasEstimation = await this.scheduledPaymentSdk.getScheduledPaymentGasEstimation(scenario, paymentToken, selectedGasToken);
+        const { gasRangeInGasTokenUnits } = this.gasEstimation;
         state.value = {
-          normal: new TokenQuantity(selectedGasToken, gasRangeInGasTokenWei.normal),
-          high: new TokenQuantity(selectedGasToken, gasRangeInGasTokenWei.high),
-          max: new TokenQuantity(selectedGasToken, gasRangeInGasTokenWei.max),
+          normal: new TokenQuantity(selectedGasToken, gasRangeInGasTokenUnits.normal),
+          high: new TokenQuantity(selectedGasToken, gasRangeInGasTokenUnits.high),
+          max: new TokenQuantity(selectedGasToken, gasRangeInGasTokenUnits.max),
         };
       } catch (error) {
         console.error(error);
@@ -332,7 +332,7 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
   });
 
   get gasEstimateInGasTokenUnits(): BigNumber {
-    return this.gasEstimation?.gasRangeInGasTokenWei.normal || BigNumber.from('0');
+    return this.gasEstimation?.gasRangeInGasTokenUnits.normal || BigNumber.from('0');
   }
 
   get gasEstimateTokenQuantity(): TokenQuantity|undefined {
@@ -351,19 +351,19 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
     if (!this.paymentTokenQuantity || !this.selectedGasToken || !this.gasEstimation) return;
 
     if (Number(this.gasEstimation.gas) <= 0) return;
-    const { gasRangeInGasTokenWei } = this.gasEstimation;
-    if (Object.keys(gasRangeInGasTokenWei).length <= 0) return;
+    const { gasRangeInGasTokenUnits } = this.gasEstimation;
+    if (Object.keys(gasRangeInGasTokenUnits).length <= 0) return;
 
     let maxGasPrice;
     switch(this.maxGasPrice) {
       case "normal":
-        maxGasPrice = gasRangeInGasTokenWei.normal.div(this.gasEstimation.gas);
+        maxGasPrice = gasRangeInGasTokenUnits.normal.div(this.gasEstimation.gas);
         break;
       case "high":
-        maxGasPrice = gasRangeInGasTokenWei.high.div(this.gasEstimation.gas);
+        maxGasPrice = gasRangeInGasTokenUnits.high.div(this.gasEstimation.gas);
         break;
       case "max":
-        maxGasPrice = gasRangeInGasTokenWei.max.div(this.gasEstimation.gas);
+        maxGasPrice = gasRangeInGasTokenUnits.max.div(this.gasEstimation.gas);
         break;
       default:
         maxGasPrice = BigNumber.from(0);
