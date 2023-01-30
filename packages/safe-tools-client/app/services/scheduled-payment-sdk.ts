@@ -7,6 +7,7 @@ import {
   poll,
   SchedulePaymentProgressListener,
   getConstant,
+  TokenDetail,
 } from '@cardstack/cardpay-sdk';
 import config from '@cardstack/safe-tools-client/config/environment';
 import SafesService, {
@@ -26,7 +27,7 @@ const GAS_RANGE_MAX_MULTIPLIER = 6;
 export type GasRange = Record<'normal' | 'high' | 'max', BigNumber>;
 export interface ServiceGasEstimationResult {
   gas: BigNumber;
-  gasRangeInGasTokenWei: GasRange;
+  gasRangeInGasTokenUnits: GasRange;
 }
 
 export interface ConfiguredScheduledPaymentFees {
@@ -98,35 +99,45 @@ export default class SchedulePaymentSDKService extends Service {
   @action
   async getScheduledPaymentGasEstimation(
     scenario: GasEstimationScenario,
-    tokenAddress: ChainAddress,
-    gasTokenAddress: ChainAddress
+    token: TokenDetail,
+    gasToken: TokenDetail
   ): Promise<ServiceGasEstimationResult> {
     const scheduledPaymentModule = await this.getSchedulePaymentModule();
 
     const gasEstimationResult = await scheduledPaymentModule.estimateGas(
       scenario,
       {
-        tokenAddress,
-        gasTokenAddress,
+        tokenAddress: token.address,
+        gasTokenAddress: gasToken.address,
         hubUrl: config.hubUrl,
       }
     );
     const { gasRangeInWei } = gasEstimationResult;
     const priceWeiInGasToken = String(
-      await getNativeWeiInToken(this.wallet.ethersProvider, gasTokenAddress)
+      await getNativeWeiInToken(this.wallet.ethersProvider, gasToken.address)
     );
+
+    const ten = BigNumber.from(10);
+    const nativeTokenUnits = ten.pow(18);
+    const gasTokenUnits = ten.pow(gasToken.decimals);
     return {
       gas: gasEstimationResult.gas,
-      gasRangeInGasTokenWei: {
+      gasRangeInGasTokenUnits: {
         normal: gasRangeInWei.standard
           .mul(priceWeiInGasToken)
-          .mul(GAS_RANGE_NORMAL_MULTIPLIER),
+          .mul(GAS_RANGE_NORMAL_MULTIPLIER)
+          .mul(gasTokenUnits)
+          .div(nativeTokenUnits),
         high: gasRangeInWei.standard
           .mul(priceWeiInGasToken)
-          .mul(GAS_RANGE_HIGH_MULTIPLIER),
+          .mul(GAS_RANGE_HIGH_MULTIPLIER)
+          .mul(gasTokenUnits)
+          .div(nativeTokenUnits),
         max: gasRangeInWei.standard
           .mul(priceWeiInGasToken)
-          .mul(GAS_RANGE_MAX_MULTIPLIER),
+          .mul(GAS_RANGE_MAX_MULTIPLIER)
+          .mul(gasTokenUnits)
+          .div(nativeTokenUnits),
       },
     };
   }
