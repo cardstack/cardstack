@@ -95,10 +95,12 @@ module('Acceptance | wallet connection', function (hooks) {
       await click('[data-test-connect-wallet-button-modal]');
 
       assert
-        .dom('[data-test-wallet-address]')
+        .dom('[data-test-wallet-address] .blockchain-address')
         .hasText(truncateMiddle([TEST_ACCOUNT_1]));
 
-      assert.dom('[data-test-safe-address-label]').hasText('0x458B...486E');
+      assert
+        .dom('[data-test-safe-address-label] .blockchain-address')
+        .hasText('0x458B...486E');
       assert.dom('[data-test-token-balance="ETH"]').hasText('1 ETH');
       assert.dom('[data-test-token-balance="USDT"]').hasText('10 USDT');
 
@@ -116,10 +118,10 @@ module('Acceptance | wallet connection', function (hooks) {
 
       await settled();
       assert
-        .dom('[data-test-wallet-address]')
+        .dom('[data-test-wallet-address] .blockchain-address')
         .hasText(truncateMiddle([TEST_ACCOUNT_2]));
       assert
-        .dom('[data-test-wallet-address]')
+        .dom('[data-test-wallet-address] .blockchain-address')
         .doesNotContainText(truncateMiddle([TEST_ACCOUNT_1]));
       assert.dom('[data-test-schedule-form-connect-wallet-cta]').doesNotExist();
 
@@ -155,10 +157,12 @@ module('Acceptance | wallet connection', function (hooks) {
       assert.dom('[data-test-hub-auth-modal]').doesNotExist();
 
       assert
-        .dom('[data-test-wallet-address]')
+        .dom('[data-test-wallet-address] .blockchain-address')
         .hasText(truncateMiddle([TEST_ACCOUNT_2]));
 
-      assert.dom('[data-test-safe-address-label]').hasText('0x458B...486E');
+      assert
+        .dom('[data-test-safe-address-label] .blockchain-address')
+        .hasText('0x458B...486E');
       assert.dom('[data-test-token-balance="ETH"]').hasText('1 ETH');
       assert.dom('[data-test-token-balance="USDT"]').hasText('10 USDT');
     });

@@ -4,8 +4,8 @@ import BoxelButton from '@cardstack/boxel/components/boxel/button';
 import cn from '@cardstack/boxel/helpers/cn';
 import or from 'ember-truth-helpers/helpers/or';
 import { on } from '@ember/modifier';
-import truncateMiddle from '@cardstack/safe-tools-client/helpers/truncate-middle';
 import WalletService from '@cardstack/safe-tools-client/services/wallet';
+import TruncatedBlockchainAddress from '@cardstack/safe-tools-client/components/truncated-blockchain-address'
 
 import './index.css';
 
@@ -48,7 +48,7 @@ export default class ConnectButton extends Component<Signature> {
           {{!-- just show the spinner --}}
           <span class="boxel-sr-only">Reconnecting</span>
         {{else if @isConnected}}
-          {{truncateMiddle @address}}
+          <TruncatedBlockchainAddress @address={{(or @address  '')}} @isCopyable={{true}}/>
         {{else}}
           Connect Wallet
         {{/if}}

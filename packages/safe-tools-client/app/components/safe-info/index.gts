@@ -4,7 +4,7 @@ import BoxelButton from '@cardstack/boxel/components/boxel/button';
 import or from 'ember-truth-helpers/helpers/or';
 import gt from 'ember-truth-helpers/helpers/gt';
 import { on } from '@ember/modifier';
-import truncateMiddle from '@cardstack/safe-tools-client/helpers/truncate-middle';
+import TruncatedBlockchainAddress from '@cardstack/safe-tools-client/components/truncated-blockchain-address';
 import nativeUnitsToDecimal from '@cardstack/safe-tools-client/helpers/native-units-to-decimal';
 import CreateSafe from '@cardstack/safe-tools-client/components/create-safe';
 import { Safe, TokenBalance } from '@cardstack/safe-tools-client/services/safes';
@@ -41,16 +41,22 @@ export default class SafeInfo extends Component<Signature> {
       <BoxelSelect
         class='safe-tools__dashboard-dropdown'
         @selected={{@currentSafe}}
+        @selectedItemComponent={{
+          (component 
+            TruncatedBlockchainAddress 
+            address=@currentSafe.address 
+            isCopyable=true
+            copyIconColor='var(--boxel-light)')}}
         @onChange={{@onSelectSafe}}
         @options={{this.safes}}
         @dropdownClass="boxel-select-usage-dropdown"
         data-test-safe-dropdown
         as |safe itemCssClass|>
-        <div class="{{itemCssClass}} blockchain-address">{{truncateMiddle safe.address}}</div>
+        <div class="{{itemCssClass}} blockchain-address"><TruncatedBlockchainAddress @address={{safe.address}} @isCopyable={{false}}/></div>
       </BoxelSelect>
-    {{else}}
+    {{else if @currentSafe.address}}
       <div class='safe-tools__dashboard-schedule-control-panel-address' title={{@currentSafe.address}} data-test-safe-address-label>
-        {{truncateMiddle (or @currentSafe.address '')}}
+        <TruncatedBlockchainAddress @address={{(or @currentSafe.address '')}} @isCopyable={{true}} @copyIconColor='var(--boxel-light)'/>
       </div>
     {{/if}}
 
