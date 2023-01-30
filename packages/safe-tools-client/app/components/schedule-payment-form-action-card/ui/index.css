@@ -27,7 +27,7 @@
   color: var(--boxel-purple-400);
 }
 
-.schedule-payment-form-action-card__fee-details {
+.schedule-payment-form-action-card__details {
   padding-top: var(--boxel-sp);
   padding-right: var(--boxel-sp);
   font: var(--boxel-font-xs);
@@ -47,8 +47,9 @@
   color: var(--boxel-red);
 }
 
-.schedule-payment-form-action-card__fee-info-icon {
+.schedule-payment-form-action-card__details-info-icon {
   margin: 0 var(--boxel-sp-xxxs);
+  flex-shrink: 0;
 }
 
 .schedule-payment-form-action-card__frequency-fieldset {

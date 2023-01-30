@@ -2,6 +2,7 @@ import { ScheduledPayment } from '@prisma/client';
 import { Decimal } from '@prisma/client/runtime';
 import { registry, setupHub } from '../../helpers/server';
 import { Networkish, TokenDetail } from '@cardstack/cardpay-sdk';
+import { addDays, addMonths } from 'date-fns';
 
 class StubCardpaySDK {
   getConstantByNetwork(name: string, network: Networkish) {
@@ -156,6 +157,50 @@ describe('ScheduledPaymentValidator', function () {
     let errors = await subject.validate(scheduledPayment);
     expect(errors.gasTokenAddress).deep.equal([
       'gas token is not supported, supported gas token: 0x52031d287Bb58E26A379A7Fec2c84acB54f54fe3, 0x26F2319Fbb44772e0ED58fB7c99cf8da59e2b5BE',
+    ]);
+  });
+
+  it('validates scheduled payment with payAt further out than 1 year', async function () {
+    let subject = await getContainer().lookup('scheduled-payment-validator');
+    let validDate = addMonths(new Date(), 12);
+    let invalidDate = addDays(validDate, 1);
+
+    const scheduledPaymentWithValidPayAt: Partial<ScheduledPayment> = {
+      chainId: 1, //Mainnet
+      payAt: validDate,
+    };
+    let errors = await subject.validate(scheduledPaymentWithValidPayAt);
+    expect(errors.payAt).deep.equal([]);
+
+    const scheduledPaymentWithInvalidPayAt: Partial<ScheduledPayment> = {
+      chainId: 1, //Mainnet
+      payAt: invalidDate,
+    };
+
+    errors = await subject.validate(scheduledPaymentWithInvalidPayAt);
+    expect(errors.payAt).deep.equal(['payment date cannot be further than 1 year in the future']);
+  });
+
+  it('validates scheduled payment with recurringUntil further out than 1 year', async function () {
+    let subject = await getContainer().lookup('scheduled-payment-validator');
+    let validDate = addMonths(new Date(), 12);
+    let invalidDate = addDays(validDate, 1);
+
+    const scheduledPaymentWithValidRecurringUntil: Partial<ScheduledPayment> = {
+      chainId: 1, //Mainnet
+      recurringUntil: validDate,
+    };
+    let errors = await subject.validate(scheduledPaymentWithValidRecurringUntil);
+    expect(errors.recurringUntil).deep.equal([]);
+
+    const scheduledPaymentWithInvalidRecuringUntil: Partial<ScheduledPayment> = {
+      chainId: 1, //Mainnet
+      recurringUntil: invalidDate,
+    };
+
+    errors = await subject.validate(scheduledPaymentWithInvalidRecuringUntil);
+    expect(errors.recurringUntil).deep.equal([
+      'recurring payment end date cannot be further than 1 year in the future',
     ]);
   });
 });

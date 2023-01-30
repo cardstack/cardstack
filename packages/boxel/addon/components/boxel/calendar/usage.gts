@@ -17,6 +17,7 @@ export default class BoxelCalendarUsage extends Component {
     this.center = val;
   }
   minDate: Day = new Date(2022,7,4);
+  maxDate: Day = new Date(2024,7,4);
 
   <template>
     <FreestyleUsage @name="Calendar">
@@ -30,6 +31,7 @@ export default class BoxelCalendarUsage extends Component {
           @center={{this.center}}
           @onCenterChange={{this.onCenterChange}}
           @minDate={{this.minDate}}
+          @maxDate={{this.maxDate}}
         />
       </:example>
       <:api as |Args|>
@@ -57,6 +59,11 @@ export default class BoxelCalendarUsage extends Component {
           @name="minDate"
           @description="Dates before this date will be disabled"
           @value={{this.minDate}}
+        />
+        <Args.Object
+          @name="maxDate"
+          @description="Dates after this date will be disabled"
+          @value={{this.maxDate}}
         />
       </:api>
     </FreestyleUsage>

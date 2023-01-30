@@ -98,6 +98,11 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
     return new Date(now.setHours(now.getHours() + 1, 0, 0, 0));
   }
 
+  get maxPaymentDate() {
+    let now = new Date();
+    return new Date(now.getFullYear() + 1, now.getMonth(), now.getDate());
+  }
+
   @tracked selectedPaymentType: 'one-time' | 'monthly' | undefined;
   @action onSelectPaymentType(paymentTypeId: string) {
     if (paymentTypeId === 'one-time') {
@@ -172,6 +177,11 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
     }
 
     return minMonthlyUntil;
+  }
+
+  get maxMonthlyUntil() {
+    let now = new Date();
+    return new Date(now.getFullYear() + 1, now.getMonth(), now.getDate());
   }
 
   @tracked payeeAddress = '';
@@ -479,6 +489,7 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
       @isPaymentTypeInvalid={{not this.validator.isPaymentTypeValid}}
       @paymentTypeErrorMessage={{this.validator.paymentTypeErrorMessage}}
       @minPaymentDate={{this.minPaymentDate}}
+      @maxPaymentDate={{this.maxPaymentDate}}
       @minPaymentTime={{this.minPaymentTime}}
       @paymentDate={{this.paymentDate}}
       @onSetPaymentTime={{this.onSetPaymentTime}}
@@ -486,6 +497,7 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
       @paymentDayOfMonth={{this.paymentDayOfMonth}}
       @onSelectPaymentDayOfMonth={{this.onSelectPaymentDayOfMonth}}
       @minMonthlyUntil={{this.minMonthlyUntil}}
+      @maxMonthlyUntil={{this.maxMonthlyUntil}}
       @monthlyUntil={{this.monthlyUntil}}
       @onSetMonthlyUntil={{this.onSetMonthlyUntil}}
       @payeeAddress={{this.payeeAddress}}

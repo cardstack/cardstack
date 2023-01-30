@@ -176,6 +176,7 @@ export default class SchedulePaymentFormActionCardUI extends Component<Signature
                           @value={{@paymentDate}}
                           @onChange={{@onSetPaymentDate}}
                           @minDate={{@minPaymentDate}}
+                          @maxDate={{@maxPaymentDate}}
                           @disabled={{this.isFormInteractionDisabled}}
                           data-test-input-payment-date
                         />
@@ -215,6 +216,7 @@ export default class SchedulePaymentFormActionCardUI extends Component<Signature
                           @value={{@monthlyUntil}}
                           @onChange={{@onSetMonthlyUntil}}
                           @minDate={{@minMonthlyUntil}}
+                          @maxDate={{@maxMonthlyUntil}}
                           @disabled={{this.isFormInteractionDisabled}}
                           data-test-input-recurring-until
                         />
@@ -289,11 +291,16 @@ export default class SchedulePaymentFormActionCardUI extends Component<Signature
             {{/if}}
           </div>
           <div><!-- empty --></div>
-          <div class="schedule-payment-form-action-card__fee-details">
+          <div class="schedule-payment-form-action-card__details">
             {{#if @configuredFees}}
-              {{svgJar "info" width="17px" height="17px" class="schedule-payment-form-action-card__fee-info-icon"}}
+              {{svgJar "info" width="14px" height="14px" class="schedule-payment-form-action-card__details-info-icon"}}
               <span>Cardstack charges {{if @configuredFees.fixedUSD (formatUsd @configuredFees.fixedUSD)}} and {{@configuredFees.percentage}}% of the transaction as a fee for executing your scheduled payments.</span>
             {{/if}}
+          </div>
+          <div><!-- empty --></div>
+          <div class="schedule-payment-form-action-card__details">
+            {{svgJar "info" width="14px" height="14px" class="schedule-payment-form-action-card__details-info-icon"}}
+            <span>Payments may be scheduled up to one year in advance. This will likely be extended in the future.</span>
           </div>
         </BoxelField>
         {{#if @isValid}}

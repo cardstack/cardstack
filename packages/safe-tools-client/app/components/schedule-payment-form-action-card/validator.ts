@@ -14,10 +14,12 @@ export type MaxGasFeeOption = 'normal' | 'high' | 'max';
 export interface ValidatableForm {
   selectedPaymentType: 'one-time' | 'monthly' | undefined;
   minPaymentDate: Date;
+  maxPaymentDate: Date;
   minPaymentTime: Date;
   paymentDate: Date | undefined;
   paymentDayOfMonth: number | undefined;
   minMonthlyUntil: Date;
+  maxMonthlyUntil: Date;
   monthlyUntil: Date | undefined;
   payeeAddress: string;
   paymentAmountRaw: string;

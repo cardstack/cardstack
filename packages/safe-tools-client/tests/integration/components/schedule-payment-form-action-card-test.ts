@@ -21,7 +21,15 @@ import {
   settled,
   waitUntil,
 } from '@ember/test-helpers';
-import { format, subDays, addMonths, addHours, subHours } from 'date-fns';
+import {
+  format,
+  addDays,
+  subDays,
+  addMonths,
+  addHours,
+  subHours,
+  isLastDayOfMonth,
+} from 'date-fns';
 import { task } from 'ember-concurrency-decorators';
 import { selectChoose } from 'ember-power-select/test-support';
 import { BigNumber, FixedNumber } from 'ethers';
@@ -254,6 +262,28 @@ module(
           .isDisabled();
       });
 
+      test(`it disables dates beyond 1 year from now (one-time payment)`, async function (assert) {
+        await render(hbs`
+          <SchedulePaymentFormActionCard />
+        `);
+        const now = new Date();
+        const aYearAndADayFromNow = addDays(addMonths(now, 12), 1);
+        await click(`[data-test-payment-type="one-time"]`);
+        await click(`[data-test-input-payment-date]`);
+        assert.dom(`[data-date="${format(now, 'yyyy-MM-dd')}"]`).isEnabled();
+        while (
+          this.element
+            .querySelector('.ember-power-calendar-nav-title')
+            ?.textContent?.trim() !==
+          `${format(aYearAndADayFromNow, 'MMMM yyyy')}`
+        ) {
+          await click(`.ember-power-calendar-nav-control--next`);
+        }
+        assert
+          .dom(`[data-date="${format(aYearAndADayFromNow, 'yyyy-MM-dd')}"]`)
+          .isDisabled();
+      });
+
       test(`it disables times before one hour from now (one-time payment)`, async function (assert) {
         await render(hbs`
           <SchedulePaymentFormActionCard />
@@ -285,7 +315,7 @@ module(
         }
       });
 
-      test(`it disables dates before the payment day of month`, async function (assert) {
+      test(`it disables until dates before the payment day of month (recurring)`, async function (assert) {
         await render(hbs`
           <SchedulePaymentFormActionCard />
         `);
@@ -321,6 +351,40 @@ module(
         }
 
         const disabledDate = subDays(minMonthlyUntil, 1);
+        assert
+          .dom(`[data-date="${format(disabledDate, 'yyyy-MM-dd')}"]`)
+          .isDisabled();
+      });
+
+      test(`it disables until dates after 1 year from now (recurring)`, async function (assert) {
+        await render(hbs`
+          <SchedulePaymentFormActionCard />
+        `);
+        const paymentDayOfMonth = 1;
+        const now = new Date();
+        const maxMonthlyUntil = new Date(addMonths(now, 12));
+
+        await click(`[data-test-payment-type="monthly"]`);
+        await click(`[data-test-input-recurring-day-of-month]`);
+        await click(`[data-option-index="${paymentDayOfMonth - 1}"]`);
+        await click(`[data-test-input-recurring-until]`);
+
+        while (
+          this.element
+            .querySelector('.ember-power-calendar-nav-title')
+            ?.textContent?.trim() !== `${format(maxMonthlyUntil, 'MMMM yyyy')}`
+        ) {
+          await click(`.ember-power-calendar-nav-control--next`);
+        }
+        assert
+          .dom(`[data-date="${format(maxMonthlyUntil, 'yyyy-MM-dd')}"]`)
+          .isEnabled();
+
+        if (isLastDayOfMonth(maxMonthlyUntil)) {
+          await click(`.ember-power-calendar-nav-control--next`);
+        }
+
+        const disabledDate = addDays(maxMonthlyUntil, 1);
         assert
           .dom(`[data-date="${format(disabledDate, 'yyyy-MM-dd')}"]`)
           .isDisabled();
@@ -378,7 +442,7 @@ module(
           <SchedulePaymentFormActionCard />
         `);
         assert
-          .dom('.schedule-payment-form-action-card__fee-details')
+          .dom('.schedule-payment-form-action-card__details')
           .containsText('Cardstack charges $0.25 USD and 0.1%');
       });
 
