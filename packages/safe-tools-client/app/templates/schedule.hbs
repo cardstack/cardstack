@@ -6,7 +6,7 @@
           class='safe-tools__dashboard-schedule-control-panel-address'
           data-test-wallet-address
         >
-          <TruncatedBlockchainAddress @address={{(or this.wallet.address '')}} @isCopyable={{true}} @copyIconColor='var(--boxel-purple-300)'/>
+          <TruncatedBlockchainAddress @address={{or this.wallet.address ''}} @isCopyable={{true}} @copyIconColor='var(--boxel-purple-300)'/>
         </div>
         <div
           class='safe-tools__dashboard-schedule-control-panel-connected-status'
@@ -46,12 +46,12 @@
               boxel-icon-button-height=0
               icon-color='var(--boxel-light)'
             }}
-            data-hover="You can change the network from your wallet. Supported networks: {{(array-join this.network.supportedNetworksName ',')}}"
+            data-hover="You can change the network from your wallet. Supported networks: {{array-join this.network.supportedNetworksName ','}}"
           />
         </div>
       {{/if}}
     </cp.Item>
-    <cp.Item @title='Safe' @icon='safe' @isActive={{(and this.wallet.isConnected (lte this.safes.safes 0))}}>
+    <cp.Item @title='Safe' @icon='safe' @isActive={{and this.wallet.isConnected (lte this.safes.safes 0)}}>
       {{#if this.wallet.isConnected}}
         <SafeInfo
           @safes={{this.safes.safes}}
