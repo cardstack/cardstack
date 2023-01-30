@@ -6,6 +6,14 @@ project = "cardstack"
 app "hub" {
   path = "./packages/hub"
 
+  config {
+    env = {
+      ENVIRONMENT        = "staging"
+      HUB_ENVIRONMENT    = "staging"
+      HUB_AWS_ACCOUNT_ID = "120317779495"
+    }
+  }
+
   build {
     use "docker" {
       dockerfile = "Dockerfile"
@@ -42,6 +50,23 @@ app "hub" {
       }
 
       secrets = {
+        # parameter store
+        CARDBOT_TOKEN         = "arn:aws:ssm:us-east-1:120317779495:parameter/production/hub/CARDBOT_TOKEN"
+        FIREBASE_CLIENT_EMAIL = "arn:aws:ssm:us-east-1:120317779495:parameter/production/hub/FIREBASE_CLIENT_EMAIL"
+        FIREBASE_DATABASE_URL = "arn:aws:ssm:us-east-1:120317779495:parameter/production/hub/FIREBASE_DATABASE_URL"
+        FIREBASE_PRIVATE_KEY  = "arn:aws:ssm:us-east-1:120317779495:parameter/production/hub/FIREBASE_PRIVATE_KEY"
+        FIREBASE_PROJECT_ID   = "arn:aws:ssm:us-east-1:120317779495:parameter/production/hub/FIREBASE_PROJECT_ID"
+        HUB_DATABASE_URL      = "arn:aws:ssm:us-east-1:120317779495:parameter/production/hub/HUB_DATABASE_URL"
+        HUB_SENTRY_DSN        = "arn:aws:ssm:us-east-1:120317779495:parameter/production/hub/HUB_SENTRY_DSN"
+        PROVISIONER_SECRET    = "arn:aws:ssm:us-east-1:120317779495:parameter/production/hub/PROVISIONER_SECRET"
+        STATUSPAGE_API_KEY    = "arn:aws:ssm:us-east-1:120317779495:parameter/production/hub/STATUSPAGE_API_KEY"
+        STATUSPAGE_PAGE_ID    = "arn:aws:ssm:us-east-1:120317779495:parameter/production/hub/STATUSPAGE_PAGE_ID"
+        WEB3_STORAGE_TOKEN    = "arn:aws:ssm:us-east-1:120317779495:parameter/production/hub/WEB3_STORAGE_TOKEN"
+        WYRE_ACCOUNT_ID       = "arn:aws:ssm:us-east-1:120317779495:parameter/production/hub/WYRE_ACCOUNT_ID"
+        WYRE_API_KEY          = "arn:aws:ssm:us-east-1:120317779495:parameter/production/hub/WYRE_API_KEY"
+        WYRE_SECRET_KEY       = "arn:aws:ssm:us-east-1:120317779495:parameter/production/hub/WYRE_SECRET_KEY"
+
+        # secrets manager
         CHECKLY_WEBHOOK_SECRET                        = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_hub_checkly_webhook_secret-1VZEgk"
         CRYPTOCOMPARE_API_KEY                         = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_CRYPTOCOMPARE_API_KEY-c9yTJ9"
         DISCORD_ON_CALL_INTERNAL_WEBHOOK              = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_discord_on_call_internal_webhook-n7SCZC"
@@ -90,6 +115,14 @@ app "hub" {
 app "hub-worker" {
   path = "./packages/hub"
 
+  config {
+    env = {
+      ENVIRONMENT        = "staging"
+      HUB_ENVIRONMENT    = "staging"
+      HUB_AWS_ACCOUNT_ID = "120317779495"
+    }
+  }
+
   build {
     use "docker" {
       dockerfile = "Dockerfile"
@@ -121,6 +154,23 @@ app "hub-worker" {
       disable_alb         = true
 
       secrets = {
+        # parameter store
+        CARDBOT_TOKEN         = "arn:aws:ssm:us-east-1:120317779495:parameter/production/hub/CARDBOT_TOKEN"
+        FIREBASE_CLIENT_EMAIL = "arn:aws:ssm:us-east-1:120317779495:parameter/production/hub/FIREBASE_CLIENT_EMAIL"
+        FIREBASE_DATABASE_URL = "arn:aws:ssm:us-east-1:120317779495:parameter/production/hub/FIREBASE_DATABASE_URL"
+        FIREBASE_PRIVATE_KEY  = "arn:aws:ssm:us-east-1:120317779495:parameter/production/hub/FIREBASE_PRIVATE_KEY"
+        FIREBASE_PROJECT_ID   = "arn:aws:ssm:us-east-1:120317779495:parameter/production/hub/FIREBASE_PROJECT_ID"
+        HUB_DATABASE_URL      = "arn:aws:ssm:us-east-1:120317779495:parameter/production/hub/HUB_DATABASE_URL"
+        HUB_SENTRY_DSN        = "arn:aws:ssm:us-east-1:120317779495:parameter/production/hub/HUB_SENTRY_DSN"
+        PROVISIONER_SECRET    = "arn:aws:ssm:us-east-1:120317779495:parameter/production/hub/PROVISIONER_SECRET"
+        STATUSPAGE_API_KEY    = "arn:aws:ssm:us-east-1:120317779495:parameter/production/hub/STATUSPAGE_API_KEY"
+        STATUSPAGE_PAGE_ID    = "arn:aws:ssm:us-east-1:120317779495:parameter/production/hub/STATUSPAGE_PAGE_ID"
+        WEB3_STORAGE_TOKEN    = "arn:aws:ssm:us-east-1:120317779495:parameter/production/hub/WEB3_STORAGE_TOKEN"
+        WYRE_ACCOUNT_ID       = "arn:aws:ssm:us-east-1:120317779495:parameter/production/hub/WYRE_ACCOUNT_ID"
+        WYRE_API_KEY          = "arn:aws:ssm:us-east-1:120317779495:parameter/production/hub/WYRE_API_KEY"
+        WYRE_SECRET_KEY       = "arn:aws:ssm:us-east-1:120317779495:parameter/production/hub/WYRE_SECRET_KEY"
+
+        # secrets manager
         DISCORD_ON_CALL_INTERNAL_WEBHOOK    = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_discord_on_call_internal_webhook-n7SCZC"
         ETHEREUM_GAS_STATION_URL            = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_ethereum_gas_station_url-tVEK2G"
         ETHEREUM_RPC_NODE_HTTPS_URL         = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_evm_ethereum_infura_https_url-9fE3dF"
@@ -163,6 +213,14 @@ app "hub-worker" {
 app "hub-bot" {
   path = "./packages/hub"
 
+  config {
+    env = {
+      ENVIRONMENT        = "staging"
+      HUB_ENVIRONMENT    = "staging"
+      HUB_AWS_ACCOUNT_ID = "120317779495"
+    }
+  }
+
   build {
     use "docker" {
       dockerfile = "Dockerfile"
@@ -194,6 +252,23 @@ app "hub-bot" {
       disable_alb         = true
 
       secrets = {
+        # parameter store
+        CARDBOT_TOKEN         = "arn:aws:ssm:us-east-1:120317779495:parameter/production/hub/CARDBOT_TOKEN"
+        FIREBASE_CLIENT_EMAIL = "arn:aws:ssm:us-east-1:120317779495:parameter/production/hub/FIREBASE_CLIENT_EMAIL"
+        FIREBASE_DATABASE_URL = "arn:aws:ssm:us-east-1:120317779495:parameter/production/hub/FIREBASE_DATABASE_URL"
+        FIREBASE_PRIVATE_KEY  = "arn:aws:ssm:us-east-1:120317779495:parameter/production/hub/FIREBASE_PRIVATE_KEY"
+        FIREBASE_PROJECT_ID   = "arn:aws:ssm:us-east-1:120317779495:parameter/production/hub/FIREBASE_PROJECT_ID"
+        HUB_DATABASE_URL      = "arn:aws:ssm:us-east-1:120317779495:parameter/production/hub/HUB_DATABASE_URL"
+        HUB_SENTRY_DSN        = "arn:aws:ssm:us-east-1:120317779495:parameter/production/hub/HUB_SENTRY_DSN"
+        PROVISIONER_SECRET    = "arn:aws:ssm:us-east-1:120317779495:parameter/production/hub/PROVISIONER_SECRET"
+        STATUSPAGE_API_KEY    = "arn:aws:ssm:us-east-1:120317779495:parameter/production/hub/STATUSPAGE_API_KEY"
+        STATUSPAGE_PAGE_ID    = "arn:aws:ssm:us-east-1:120317779495:parameter/production/hub/STATUSPAGE_PAGE_ID"
+        WEB3_STORAGE_TOKEN    = "arn:aws:ssm:us-east-1:120317779495:parameter/production/hub/WEB3_STORAGE_TOKEN"
+        WYRE_ACCOUNT_ID       = "arn:aws:ssm:us-east-1:120317779495:parameter/production/hub/WYRE_ACCOUNT_ID"
+        WYRE_API_KEY          = "arn:aws:ssm:us-east-1:120317779495:parameter/production/hub/WYRE_API_KEY"
+        WYRE_SECRET_KEY       = "arn:aws:ssm:us-east-1:120317779495:parameter/production/hub/WYRE_SECRET_KEY"
+
+        # secrets manager
         DISCORD_ON_CALL_INTERNAL_WEBHOOK = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_discord_on_call_internal_webhook-n7SCZC"
         ETHEREUM_GAS_STATION_URL         = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_ethereum_gas_station_url-tVEK2G"
         ETHEREUM_RPC_NODE_HTTPS_URL      = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_evm_ethereum_infura_https_url-9fE3dF"
@@ -265,6 +340,23 @@ app "hub-event-listener" {
       disable_alb         = true
 
       secrets = {
+        # parameter store
+        CARDBOT_TOKEN         = "arn:aws:ssm:us-east-1:120317779495:parameter/production/hub/CARDBOT_TOKEN"
+        FIREBASE_CLIENT_EMAIL = "arn:aws:ssm:us-east-1:120317779495:parameter/production/hub/FIREBASE_CLIENT_EMAIL"
+        FIREBASE_DATABASE_URL = "arn:aws:ssm:us-east-1:120317779495:parameter/production/hub/FIREBASE_DATABASE_URL"
+        FIREBASE_PRIVATE_KEY  = "arn:aws:ssm:us-east-1:120317779495:parameter/production/hub/FIREBASE_PRIVATE_KEY"
+        FIREBASE_PROJECT_ID   = "arn:aws:ssm:us-east-1:120317779495:parameter/production/hub/FIREBASE_PROJECT_ID"
+        HUB_DATABASE_URL      = "arn:aws:ssm:us-east-1:120317779495:parameter/production/hub/HUB_DATABASE_URL"
+        HUB_SENTRY_DSN        = "arn:aws:ssm:us-east-1:120317779495:parameter/production/hub/HUB_SENTRY_DSN"
+        PROVISIONER_SECRET    = "arn:aws:ssm:us-east-1:120317779495:parameter/production/hub/PROVISIONER_SECRET"
+        STATUSPAGE_API_KEY    = "arn:aws:ssm:us-east-1:120317779495:parameter/production/hub/STATUSPAGE_API_KEY"
+        STATUSPAGE_PAGE_ID    = "arn:aws:ssm:us-east-1:120317779495:parameter/production/hub/STATUSPAGE_PAGE_ID"
+        WEB3_STORAGE_TOKEN    = "arn:aws:ssm:us-east-1:120317779495:parameter/production/hub/WEB3_STORAGE_TOKEN"
+        WYRE_ACCOUNT_ID       = "arn:aws:ssm:us-east-1:120317779495:parameter/production/hub/WYRE_ACCOUNT_ID"
+        WYRE_API_KEY          = "arn:aws:ssm:us-east-1:120317779495:parameter/production/hub/WYRE_API_KEY"
+        WYRE_SECRET_KEY       = "arn:aws:ssm:us-east-1:120317779495:parameter/production/hub/WYRE_SECRET_KEY"
+
+        # secrets manager
         DISCORD_ON_CALL_INTERNAL_WEBHOOK = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_discord_on_call_internal_webhook-n7SCZC"
         ETHEREUM_GAS_STATION_URL         = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_ethereum_gas_station_url-tVEK2G"
         ETHEREUM_RPC_NODE_HTTPS_URL      = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_evm_ethereum_infura_https_url-9fE3dF"
@@ -368,6 +460,13 @@ app "cardpay-subg-ext" {
 app "ssr-web" {
   path = "./packages/ssr-web/deployment"
 
+  config {
+    env = {
+      ENVIRONMENT         = "staging"
+      SSR_WEB_ENVIRONMENT = "staging"
+    }
+  }
+
   build {
     use "docker" {
       dockerfile = "Dockerfile"
@@ -398,6 +497,10 @@ app "ssr-web" {
         subnets     = ["subnet-0c22641bd41cbdd1e", "subnet-01d36d7bcd0334fc0"]
         certificate = "arn:aws:acm:us-east-1:120317779495:certificate/e1d6a1c7-456e-4058-b90b-9c603a65734d"
       }
+
+      secrets = {
+        SSR_WEB_SERVER_SENTRY_DSN = "arn:aws:ssm:us-east-1:120317779495:parameter/production/ssr-web/SSR_WEB_SERVER_SENTRY_DSN"
+      }
     }
 
     hook {
@@ -419,7 +522,6 @@ app "ssr-web" {
 app "reward-submit-lambda" {
   path = "./packages/reward-root-submitter"
 
-
   build {
     use "docker" {
       dockerfile = "Dockerfile"
@@ -435,16 +537,15 @@ app "reward-submit-lambda" {
   }
 
   deploy {
-  use "aws-lambda" {
-    region = "us-east-1"
+    use "aws-lambda" {
+      region = "us-east-1"
+    }
   }
-}
 
   url {
     auto_hostname = false
   }
 }
-
 
 app "reward-api" {
   path = "./packages/cardpay-reward-api"

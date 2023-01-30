@@ -6,6 +6,14 @@ project = "cardstack"
 app "hub" {
   path = "./packages/hub"
 
+  config {
+    env = {
+      ENVIRONMENT        = "staging"
+      HUB_ENVIRONMENT    = "staging"
+      HUB_AWS_ACCOUNT_ID = "680542703984"
+    }
+  }
+
   build {
     use "docker" {
       dockerfile = "Dockerfile"
@@ -42,6 +50,21 @@ app "hub" {
       }
 
       secrets = {
+        # parameter store
+        CARDBOT_TOKEN         = "arn:aws:ssm:us-east-1:680542703984:parameter/staging/hub/CARDBOT_TOKEN"
+        FIREBASE_CLIENT_EMAIL = "arn:aws:ssm:us-east-1:680542703984:parameter/staging/hub/FIREBASE_CLIENT_EMAIL"
+        FIREBASE_DATABASE_URL = "arn:aws:ssm:us-east-1:680542703984:parameter/staging/hub/FIREBASE_DATABASE_URL"
+        FIREBASE_PRIVATE_KEY  = "arn:aws:ssm:us-east-1:680542703984:parameter/staging/hub/FIREBASE_PRIVATE_KEY"
+        FIREBASE_PROJECT_ID   = "arn:aws:ssm:us-east-1:680542703984:parameter/staging/hub/FIREBASE_PROJECT_ID"
+        HUB_DATABASE_URL      = "arn:aws:ssm:us-east-1:680542703984:parameter/staging/hub/HUB_DATABASE_URL"
+        HUB_SENTRY_DSN        = "arn:aws:ssm:us-east-1:680542703984:parameter/staging/hub/HUB_SENTRY_DSN"
+        PROVISIONER_SECRET    = "arn:aws:ssm:us-east-1:680542703984:parameter/staging/hub/PROVISIONER_SECRET"
+        WEB3_STORAGE_TOKEN    = "arn:aws:ssm:us-east-1:680542703984:parameter/staging/hub/WEB3_STORAGE_TOKEN"
+        WYRE_ACCOUNT_ID       = "arn:aws:ssm:us-east-1:680542703984:parameter/staging/hub/WYRE_ACCOUNT_ID"
+        WYRE_API_KEY          = "arn:aws:ssm:us-east-1:680542703984:parameter/staging/hub/WYRE_API_KEY"
+        WYRE_SECRET_KEY       = "arn:aws:ssm:us-east-1:680542703984:parameter/staging/hub/WYRE_SECRET_KEY"
+
+        # secrets manager
         CHECKLY_WEBHOOK_SECRET                        = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_hub_checkly_webhook_secret-etKeUa"
         CRYPTOCOMPARE_API_KEY                         = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_CRYPTOCOMPARE_API_KEY-3Sk0nr"
         DISCORD_ON_CALL_INTERNAL_WEBHOOK              = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_discord_on_call_internal_webhook-4ylxfM"
@@ -52,7 +75,6 @@ app "hub" {
         GNOSIS_RPC_NODE_HTTPS_URL                     = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_evm_gnosis_https_url-U4pZOp"
         GNOSIS_RPC_NODE_WSS_URL                       = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_evm_gnosis_wss_url-mwHYYq"
         HUB_AUTH_SECRET                               = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_hub_auth_secret-50oF6K"
-        HUB_DATABASE_URL                              = "arn:aws:ssm:us-east-1:680542703984:parameter/staging/hub/HUB_DATABASE_URL"
         HUB_EMAIL_CARD_DROP_RATE_LIMIT_COUNT          = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_hub_email_card_drop_rate_limit_count-RdAViY"
         HUB_EMAIL_CARD_DROP_RATE_LIMIT_PERIOD_MINUTES = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_hub_email_card_drop_rate_limit_period_minutes-UKgldx"
         HUB_EMAIL_HASH_SALT                           = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_hub_email_hash_salt-nJvKQH"
@@ -92,6 +114,14 @@ app "hub" {
 app "hub-worker" {
   path = "./packages/hub"
 
+  config {
+    env = {
+      ENVIRONMENT        = "staging"
+      HUB_ENVIRONMENT    = "staging"
+      HUB_AWS_ACCOUNT_ID = "680542703984"
+    }
+  }
+
   build {
     use "docker" {
       dockerfile = "Dockerfile"
@@ -123,25 +153,39 @@ app "hub-worker" {
       disable_alb         = true
 
       secrets = {
-        DISCORD_ON_CALL_INTERNAL_WEBHOOK    = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_discord_on_call_internal_webhook-4ylxfM"
-        ETHEREUM_GAS_STATION_URL       = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_ethereum_gas_station_url-AlItsC"
-        ETHEREUM_RPC_NODE_HTTPS_URL    = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_evm_ethereum_infura_https_url-okgckW"
-        ETHEREUM_RPC_NODE_WSS_URL      = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_evm_ethereum_infura_wss_url-hXLd7Q"
-        GNOSIS_GAS_STATION_URL         = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_gnosis_gas_station_url-0xbRlJ"
-        GNOSIS_RPC_NODE_HTTPS_URL      = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_evm_gnosis_https_url-U4pZOp"
-        GNOSIS_RPC_NODE_WSS_URL        = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_evm_gnosis_wss_url-mwHYYq"
-        HUB_AUTH_SECRET                = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_hub_auth_secret-50oF6K"
-        HUB_DATABASE_URL               = "arn:aws:ssm:us-east-1:680542703984:parameter/staging/hub/HUB_DATABASE_URL"
-        HUB_PRIVATE_KEY                = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_hub_private_key-fJhPUj"
-        LAYER1_RPC_NODE_HTTPS_URL      = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_evm_infura_https_url-aCpG9I"
-        LAYER1_RPC_NODE_WSS_URL        = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_evm_infura_wss_url-eirZPn"
-        LAYER2_RPC_NODE_HTTPS_URL      = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_evm_full_node_url-NBKUCq"
-        LAYER2_RPC_NODE_WSS_URL        = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_evm_full_node_wss_url-4RtEaG"
-        MAILCHIMP_API_KEY              = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_MAILCHIMP_API_KEY-lkxsEk"
-        PAGERDUTY_TOKEN                = "arn:aws:secretsmanager:us-east-1:680542703984:secret:PAGERDUTY_TOKEN-kTxFxL"
-        POLYGON_GAS_STATION_URL        = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_polygon_gas_station_url-cUpbHc"
-        POLYGON_RPC_NODE_HTTPS_URL     = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_evm_polygon_infura_https_url-wIF3tU"
-        POLYGON_RPC_NODE_WSS_URL       = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_evm_polygon_infura_wss_url-UvdYiF"
+        # parameter store
+        CARDBOT_TOKEN         = "arn:aws:ssm:us-east-1:680542703984:parameter/staging/hub/CARDBOT_TOKEN"
+        FIREBASE_CLIENT_EMAIL = "arn:aws:ssm:us-east-1:680542703984:parameter/staging/hub/FIREBASE_CLIENT_EMAIL"
+        FIREBASE_DATABASE_URL = "arn:aws:ssm:us-east-1:680542703984:parameter/staging/hub/FIREBASE_DATABASE_URL"
+        FIREBASE_PRIVATE_KEY  = "arn:aws:ssm:us-east-1:680542703984:parameter/staging/hub/FIREBASE_PRIVATE_KEY"
+        FIREBASE_PROJECT_ID   = "arn:aws:ssm:us-east-1:680542703984:parameter/staging/hub/FIREBASE_PROJECT_ID"
+        HUB_DATABASE_URL      = "arn:aws:ssm:us-east-1:680542703984:parameter/staging/hub/HUB_DATABASE_URL"
+        HUB_SENTRY_DSN        = "arn:aws:ssm:us-east-1:680542703984:parameter/staging/hub/HUB_SENTRY_DSN"
+        PROVISIONER_SECRET    = "arn:aws:ssm:us-east-1:680542703984:parameter/staging/hub/PROVISIONER_SECRET"
+        WEB3_STORAGE_TOKEN    = "arn:aws:ssm:us-east-1:680542703984:parameter/staging/hub/WEB3_STORAGE_TOKEN"
+        WYRE_ACCOUNT_ID       = "arn:aws:ssm:us-east-1:680542703984:parameter/staging/hub/WYRE_ACCOUNT_ID"
+        WYRE_API_KEY          = "arn:aws:ssm:us-east-1:680542703984:parameter/staging/hub/WYRE_API_KEY"
+        WYRE_SECRET_KEY       = "arn:aws:ssm:us-east-1:680542703984:parameter/staging/hub/WYRE_SECRET_KEY"
+
+        # secrets manager
+        DISCORD_ON_CALL_INTERNAL_WEBHOOK = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_discord_on_call_internal_webhook-4ylxfM"
+        ETHEREUM_GAS_STATION_URL         = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_ethereum_gas_station_url-AlItsC"
+        ETHEREUM_RPC_NODE_HTTPS_URL      = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_evm_ethereum_infura_https_url-okgckW"
+        ETHEREUM_RPC_NODE_WSS_URL        = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_evm_ethereum_infura_wss_url-hXLd7Q"
+        GNOSIS_GAS_STATION_URL           = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_gnosis_gas_station_url-0xbRlJ"
+        GNOSIS_RPC_NODE_HTTPS_URL        = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_evm_gnosis_https_url-U4pZOp"
+        GNOSIS_RPC_NODE_WSS_URL          = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_evm_gnosis_wss_url-mwHYYq"
+        HUB_AUTH_SECRET                  = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_hub_auth_secret-50oF6K"
+        HUB_PRIVATE_KEY                  = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_hub_private_key-fJhPUj"
+        LAYER1_RPC_NODE_HTTPS_URL        = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_evm_infura_https_url-aCpG9I"
+        LAYER1_RPC_NODE_WSS_URL          = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_evm_infura_wss_url-eirZPn"
+        LAYER2_RPC_NODE_HTTPS_URL        = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_evm_full_node_url-NBKUCq"
+        LAYER2_RPC_NODE_WSS_URL          = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_evm_full_node_wss_url-4RtEaG"
+        MAILCHIMP_API_KEY                = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_MAILCHIMP_API_KEY-lkxsEk"
+        PAGERDUTY_TOKEN                  = "arn:aws:secretsmanager:us-east-1:680542703984:secret:PAGERDUTY_TOKEN-kTxFxL"
+        POLYGON_GAS_STATION_URL          = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_polygon_gas_station_url-cUpbHc"
+        POLYGON_RPC_NODE_HTTPS_URL       = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_evm_polygon_infura_https_url-wIF3tU"
+        POLYGON_RPC_NODE_WSS_URL         = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_evm_polygon_infura_wss_url-UvdYiF"
 
         # The below is a distribution in the production AWS account
         HUB_STORAGE_CLOUDFRONT_DISTRIBUTION = "arn:aws:secretsmanager:us-east-1:680542703984:secret:hub_storage_cloudfront_distribution-Frtsb3"
@@ -166,6 +210,14 @@ app "hub-worker" {
 
 app "hub-bot" {
   path = "./packages/hub"
+
+  config {
+    env = {
+      ENVIRONMENT        = "staging"
+      HUB_ENVIRONMENT    = "staging"
+      HUB_AWS_ACCOUNT_ID = "680542703984"
+    }
+  }
 
   build {
     use "docker" {
@@ -198,6 +250,21 @@ app "hub-bot" {
       disable_alb         = true
 
       secrets = {
+        # parameter store
+        CARDBOT_TOKEN         = "arn:aws:ssm:us-east-1:680542703984:parameter/staging/hub/CARDBOT_TOKEN"
+        FIREBASE_CLIENT_EMAIL = "arn:aws:ssm:us-east-1:680542703984:parameter/staging/hub/FIREBASE_CLIENT_EMAIL"
+        FIREBASE_DATABASE_URL = "arn:aws:ssm:us-east-1:680542703984:parameter/staging/hub/FIREBASE_DATABASE_URL"
+        FIREBASE_PRIVATE_KEY  = "arn:aws:ssm:us-east-1:680542703984:parameter/staging/hub/FIREBASE_PRIVATE_KEY"
+        FIREBASE_PROJECT_ID   = "arn:aws:ssm:us-east-1:680542703984:parameter/staging/hub/FIREBASE_PROJECT_ID"
+        HUB_DATABASE_URL      = "arn:aws:ssm:us-east-1:680542703984:parameter/staging/hub/HUB_DATABASE_URL"
+        HUB_SENTRY_DSN        = "arn:aws:ssm:us-east-1:680542703984:parameter/staging/hub/HUB_SENTRY_DSN"
+        PROVISIONER_SECRET    = "arn:aws:ssm:us-east-1:680542703984:parameter/staging/hub/PROVISIONER_SECRET"
+        WEB3_STORAGE_TOKEN    = "arn:aws:ssm:us-east-1:680542703984:parameter/staging/hub/WEB3_STORAGE_TOKEN"
+        WYRE_ACCOUNT_ID       = "arn:aws:ssm:us-east-1:680542703984:parameter/staging/hub/WYRE_ACCOUNT_ID"
+        WYRE_API_KEY          = "arn:aws:ssm:us-east-1:680542703984:parameter/staging/hub/WYRE_API_KEY"
+        WYRE_SECRET_KEY       = "arn:aws:ssm:us-east-1:680542703984:parameter/staging/hub/WYRE_SECRET_KEY"
+
+        # secrets manager
         DISCORD_ON_CALL_INTERNAL_WEBHOOK = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_discord_on_call_internal_webhook-4ylxfM"
         ETHEREUM_GAS_STATION_URL         = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_ethereum_gas_station_url-AlItsC"
         ETHEREUM_RPC_NODE_HTTPS_URL      = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_evm_ethereum_infura_https_url-okgckW"
@@ -206,7 +273,6 @@ app "hub-bot" {
         GNOSIS_RPC_NODE_HTTPS_URL        = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_evm_gnosis_https_url-U4pZOp"
         GNOSIS_RPC_NODE_WSS_URL          = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_evm_gnosis_wss_url-mwHYYq"
         HUB_AUTH_SECRET                  = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_hub_auth_secret-50oF6K"
-        HUB_DATABASE_URL                 = "arn:aws:ssm:us-east-1:680542703984:parameter/staging/hub/HUB_DATABASE_URL"
         HUB_PRIVATE_KEY                  = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_hub_private_key-fJhPUj"
         LAYER1_RPC_NODE_HTTPS_URL        = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_evm_infura_https_url-aCpG9I"
         LAYER1_RPC_NODE_WSS_URL          = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_evm_infura_wss_url-eirZPn"
@@ -237,6 +303,12 @@ app "hub-bot" {
 
 app "hub-event-listener" {
   path = "./packages/hub"
+
+  config {
+    env = {
+      ENVIRONMENT = "staging"
+    }
+  }
 
   build {
     use "docker" {
@@ -269,6 +341,21 @@ app "hub-event-listener" {
       disable_alb         = true
 
       secrets = {
+        # parameter store
+        CARDBOT_TOKEN         = "arn:aws:ssm:us-east-1:680542703984:parameter/staging/hub/CARDBOT_TOKEN"
+        FIREBASE_CLIENT_EMAIL = "arn:aws:ssm:us-east-1:680542703984:parameter/staging/hub/FIREBASE_CLIENT_EMAIL"
+        FIREBASE_DATABASE_URL = "arn:aws:ssm:us-east-1:680542703984:parameter/staging/hub/FIREBASE_DATABASE_URL"
+        FIREBASE_PRIVATE_KEY  = "arn:aws:ssm:us-east-1:680542703984:parameter/staging/hub/FIREBASE_PRIVATE_KEY"
+        FIREBASE_PROJECT_ID   = "arn:aws:ssm:us-east-1:680542703984:parameter/staging/hub/FIREBASE_PROJECT_ID"
+        HUB_DATABASE_URL      = "arn:aws:ssm:us-east-1:680542703984:parameter/staging/hub/HUB_DATABASE_URL"
+        HUB_SENTRY_DSN        = "arn:aws:ssm:us-east-1:680542703984:parameter/staging/hub/HUB_SENTRY_DSN"
+        PROVISIONER_SECRET    = "arn:aws:ssm:us-east-1:680542703984:parameter/staging/hub/PROVISIONER_SECRET"
+        WEB3_STORAGE_TOKEN    = "arn:aws:ssm:us-east-1:680542703984:parameter/staging/hub/WEB3_STORAGE_TOKEN"
+        WYRE_ACCOUNT_ID       = "arn:aws:ssm:us-east-1:680542703984:parameter/staging/hub/WYRE_ACCOUNT_ID"
+        WYRE_API_KEY          = "arn:aws:ssm:us-east-1:680542703984:parameter/staging/hub/WYRE_API_KEY"
+        WYRE_SECRET_KEY       = "arn:aws:ssm:us-east-1:680542703984:parameter/staging/hub/WYRE_SECRET_KEY"
+
+        # secrets manager
         DISCORD_ON_CALL_INTERNAL_WEBHOOK = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_discord_on_call_internal_webhook-4ylxfM"
         ETHEREUM_GAS_STATION_URL         = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_ethereum_gas_station_url-AlItsC"
         ETHEREUM_RPC_NODE_HTTPS_URL      = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_evm_ethereum_infura_https_url-okgckW"
@@ -277,7 +364,6 @@ app "hub-event-listener" {
         GNOSIS_RPC_NODE_HTTPS_URL        = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_evm_gnosis_https_url-U4pZOp"
         GNOSIS_RPC_NODE_WSS_URL          = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_evm_gnosis_wss_url-mwHYYq"
         HUB_AUTH_SECRET                  = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_hub_auth_secret-50oF6K"
-        HUB_DATABASE_URL                 = "arn:aws:ssm:us-east-1:680542703984:parameter/staging/hub/HUB_DATABASE_URL"
         HUB_PRIVATE_KEY                  = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_hub_private_key-fJhPUj"
         LAYER1_RPC_NODE_HTTPS_URL        = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_evm_infura_https_url-aCpG9I"
         LAYER1_RPC_NODE_WSS_URL          = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_evm_infura_wss_url-eirZPn"
@@ -308,6 +394,12 @@ app "hub-event-listener" {
 
 app "cardie" {
   path = "./packages/cardie"
+
+  config {
+    env = {
+      ENVIRONMENT = "staging"
+    }
+  }
 
   build {
     use "pack" {
@@ -423,6 +515,13 @@ app "cardpay-subg-ext" {
 app "ssr-web" {
   path = "./packages/ssr-web/deployment"
 
+  config {
+    env = {
+      ENVIRONMENT         = "staging"
+      SSR_WEB_ENVIRONMENT = "staging"
+    }
+  }
+
   build {
     use "docker" {
       dockerfile = "Dockerfile"
@@ -453,6 +552,10 @@ app "ssr-web" {
         subnets     = ["subnet-09af2ce7fb316890b", "subnet-08c7d485ed397ca69"]
         certificate = "arn:aws:acm:us-east-1:680542703984:certificate/8b232d17-3bb7-41f5-abc0-7b32b0d5190c"
       }
+
+      secrets = {
+        SSR_WEB_SERVER_SENTRY_DSN = "arn:aws:ssm:us-east-1:680542703984:parameter/staging/ssr-web/SSR_WEB_SERVER_SENTRY_DSN"
+      }
     }
 
     hook {
@@ -473,6 +576,12 @@ app "ssr-web" {
 
 app "reward-submit-lambda" {
   path = "./packages/reward-root-submitter"
+
+  config {
+    env = {
+      ENVIRONMENT = "staging"
+    }
+  }
 
   build {
     use "docker" {
