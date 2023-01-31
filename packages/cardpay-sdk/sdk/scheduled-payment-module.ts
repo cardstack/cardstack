@@ -155,7 +155,8 @@ export default class ScheduledPaymentModule {
       multiSendTransaction.value,
       multiSendTransaction.data,
       multiSendTransaction.operation,
-      gasTokenAddress
+      gasTokenAddress,
+      true
     );
     let gasCost = BigNumber.from(estimate.safeTxGas)
       .add(BigNumber.from(estimate.baseGas))
@@ -235,7 +236,8 @@ export default class ScheduledPaymentModule {
       multiSendTx.value,
       multiSendTx.data,
       multiSendTx.operation,
-      AddressZero
+      AddressZero,
+      true
     );
     let nonce = new BN('0');
     let gasPrice = '0';
@@ -321,7 +323,8 @@ export default class ScheduledPaymentModule {
       enableModuleTxs.txs[1].value,
       enableModuleTxs.txs[1].data,
       enableModuleTxs.txs[1].operation,
-      AddressZero
+      AddressZero,
+      true
     );
     let enableSPModuleGas = BigNumber.from(estimateEnableSPModule.baseGas).add(estimateEnableSPModule.safeTxGas);
 
@@ -332,7 +335,8 @@ export default class ScheduledPaymentModule {
       setGuardTxs.txs[1].value,
       setGuardTxs.txs[1].data,
       setGuardTxs.txs[1].operation,
-      AddressZero
+      AddressZero,
+      true
     );
     let setMetaGuardGas = BigNumber.from(estimateSetMetaGuard.baseGas).add(estimateSetMetaGuard.safeTxGas);
 
@@ -584,7 +588,8 @@ export default class ScheduledPaymentModule {
       '0',
       cancelScheduledPaymentData,
       Operation.CALL,
-      gasTokenAddress
+      gasTokenAddress,
+      true
     );
     let gasCost = BigNumber.from(estimate.safeTxGas)
       .add(BigNumber.from(estimate.baseGas))
@@ -720,7 +725,8 @@ export default class ScheduledPaymentModule {
       '0',
       payload,
       Operation.CALL,
-      gasTokenAddress
+      gasTokenAddress,
+      true
     );
 
     let nonce = getNextNonceFromEstimate(estimate);
@@ -760,7 +766,8 @@ export default class ScheduledPaymentModule {
       '0',
       payload,
       Operation.CALL,
-      gasTokenAddress
+      gasTokenAddress,
+      true
     );
 
     let nonce = getNextNonceFromEstimate(estimate);
