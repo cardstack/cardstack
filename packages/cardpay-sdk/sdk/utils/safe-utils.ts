@@ -131,8 +131,17 @@ export async function gasEstimate(
   value: string,
   data: string,
   operation: Operation,
-  gasToken: string
+  gasToken: string,
+  retryOnFailure = false
 ): Promise<Estimate> {
+  // `retryOnFailure` is a workaround for a bug in the relay service where it returns an Internal Server Error
+  // after ~10 minutes of inactivity. This happens internally in the relay server when the it
+  // sends a request to the ethereum node using ethereum_client.http_session.post (https://vscode.dev/github.com/safe-global/safe-eth-py/blob/8bedebca1641957bd09a5fc023462b25de0e1c5d/gnosis/safe/safe.py#L704)
+  // and the node did not receive any POST requests for a while. The node aborts the connection: (Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+  // and the relay server then returns an Internal Server Error to the caller that asks for the gas estimate.
+  // It could be that the relay server is not closing the connection properly, or that the node considers connection stale. There are multiple mentions
+  // of this issue, for example: https://github.com/python/cpython/issues/85517#issuecomment-1093877874.
+  // We did not research this issue further, but we can work around it by retrying the request once in case it fails.
   let relayServiceURL = await getConstant('relayServiceURL', web3OrEthersProvider);
   let url = `${relayServiceURL}/v2/safes/${from}/transactions/estimate/`;
   let options = {
@@ -151,7 +160,11 @@ export async function gasEstimate(
   };
   let response = await fetch(url, options);
   if (!response?.ok) {
-    throw new Error(await response.text());
+    if (retryOnFailure) {
+      return await gasEstimate(web3OrEthersProvider, from, to, value, data, operation, gasToken, false);
+    } else {
+      throw new Error(await response.text());
+    }
   }
   return await response.json();
 }
