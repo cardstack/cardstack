@@ -73,8 +73,10 @@ export default class Wallet extends Service {
       this.providerId = undefined;
     });
 
-    this.chainConnectionManager.on('chain-changed', (chainId: number) => {
-      if (!this.network.isSupportedNetwork(chainId)) {
+    this.chainConnectionManager.on('chain-changed', async (chainId: number) => {
+      const isSupported = await this.network.isSupportedNetwork(chainId);
+
+      if (!isSupported) {
         // TODO: improve unsupported net handling
         alert('Unsupported network! Choose a supported one and reconnect');
         this.disconnect();
