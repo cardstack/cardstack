@@ -61,8 +61,6 @@ describe('estimate gas', function () {
     expect(gasEstimationResult.scenario).to.equal(gasEstimationParams.scenario);
     expect(gasEstimationResult.chainId).to.equal(gasEstimationParams.chainId);
     expect(gasEstimationResult.gas).to.equal(createSafeGas);
-    expect(gasEstimationResult.tokenAddress).to.equal('');
-    expect(gasEstimationResult.gasTokenAddress).to.equal('');
   });
 
   it('estimates gas for execute scheduled one-time payment scenario', async function () {
@@ -70,16 +68,12 @@ describe('estimate gas', function () {
     let gasEstimationParams: GasEstimationParams = {
       scenario: GasEstimationResultsScenarioEnum.execute_one_time_payment,
       chainId: 5,
-      tokenAddress: '0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6',
-      gasTokenAddress: '0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6',
     };
     let gasEstimationResult = await subject.estimate(gasEstimationParams);
 
     expect(gasEstimationResult.scenario).to.equal(gasEstimationParams.scenario);
     expect(gasEstimationResult.chainId).to.equal(gasEstimationParams.chainId);
     expect(gasEstimationResult.gas).to.equal(executionGas);
-    expect(gasEstimationResult.tokenAddress).to.equal(gasEstimationParams.tokenAddress);
-    expect(gasEstimationResult.gasTokenAddress).to.equal(gasEstimationParams.gasTokenAddress);
   });
 
   it('estimates gas for execute scheduled recurring payment scenario', async function () {
@@ -87,16 +81,12 @@ describe('estimate gas', function () {
     let gasEstimationParams: GasEstimationParams = {
       scenario: GasEstimationResultsScenarioEnum.execute_recurring_payment,
       chainId: 5,
-      tokenAddress: '0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6',
-      gasTokenAddress: '0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6',
     };
     let gasEstimationResult = await subject.estimate(gasEstimationParams);
 
     expect(gasEstimationResult.scenario).to.equal(gasEstimationParams.scenario);
     expect(gasEstimationResult.chainId).to.equal(gasEstimationParams.chainId);
     expect(gasEstimationResult.gas).to.equal(executionGas);
-    expect(gasEstimationResult.tokenAddress).to.equal(gasEstimationParams.tokenAddress);
-    expect(gasEstimationResult.gasTokenAddress).to.equal(gasEstimationParams.gasTokenAddress);
   });
 
   it('retrieves gas from DB if gas exist in DB and still in valid TTL', async function () {
@@ -123,40 +113,12 @@ describe('estimate gas', function () {
     expect(gasEstimationResult.gas).not.to.equal(executionGas);
   });
 
-  it('throws error if tokenAddress and gasTokenAddress are undefined in execution scenario', async function () {
-    executionGas = 1000000;
-
-    let gasEstimationParams: GasEstimationParams = {
-      scenario: GasEstimationResultsScenarioEnum.execute_one_time_payment,
-      chainId: 5,
-    };
-    await expect(subject.estimate(gasEstimationParams)).to.be.rejectedWith(
-      'tokenAddress and gasTokenAddress is required in execute_one_time_payment'
-    );
-  });
-
-  it('throws error if tokenAddress and gasTokenAddress are blank string in execution scenario', async function () {
-    executionGas = 1000000;
-
-    let gasEstimationParams: GasEstimationParams = {
-      scenario: GasEstimationResultsScenarioEnum.execute_recurring_payment,
-      chainId: 5,
-      tokenAddress: '',
-      gasTokenAddress: '',
-    };
-    await expect(subject.estimate(gasEstimationParams)).to.be.rejectedWith(
-      'tokenAddress and gasTokenAddress is required in execute_recurring_payment'
-    );
-  });
-
   it('throws error if chain id is not supported', async function () {
     executionGas = 1000000;
 
     let gasEstimationParams: GasEstimationParams = {
       scenario: GasEstimationResultsScenarioEnum.execute_recurring_payment,
       chainId: 3,
-      tokenAddress: '0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6',
-      gasTokenAddress: '0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6',
     };
     await expect(subject.estimate(gasEstimationParams)).to.be.rejectedWith('Unsupported network: 3');
   });

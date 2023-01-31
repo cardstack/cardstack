@@ -4,15 +4,12 @@ import { nowUtc } from '../utils/dates';
 import config from 'config';
 import { Wallet } from 'ethers';
 import { GasEstimationResultsScenarioEnum } from '@prisma/client';
-import { convertChainIdToName } from '@cardstack/cardpay-sdk';
-import { supportedChains } from '@cardstack/cardpay-sdk';
+import { convertChainIdToName, getAddress, supportedChains } from '@cardstack/cardpay-sdk';
 import { NotFound } from '@cardstack/core/src/utils/errors';
 
 export interface GasEstimationParams {
   scenario: GasEstimationResultsScenarioEnum;
   chainId: number;
-  tokenAddress?: string;
-  gasTokenAddress?: string;
 }
 
 export default class GasEstimationService {
@@ -27,8 +24,6 @@ export default class GasEstimationService {
       where: {
         chainId: params.chainId,
         scenario: params.scenario,
-        tokenAddress: params.tokenAddress,
-        gasTokenAddress: params.gasTokenAddress,
       },
     });
 
@@ -53,18 +48,14 @@ export default class GasEstimationService {
 
     gasLimit = await prisma.gasEstimationResult.upsert({
       where: {
-        chainId_scenario_tokenAddress_gasTokenAddress: {
+        chainId_scenario: {
           chainId: params.chainId,
           scenario: params.scenario,
-          tokenAddress: params.tokenAddress ?? '',
-          gasTokenAddress: params.gasTokenAddress ?? '',
         },
       },
       create: {
         chainId: params.chainId,
         scenario: params.scenario,
-        tokenAddress: params.tokenAddress,
-        gasTokenAddress: params.gasTokenAddress,
         gas: gas,
       },
       update: {
@@ -76,15 +67,6 @@ export default class GasEstimationService {
   }
 
   private async estimatePaymentExecution(params: GasEstimationParams) {
-    if (
-      !params.tokenAddress ||
-      params.tokenAddress === '' ||
-      !params.gasTokenAddress ||
-      params.gasTokenAddress === ''
-    ) {
-      throw Error(`tokenAddress and gasTokenAddress is required in ${params.scenario}`);
-    }
-
     let provider = this.ethersProvider.getInstance(params.chainId);
     let signer = new Wallet(config.get('hubPrivateKey'));
     let scheduledPaymentModule = await this.cardpay.getSDK('ScheduledPaymentModule', provider, signer);
@@ -96,17 +78,18 @@ export default class GasEstimationService {
     // since transferAmount will be calculated with fee percentage.
     // And gasPrice is price per unit of gas, so it will be multiplied by the gas execution.
     let transferAmount = '1000';
-    let gasPrice = '100';
+    let gasPrice = '1';
     let gas;
+    let usdTokenAddress = await getAddress('usdStableCoinToken', provider);
     switch (params.scenario) {
       case GasEstimationResultsScenarioEnum.execute_one_time_payment:
         gas = await scheduledPaymentModule.estimateExecutionGas(
           this.getHubSPModuleAddress(params.chainId),
-          params.tokenAddress,
+          usdTokenAddress,
           transferAmount.toString(),
           signer.address,
           gasPrice.toString(),
-          params.gasTokenAddress,
+          usdTokenAddress,
           'salt1',
           gasPrice.toString(),
           Math.round(nowUtc().getTime() / 1000),
@@ -115,21 +98,13 @@ export default class GasEstimationService {
         );
         break;
       case GasEstimationResultsScenarioEnum.execute_recurring_payment:
-        if (
-          !params.tokenAddress ||
-          params.tokenAddress === '' ||
-          !params.gasTokenAddress ||
-          params.gasTokenAddress === ''
-        ) {
-          throw Error(`tokenAddress and gasTokenAddress is required in ${params.scenario}`);
-        }
         gas = await scheduledPaymentModule.estimateExecutionGas(
           this.getHubSPModuleAddress(params.chainId),
-          params.tokenAddress,
+          usdTokenAddress,
           transferAmount.toString(),
           signer.address,
           gasPrice.toString(),
-          params.gasTokenAddress,
+          usdTokenAddress,
           'salt1',
           gasPrice.toString(),
           null,
@@ -141,7 +116,7 @@ export default class GasEstimationService {
         throw Error('unknown estimation scenario');
     }
 
-    return gas;
+    return gas + 30000; // Add 30000 to make the payment gas is high enough to be executed
   }
 
   private getHubSPModuleAddress(chainId: number) {
