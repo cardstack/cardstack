@@ -67,6 +67,10 @@ export default class Wallet extends Service {
 
     this.chainConnectionManager.on('disconnected', () => {
       this.isConnected = false;
+      this.safes = [];
+      this.address = undefined;
+      this.nativeTokenBalance = undefined;
+      this.providerId = undefined;
     });
 
     this.chainConnectionManager.on('chain-changed', (chainId: number) => {
