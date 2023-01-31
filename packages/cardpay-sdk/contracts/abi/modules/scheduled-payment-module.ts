@@ -12,6 +12,11 @@ export default [
         type: 'address',
       },
       {
+        internalType: 'address[]',
+        name: '_avatarOwners',
+        type: 'address[]',
+      },
+      {
         internalType: 'address',
         name: '_target',
         type: 'address',
@@ -262,6 +267,12 @@ export default [
       },
       {
         indexed: false,
+        internalType: 'address[]',
+        name: 'avatarOwners',
+        type: 'address[]',
+      },
+      {
+        indexed: false,
         internalType: 'address',
         name: 'target',
         type: 'address',
@@ -276,6 +287,12 @@ export default [
         indexed: false,
         internalType: 'address',
         name: 'exchange',
+        type: 'address',
+      },
+      {
+        indexed: false,
+        internalType: 'address',
+        name: 'moduleAddress',
         type: 'address',
       },
     ],
@@ -897,6 +914,35 @@ export default [
         internalType: 'address',
         name: '_guard',
         type: 'address',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'bytes32',
+        name: 'spHash',
+        type: 'bytes32',
+      },
+      {
+        internalType: 'uint256',
+        name: 'recursDayOfMonth',
+        type: 'uint256',
+      },
+      {
+        internalType: 'uint256',
+        name: 'until',
+        type: 'uint256',
+      },
+    ],
+    name: 'getRecursDate',
+    outputs: [
+      {
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
       },
     ],
     stateMutability: 'view',
