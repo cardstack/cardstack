@@ -73,7 +73,9 @@ export default class NetworkService extends Service {
     return this.supportedNetworks.map((network) => network.name);
   }
 
-  isSupportedNetwork(chainId: number): boolean {
+  async isSupportedNetwork(chainId: number): Promise<boolean> {
+    await this.hubConfig.remoteConfig.ready;
+
     return this.supportedNetworks.some(
       (n: NetworkInfo) => n.chainId === chainId
     );
