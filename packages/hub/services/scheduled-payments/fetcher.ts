@@ -1,6 +1,5 @@
 import { inject } from '@cardstack/di';
 import { ScheduledPayment } from '@prisma/client';
-import { startOfDay, subDays } from 'date-fns';
 import { Prisma } from '@prisma/client';
 
 export default class ScheduledPaymentsFetcherService {
@@ -48,7 +47,7 @@ export default class ScheduledPaymentsFetcherService {
         (
           scheduled_payments.canceled_at IS NULL
           AND scheduled_payments.creation_block_number > 0
-          AND scheduled_payments.pay_at > ${startOfDay(subDays(now, this.validForDays)).toISOString()}::timestamp
+          AND scheduled_payments.pay_at > DATE_TRUNC('day', ${nowString}::timestamp)::date - scheduled_payments.valid_for_days
           AND scheduled_payments.pay_at <= ${nowString}::timestamp
           AND COALESCE(failed_attempts_count, 0) < ${retryBackoffsInMinutes.length}
           AND ${nowString}::timestamp >= (COALESCE(last_failed_payment_attempt.started_at, to_timestamp(0)) + (interval '1 minute' * (ARRAY[${Prisma.join(
