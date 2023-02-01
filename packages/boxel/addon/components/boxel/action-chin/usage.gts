@@ -63,7 +63,6 @@ export default class ActionChinUsage extends Component<Signature> {
   <template>
     <FreestyleUsage @name="ActionChin">
       <:description>
-        TO BE REVERTED JUST TESTING THE GB ACTIONS
         Bottom action area for an action card, a.k.a the "Chin".<br><br>
         Use the API controls below to change <code>state</code> and <code>stepNumber</code>.
 
