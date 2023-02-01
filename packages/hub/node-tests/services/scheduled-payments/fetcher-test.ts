@@ -10,7 +10,8 @@ import { ExtendedPrismaClient } from '../../../services/prisma-manager';
 describe('fetching scheduled payments that are due', function () {
   let subject: ScheduledPaymentsFetcherService;
   let now: Date;
-  let validForDays: number;
+  let chainId = 1;
+  let validForDays = 3;
   let prisma: ExtendedPrismaClient;
 
   let { getPrisma, getContainer } = setupHub(this);
@@ -18,7 +19,6 @@ describe('fetching scheduled payments that are due', function () {
   this.beforeEach(async function () {
     subject = await getContainer().lookup('scheduled-payment-fetcher');
     now = convertDateToUTC(new Date());
-    validForDays = subject.validForDays;
     prisma = await getPrisma();
   });
 
@@ -44,7 +44,7 @@ describe('fetching scheduled payments that are due', function () {
         spHash: crypto.randomBytes(20).toString('hex'),
         canceledAt: params.canceledAt,
         creationBlockNumber: 'creationBlockNumber' in params ? params.creationBlockNumber : 1,
-        chainId: 1,
+        chainId,
         userAddress: '0x57022DA74ec3e6d8274918C732cf8864be7da833',
       },
     });
@@ -69,35 +69,36 @@ describe('fetching scheduled payments that are due', function () {
 
   describe('one-time scheduled payments', function () {
     it('fetches scheduled payments that are due', async function () {
-      await createScheduledPayment({ payAt: addDays(now, -validForDays - 1) }); // not valid to retry anymore
       let sp1 = await createScheduledPayment({ payAt: subDays(now, validForDays) }); // still valid to retry
       let sp2 = await createScheduledPayment({ payAt: subDays(now, validForDays - 1) }); // still valid to retry
       let sp3 = await createScheduledPayment({ payAt: now });
-      await createScheduledPayment({ payAt: addDays(now, 1) }); // future payment for tomorrow, not due to execute now
-      await createScheduledPayment({ payAt: addDays(now, 2) }); // future payment for day after tomorrow, not due to execute now
 
-      expect((await subject.fetchScheduledPayments()).map((sp) => sp.id)).to.deep.equal([sp1.id, sp2.id, sp3.id]);
+      expect((await subject.fetchScheduledPayments(chainId, validForDays)).map((sp) => sp.id)).to.deep.equal([
+        sp1.id,
+        sp2.id,
+        sp3.id,
+      ]);
     });
 
     it('does not fetch scheduled payments with payment attempts in progress', async function () {
       let sp1 = await createScheduledPayment({ payAt: now });
       await createScheduledPaymentAttempt(sp1, now, null, 'inProgress');
 
-      expect(await subject.fetchScheduledPayments()).to.be.empty;
+      expect(await subject.fetchScheduledPayments(chainId, validForDays)).to.be.empty;
     });
 
     it('does not fetch scheduled payments with payment attempts that succeeded', async function () {
       let sp1 = await createScheduledPayment({ payAt: subDays(now, 1) });
       await createScheduledPaymentAttempt(sp1, subMinutes(now, 2), subMinutes(now, 1), 'succeeded');
 
-      expect(await subject.fetchScheduledPayments()).to.be.empty;
+      expect(await subject.fetchScheduledPayments(chainId, validForDays)).to.be.empty;
     });
 
     it('fetches scheduled payments with payment attempts that failed', async function () {
       let sp1 = await createScheduledPayment({ payAt: subDays(now, 1) }); // was due yesterday
       await createScheduledPaymentAttempt(sp1, subDays(now, 1), addMinutes(subDays(now, 1), 2), 'failed'); // it failed yesterday, but it's still valid to retry now
 
-      expect((await subject.fetchScheduledPayments()).map((sp) => sp.id)).to.deep.equal([sp1.id]);
+      expect((await subject.fetchScheduledPayments(chainId, validForDays)).map((sp) => sp.id)).to.deep.equal([sp1.id]);
     });
 
     it('fetches 3 of 5 scheduled payment that are due in the correct order', async function () {
@@ -118,7 +119,11 @@ describe('fetching scheduled payments that are due', function () {
       await createScheduledPaymentAttempt(sp4, sp4And5Date, addMinutes(sp4And5Date, 5), 'failed');
       await createScheduledPaymentAttempt(sp5, sp4And5Date, addMinutes(sp4And5Date, 5), 'failed');
 
-      expect((await subject.fetchScheduledPayments(3)).map((sp) => sp.id)).to.deep.equal([sp1.id, sp2.id, sp3.id]);
+      expect((await subject.fetchScheduledPayments(chainId, validForDays, 3)).map((sp) => sp.id)).to.deep.equal([
+        sp1.id,
+        sp2.id,
+        sp3.id,
+      ]);
     });
   });
 
@@ -152,7 +157,10 @@ describe('fetching scheduled payments that are due', function () {
         payAt: addDays(now, 1),
       });
 
-      expect((await subject.fetchScheduledPayments()).map((sp) => sp.id)).to.deep.equal([sp1.id, sp2.id]);
+      expect((await subject.fetchScheduledPayments(chainId, validForDays)).map((sp) => sp.id)).to.deep.equal([
+        sp1.id,
+        sp2.id,
+      ]);
     });
 
     it('does not fetch payments that have recurringUntil in the past', async function () {
@@ -162,7 +170,7 @@ describe('fetching scheduled payments that are due', function () {
         recurringUntil: subDays(now, 1),
       });
 
-      expect(await subject.fetchScheduledPayments()).to.be.empty;
+      expect(await subject.fetchScheduledPayments(chainId, validForDays)).to.be.empty;
     });
 
     it('fetches payments that succeeded in the past', async function () {
@@ -174,7 +182,7 @@ describe('fetching scheduled payments that are due', function () {
 
       await createScheduledPaymentAttempt(sp1, subMonths(now, 1), addMinutes(subMonths(now, 1), 1), 'succeeded');
 
-      expect((await subject.fetchScheduledPayments()).map((sp) => sp.id)).to.deep.equal([sp1.id]);
+      expect((await subject.fetchScheduledPayments(chainId, validForDays)).map((sp) => sp.id)).to.deep.equal([sp1.id]);
     });
 
     it('fetches 3 of 5 scheduled payment that are due in the correct order', async function () {
@@ -217,7 +225,11 @@ describe('fetching scheduled payments that are due', function () {
       await createScheduledPaymentAttempt(sp4, sp4And5Date, addMinutes(sp4And5Date, 5), 'failed');
       await createScheduledPaymentAttempt(sp5, sp4And5Date, addMinutes(sp4And5Date, 5), 'failed');
 
-      expect((await subject.fetchScheduledPayments(3)).map((sp) => sp.id)).to.deep.equal([sp1.id, sp2.id, sp3.id]);
+      expect((await subject.fetchScheduledPayments(chainId, validForDays, 3)).map((sp) => sp.id)).to.deep.equal([
+        sp1.id,
+        sp2.id,
+        sp3.id,
+      ]);
     });
 
     it('respects exponential back-off rule when fetching payments for execution', async function () {
@@ -231,43 +243,43 @@ describe('fetching scheduled payments that are due', function () {
       await createScheduledPaymentAttempt(sp1, yesterday, addMinutes(yesterday, 1), 'failed');
 
       // First attempt has failed so we do not retry yet after required time has passed
-      expect((await subject.fetchScheduledPayments()).map((sp) => sp.id)).to.deep.equal([]);
+      expect((await subject.fetchScheduledPayments(chainId, validForDays)).map((sp) => sp.id)).to.deep.equal([]);
 
       // After 5 minutes the payment is available for retry
       clock.utcNow = () => addMinutes(yesterday, 5);
-      expect((await subject.fetchScheduledPayments()).map((sp) => sp.id)).to.deep.equal([sp1.id]);
+      expect((await subject.fetchScheduledPayments(chainId, validForDays)).map((sp) => sp.id)).to.deep.equal([sp1.id]);
       // It fails again
       await createScheduledPaymentAttempt(sp1, yesterday, addMinutes(yesterday, 5), 'failed');
 
       // Then it's not available for retry until required time has passed
-      expect((await subject.fetchScheduledPayments()).map((sp) => sp.id)).to.deep.equal([]);
+      expect((await subject.fetchScheduledPayments(chainId, validForDays)).map((sp) => sp.id)).to.deep.equal([]);
 
       // After 60 minutes the payment is available for retry
       clock.utcNow = () => addMinutes(yesterday, 60);
-      expect((await subject.fetchScheduledPayments()).map((sp) => sp.id)).to.deep.equal([sp1.id]);
+      expect((await subject.fetchScheduledPayments(chainId, validForDays)).map((sp) => sp.id)).to.deep.equal([sp1.id]);
       // It fails again
       await createScheduledPaymentAttempt(sp1, yesterday, addMinutes(yesterday, 60), 'failed');
 
       // Then it's not available for retry until required time has passed
-      expect((await subject.fetchScheduledPayments()).map((sp) => sp.id)).to.deep.equal([]);
+      expect((await subject.fetchScheduledPayments(chainId, validForDays)).map((sp) => sp.id)).to.deep.equal([]);
 
       // After 300 minutes the payment is available for retry
       clock.utcNow = () => addMinutes(yesterday, 360);
-      expect((await subject.fetchScheduledPayments()).map((sp) => sp.id)).to.deep.equal([sp1.id]);
+      expect((await subject.fetchScheduledPayments(chainId, validForDays)).map((sp) => sp.id)).to.deep.equal([sp1.id]);
       // It fails again
       await createScheduledPaymentAttempt(sp1, yesterday, addMinutes(yesterday, 360), 'failed');
 
       // Then it's not available for retry until required time has passed
-      expect((await subject.fetchScheduledPayments()).map((sp) => sp.id)).to.deep.equal([]);
+      expect((await subject.fetchScheduledPayments(chainId, validForDays)).map((sp) => sp.id)).to.deep.equal([]);
 
       // After 720 minutes (12 hours) the payment is available for retry
       clock.utcNow = () => addMinutes(yesterday, 720);
-      expect((await subject.fetchScheduledPayments()).map((sp) => sp.id)).to.deep.equal([sp1.id]);
+      expect((await subject.fetchScheduledPayments(chainId, validForDays)).map((sp) => sp.id)).to.deep.equal([sp1.id]);
       // It succeeds
       await createScheduledPaymentAttempt(sp1, yesterday, addMinutes(yesterday, 720), 'succeeded');
 
       // Then it's not available anymore because it succeeded
-      expect((await subject.fetchScheduledPayments()).map((sp) => sp.id)).to.deep.equal([]);
+      expect((await subject.fetchScheduledPayments(chainId, validForDays)).map((sp) => sp.id)).to.deep.equal([]);
 
       clock.utcNow = utcNow; // Restore clock
     });
@@ -282,7 +294,7 @@ describe('fetching scheduled payments that are due', function () {
         canceledAt: now,
       });
 
-      expect(await subject.fetchScheduledPayments()).to.be.empty;
+      expect(await subject.fetchScheduledPayments(chainId, validForDays)).to.be.empty;
     });
 
     it('does not fetch scheduled payments that have a blank creationBlockNumber', async function () {
@@ -293,15 +305,18 @@ describe('fetching scheduled payments that are due', function () {
         creationBlockNumber: null,
       });
 
-      expect(await subject.fetchScheduledPayments()).to.be.empty;
+      expect(await subject.fetchScheduledPayments(chainId, validForDays)).to.be.empty;
     });
 
     it('does not fetch payments that were attempted for maximum amount of times', async function () {
       let sp1 = await createScheduledPayment({ payAt: subDays(now, 3) });
       let sp2 = await createScheduledPayment({ payAt: subDays(now, 3) });
-      expect((await subject.fetchScheduledPayments()).map((sp) => sp.id)).to.deep.equal([sp1.id, sp2.id]);
+      expect((await subject.fetchScheduledPayments(chainId, validForDays)).map((sp) => sp.id)).to.deep.equal([
+        sp1.id,
+        sp2.id,
+      ]);
 
-      for await (let i of Array(subject.calculateRetryBackoffsInMinutes().length).keys()) {
+      for await (let i of Array(subject.calculateRetryBackoffsInMinutes(validForDays).length).keys()) {
         await createScheduledPaymentAttempt(
           sp1,
           addMinutes(subDays(now, 3), i),
@@ -311,12 +326,13 @@ describe('fetching scheduled payments that are due', function () {
       }
 
       // sp1 had reached max attempts, so we don't expect it to be fetched again
-      expect((await subject.fetchScheduledPayments()).map((sp) => sp.id)).to.deep.equal([sp2.id]);
+      expect((await subject.fetchScheduledPayments(chainId, validForDays)).map((sp) => sp.id)).to.deep.equal([sp2.id]);
     });
 
     it('calculates exponential backoff values correctly', async function () {
-      // validForDays is hardcoded to 3 days
-      expect(subject.calculateRetryBackoffsInMinutes()).to.deep.equal([0, 5, 60, 360, 720, 720, 720, 720, 720]);
+      expect(subject.calculateRetryBackoffsInMinutes(validForDays)).to.deep.equal([
+        0, 5, 60, 360, 720, 720, 720, 720, 720,
+      ]);
     });
   });
 });

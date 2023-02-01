@@ -3,6 +3,7 @@
 import GnosisSafeABI from '../contracts/abi/gnosis-safe';
 import MetaGuardABI from '../contracts/abi/modules/meta-guard';
 import ScheduledPaymentABI from '../contracts/abi/modules/scheduled-payment-module';
+import ScheduledPaymentConfigABI from '../contracts/abi/modules/scheduled-payment-config';
 import { getAddress } from '../contracts/addresses';
 import { isAddress } from 'web3-utils';
 import {
@@ -1371,5 +1372,11 @@ export default class ScheduledPaymentModule {
       gasRangeInWei,
       gasRangeInUSD,
     };
+  }
+
+  async getValidForDays(): Promise<number> {
+    let configModuleAddress = await getAddress('scheduledPaymentConfig', this.ethersProvider);
+    const scheduledPaymentConfig = new Contract(configModuleAddress, ScheduledPaymentConfigABI, this.ethersProvider);
+    return await scheduledPaymentConfig.validForDays();
   }
 }
