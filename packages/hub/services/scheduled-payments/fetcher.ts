@@ -103,10 +103,13 @@ export default class ScheduledPaymentsFetcherService {
   }
 
   calculateRetryBackoffsInMinutes() {
-    let fixedPart = [0, 5, 60, 360]; // Retry immediately, then after 5 minutes, 1 hour, 6 hours
+    const ONE_HOUR = 60;
+    const SIX_HOURS = 360;
+    const TWELVE_HOURS = 720;
+    let fixedPart = [0, 5, ONE_HOUR, SIX_HOURS]; // Retry immediately, then after 5 minutes, 1 hour, 6 hours
     let fixedPartSum = fixedPart.reduce((a, b) => a + b, 0);
-    let variablePartChunksCount = Math.floor((this.validForDays * 24 * 60 - fixedPartSum) / 720);
-    let variablePart = Array(variablePartChunksCount).fill(720); // Then every 12 hours until we reach the end of validForDays
+    let variablePartChunksCount = Math.floor((this.validForDays * 24 * ONE_HOUR - fixedPartSum) / TWELVE_HOURS);
+    let variablePart = Array(variablePartChunksCount).fill(TWELVE_HOURS); // Then every 12 hours until we reach the end of validForDays
     return [...fixedPart, ...variablePart];
   }
 }
