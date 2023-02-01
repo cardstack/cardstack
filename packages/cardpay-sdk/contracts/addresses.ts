@@ -131,7 +131,7 @@ const MAINNET = {
   gnosisProxyFactory_v1_3: '0xa6B71E26C5e0845f74c812102Ca7114b6a896AB2',
   scheduledPaymentConfig: '0xc0dd52489b04A01b9F4028849dABB46e1E54afDc',
   scheduledPaymentExchange: '0xc726F652e818abA01c6bFE8edBE4ccE0021337BF',
-  scheduledPaymentModule: '0x024EA6929d03995D16c12B7C33b94CE88E43a6Da',
+  scheduledPaymentModule: '0x4D14d82Bc37199B289db5B0bd185cB5b79893cDB',
   multiSend: '0xA238CBeb142c10Ef7Ad8442C6D1f9E89e07e7761',
   multiSendCallOnly: '0x40A2aCCbd92BCA938b02010E17A5b8929b49130D',
   moduleProxyFactory: '0x00000000000DC7F163742Eb4aBEf650037b1f588',
