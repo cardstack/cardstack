@@ -106,6 +106,7 @@ export default class SchedulePaymentSDKService extends Service {
     const gasEstimationResult = await scheduledPaymentModule.estimateGas(
       scenario,
       {
+        safeAddress: this.safes.currentSafe?.address,
         hubUrl: config.hubUrl,
       }
     );

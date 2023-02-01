@@ -4,12 +4,12 @@ import { nowUtc } from '../utils/dates';
 import config from 'config';
 import { Wallet } from 'ethers';
 import { GasEstimationResultsScenarioEnum } from '@prisma/client';
-import { convertChainIdToName, getAddress, supportedChains } from '@cardstack/cardpay-sdk';
-import { NotFound } from '@cardstack/core/src/utils/errors';
+import { getAddress } from '@cardstack/cardpay-sdk';
 
 export interface GasEstimationParams {
   scenario: GasEstimationResultsScenarioEnum;
   chainId: number;
+  safeAddress?: string;
 }
 
 export default class GasEstimationService {
@@ -67,23 +67,28 @@ export default class GasEstimationService {
   }
 
   private async estimatePaymentExecution(params: GasEstimationParams) {
+    if (!params.safeAddress) {
+      throw Error(`safeAddress is required in ${params.scenario}`);
+    }
+
+    let spModuleAddress = await this.getSpModuleAddress(params.chainId, params.safeAddress);
     let provider = this.ethersProvider.getInstance(params.chainId);
     let signer = new Wallet(config.get('hubPrivateKey'));
     let scheduledPaymentModule = await this.cardpay.getSDK('ScheduledPaymentModule', provider, signer);
 
-  // Payment execution can support multiple transfer and gas tokens, but for estimating the 
-  // execution we can simply use the USDC token. This is because this token contract allows 
-  // zero amounts for transfer, which is usually not the case for other token implementations.
-  // Because of this feature, we don't have to deposit any USDC to the safe if we
-  // set the transaction amounts to 0. If we used some other transfer/gas token for estimation,
-  // then we would have to deposit an adequate amount of tokens to the safe in order for 
-  // the estimation process to work.
+    // Payment execution can support multiple transfer and gas tokens, but for estimating the
+    // execution we can simply use the USDC token. This is because this token contract allows
+    // zero amounts for transfer, which is usually not the case for other token implementations.
+    // Because of this feature, we don't have to deposit any USDC to the safe if we
+    // set the transaction amounts to 0. If we used some other transfer/gas token for estimation,
+    // then we would have to deposit an adequate amount of tokens to the safe in order for
+    // the estimation process to work.
     let gas;
     let usdTokenAddress = await getAddress('usdStableCoinToken', provider);
     switch (params.scenario) {
       case GasEstimationResultsScenarioEnum.execute_one_time_payment:
         gas = await scheduledPaymentModule.estimateExecutionGas(
-          this.getHubSPModuleAddress(params.chainId),
+          spModuleAddress,
           usdTokenAddress,
           '0',
           signer.address,
@@ -98,7 +103,7 @@ export default class GasEstimationService {
         break;
       case GasEstimationResultsScenarioEnum.execute_recurring_payment:
         gas = await scheduledPaymentModule.estimateExecutionGas(
-          this.getHubSPModuleAddress(params.chainId),
+          spModuleAddress,
           usdTokenAddress,
           '0',
           signer.address,
@@ -122,15 +127,12 @@ export default class GasEstimationService {
     return gas + 25500 + 30000;
   }
 
-  private getHubSPModuleAddress(chainId: number) {
-    const networkName = convertChainIdToName(chainId);
-    const hubSPModuleAddresses: { ethereum: string; gnosis: string; polygon: string } =
-      config.get('hubSPModuleAddress');
-    if (supportedChains.ethereum.includes(networkName)) return hubSPModuleAddresses.ethereum;
-    if (supportedChains.gnosis.includes(networkName)) return hubSPModuleAddresses.gnosis;
-    if (supportedChains.polygon.includes(networkName)) return hubSPModuleAddresses.polygon;
-
-    throw new NotFound(`Cannot get Hub SP module address, unsupported network: ${chainId}`);
+  private async getSpModuleAddress(chainId: number, safeAddress: string): Promise<string> {
+    let spModuleAddress = await this.cardpay.getSpModuleAddressBySafeAddress(chainId, safeAddress);
+    if (!spModuleAddress) {
+      throw Error(`cannot find SP module in this safe`);
+    }
+    return spModuleAddress;
   }
 }
 

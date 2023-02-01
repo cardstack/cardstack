@@ -5,7 +5,7 @@ import { Arguments, CommandModule } from 'yargs';
 import { fromWei } from 'web3-utils';
 
 export default {
-  command: 'estimate-gas <scenario>',
+  command: 'estimate-gas <scenario> <safeAddress>',
   describe: `Gas estimates for various scenarios in scheduled payments. This command allows you to estimate gas without sufficient transfer of tokens and gas tokens.`,
   builder(yargs: Argv) {
     return yargs
@@ -13,12 +13,17 @@ export default {
         type: 'string',
         description: `Gas estimation scenario, values = ${GAS_ESTIMATION_SCENARIOS}`,
       })
+      .positional('safeAddress', {
+        type: 'string',
+        description: 'The address of safe with SP module enabled',
+      })
       .option('network', NETWORK_OPTION_ANY);
   },
   async handler(args: Arguments) {
-    let { network, scenario } = args as unknown as {
+    let { network, scenario, safeAddress } = args as unknown as {
       network: string;
       scenario: string;
+      safeAddress: string | null;
     };
 
     let { ethersProvider, signer } = await getEthereumClients(network, getConnectionType(args));
@@ -26,7 +31,9 @@ export default {
 
     console.log(`Estimate gas for ${scenario} scenario ...`);
 
-    let result = await scheduledPaymentModule.estimateGas(scenario as typeof GAS_ESTIMATION_SCENARIOS[number], {});
+    let result = await scheduledPaymentModule.estimateGas(scenario as typeof GAS_ESTIMATION_SCENARIOS[number], {
+      safeAddress,
+    });
 
     console.log(`Required gas: ${result.gas}`);
     console.log(`Required gas in ETH (slow): ${fromWei(result.gasRangeInWei.slow.toString(), 'ether')}`);

@@ -14,6 +14,8 @@ const safesQuery = `
   }
 `;
 
+const spModuleAddressBySafeAddressQuery = 'query($safe: ID!) {safe(id: $safe) {id spModule}}';
+
 interface Safe {
   address: string;
   spModuleAddress: string;
@@ -29,4 +31,15 @@ export async function getSafesWithSpModuleEnabled(chainId: number, accountAddres
     let safe = safeData.safe;
     return { address: safe.id, spModuleAddress: safe.spModule };
   });
+}
+
+export async function getSpModuleAddressBySafeAddress(
+  chainId: number,
+  safeAddress: string
+): Promise<string | undefined> {
+  let networkName = convertChainIdToName(chainId);
+  let result = await query(networkName, spModuleAddressBySafeAddressQuery, { safe: safeAddress });
+
+  if (!result.data.safe) return undefined;
+  return result.data.safe.spModule;
 }

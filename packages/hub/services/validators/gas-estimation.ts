@@ -1,10 +1,12 @@
 import { GasEstimationResultsScenarioEnum } from '@prisma/client';
 import { startCase } from 'lodash';
+import Web3 from 'web3';
 import { inject } from '@cardstack/di';
 import { GasEstimationParams } from '../gas-estimation';
 import { isSupportedChain } from '@cardstack/cardpay-sdk';
+const { isAddress } = Web3.utils;
 
-type GasEstimationAttribute = 'scenario' | 'chainId';
+type GasEstimationAttribute = 'scenario' | 'chainId' | 'safeAddress';
 
 type GasEstimationErrors = Record<GasEstimationAttribute, string[]>;
 
@@ -15,6 +17,7 @@ export default class GasEstimationValidator {
     let errors: GasEstimationErrors = {
       scenario: [],
       chainId: [],
+      safeAddress: [],
     };
 
     let mandatoryAttributes: GasEstimationAttribute[] = ['scenario', 'chainId'];
@@ -36,6 +39,18 @@ export default class GasEstimationValidator {
 
     if (gasEstimationParams.chainId && !isSupportedChain(gasEstimationParams.chainId)) {
       errors.chainId.push(`chain is not supported`);
+    }
+
+    if (
+      (gasEstimationParams.scenario === GasEstimationResultsScenarioEnum.execute_one_time_payment ||
+        gasEstimationParams.scenario === GasEstimationResultsScenarioEnum.execute_recurring_payment) &&
+      !gasEstimationParams.safeAddress
+    ) {
+      errors.safeAddress.push(`safe address is required in ${gasEstimationParams.scenario} scenario`);
+    }
+
+    if (gasEstimationParams.safeAddress && !isAddress(gasEstimationParams.safeAddress)) {
+      errors.safeAddress.push(`safe address is not a valid address`);
     }
 
     return errors;

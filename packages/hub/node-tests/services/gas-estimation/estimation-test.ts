@@ -6,6 +6,7 @@ import { registry, setupHub } from '../../helpers/server';
 
 let createSafeGas = 0;
 let executionGas = 0;
+let isReturnUndefinedSpModule = false;
 
 class StubCardpaySDK {
   getSDK(sdk: string) {
@@ -34,6 +35,11 @@ class StubCardpaySDK {
       default:
         throw new Error(`unsupported mock cardpay sdk: ${sdk}`);
     }
+  }
+
+  async getSpModuleAddressBySafeAddress(_chainId: number, _safeAddress: string) {
+    if (isReturnUndefinedSpModule) return undefined;
+    return '0xC4A8d85a2cc87d3537a4c19EA175472a2C226D10';
   }
 }
 
@@ -68,6 +74,7 @@ describe('estimate gas', function () {
     let gasEstimationParams: GasEstimationParams = {
       scenario: GasEstimationResultsScenarioEnum.execute_one_time_payment,
       chainId: 5,
+      safeAddress: '0x71C7656EC7ab88b098defB751B7401B5f6d8976F',
     };
     let gasEstimationResult = await subject.estimate(gasEstimationParams);
 
@@ -81,6 +88,7 @@ describe('estimate gas', function () {
     let gasEstimationParams: GasEstimationParams = {
       scenario: GasEstimationResultsScenarioEnum.execute_recurring_payment,
       chainId: 5,
+      safeAddress: '0x71C7656EC7ab88b098defB751B7401B5f6d8976F',
     };
     let gasEstimationResult = await subject.estimate(gasEstimationParams);
 
@@ -119,7 +127,30 @@ describe('estimate gas', function () {
     let gasEstimationParams: GasEstimationParams = {
       scenario: GasEstimationResultsScenarioEnum.execute_recurring_payment,
       chainId: 3,
+      safeAddress: '0x71C7656EC7ab88b098defB751B7401B5f6d8976F',
     };
     await expect(subject.estimate(gasEstimationParams)).to.be.rejectedWith('Unsupported network: 3');
+  });
+
+  it('throws error if safe address is not exist in execution scenario', async function () {
+    let gasEstimationParams: GasEstimationParams = {
+      scenario: GasEstimationResultsScenarioEnum.execute_recurring_payment,
+      chainId: 5,
+      safeAddress: undefined,
+    };
+    await expect(subject.estimate(gasEstimationParams)).to.be.rejectedWith(
+      `safeAddress is required in ${GasEstimationResultsScenarioEnum.execute_recurring_payment}`
+    );
+  });
+
+  it('throws error if safe have not enabled sp module', async function () {
+    isReturnUndefinedSpModule = true;
+
+    let gasEstimationParams: GasEstimationParams = {
+      scenario: GasEstimationResultsScenarioEnum.execute_recurring_payment,
+      chainId: 5,
+      safeAddress: '0x71C7656EC7ab88b098defB751B7401B5f6d8976F',
+    };
+    await expect(subject.estimate(gasEstimationParams)).to.be.rejectedWith(`cannot find SP module in this safe`);
   });
 });

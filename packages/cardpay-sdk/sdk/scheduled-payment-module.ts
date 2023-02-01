@@ -1321,6 +1321,7 @@ export default class ScheduledPaymentModule {
   async estimateGas(
     scenario: GasEstimationScenario,
     options: {
+      safeAddress?: string | null;
       hubUrl?: string | null;
     }
   ): Promise<GasEstimationResult> {
@@ -1331,6 +1332,7 @@ export default class ScheduledPaymentModule {
         attributes: {
           scenario: scenario,
           'chain-id': chainId,
+          'safe-address': options.safeAddress,
         },
       },
     };
