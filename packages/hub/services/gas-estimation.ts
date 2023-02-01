@@ -71,14 +71,11 @@ export default class GasEstimationService {
     let signer = new Wallet(config.get('hubPrivateKey'));
     let scheduledPaymentModule = await this.cardpay.getSDK('ScheduledPaymentModule', provider, signer);
 
-    // Both transferAmount and gasPrice should be as small as possible
-    // (so that we don't have to keep a non-trivial balance of tokens in the crank)
-    // given their token decimal amount.
-    // For transferAmount we should consider the underflow error,
-    // since transferAmount will be calculated with fee percentage.
-    // And gasPrice is price per unit of gas, so it will be multiplied by the gas execution.
-    let transferAmount = '1000';
-    let gasPrice = '1';
+    // Estimating using transfer and gas amount are zero,
+    // so we don't need to deposit any amount to the safe owned by the crank.
+    // Using USDC token because USDC token doesn't throw any errors
+    // if transfer amount is zero.
+    // Other tokens might revert erorr if the transfer amount is zero.
     let gas;
     let usdTokenAddress = await getAddress('usdStableCoinToken', provider);
     switch (params.scenario) {
@@ -86,12 +83,12 @@ export default class GasEstimationService {
         gas = await scheduledPaymentModule.estimateExecutionGas(
           this.getHubSPModuleAddress(params.chainId),
           usdTokenAddress,
-          transferAmount.toString(),
+          '0',
           signer.address,
-          gasPrice.toString(),
+          '0',
           usdTokenAddress,
           'salt1',
-          gasPrice.toString(),
+          '0',
           Math.round(nowUtc().getTime() / 1000),
           null,
           null
@@ -101,12 +98,12 @@ export default class GasEstimationService {
         gas = await scheduledPaymentModule.estimateExecutionGas(
           this.getHubSPModuleAddress(params.chainId),
           usdTokenAddress,
-          transferAmount.toString(),
+          '0',
           signer.address,
-          gasPrice.toString(),
+          '0',
           usdTokenAddress,
           'salt1',
-          gasPrice.toString(),
+          '0',
           null,
           28,
           Math.round(addDays(nowUtc(), 30).getTime() / 1000)
@@ -116,7 +113,11 @@ export default class GasEstimationService {
         throw Error('unknown estimation scenario');
     }
 
-    return gas + 30000; // Add 30000 to make the payment gas is high enough to be executed
+    // Add 25500 to handle transfer amount and gas token is not zero.
+    // Add 30000 to make the payment gas is high enough to be executed.
+    // Other tokens have different transfer logic
+    // and will be executed through the USD conversion process.
+    return gas + 25500 + 30000;
   }
 
   private getHubSPModuleAddress(chainId: number) {
