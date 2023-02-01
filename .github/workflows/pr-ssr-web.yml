@@ -57,10 +57,10 @@ jobs:
       - uses: actions/checkout@v3
       - name: Get ssr-web files that changed
         id: ssr-web-files-that-changed
-        uses: tj-actions/changed-files@v1.1.2
+        uses: tj-actions/changed-files@v35
         with:
           files: |
-            ^packages/ssr-web
+            **/packages/ssr-web
 
   deploy-ssr-preview-staging:
     name: Deploy a ssr-web staging preview to S3

@@ -44,10 +44,10 @@ jobs:
       - uses: actions/checkout@v3
       - name: Get safe-tools-client files that changed
         id: safe-tools-client-files-that-changed
-        uses: tj-actions/changed-files@v1.1.2
+        uses: tj-actions/changed-files@v35
         with:
           files: |
-            ^packages/safe-tools-client
+            **/packages/safe-tools-client
 
   deploy-safe-tools-preview-staging:
     name: Deploy a safe-tools-client staging preview to S3
