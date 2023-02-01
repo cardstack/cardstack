@@ -73,7 +73,7 @@ describe('estimate gas', function () {
 
     expect(gasEstimationResult.scenario).to.equal(gasEstimationParams.scenario);
     expect(gasEstimationResult.chainId).to.equal(gasEstimationParams.chainId);
-    expect(gasEstimationResult.gas).to.equal(executionGas);
+    expect(gasEstimationResult.gas).to.equal(executionGas + 30000 + 25500);
   });
 
   it('estimates gas for execute scheduled recurring payment scenario', async function () {
@@ -86,7 +86,7 @@ describe('estimate gas', function () {
 
     expect(gasEstimationResult.scenario).to.equal(gasEstimationParams.scenario);
     expect(gasEstimationResult.chainId).to.equal(gasEstimationParams.chainId);
-    expect(gasEstimationResult.gas).to.equal(executionGas);
+    expect(gasEstimationResult.gas).to.equal(executionGas + 30000 + 25500);
   });
 
   it('retrieves gas from DB if gas exist in DB and still in valid TTL', async function () {
