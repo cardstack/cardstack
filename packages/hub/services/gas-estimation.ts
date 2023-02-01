@@ -71,11 +71,13 @@ export default class GasEstimationService {
     let signer = new Wallet(config.get('hubPrivateKey'));
     let scheduledPaymentModule = await this.cardpay.getSDK('ScheduledPaymentModule', provider, signer);
 
-    // Estimating using transfer and gas amount are zero,
-    // so we don't need to deposit any amount to the safe owned by the crank.
-    // Using USDC token because USDC token doesn't throw any errors
-    // if transfer amount is zero.
-    // Other tokens might revert erorr if the transfer amount is zero.
+  // Payment execution can support multiple transfer and gas tokens, but for estimating the 
+  // execution we can simply use the USDC token. This is because this token contract allows 
+  // zero amounts for transfer, which is usually not the case for other token implementations.
+  // Because of this feature, we don't have to deposit any USDC to the safe if we
+  // set the transaction amounts to 0. If we used some other transfer/gas token for estimation,
+  // then we would have to deposit an adequate amount of tokens to the safe in order for 
+  // the estimation process to work.
     let gas;
     let usdTokenAddress = await getAddress('usdStableCoinToken', provider);
     switch (params.scenario) {
