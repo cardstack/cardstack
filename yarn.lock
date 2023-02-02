@@ -7798,7 +7798,7 @@
   dependencies:
     "@types/node" "*"
 
-"@types/formidable@^1.0.31":
+"@types/formidable@^1.0.32":
   version "1.0.32"
   resolved "https://registry.yarnpkg.com/@types/formidable/-/formidable-1.0.32.tgz#d9a7eefbaa995a4486ec4e3960e9552e68b3f33c"
   integrity sha512-jOAB5+GFW+C+2xdvUcpd/CnYg2rD5xCyagJLBJU+9PB4a/DKmsAqS9yZI3j/Q9zwvM7ztPHaAIH1ijzp4cezdQ==
@@ -23151,7 +23151,7 @@ koa-body@^4.2.0:
   resolved "https://registry.yarnpkg.com/koa-body/-/koa-body-4.2.0.tgz#37229208b820761aca5822d14c5fc55cee31b26f"
   integrity sha512-wdGu7b9amk4Fnk/ytH8GuWwfs4fsB5iNkY8kZPpgQVb04QZSv85T0M8reb+cJmvLE8cjPYvBzRikD3s6qz8OoA==
   dependencies:
-    "@types/formidable" "^1.0.31"
+    "@types/formidable" "^1.0.32"
     co-body "^5.1.1"
     formidable "^1.1.1"
 
