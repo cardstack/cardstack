@@ -152,11 +152,6 @@ module.exports = {
     ethereum: 'https://api.etherscan.io/api?module=gastracker&action=gasoracle',
     polygon: 'https://gasstation-mumbai.matic.today/v2',
   },
-  hubSPModuleAddress: {
-    gnosis: '0x55e6975b2eE7e787a7D76569F0E9E5aE40b681B6',
-    ethereum: '0x55e6975b2eE7e787a7D76569F0E9E5aE40b681B6',
-    polygon: '0x55e6975b2eE7e787a7D76569F0E9E5aE40b681B6',
-  },
   rewardsIndexer: {
     enabled: false,
   },

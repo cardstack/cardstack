@@ -7,8 +7,6 @@ let result: GasEstimationResult = {
   id: '1',
   scenario: GasEstimationResultsScenarioEnum.create_safe_with_module,
   chainId: 1,
-  tokenAddress: '',
-  gasTokenAddress: '',
   gas: 0,
   createdAt: nowUtc(),
   updatedAt: nowUtc(),
@@ -30,8 +28,6 @@ describe('POST /api/gas-estimation', function () {
   it('returns gas price for create a new safe scenario', async function () {
     result.scenario = GasEstimationResultsScenarioEnum.create_safe_with_module;
     result.gas = 8000000;
-    result.tokenAddress = '';
-    result.gasTokenAddress = '';
 
     await request()
       .post('/api/gas-estimation')
@@ -40,6 +36,7 @@ describe('POST /api/gas-estimation', function () {
           attributes: {
             scenario: result.scenario,
             'chain-id': result.chainId,
+            'safe-address': '0x71C7656EC7ab88b098defB751B7401B5f6d8976F',
           },
         },
       })
@@ -54,8 +51,6 @@ describe('POST /api/gas-estimation', function () {
             scenario: result.scenario,
             'chain-id': result.chainId,
             gas: result.gas,
-            'token-address': result.tokenAddress,
-            'gas-token-address': result.gasTokenAddress,
           },
         },
       })
@@ -65,8 +60,6 @@ describe('POST /api/gas-estimation', function () {
   it('returns gas price for execute one-time payment scenario', async function () {
     result.scenario = GasEstimationResultsScenarioEnum.execute_one_time_payment;
     result.gas = 6000000;
-    result.tokenAddress = '0x8F4fdA26e5039eb0bf5dA90c3531AeB91256b56b';
-    result.gasTokenAddress = '0x8F4fdA26e5039eb0bf5dA90c3531AeB91256b56b';
 
     await request()
       .post('/api/gas-estimation')
@@ -75,8 +68,7 @@ describe('POST /api/gas-estimation', function () {
           attributes: {
             scenario: result.scenario,
             'chain-id': result.chainId,
-            'token-address': result.tokenAddress,
-            'gas-token-address': result.gasTokenAddress,
+            'safe-address': '0x71C7656EC7ab88b098defB751B7401B5f6d8976F',
           },
         },
       })
@@ -91,8 +83,6 @@ describe('POST /api/gas-estimation', function () {
             scenario: result.scenario,
             'chain-id': result.chainId,
             gas: result.gas,
-            'token-address': result.tokenAddress,
-            'gas-token-address': result.gasTokenAddress,
           },
         },
       })
@@ -102,8 +92,6 @@ describe('POST /api/gas-estimation', function () {
   it('returns gas price for execute recurring payment scenario', async function () {
     result.scenario = GasEstimationResultsScenarioEnum.execute_recurring_payment;
     result.gas = 6000000;
-    result.tokenAddress = '0x8F4fdA26e5039eb0bf5dA90c3531AeB91256b56b';
-    result.gasTokenAddress = '0x8F4fdA26e5039eb0bf5dA90c3531AeB91256b56b';
 
     await request()
       .post('/api/gas-estimation')
@@ -112,8 +100,7 @@ describe('POST /api/gas-estimation', function () {
           attributes: {
             scenario: result.scenario,
             'chain-id': result.chainId,
-            'token-address': result.tokenAddress,
-            'gas-token-address': result.gasTokenAddress,
+            'safe-address': '0x71C7656EC7ab88b098defB751B7401B5f6d8976F',
           },
         },
       })
@@ -128,8 +115,6 @@ describe('POST /api/gas-estimation', function () {
             scenario: result.scenario,
             'chain-id': result.chainId,
             gas: result.gas,
-            'token-address': result.tokenAddress,
-            'gas-token-address': result.gasTokenAddress,
           },
         },
       })
@@ -138,8 +123,6 @@ describe('POST /api/gas-estimation', function () {
 
   it('returns with errors when attrs are missing', async function () {
     result.gas = 6000000;
-    result.tokenAddress = '0x8F4fdA26e5039eb0bf5dA90c3531AeB91256b56b';
-    result.gasTokenAddress = '0x8F4fdA26e5039eb0bf5dA90c3531AeB91256b56b';
 
     await request()
       .post('/api/gas-estimation')
@@ -148,8 +131,6 @@ describe('POST /api/gas-estimation', function () {
           attributes: {
             scenario: undefined,
             'chain-id': undefined,
-            'token-address': result.tokenAddress,
-            'gas-token-address': result.gasTokenAddress,
           },
         },
       })
@@ -170,6 +151,63 @@ describe('POST /api/gas-estimation', function () {
             detail: 'chain id is required',
             source: {
               pointer: '/data/attributes/chain-id',
+            },
+            status: '422',
+            title: 'Invalid attribute',
+          },
+        ],
+      });
+  });
+
+  it('returns with errors when safe address are missing in execution scenario', async function () {
+    await request()
+      .post('/api/gas-estimation')
+      .send({
+        data: {
+          attributes: {
+            scenario: GasEstimationResultsScenarioEnum.execute_recurring_payment,
+            'chain-id': result.chainId,
+          },
+        },
+      })
+      .set('Accept', 'application/vnd.api+json')
+      .set('Content-Type', 'application/vnd.api+json')
+      .expect(422)
+      .expect({
+        errors: [
+          {
+            detail: `safe address is required in ${GasEstimationResultsScenarioEnum.execute_recurring_payment} scenario`,
+            source: {
+              pointer: '/data/attributes/safe-address',
+            },
+            status: '422',
+            title: 'Invalid attribute',
+          },
+        ],
+      });
+  });
+
+  it('returns with errors when safe address is invalid in execution scenario', async function () {
+    await request()
+      .post('/api/gas-estimation')
+      .send({
+        data: {
+          attributes: {
+            scenario: GasEstimationResultsScenarioEnum.execute_recurring_payment,
+            'chain-id': result.chainId,
+            'safe-address': 'wrong address',
+          },
+        },
+      })
+      .set('Accept', 'application/vnd.api+json')
+      .set('Content-Type', 'application/vnd.api+json')
+      .expect(422)
+      .expect({
+        errors: [
+          {
+            detail: `safe address is not a valid address`,
+            source: {
+              pointer: '/data/attributes/safe-address',
             },
             status: '422',
             title: 'Invalid attribute',

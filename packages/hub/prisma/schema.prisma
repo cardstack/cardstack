@@ -353,16 +353,14 @@ model GasPrice {
 }
 
 model GasEstimationResult {
-  id              String                           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  chainId         Int                              @map("chain_id")
-  scenario        GasEstimationResultsScenarioEnum
-  tokenAddress    String                           @default("") @map("token_address")
-  gasTokenAddress String                           @default("") @map("gas_token_address")
-  gas             Int
-  createdAt       DateTime                         @default(now()) @map("created_at") @db.Timestamp(6)
-  updatedAt       DateTime                         @default(now()) @map("updated_at") @db.Timestamp(6)
+  id        String                           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  chainId   Int                              @map("chain_id")
+  scenario  GasEstimationResultsScenarioEnum
+  gas       Int
+  createdAt DateTime                         @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt DateTime                         @default(now()) @map("updated_at") @db.Timestamp(6)
 
-  @@unique([chainId, scenario, tokenAddress, gasTokenAddress], map: "gas_estimation_results_unique_chain_and_scenario")
+  @@unique([chainId, scenario], map: "gas_estimation_results_unique_chain_and_scenario")
   @@map("gas_estimation_results")
 }
 

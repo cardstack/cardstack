@@ -15,7 +15,7 @@ describe('GET /api/config', function () {
           attributes: {
             web3: {
               ethereum: {
-                rpcNodeHttpsUrl: 'https://ethereum.test/abc123/',
+                rpcNodeHttpsUrl: 'https://goerli.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161',
                 rpcNodeWssUrl: 'wss://ethereum.test/abc123/',
               },
               gnosis: {

@@ -15,8 +15,6 @@ export default class GasEstimationResultSerializer {
           attributes: {
             scenario: model.scenario,
             'chain-id': model.chainId,
-            'token-address': model.tokenAddress,
-            'gas-token-address': model.gasTokenAddress,
             gas: model.gas,
           },
         },

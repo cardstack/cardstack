@@ -18,12 +18,11 @@ describe('GasEstimationValidator', function () {
     expect(errors).deep.equal({
       scenario: ['scenario is required'],
       chainId: ['chain id is required'],
-      tokenAddress: [],
-      gasTokenAddress: [],
+      safeAddress: [],
     });
   });
 
-  it('validates gas estimation with missing attrs for execution scenario', async function () {
+  it('validates gas estimation with missing attr for execution scenario', async function () {
     const gasEstimationParams: Partial<GasEstimationParams> = {
       scenario: GasEstimationResultsScenarioEnum.execute_one_time_payment,
       chainId: 1,
@@ -33,8 +32,9 @@ describe('GasEstimationValidator', function () {
     expect(errors).deep.equal({
       scenario: [],
       chainId: [],
-      tokenAddress: ['token address is required in this scenario'],
-      gasTokenAddress: ['gas token address is required in this scenario'],
+      safeAddress: [
+        `safe address is required in ${GasEstimationResultsScenarioEnum.execute_one_time_payment} scenario`,
+      ],
     });
   });
 
@@ -42,16 +42,14 @@ describe('GasEstimationValidator', function () {
     const gasEstimationParams: Partial<GasEstimationParams> = {
       scenario: GasEstimationResultsScenarioEnum.execute_one_time_payment,
       chainId: 1,
-      tokenAddress: 'wrong address',
-      gasTokenAddress: 'wrong address',
+      safeAddress: 'wrong address',
     };
 
     let errors = await subject.validate(gasEstimationParams);
     expect(errors).deep.equal({
       scenario: [],
       chainId: [],
-      tokenAddress: ['token address is not a valid address'],
-      gasTokenAddress: ['gas token address is not a valid address'],
+      safeAddress: [`safe address is not a valid address`],
     });
   });
 });

@@ -51,7 +51,7 @@ fNnC/5IGBxBkFQIgGC1mdtwPDSBMQY0XpAzPw6dXE8z0LaoV5qXeB8LV8CECIGmi
   },
   web3: {
     ethereum: {
-      rpcNodeHttpsUrl: 'https://ethereum.test/abc123/',
+      rpcNodeHttpsUrl: 'https://goerli.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161',
       rpcNodeWssUrl: 'wss://ethereum.test/abc123/',
     },
     gnosis: {

@@ -4,15 +4,12 @@ import { nowUtc } from '../utils/dates';
 import config from 'config';
 import { Wallet } from 'ethers';
 import { GasEstimationResultsScenarioEnum } from '@prisma/client';
-import { convertChainIdToName } from '@cardstack/cardpay-sdk';
-import { supportedChains } from '@cardstack/cardpay-sdk';
-import { NotFound } from '@cardstack/core/src/utils/errors';
+import { getAddress } from '@cardstack/cardpay-sdk';
 
 export interface GasEstimationParams {
   scenario: GasEstimationResultsScenarioEnum;
   chainId: number;
-  tokenAddress?: string;
-  gasTokenAddress?: string;
+  safeAddress?: string;
 }
 
 export default class GasEstimationService {
@@ -27,8 +24,6 @@ export default class GasEstimationService {
       where: {
         chainId: params.chainId,
         scenario: params.scenario,
-        tokenAddress: params.tokenAddress,
-        gasTokenAddress: params.gasTokenAddress,
       },
     });
 
@@ -53,18 +48,14 @@ export default class GasEstimationService {
 
     gasLimit = await prisma.gasEstimationResult.upsert({
       where: {
-        chainId_scenario_tokenAddress_gasTokenAddress: {
+        chainId_scenario: {
           chainId: params.chainId,
           scenario: params.scenario,
-          tokenAddress: params.tokenAddress ?? '',
-          gasTokenAddress: params.gasTokenAddress ?? '',
         },
       },
       create: {
         chainId: params.chainId,
         scenario: params.scenario,
-        tokenAddress: params.tokenAddress,
-        gasTokenAddress: params.gasTokenAddress,
         gas: gas,
       },
       update: {
@@ -76,62 +67,50 @@ export default class GasEstimationService {
   }
 
   private async estimatePaymentExecution(params: GasEstimationParams) {
-    if (
-      !params.tokenAddress ||
-      params.tokenAddress === '' ||
-      !params.gasTokenAddress ||
-      params.gasTokenAddress === ''
-    ) {
-      throw Error(`tokenAddress and gasTokenAddress is required in ${params.scenario}`);
+    if (!params.safeAddress) {
+      throw Error(`safeAddress is required in ${params.scenario}`);
     }
 
+    let spModuleAddress = await this.getSpModuleAddress(params.chainId, params.safeAddress);
     let provider = this.ethersProvider.getInstance(params.chainId);
     let signer = new Wallet(config.get('hubPrivateKey'));
     let scheduledPaymentModule = await this.cardpay.getSDK('ScheduledPaymentModule', provider, signer);
 
-    // Both transferAmount and gasPrice should be as small as possible
-    // (so that we don't have to keep a non-trivial balance of tokens in the crank)
-    // given their token decimal amount.
-    // For transferAmount we should consider the underflow error,
-    // since transferAmount will be calculated with fee percentage.
-    // And gasPrice is price per unit of gas, so it will be multiplied by the gas execution.
-    let transferAmount = '1000';
-    let gasPrice = '100';
+    // Payment execution can support multiple transfer and gas tokens, but for estimating the
+    // execution we can simply use the USDC token. This is because this token contract allows
+    // zero amounts for transfer, which is usually not the case for other token implementations.
+    // Because of this feature, we don't have to deposit any USDC to the safe if we
+    // set the transaction amounts to 0. If we used some other transfer/gas token for estimation,
+    // then we would have to deposit an adequate amount of tokens to the safe in order for
+    // the estimation process to work.
     let gas;
+    let usdTokenAddress = await getAddress('usdStableCoinToken', provider);
     switch (params.scenario) {
       case GasEstimationResultsScenarioEnum.execute_one_time_payment:
         gas = await scheduledPaymentModule.estimateExecutionGas(
-          this.getHubSPModuleAddress(params.chainId),
-          params.tokenAddress,
-          transferAmount.toString(),
+          spModuleAddress,
+          usdTokenAddress,
+          '0',
           signer.address,
-          gasPrice.toString(),
-          params.gasTokenAddress,
+          '0',
+          usdTokenAddress,
           'salt1',
-          gasPrice.toString(),
+          '0',
           Math.round(nowUtc().getTime() / 1000),
           null,
           null
         );
         break;
       case GasEstimationResultsScenarioEnum.execute_recurring_payment:
-        if (
-          !params.tokenAddress ||
-          params.tokenAddress === '' ||
-          !params.gasTokenAddress ||
-          params.gasTokenAddress === ''
-        ) {
-          throw Error(`tokenAddress and gasTokenAddress is required in ${params.scenario}`);
-        }
         gas = await scheduledPaymentModule.estimateExecutionGas(
-          this.getHubSPModuleAddress(params.chainId),
-          params.tokenAddress,
-          transferAmount.toString(),
+          spModuleAddress,
+          usdTokenAddress,
+          '0',
           signer.address,
-          gasPrice.toString(),
-          params.gasTokenAddress,
+          '0',
+          usdTokenAddress,
           'salt1',
-          gasPrice.toString(),
+          '0',
           null,
           28,
           Math.round(addDays(nowUtc(), 30).getTime() / 1000)
@@ -141,18 +120,19 @@ export default class GasEstimationService {
         throw Error('unknown estimation scenario');
     }
 
-    return gas;
+    // Add 25500 to handle transfer amount and gas token is not zero.
+    // Add 30000 to make the payment gas is high enough to be executed.
+    // Other tokens have different transfer logic
+    // and will be executed through the USD conversion process.
+    return gas + 25500 + 30000;
   }
 
-  private getHubSPModuleAddress(chainId: number) {
-    const networkName = convertChainIdToName(chainId);
-    const hubSPModuleAddresses: { ethereum: string; gnosis: string; polygon: string } =
-      config.get('hubSPModuleAddress');
-    if (supportedChains.ethereum.includes(networkName)) return hubSPModuleAddresses.ethereum;
-    if (supportedChains.gnosis.includes(networkName)) return hubSPModuleAddresses.gnosis;
-    if (supportedChains.polygon.includes(networkName)) return hubSPModuleAddresses.polygon;
-
-    throw new NotFound(`Cannot get Hub SP module address, unsupported network: ${chainId}`);
+  private async getSpModuleAddress(chainId: number, safeAddress: string): Promise<string> {
+    let spModuleAddress = await this.cardpay.getSpModuleAddressBySafeAddress(chainId, safeAddress);
+    if (!spModuleAddress) {
+      throw Error(`cannot find SP module in this safe`);
+    }
+    return spModuleAddress;
   }
 }
 
