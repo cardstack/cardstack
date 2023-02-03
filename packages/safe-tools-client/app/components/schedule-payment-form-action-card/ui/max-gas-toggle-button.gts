@@ -4,6 +4,7 @@ import tokenToUsd from '@cardstack/safe-tools-client/helpers/token-to-usd';
 import { ButtonYieldedByToggleButtonGroup } from '@cardstack/boxel/components/boxel/toggle-button-group';
 import { titleize } from '@cardstack/safe-tools-client/utils/titleize';
 import TokenQuantity from '@cardstack/safe-tools-client/utils/token-quantity';
+import { MaxGasFeeOption } from '@cardstack/safe-tools-client/components/schedule-payment-form-action-card/validator';
 
 interface Signature {
   Element: HTMLButtonElement;
@@ -17,10 +18,7 @@ interface Signature {
 export default class MaxGasToggleButton extends Component<Signature> {
   get tokenQuantity(): TokenQuantity | undefined {
     let value = this.args.maxGasDescriptions?.value;
-    if (this.args.name === 'normal') return value?.normal;
-    else if (this.args.name === 'high') return value?.high;
-    else if (this.args.name === 'max') return value?.max;
-    else return undefined;
+    return value?.[this.args.name as MaxGasFeeOption];
   }
 
   <template>
