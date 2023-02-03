@@ -503,6 +503,29 @@ module(
           .containsText('0.015 WETH');
         assert.dom('[data-test-summary-variable-fee]').containsText('$ 0.01');
       });
+
+      test('max gas cost ranges should have different values', async function (assert) {
+        await render(hbs`
+          <SchedulePaymentFormActionCard />
+        `);
+        await fillInSchedulePaymentFormWithValidInfo({
+          paymentTokenName: 'WETH',
+        });
+        await waitUntil(() => {
+          return !find(
+            '[data-test-max-gas-toggle] [data-toggle-group-option="normal"]'
+          )?.textContent?.includes('Loading gas price');
+        });
+        assert
+          .dom('[data-test-max-gas-toggle] [data-toggle-group-option="normal"]')
+          .containsText('20.0 USDC');
+        assert
+          .dom('[data-test-max-gas-toggle] [data-toggle-group-option="high"]')
+          .containsText('40.0 USDC');
+        assert
+          .dom('[data-test-max-gas-toggle] [data-toggle-group-option="max"]')
+          .containsText('80.0 USDC');
+      });
     });
 
     module('when the wallet is not connected', function (hooks) {
