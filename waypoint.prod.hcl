@@ -6,14 +6,6 @@ project = "cardstack"
 app "hub" {
   path = "./packages/hub"
 
-  config {
-    env = {
-      ENVIRONMENT        = "staging"
-      HUB_ENVIRONMENT    = "staging"
-      HUB_AWS_ACCOUNT_ID = "120317779495"
-    }
-  }
-
   build {
     use "docker" {
       dockerfile = "Dockerfile"
@@ -47,6 +39,12 @@ app "hub" {
       alb {
         certificate = "arn:aws:acm:us-east-1:120317779495:certificate/20f287dd-ba3c-4175-8b06-5c3b1e75f6d9"
         subnets     = ["subnet-01d36d7bcd0334fc0", "subnet-0c22641bd41cbdd1e"]
+      }
+
+      static_environment = {
+        ENVIRONMENT        = "production"
+        HUB_ENVIRONMENT    = "production"
+        HUB_AWS_ACCOUNT_ID = "120317779495"
       }
 
       secrets = {
@@ -115,14 +113,6 @@ app "hub" {
 app "hub-worker" {
   path = "./packages/hub"
 
-  config {
-    env = {
-      ENVIRONMENT        = "staging"
-      HUB_ENVIRONMENT    = "staging"
-      HUB_AWS_ACCOUNT_ID = "120317779495"
-    }
-  }
-
   build {
     use "docker" {
       dockerfile = "Dockerfile"
@@ -152,6 +142,12 @@ app "hub-worker" {
       execution_role_name = "hub-worker-ecs-task-execution"
       security_group_ids  = ["sg-03ae615bbcfa87393"]
       disable_alb         = true
+
+      static_environment = {
+        ENVIRONMENT        = "production"
+        HUB_ENVIRONMENT    = "production"
+        HUB_AWS_ACCOUNT_ID = "120317779495"
+      }
 
       secrets = {
         # parameter store
@@ -213,14 +209,6 @@ app "hub-worker" {
 app "hub-bot" {
   path = "./packages/hub"
 
-  config {
-    env = {
-      ENVIRONMENT        = "staging"
-      HUB_ENVIRONMENT    = "staging"
-      HUB_AWS_ACCOUNT_ID = "120317779495"
-    }
-  }
-
   build {
     use "docker" {
       dockerfile = "Dockerfile"
@@ -250,6 +238,12 @@ app "hub-bot" {
       execution_role_name = "hub-bot-ecs-task-execution"
       security_group_ids  = ["sg-003ba9cd5594cbcc2"]
       disable_alb         = true
+
+      static_environment = {
+        ENVIRONMENT        = "production"
+        HUB_ENVIRONMENT    = "production"
+        HUB_AWS_ACCOUNT_ID = "120317779495"
+      }
 
       secrets = {
         # parameter store
@@ -339,6 +333,12 @@ app "hub-event-listener" {
       security_group_ids  = ["sg-09b022c7166e01262"]
       disable_alb         = true
 
+      static_environment = {
+        ENVIRONMENT        = "production"
+        HUB_ENVIRONMENT    = "production"
+        HUB_AWS_ACCOUNT_ID = "120317779495"
+      }
+
       secrets = {
         # parameter store
         CARDBOT_TOKEN         = "arn:aws:ssm:us-east-1:120317779495:parameter/production/hub/CARDBOT_TOKEN"
@@ -402,12 +402,6 @@ app "hub-event-listener" {
 app "cardpay-subg-ext" {
   path = "./packages/cardpay-subgraph-extraction"
 
-  config {
-    env = {
-      ENVIRONMENT = "production"
-    }
-  }
-
   build {
     use "docker" {
       dockerfile = "Dockerfile"
@@ -432,6 +426,10 @@ app "cardpay-subg-ext" {
       task_role_name      = "cardpay-subg-ext-ecs-task"
       execution_role_name = "cardpay-subg-ext-ecs-task-execution"
       security_group_ids  = ["sg-08a9f0f453e7e7a43"]
+
+      static_environment = {
+        ENVIRONMENT = "production"
+      }
 
       secrets = {
         SE_DATABASE_STRING = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_subg_extract_database_url-5HyPh7"
@@ -459,13 +457,6 @@ app "cardpay-subg-ext" {
 
 app "ssr-web" {
   path = "./packages/ssr-web/deployment"
-
-  config {
-    env = {
-      ENVIRONMENT         = "staging"
-      SSR_WEB_ENVIRONMENT = "staging"
-    }
-  }
 
   build {
     use "docker" {
@@ -496,6 +487,11 @@ app "ssr-web" {
       alb {
         subnets     = ["subnet-0c22641bd41cbdd1e", "subnet-01d36d7bcd0334fc0"]
         certificate = "arn:aws:acm:us-east-1:120317779495:certificate/e1d6a1c7-456e-4058-b90b-9c603a65734d"
+      }
+
+      static_environment = {
+        ENVIRONMENT         = "production"
+        SSR_WEB_ENVIRONMENT = "production"
       }
 
       secrets = {
@@ -540,6 +536,10 @@ app "reward-submit-lambda" {
     use "aws-lambda" {
       region = "us-east-1"
     }
+
+    static_environment = {
+      ENVIRONMENT = "production"
+    }
   }
 
   url {
@@ -549,14 +549,6 @@ app "reward-submit-lambda" {
 
 app "reward-api" {
   path = "./packages/cardpay-reward-api"
-
-  config {
-    env = {
-      ENVIRONMENT    = "production"
-      REWARDS_BUCKET = "s3://cardpay-production-reward-programs"
-      SUBGRAPH_URL   = "https://graph.cardstack.com/subgraphs/name/habdelra/cardpay-xdai"
-    }
-  }
 
   build {
     use "docker" {
@@ -589,6 +581,12 @@ app "reward-api" {
         certificate = "arn:aws:acm:us-east-1:120317779495:certificate/e8ea5aa9-f28e-40ea-88a6-05ff8f47fa5e"
       }
 
+      static_environment = {
+        ENVIRONMENT    = "production"
+        REWARDS_BUCKET = "s3://cardpay-production-reward-programs"
+        SUBGRAPH_URL   = "https://graph.cardstack.com/subgraphs/name/habdelra/cardpay-xdai"
+      }
+
       secrets = {
         DB_STRING         = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_reward_api_database_url_blue-gtyUuy"
         SENTRY_DSN        = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_reward_api_sentry_dsn-Pwim3k"
@@ -614,14 +612,6 @@ app "reward-api" {
 
 app "reward-indexer" {
   path = "./packages/cardpay-reward-indexer"
-
-  config {
-    env = {
-      ENVIRONMENT    = "production"
-      REWARDS_BUCKET = "s3://cardpay-production-reward-programs"
-      SUBGRAPH_URL   = "https://graph.cardstack.com/subgraphs/name/habdelra/cardpay-xdai"
-    }
-  }
 
   build {
     use "docker" {
@@ -649,6 +639,12 @@ app "reward-indexer" {
       security_group_ids  = ["sg-05c9c059e019205ca"]
       disable_alb         = true
 
+      static_environment = {
+        ENVIRONMENT    = "production"
+        REWARDS_BUCKET = "s3://cardpay-production-reward-programs"
+        SUBGRAPH_URL   = "https://graph.cardstack.com/subgraphs/name/habdelra/cardpay-xdai"
+      }
+
       secrets = {
         DB_STRING  = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_reward_api_database_url-EIMQl7"
         SENTRY_DSN = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_reward_api_sentry_dsn-Pwim3k"
@@ -673,14 +669,6 @@ app "reward-indexer" {
 
 app "reward-indexer-blue" {
   path = "./packages/cardpay-reward-indexer"
-
-  config {
-    env = {
-      ENVIRONMENT    = "production"
-      REWARDS_BUCKET = "s3://cardpay-production-reward-programs"
-      SUBGRAPH_URL   = "https://graph.cardstack.com/subgraphs/name/habdelra/cardpay-xdai"
-    }
-  }
 
   build {
     use "docker" {
@@ -708,6 +696,12 @@ app "reward-indexer-blue" {
       security_group_ids  = ["sg-05c9c059e019205ca"]
       disable_alb         = true
 
+      static_environment = {
+        ENVIRONMENT    = "production"
+        REWARDS_BUCKET = "s3://cardpay-production-reward-programs"
+        SUBGRAPH_URL   = "https://graph.cardstack.com/subgraphs/name/habdelra/cardpay-xdai"
+      }
+
       secrets = {
         DB_STRING  = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_reward_api_database_url_blue-gtyUuy"
         SENTRY_DSN = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_reward_api_sentry_dsn-Pwim3k"
@@ -732,18 +726,6 @@ app "reward-indexer-blue" {
 
 app "reward-scheduler" {
   path = "./packages/cardpay-reward-scheduler"
-
-  config {
-    env = {
-      ENVIRONMENT                        = "production"
-      REWARDS_BUCKET                     = "s3://cardpay-production-reward-programs"
-      SUBGRAPH_URL                       = "https://graph.cardstack.com/subgraphs/name/habdelra/cardpay-xdai"
-      REWARD_SCHEDULER_APPROVED_PROGRAMS = "0x979C9F171fb6e9BC501Aa7eEd71ca8dC27cF1185"
-      REWARD_MANAGER_ADDRESS             = "0xDbAe2bC81bFa4e46df43a34403aAcde5FFdB2A9D"
-      REWARDS_SUBGRAPH_EXTRACTION        = "s3://cardpay-production-partitioned-graph-data/data/rewards/0.0.2/"
-      REWARD_SCHEDULER_UPDATE_FREQUENCY  = "600"
-    }
-  }
 
   build {
     use "docker" {
@@ -770,6 +752,16 @@ app "reward-scheduler" {
       subnets             = ["subnet-0d71c50519109f369", "subnet-03eac43ed0e35227e"]
       security_group_ids  = ["sg-0e26577768ce001a2"]
       disable_alb         = true
+
+      static_environment = {
+        ENVIRONMENT                        = "production"
+        REWARDS_BUCKET                     = "s3://cardpay-production-reward-programs"
+        SUBGRAPH_URL                       = "https://graph.cardstack.com/subgraphs/name/habdelra/cardpay-xdai"
+        REWARD_SCHEDULER_APPROVED_PROGRAMS = "0x979C9F171fb6e9BC501Aa7eEd71ca8dC27cF1185"
+        REWARD_MANAGER_ADDRESS             = "0xDbAe2bC81bFa4e46df43a34403aAcde5FFdB2A9D"
+        REWARDS_SUBGRAPH_EXTRACTION        = "s3://cardpay-production-partitioned-graph-data/data/rewards/0.0.2/"
+        REWARD_SCHEDULER_UPDATE_FREQUENCY  = "600"
+      }
 
       secrets = {
         SENTRY_DSN        = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_reward_programs_sentry_dsn-lsCwEe"
