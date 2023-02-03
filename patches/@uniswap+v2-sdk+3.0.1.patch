@@ -51,3 +51,42 @@ index f1a6331..04b3720 100644
        tokenA: tokenA,
        tokenB: tokenB
      });
+diff --git a/node_modules/@uniswap/v2-sdk/dist/v2-sdk.esm.js b/node_modules/@uniswap/v2-sdk/dist/v2-sdk.esm.js
+index 9a899ed..f7c8888 100644
+--- a/node_modules/@uniswap/v2-sdk/dist/v2-sdk.esm.js
++++ b/node_modules/@uniswap/v2-sdk/dist/v2-sdk.esm.js
+@@ -215,6 +215,7 @@ var InsufficientInputAmountError = /*#__PURE__*/function (_Error2) {
+ 
+ var computePairAddress = function computePairAddress(_ref) {
+   var factoryAddress = _ref.factoryAddress,
++      initCodeHash = _ref.initCodeHash,
+       tokenA = _ref.tokenA,
+       tokenB = _ref.tokenB;
+ 
+@@ -222,20 +223,20 @@ var computePairAddress = function computePairAddress(_ref) {
+       token0 = _ref2[0],
+       token1 = _ref2[1]; // does safety checks
+ 
+-
+-  return getCreate2Address(factoryAddress, keccak256(['bytes'], [pack(['address', 'address'], [token0.address, token1.address])]), INIT_CODE_HASH);
++  return getCreate2Address(factoryAddress, keccak256(['bytes'], [pack(['address', 'address'], [token0.address, token1.address])]), initCodeHash);
+ };
+ var Pair = /*#__PURE__*/function () {
+-  function Pair(currencyAmountA, tokenAmountB) {
++  function Pair(currencyAmountA, tokenAmountB, factoryAddress = FACTORY_ADDRESS, initCodeHash = INIT_CODE_HASH) {
+     var tokenAmounts = currencyAmountA.currency.sortsBefore(tokenAmountB.currency) // does safety checks
+     ? [currencyAmountA, tokenAmountB] : [tokenAmountB, currencyAmountA];
+-    this.liquidityToken = new Token(tokenAmounts[0].currency.chainId, Pair.getAddress(tokenAmounts[0].currency, tokenAmounts[1].currency), 18, 'UNI-V2', 'Uniswap V2');
++    this.liquidityToken = new Token(tokenAmounts[0].currency.chainId, Pair.getAddress(tokenAmounts[0].currency, tokenAmounts[1].currency, factoryAddress, initCodeHash), 18, 'UNI-V2', 'Uniswap V2');
+     this.tokenAmounts = tokenAmounts;
+   }
+ 
+-  Pair.getAddress = function getAddress(tokenA, tokenB) {
++  Pair.getAddress = function getAddress(tokenA, tokenB, factoryAddress = FACTORY_ADDRESS, initCodeHash = INIT_CODE_HASH) {
+     return computePairAddress({
+-      factoryAddress: FACTORY_ADDRESS,
++      factoryAddress,
++      initCodeHash,
+       tokenA: tokenA,
+       tokenB: tokenB
+     });
