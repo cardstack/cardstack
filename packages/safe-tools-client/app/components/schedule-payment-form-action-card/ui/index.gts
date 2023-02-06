@@ -234,6 +234,7 @@ export default class SchedulePaymentFormActionCardUI extends Component<Signature
             data-test-payee-address-input
             @value={{@payeeAddress}}
             @invalid={{this.isPayeeAddressInvalid}}
+            @helperText="Any, including EOA and safe. Use caution sending to exchange deposit addresses."
             @errorMessage={{@payeeAddressErrorMessage}}
             @disabled={{this.isFormInteractionDisabled}}
             @onInput={{@onUpdatePayeeAddress}}
