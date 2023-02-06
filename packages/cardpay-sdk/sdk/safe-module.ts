@@ -391,11 +391,11 @@ export default class SafeModule {
   async getModuleAndGuardAddressFromTxn(txnHash: string): Promise<EnableModuleAndGuardResult> {
     let receipt = await waitUntilTransactionMined(this.ethersProvider, txnHash);
     let moduleProxyCreationEvents = await getModuleProxyCreationEvent(this.ethersProvider, receipt.logs);
-    let scheduledPaymentMasterCopy = await getAddress('scheduledPaymentModule', this.ethersProvider);
+    let moduleMasterCopy = await getAddress('scheduledPaymentModule', this.ethersProvider);
     let metaGuardMasterCopy = await getAddress('metaGuard', this.ethersProvider);
-    let moduleAddress = moduleProxyCreationEvents.find(
-      (event) => event.args['masterCopy'] === scheduledPaymentMasterCopy
-    )?.args['proxy'];
+    let moduleAddress = moduleProxyCreationEvents.find((event) => event.args['masterCopy'] === moduleMasterCopy)?.args[
+      'proxy'
+    ];
     let metaGuardAddress = moduleProxyCreationEvents.find((event) => event.args['masterCopy'] === metaGuardMasterCopy)
       ?.args['proxy'];
     return {
