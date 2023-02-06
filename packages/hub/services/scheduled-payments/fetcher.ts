@@ -20,6 +20,7 @@ export default class ScheduledPaymentsFetcherService {
   // where enough time has passed since the last failed payment attempt. We allow maximum 8 failed attempts, and the time
   // between attempts is defined in the calculateRetryBackoffsInMinutes method.
 
+  // validForDays could be different for each chainId, so we pass them as parameters (defined in scheduledPaymentConfig contract)
   async fetchScheduledPayments(chainId: number, validForDays: number, limit = 10): Promise<ScheduledPayment[]> {
     let prisma = await this.prismaManager.getClient();
     let now = this.clock.utcNow();
