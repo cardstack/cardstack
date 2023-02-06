@@ -6,7 +6,7 @@ import shortUUID from 'short-uuid';
 import { nowUtc } from '../../utils/dates';
 import config from 'config';
 import { Wallet } from 'ethers';
-import { JsonRpcProvider, gasPriceInToken } from '@cardstack/cardpay-sdk';
+import { JsonRpcProvider, gasPriceInToken, getConstant, ScheduledPaymentModule } from '@cardstack/cardpay-sdk';
 import BN from 'bn.js';
 
 export default class ScheduledPaymentsExecutorService {
@@ -23,27 +23,36 @@ export default class ScheduledPaymentsExecutorService {
   }
 
   async executeScheduledPayments() {
-    let scheduledPayments = await this.scheduledPaymentFetcher.fetchScheduledPayments();
+    const schedulerNetworks: string[] = config.get('web3.schedulerNetworks');
+    for (const network of schedulerNetworks) {
+      const chainId = await getConstant('chainId', network);
+      let provider = this.ethersProvider.getInstance(chainId);
+      let signer = new Wallet(config.get('hubPrivateKey'));
+      let scheduledPaymentModule = await this.cardpay.getSDK('ScheduledPaymentModule', provider, signer);
+      const validForDays = await scheduledPaymentModule.getValidForDays();
+      let scheduledPayments = await this.scheduledPaymentFetcher.fetchScheduledPayments(chainId, validForDays);
 
-    // Currently we do one by one, but we can do in parallel when we'll have a lot of scheduled payments
-    for (let scheduledPayment of scheduledPayments) {
-      try {
-        // If this succeeds, it means that the scheduled payment transaction was submitted
-        // and the ScheduledPaymentOnChainExecutionWaiter will wait for it to be mined in the background
-        await this.executePayment(scheduledPayment);
-      } catch (e) {
-        Sentry.captureException(e);
-        console.error(e);
-        // Don't throw, continue to the next scheduled payment
+      // Currently we do one by one, but we can do in parallel when we'll have a lot of scheduled payments
+      for (let scheduledPayment of scheduledPayments) {
+        try {
+          // If this succeeds, it means that the scheduled payment transaction was submitted
+          // and the ScheduledPaymentOnChainExecutionWaiter will wait for it to be mined in the background
+          await this.executePayment(scheduledPayment, validForDays, provider, scheduledPaymentModule);
+        } catch (e) {
+          Sentry.captureException(e);
+          console.error(e);
+          // Don't throw, continue to the next scheduled payment
+        }
       }
     }
   }
 
-  async executePayment(scheduledPayment: ScheduledPayment) {
-    let provider = this.ethersProvider.getInstance(scheduledPayment.chainId);
-    let signer = new Wallet(config.get('hubPrivateKey'));
-    let scheduledPaymentModule = await this.cardpay.getSDK('ScheduledPaymentModule', provider, signer);
-
+  async executePayment(
+    scheduledPayment: ScheduledPayment,
+    validForDays: number,
+    provider: JsonRpcProvider,
+    scheduledPaymentModule: ScheduledPaymentModule
+  ) {
     let prisma = await this.prismaManager.getClient();
     let paymentAttemptInProgress = await prisma.scheduledPaymentAttempt.findFirst({
       where: { scheduledPaymentId: scheduledPayment.id, status: 'inProgress' },
@@ -63,7 +72,7 @@ export default class ScheduledPaymentsExecutorService {
       // 28 days is the max number of days in a month, and validForDays is the retry period for failed payments.
       // For more accurate validation we rely on the scheduled payment module contract, which will revert with
       // InvalidPeriod if the payment is executed at the wrong time
-      let minDaysBetweenPayments = 28 - this.scheduledPaymentFetcher.validForDays;
+      let minDaysBetweenPayments = 28 - validForDays;
       if (
         lastSuccessfulPaymentAttempt &&
         !isBefore(lastSuccessfulPaymentAttempt.startedAt!, subDays(nowUtc(), minDaysBetweenPayments))

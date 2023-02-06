@@ -10,35 +10,37 @@ import shortUuid from 'short-uuid';
 
 let sdkError: Error | null = null;
 
+const stubbedSchedulePaymentModule = {
+  executeScheduledPayment: async (
+    _moduleAddress: any,
+    _tokenAddress: any,
+    _amount: any,
+    _payeeAddress: any,
+    _feeFixedUsd: any,
+    _feePercentage: any,
+    _executionGasEstimation: any,
+    _maxGasPrice: 'any',
+    _gasTokenAddress: any,
+    _salt: any,
+    _payAt: any,
+    _gasPrice: any,
+    _recurringDayOfMonth: any,
+    _recurringUntil: any,
+    { onTxnHash }: any
+  ) => {
+    if (sdkError) {
+      throw sdkError;
+    }
+    await onTxnHash('0x123');
+    return Promise.resolve();
+  },
+};
+
 class StubCardpaySDK {
   getSDK(sdk: string) {
     switch (sdk) {
       case 'ScheduledPaymentModule':
-        return Promise.resolve({
-          executeScheduledPayment: async (
-            _moduleAddress: any,
-            _tokenAddress: any,
-            _amount: any,
-            _payeeAddress: any,
-            _feeFixedUsd: any,
-            _feePercentage: any,
-            _executionGasEstimation: any,
-            _maxGasPrice: 'any',
-            _gasTokenAddress: any,
-            _salt: any,
-            _payAt: any,
-            _gasPrice: any,
-            _recurringDayOfMonth: any,
-            _recurringUntil: any,
-            { onTxnHash }: any
-          ) => {
-            if (sdkError) {
-              throw sdkError;
-            }
-            await onTxnHash('0x123');
-            return Promise.resolve();
-          },
-        });
+        return Promise.resolve(stubbedSchedulePaymentModule);
       default:
         throw new Error(`unsupported mock cardpay sdk: ${sdk}`);
     }
@@ -93,7 +95,7 @@ describe('executing scheduled payments', function () {
       },
     });
 
-    await subject.executePayment(scheduledPayment);
+    await subject.executePayment(scheduledPayment, 3, {} as any, stubbedSchedulePaymentModule as any);
 
     let scheduledPaymentAttempts = await prisma.scheduledPaymentAttempt.findMany({
       where: {
@@ -132,7 +134,8 @@ describe('executing scheduled payments', function () {
       },
     });
 
-    await expect(subject.executePayment(scheduledPayment)).to.be.rejected;
+    await expect(subject.executePayment(scheduledPayment, 3, {} as any, stubbedSchedulePaymentModule as any)).to.be
+      .rejected;
 
     let scheduledPaymentAttempts = await prisma.scheduledPaymentAttempt.findMany({
       where: {
