@@ -10,6 +10,7 @@ import DataIntegrityChecksScheduledPayments, {
 } from '../../services/data-integrity-checks/scheduled-payments';
 import shortUuid from 'short-uuid';
 import cryptoRandomString from 'crypto-random-string';
+import { ethers } from 'ethers';
 
 describe('data integrity checks', function () {
   let prisma: ExtendedPrismaClient;
@@ -25,6 +26,8 @@ describe('data integrity checks', function () {
 
     this.beforeEach(async function () {
       service = await getContainer().lookup('data-integrity-checks-scheduled-payments');
+      service.getRelayerFunderBalance = () => Promise.resolve(ethers.utils.parseEther('1'));
+      service.getCrankBalance = () => Promise.resolve(ethers.utils.parseEther('1'));
     });
 
     it('returns a degraded check when there are scheduled payments that should have a creation transaction hash or should be mined by now', async function () {
@@ -254,6 +257,28 @@ describe('data integrity checks', function () {
         status: 'degraded',
         name: 'scheduled-payments',
         message: `scheduled payment attempts without transaction hash: ${spa.id}`,
+      });
+    });
+
+    it('returns a degraded check when relay funds are low', async function () {
+      service.getRelayerFunderBalance = () => Promise.resolve(ethers.utils.parseEther('0.05'));
+
+      let result = await service.check();
+      expect(result).to.deep.equal({
+        status: 'degraded',
+        name: 'scheduled-payments',
+        message: `Relayer balance low on goerli: 0.05 ETH`,
+      });
+    });
+
+    it('returns a degraded check when crank funds are low', async function () {
+      service.getCrankBalance = () => Promise.resolve(ethers.utils.parseEther('0.05'));
+
+      let result = await service.check();
+      expect(result).to.deep.equal({
+        status: 'degraded',
+        name: 'scheduled-payments',
+        message: `Crank balance low on goerli: 0.05 ETH`,
       });
     });
   });

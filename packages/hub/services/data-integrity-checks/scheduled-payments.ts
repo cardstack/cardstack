@@ -1,6 +1,10 @@
 import { inject } from '@cardstack/di';
+import config from 'config';
 import { subMinutes } from 'date-fns';
 import { nowUtc } from '../../utils/dates';
+import fetch from 'node-fetch';
+import { getConstantByNetwork } from '@cardstack/cardpay-sdk';
+import { BigNumber, ethers, Wallet } from 'ethers';
 
 export const CREATION_WITHOUT_TX_HASH_ALLOWED_MINUTES = 2;
 export const CREATION_UNMINED_ALLOWED_MINUTES = 3 * 60;
@@ -9,6 +13,15 @@ export const CANCELATION_UNMINED_ALLOWED_MINUTES = CREATION_UNMINED_ALLOWED_MINU
 export const UNATTEMPTED_ALLOWED_MINUTES = 24 * 60;
 export const ATTEMPTS_WITHOUT_TX_HASH_ALLOWED_MINUTES = 60;
 export const UNFINISHED_ATTEMPT_DURATION_ALLOWED_MINUTES = 24 * 60;
+
+// Relayer needs funds to pay for safe transactions gas (e.g creating safes, scheduling a payment).
+// Gas cost reimbursement for the relayer will be paid from the (specified) gas token balance in the user's safe.
+const LOW_RELAYER_FUNDS_THRESHOLD = ethers.utils.parseEther('0.05');
+
+// Crank (i.e the hub) needs funds to pay for scheduled payment execution transactions gas.
+// This gets reimbursed to the fee receiver using platform defined fees collected from the
+// scheduled payment (for example $0.25 USD and 0.1% of the transaction amount)
+const LOW_CRANK_FUNDS_THRESHOLD = LOW_RELAYER_FUNDS_THRESHOLD;
 
 function addToMessages(collection: any, message: string, messages: string[]) {
   if (collection.length == 0) return;
@@ -24,6 +37,7 @@ export interface IntegrityCheckResult {
 
 export default class DataIntegrityChecksScheduledPayments {
   prismaManager = inject('prisma-manager', { as: 'prismaManager' });
+  ethersProvider = inject('ethers-provider', { as: 'ethersProvider' });
 
   async check(): Promise<IntegrityCheckResult> {
     let prisma = await this.prismaManager.getClient();
@@ -152,11 +166,52 @@ export default class DataIntegrityChecksScheduledPayments {
       errorMessages
     );
 
+    await this.addCrankAndRelayerErrorMessages(errorMessages);
+
     return {
       name: 'scheduled-payments',
       status: errorMessages.length > 0 ? 'degraded' : 'operational',
       message: errorMessages.length > 0 ? errorMessages.join('; ') : null,
     };
+  }
+
+  async addCrankAndRelayerErrorMessages(errorMessages: string[]) {
+    let networkNames = config.get('web3.schedulerNetworks') as string[];
+
+    for await (let networkName of networkNames) {
+      let relayerBalance = await this.getRelayerFunderBalance(networkName);
+      let crankBalance = await this.getCrankBalance(networkName);
+
+      let nativeTokenSymbol = getConstantByNetwork('nativeTokenSymbol', networkName);
+
+      if (relayerBalance.lte(LOW_RELAYER_FUNDS_THRESHOLD)) {
+        errorMessages.push(
+          `Relayer balance low on ${networkName}: ${ethers.utils.formatEther(relayerBalance)} ${nativeTokenSymbol}`
+        );
+      }
+
+      if (crankBalance.lte(LOW_CRANK_FUNDS_THRESHOLD)) {
+        errorMessages.push(
+          `Crank balance low on ${networkName}: ${ethers.utils.formatEther(crankBalance)} ${nativeTokenSymbol}`
+        );
+      }
+    }
+  }
+
+  async getRelayerFunderBalance(networkName: string): Promise<BigNumber> {
+    let relayerUrl = getConstantByNetwork('relayServiceURL', networkName);
+
+    let responseText = await (await fetch(`${relayerUrl}/v1/about`)).text();
+    let relayerFunderPublicKey = JSON.parse(responseText).settings.SAFE_FUNDER_PUBLIC_KEY;
+
+    let provider = this.ethersProvider.getInstance(networkName);
+    return await provider.getBalance(relayerFunderPublicKey);
+  }
+
+  async getCrankBalance(networkName: string): Promise<BigNumber> {
+    let crank = new Wallet(config.get('hubPrivateKey'));
+    let provider = this.ethersProvider.getInstance(networkName);
+    return await provider.getBalance(crank.address);
   }
 }
 
