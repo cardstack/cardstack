@@ -87,7 +87,6 @@ export default class SchedulePaymentFormValidator {
 
   get isAmountValid(): boolean {
     return this.amountErrorMessage === '';
-    return isNumeric(this.form.paymentAmountRaw) && !!this.form.paymentToken;
   }
 
   get amountErrorMessage(): string {
@@ -96,6 +95,9 @@ export default class SchedulePaymentFormValidator {
     }
     if (!isNumeric(this.form.paymentAmountRaw)) {
       return 'must be numeric';
+    }
+    if (Number(this.form.paymentAmountRaw) <= 0) {
+      return 'must be greater than zero';
     }
     if (!this.form.paymentToken) {
       return 'must choose a token for the payment';
