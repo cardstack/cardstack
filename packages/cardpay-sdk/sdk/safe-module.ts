@@ -39,13 +39,13 @@ import { getConstantByNetwork } from './constants';
 import { getGasPricesInNativeWei, getNativeWeiInToken } from './utils/conversions';
 
 export interface EnableModuleAndGuardResult {
-  scheduledPaymentModuleAddress: string;
+  moduleAddress: string;
   metaGuardAddress: string;
 }
 
 export interface CreateSafeWithModuleAndGuardResult {
   safeAddress: string;
-  scheduledPaymentModuleAddress: string;
+  moduleAddress: string;
   metaGuardAddress: string;
 }
 
@@ -162,7 +162,7 @@ export default class SafeModule {
     }
 
     return {
-      scheduledPaymentModuleAddress: enableModuleTxs.expectedModuleAddress,
+      moduleAddress: enableModuleTxs.expectedModuleAddress,
       metaGuardAddress: setGuardTxs.expectedModuleAddress,
     };
   }
@@ -306,10 +306,10 @@ export default class SafeModule {
   ): Promise<CreateSafeWithModuleAndGuardResult> {
     if (txnHash && isTransactionHash(txnHash)) {
       let safeAddress = await this.getSafeAddressFromTxn(txnHash);
-      let { scheduledPaymentModuleAddress, metaGuardAddress } = await this.getModuleAndGuardAddressFromTxn(txnHash);
+      let { moduleAddress, metaGuardAddress } = await this.getModuleAndGuardAddressFromTxn(txnHash);
       return {
         safeAddress,
-        scheduledPaymentModuleAddress,
+        moduleAddress,
         metaGuardAddress,
       };
     }
@@ -331,7 +331,7 @@ export default class SafeModule {
 
     return {
       safeAddress: expectedSafeAddress,
-      scheduledPaymentModuleAddress: expectedSPModuleAddress,
+      moduleAddress: expectedSPModuleAddress,
       metaGuardAddress: expectedMetaGuardAddress,
     };
   }
@@ -393,13 +393,13 @@ export default class SafeModule {
     let moduleProxyCreationEvents = await getModuleProxyCreationEvent(this.ethersProvider, receipt.logs);
     let scheduledPaymentMasterCopy = await getAddress('scheduledPaymentModule', this.ethersProvider);
     let metaGuardMasterCopy = await getAddress('metaGuard', this.ethersProvider);
-    let scheduledPaymentModuleAddress = moduleProxyCreationEvents.find(
+    let moduleAddress = moduleProxyCreationEvents.find(
       (event) => event.args['masterCopy'] === scheduledPaymentMasterCopy
     )?.args['proxy'];
     let metaGuardAddress = moduleProxyCreationEvents.find((event) => event.args['masterCopy'] === metaGuardMasterCopy)
       ?.args['proxy'];
     return {
-      scheduledPaymentModuleAddress,
+      moduleAddress,
       metaGuardAddress,
     };
   }
