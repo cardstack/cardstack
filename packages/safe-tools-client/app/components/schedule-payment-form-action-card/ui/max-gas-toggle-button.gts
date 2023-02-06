@@ -10,7 +10,7 @@ interface Signature {
   Element: HTMLButtonElement;
   Args: {
     group: { Button: ButtonYieldedByToggleButtonGroup; };
-    name: string;
+    name: MaxGasFeeOption;
     maxGasDescriptions?: MaxGasDescriptionsState;
   }
 }
@@ -18,7 +18,7 @@ interface Signature {
 export default class MaxGasToggleButton extends Component<Signature> {
   get tokenQuantity(): TokenQuantity | undefined {
     let value = this.args.maxGasDescriptions?.value;
-    return value?.[this.args.name as MaxGasFeeOption];
+    return value?.[this.args.name];
   }
 
   <template>
