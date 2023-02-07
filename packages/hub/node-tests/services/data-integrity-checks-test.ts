@@ -261,24 +261,24 @@ describe('data integrity checks', function () {
     });
 
     it('returns a degraded check when relay funds are low', async function () {
-      service.getRelayerFunderBalance = () => Promise.resolve(ethers.utils.parseEther('0.05'));
+      service.getRelayerFunderBalance = () => Promise.resolve(ethers.utils.parseEther('0.5'));
 
       let result = await service.check();
       expect(result).to.deep.equal({
         status: 'degraded',
         name: 'scheduled-payments',
-        message: `Relayer balance low on goerli: 0.05 ETH`,
+        message: `Relayer balance low on goerli: 0.5 ETH`,
       });
     });
 
     it('returns a degraded check when crank funds are low', async function () {
-      service.getCrankBalance = () => Promise.resolve(ethers.utils.parseEther('0.05'));
+      service.getCrankBalance = () => Promise.resolve(ethers.utils.parseEther('0.5'));
 
       let result = await service.check();
       expect(result).to.deep.equal({
         status: 'degraded',
         name: 'scheduled-payments',
-        message: `Crank balance low on goerli: 0.05 ETH`,
+        message: `Crank balance low on goerli: 0.5 ETH`,
       });
     });
   });

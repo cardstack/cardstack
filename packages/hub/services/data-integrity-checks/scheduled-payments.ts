@@ -3,7 +3,7 @@ import config from 'config';
 import { subMinutes } from 'date-fns';
 import { nowUtc } from '../../utils/dates';
 import fetch from 'node-fetch';
-import { getConstantByNetwork } from '@cardstack/cardpay-sdk';
+import { getConstantByNetwork, SchedulerCapableNetworks } from '@cardstack/cardpay-sdk';
 import { BigNumber, ethers, Wallet } from 'ethers';
 
 export const CREATION_WITHOUT_TX_HASH_ALLOWED_MINUTES = 2;
@@ -14,19 +14,34 @@ export const UNATTEMPTED_ALLOWED_MINUTES = 24 * 60;
 export const ATTEMPTS_WITHOUT_TX_HASH_ALLOWED_MINUTES = 60;
 export const UNFINISHED_ATTEMPT_DURATION_ALLOWED_MINUTES = 24 * 60;
 
-// Relayer needs funds to pay for safe transactions gas (e.g creating safes, scheduling a payment).
-// Gas cost reimbursement for the relayer will be paid from the (specified) gas token balance in the user's safe.
-const LOW_RELAYER_FUNDS_THRESHOLD = ethers.utils.parseEther('0.05');
-
-// Crank (i.e the hub) needs funds to pay for scheduled payment execution transactions gas.
-// This gets reimbursed to the fee receiver using platform defined fees collected from the
-// scheduled payment (for example $0.25 USD and 0.1% of the transaction amount)
-const LOW_CRANK_FUNDS_THRESHOLD = LOW_RELAYER_FUNDS_THRESHOLD;
-
 function addToMessages(collection: any, message: string, messages: string[]) {
   if (collection.length == 0) return;
 
   messages.push(`${message}: ${collection.map((item: any) => item.id).join(', ')}`);
+}
+
+// This function will return the minimum balance for the following purposes:
+// 1. Relayer needs native token funds to pay for safe transactions gas (scheduling a payment, canceling a payment).
+//    Gas cost reimbursement for the relayer is paid using the user safe's gas token balance.
+// 2. Crank (i.e the hub) needs native token funds to pay for scheduled payment execution transaction gas.
+//    This gets reimbursed to the fee receiver using the user safe's gas token balance.
+function lowBalanceThreshold(networkName: SchedulerCapableNetworks) {
+  // These values are rougly defined by looking at the current average transaction gas cost and multiplying it by 1000, then rounded.
+  // This means that the relayer and the crank should have enough funds to pay for around 1000 transactions before running out of funds.
+  // This is a very rough estimate and it should be revisited in the future when there is more activity in the payments system.
+  let minThresholdBalances: Record<SchedulerCapableNetworks, BigNumber> = {
+    goerli: ethers.utils.parseEther('0.5'), // goerli ether
+    mainnet: ethers.utils.parseEther('0.5'), // mainnet ether
+    polygon: ethers.utils.parseEther('30'), // MATIC
+  };
+
+  let min = minThresholdBalances[networkName];
+
+  if (!min) {
+    throw new Error(`No minimum threshold balance defined for network ${networkName}`);
+  }
+
+  return min;
 }
 
 export interface IntegrityCheckResult {
@@ -176,21 +191,22 @@ export default class DataIntegrityChecksScheduledPayments {
   }
 
   async addCrankAndRelayerErrorMessages(errorMessages: string[]) {
-    let networkNames = config.get('web3.schedulerNetworks') as string[];
+    let networkNames = config.get('web3.schedulerNetworks') as SchedulerCapableNetworks[];
 
     for await (let networkName of networkNames) {
       let relayerBalance = await this.getRelayerFunderBalance(networkName);
       let crankBalance = await this.getCrankBalance(networkName);
 
       let nativeTokenSymbol = getConstantByNetwork('nativeTokenSymbol', networkName);
+      let minBalance = lowBalanceThreshold(networkName);
 
-      if (relayerBalance.lte(LOW_RELAYER_FUNDS_THRESHOLD)) {
+      if (relayerBalance.lte(minBalance)) {
         errorMessages.push(
           `Relayer balance low on ${networkName}: ${ethers.utils.formatEther(relayerBalance)} ${nativeTokenSymbol}`
         );
       }
 
-      if (crankBalance.lte(LOW_CRANK_FUNDS_THRESHOLD)) {
+      if (crankBalance.lte(minBalance)) {
         errorMessages.push(
           `Crank balance low on ${networkName}: ${ethers.utils.formatEther(crankBalance)} ${nativeTokenSymbol}`
         );
