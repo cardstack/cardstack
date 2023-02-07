@@ -42,7 +42,9 @@ app "hub" {
       }
 
       static_environment = {
+        NETWORK            = "sokol"
         ENVIRONMENT        = "staging"
+        NODE_CONFIG_ENV    = "staging"
         HUB_ENVIRONMENT    = "staging"
         HUB_AWS_ACCOUNT_ID = "680542703984"
       }
@@ -54,6 +56,7 @@ app "hub" {
         FIREBASE_DATABASE_URL = "arn:aws:ssm:us-east-1:680542703984:parameter/staging/hub/FIREBASE_DATABASE_URL"
         FIREBASE_PRIVATE_KEY  = "arn:aws:ssm:us-east-1:680542703984:parameter/staging/hub/FIREBASE_PRIVATE_KEY"
         FIREBASE_PROJECT_ID   = "arn:aws:ssm:us-east-1:680542703984:parameter/staging/hub/FIREBASE_PROJECT_ID"
+        FIXER_API_KEY         = "arn:aws:ssm:us-east-1:680542703984:parameter/staging/hub/FIXER_API_KEY"
         HUB_DATABASE_URL      = "arn:aws:ssm:us-east-1:680542703984:parameter/staging/hub/HUB_DATABASE_URL"
         HUB_SENTRY_DSN        = "arn:aws:ssm:us-east-1:680542703984:parameter/staging/hub/HUB_SENTRY_DSN"
         PROVISIONER_SECRET    = "arn:aws:ssm:us-east-1:680542703984:parameter/staging/hub/PROVISIONER_SECRET"
@@ -143,7 +146,9 @@ app "hub-worker" {
       disable_alb         = true
 
       static_environment = {
+        NETWORK            = "sokol"
         ENVIRONMENT        = "staging"
+        NODE_CONFIG_ENV    = "staging"
         HUB_ENVIRONMENT    = "staging"
         HUB_AWS_ACCOUNT_ID = "680542703984"
       }

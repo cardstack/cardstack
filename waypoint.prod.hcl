@@ -42,7 +42,9 @@ app "hub" {
       }
 
       static_environment = {
+        NETWORK            = "xdai"
         ENVIRONMENT        = "production"
+        NODE_CONFIG_ENV    = "production"
         HUB_ENVIRONMENT    = "production"
         HUB_AWS_ACCOUNT_ID = "120317779495"
       }
@@ -54,6 +56,7 @@ app "hub" {
         FIREBASE_DATABASE_URL = "arn:aws:ssm:us-east-1:120317779495:parameter/production/hub/FIREBASE_DATABASE_URL"
         FIREBASE_PRIVATE_KEY  = "arn:aws:ssm:us-east-1:120317779495:parameter/production/hub/FIREBASE_PRIVATE_KEY"
         FIREBASE_PROJECT_ID   = "arn:aws:ssm:us-east-1:120317779495:parameter/production/hub/FIREBASE_PROJECT_ID"
+        FIXER_API_KEY         = "arn:aws:ssm:us-east-1:120317779495:parameter/production/hub/FIXER_API_KEY"
         HUB_DATABASE_URL      = "arn:aws:ssm:us-east-1:120317779495:parameter/production/hub/HUB_DATABASE_URL"
         HUB_SENTRY_DSN        = "arn:aws:ssm:us-east-1:120317779495:parameter/production/hub/HUB_SENTRY_DSN"
         PROVISIONER_SECRET    = "arn:aws:ssm:us-east-1:120317779495:parameter/production/hub/PROVISIONER_SECRET"
@@ -144,7 +147,9 @@ app "hub-worker" {
       disable_alb         = true
 
       static_environment = {
+        NETWORK            = "xdai"
         ENVIRONMENT        = "production"
+        NODE_CONFIG_ENV    = "production"
         HUB_ENVIRONMENT    = "production"
         HUB_AWS_ACCOUNT_ID = "120317779495"
       }
@@ -240,7 +245,9 @@ app "hub-bot" {
       disable_alb         = true
 
       static_environment = {
+        NETWORK            = "xdai"
         ENVIRONMENT        = "production"
+        NODE_CONFIG_ENV    = "production"
         HUB_ENVIRONMENT    = "production"
         HUB_AWS_ACCOUNT_ID = "120317779495"
       }
@@ -334,7 +341,9 @@ app "hub-event-listener" {
       disable_alb         = true
 
       static_environment = {
+        NETWORK            = "xdai"
         ENVIRONMENT        = "production"
+        NODE_CONFIG_ENV    = "production"
         HUB_ENVIRONMENT    = "production"
         HUB_AWS_ACCOUNT_ID = "120317779495"
       }
