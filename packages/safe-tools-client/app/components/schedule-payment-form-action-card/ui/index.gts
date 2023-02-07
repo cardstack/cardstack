@@ -294,7 +294,10 @@ export default class SchedulePaymentFormActionCardUI extends Component<Signature
           <div class="schedule-payment-form-action-card__details">
             {{#if @configuredFees}}
               {{svgJar "info" width="14px" height="14px" class="schedule-payment-form-action-card__details-info-icon"}}
-              <span>Cardstack charges {{if @configuredFees.fixedUSD (formatUsd @configuredFees.fixedUSD)}} and {{@configuredFees.percentage}}% of the transaction as a fee for executing your scheduled payments.</span>
+              <span>Cardstack charges {{if @configuredFees.fixedUSD (formatUsd @configuredFees.fixedUSD)}}
+                and {{@configuredFees.percentage}}% of the transaction as a fee. Cardstack fees only apply
+                when a payment is executed as scheduled. Network fees ("gas") will be charged when
+                scheduling, canceling and executing payments.</span>
             {{/if}}
           </div>
           <div><!-- empty --></div>
