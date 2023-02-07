@@ -96,7 +96,7 @@ export default class ScheduledPaymentCard extends Component<Signature> {
       @displayBoundaries={{true}}
       class="scheduled-payment-card">
       <div class="scheduled-payment-card__content" data-test-scheduled-payment-card data-test-scheduled-payment-card-id={{@scheduledPayment.id}}>
-        <span class="scheduled-payment-card__pay-at">{{this.paymentType}} on {{formatDate @scheduledPayment.payAt "d/M/yyyy"}}</span>
+        <span class="scheduled-payment-card__pay-at">{{this.paymentType}} on {{formatDate @scheduledPayment.payAt "d/M/yyyy (h:mm a)"}}</span>
         <div class="scheduled-payment-card__payee">
           <span class="scheduled-payment-card__payee-to">To:</span> 
           <TruncatedBlockchainAddress @address={{@scheduledPayment.payeeAddress}} @isCopyable={{true}} @copyIconColor='var(--boxel-purple-400)'/>
