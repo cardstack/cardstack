@@ -202,7 +202,7 @@ export default class DataIntegrityChecksScheduledPayments {
     let relayerUrl = getConstantByNetwork('relayServiceURL', networkName);
 
     let responseText = await (await fetch(`${relayerUrl}/v1/about`)).text();
-    let relayerFunderPublicKey = JSON.parse(responseText).settings.SAFE_FUNDER_PUBLIC_KEY;
+    let relayerFunderPublicKey = JSON.parse(responseText).settings.SAFE_TX_SENDER_PUBLIC_KEY;
 
     let provider = this.ethersProvider.getInstance(networkName);
     return await provider.getBalance(relayerFunderPublicKey);
