@@ -43,33 +43,6 @@
     },
     {
       "chainId": 5,
-      "name": "Goerli USD Coin",
-      "symbol": "USDC",
-      "decimals": 6,
-      "address": "0x07865c6E87B9F70255377e024ace6630C1Eaa37F",
-      "logoURI": "https://wallet-asset.matic.network/img/tokens/usdc.svg",
-      "tags": ["erc20", "relayGas", "stablecoin"]
-    },
-    {
-      "chainId": 5,
-      "name": "Goerli DAI",
-      "symbol": "DAI",
-      "decimals": 18,
-      "address": "0x024f245F740667fF208068d593E4C7f8f26416f2",
-      "logoURI": "https://wallet-asset.matic.network/img/tokens/dai.svg",
-      "tags": ["erc20", "relayGas", "stablecoin"]
-    },
-    {
-      "chainId": 5,
-      "name": "Goerli USDT",
-      "symbol": "USDT",
-      "decimals": 6,
-      "address": "0xb0f7554a44cC178e935Ea10c79e7c042D1840044",
-      "logoURI": "https://wallet-asset.matic.network/img/tokens/usdt.svg",
-      "tags": ["erc20", "relayGas", "stablecoin"]
-    },
-    {
-      "chainId": 5,
       "name": "Cardstack Test Token",
       "symbol": "CTST",
       "decimals": 18,
