@@ -3,8 +3,6 @@ import { ConfiguredScheduledPaymentFees } from '@cardstack/safe-tools-client/ser
 import TokenQuantity from '@cardstack/safe-tools-client/utils/token-quantity';
 import { BigNumber, FixedNumber } from 'ethers';
 
-const USDC_DECIMALS = 6;
-
 export interface CurrentFees {
   fixedFeeInUSD: number | undefined;
   fixedFee: TokenQuantity | undefined;
@@ -35,11 +33,10 @@ export default class FeeCalculator {
     const { usdcToGasTokenRate } = this;
     let amount: BigNumber;
     if (fixedFeeUSDNum && usdcToGasTokenRate) {
-      const fixedFeeUSDCFixedNum = FixedNumber.from(
-        fixedFeeUSDNum.toString()
-      ).mulUnsafe(FixedNumber.from(10 ** USDC_DECIMALS));
+      const fixedFeeUSDCFixedNum = FixedNumber.from(fixedFeeUSDNum.toString());
       amount = BigNumber.from(
         usdcToGasTokenRate
+          .mulUnsafe(FixedNumber.from(String(10 ** this.gasToken.decimals)))
           .mulUnsafe(fixedFeeUSDCFixedNum)
           .round(0)
           .toString()
