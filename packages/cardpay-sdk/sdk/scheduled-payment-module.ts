@@ -5,7 +5,7 @@ import MetaGuardABI from '../contracts/abi/modules/meta-guard';
 import ScheduledPaymentABI from '../contracts/abi/modules/scheduled-payment-module';
 import ScheduledPaymentConfigABI from '../contracts/abi/modules/scheduled-payment-config';
 import { getAddress } from '../contracts/addresses';
-import { isAddress } from 'web3-utils';
+import { isAddress, toWei } from 'web3-utils';
 import {
   deployAndSetUpModule,
   encodeMultiSend,
@@ -74,9 +74,6 @@ export interface GasEstimationResult {
   gasRangeInWei: GasRange;
   gasRangeInUSD: GasRange;
 }
-
-export const FEE_BASE_POW = new BN(18);
-export const FEE_BASE = new BN(10).pow(FEE_BASE_POW);
 
 interface TransactionParams {
   nonce: BN;
@@ -486,14 +483,7 @@ export default class ScheduledPaymentModule {
           tokenAddress,
           amount,
           payeeAddress,
-          {
-            fixedUSD: {
-              value: FEE_BASE.mul(new BN(feeFixedUSD)).toString(),
-            },
-            percentage: {
-              value: FEE_BASE.mul(new BN(feePercentage / 100)).toString(),
-            },
-          },
+          this.composeFees(feeFixedUSD, feePercentage),
           maxGasPrice,
           gasTokenAddress,
           salt,
@@ -508,14 +498,7 @@ export default class ScheduledPaymentModule {
           tokenAddress,
           amount,
           payeeAddress,
-          {
-            fixedUSD: {
-              value: FEE_BASE.mul(new BN(feeFixedUSD)).toString(),
-            },
-            percentage: {
-              value: FEE_BASE.mul(new BN(feePercentage / 100)).toString(),
-            },
-          },
+          this.composeFees(feeFixedUSD, feePercentage),
           maxGasPrice,
           gasTokenAddress,
           salt,
@@ -669,14 +652,7 @@ export default class ScheduledPaymentModule {
         tokenAddress,
         amount,
         payeeAddress,
-        {
-          fixedUSD: {
-            value: FEE_BASE.mul(new BN(feeFixedUSD)).toString(),
-          },
-          percentage: {
-            value: FEE_BASE.mul(new BN(feePercentage / 100)).toString(),
-          },
-        },
+        this.composeFees(feeFixedUSD, feePercentage),
         executionGas,
         maxGasPrice,
         gasTokenAddress,
@@ -691,14 +667,7 @@ export default class ScheduledPaymentModule {
         tokenAddress,
         amount,
         payeeAddress,
-        {
-          fixedUSD: {
-            value: FEE_BASE.mul(new BN(feeFixedUSD)).toString(),
-          },
-          percentage: {
-            value: FEE_BASE.mul(new BN(feePercentage / 100)).toString(),
-          },
-        },
+        this.composeFees(feeFixedUSD, feePercentage),
         executionGas,
         maxGasPrice,
         gasTokenAddress,
@@ -1251,14 +1220,7 @@ export default class ScheduledPaymentModule {
           tokenAddress,
           amount,
           payeeAddress,
-          {
-            fixedUSD: {
-              value: FEE_BASE.mul(new BN(feeFixedUSD)).toString(),
-            },
-            percentage: {
-              value: FEE_BASE.mul(new BN(feePercentage / 100)).toString(),
-            },
-          },
+          this.composeFees(feeFixedUSD, feePercentage),
           executionGas,
           maxGasPrice,
           gasTokenAddress,
@@ -1275,14 +1237,7 @@ export default class ScheduledPaymentModule {
           tokenAddress,
           amount,
           payeeAddress,
-          {
-            fixedUSD: {
-              value: FEE_BASE.mul(new BN(feeFixedUSD)).toString(),
-            },
-            percentage: {
-              value: FEE_BASE.mul(new BN(feePercentage / 100)).toString(),
-            },
-          },
+          this.composeFees(feeFixedUSD, feePercentage),
           executionGas,
           maxGasPrice,
           gasTokenAddress,
@@ -1383,5 +1338,20 @@ export default class ScheduledPaymentModule {
     let configModuleAddress = await getAddress('scheduledPaymentConfig', this.ethersProvider);
     const scheduledPaymentConfig = new Contract(configModuleAddress, ScheduledPaymentConfigABI, this.ethersProvider);
     return await scheduledPaymentConfig.validForDays();
+  }
+
+  private composeFees(
+    feeFixedUSD: number,
+    feePercentage: number
+  ): { fixedUSD: { value: string }; percentage: { value: string } } {
+    // We can use toWei because decimals of Decimal.D256 is 18
+    return {
+      fixedUSD: {
+        value: toWei(String(feeFixedUSD), 'ether'),
+      },
+      percentage: {
+        value: new BN(toWei(String(feePercentage), 'ether')).div(new BN(100)).toString(),
+      },
+    };
   }
 }
