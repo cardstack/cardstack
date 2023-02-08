@@ -104,7 +104,9 @@ module('Unit | FeeCalculator', (hooks) => {
         name: 'Example Token B',
         decimals: 18,
       };
-      usdcToGasTokenRate = FixedNumber.from('2000000000000'); // e.g. $1 = 2.0 gas token (1000000 = 2000000000000000000)
+      // usdcToGasTokenRate is in eth not wei.
+      // e.g. $1 = 200 gas token in eth.
+      usdcToGasTokenRate = FixedNumber.from('200');
     });
 
     test('should calculate the correct fixed fee', function (assert) {
@@ -119,7 +121,7 @@ module('Unit | FeeCalculator', (hooks) => {
       assert.strictEqual((fixedFeeResult as TokenQuantity).token, gasToken);
       assert.strictEqual(
         (fixedFeeResult as TokenQuantity).count.toString(),
-        '1500000000000000000' // 1.5 GASB
+        '150000000000000000000' // 150 GASB
       );
     });
 
@@ -153,7 +155,7 @@ module('Unit | FeeCalculator', (hooks) => {
         fixedFeeInUSD: 0.75,
         fixedFee: new TokenQuantity(
           gasToken,
-          BigNumber.from('1500000000000000000')
+          BigNumber.from('150000000000000000000')
         ),
         percentageFee: 1.5,
         variableFee: new TokenQuantity(paymentToken, BigNumber.from('3000000')),
