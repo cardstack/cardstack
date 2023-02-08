@@ -1,5 +1,6 @@
 import cryptoRandomString from 'crypto-random-string';
 import { subMinutes } from 'date-fns';
+import { ethers } from 'ethers';
 import shortUuid from 'short-uuid';
 import { CREATION_WITHOUT_TX_HASH_ALLOWED_MINUTES } from '../../services/data-integrity-checks/scheduled-payments';
 import { ExtendedPrismaClient } from '../../services/prisma-manager';
@@ -8,10 +9,13 @@ import { setupHub } from '../helpers/server';
 
 describe('GET /api/data-integrity-checks/scheduled-payments', async function () {
   let prisma: ExtendedPrismaClient;
-  let { getPrisma, request } = setupHub(this);
+  let { getPrisma, request, getContainer } = setupHub(this);
 
   this.beforeEach(async function () {
     prisma = await getPrisma();
+    let service = await getContainer().lookup('data-integrity-checks-scheduled-payments');
+    service.getRelayerFunderBalance = () => Promise.resolve(ethers.utils.parseEther('1'));
+    service.getCrankBalance = () => Promise.resolve(ethers.utils.parseEther('1'));
   });
 
   it('returns operational status for provided check', async function () {
