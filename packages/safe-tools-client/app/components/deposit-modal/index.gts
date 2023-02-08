@@ -53,7 +53,7 @@ export default class DepositModal extends Component<Signature> {
       <BoxelActionContainer as |Section ActionChin|>
         <Section @title="Deposit Instructions" class="deposit-modal__section">
           <p>
-            It is the your responsibility to ensure that sufficient funds are
+            It is your responsibility to ensure that sufficient funds are
             present in your safe at the time of each transaction.
           </p>
           <p>To deposit into your {{@networkName}} safe, transfer tokens to:
