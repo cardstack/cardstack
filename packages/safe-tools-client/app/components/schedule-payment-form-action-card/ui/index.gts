@@ -242,7 +242,7 @@ export default class SchedulePaymentFormActionCardUI extends Component<Signature
             @onBlur={{set this 'hasBlurredPayeeAddress' true}}
           />
         </BoxelField>
-        <BoxelField @label="Amount" @tag="label" for="schedule-payment-form-amount">
+        <BoxelField @label="Amount">
           <BoxelInputSelectableTokenAmount
             data-test-amount-input
             @id="schedule-payment-form-amount"
