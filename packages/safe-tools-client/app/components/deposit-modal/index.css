@@ -12,6 +12,14 @@
   font-size: var(--boxel-font-size-sm);
 }
 
+.deposit-modal__section p a {
+  text-decoration: underline;
+}
+
+.deposit-modal__copyable-address {
+  margin: var(--boxel-sp) 0;
+}
+
 .deposit-modal__section-funds-info,
 .deposit-modal__section-funds-info-balance,
 .deposit-modal__section-funds-info-token {

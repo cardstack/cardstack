@@ -53,35 +53,43 @@ export default class DepositModal extends Component<Signature> {
       <BoxelActionContainer as |Section ActionChin|>
         <Section @title="Deposit Instructions" class="deposit-modal__section">
           <p>
-            It is the user’s responsibility to ensure that sufficient funds are
-            present in their wallet at the time of each transaction
+            It is your responsibility to ensure that sufficient funds are
+            present in your safe at the time of each transaction.
           </p>
-          <p>To deposit into your {{@networkName}} safe, transfer assets to:</p>
-          <BoxelInputGroup
-            @value={{@safeAddress}}
-            @readonly={{true}}
-            style={{cssVar
-              boxel-input-group-border-radius="var(--boxel-border-radius)"
-            }}
-          >
-            <:after as |Accessories inputGroup|>
-              {{#if this.isShowingCopiedConfirmation}}
-                <Accessories.Text>Copied!</Accessories.Text>
-              {{/if}}
-              <Accessories.IconButton
-                @width="20px"
-                @height="20px"
-                @icon="copy"
-                aria-label="Copy to Clipboard"
-                {{on "click"
-                  (copyToClipboard
-                    elementId=inputGroup.elementId
-                    onCopy=this.flashCopiedConfirmation
-                  )
-                }}
-              />
-            </:after>
-          </BoxelInputGroup>
+          <p>To deposit into your {{@networkName}} safe, transfer tokens to:
+            <br />
+            <BoxelInputGroup
+              @value={{@safeAddress}}
+              @readonly={{true}}
+              class="deposit-modal__copyable-address"
+              style={{cssVar
+                boxel-input-group-border-radius="var(--boxel-border-radius)"
+              }}
+            >
+              <:after as |Accessories inputGroup|>
+                {{#if this.isShowingCopiedConfirmation}}
+                  <Accessories.Text>Copied!</Accessories.Text>
+                {{/if}}
+                <Accessories.IconButton
+                  @width="20px"
+                  @height="20px"
+                  @icon="copy"
+                  aria-label="Copy to Clipboard"
+                  {{on "click"
+                    (copyToClipboard
+                      elementId=inputGroup.elementId
+                      onCopy=this.flashCopiedConfirmation
+                    )
+                  }}
+                />
+              </:after>
+            </BoxelInputGroup>
+            Note: A Safe is not the same thing as an EOA wallet.
+            <a href="https://help.gnosis-safe.io/en/articles/3876456-what-is-gnosis-safe"
+              target="_blank">
+                Learn more.
+            </a>
+          </p>
           {{#if @tokensToCover}}
             <div class="deposit-modal__section-funds-info">
               {{svgJar "info" class="deposit-modal__section-funds-info-icon"}}
@@ -105,10 +113,10 @@ export default class DepositModal extends Component<Signature> {
            {{/if}} 
         </Section>
         <ActionChin @state="default">
-          <:default as |a|>
-            <a.ActionButton {{on "click" @onClose}}>
+          <:default as |ac|>
+            <ac.ActionButton {{on "click" @onClose}}>
               Close
-            </a.ActionButton>
+            </ac.ActionButton>
           </:default>
         </ActionChin>
       </BoxelActionContainer>
