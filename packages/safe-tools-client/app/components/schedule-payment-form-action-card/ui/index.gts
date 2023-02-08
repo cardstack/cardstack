@@ -228,21 +228,24 @@ export default class SchedulePaymentFormActionCardUI extends Component<Signature
             {{/if}}
           </div>
         </BoxelField>
-        <BoxelField @label="Recipient">
+        <BoxelField @label="Recipient" @tag="label" for="schedule-payment-form-recipient">
           <BoxelInput
             placeholder="Enter Address"
             data-test-payee-address-input
+            @id="schedule-payment-form-recipient"
             @value={{@payeeAddress}}
             @invalid={{this.isPayeeAddressInvalid}}
+            @helperText="Any, including EOA and safe. Use caution sending to exchange deposit addresses."
             @errorMessage={{@payeeAddressErrorMessage}}
             @disabled={{this.isFormInteractionDisabled}}
             @onInput={{@onUpdatePayeeAddress}}
             @onBlur={{set this 'hasBlurredPayeeAddress' true}}
           />
         </BoxelField>
-        <BoxelField @label="Amount">
+        <BoxelField @label="Amount" @tag="label" for="schedule-payment-form-amount">
           <BoxelInputSelectableTokenAmount
             data-test-amount-input
+            @id="schedule-payment-form-amount"
             @value={{@paymentAmountRaw}}
             @onInput={{@onUpdatePaymentAmount}}
             @invalid={{this.isPaymentAmountInvalid}}
