@@ -190,11 +190,13 @@ class PaymentTransactionsList extends Component {
                   {{/if}}
                 </td>
                 <td class="table__cell" data-test-scheduled-payment-attempts-blockexplorer>
-                  <BlockExplorerButton
-                    @networkSymbol={{this.network.symbol}}
-                    @transactionHash={{paymentAttempt.transactionHash}}
-                    data-test-scheduled-payment-attempts-item-explorer-button
-                  />
+                  {{#if paymentAttempt.transactionHash}}
+                    <BlockExplorerButton
+                      @networkSymbol={{this.network.symbol}}
+                      @transactionHash={{paymentAttempt.transactionHash}}
+                      data-test-scheduled-payment-attempts-item-explorer-button
+                    />
+                  {{/if}}
                 </td>
               </tr>
             {{/each}}
