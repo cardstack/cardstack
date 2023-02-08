@@ -4,6 +4,7 @@
   "license": "MIT",
   "type": "module",
   "dependencies": {
+    "@aws-sdk/client-ecr": "^3.266.0",
     "@aws-sdk/client-iam": "^3.231.0",
     "@aws-sdk/client-sts": "^3.231.0",
     "hcl2-parser": "^1.0.3",

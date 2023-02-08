@@ -104,7 +104,8 @@
     "status:subgraph-xdai-green": "yarn --cwd packages/cardpay-subgraph xdai-green-status",
     "status:subgraph-xdai-blue": "yarn --cwd packages/cardpay-subgraph xdai-blue-status",
     "waypoint-vars": "node ./scripts/waypoint-vars.js",
-    "update-relay-gas-tokens": "ts-node --esm scripts/update-relay-server-gas-tokens.ts"
+    "update-relay-gas-tokens": "ts-node --esm scripts/update-relay-server-gas-tokens.ts",
+    "aws:update-ecr-lifecycle-policy": "ts-node --esm scripts/ecr-lifecycle.ts"
   },
   "resolutions": {
     "ember-a11y-testing": "4.0.3",
