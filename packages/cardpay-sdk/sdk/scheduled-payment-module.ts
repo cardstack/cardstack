@@ -1340,10 +1340,7 @@ export default class ScheduledPaymentModule {
     return await scheduledPaymentConfig.validForDays();
   }
 
-  private composeFees(
-    feeFixedUSD: number,
-    feePercentage: number
-  ): { fixedUSD: { value: string }; percentage: { value: string } } {
+  private composeFees(feeFixedUSD: number, feePercentage: number) {
     // We can use toWei because decimals of Decimal.D256 is 18
     return {
       fixedUSD: {
