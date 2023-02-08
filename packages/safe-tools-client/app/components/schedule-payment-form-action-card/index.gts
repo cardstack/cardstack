@@ -432,6 +432,7 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
         }
       )
       this.scheduledPaymentsService.reloadScheduledPayments();
+      this.safes.reloadTokenBalances();
       this.isSuccessfullyScheduled = true;
     } catch(e) {
       this.schedulingStatus = undefined;

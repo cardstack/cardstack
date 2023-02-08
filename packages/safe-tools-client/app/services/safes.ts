@@ -37,6 +37,7 @@ interface TokenBalanceResourceState extends Record<PropertyKey, unknown> {
   error?: Error;
   isLoading: boolean;
   value?: TokenBalance[];
+  load: () => Promise<void>;
 }
 
 export default class SafesService extends Service {
@@ -44,6 +45,16 @@ export default class SafesService extends Service {
   @service declare wallet: WalletService;
 
   @tracked selectedSafe?: Safe;
+
+  constructor(properties?: object | undefined) {
+    super(properties);
+
+    // We keep reloading the token balances so that they are up do date
+    // when user adds funds to the safe independently of the app
+    setInterval(() => {
+      this.reloadTokenBalances();
+    }, 30 * 1000);
+  }
 
   get safes(): Safe[] | undefined {
     return this.safesResource.value;
@@ -69,41 +80,50 @@ export default class SafesService extends Service {
     this.selectedSafe = safe;
   }
 
+  async reloadTokenBalances() {
+    await this.tokenBalancesResource.load();
+  }
+
   @use tokenBalancesResource = resource(() => {
     if (!this.wallet.ethersProvider || !this.currentSafe) {
       return {
         error: false,
         isLoading: false,
         value: [],
+        load: () => Promise<void>,
       };
     }
 
     const state: TokenBalanceResourceState = new TrackedObject({
       isLoading: true,
+      value: [],
+      error: undefined,
+      load: async () => {
+        state.isLoading = true;
+
+        const tokenAddresses = getConstantByNetwork(
+          'tokenList',
+          this.network.symbol
+        ).tokens.map((t: TokenDetail) => t.address);
+
+        try {
+          if (!this.currentSafe) return;
+
+          state.value = await this.fetchTokenBalances(
+            this.currentSafe.address,
+            tokenAddresses,
+            this.wallet.ethersProvider
+          );
+        } catch (error) {
+          console.log(error);
+          state.error = error;
+        } finally {
+          state.isLoading = false;
+        }
+      },
     });
 
-    const tokenAddresses = getConstantByNetwork(
-      'tokenList',
-      this.network.symbol
-    ).tokens.map((t: TokenDetail) => t.address);
-
-    (async () => {
-      try {
-        if (!this.currentSafe) return;
-
-        state.value = await this.fetchTokenBalances(
-          this.currentSafe.address,
-          tokenAddresses,
-          this.wallet.ethersProvider
-        );
-      } catch (error) {
-        console.log(error);
-        state.error = error;
-      } finally {
-        state.isLoading = false;
-      }
-    })();
-
+    state.load();
     return state;
   });
 

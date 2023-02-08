@@ -17,6 +17,7 @@ import { tracked } from '@glimmer/tracking';
 import { noop } from '@cardstack/safe-tools-client/helpers/noop';
 import { taskFor } from 'ember-concurrency-ts';
 import HubAuthenticationService from '@cardstack/safe-tools-client/services/hub-authentication';
+import SafesService from '@cardstack/safe-tools-client/services/safes';
 import SuccessIcon from '@cardstack/safe-tools-client/components/icons/success';
 import FailureIcon from '@cardstack/safe-tools-client/components/icons/failure';
 import InfoIcon from '@cardstack/safe-tools-client/components/icons/info';
@@ -45,6 +46,7 @@ export default class ScheduledPaymentCard extends Component<Signature> {
   @service declare scheduledPaymentSdk: ScheduledPaymentSdkService;
   @service declare scheduledPayments: ScheduledPaymentsService;
   @service declare hubAuthentication: HubAuthenticationService;
+  @service declare safes: SafesService;
   @service declare tokens: TokensService;
   @tracked optionsMenuOpened = false;
   @tracked isCancelPaymentModalOpen = false;
@@ -77,6 +79,7 @@ export default class ScheduledPaymentCard extends Component<Signature> {
 
   @action async cancelScheduledPayment() {
     await taskFor(this.cancelScheduledPaymentTask).perform(this.args.scheduledPayment.id, this.hubAuthentication.authToken!)
+    this.safes.reloadTokenBalances();
   }
 
   get paymentCanceled() {
