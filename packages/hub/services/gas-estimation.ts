@@ -98,7 +98,9 @@ export default class GasEstimationService {
           '0',
           Math.round(nowUtc().getTime() / 1000),
           null,
-          null
+          null,
+          0,
+          0
         );
         break;
       case GasEstimationResultsScenarioEnum.execute_recurring_payment:
@@ -113,7 +115,9 @@ export default class GasEstimationService {
           '0',
           null,
           28,
-          Math.round(addDays(nowUtc(), 30).getTime() / 1000)
+          Math.round(addDays(nowUtc(), 30).getTime() / 1000),
+          0,
+          0
         );
         break;
       default:
