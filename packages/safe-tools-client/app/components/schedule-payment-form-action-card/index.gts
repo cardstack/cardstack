@@ -77,7 +77,7 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
 
     this.updateInterval = setInterval(() => {
       if (this.selectedGasToken) {
-        taskFor(this.tokenToUsdService.updateUsdcRate).perform(this.selectedGasToken.address); 
+        taskFor(this.tokenToUsdService.updateUsdcRate).perform(this.selectedGasToken.address);
       }
     }, INTERVAL);
   }
@@ -245,7 +245,8 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
       this.validator.isValid &&
       Boolean(this.safes.currentSafe) &&
       Boolean(this.gasEstimation) &&
-      Number(this.gasEstimation?.gas) > 0
+      Number(this.gasEstimation?.gas) > 0 &&
+      Boolean(this.usdcToGasTokenRate)
     );
   }
 
