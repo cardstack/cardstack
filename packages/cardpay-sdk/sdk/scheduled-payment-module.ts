@@ -457,7 +457,9 @@ export default class ScheduledPaymentModule {
     gasPrice: string,
     payAt?: number | null,
     recurringDayOfMonth?: number | null,
-    recurringUntil?: number | null
+    recurringUntil?: number | null,
+    feeFixedUSD?: number | null,
+    feePercentage?: number | null
   ): Promise<number> {
     if (payAt == null && (recurringDayOfMonth == null || recurringUntil == null))
       throw new Error('When payAt is null, recurringDayOfMonth and recurringUntil must have a value');
@@ -471,8 +473,10 @@ export default class ScheduledPaymentModule {
       return decodedError.args[0].toNumber();
     };
 
-    let feeFixedUSD = (await getConstant('scheduledPaymentFeeFixedUSD', this.ethersProvider)) ?? 0;
-    let feePercentage = (await getConstant('scheduledPaymentFeePercentage', this.ethersProvider)) ?? 0;
+    feeFixedUSD =
+      feeFixedUSD != null ? feeFixedUSD : (await getConstant('scheduledPaymentFeeFixedUSD', this.ethersProvider))!;
+    feePercentage =
+      feePercentage != null ? feePercentage : (await getConstant('scheduledPaymentFeeFixedUSD', this.ethersProvider))!;
     let requiredGas = 0;
     try {
       let module = new Contract(moduleAddress, ScheduledPaymentABI, this.ethersProvider);
@@ -643,8 +647,8 @@ export default class ScheduledPaymentModule {
 
     let spHash;
     let module = new Contract(moduleAddress, ScheduledPaymentABI, this.ethersProvider);
-    let feeFixedUSD = (await getConstant('scheduledPaymentFeeFixedUSD', this.ethersProvider)) ?? 0;
-    let feePercentage = (await getConstant('scheduledPaymentFeePercentage', this.ethersProvider)) ?? 0;
+    let feeFixedUSD = (await getConstant('scheduledPaymentFeeFixedUSD', this.ethersProvider))!;
+    let feePercentage = (await getConstant('scheduledPaymentFeePercentage', this.ethersProvider))!;
     if (recurringUntil) {
       spHash = await module.callStatic[
         'createSpHash(address,uint256,address,((uint256),(uint256)),uint256,uint256,address,string,uint256,uint256)'
@@ -1017,8 +1021,8 @@ export default class ScheduledPaymentModule {
     options.listener?.onBeginPrepareScheduledPayment?.();
     let signer = this.signer ? this.signer : this.ethersProvider.getSigner();
     let account = await signer.getAddress();
-    let feeFixedUSD = (await getConstant('scheduledPaymentFeeFixedUSD', this.ethersProvider)) ?? 0;
-    let feePercentage = (await getConstant('scheduledPaymentFeePercentage', this.ethersProvider)) ?? 0;
+    let feeFixedUSD = (await getConstant('scheduledPaymentFeeFixedUSD', this.ethersProvider))!;
+    let feePercentage = (await getConstant('scheduledPaymentFeePercentage', this.ethersProvider))!;
     options.listener?.onEndPrepareScheduledPayment?.();
 
     options.listener?.onBeginRegisterPaymentWithHub?.();
