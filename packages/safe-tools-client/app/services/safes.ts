@@ -53,12 +53,12 @@ export default class SafesService extends Service {
     super(properties);
 
     // We keep reloading the token balances so that they are up do date
-    // when users add funds to the safe independently of the app
+    // when users add or remove funds in the safe independently of the app
     taskFor(this.refreshTokenBalancesIndefinitely).perform();
   }
 
   @task *refreshTokenBalancesIndefinitely(): TaskGenerator<void> {
-    while (1) {
+    while (true) {
       yield this.reloadTokenBalances();
       yield timeout(30 * 1000); // Every 30 seconds
     }
