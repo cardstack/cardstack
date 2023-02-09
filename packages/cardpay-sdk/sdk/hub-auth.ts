@@ -10,6 +10,7 @@ export interface IHubAuth {
   getNonce(): Promise<NonceResponse>;
   authenticate(): Promise<string>;
   checkValidAuth(authToken: string): Promise<boolean>;
+  getAddress(authToken: string): Promise<string>;
   getHubUrl(network?: string): Promise<string>;
 }
 interface NonceResponse {
@@ -27,6 +28,15 @@ export default class HubAuth implements IHubAuth {
   async checkValidAuth(authToken: string): Promise<boolean> {
     let response = await this.httpGetSession(authToken);
     return response.status === 200;
+  }
+
+  async getAddress(authToken: string): Promise<string> {
+    let response = await this.httpGetSession(authToken);
+    if (response.status !== 200) {
+      throw Error('Invalid auth token');
+    }
+    let responseJson = await response.json();
+    return responseJson.data.attributes.user;
   }
 
   async getNonce(): Promise<NonceResponse> {

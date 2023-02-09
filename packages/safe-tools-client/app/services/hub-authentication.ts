@@ -29,7 +29,6 @@ export default class HubAuthenticationService extends Service {
     try {
       const hubAuth = await this.getHubAuth();
       const newAuthToken = await hubAuth.authenticate();
-
       if (newAuthToken) {
         this.authToken = newAuthToken;
         this.isAuthenticated = true;
@@ -49,26 +48,36 @@ export default class HubAuthenticationService extends Service {
   }
 
   get authToken(): string | null {
-    return this.storage.getItem('authToken');
+    const authTokens = this.storage.getItem('authTokens');
+    if (!this.wallet.address || !authTokens) return null;
+    const authTokensObj = JSON.parse(authTokens);
+    return authTokensObj[this.wallet.address];
   }
 
   set authToken(val: string | null) {
     if (val) {
-      this.storage.setItem('authToken', val);
+      const authTokens = this.storage.getItem('authTokens');
+      const authTokensObj = authTokens ? JSON.parse(authTokens) : {};
+      if (this.wallet.address) authTokensObj[this.wallet.address] = val;
+      this.storage.setItem('authTokens', JSON.stringify(authTokensObj));
     } else {
       this.isAuthenticated = false;
-      this.storage.removeItem('authToken');
+      this.storage.removeItem('authTokens');
     }
   }
 
   async hasValidAuthentication() {
     const hubAuth = await this.getHubAuth();
-
-    return Boolean(
-      this.wallet.isConnected &&
-        this.authToken &&
-        (await hubAuth.checkValidAuth(this.authToken))
-    );
+    try {
+      const authAddress = this.authToken
+        ? await hubAuth.getAddress(this.authToken)
+        : null;
+      return Boolean(
+        this.wallet.isConnected && authAddress === this.wallet.address
+      );
+    } catch (e) {
+      return false;
+    }
   }
 }
 
