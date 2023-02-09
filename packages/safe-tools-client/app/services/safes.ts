@@ -10,6 +10,9 @@ import WalletService from '@cardstack/safe-tools-client/services/wallet';
 import { action } from '@ember/object';
 import Service, { inject as service } from '@ember/service';
 import { tracked } from '@glimmer/tracking';
+import { TaskGenerator, timeout } from 'ember-concurrency';
+import { task } from 'ember-concurrency-decorators';
+import { taskFor } from 'ember-concurrency-ts';
 import { use, resource } from 'ember-resources';
 import { BigNumber } from 'ethers';
 import { TrackedObject } from 'tracked-built-ins';
@@ -50,10 +53,15 @@ export default class SafesService extends Service {
     super(properties);
 
     // We keep reloading the token balances so that they are up do date
-    // when user adds funds to the safe independently of the app
-    setInterval(() => {
-      this.reloadTokenBalances();
-    }, 30 * 1000);
+    // when users add funds to the safe independently of the app
+    taskFor(this.refreshTokenBalancesIndefinitely).perform();
+  }
+
+  @task *refreshTokenBalancesIndefinitely(): TaskGenerator<void> {
+    while (1) {
+      yield this.reloadTokenBalances();
+      yield timeout(30 * 1000); // Every 30 seconds
+    }
   }
 
   get safes(): Safe[] | undefined {
