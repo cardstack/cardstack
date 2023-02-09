@@ -216,17 +216,19 @@ export default class DataIntegrityChecksScheduledPayments {
 
   async getRelayerFunderBalance(networkName: string): Promise<BigNumber> {
     let relayerUrl = getConstantByNetwork('relayServiceURL', networkName);
+    let chainId = getConstantByNetwork('chainId', networkName);
 
     let responseText = await (await fetch(`${relayerUrl}/v1/about`)).text();
     let relayerFunderPublicKey = JSON.parse(responseText).settings.SAFE_TX_SENDER_PUBLIC_KEY;
 
-    let provider = this.ethersProvider.getInstance(networkName);
+    let provider = this.ethersProvider.getInstance(chainId);
     return await provider.getBalance(relayerFunderPublicKey);
   }
 
   async getCrankBalance(networkName: string): Promise<BigNumber> {
+    let chainId = getConstantByNetwork('chainId', networkName);
     let crank = new Wallet(config.get('hubPrivateKey'));
-    let provider = this.ethersProvider.getInstance(networkName);
+    let provider = this.ethersProvider.getInstance(chainId);
     return await provider.getBalance(crank.address);
   }
 }
