@@ -10,7 +10,6 @@ import { action } from '@ember/object';
 import { tracked } from '@glimmer/tracking';
 import { Day } from '@cardstack/boxel/components/boxel/input/date';
 import { Time } from '@cardstack/boxel/components/boxel/input/time';
-import withTokenIcons from '../../helpers/with-token-icons';
 import SchedulePaymentFormValidator, { MaxGasFeeOption, ValidatableForm } from './validator';
 import { use, resource } from 'ember-resources';
 import { TrackedObject } from 'tracked-built-ins';
@@ -506,7 +505,7 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
       @paymentTokens={{this.paymentTokens}}
       @onUpdatePaymentToken={{this.onUpdatePaymentToken}}
       @selectedGasToken={{this.selectedGasToken}}
-      @gasTokens={{withTokenIcons this.tokens.gasTokens.value}}
+      @gasTokens={{this.tokens.gasTokens.value}}
       @onSelectGasToken={{this.onSelectGasToken}}
       @isGasTokenInvalid={{not this.validator.isGasTokenValid}}
       @gasTokenErrorMessage={{this.validator.gasTokenErrorMessage}}
