@@ -37,9 +37,10 @@ export default class FuturePaymentsList extends Component<Signature> {
 
   get today(): ScheduledPayment[] {
     if (!this.scheduledPayments) return [];
-    let startOfToday = startOfDay(this.now);
+    // In order to avoid filtering out a payment that was scheduled 12:00 that is not yet processed at 12:01,
+    // we include all payments with payAt earlier than the end of today
     let endOfToday = endOfDay(this.now);
-    return this.scheduledPayments.filter((s: ScheduledPayment) => s.payAt >= startOfToday && s.payAt <= endOfToday);
+    return this.scheduledPayments.filter((s: ScheduledPayment) => s.payAt <= endOfToday);
   }
 
   get tomorrow(): ScheduledPayment[] {
