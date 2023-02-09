@@ -63,12 +63,13 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
   @service declare scheduledPaymentSdk: ScheduledPaymentSdkService;
   @service('scheduled-payments') declare scheduledPaymentsService: ScheduledPaymentsService;
   validator = new SchedulePaymentFormValidator(this);
-  gasEstimation?: ServiceGasEstimationResult;
+
   lastScheduledPaymentId?: string;
 
   @tracked schedulingStatus?: string;
   @tracked txHash?: TransactionHash;
   @tracked scheduleErrorMessage?: string;
+  @tracked gasEstimation?: ServiceGasEstimationResult;
 
   updateInterval: ReturnType<typeof setInterval>;
 
