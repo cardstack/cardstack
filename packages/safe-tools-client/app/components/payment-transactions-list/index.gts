@@ -21,6 +21,7 @@ import formatDate from '@cardstack/safe-tools-client/helpers/format-date';
 import { taskFor } from 'ember-concurrency-ts';
 import { task, TaskGenerator } from 'ember-concurrency';
 import nativeUnitsToDecimal from '@cardstack/safe-tools-client/helpers/native-units-to-decimal';
+import paymentErrorMessage from '@cardstack/safe-tools-client/helpers/payment-error-message';
 import { type TokenInfo } from '@uniswap/token-lists';
 import TokensService from '@cardstack/safe-tools-client/services/tokens';
 import { subDays } from 'date-fns';
@@ -185,7 +186,7 @@ class PaymentTransactionsList extends Component {
 
                   {{#if (eq paymentAttempt.status 'failed')}}
                     <span class="transactions-table-item-status-failure-reason">
-                      ({{paymentAttempt.failureReason}})
+                      ({{paymentErrorMessage paymentAttempt.failureReason}})
                     </span>
                   {{/if}}
                 </td>
