@@ -35,7 +35,7 @@ export default class Wallet extends Service {
   @tracked safes = [];
 
   //@ts-expect-error  ethersProvider will be assigned in constructor
-  ethersProvider: Web3Provider;
+  @tracked ethersProvider: Web3Provider;
   chainConnectionManager: ChainConnectionManager;
 
   walletProviders = walletProviders.map((w) =>

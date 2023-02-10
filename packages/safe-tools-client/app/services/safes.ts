@@ -9,10 +9,16 @@ import NetworkService from '@cardstack/safe-tools-client/services/network';
 import WalletService from '@cardstack/safe-tools-client/services/wallet';
 import { action } from '@ember/object';
 import Service, { inject as service } from '@ember/service';
+import { isTesting } from '@embroider/macros';
 import { tracked } from '@glimmer/tracking';
+import { TaskGenerator, rawTimeout } from 'ember-concurrency';
+import { task } from 'ember-concurrency-decorators';
+import { taskFor } from 'ember-concurrency-ts';
 import { use, resource } from 'ember-resources';
 import { BigNumber } from 'ethers';
 import { TrackedObject } from 'tracked-built-ins';
+
+const RELOAD_BALANCES_INTERVAL = isTesting() ? 500 : 30 * 1000; // Every 30 seconds
 
 export interface Safe {
   address: string;
@@ -37,6 +43,7 @@ interface TokenBalanceResourceState extends Record<PropertyKey, unknown> {
   error?: Error;
   isLoading: boolean;
   value?: TokenBalance[];
+  load: () => Promise<void>;
 }
 
 export default class SafesService extends Service {
@@ -44,6 +51,21 @@ export default class SafesService extends Service {
   @service declare wallet: WalletService;
 
   @tracked selectedSafe?: Safe;
+
+  constructor(properties?: object | undefined) {
+    super(properties);
+
+    // We keep reloading the token balances so that they are up do date
+    // when users add or remove funds in the safe independently of the app
+    taskFor(this.refreshTokenBalancesIndefinitely).perform();
+  }
+
+  @task *refreshTokenBalancesIndefinitely(): TaskGenerator<void> {
+    while (true) {
+      yield this.reloadTokenBalances();
+      yield rawTimeout(RELOAD_BALANCES_INTERVAL);
+    }
+  }
 
   get safes(): Safe[] | undefined {
     return this.safesResource.value;
@@ -69,41 +91,50 @@ export default class SafesService extends Service {
     this.selectedSafe = safe;
   }
 
+  async reloadTokenBalances() {
+    await this.tokenBalancesResource.load();
+  }
+
   @use tokenBalancesResource = resource(() => {
     if (!this.wallet.ethersProvider || !this.currentSafe) {
-      return {
+      return new TrackedObject({
         error: false,
         isLoading: false,
         value: [],
-      };
+        load: () => Promise<void>,
+      });
     }
 
     const state: TokenBalanceResourceState = new TrackedObject({
       isLoading: true,
+      value: [],
+      error: undefined,
+      load: async () => {
+        state.isLoading = true;
+
+        const tokenAddresses = getConstantByNetwork(
+          'tokenList',
+          this.network.symbol
+        ).tokens.map((t: TokenDetail) => t.address);
+
+        try {
+          if (!this.currentSafe) return;
+
+          state.value = await this.fetchTokenBalances(
+            this.currentSafe.address,
+            tokenAddresses,
+            this.wallet.ethersProvider
+          );
+        } catch (error) {
+          console.log(error);
+          state.error = error;
+        } finally {
+          state.isLoading = false;
+        }
+      },
     });
 
-    const tokenAddresses = getConstantByNetwork(
-      'tokenList',
-      this.network.symbol
-    ).tokens.map((t: TokenDetail) => t.address);
-
-    (async () => {
-      try {
-        if (!this.currentSafe) return;
-
-        state.value = await this.fetchTokenBalances(
-          this.currentSafe.address,
-          tokenAddresses,
-          this.wallet.ethersProvider
-        );
-      } catch (error) {
-        console.log(error);
-        state.error = error;
-      } finally {
-        state.isLoading = false;
-      }
-    })();
-
+    state.load();
     return state;
   });
 

@@ -167,8 +167,12 @@ module('Acceptance | wallet connection', function (hooks) {
       assert.dom('[data-test-token-balance="USDT"]').hasText('10 USDT');
     });
   });
+});
 
-  module('Remembering the selected chain', function () {
+module(
+  'Acceptance | wallet connection | Remembering the selected chain',
+  function (hooks) {
+    setupApplicationTest(hooks);
     test('Defaults to mainnet', async function (assert) {
       await visit('/schedule');
       await click('[data-test-connect-wallet-button-modal-sidebar]');
@@ -183,11 +187,10 @@ module('Acceptance | wallet connection', function (hooks) {
       test('Uses localstorage value for other', async function (assert) {
         await visit('/schedule');
         await click('[data-test-connect-wallet-button-modal-sidebar]');
-
         assert
           .dom('[data-test-connect-wallet-button-modal]')
           .hasAttribute('data-test-connect-wallet-button-modal-chain-id', '5');
       });
     });
-  });
-});
+  }
+);
