@@ -9,13 +9,16 @@ import NetworkService from '@cardstack/safe-tools-client/services/network';
 import WalletService from '@cardstack/safe-tools-client/services/wallet';
 import { action } from '@ember/object';
 import Service, { inject as service } from '@ember/service';
+import { isTesting } from '@embroider/macros';
 import { tracked } from '@glimmer/tracking';
-import { TaskGenerator, timeout } from 'ember-concurrency';
+import { TaskGenerator, rawTimeout } from 'ember-concurrency';
 import { task } from 'ember-concurrency-decorators';
 import { taskFor } from 'ember-concurrency-ts';
 import { use, resource } from 'ember-resources';
 import { BigNumber } from 'ethers';
 import { TrackedObject } from 'tracked-built-ins';
+
+const RELOAD_BALANCES_INTERVAL = isTesting() ? 500 : 30 * 1000; // Every 30 seconds
 
 export interface Safe {
   address: string;
@@ -60,7 +63,7 @@ export default class SafesService extends Service {
   @task *refreshTokenBalancesIndefinitely(): TaskGenerator<void> {
     while (true) {
       yield this.reloadTokenBalances();
-      yield timeout(30 * 1000); // Every 30 seconds
+      yield rawTimeout(RELOAD_BALANCES_INTERVAL);
     }
   }
 
@@ -94,12 +97,12 @@ export default class SafesService extends Service {
 
   @use tokenBalancesResource = resource(() => {
     if (!this.wallet.ethersProvider || !this.currentSafe) {
-      return {
+      return new TrackedObject({
         error: false,
         isLoading: false,
         value: [],
         load: () => Promise<void>,
-      };
+      });
     }
 
     const state: TokenBalanceResourceState = new TrackedObject({
