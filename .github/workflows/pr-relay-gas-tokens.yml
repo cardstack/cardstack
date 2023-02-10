@@ -1,0 +1,136 @@
+name: CI [relay-gas-tokens]
+
+on:
+  pull_request:
+    paths:
+      - "packages/cardpay-sdk/token-lists/*.json"
+      - ".github/workflows/pr-relay-gas-tokens.yml"
+      - "scripts/relay/**"
+      - "scripts/update-relay-server-gas-tokens.ts"
+
+jobs:
+  dry-run:
+    name: Dry Run - Update Relay Gas Tokens
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: volta-cli/action@v4
+
+      - uses: ./.github/actions/setup-node-modules-cache
+        with:
+          yarn_lock_md5: ${{ hashFiles('yarn.lock') }}
+
+      - run: yarn --prefer-offline --frozen-lockfile
+
+      - name: Configure staging AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1-node16
+        with:
+          role-to-assume: arn:aws:iam::680542703984:role/github-actions-relay
+          aws-region: us-east-1
+
+      - uses: dkershner6/aws-ssm-getparameters-action@v1
+        with:
+          parameterPairs: |
+            /staging/safe-relay/goerli/admin_username = GOERLI_ADMIN_USERNAME,
+            /staging/safe-relay/goerli/admin_password = GOERLI_ADMIN_PASSWORD,
+            /staging/safe-relay/mumbai/admin_username = MUMBAI_ADMIN_USERNAME,
+            /staging/safe-relay/mumbai/admin_password = MUMBAI_ADMIN_PASSWORD
+
+      - name: Update ECR lifecycle policy in goerli
+        id: goerli
+        env:
+          DRY_RUN: "true"
+          TOKEN_LIST_JSON_FILE_PATH: "packages/cardpay-sdk/token-lists/goerli-tokenlist.json"
+          RELAY_ADMIN_HOST: "https://relay-goerli.staging.stack.cards"
+        run: >
+          echo "output=$(
+          yarn update-relay-gas-tokens
+          $TOKEN_LIST_JSON_FILE_PATH
+          $RELAY_ADMIN_HOST
+          $GOERLI_ADMIN_USERNAME
+          $GOERLI_ADMIN_PASSWORD)"
+          >> $GITHUB_OUTPUT
+
+      - name: Update ECR lifecycle policy in mumbai
+        id: mumbai
+        env:
+          DRY_RUN: "true"
+          TOKEN_LIST_JSON_FILE_PATH: "packages/cardpay-sdk/token-lists/mumbai-tokenlist.json"
+          RELAY_ADMIN_HOST: "https://relay-mumbai.staging.stack.cards"
+        run: >
+          echo "output=$(
+          yarn update-relay-gas-tokens
+          $TOKEN_LIST_JSON_FILE_PATH
+          $RELAY_ADMIN_HOST
+          $MUMBAI_ADMIN_USERNAME
+          $MUMBAI_ADMIN_PASSWORD)"
+          >> $GITHUB_OUTPUT
+
+      - name: Configure prod AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1-node16
+        with:
+          role-to-assume: arn:aws:iam::120317779495:role/github-actions-relay
+          aws-region: us-east-1
+
+      - uses: dkershner6/aws-ssm-getparameters-action@v1
+        with:
+          parameterPairs: |
+            /production/safe-relay/ethereum/admin_username = ETHEREUM_ADMIN_USERNAME,
+            /production/safe-relay/ethereum/admin_password = ETHEREUM_ADMIN_PASSWORD,
+            /production/safe-relay/polygon/admin_username = POLYGON_ADMIN_USERNAME,
+            /production/safe-relay/polygon/admin_password = POLYGON_ADMIN_PASSWORD
+
+      - name: Update ECR lifecycle policy in ethereum
+        id: ethereum
+        env:
+          DRY_RUN: "true"
+          TOKEN_LIST_JSON_FILE_PATH: "packages/cardpay-sdk/token-lists/ethereum-tokenlist.json"
+          RELAY_ADMIN_HOST: "https://relay-ethereum.cardstack.com"
+        run: >
+          echo "output=$(
+          yarn update-relay-gas-tokens
+          $TOKEN_LIST_JSON_FILE_PATH
+          $RELAY_ADMIN_HOST
+          $ETHEREUM_ADMIN_USERNAME
+          $ETHEREUM_ADMIN_PASSWORD)"
+          >> $GITHUB_OUTPUT
+
+      - name: Update ECR lifecycle policy in polygon
+        id: polygon
+        env:
+          DRY_RUN: "true"
+          TOKEN_LIST_JSON_FILE_PATH: "packages/cardpay-sdk/token-lists/polygon-tokenlist.json"
+          RELAY_ADMIN_HOST: "https://relay-polygon.cardstack.com"
+        run: >
+          echo "output=$(
+          yarn update-relay-gas-tokens
+          $TOKEN_LIST_JSON_FILE_PATH
+          $RELAY_ADMIN_HOST
+          $POLYGON_ADMIN_USERNAME
+          $POLYGON_ADMIN_PASSWORD)"
+          >> $GITHUB_OUTPUT
+
+      - uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          number: ${{ github.event.pull_request.number }}
+          header: relay-gas-tokens
+          hide_and_recreate: true
+          hide_classify: "OUTDATED"
+          message: |
+            ### goerli
+            ```
+            ${{ steps.goerli.outputs.output }}
+            ```
+            ### mumbai
+            ```
+            ${{ steps.mumbai.outputs.output }}
+            ```
+            ### ethereum
+            ```
+            ${{ steps.ethereum.outputs.output }}
+            ```
+            ### polygon
+            ```
+            ${{ steps.polygon.outputs.output }}
+            ```
+          path: configs/${{ env.WORKSPACE }}/comment.md
