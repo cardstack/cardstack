@@ -2,13 +2,12 @@
 
 import GnosisSafeABI from '../contracts/abi/gnosis-safe';
 import MetaGuardABI from '../contracts/abi/modules/meta-guard';
-import ScheduledPaymentABI from '../contracts/abi/modules/scheduled-payment-module';
 import { getAddress } from '../contracts/addresses';
 import {
-  deployAndSetUpModule,
   encodeMultiSend,
   encodeMultiSendCallOnly,
   getModuleProxyCreationEvent,
+  deployAndSetUpModule,
 } from './utils/module-utils';
 import {
   generateSaltNonce,
@@ -29,14 +28,12 @@ import {
 } from './utils/safe-utils';
 import { BigNumber, Contract, Signer, utils } from 'ethers';
 import { signSafeTx, signSafeTxAsBytes } from './utils/signing-utils';
-import { convertChainIdToName, ERC20ABI } from '../dist';
+import { AddressKeys, ERC20ABI } from '..';
 /* eslint-disable node/no-extraneous-import */
 import { AddressZero } from '@ethersproject/constants';
-import { GasEstimationScenario } from './scheduled-payment/utils';
 import BN from 'bn.js';
 import JsonRpcProvider from '../providers/json-rpc-provider';
-import { getConstantByNetwork } from './constants';
-import { getGasPricesInNativeWei, getNativeWeiInToken } from './utils/conversions';
+import { camelCase } from 'lodash';
 
 export interface EnableModuleAndGuardResult {
   moduleAddress: string;
@@ -52,7 +49,7 @@ export interface CreateSafeWithModuleAndGuardResult {
 export interface CreateSafeWithModuleAndGuardTx {
   multiSendCallOnlyTx: Transaction;
   expectedSafeAddress: string;
-  expectedSPModuleAddress: string;
+  expectedModuleAddress: string;
   expectedMetaGuardAddress: string;
 }
 
@@ -66,9 +63,18 @@ export interface GasEstimationResult {
 export const FEE_BASE_POW = new BN(18);
 export const FEE_BASE = new BN(10).pow(FEE_BASE_POW);
 
-export default class SafeModule {
-  constructor(private ethersProvider: JsonRpcProvider, private signer?: Signer) {
+export default abstract class SafeModule {
+  private ethersProvider: JsonRpcProvider;
+  private signer?: Signer;
+  public name: AddressKeys;
+  public salt: string;
+  public abi: any & (null | undefined);
+
+  constructor(ethersProvider: JsonRpcProvider, signer?: Signer) {
+    this.name = camelCase(this.constructor.name) as AddressKeys;
     this.signer = signer ? signer.connect(ethersProvider) : signer;
+    this.ethersProvider = ethersProvider;
+    this.salt = 'defaultSalt';
   }
 
   async enableModuleAndGuard(txnHash: string): Promise<EnableModuleAndGuardResult>;
@@ -178,7 +184,7 @@ export default class SafeModule {
       AddressZero,
       '0',
       AddressZero,
-      generateSaltNonce('cardstack-sp-create-safe')
+      generateSaltNonce(this.salt)
     );
     let enableModuleTxs = await this.generateEnableModuleTxs(expectedSafeAddress, [from]);
     let setGuardTxs = await this.generateSetGuardTxs(expectedSafeAddress);
@@ -235,68 +241,9 @@ export default class SafeModule {
     return {
       multiSendCallOnlyTx,
       expectedSafeAddress,
-      expectedSPModuleAddress: enableModuleTxs.expectedModuleAddress,
+      expectedModuleAddress: enableModuleTxs.expectedModuleAddress,
       expectedMetaGuardAddress: setGuardTxs.expectedModuleAddress,
     };
-  }
-
-  async createSafeWithModuleAndGuardEstimation(contractOptions?: ContractOptions): Promise<BigNumber> {
-    let signer = this.signer ? this.signer : this.ethersProvider.getSigner();
-    let from = contractOptions?.from ?? (await signer.getAddress());
-
-    let { expectedSafeAddress, create2SafeTx } = await generateCreate2SafeTx(
-      this.ethersProvider,
-      [from],
-      1,
-      AddressZero,
-      '0x',
-      AddressZero,
-      AddressZero,
-      '0',
-      AddressZero,
-      generateSaltNonce('cardstack-sp-create-safe')
-    );
-    let enableModuleTxs = await this.generateEnableModuleTxs(expectedSafeAddress, [from]);
-    let setGuardTxs = await this.generateSetGuardTxs(expectedSafeAddress);
-
-    let createSafeGas = await this.ethersProvider.estimateGas({
-      to: create2SafeTx.to,
-      data: create2SafeTx.data,
-    });
-    let deploySPModuleGas = await this.ethersProvider.estimateGas({
-      to: enableModuleTxs.txs[0].to,
-      data: enableModuleTxs.txs[0].data,
-    });
-    let deployMetaGuardGas = await this.ethersProvider.estimateGas({
-      to: setGuardTxs.txs[0].to,
-      data: setGuardTxs.txs[0].data,
-    });
-
-    let estimateEnableSPModule = await gasEstimate(
-      this.ethersProvider,
-      await getAddress('gnosisSafeMasterCopy', this.ethersProvider),
-      utils.getAddress(enableModuleTxs.txs[1].to),
-      enableModuleTxs.txs[1].value,
-      enableModuleTxs.txs[1].data,
-      enableModuleTxs.txs[1].operation,
-      AddressZero,
-      true
-    );
-    let enableSPModuleGas = BigNumber.from(estimateEnableSPModule.baseGas).add(estimateEnableSPModule.safeTxGas);
-
-    let estimateSetMetaGuard = await gasEstimate(
-      this.ethersProvider,
-      await getAddress('gnosisSafeMasterCopy', this.ethersProvider),
-      utils.getAddress(enableModuleTxs.txs[1].to),
-      setGuardTxs.txs[1].value,
-      setGuardTxs.txs[1].data,
-      setGuardTxs.txs[1].operation,
-      AddressZero,
-      true
-    );
-    let setMetaGuardGas = BigNumber.from(estimateSetMetaGuard.baseGas).add(estimateSetMetaGuard.safeTxGas);
-
-    return createSafeGas.add(deploySPModuleGas).add(deployMetaGuardGas).add(enableSPModuleGas).add(setMetaGuardGas);
   }
 
   async createSafeWithModuleAndGuard(
@@ -318,7 +265,7 @@ export default class SafeModule {
     let signer = this.signer ? this.signer : this.ethersProvider.getSigner();
     let from = contractOptions?.from ?? (await signer.getAddress());
 
-    let { multiSendCallOnlyTx, expectedSafeAddress, expectedSPModuleAddress, expectedMetaGuardAddress } =
+    let { multiSendCallOnlyTx, expectedSafeAddress, expectedModuleAddress, expectedMetaGuardAddress } =
       await this.createSafeWithModuleAndGuardTx(from);
     let response = await signer.sendTransaction({
       to: multiSendCallOnlyTx.to,
@@ -331,22 +278,16 @@ export default class SafeModule {
 
     return {
       safeAddress: expectedSafeAddress,
-      moduleAddress: expectedSPModuleAddress,
+      moduleAddress: expectedModuleAddress,
       metaGuardAddress: expectedMetaGuardAddress,
     };
   }
 
   async generateEnableModuleTxs(safeAddress: string, safeOwners: string[] = []) {
-    let masterCopy = new Contract(
-      await getAddress('scheduledPaymentModule', this.ethersProvider),
-      ScheduledPaymentABI,
-      this.ethersProvider
-    );
-    let configAddress = await getAddress('scheduledPaymentConfig', this.ethersProvider);
-    let exchangeAddress = await getAddress('scheduledPaymentExchange', this.ethersProvider);
+    let masterCopy = new Contract(await getAddress(this.name, this.ethersProvider), this.abi, this.ethersProvider);
     let { transaction, expectedModuleAddress } = await deployAndSetUpModule(this.ethersProvider, masterCopy, {
-      types: ['address', 'address', 'address[]', 'address', 'address', 'address'],
-      values: [safeAddress, safeAddress, safeOwners, safeAddress, configAddress, exchangeAddress],
+      types: ['address', 'address', 'address[]', 'address'],
+      values: [safeAddress, safeAddress, safeOwners, safeAddress],
     });
     let safe = new Contract(safeAddress, GnosisSafeABI, this.ethersProvider);
     let enableModuleData = safe.interface.encodeFunctionData('enableModule', [expectedModuleAddress]);
@@ -361,15 +302,21 @@ export default class SafeModule {
   }
 
   async generateSetGuardTxs(safeAddress: string) {
+    //TODO: salt nonce in deployAndSetup
     let masterCopy = new Contract(
       await getAddress('metaGuard', this.ethersProvider),
       MetaGuardABI,
       this.ethersProvider
     );
-    let { transaction, expectedModuleAddress } = await deployAndSetUpModule(this.ethersProvider, masterCopy, {
-      types: ['address', 'address', 'uint256', 'address[]'],
-      values: [safeAddress, safeAddress, 0, []],
-    });
+    let { transaction, expectedModuleAddress } = await deployAndSetUpModule(
+      this.ethersProvider,
+      masterCopy,
+      {
+        types: ['address', 'address', 'uint256', 'address[]'],
+        values: [safeAddress, safeAddress, 0, []],
+      },
+      'cardstack-cs-create-safe'
+    );
     let safe = new Contract(safeAddress, GnosisSafeABI, this.ethersProvider);
     let setGuardData = safe.interface.encodeFunctionData('setGuard', [expectedModuleAddress]);
     let setGuardTransaction = {
@@ -391,7 +338,7 @@ export default class SafeModule {
   async getModuleAndGuardAddressFromTxn(txnHash: string): Promise<EnableModuleAndGuardResult> {
     let receipt = await waitUntilTransactionMined(this.ethersProvider, txnHash);
     let moduleProxyCreationEvents = await getModuleProxyCreationEvent(this.ethersProvider, receipt.logs);
-    let moduleMasterCopy = await getAddress('scheduledPaymentModule', this.ethersProvider);
+    let moduleMasterCopy = await getAddress(this.name, this.ethersProvider);
     let metaGuardMasterCopy = await getAddress('metaGuard', this.ethersProvider);
     let moduleAddress = moduleProxyCreationEvents.find((event) => event.args['masterCopy'] === moduleMasterCopy)?.args[
       'proxy'
@@ -401,62 +348,6 @@ export default class SafeModule {
     return {
       moduleAddress,
       metaGuardAddress,
-    };
-  }
-
-  // Use the hub as a proxy to estimate
-  // to make the estimation process faster
-  // and doesn't requiring user to have enough balance of token transfer & gas token
-  async estimateGas(
-    scenario: GasEstimationScenario,
-    options: {
-      safeAddress?: string | null;
-      hubUrl?: string | null;
-    }
-  ): Promise<GasEstimationResult> {
-    let chainId = (await this.ethersProvider.getNetwork()).chainId;
-    const network = convertChainIdToName(chainId);
-    let body = {
-      data: {
-        attributes: {
-          scenario: scenario,
-          'chain-id': chainId,
-          'safe-address': options.safeAddress,
-        },
-      },
-    };
-    let gasEstimationResponse = await fetch(
-      `${options.hubUrl || getConstantByNetwork('hubUrl', network)}/api/gas-estimation`,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/vnd.api+json',
-          Accept: 'application/vnd.api+json',
-        },
-        body: JSON.stringify(body),
-      }
-    );
-    let gasStationResponse = await getGasPricesInNativeWei(chainId, { hubUrl: options.hubUrl });
-    let gas = BigNumber.from((await gasEstimationResponse.json()).data?.attributes?.gas);
-    let gasRangeInWei = {
-      slow: gas.mul(String(gasStationResponse.slow)),
-      standard: gas.mul(String(gasStationResponse.standard)),
-      fast: gas.mul(String(gasStationResponse.fast)),
-    };
-
-    let usdStableCoinToken = await getAddress('usdStableCoinToken', this.ethersProvider);
-    if (!usdStableCoinToken) throw Error('USD Stable Coin token not found');
-    let priceWeiInUSD = String(await getNativeWeiInToken(this.ethersProvider, usdStableCoinToken));
-    let gasRangeInUSD = {
-      slow: gasRangeInWei.slow.mul(priceWeiInUSD),
-      standard: gasRangeInWei.standard.mul(priceWeiInUSD),
-      fast: gasRangeInWei.fast.mul(priceWeiInUSD),
-    };
-
-    return {
-      gas,
-      gasRangeInWei,
-      gasRangeInUSD,
     };
   }
 }
