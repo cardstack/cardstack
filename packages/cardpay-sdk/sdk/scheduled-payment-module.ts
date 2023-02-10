@@ -1278,7 +1278,7 @@ export default class ScheduledPaymentModule {
       // ExceedMaxGasPrice: gasPrice must be lower than or equal maxGasPrice
       // PaymentExecutionFailed: safe balance is not enough to make payments and pay fees
       // OutOfGas: executionGas to low to execute scheduled payment
-      throw extractSendTransactionError(e, new Interface(ScheduledPaymentABI));
+      throw new Error(extractSendTransactionError(e, new Interface(ScheduledPaymentABI)));
     }
   }
 
