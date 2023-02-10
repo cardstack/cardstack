@@ -118,7 +118,7 @@ module('Acceptance | wallet connection', function (hooks) {
       assert.dom('[data-test-token-balance="USDT"]').hasText('10 USDT');
 
       await waitFor('[data-test-hub-auth-modal]');
-      await percySnapshot(assert);
+      await percySnapshot('before hub auth prompt');
       await click('[data-test-hub-auth-modal] button');
       assert.dom('[data-test-hub-auth-modal]').doesNotExist();
 
@@ -130,7 +130,7 @@ module('Acceptance | wallet connection', function (hooks) {
         'auth-token-1337-account-1'
       );
 
-      await percySnapshot(assert);
+      await percySnapshot('after hub auth prompt');
 
       currentAccount = TEST_ACCOUNT_2;
       await this.mockMetaMask.mockAccountsChanged([TEST_ACCOUNT_2]);
@@ -145,7 +145,6 @@ module('Acceptance | wallet connection', function (hooks) {
       assert.dom('[data-test-schedule-form-connect-wallet-cta]').doesNotExist();
 
       await waitFor('[data-test-hub-auth-modal]');
-      await percySnapshot(assert);
       await click('[data-test-hub-auth-modal] button');
       assert.dom('[data-test-hub-auth-modal]').doesNotExist();
 

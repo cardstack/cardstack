@@ -83,15 +83,24 @@ module('Acceptance | scheduling', function (hooks) {
         return res(
           ctx.status(200),
           ctx.json({
-            web3: {
-              schedulerToolNetworks: ['mainnet', 'polygon'],
+            data: {
+              attributes: {
+                web3: {
+                  schedulerNetworks: ['mainnet', 'polygon'],
+                },
+              },
             },
           })
         );
       }),
       rest.get('/hub-test/api/session', (req, res, ctx) => {
         if (req.headers.get('Authorization')) {
-          return res(ctx.status(200), ctx.json({}));
+          return res(
+            ctx.status(200),
+            ctx.json({
+              data: { attributes: { user: FAKE_WALLET_CONNECT_ACCOUNT } },
+            })
+          );
         } else {
           return res(
             ctx.status(401),
@@ -282,7 +291,10 @@ module('Acceptance | scheduling', function (hooks) {
         warning();
       },
     });
-    this.mockLocalStorage.setItem('authToken', 'abc123');
+    this.mockLocalStorage.setItem(
+      'authTokens',
+      JSON.stringify({ FAKE_WALLET_CONNECT_ACCOUNT: 'abc123' })
+    );
 
     this.mockWalletConnect.mockMainnet();
     this.mockWalletConnect.mockConnectedWallet([FAKE_WALLET_CONNECT_ACCOUNT]);
@@ -379,6 +391,11 @@ module('Acceptance | scheduling', function (hooks) {
         FAKE_WALLET_CONNECT_ACCOUNT,
       ]);
       await waitFor(`[data-test-safe-address-label][title="${SAFE_ADDRESS}"]`);
+
+      await waitFor('[data-test-hub-auth-modal]');
+      await click('[data-test-hub-auth-modal] button');
+      await waitUntil(() => find('[data-test-hub-auth-modal]') === null);
+
       await fillInSchedulePaymentFormWithValidInfo({ type: 'one-time' });
       await waitFor(`${SUBMIT_BUTTON}:not(:disabled)`);
       await click(SUBMIT_BUTTON);
@@ -395,7 +412,7 @@ module('Acceptance | scheduling', function (hooks) {
 
       assert.strictEqual(
         signedHubAuthentication,
-        1,
+        2,
         'signed hub authentication'
       );
       scheduledPaymentCreateSpHashDeferred?.fulfill();
