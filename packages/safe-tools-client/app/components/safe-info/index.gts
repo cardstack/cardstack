@@ -70,7 +70,7 @@ export default class SafeInfo extends Component<Signature> {
               as |balanceDecimalValue|
             }}
               {{!-- Don't show zero balances and crypto dust --}}
-              {{#if (or tokenBalance.isNativeToken (gt tokenBalance.balance 0.0001))}}
+              {{#if (gt tokenBalance.balance 0.0001)}}
                 <div class='safe-tools_safe-info-balance' data-test-token-balance={{tokenBalance.symbol}}>
                   {{balanceDecimalValue}} {{tokenBalance.symbol}}
                 </div>
