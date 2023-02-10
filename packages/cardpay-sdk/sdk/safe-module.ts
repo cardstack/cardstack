@@ -308,15 +308,10 @@ export default abstract class SafeModule {
       MetaGuardABI,
       this.ethersProvider
     );
-    let { transaction, expectedModuleAddress } = await deployAndSetUpModule(
-      this.ethersProvider,
-      masterCopy,
-      {
-        types: ['address', 'address', 'uint256', 'address[]'],
-        values: [safeAddress, safeAddress, 0, []],
-      },
-      'cardstack-cs-create-safe'
-    );
+    let { transaction, expectedModuleAddress } = await deployAndSetUpModule(this.ethersProvider, masterCopy, {
+      types: ['address', 'address', 'uint256', 'address[]'],
+      values: [safeAddress, safeAddress, 0, []],
+    });
     let safe = new Contract(safeAddress, GnosisSafeABI, this.ethersProvider);
     let setGuardData = safe.interface.encodeFunctionData('setGuard', [expectedModuleAddress]);
     let setGuardTransaction = {
