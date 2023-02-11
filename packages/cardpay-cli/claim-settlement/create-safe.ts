@@ -5,7 +5,7 @@ import { Arguments, CommandModule } from 'yargs';
 
 export default {
   command: 'create-safe',
-  describe: 'Create a new safe with SP module and meta guard installed',
+  describe: 'Create a new safe with claim-settlement module and meta guard installed',
   builder(yargs: Argv) {
     return yargs
       .option('txnHash', {
