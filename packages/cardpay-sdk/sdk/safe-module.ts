@@ -1,5 +1,3 @@
-/*global fetch */
-
 import GnosisSafeABI from '../contracts/abi/gnosis-safe';
 import MetaGuardABI from '../contracts/abi/modules/meta-guard';
 import { getAddress } from '../contracts/addresses';

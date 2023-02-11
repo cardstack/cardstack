@@ -1,5 +1,3 @@
-/*global fetch */
-
 import JsonRpcProvider from '../providers/json-rpc-provider';
 import SafeModule from './safe-module';
 import { Signer } from 'ethers';
