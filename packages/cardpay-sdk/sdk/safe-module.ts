@@ -26,7 +26,7 @@ import {
   getSafeProxyCreationEvent,
   Operation,
 } from './utils/safe-utils';
-import { BigNumber, Contract, Signer, utils } from 'ethers';
+import { BigNumber, Contract, ContractInterface, Signer, utils } from 'ethers';
 import { signSafeTx, signSafeTxAsBytes } from './utils/signing-utils';
 import { AddressKeys, ERC20ABI } from '..';
 /* eslint-disable node/no-extraneous-import */
@@ -64,17 +64,14 @@ export const FEE_BASE_POW = new BN(18);
 export const FEE_BASE = new BN(10).pow(FEE_BASE_POW);
 
 export default abstract class SafeModule {
-  private ethersProvider: JsonRpcProvider;
-  private signer?: Signer;
   public name: AddressKeys;
-  public salt: string;
-  public abi: any & (null | undefined);
+  public abstract salt: string;
+  public abstract abi: ContractInterface;
 
-  constructor(ethersProvider: JsonRpcProvider, signer?: Signer) {
-    this.name = camelCase(this.constructor.name) as AddressKeys;
+  constructor(private ethersProvider: JsonRpcProvider, private signer?: Signer) {
     this.signer = signer ? signer.connect(ethersProvider) : signer;
     this.ethersProvider = ethersProvider;
-    this.salt = 'defaultSalt';
+    this.name = camelCase(this.constructor.name) as AddressKeys;
   }
 
   async enableModuleAndGuard(txnHash: string): Promise<EnableModuleAndGuardResult>;
