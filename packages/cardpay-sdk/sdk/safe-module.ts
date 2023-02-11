@@ -8,6 +8,7 @@ import {
   encodeMultiSendCallOnly,
   getModuleProxyCreationEvent,
   deployAndSetUpModule,
+  SetupArgs,
 } from './utils/module-utils';
 import {
   generateSaltNonce,
@@ -68,10 +69,71 @@ export default abstract class SafeModule {
   public abstract salt: string;
   public abstract abi: ContractInterface;
 
-  constructor(private ethersProvider: JsonRpcProvider, private signer?: Signer) {
+  constructor(protected ethersProvider: JsonRpcProvider, protected signer?: Signer) {
     this.signer = signer ? signer.connect(ethersProvider) : signer;
     this.ethersProvider = ethersProvider;
     this.name = camelCase(this.constructor.name) as AddressKeys;
+  }
+
+  abstract setupArgs(safeAddress: string, safeOwners: string[]): Promise<SetupArgs>;
+
+  async createSafeWithModuleAndGuardEstimation(contractOptions?: ContractOptions): Promise<BigNumber> {
+    let signer = this.signer ? this.signer : this.ethersProvider.getSigner();
+    let from = contractOptions?.from ?? (await signer.getAddress());
+
+    let { expectedSafeAddress, create2SafeTx } = await generateCreate2SafeTx(
+      this.ethersProvider,
+      [from],
+      1,
+      AddressZero,
+      '0x',
+      AddressZero,
+      AddressZero,
+      '0',
+      AddressZero,
+      generateSaltNonce(this.salt)
+    );
+    let enableModuleTxs = await this.generateEnableModuleTxs(expectedSafeAddress, [from]);
+    let setGuardTxs = await this.generateSetGuardTxs(expectedSafeAddress);
+
+    let createSafeGas = await this.ethersProvider.estimateGas({
+      to: create2SafeTx.to,
+      data: create2SafeTx.data,
+    });
+    let deploySPModuleGas = await this.ethersProvider.estimateGas({
+      to: enableModuleTxs.txs[0].to,
+      data: enableModuleTxs.txs[0].data,
+    });
+    let deployMetaGuardGas = await this.ethersProvider.estimateGas({
+      to: setGuardTxs.txs[0].to,
+      data: setGuardTxs.txs[0].data,
+    });
+
+    let estimateEnableSPModule = await gasEstimate(
+      this.ethersProvider,
+      await getAddress('gnosisSafeMasterCopy', this.ethersProvider),
+      utils.getAddress(enableModuleTxs.txs[1].to),
+      enableModuleTxs.txs[1].value,
+      enableModuleTxs.txs[1].data,
+      enableModuleTxs.txs[1].operation,
+      AddressZero,
+      true
+    );
+    let enableSPModuleGas = BigNumber.from(estimateEnableSPModule.baseGas).add(estimateEnableSPModule.safeTxGas);
+
+    let estimateSetMetaGuard = await gasEstimate(
+      this.ethersProvider,
+      await getAddress('gnosisSafeMasterCopy', this.ethersProvider),
+      utils.getAddress(enableModuleTxs.txs[1].to),
+      setGuardTxs.txs[1].value,
+      setGuardTxs.txs[1].data,
+      setGuardTxs.txs[1].operation,
+      AddressZero,
+      true
+    );
+    let setMetaGuardGas = BigNumber.from(estimateSetMetaGuard.baseGas).add(estimateSetMetaGuard.safeTxGas);
+
+    return createSafeGas.add(deploySPModuleGas).add(deployMetaGuardGas).add(enableSPModuleGas).add(setMetaGuardGas);
   }
 
   async enableModuleAndGuard(txnHash: string): Promise<EnableModuleAndGuardResult>;
@@ -282,10 +344,13 @@ export default abstract class SafeModule {
 
   async generateEnableModuleTxs(safeAddress: string, safeOwners: string[] = []) {
     let masterCopy = new Contract(await getAddress(this.name, this.ethersProvider), this.abi, this.ethersProvider);
-    let { transaction, expectedModuleAddress } = await deployAndSetUpModule(this.ethersProvider, masterCopy, {
-      types: ['address', 'address', 'address[]', 'address'],
-      values: [safeAddress, safeAddress, safeOwners, safeAddress],
-    });
+    let args = await this.setupArgs(safeAddress, safeOwners);
+    let { transaction, expectedModuleAddress } = await deployAndSetUpModule(
+      this.ethersProvider,
+      masterCopy,
+      args,
+      this.salt
+    );
     let safe = new Contract(safeAddress, GnosisSafeABI, this.ethersProvider);
     let enableModuleData = safe.interface.encodeFunctionData('enableModule', [expectedModuleAddress]);
     let enableModuleTransaction = {
@@ -305,10 +370,15 @@ export default abstract class SafeModule {
       MetaGuardABI,
       this.ethersProvider
     );
-    let { transaction, expectedModuleAddress } = await deployAndSetUpModule(this.ethersProvider, masterCopy, {
-      types: ['address', 'address', 'uint256', 'address[]'],
-      values: [safeAddress, safeAddress, 0, []],
-    });
+    let { transaction, expectedModuleAddress } = await deployAndSetUpModule(
+      this.ethersProvider,
+      masterCopy,
+      {
+        types: ['address', 'address', 'uint256', 'address[]'],
+        values: [safeAddress, safeAddress, 0, []],
+      },
+      this.salt
+    );
     let safe = new Contract(safeAddress, GnosisSafeABI, this.ethersProvider);
     let setGuardData = safe.interface.encodeFunctionData('setGuard', [expectedModuleAddress]);
     let setGuardTransaction = {
