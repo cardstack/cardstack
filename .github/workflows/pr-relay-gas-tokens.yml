@@ -74,7 +74,7 @@ jobs:
           HOST: "https://relay-ethereum.cardstack.com"
           USERNAME: ${{ env.ETHEREUM_ADMIN_USERNAME }}
           PASSWORD: ${{ env.ETHEREUM_ADMIN_PASSWORD }}
-        run: >
+        run: |
           echo "output<<EOF" >> $GITHUB_OUTPUT
           echo "$(yarn update-relay-gas-tokens $TOKEN $HOST $USERNAME $PASSWORD)" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
@@ -99,7 +99,7 @@ jobs:
           HOST: "https://relay-polygon.cardstack.com"
           USERNAME: ${{ env.POLYGON_ADMIN_USERNAME }}
           PASSWORD: ${{ env.POLYGON_ADMIN_PASSWORD }}
-        run: >
+        run: |
           echo "output<<EOF" >> $GITHUB_OUTPUT
           echo "$(yarn update-relay-gas-tokens $TOKEN $HOST $USERNAME $PASSWORD)" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
