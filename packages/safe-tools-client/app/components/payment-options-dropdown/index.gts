@@ -4,7 +4,7 @@ import ScheduledPaymentSdkService from '@cardstack/safe-tools-client/services/sc
 import BoxelLoadingIndicator from '@cardstack/boxel/components/boxel/loading-indicator';
 import BoxelActionContainer from '@cardstack/boxel/components/boxel/action-container';
 import BoxelModal from '@cardstack/boxel/components/boxel/modal';
-import { ScheduledPayment } from '@cardstack/safe-tools-client/services/scheduled-payments';
+import { ScheduledPaymentBase } from '@cardstack/safe-tools-client/services/scheduled-payments';
 import formatDate from '@cardstack/safe-tools-client/helpers/format-date';
 import truncateMiddle from '@cardstack/safe-tools-client/helpers/truncate-middle';
 import { inject as service } from '@ember/service';
@@ -35,7 +35,7 @@ import './index.css';
 interface Signature {
   Element: HTMLElement;
   Args: {
-    scheduledPayment: ScheduledPayment;
+    scheduledPayment: ScheduledPaymentBase;
   }
 }
 

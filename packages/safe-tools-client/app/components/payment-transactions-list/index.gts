@@ -11,6 +11,7 @@ import WalletService from '@cardstack/safe-tools-client/services/wallet';
 import NetworkService from '@cardstack/safe-tools-client/services/network';
 import HubAuthenticationService from '@cardstack/safe-tools-client/services/hub-authentication';
 import ScheduledPaymentsService, { ScheduledPaymentAttempt, type ScheduledPaymentAttemptStatus } from '@cardstack/safe-tools-client/services/scheduled-payments';
+import PaymentOptionsDropdown from '@cardstack/safe-tools-client/components/payment-options-dropdown';
 import { inject as service } from '@ember/service';
 import { tracked } from '@glimmer/tracking';
 import { TrackedObject } from 'tracked-built-ins';
@@ -191,6 +192,10 @@ class PaymentTransactionsList extends Component {
                     />
                   {{/if}}
                 </td>
+                {{!-- TODO: only show options for < 3 attempt, when this info is stored --}}
+                {{#if (eq paymentAttempt.status 'failed')}}
+                  <PaymentOptionsDropdown @scheduledPayment={{paymentAttempt.scheduledPayment}}/>
+                {{/if}}
               </tr>
             {{/each}}
           </tbody>
