@@ -76,7 +76,7 @@ export default class HubAuthenticationService extends Service {
         this.wallet.isConnected && authAddress === this.wallet.address
       );
     } catch (e) {
-      if (e === 'Invalid auth token') {
+      if (e.message === 'Invalid auth token') {
         return false;
       }
       throw e;
