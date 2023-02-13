@@ -14,7 +14,7 @@ import { use, resource } from 'ember-resources';
 import { BigNumber } from 'ethers';
 import { TrackedObject } from 'tracked-built-ins';
 
-export interface ScheduledPayment {
+export interface ScheduledPaymentBase {
   id: string;
   feeFixedUSD: string;
   feePercentage: string;
@@ -23,6 +23,9 @@ export interface ScheduledPayment {
   payeeAddress: string;
   payAt: Date;
   chainId: number;
+}
+
+export interface ScheduledPayment extends ScheduledPaymentBase {
   executionGasEstimation: string;
   maxGasPrice: string;
   salt: string;
@@ -44,16 +47,7 @@ export interface ScheduledPaymentAttempt {
   status: string;
   failureReason: string;
   transactionHash: string;
-  scheduledPayment: {
-    amount: BigNumber;
-    feeFixedUSD: string;
-    feePercentage: string;
-    tokenAddress: string;
-    gasTokenAddress: string;
-    payeeAddress: string;
-    payAt: Date;
-    chainId: number;
-  };
+  scheduledPayment: ScheduledPaymentBase;
 }
 
 export interface ScheduledPaymentAttemptResponseItem {
@@ -187,6 +181,12 @@ export default class ScheduledPaymentsService extends Service {
       const scheduledPayment = response.included.find(
         (i) => i.id === scheduledPaymentId && i.type === 'scheduled-payments'
       )?.attributes;
+
+      const paymentTokenAddress = scheduledPayment!['token-address'];
+      const paymentToken =
+        this.tokens.tokenFromAddress(paymentTokenAddress) ||
+        buildUnknownToken(paymentTokenAddress);
+
       return {
         startedAt: new Date(s.attributes['started-at']),
         endedAt: new Date(s.attributes['ended-at']),
@@ -194,11 +194,14 @@ export default class ScheduledPaymentsService extends Service {
         failureReason: s.attributes['failure-reason'],
         transactionHash: s.attributes['transaction-hash'],
         scheduledPayment: {
-          amount: BigNumber.from(scheduledPayment!.amount),
+          id: scheduledPaymentId,
+          paymentTokenQuantity: new TokenQuantity(
+            paymentToken,
+            BigNumber.from(scheduledPayment!.amount)
+          ),
           feeFixedUSD: scheduledPayment!['fee-fixed-usd'],
           feePercentage: scheduledPayment!['fee-percentage'],
           gasTokenAddress: scheduledPayment!['gas-token-address'],
-          tokenAddress: scheduledPayment!['token-address'],
           chainId: Number(scheduledPayment!['chain-id']),
           payeeAddress: scheduledPayment!['payee-address'],
           payAt: new Date(scheduledPayment!['pay-at']),

@@ -20,9 +20,7 @@ import { menuItemFunc, MenuItem } from '@cardstack/boxel/helpers/menu-item'
 import formatDate from '@cardstack/safe-tools-client/helpers/format-date';
 import { taskFor } from 'ember-concurrency-ts';
 import { task, TaskGenerator } from 'ember-concurrency';
-import nativeUnitsToDecimal from '@cardstack/safe-tools-client/helpers/native-units-to-decimal';
 import paymentErrorMessage from '@cardstack/safe-tools-client/helpers/payment-error-message';
-import { type TokenInfo } from '@uniswap/token-lists';
 import TokensService from '@cardstack/safe-tools-client/services/tokens';
 import { subDays } from 'date-fns';
 import { action } from '@ember/object';
@@ -63,13 +61,7 @@ class PaymentTransactionsList extends Component {
   }
 
   get paymentAttempts() {
-    if (!this.scheduledPaymentAttemptsResource.value) return [];
-
-    // Add token info to each scheduled payment attempt so that we can display the token symbol and convert the amount to decimal using nativeUnitsToDecimal
-    return this.scheduledPaymentAttemptsResource.value.map((scheduledPaymentAttempt) => {
-      const tokenInfo = this.tokens.transactionTokens.find((t) => t.address === scheduledPaymentAttempt.scheduledPayment.tokenAddress) as TokenInfo;
-      return { ...scheduledPaymentAttempt, tokenInfo };
-    });
+    return this.scheduledPaymentAttemptsResource.value || []
   }
 
   @task *loadScheduledPaymentAttemptsTask(chainId: number, status?: ScheduledPaymentAttemptStatus, startedAt?: Date): TaskGenerator<ScheduledPaymentAttempt[]> {
@@ -173,7 +165,7 @@ class PaymentTransactionsList extends Component {
                   {{paymentAttempt.scheduledPayment.payeeAddress}}
                 </td>
                 <td class="table__cell" data-test-scheduled-payment-attempts-item-amount>
-                  <strong>{{nativeUnitsToDecimal paymentAttempt.scheduledPayment.amount paymentAttempt.tokenInfo.decimals}} {{paymentAttempt.tokenInfo.symbol}}</strong>
+                  <strong>{{paymentAttempt.scheduledPayment.paymentTokenQuantity.displayable}}</strong>
                 </td>
                 <td class="table__cell" data-test-scheduled-payment-attempts-item-status>
                   {{#if (eq paymentAttempt.status 'succeeded')}}
