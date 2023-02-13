@@ -41,7 +41,7 @@ jobs:
             /staging/safe-relay/goerli/admin_username = GOERLI_ADMIN_USERNAME,
             /staging/safe-relay/goerli/admin_password = GOERLI_ADMIN_PASSWORD
 
-      - name: Update ECR lifecycle policy in goerli
+      - name: Check drift in goerli relay server
         id: goerli
         env:
           DRY_RUN: "true"
@@ -66,20 +66,18 @@ jobs:
             /production/safe-relay/ethereum/admin_username = ETHEREUM_ADMIN_USERNAME,
             /production/safe-relay/ethereum/admin_password = ETHEREUM_ADMIN_PASSWORD
 
-      - name: Update ECR lifecycle policy in ethereum
+      - name: Check drift in ethereum relay server
         id: ethereum
         env:
           DRY_RUN: "true"
-          TOKEN_LIST_JSON_FILE_PATH: "packages/cardpay-sdk/token-lists/ethereum-tokenlist.json"
-          RELAY_ADMIN_HOST: "https://relay-ethereum.cardstack.com"
+          TOKEN: "packages/cardpay-sdk/token-lists/ethereum-tokenlist.json"
+          HOST: "https://relay-ethereum.cardstack.com"
+          USERNAME: ${{ env.ETHEREUM_ADMIN_USERNAME }}
+          PASSWORD: ${{ env.ETHEREUM_ADMIN_PASSWORD }}
         run: >
-          echo "output=$(
-          yarn update-relay-gas-tokens
-          $TOKEN_LIST_JSON_FILE_PATH
-          $RELAY_ADMIN_HOST
-          $ETHEREUM_ADMIN_USERNAME
-          $ETHEREUM_ADMIN_PASSWORD)"
-          >> $GITHUB_OUTPUT
+          echo "output<<EOF" >> $GITHUB_OUTPUT
+          echo "$(yarn update-relay-gas-tokens $TOKEN $HOST $USERNAME $PASSWORD)" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
 
       - name: Configure polygon AWS credentials
         uses: aws-actions/configure-aws-credentials@v1-node16
@@ -93,20 +91,18 @@ jobs:
             /production/safe-relay/polygon/admin_username = POLYGON_ADMIN_USERNAME,
             /production/safe-relay/polygon/admin_password = POLYGON_ADMIN_PASSWORD
 
-      - name: Update ECR lifecycle policy in polygon
+      - name: Check drift in polygon relay server
         id: polygon
         env:
           DRY_RUN: "true"
-          TOKEN_LIST_JSON_FILE_PATH: "packages/cardpay-sdk/token-lists/polygon-tokenlist.json"
-          RELAY_ADMIN_HOST: "https://relay-polygon.cardstack.com"
+          TOKEN: "packages/cardpay-sdk/token-lists/polygon-tokenlist.json"
+          HOST: "https://relay-polygon.cardstack.com"
+          USERNAME: ${{ env.POLYGON_ADMIN_USERNAME }}
+          PASSWORD: ${{ env.POLYGON_ADMIN_PASSWORD }}
         run: >
-          echo "output=$(
-          yarn update-relay-gas-tokens
-          $TOKEN_LIST_JSON_FILE_PATH
-          $RELAY_ADMIN_HOST
-          $POLYGON_ADMIN_USERNAME
-          $POLYGON_ADMIN_PASSWORD)"
-          >> $GITHUB_OUTPUT
+          echo "output<<EOF" >> $GITHUB_OUTPUT
+          echo "$(yarn update-relay-gas-tokens $TOKEN $HOST $USERNAME $PASSWORD)" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
 
       - uses: marocchino/sticky-pull-request-comment@v2
         with:
