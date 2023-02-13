@@ -8,6 +8,13 @@ on:
       - "scripts/relay/**"
       - "scripts/update-relay-server-gas-tokens.ts"
 
+permissions:
+  contents: read
+  issues: read
+  checks: write
+  pull-requests: write
+  id-token: write
+
 jobs:
   dry-run:
     name: Dry Run - Update Relay Gas Tokens
