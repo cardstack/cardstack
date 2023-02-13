@@ -52,7 +52,7 @@ class ScheduledPaymentsStub extends Service {
           startedAt: subDays(now, 20),
           endedAt: addMinutes(subDays(now, 20), 120),
           status: 'failed',
-          failureReason: 'Funds too low',
+          failureReason: 'PaymentExecutionFailed',
           transactionHash: '0x123',
           scheduledPayment: {
             amount: '10000000',
@@ -145,7 +145,7 @@ module('Integration | Component | payment-transactions-list', function (hooks) {
       .dom(
         '[data-test-scheduled-payment-attempts-item="1"] [data-test-scheduled-payment-attempts-item-status]'
       )
-      .includesText('Failed (Funds too low)');
+      .includesText('Failed (insufficient funds to execute the payment)');
 
     assert
       .dom(
@@ -181,7 +181,7 @@ module('Integration | Component | payment-transactions-list', function (hooks) {
       .dom(
         '[data-test-scheduled-payment-attempts-item="0"] [data-test-scheduled-payment-attempts-item-status]'
       )
-      .includesText('Failed (Funds too low)');
+      .includesText('Failed (insufficient funds to execute the payment)');
     await click('[data-test-scheduled-payment-status-filter]');
     await click('[data-test-boxel-menu-item-text="Succeeded"]');
 
