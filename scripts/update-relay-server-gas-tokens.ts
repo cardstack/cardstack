@@ -59,7 +59,7 @@ async function main() {
       if (!DRY_RUN) {
         await client.addToken(token);
       } else {
-        console.log(`token to be added: ${token.symbol}`);
+        console.info(`token to be added: ${token.symbol}`);
       }
     }
 
@@ -70,7 +70,7 @@ async function main() {
       if (!DRY_RUN) {
         await client.deleteToken(token.id);
       } else {
-        console.log(`token to be deleted: ${token.symbol}`);
+        console.info(`token to be deleted: ${token.symbol}`);
       }
     }
 
@@ -103,7 +103,7 @@ async function main() {
       if (!DRY_RUN) {
         await client.addPriceOracleTicker(ticker);
       } else {
-        console.log(`ticker to be added: ${ticker.token.symbol} - ${ticker.ticker}`);
+        console.info(`ticker to be added: ${ticker.token.symbol} - ${ticker.ticker}`);
       }
     }
 
@@ -118,7 +118,7 @@ async function main() {
       if (!DRY_RUN) {
         await client.deletePriceOracleTicker(ticker.id);
       } else {
-        console.log(`ticker to be deleted: ${ticker.token.symbol} - ${ticker.ticker}`);
+        console.info(`ticker to be deleted: ${ticker.token.symbol} - ${ticker.ticker}`);
       }
     }
 
@@ -129,7 +129,17 @@ async function main() {
       .filter((ticker) => !ticker.price)
       .map((ticker) => `${ticker.token.symbol} - ${ticker.ticker}`);
     if (tickersMissingPrice.length > 0) {
-      console.log('Following tickers are unable to compute the price(s):\n' + tickersMissingPrice.join('\n'));
+      console.info('Following tickers are unable to compute the price(s):\n' + tickersMissingPrice.join('\n'));
+    }
+
+    if (
+      DRY_RUN &&
+      tokensToAdd.length == 0 &&
+      tokensToDelete.length == 0 &&
+      tickersToAdd.length == 0 &&
+      tickersToDelete.length == 0
+    ) {
+      console.info('No changes. Tokens and tickers matches the configuration.');
     }
   } catch (err) {
     console.error(err);
