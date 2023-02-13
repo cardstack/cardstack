@@ -45,16 +45,14 @@ jobs:
         id: goerli
         env:
           DRY_RUN: "true"
-          TOKEN_LIST_JSON_FILE_PATH: "packages/cardpay-sdk/token-lists/goerli-tokenlist.json"
-          RELAY_ADMIN_HOST: "https://relay-goerli.staging.stack.cards"
-        run: >
-          echo "output=$(
-          yarn update-relay-gas-tokens
-          $TOKEN_LIST_JSON_FILE_PATH
-          $RELAY_ADMIN_HOST
-          $GOERLI_ADMIN_USERNAME
-          $GOERLI_ADMIN_PASSWORD)"
-          >> $GITHUB_OUTPUT
+          TOKEN: "packages/cardpay-sdk/token-lists/goerli-tokenlist.json"
+          HOST: "https://relay-goerli.staging.stack.cards"
+          USERNAME: ${{ env.GOERLI_ADMIN_USERNAME }}
+          PASSWORD: ${{ env.GOERLI_ADMIN_PASSWORD }}
+        run: |
+          echo "output<<EOF" >> $GITHUB_OUTPUT
+          echo "$(yarn update-relay-gas-tokens $TOKEN $HOST $USERNAME $PASSWORD)" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
 
       - name: Configure ethereum AWS credentials
         uses: aws-actions/configure-aws-credentials@v1-node16
