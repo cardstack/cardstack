@@ -173,8 +173,10 @@ class PaymentTransactionsList extends Component {
                     🟢 <span class="transactions-table-item-status-text">Confirmed</span>
                   {{else if (eq paymentAttempt.status 'failed')}}
                     🔴 <span class="transactions-table-item-status-text">Failed</span>
-                  {{else}}
+                  {{else if (eq paymentAttempt.status 'inProgress')}}
                     🔵 <span class="transactions-table-item-status-text">Pending</span>
+                  {{else if (eq paymentAttempt.status 'canceled')}}
+                    🟠 <span class="transactions-table-item-status-text">Canceled</span>
                   {{/if}}
 
                   {{#if (eq paymentAttempt.status 'failed')}}
