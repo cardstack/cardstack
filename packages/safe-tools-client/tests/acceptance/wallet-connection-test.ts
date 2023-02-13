@@ -72,13 +72,6 @@ module('Acceptance | wallet connection', function (hooks) {
         checkValidAuth: async () => {
           return Promise.resolve(true);
         },
-        getAddress: async (authToken: string) => {
-          if (!authToken)
-            return Promise.reject(new Error('Invalid auth token'));
-          return Promise.resolve(
-            currentAccount === TEST_ACCOUNT_1 ? TEST_ACCOUNT_1 : TEST_ACCOUNT_2
-          );
-        },
       });
     };
 

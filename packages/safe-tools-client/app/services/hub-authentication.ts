@@ -68,19 +68,12 @@ export default class HubAuthenticationService extends Service {
 
   async hasValidAuthentication() {
     const hubAuth = await this.getHubAuth();
-    try {
-      const authAddress = this.authToken
-        ? await hubAuth.getAddress(this.authToken)
-        : null;
-      return Boolean(
-        this.wallet.isConnected && authAddress === this.wallet.address
-      );
-    } catch (e) {
-      if (e.message === 'Invalid auth token') {
-        return false;
-      }
-      throw e;
-    }
+
+    return Boolean(
+      this.wallet.isConnected &&
+        this.authToken &&
+        (await hubAuth.checkValidAuth(this.authToken))
+    );
   }
 }
 
