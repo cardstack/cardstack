@@ -133,7 +133,7 @@ module('Integration | Component | payment-transactions-list', function (hooks) {
       .dom(
         '[data-test-scheduled-payment-attempts-item="0"] [data-test-scheduled-payment-attempts-item-amount]'
       )
-      .hasText('10 USDC');
+      .hasText('10.0 USDC');
 
     assert
       .dom(
