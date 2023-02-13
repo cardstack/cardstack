@@ -40,6 +40,7 @@ const SP_CREATION_TX_HASH =
 const SUBMIT_BUTTON = '[data-test-schedule-payment-form-submit-button]';
 const PAYEE_INPUT = '[data-test-payee-address-input]';
 const IN_PROGRESS_MESSAGE = '[data-test-in-progress-message]';
+const CHAIN_ID = 5;
 
 interface SpCreationApiPayload {
   data: {
@@ -141,7 +142,7 @@ module('Acceptance | scheduling', function (hooks) {
               type: 'gas-estimation-results',
               attributes: {
                 scenario: 'execute_one_time_payment',
-                'chain-id': 5,
+                'chain-id': CHAIN_ID,
                 'token-address': '0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6',
                 'gas-token-address':
                   '0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6',
@@ -159,7 +160,7 @@ module('Acceptance | scheduling', function (hooks) {
               id: '92cda036-c9d9-49a4-bf5d-ecbada790194',
               type: 'gas-prices',
               attributes: {
-                'chain-id': 5,
+                'chain-id': CHAIN_ID,
                 slow: '130',
                 standard: '140',
                 fast: '160',
@@ -292,8 +293,8 @@ module('Acceptance | scheduling', function (hooks) {
       },
     });
     this.mockLocalStorage.setItem(
-      'authTokens',
-      JSON.stringify({ FAKE_WALLET_CONNECT_ACCOUNT: 'abc123' })
+      `authToken-${FAKE_WALLET_CONNECT_ACCOUNT}-${CHAIN_ID}`,
+      'abc123'
     );
 
     this.mockWalletConnect.mockMainnet();

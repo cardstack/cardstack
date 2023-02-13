@@ -35,6 +35,8 @@ export const TEST_ACCOUNT_1 = '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266';
 // Hardhat default test account 2 (PK 0x59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d)
 export const TEST_ACCOUNT_2 = '0x70997970C51812dc3A010C7d01b50e0d17dc79C8';
 
+export const CHAIN_ID = 1;
+
 interface MockSafeOptions {
   nativeBalance?: string;
   spModuleAddress?: string;
@@ -146,7 +148,7 @@ function setupApplicationTest(
 
     this.mockMetaMask.mockNotConnectedWallet();
     this.mockMetaMask.mockAccounts([TEST_ACCOUNT_1]);
-    this.mockMetaMask.mockChainId(1);
+    this.mockMetaMask.mockChainId(CHAIN_ID);
   });
 
   hooks.afterEach(function (this: TestContext) {

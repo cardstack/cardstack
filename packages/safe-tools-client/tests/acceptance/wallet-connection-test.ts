@@ -20,6 +20,7 @@ import { module, test } from 'qunit';
 import {
   TEST_ACCOUNT_1,
   TEST_ACCOUNT_2,
+  CHAIN_ID,
   setupApplicationTest,
 } from '../helpers';
 
@@ -123,12 +124,10 @@ module('Acceptance | wallet connection', function (hooks) {
       assert.dom('[data-test-hub-auth-modal]').doesNotExist();
 
       const storage = this.owner.lookup('storage:local') as Storage;
-      let authTokens = storage.getItem('authTokens');
-      let authTokensObj = authTokens ? JSON.parse(authTokens) : {};
-      assert.deepEqual(
-        authTokensObj[TEST_ACCOUNT_1],
-        'auth-token-1337-account-1'
+      let authToken = storage.getItem(
+        `authToken-${TEST_ACCOUNT_1}-${CHAIN_ID}`
       );
+      assert.deepEqual(authToken, 'auth-token-1337-account-1');
 
       await percySnapshot('after hub auth prompt');
 
@@ -148,12 +147,8 @@ module('Acceptance | wallet connection', function (hooks) {
       await click('[data-test-hub-auth-modal] button');
       assert.dom('[data-test-hub-auth-modal]').doesNotExist();
 
-      authTokens = storage.getItem('authTokens');
-      authTokensObj = authTokens ? JSON.parse(authTokens) : {};
-      assert.deepEqual(
-        authTokensObj[TEST_ACCOUNT_2],
-        'auth-token-1337-account-2'
-      );
+      authToken = storage.getItem(`authToken-${TEST_ACCOUNT_1}-${CHAIN_ID}`);
+      assert.deepEqual(authToken, 'auth-token-1337-account-1');
 
       await click('[data-test-disconnect-button]');
 
