@@ -352,7 +352,7 @@ export async function sendTransaction(web3: Web3, transaction: Transaction): Pro
   return txHash;
 }
 
-export function extractSendTransactionError(revert: RevertError, abiInterface: Interface) {
+export function extractSendTransactionErrorMessage(revert: RevertError, abiInterface: Interface) {
   let error;
   let bytes = extractBytesLikeFromError(revert);
   if (bytes) {
