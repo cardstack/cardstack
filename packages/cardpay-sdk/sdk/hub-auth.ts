@@ -32,7 +32,7 @@ export default class HubAuth implements IHubAuth {
 
   async getAddress(authToken: string): Promise<string> {
     let response = await this.httpGetSession(authToken);
-    if (response.status !== 200) {
+    if (response.status === 401) {
       throw Error('Invalid auth token');
     }
     let responseJson = await response.json();
