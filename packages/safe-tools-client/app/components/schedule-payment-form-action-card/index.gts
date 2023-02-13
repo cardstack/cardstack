@@ -10,7 +10,6 @@ import { action } from '@ember/object';
 import { tracked } from '@glimmer/tracking';
 import { Day } from '@cardstack/boxel/components/boxel/input/date';
 import { Time } from '@cardstack/boxel/components/boxel/input/time';
-import withTokenIcons from '../../helpers/with-token-icons';
 import SchedulePaymentFormValidator, { MaxGasFeeOption, ValidatableForm } from './validator';
 import { use, resource } from 'ember-resources';
 import { TrackedObject } from 'tracked-built-ins';
@@ -63,12 +62,13 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
   @service declare scheduledPaymentSdk: ScheduledPaymentSdkService;
   @service('scheduled-payments') declare scheduledPaymentsService: ScheduledPaymentsService;
   validator = new SchedulePaymentFormValidator(this);
-  gasEstimation?: ServiceGasEstimationResult;
+
   lastScheduledPaymentId?: string;
 
   @tracked schedulingStatus?: string;
   @tracked txHash?: TransactionHash;
   @tracked scheduleErrorMessage?: string;
+  @tracked gasEstimation?: ServiceGasEstimationResult;
 
   updateInterval: ReturnType<typeof setInterval>;
 
@@ -77,7 +77,7 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
 
     this.updateInterval = setInterval(() => {
       if (this.selectedGasToken) {
-        taskFor(this.tokenToUsdService.updateUsdcRate).perform(this.selectedGasToken.address); 
+        taskFor(this.tokenToUsdService.updateUsdcRate).perform(this.selectedGasToken.address);
       }
     }, INTERVAL);
   }
@@ -234,13 +234,20 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
     return undefined;
   }
 
-  @tracked maxGasPrice: 'normal' | 'high' | 'max' | undefined;
+  @tracked maxGasPrice: 'normal' | 'high' | 'max' = 'normal'
+
   @action onUpdateMaxGasPrice(val: 'normal' | 'high' | 'max') {
     this.maxGasPrice = val;
   }
 
   get isValid(): boolean {
-    return this.validator.isValid;
+    return (
+      this.validator.isValid &&
+      Boolean(this.safes.currentSafe) &&
+      Boolean(this.gasEstimation) &&
+      Number(this.gasEstimation?.gas) > 0 &&
+      Boolean(this.usdcToGasTokenRate)
+    );
   }
 
   @use configuredFees = resource(() => {
@@ -353,31 +360,16 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
   }
 
   @task *schedulePaymentTask() {
-    let { currentSafe } = this.safes;
-    if (!currentSafe) return;
-    if (!this.validator.isValid) return;
+    if (
+      !this.isValid ||
+       // Redundant to validation check but including it to narrow types for Typescript
+      !this.paymentTokenQuantity || !this.selectedGasToken || !this.safes.currentSafe || !this.gasEstimation
+    ) return;
 
-    // Redundant to validation check but including it to narrow types for Typescript
-    if (!this.paymentTokenQuantity || !this.selectedGasToken || !this.gasEstimation) return;
+    const defaultGas = BigNumber.from(0);
+    const gasRangeByMaxPrice = this.gasEstimation.gasRangeInGasTokenUnits[this.maxGasPrice];
 
-    if (Number(this.gasEstimation.gas) <= 0) return;
-    const { gasRangeInGasTokenUnits } = this.gasEstimation;
-    if (Object.keys(gasRangeInGasTokenUnits).length <= 0) return;
-
-    let maxGasPrice;
-    switch(this.maxGasPrice) {
-      case "normal":
-        maxGasPrice = gasRangeInGasTokenUnits.normal.div(this.gasEstimation.gas);
-        break;
-      case "high":
-        maxGasPrice = gasRangeInGasTokenUnits.high.div(this.gasEstimation.gas);
-        break;
-      case "max":
-        maxGasPrice = gasRangeInGasTokenUnits.max.div(this.gasEstimation.gas);
-        break;
-      default:
-        maxGasPrice = BigNumber.from(0);
-    }
+    const maxGasPriceString = String(gasRangeByMaxPrice.div(this.gasEstimation.gas) || defaultGas);
 
     const array = new Uint8Array(32);
     window.crypto.getRandomValues(array);
@@ -387,15 +379,16 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
     this.scheduleErrorMessage = undefined;
 
     try {
-      const {paymentTokenQuantity} = this;
+      const { currentSafe } = this.safes;
+
       yield taskFor(this.scheduledPaymentSdk.schedulePayment).perform(
         currentSafe.address,
         currentSafe.spModuleAddress,
-        paymentTokenQuantity.address,
-        paymentTokenQuantity.count,
+        this.paymentTokenQuantity.address,
+        this.paymentTokenQuantity.count,
         this.payeeAddress,
         Number(this.gasEstimation.gas),
-        String(maxGasPrice),
+        maxGasPriceString,
         this.selectedGasToken.address,
         salt,
         this.selectedPaymentType === 'one-time' ? Math.round(this.paymentDate!.getTime() / 1000) : null,
@@ -432,6 +425,7 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
         }
       )
       this.scheduledPaymentsService.reloadScheduledPayments();
+      this.safes.reloadTokenBalances();
       this.isSuccessfullyScheduled = true;
     } catch(e) {
       this.schedulingStatus = undefined;
@@ -513,7 +507,7 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
       @paymentTokens={{this.paymentTokens}}
       @onUpdatePaymentToken={{this.onUpdatePaymentToken}}
       @selectedGasToken={{this.selectedGasToken}}
-      @gasTokens={{withTokenIcons this.tokens.gasTokens.value}}
+      @gasTokens={{this.tokens.gasTokens.value}}
       @onSelectGasToken={{this.onSelectGasToken}}
       @isGasTokenInvalid={{not this.validator.isGasTokenValid}}
       @gasTokenErrorMessage={{this.validator.gasTokenErrorMessage}}

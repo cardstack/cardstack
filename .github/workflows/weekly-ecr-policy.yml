@@ -26,7 +26,7 @@ jobs:
       - name: Configure staging AWS credentials
         uses: aws-actions/configure-aws-credentials@v1-node16
         with:
-          role-to-assume: arn:aws:iam::680542703984:role/waypoint
+          role-to-assume: arn:aws:iam::680542703984:role/github
           aws-region: us-east-1
 
       - name: Update ECR lifecycle policy in staging
@@ -35,7 +35,7 @@ jobs:
       - name: Configure prod AWS credentials
         uses: aws-actions/configure-aws-credentials@v1-node16
         with:
-          role-to-assume: arn:aws:iam::120317779495:role/waypoint
+          role-to-assume: arn:aws:iam::120317779495:role/github
           aws-region: us-east-1
 
       - name: Update ECR lifecycle policy in production

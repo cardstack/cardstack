@@ -1,0 +1,125 @@
+name: CI [relay-gas-tokens]
+
+on:
+  pull_request:
+    paths:
+      - "packages/cardpay-sdk/token-lists/*.json"
+      - ".github/workflows/pr-relay-gas-tokens.yml"
+      - "scripts/relay/**"
+      - "scripts/update-relay-server-gas-tokens.ts"
+
+permissions:
+  contents: read
+  issues: read
+  checks: write
+  pull-requests: write
+  id-token: write
+
+jobs:
+  dry-run:
+    name: Dry Run - Update Relay Gas Tokens
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: volta-cli/action@v4
+
+      - uses: ./.github/actions/setup-node-modules-cache
+        with:
+          yarn_lock_md5: ${{ hashFiles('yarn.lock') }}
+
+      - run: yarn --prefer-offline --frozen-lockfile
+
+      - name: Configure staging AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1-node16
+        with:
+          role-to-assume: arn:aws:iam::680542703984:role/ga-safe-relay-goerli
+          aws-region: us-east-1
+
+      - uses: dkershner6/aws-ssm-getparameters-action@v1
+        with:
+          parameterPairs: |
+            /staging/safe-relay/goerli/admin_username = GOERLI_ADMIN_USERNAME,
+            /staging/safe-relay/goerli/admin_password = GOERLI_ADMIN_PASSWORD
+
+      - name: Check drift in goerli relay server
+        id: goerli
+        env:
+          DRY_RUN: "true"
+          TOKEN: "packages/cardpay-sdk/token-lists/goerli-tokenlist.json"
+          HOST: "https://relay-goerli.staging.stack.cards"
+          USERNAME: ${{ env.GOERLI_ADMIN_USERNAME }}
+          PASSWORD: ${{ env.GOERLI_ADMIN_PASSWORD }}
+        run: |
+          echo "output<<EOF" >> $GITHUB_OUTPUT
+          echo "$(yarn update-relay-gas-tokens $TOKEN $HOST $USERNAME $PASSWORD)" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Configure ethereum AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1-node16
+        with:
+          role-to-assume: arn:aws:iam::120317779495:role/ga-safe-relay-ethereum
+          aws-region: us-east-1
+
+      - uses: dkershner6/aws-ssm-getparameters-action@v1
+        with:
+          parameterPairs: |
+            /production/safe-relay/ethereum/admin_username = ETHEREUM_ADMIN_USERNAME,
+            /production/safe-relay/ethereum/admin_password = ETHEREUM_ADMIN_PASSWORD
+
+      - name: Check drift in ethereum relay server
+        id: ethereum
+        env:
+          DRY_RUN: "true"
+          TOKEN: "packages/cardpay-sdk/token-lists/ethereum-tokenlist.json"
+          HOST: "https://relay-ethereum.cardstack.com"
+          USERNAME: ${{ env.ETHEREUM_ADMIN_USERNAME }}
+          PASSWORD: ${{ env.ETHEREUM_ADMIN_PASSWORD }}
+        run: |
+          echo "output<<EOF" >> $GITHUB_OUTPUT
+          echo "$(yarn update-relay-gas-tokens $TOKEN $HOST $USERNAME $PASSWORD)" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Configure polygon AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1-node16
+        with:
+          role-to-assume: arn:aws:iam::120317779495:role/ga-safe-relay-polygon
+          aws-region: us-east-1
+
+      - uses: dkershner6/aws-ssm-getparameters-action@v1
+        with:
+          parameterPairs: |
+            /production/safe-relay/polygon/admin_username = POLYGON_ADMIN_USERNAME,
+            /production/safe-relay/polygon/admin_password = POLYGON_ADMIN_PASSWORD
+
+      - name: Check drift in polygon relay server
+        id: polygon
+        env:
+          DRY_RUN: "true"
+          TOKEN: "packages/cardpay-sdk/token-lists/polygon-tokenlist.json"
+          HOST: "https://relay-polygon.cardstack.com"
+          USERNAME: ${{ env.POLYGON_ADMIN_USERNAME }}
+          PASSWORD: ${{ env.POLYGON_ADMIN_PASSWORD }}
+        run: |
+          echo "output<<EOF" >> $GITHUB_OUTPUT
+          echo "$(yarn update-relay-gas-tokens $TOKEN $HOST $USERNAME $PASSWORD)" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          number: ${{ github.event.pull_request.number }}
+          header: relay-gas-tokens
+          hide_and_recreate: true
+          hide_classify: "OUTDATED"
+          message: |
+            ### goerli
+            ```
+            ${{ steps.goerli.outputs.output }}
+            ```
+            ### ethereum
+            ```
+            ${{ steps.ethereum.outputs.output }}
+            ```
+            ### polygon
+            ```
+            ${{ steps.polygon.outputs.output }}
+            ```

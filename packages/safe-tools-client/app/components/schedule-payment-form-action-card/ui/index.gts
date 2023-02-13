@@ -44,7 +44,7 @@ interface Signature {
     currentFees: CurrentFees | undefined;
     gasEstimateTokenQuantity: TokenQuantity | undefined;
     gasTokenErrorMessage: string;
-    gasTokens: TokenDetail[];
+    gasTokens: TokenDetail[] | undefined;
     isGasTokenInvalid: boolean;
     isMaxGasPriceInvalid: boolean;
     isPayeeAddressInvalid: boolean;
@@ -110,6 +110,10 @@ export default class SchedulePaymentFormActionCardUI extends Component<Signature
     return this.args.isPaymentAmountInvalid;
   }
 
+  get gasTokens() {
+    return this.args.gasTokens || [];
+  }
+  
   get isGasTokenInvalid() {
     if (!this.hasBlurredGasToken) {
       return false;
@@ -242,7 +246,7 @@ export default class SchedulePaymentFormActionCardUI extends Component<Signature
             @onBlur={{set this 'hasBlurredPayeeAddress' true}}
           />
         </BoxelField>
-        <BoxelField @label="Amount" @tag="label" for="schedule-payment-form-amount">
+        <BoxelField @label="Amount">
           <BoxelInputSelectableTokenAmount
             data-test-amount-input
             @id="schedule-payment-form-amount"
@@ -264,7 +268,7 @@ export default class SchedulePaymentFormActionCardUI extends Component<Signature
             @invalid={{this.isGasTokenInvalid}}
             @errorMessage={{@gasTokenErrorMessage}}
             @value={{@selectedGasToken}}
-            @tokens={{@gasTokens}}
+            @tokens={{this.gasTokens}}
             @disabled={{this.isFormInteractionDisabled}}
             @onChooseToken={{@onSelectGasToken}}
             @onBlur={{set this 'hasBlurredGasToken' true}}

@@ -4,6 +4,8 @@ import {
   PutLifecyclePolicyCommand,
   Repository,
   GetLifecyclePolicyCommand,
+  LifecyclePolicyNotFoundException,
+  GetLifecyclePolicyCommandOutput,
 } from '@aws-sdk/client-ecr';
 
 const policy = JSON.stringify({
@@ -40,9 +42,20 @@ async function main() {
       let getCommand = new GetLifecyclePolicyCommand({
         repositoryName: repo.repositoryName,
       });
-      const res = await client.send(getCommand);
 
-      if (res.lifecyclePolicyText != policy) {
+      let res: GetLifecyclePolicyCommandOutput;
+      let hasPolicy = true;
+      try {
+        res = await client.send(getCommand);
+      } catch (err) {
+        if (err instanceof LifecyclePolicyNotFoundException) {
+          hasPolicy = false;
+        } else {
+          throw err;
+        }
+      }
+
+      if (!hasPolicy || res.lifecyclePolicyText != policy) {
         console.info(`updating lifecycle policy for ${repo.repositoryName}`);
         let putCommand = new PutLifecyclePolicyCommand({
           repositoryName: repo.repositoryName,

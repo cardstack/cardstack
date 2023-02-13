@@ -104,6 +104,9 @@ class SafeServiceStub extends Service {
     }
     return safes;
   }
+  get currentSafe() {
+    return this.safes?.[0];
+  }
 }
 
 let tokensService: TokensService;
@@ -199,17 +202,13 @@ module(
         // Choose USDC for the gas token
         await selectChoose('[data-test-gas-token-select]', 'USDC');
 
-        assert
-          .dom('[data-test-schedule-payment-form-submit-button]')
-          .isDisabled();
-
-        await click(
-          '[data-test-max-gas-toggle] [data-toggle-group-option="normal"]'
-        );
-
+        // Button is enabled since max-gas defaults to normal
         assert
           .dom('[data-test-schedule-payment-form-submit-button]')
           .isEnabled();
+        await click(
+          '[data-test-max-gas-toggle] [data-toggle-group-option="high"]'
+        );
 
         await fillIn('[data-test-payee-address-input]', 'Not an address');
         assert
