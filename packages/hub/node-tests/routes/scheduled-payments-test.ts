@@ -7,6 +7,7 @@ import { calculateNextPayAt } from '../../utils/scheduled-payments';
 import { registry, setupHub } from '../helpers/server';
 import { setupStubWorkerClient } from '../helpers/stub-worker-client';
 import cryptoRandomString from 'crypto-random-string';
+import sinon from 'sinon';
 
 class StubAuthenticationUtils {
   validateAuthToken(encryptedAuthToken: string) {
@@ -238,6 +239,7 @@ describe('POST /api/scheduled-payments', async function () {
             'sp-hash': spHash,
             'chain-id': 1,
             userAddress: stubUserAddress,
+            'canceled-at': null,
           },
         },
       })
@@ -275,6 +277,7 @@ describe('POST /api/scheduled-payments', async function () {
             'cancelation-block-number': null,
             'recurring-day-of-month': null,
             'recurring-until': null,
+            'canceled-at': null,
           },
         },
       })
@@ -309,6 +312,7 @@ describe('POST /api/scheduled-payments', async function () {
             'sp-hash': spHash,
             'chain-id': 1,
             userAddress: stubUserAddress,
+            'canceled-at': null,
           },
         },
       })
@@ -348,6 +352,7 @@ describe('POST /api/scheduled-payments', async function () {
             'cancelation-block-number': null,
             'recurring-day-of-month': 1,
             'recurring-until': '2022-12-31T00:00:00.000Z',
+            'canceled-at': null,
           },
         },
       })
@@ -471,6 +476,7 @@ describe('GET /api/scheduled-payments', async function () {
               'cancelation-block-number': null,
               'recurring-day-of-month': null,
               'recurring-until': null,
+              'canceled-at': null,
             },
           },
         ],
@@ -668,6 +674,7 @@ describe('GET /api/scheduled-payments/:id', async function () {
             'cancelation-block-number': null,
             'recurring-day-of-month': null,
             'recurring-until': null,
+            'canceled-at': null,
           },
         },
       })
@@ -771,6 +778,7 @@ describe('PATCH /api/scheduled-payments/:id', async function () {
             'cancelation-block-number': null,
             'recurring-day-of-month': null,
             'recurring-until': null,
+            'canceled-at': null,
           },
         },
       })
@@ -781,6 +789,10 @@ describe('PATCH /api/scheduled-payments/:id', async function () {
   });
 
   it('updates a scheduled payment when cancelation transaction hash is provided', async function () {
+    const canceledAtDate = '2023-02-14T13:40:40.000Z';
+
+    const clock = sinon.useFakeTimers(new Date(canceledAtDate));
+
     let scheduledPayment = await prisma.scheduledPayment.create({
       data: {
         id: shortUuid.uuid(),
@@ -843,10 +855,13 @@ describe('PATCH /api/scheduled-payments/:id', async function () {
             'cancelation-block-number': null,
             'recurring-day-of-month': null,
             'recurring-until': null,
+            'canceled-at': canceledAtDate,
           },
         },
       })
       .expect('Content-Type', 'application/vnd.api+json');
+
+    clock.restore();
 
     expect(getJobIdentifiers()[0]).to.equal('scheduled-payment-on-chain-cancelation-waiter');
     expect(getJobPayloads()[0]).to.deep.equal({ scheduledPaymentId: scheduledPayment.id });

@@ -35,6 +35,7 @@ export default class ScheduledPaymentSerializer {
             'creation-transaction-error': model.creationTransactionError,
             'cancelation-transaction-hash': model.cancelationTransactionHash,
             'cancelation-block-number': model.cancelationBlockNumber,
+            'canceled-at': model.canceledAt,
           },
         },
       };

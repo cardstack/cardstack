@@ -100,6 +100,7 @@
     "sane": "^4.1.0",
     "scenario-tester": "^0.4.0",
     "semver": "^7.3.5",
+    "sinon": "^11.1.2",
     "short-uuid": "^4.2.0",
     "source-map-support": "^0.5.21",
     "tmp": "^0.2.1",
