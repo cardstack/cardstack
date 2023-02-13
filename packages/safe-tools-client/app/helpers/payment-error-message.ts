@@ -22,7 +22,7 @@ export function paymentErrorMessage([failureReason]: PositionalArgs) {
       return 'execution gas is too low to execute the payment'; // Probably our fault where we estimate execution gas. Not much the user can do about it except report it to support
   }
 
-  return 'unrecognized error';
+  return 'unrecognized error - contact support';
 }
 
 export default helper<Signature>(paymentErrorMessage);
