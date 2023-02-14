@@ -40,6 +40,7 @@ const SP_CREATION_TX_HASH =
 const SUBMIT_BUTTON = '[data-test-schedule-payment-form-submit-button]';
 const PAYEE_INPUT = '[data-test-payee-address-input]';
 const IN_PROGRESS_MESSAGE = '[data-test-in-progress-message]';
+const CHAIN_ID = 5;
 
 interface SpCreationApiPayload {
   data: {
@@ -83,15 +84,24 @@ module('Acceptance | scheduling', function (hooks) {
         return res(
           ctx.status(200),
           ctx.json({
-            web3: {
-              schedulerToolNetworks: ['mainnet', 'polygon'],
+            data: {
+              attributes: {
+                web3: {
+                  schedulerNetworks: ['mainnet', 'polygon'],
+                },
+              },
             },
           })
         );
       }),
       rest.get('/hub-test/api/session', (req, res, ctx) => {
         if (req.headers.get('Authorization')) {
-          return res(ctx.status(200), ctx.json({}));
+          return res(
+            ctx.status(200),
+            ctx.json({
+              data: { attributes: { user: FAKE_WALLET_CONNECT_ACCOUNT } },
+            })
+          );
         } else {
           return res(
             ctx.status(401),
@@ -132,7 +142,7 @@ module('Acceptance | scheduling', function (hooks) {
               type: 'gas-estimation-results',
               attributes: {
                 scenario: 'execute_one_time_payment',
-                'chain-id': 5,
+                'chain-id': CHAIN_ID,
                 'token-address': '0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6',
                 'gas-token-address':
                   '0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6',
@@ -150,7 +160,7 @@ module('Acceptance | scheduling', function (hooks) {
               id: '92cda036-c9d9-49a4-bf5d-ecbada790194',
               type: 'gas-prices',
               attributes: {
-                'chain-id': 5,
+                'chain-id': CHAIN_ID,
                 slow: '130',
                 standard: '140',
                 fast: '160',
@@ -282,7 +292,10 @@ module('Acceptance | scheduling', function (hooks) {
         warning();
       },
     });
-    this.mockLocalStorage.setItem('authToken', 'abc123');
+    this.mockLocalStorage.setItem(
+      `authToken-${FAKE_WALLET_CONNECT_ACCOUNT}-${CHAIN_ID}`,
+      'abc123'
+    );
 
     this.mockWalletConnect.mockMainnet();
     this.mockWalletConnect.mockConnectedWallet([FAKE_WALLET_CONNECT_ACCOUNT]);
@@ -379,6 +392,11 @@ module('Acceptance | scheduling', function (hooks) {
         FAKE_WALLET_CONNECT_ACCOUNT,
       ]);
       await waitFor(`[data-test-safe-address-label][title="${SAFE_ADDRESS}"]`);
+
+      await waitFor('[data-test-hub-auth-modal]');
+      await click('[data-test-hub-auth-modal] button');
+      await waitUntil(() => find('[data-test-hub-auth-modal]') === null);
+
       await fillInSchedulePaymentFormWithValidInfo({ type: 'one-time' });
       await waitFor(`${SUBMIT_BUTTON}:not(:disabled)`);
       await click(SUBMIT_BUTTON);
@@ -395,7 +413,7 @@ module('Acceptance | scheduling', function (hooks) {
 
       assert.strictEqual(
         signedHubAuthentication,
-        1,
+        2,
         'signed hub authentication'
       );
       scheduledPaymentCreateSpHashDeferred?.fulfill();

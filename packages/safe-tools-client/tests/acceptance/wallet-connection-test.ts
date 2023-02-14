@@ -20,9 +20,11 @@ import { module, test } from 'qunit';
 import {
   TEST_ACCOUNT_1,
   TEST_ACCOUNT_2,
+  CHAIN_ID,
   setupApplicationTest,
 } from '../helpers';
 
+let currentAccount: string;
 module('Acceptance | wallet connection', function (hooks) {
   setupApplicationTest(hooks);
 
@@ -61,7 +63,11 @@ module('Acceptance | wallet connection', function (hooks) {
     hubAuthenticationService.getHubAuth = (): Promise<unknown> => {
       return Promise.resolve({
         authenticate: async () => {
-          return Promise.resolve('auth-token-1337');
+          return Promise.resolve(
+            currentAccount === TEST_ACCOUNT_1
+              ? 'auth-token-1337-account-1'
+              : 'auth-token-1337-account-2'
+          );
         },
         checkValidAuth: async () => {
           return Promise.resolve(true);
@@ -76,6 +82,7 @@ module('Acceptance | wallet connection', function (hooks) {
     scheduledPaymentsService.fetchScheduledPayments = (): Promise<[]> => {
       return Promise.resolve([]);
     };
+    currentAccount = TEST_ACCOUNT_1;
   });
 
   module('With Metamask', function () {
@@ -105,15 +112,19 @@ module('Acceptance | wallet connection', function (hooks) {
       assert.dom('[data-test-token-balance="USDT"]').hasText('10 USDT');
 
       await waitFor('[data-test-hub-auth-modal]');
-      await percySnapshot(assert);
+      await percySnapshot('before hub auth prompt');
       await click('[data-test-hub-auth-modal] button');
       assert.dom('[data-test-hub-auth-modal]').doesNotExist();
 
       const storage = this.owner.lookup('storage:local') as Storage;
-      assert.strictEqual(storage.getItem('authToken'), 'auth-token-1337');
+      let authToken = storage.getItem(
+        `authToken-${TEST_ACCOUNT_1}-${CHAIN_ID}`
+      );
+      assert.deepEqual(authToken, 'auth-token-1337-account-1');
 
-      await percySnapshot(assert);
+      await percySnapshot('after hub auth prompt');
 
+      currentAccount = TEST_ACCOUNT_2;
       await this.mockMetaMask.mockAccountsChanged([TEST_ACCOUNT_2]);
 
       await settled();
@@ -124,6 +135,13 @@ module('Acceptance | wallet connection', function (hooks) {
         .dom('[data-test-wallet-address] .blockchain-address')
         .doesNotContainText(truncateMiddle([TEST_ACCOUNT_1]));
       assert.dom('[data-test-schedule-form-connect-wallet-cta]').doesNotExist();
+
+      await waitFor('[data-test-hub-auth-modal]');
+      await click('[data-test-hub-auth-modal] button');
+      assert.dom('[data-test-hub-auth-modal]').doesNotExist();
+
+      authToken = storage.getItem(`authToken-${TEST_ACCOUNT_1}-${CHAIN_ID}`);
+      assert.deepEqual(authToken, 'auth-token-1337-account-1');
 
       await click('[data-test-disconnect-button]');
 
@@ -149,7 +167,7 @@ module('Acceptance | wallet connection', function (hooks) {
 
       await click('[data-test-connect-wallet-button-modal]');
 
-      this.mockWalletConnect.mockConnectedWallet([TEST_ACCOUNT_2]);
+      currentAccount = TEST_ACCOUNT_2;
       this.mockWalletConnect.mockAccountsChanged([TEST_ACCOUNT_2]);
 
       await waitFor('[data-test-hub-auth-modal]');

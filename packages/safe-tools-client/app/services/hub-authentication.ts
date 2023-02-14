@@ -1,5 +1,6 @@
 import { getSDK } from '@cardstack/cardpay-sdk';
 import config from '@cardstack/safe-tools-client/config/environment';
+import NetworkService from '@cardstack/safe-tools-client/services/network';
 import WalletService from '@cardstack/safe-tools-client/services/wallet';
 import { getOwner } from '@ember/application';
 import Service, { inject as service } from '@ember/service';
@@ -8,6 +9,7 @@ import { tracked } from '@glimmer/tracking';
 export default class HubAuthenticationService extends Service {
   storage: Storage;
   @service declare wallet: WalletService;
+  @service declare network: NetworkService;
   @tracked isAuthenticated: boolean | null = null;
 
   constructor(parameters?: object | undefined) {
@@ -29,7 +31,6 @@ export default class HubAuthenticationService extends Service {
     try {
       const hubAuth = await this.getHubAuth();
       const newAuthToken = await hubAuth.authenticate();
-
       if (newAuthToken) {
         this.authToken = newAuthToken;
         this.isAuthenticated = true;
@@ -48,16 +49,20 @@ export default class HubAuthenticationService extends Service {
     return await getSDK('HubAuth', ethersProvider, config.hubUrl);
   }
 
+  get authTokenKey() {
+    return `authToken-${this.wallet.address}-${this.network.chainId}`;
+  }
+
   get authToken(): string | null {
-    return this.storage.getItem('authToken');
+    return this.storage.getItem(this.authTokenKey);
   }
 
   set authToken(val: string | null) {
     if (val) {
-      this.storage.setItem('authToken', val);
+      this.storage.setItem(this.authTokenKey, val);
     } else {
       this.isAuthenticated = false;
-      this.storage.removeItem('authToken');
+      this.storage.removeItem(this.authTokenKey);
     }
   }
 
