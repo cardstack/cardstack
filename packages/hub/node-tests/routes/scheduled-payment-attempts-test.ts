@@ -253,6 +253,7 @@ describe('GET /api/scheduled-payment-attempts', async function () {
               'sender-safe-address': '0xc0ffee254729296a45a3885639AC7E10F9d54979',
               'sp-hash': '0x1234',
               'token-address': '0xa455bbB2A81E09E0337c13326BBb302Cb37D7cf6',
+              'canceled-at': null,
             },
           },
         ],

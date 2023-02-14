@@ -1,8 +1,13 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
-import { type ScheduledPaymentAttemptStatus } from '@cardstack/safe-tools-client/services/scheduled-payments';
+import {
+  ScheduledPaymentAttempt,
+  type ScheduledPaymentAttemptStatus,
+} from '@cardstack/safe-tools-client/services/scheduled-payments';
+import TokenQuantity from '@cardstack/safe-tools-client/utils/token-quantity';
 import Service from '@ember/service';
 import { click, render, TestContext } from '@ember/test-helpers';
 import { subDays, addMinutes, format } from 'date-fns';
+import { BigNumber } from 'ethers';
 
 import hbs from 'htmlbars-inline-precompile';
 import { module, test } from 'qunit';
@@ -24,25 +29,36 @@ class ScheduledPaymentsStub extends Service {
     chainId: number,
     status?: ScheduledPaymentAttemptStatus,
     startedAt?: Date
-  ) => {
+  ): Promise<ScheduledPaymentAttempt[]> => {
     if (returnEmptyScheduledPaymentAttempts) {
       return Promise.resolve([]);
     }
+
+    const paymentToken = {
+      address: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
+      symbol: 'USDC',
+      name: 'Example USDC',
+      decimals: 6,
+    };
+
+    const addPaymentTokenQuantity = (amount: string) =>
+      new TokenQuantity(paymentToken, BigNumber.from(amount));
+
     return Promise.resolve(
       [
         {
           startedAt: subDays(now, 10),
           endedAt: addMinutes(subDays(now, 10), 120),
           status: 'succeeded',
-          failureReason: null,
+          failureReason: '',
           transactionHash:
             '0x6f7c54719c0901e30ef018206c37df4daa059224549a08d55acb3360f01094e2',
           scheduledPayment: {
-            amount: '10000000',
+            id: '01234',
+            paymentTokenQuantity: addPaymentTokenQuantity('10000000'),
             feeFixedUSD: '0',
             feePercentage: '0',
             gasTokenAddress: '0x123',
-            tokenAddress: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
             chainId,
             payeeAddress: '0xeBCC5516d44FFf5E9aBa2AcaeB65BbB49bC3EBe1',
             payAt: addMinutes(subDays(now, 10), 120),
@@ -55,11 +71,11 @@ class ScheduledPaymentsStub extends Service {
           failureReason: 'PaymentExecutionFailed',
           transactionHash: '0x123',
           scheduledPayment: {
-            amount: '10000000',
+            id: '34234',
+            paymentTokenQuantity: addPaymentTokenQuantity('10000000'),
             feeFixedUSD: '0',
             feePercentage: '0',
             gasTokenAddress: '0x123',
-            tokenAddress: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
             chainId,
             payeeAddress: '0xeBCC5516d44FFf5E9aBa2AcaeB65BbB49bC3EBe1',
             payAt: addMinutes(subDays(now, 20), 120),
@@ -69,14 +85,14 @@ class ScheduledPaymentsStub extends Service {
           startedAt: subDays(now, 60),
           endedAt: addMinutes(subDays(now, 60), 120),
           status: 'succeeded',
-          failureReason: undefined,
+          failureReason: '',
           transactionHash: '0x123',
           scheduledPayment: {
-            amount: '15000000',
+            id: '323232',
+            paymentTokenQuantity: addPaymentTokenQuantity('15000000'),
             feeFixedUSD: '0',
             feePercentage: '0',
             gasTokenAddress: '0x123',
-            tokenAddress: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
             chainId,
             payeeAddress: '0xeBCC5516d44FFf5E9aBa2AcaeB65BbB49bC3EBe1',
             payAt: addMinutes(subDays(now, 60), 120),
@@ -133,7 +149,7 @@ module('Integration | Component | payment-transactions-list', function (hooks) {
       .dom(
         '[data-test-scheduled-payment-attempts-item="0"] [data-test-scheduled-payment-attempts-item-amount]'
       )
-      .hasText('10 USDC');
+      .hasText('10.0 USDC');
 
     assert
       .dom(

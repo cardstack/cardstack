@@ -11,18 +11,19 @@ import WalletService from '@cardstack/safe-tools-client/services/wallet';
 import NetworkService from '@cardstack/safe-tools-client/services/network';
 import HubAuthenticationService from '@cardstack/safe-tools-client/services/hub-authentication';
 import ScheduledPaymentsService, { ScheduledPaymentAttempt, type ScheduledPaymentAttemptStatus } from '@cardstack/safe-tools-client/services/scheduled-payments';
+import PaymentOptionsDropdown from '@cardstack/safe-tools-client/components/payment-options-dropdown';
 import { inject as service } from '@ember/service';
 import { tracked } from '@glimmer/tracking';
 import { TrackedObject } from 'tracked-built-ins';
 import eq from 'ember-truth-helpers/helpers/eq';
+import and from 'ember-truth-helpers/helpers/and';
+import not from 'ember-truth-helpers/helpers/not';
 import { concat, fn } from '@ember/helper';
 import { menuItemFunc, MenuItem } from '@cardstack/boxel/helpers/menu-item'
 import formatDate from '@cardstack/safe-tools-client/helpers/format-date';
 import { taskFor } from 'ember-concurrency-ts';
 import { task, TaskGenerator } from 'ember-concurrency';
-import nativeUnitsToDecimal from '@cardstack/safe-tools-client/helpers/native-units-to-decimal';
 import paymentErrorMessage from '@cardstack/safe-tools-client/helpers/payment-error-message';
-import { type TokenInfo } from '@uniswap/token-lists';
 import TokensService from '@cardstack/safe-tools-client/services/tokens';
 import { subDays } from 'date-fns';
 import { action } from '@ember/object';
@@ -63,13 +64,7 @@ class PaymentTransactionsList extends Component {
   }
 
   get paymentAttempts() {
-    if (!this.scheduledPaymentAttemptsResource.value) return [];
-
-    // Add token info to each scheduled payment attempt so that we can display the token symbol and convert the amount to decimal using nativeUnitsToDecimal
-    return this.scheduledPaymentAttemptsResource.value.map((scheduledPaymentAttempt) => {
-      const tokenInfo = this.tokens.transactionTokens.find((t) => t.address === scheduledPaymentAttempt.scheduledPayment.tokenAddress) as TokenInfo;
-      return { ...scheduledPaymentAttempt, tokenInfo };
-    });
+    return this.scheduledPaymentAttemptsResource.value || []
   }
 
   @task *loadScheduledPaymentAttemptsTask(chainId: number, status?: ScheduledPaymentAttemptStatus, startedAt?: Date): TaskGenerator<ScheduledPaymentAttempt[]> {
@@ -173,13 +168,17 @@ class PaymentTransactionsList extends Component {
                   {{paymentAttempt.scheduledPayment.payeeAddress}}
                 </td>
                 <td class="table__cell" data-test-scheduled-payment-attempts-item-amount>
-                  <strong>{{nativeUnitsToDecimal paymentAttempt.scheduledPayment.amount paymentAttempt.tokenInfo.decimals}} {{paymentAttempt.tokenInfo.symbol}}</strong>
+                  <strong>{{paymentAttempt.scheduledPayment.paymentTokenQuantity.displayable}}</strong>
                 </td>
                 <td class="table__cell" data-test-scheduled-payment-attempts-item-status>
                   {{#if (eq paymentAttempt.status 'succeeded')}}
                     🟢 <span class="transactions-table-item-status-text">Confirmed</span>
                   {{else if (eq paymentAttempt.status 'failed')}}
-                    🔴 <span class="transactions-table-item-status-text">Failed</span>
+                    {{#if paymentAttempt.scheduledPayment.isCanceled}}
+                      🟠 <span class="transactions-table-item-status-text">Canceled</span>
+                    {{else}}
+                      🔴 <span class="transactions-table-item-status-text">Failed</span>
+                    {{/if}}
                   {{else}}
                     🔵 <span class="transactions-table-item-status-text">Pending</span>
                   {{/if}}
@@ -199,6 +198,10 @@ class PaymentTransactionsList extends Component {
                     />
                   {{/if}}
                 </td>
+                {{!-- TODO: only show options for < 3 attempt, when this info is stored --}}
+                {{#if (and (eq paymentAttempt.status 'failed') (not paymentAttempt.scheduledPayment.isCanceled))}}
+                  <PaymentOptionsDropdown @scheduledPayment={{paymentAttempt.scheduledPayment}}/>
+                {{/if}}
               </tr>
             {{/each}}
           </tbody>

@@ -61,7 +61,3 @@
   font: 500 var(--boxel-font-sm);
   color: var(--boxel-purple-400);
 }
-
-.cancel-scheduled-payment .boxel-action-container-section > div {
-  margin-top: 0;
-}
