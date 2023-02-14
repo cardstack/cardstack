@@ -16,6 +16,8 @@ import { inject as service } from '@ember/service';
 import { tracked } from '@glimmer/tracking';
 import { TrackedObject } from 'tracked-built-ins';
 import eq from 'ember-truth-helpers/helpers/eq';
+import and from 'ember-truth-helpers/helpers/and';
+import not from 'ember-truth-helpers/helpers/not';
 import { concat, fn } from '@ember/helper';
 import { menuItemFunc, MenuItem } from '@cardstack/boxel/helpers/menu-item'
 import formatDate from '@cardstack/safe-tools-client/helpers/format-date';
@@ -172,11 +174,13 @@ class PaymentTransactionsList extends Component {
                   {{#if (eq paymentAttempt.status 'succeeded')}}
                     🟢 <span class="transactions-table-item-status-text">Confirmed</span>
                   {{else if (eq paymentAttempt.status 'failed')}}
-                    🔴 <span class="transactions-table-item-status-text">Failed</span>
-                  {{else if (eq paymentAttempt.status 'inProgress')}}
+                    {{#if paymentAttempt.scheduledPayment.isCanceled}}
+                      🟠 <span class="transactions-table-item-status-text">Canceled</span>
+                    {{else}}
+                      🔴 <span class="transactions-table-item-status-text">Failed</span>
+                    {{/if}}
+                  {{else}}
                     🔵 <span class="transactions-table-item-status-text">Pending</span>
-                  {{else if (eq paymentAttempt.status 'canceled')}}
-                    🟠 <span class="transactions-table-item-status-text">Canceled</span>
                   {{/if}}
 
                   {{#if (eq paymentAttempt.status 'failed')}}
@@ -195,7 +199,7 @@ class PaymentTransactionsList extends Component {
                   {{/if}}
                 </td>
                 {{!-- TODO: only show options for < 3 attempt, when this info is stored --}}
-                {{#if (eq paymentAttempt.status 'failed')}}
+                {{#if (and (eq paymentAttempt.status 'failed') (not paymentAttempt.scheduledPayment.isCanceled))}}
                   <PaymentOptionsDropdown @scheduledPayment={{paymentAttempt.scheduledPayment}}/>
                 {{/if}}
               </tr>

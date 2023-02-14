@@ -23,6 +23,7 @@ export interface ScheduledPaymentBase {
   payeeAddress: string;
   payAt: Date;
   chainId: number;
+  isCanceled?: boolean;
 }
 
 export interface ScheduledPayment extends ScheduledPaymentBase {
@@ -86,6 +87,7 @@ export interface ScheduledPaymentAttemptIncludedData {
   'payee-address': string;
   'pay-at': string;
   'chain-id': string;
+  'canceled-at': string;
 }
 
 export interface ScheduledPaymentAttemptResponseIncludedItem {
@@ -205,6 +207,7 @@ export default class ScheduledPaymentsService extends Service {
           chainId: Number(scheduledPayment!['chain-id']),
           payeeAddress: scheduledPayment!['payee-address'],
           payAt: new Date(scheduledPayment!['pay-at']),
+          isCanceled: Boolean(scheduledPayment!['canceled-at']),
         },
       };
     });
