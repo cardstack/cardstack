@@ -72,6 +72,7 @@ jobs:
           AWS_REGION: us-east-1
           AWS_CLOUDFRONT_DISTRIBUTION: E21LN3O969NVVW
           SENTRY_DSN: ${{ secrets.SAFE_TOOLS_CLIENT_SENTRY_DSN }}
+          WALLET_CONNECT_PROJ_ID: ${{ secrets.SAFE_TOOLS_WALLET_CONNECT_PROJ_ID }}
         with:
           package: safe-tools-client
           environment: staging
@@ -99,6 +100,7 @@ jobs:
           AWS_REGION: us-east-1
           AWS_CLOUDFRONT_DISTRIBUTION: E2RX1JI5H3FD5M
           SENTRY_DSN: ${{ secrets.SAFE_TOOLS_CLIENT_SENTRY_DSN }}
+          WALLET_CONNECT_PROJ_ID: ${{ secrets.SAFE_TOOLS_WALLET_CONNECT_PROJ_ID }}
         with:
           package: safe-tools-client
           environment: production

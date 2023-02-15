@@ -4,9 +4,9 @@ import {
   convertChainIdToName,
   Web3Provider,
 } from '@cardstack/cardpay-sdk';
+import ChainConnectionService from '@cardstack/safe-tools-client/services/chain-connection-manager';
 import HubAuthenticationService from '@cardstack/safe-tools-client/services/hub-authentication';
 import NetworkService from '@cardstack/safe-tools-client/services/network';
-import { ChainConnectionManager } from '@cardstack/safe-tools-client/utils/chain-connection-manager';
 import walletProviders, {
   WalletProviderId,
 } from '@cardstack/safe-tools-client/utils/wallet-providers';
@@ -25,6 +25,7 @@ const ERR_METAMASK_UNKNOWN_NETWORK = 4902; // The requested chain has not been a
 export default class Wallet extends Service {
   @service declare network: NetworkService;
   @service declare hubAuthentication: HubAuthenticationService;
+  @service declare chainConnectionManager: ChainConnectionService;
 
   @tracked isConnected = false;
   @tracked providerId: WalletProviderId | undefined;
@@ -36,7 +37,6 @@ export default class Wallet extends Service {
 
   //@ts-expect-error  ethersProvider will be assigned in constructor
   @tracked ethersProvider: Web3Provider;
-  chainConnectionManager: ChainConnectionManager;
 
   walletProviders = walletProviders.map((w) =>
     w.id === 'metamask'
@@ -52,12 +52,6 @@ export default class Wallet extends Service {
 
   constructor(owner: Owner) {
     super(owner);
-
-    this.chainConnectionManager = new ChainConnectionManager(
-      this.network.symbol,
-      this.network.chainId,
-      owner
-    );
 
     this.chainConnectionManager.on('connected', (accounts: string[]) => {
       this.isConnected = true;
@@ -187,6 +181,7 @@ export default class Wallet extends Service {
       (web3Provider) => (this.ethersProvider = web3Provider),
       this.providerId
     );
+
     yield timeout(500); // allow time for strategy to verify connected chain -- it might not accept the connection
 
     this.isConnecting = false;

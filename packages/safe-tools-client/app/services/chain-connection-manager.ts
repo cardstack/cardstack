@@ -1,37 +1,31 @@
 import {
   HubConfig,
   getWeb3ConfigByNetwork,
-  Network,
   Web3Provider,
   ExternalProvider,
 } from '@cardstack/cardpay-sdk';
 import config from '@cardstack/safe-tools-client/config/environment';
-import WalletConnectProvider from '@cardstack/wc-provider';
-import { getOwner, setOwner } from '@ember/application';
+import { getOwner } from '@ember/application';
 import { action } from '@ember/object';
-import Owner from '@ember/owner';
+import Service, { inject as service } from '@ember/service';
 import detectEthereumProvider from '@metamask/detect-provider';
 import { BaseProvider } from '@metamask/providers';
-import WalletConnectQRCodeModal from '@walletconnect/qrcode-modal';
-import { IWalletConnectSession } from '@walletconnect/types';
-import { WalletConnectProvider as TestWalletConnectProvider } from 'eth-testing/lib/providers';
+import WConnetUniversalProvider from '@walletconnect/universal-provider';
+import { getSdkError } from '@walletconnect/utils';
+import { Web3Modal } from '@web3modal/standalone';
 
-import { Emitter, SimpleEmitter } from './events';
-import { TypedChannel } from './typed-channel';
-import { VoidCallback } from './types';
-import { WalletProviderId } from './wallet-providers';
-import CustomStorageWalletConnect, {
-  clearWalletConnectStorage,
-} from './wc-connector';
+import { Emitter, SimpleEmitter } from '../utils/events';
+import { TypedChannel } from '../utils/typed-channel';
+import { VoidCallback } from '../utils/types';
+import { WalletProviderId } from '../utils/wallet-providers';
+
+import NetworkService from './network';
 
 const GET_PROVIDER_STORAGE_KEY = (chainId: number) =>
   `cardstack-chain-${chainId}-provider`;
-const WALLET_CONNECT_BRIDGE = 'https://bridge.walletconnect.org';
 
 interface ConnectionStrategyOptions {
-  chainId: number;
-  networkSymbol: Network;
-  connectionManager: ChainConnectionManager;
+  connectionManager: ChainConnectionService;
 }
 
 type ConnectionManagerWalletEvent =
@@ -79,23 +73,21 @@ type ConnectionEvent = ConnectEvent | DisconnectEvent;
  *
  * This class does not, at the moment, store any state used directly by the UI besides providerId.
  */
-export class ChainConnectionManager {
+export default class ChainConnectionService extends Service {
+  @service declare network: NetworkService;
+
   storage: Storage;
 
   broadcastChannel: TypedChannel<ConnectionEvent>;
   strategy: ConnectionStrategy | undefined;
-  chainId: number;
-  networkSymbol: Network;
   simpleEmitter = new SimpleEmitter();
 
-  constructor(networkSymbol: Network, chainId: number, owner: Owner) {
-    setOwner(this, owner);
+  constructor(args: object) {
+    super(args);
 
     this.storage =
-      (owner.lookup('storage:local') as Storage) || window.localStorage;
-
-    this.networkSymbol = networkSymbol;
-    this.chainId = chainId;
+      (getOwner(this).lookup('storage:local') as Storage) ||
+      window.localStorage;
 
     // we want to ensure that users don't get confused by different tabs having
     // different wallets connected so we communicate connections and disconnections across tabs
@@ -128,45 +120,36 @@ export class ChainConnectionManager {
     return this.strategy?.providerId;
   }
 
+  get chainId() {
+    return this.network.chainId;
+  }
+
+  get networkSymbol() {
+    return this.network.symbol;
+  }
+
   reset() {
     this.strategy?.destroy();
     this.strategy = undefined;
   }
 
-  private async setup(providerId: WalletProviderId, session?: unknown) {
-    this.strategy = this.createStrategy(
-      this.chainId,
-      this.networkSymbol,
-      providerId
-    );
+  private async setup(providerId: WalletProviderId) {
+    this.strategy = this.createStrategy(providerId);
     this.strategy.on('connected', this.onConnect);
     this.strategy.on('disconnected', this.onDisconnect);
     this.strategy.on('chain-changed', this.onChainChanged);
     this.strategy.on('websocket-disconnected', this.onWebsocketDisconnected);
-    await this.strategy.setup(session);
+    await this.strategy.setup();
   }
 
-  createStrategy(
-    chainId: number,
-    networkSymbol: Network,
-    providerId: WalletProviderId
-  ) {
+  createStrategy(providerId: WalletProviderId) {
     if (providerId === 'metamask') {
       return new MetaMaskConnectionStrategy({
         connectionManager: this,
-        chainId,
-        networkSymbol,
       });
     } else if (providerId === 'wallet-connect') {
-      const provider = getOwner(this)?.lookup(
-        'ethereum-provider:wallet-connect'
-      ) as WalletConnectProviderish | undefined;
-
       return new WalletConnectConnectionStrategy({
         connectionManager: this,
-        chainId,
-        networkSymbol,
-        provider,
       });
     } else {
       throw new Error(`Unrecognised wallet provider id: ${providerId}`);
@@ -181,18 +164,21 @@ export class ChainConnectionManager {
     if (!this.strategy)
       throw new Error('Failed to setup strategy in layer 1 connection manager');
     if (!this.provider) throw new Error('Missing Provider');
+    const isConnected = await this.strategy.connect();
+
     setProvider(new Web3Provider(this.provider as ExternalProvider));
-    return await this.strategy.connect();
+
+    return isConnected;
   }
 
   async reconnect(
     setProvider: (provider: Web3Provider) => void,
-    providerId: WalletProviderId,
-    session?: unknown
+    providerId: WalletProviderId
   ) {
-    await this.setup(providerId, session);
-    setProvider(new Web3Provider(this.provider as ExternalProvider));
+    await this.setup(providerId);
     await this.strategy?.reconnect();
+
+    setProvider(new Web3Provider(this.provider as ExternalProvider));
   }
 
   disconnect() {
@@ -238,7 +224,6 @@ export class ChainConnectionManager {
       this.broadcastChannel?.postMessage({
         type: BROADCAST_CHANNEL_MESSAGES.CONNECTED,
         providerId: this.providerId,
-        session: this.strategy.getSession(),
       });
     }
   }
@@ -259,7 +244,7 @@ export abstract class ConnectionStrategy
 
   // concrete classes will need to implement these
   abstract providerId: WalletProviderId;
-  abstract setup(session?: unknown): Promise<unknown>;
+  abstract setup(): Promise<unknown>;
   abstract reconnect(): Promise<void>;
   /**
    * Returns true if connect calls go through without errors/cancelation by user
@@ -268,19 +253,13 @@ export abstract class ConnectionStrategy
   abstract disconnect(): Promise<void>;
 
   // concrete classes may optionally implement these methods
-  abstract getSession(): unknown;
   abstract destroy(): void;
 
-  // networkSymbol and chainId are initialized in the constructor
-  networkSymbol: Network;
-  chainId: number;
-  connectionManager: ChainConnectionManager;
-  provider?: WalletConnectProvider | TestWalletConnectProvider | BaseProvider;
+  connectionManager: ChainConnectionService;
+  provider?: WalletConnectProviderish | BaseProvider;
 
   constructor(options: ConnectionStrategyOptions) {
     this.connectionManager = options.connectionManager;
-    this.chainId = options.chainId;
-    this.networkSymbol = options.networkSymbol;
     this.simpleEmitter = new SimpleEmitter();
   }
 
@@ -328,7 +307,7 @@ class MetaMaskConnectionStrategy extends ConnectionStrategy {
   // this is initialized in the `setup` method of concrete classes
   provider?: BaseProvider;
 
-  providerId = 'metamask' as WalletProviderId;
+  providerId: WalletProviderId = 'metamask';
 
   async setup() {
     const provider: BaseProvider | undefined =
@@ -425,7 +404,9 @@ class MetaMaskConnectionStrategy extends ConnectionStrategy {
       this.emitChainIdChange();
     } else {
       // if we didn't find accounts, then the stored provider key is not useful, delete it
-      this.connectionManager.removeProviderFromStorage(this.chainId);
+      this.connectionManager.removeProviderFromStorage(
+        this.connectionManager.chainId
+      );
     }
   }
 
@@ -435,80 +416,47 @@ class MetaMaskConnectionStrategy extends ConnectionStrategy {
     // otherwise disconnecting and reconnecting might cause "duplicate" event listeners
     this.provider?.removeAllListeners();
   }
-
-  getSession() {
-    return null;
-  }
 }
 
-type WalletConnectProviderish =
-  | WalletConnectProvider
-  | TestWalletConnectProvider;
+type WalletConnectProviderish = WConnetUniversalProvider;
+// TODO: handle test
+// | TestWalletConnectProvider;
+
+const wcWeb3Modal = new Web3Modal({
+  projectId: config.walletConnectProjectId,
+  themeMode: 'light',
+  themeColor: 'teal',
+  themeBackground: 'themeColor',
+});
+
+const EIP155 = 'eip155';
 
 class WalletConnectConnectionStrategy extends ConnectionStrategy {
-  providerId = 'wallet-connect' as WalletProviderId;
+  providerId: WalletProviderId = 'wallet-connect';
   provider?: WalletConnectProviderish;
-
-  getSession() {
-    if (this.provider?.constructor === WalletConnectProvider) {
-      return this.provider.connector.session;
-    } else {
-      return null;
-    }
-  }
 
   // eslint-disable-next-line ember/classic-decorator-hooks, @typescript-eslint/no-empty-function
   destroy() {}
 
   constructor(
-    options: ConnectionStrategyOptions & { provider?: WalletConnectProviderish }
+    options: ConnectionStrategyOptions & { provider?: WConnetUniversalProvider }
   ) {
     super(options);
     this.provider = options.provider;
   }
 
-  async setup(session?: IWalletConnectSession) {
-    const { chainId } = this;
-    // in case we've disconnected, we should clear wallet connect's local storage data as well
-    // As per https://github.com/WalletConnect/walletconnect-monorepo/issues/258 there is no way
-    // for us to tell if this is valid before we connect, but we don't want to connect to something
-    // if we have disconnected from it in the first place (since we cleared our local storage identification of provider)
-    if (
-      this.connectionManager.getProviderIdForChain(chainId) !== this.providerId
-    ) {
-      clearWalletConnectStorage(chainId);
-    }
-
-    let connectorOptions;
-    if (session) {
-      connectorOptions = { session };
-    } else {
-      connectorOptions = {
-        bridge: WALLET_CONNECT_BRIDGE,
-        qrcodeModal: WalletConnectQRCodeModal,
-      };
-    }
+  async setup() {
+    const { chainId } = this.connectionManager;
 
     if (!this.provider) {
-      const hubConfigApi = new HubConfig(config.hubUrl);
-      const hubConfigResponse = await hubConfigApi.getConfig();
-
-      const { rpcNodeHttpsUrl, rpcNodeWssUrl } = getWeb3ConfigByNetwork(
-        hubConfigResponse,
-        this.networkSymbol
-      );
-
-      this.provider = new WalletConnectProvider({
-        chainId,
-        infuraId: config.infuraId,
-        rpc: {
-          [chainId]: rpcNodeHttpsUrl,
+      this.provider = await WConnetUniversalProvider.init({
+        projectId: config.walletConnectProjectId,
+        metadata: {
+          name: 'Cardstack Safe Tools',
+          description: '',
+          url: window.location.origin,
+          icons: [], // TODO: Add favicon to use here too
         },
-        rpcWss: {
-          [chainId]: rpcNodeWssUrl,
-        },
-        // based on https://github.com/WalletConnect/walletconnect-monorepo/blob/7aa9a7213e15489fa939e2e020c7102c63efd9c4/packages/providers/web3-provider/src/index.ts#L47-L52
-        connector: new CustomStorageWalletConnect(connectorOptions, chainId),
       });
     }
 
@@ -520,6 +468,13 @@ class WalletConnectConnectionStrategy extends ConnectionStrategy {
     // Subscribe to chainId change
     this.provider.on('chainChanged', (changedChainId: number) => {
       this.emitChainIdChange(changedChainId);
+    });
+
+    this.provider.on('display_uri', async (uri: string) => {
+      wcWeb3Modal.openModal({
+        uri,
+        standaloneChains: [`eip155:${chainId}`],
+      });
     });
 
     // Subscribe to session disconnection
@@ -540,30 +495,63 @@ class WalletConnectConnectionStrategy extends ConnectionStrategy {
   }
 
   async connect() {
-    try {
-      await this.provider?.enable();
+    const { chainId, networkSymbol } = this.connectionManager;
 
-      // we need to trigger the event manually to update dapp with wallet network
-      this.emitChainIdChange();
+    try {
+      const hubConfigApi = new HubConfig(config.hubUrl);
+      const hubConfigResponse = await hubConfigApi.getConfig();
+
+      const { rpcNodeHttpsUrl } = getWeb3ConfigByNetwork(
+        hubConfigResponse,
+        networkSymbol
+      );
+
+      await this.provider?.connect({
+        namespaces: {
+          [EIP155]: {
+            methods: [
+              'eth_sendTransaction',
+              'eth_signTransaction',
+              'eth_sign',
+              'personal_sign',
+              'eth_signTypedData',
+              'eth_signTypedData_v4',
+            ],
+            chains: [`${EIP155}:${chainId}`],
+            events: ['chainChanged', 'accountsChanged'],
+            rpcMap: {
+              [chainId]: rpcNodeHttpsUrl,
+            },
+          },
+        },
+      });
+
+      const accounts = (await this.provider?.enable()) || [];
+      this.onConnect(accounts);
+
       return true;
     } catch (e) {
-      // check modal_closed event in WalletConnectProvider for message to match
-      // for user closing the modal
-      if (e.message === 'User closed modal') {
+      const userRejectedCode = getSdkError('USER_REJECTED').code;
+
+      if (e.code === userRejectedCode) {
         return false;
       }
       throw e;
+    } finally {
+      // Modal is open on display_uri event
+      wcWeb3Modal.closeModal();
     }
   }
 
   async disconnect() {
-    return await this.provider?.disconnect();
+    await this.provider?.disconnect();
+    this.onDisconnect();
   }
 
   async reconnect() {
-    // if the qr code modal ever pops up when the application is loading, it's time to revisit this code
-    // this typically should not open the modal if CustomStorageWalletConnect is initialized with a
-    // valid session from localStorage
-    await this.provider?.enable();
+    if (this.provider?.session) {
+      const accounts = (await this.provider?.enable()) || [];
+      this.onConnect(accounts);
+    }
   }
 }

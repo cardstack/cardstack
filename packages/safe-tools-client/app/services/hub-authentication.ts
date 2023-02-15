@@ -5,6 +5,8 @@ import WalletService from '@cardstack/safe-tools-client/services/wallet';
 import { getOwner } from '@ember/application';
 import Service, { inject as service } from '@ember/service';
 import { tracked } from '@glimmer/tracking';
+import { task, TaskGenerator, waitForProperty } from 'ember-concurrency';
+import { taskFor } from 'ember-concurrency-ts';
 
 export default class HubAuthenticationService extends Service {
   storage: Storage;
@@ -20,7 +22,12 @@ export default class HubAuthenticationService extends Service {
   }
 
   async updateAuthenticationValidity() {
-    this.isAuthenticated = await this.hasValidAuthentication();
+    return taskFor(this.updateAuthenticationValidityTask).perform();
+  }
+
+  @task *updateAuthenticationValidityTask(): TaskGenerator<void> {
+    yield waitForProperty(this.wallet, 'ethersProvider', Boolean);
+    this.isAuthenticated = yield this.hasValidAuthentication();
   }
 
   async ensureAuthenticated(): Promise<void> {
