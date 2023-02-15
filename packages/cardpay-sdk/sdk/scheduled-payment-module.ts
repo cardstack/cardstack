@@ -997,8 +997,12 @@ export default class ScheduledPaymentModule {
     if (!payeeAddress) throw new Error('payeeAddress must be provided');
     if (!executionGas) throw new Error('executionGas must be provided');
     if (!maxGasPrice) throw new Error('maxGasPrice must be provided');
-    if (!gasTokenAddress) throw new Error('gasTokenAddress must be provided ');
+    if (!gasTokenAddress) throw new Error('gasTokenAddress must be provided');
     if (!salt) throw new Error('salt must be provided');
+    // payAt is in seconds
+    if (payAt && payAt < Math.round(Date.now() / 1000)) {
+      throw new Error('payAt must be in the future');
+    }
 
     options.listener?.onBeginSpHashCreation?.();
     let spHash: string = await this.createSpHash(

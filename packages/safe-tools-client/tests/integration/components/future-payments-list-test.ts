@@ -14,6 +14,7 @@ import {
   startOfDay,
   endOfDay,
   endOfMonth,
+  addMinutes,
 } from 'date-fns';
 import { task } from 'ember-concurrency-decorators';
 import {
@@ -81,11 +82,24 @@ class ScheduledPaymentsStub extends ScheduledPaymentsService {
         'https://assets-cdn.trustwallet.com/blockchains/ethereum/assets/0x6B175474E89094C44Da98b954EedeAC495271d0F/logo.png',
     };
 
+    // 1 SP is yesterday but not yet run (5-minute window where this could happen)
     // 3 SPs are today
     // 2 Sps are tomorrow
     // 1 Sp is this month
     // 1 Sp is later
     const scheduledPayments = [
+      {
+        paymentTokenQuantity: new TokenQuantity(
+          USDC_TOKEN,
+          BigNumber.from('15000000')
+        ),
+        feeFixedUSD: '0',
+        feePercentage: '0',
+        gasTokenAddress: '0x123',
+        chainId,
+        payeeAddress: '0xeBCC5516d44FFf5E9aBa2AcaeB65BbB49bC3EBe1',
+        payAt: addMinutes(startOfToday, -2),
+      },
       {
         paymentTokenQuantity: new TokenQuantity(
           USDC_TOKEN,
@@ -241,7 +255,7 @@ module('Integration | Component | future-payments-list', function (hooks) {
       document.querySelectorAll(
         `[data-test-time-bracket='today'] [data-test-scheduled-payment-card]`
       ).length,
-      3
+      4
     );
     assert.true(
       document
@@ -359,7 +373,7 @@ module('Integration | Component | future-payments-list', function (hooks) {
       document.querySelectorAll(
         `[data-test-time-bracket='today'] [data-test-scheduled-payment-card]`
       ).length,
-      3
+      4
     );
     assert.strictEqual(
       document.querySelectorAll(
@@ -371,7 +385,7 @@ module('Integration | Component | future-payments-list', function (hooks) {
     assert.dom(`[data-test-time-bracket='later']`).isNotVisible();
   });
 
-  test('It renders future payments list, with no ealier time windows than later', async function (assert) {
+  test('It renders future payments list, with no earlier time windows than later', async function (assert) {
     assert.expect(6);
     returnOnlyLaterScheduledPayments = true;
     this.set('onDepositClick', () => {});
