@@ -56,7 +56,7 @@ module('Integration | Component | safe-info', function (hooks) {
   });
 
   test('It renders token balances without zero or dust amounts', async function (assert) {
-    assert.expect(2);
+    assert.expect(3);
 
     this.set('onSelectSafe', () => {});
     this.set('onDepositClick', () => {});
@@ -64,7 +64,7 @@ module('Integration | Component | safe-info', function (hooks) {
       {
         symbol: 'ETH',
         decimals: 18,
-        balance: BigNumber.from('1000000000000000000'),
+        balance: BigNumber.from('0'),
       },
       {
         symbol: 'USDC',
@@ -79,7 +79,7 @@ module('Integration | Component | safe-info', function (hooks) {
       {
         symbol: 'WMATIC',
         decimals: 18,
-        balance: BigNumber.from('0'),
+        balance: BigNumber.from('1000000000000000000'),
       },
     ]);
 
@@ -93,7 +93,8 @@ module('Integration | Component | safe-info', function (hooks) {
         />
       `);
 
-    assert.dom('[data-test-token-balance="ETH"]').hasText('1 ETH');
+    assert.dom('[data-test-token-balance="ETH"]').doesNotExist();
+    assert.dom('[data-test-token-balance="WMATIC"]').hasText('1 WMATIC');
     assert.dom('[data-test-token-balance="USDC"]').hasText('100 USDC');
   });
 });
