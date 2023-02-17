@@ -38,6 +38,7 @@ module.exports = function (environment) {
         // of transactions for performance monitoring.
         // We recommend adjusting this value in production,
         tracesSampleRate: 1.0,
+        maxValueLength: 2000, // Don't truncate long strings in error traces
       },
     },
   };
