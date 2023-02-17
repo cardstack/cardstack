@@ -378,22 +378,41 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
 
     this.scheduleErrorMessage = undefined;
 
-    try {
-      const { currentSafe } = this.safes;
+    const { currentSafe } = this.safes;
 
+    let payAt = this.selectedPaymentType === 'one-time' ? Math.round(this.paymentDate!.getTime() / 1000) : null;
+    let recurringDayOfMonth = this.selectedPaymentType === 'monthly' ? this.paymentDayOfMonth! : null;
+    let recurringUntil = this.selectedPaymentType === 'monthly' ? Math.round(this.monthlyUntil!.getTime() / 1000) : null
+
+    let params = {
+      safeAddress: currentSafe.address,
+      spModuleAddress: currentSafe.spModuleAddress,
+      tokenAddress: this.paymentTokenQuantity.address,
+      amount: this.paymentTokenQuantity.count,
+      payeeAddress: this.payeeAddress,
+      executionGas: Number(this.gasEstimation.gas),
+      maxGasPrice: maxGasPriceString,
+      gasTokenAddress: this.selectedGasToken.address,
+      salt,
+      payAt,
+      recurringDayOfMonth,
+      recurringUntil
+    }
+
+    try {
       yield taskFor(this.scheduledPaymentSdk.schedulePayment).perform(
-        currentSafe.address,
-        currentSafe.spModuleAddress,
-        this.paymentTokenQuantity.address,
-        this.paymentTokenQuantity.count,
-        this.payeeAddress,
-        Number(this.gasEstimation.gas),
-        maxGasPriceString,
-        this.selectedGasToken.address,
-        salt,
-        this.selectedPaymentType === 'one-time' ? Math.round(this.paymentDate!.getTime() / 1000) : null,
-        this.selectedPaymentType === 'monthly' ? this.paymentDayOfMonth! : null,
-        this.selectedPaymentType === 'monthly' ? Math.round(this.monthlyUntil!.getTime() / 1000) : null,
+        params.safeAddress,
+        params.spModuleAddress,
+        params.tokenAddress,
+        params.amount,
+        params.payeeAddress,
+        params.executionGas,
+        params.maxGasPrice,
+        params.gasTokenAddress,
+        params.salt,
+        params.payAt,
+        params.recurringDayOfMonth,
+        params.recurringUntil,
         {
           onScheduledPaymentIdReady(scheduledPaymentId: string) {
             self.lastScheduledPaymentId = scheduledPaymentId;
@@ -455,8 +474,9 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
       }
 
       this.scheduleErrorMessage = message;
-
     }
+
+    Sentry.captureMessage(`Scheduled a payment with params: ${JSON.stringify(params)}`); // Useful for debugging purposes (for example, to see which params were used to calculate the spHash)
   }
 
   @action resetForm() {
