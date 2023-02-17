@@ -23,10 +23,11 @@ export default class ScheduledPaymentTimeBracket extends Component<Signature> {
         {{#if @title}}
           <BoxelHeader @header={{@title}} @noBackground={{true}}/>
         {{/if}}
-
-        {{#each @scheduledPayments as |scheduledPayment|}}
-          <ScheduledPaymentCard @scheduledPayment={{scheduledPayment}} />
-        {{/each}}
+        <div class="scheduled-payment-time-bracket__scheduled-payment-cards">
+          {{#each @scheduledPayments as |scheduledPayment|}}
+            <ScheduledPaymentCard @scheduledPayment={{scheduledPayment}} />
+          {{/each}}
+        </div>
       </BoxelCardContainer>
     {{/if}}
   </template>
