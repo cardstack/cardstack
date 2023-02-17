@@ -110,24 +110,43 @@ export default class ScheduledPaymentsExecutorService {
     } = scheduledPayment;
 
     let currentGasPrice = await this.getCurrentGasPrice(provider, gasTokenAddress);
+    let params = {
+      moduleAddress,
+      tokenAddress,
+      amount: amount.toString(),
+      payeeAddress,
+      feeFixedUsd: Number(feeFixedUsd),
+      feePercentage: Number(feePercentage),
+      executionGasEstimation: Number(executionGasEstimation),
+      maxGasPrice: String(maxGasPrice),
+      gasTokenAddress,
+      salt,
+      currentGasPrice: String(currentGasPrice), // Contract will revert if this is larger than maxGasPrice
+      payAt: payAt!.getTime() / 1000, // getTime returns milliseconds, but we want seconds, thus divide by 1000
+      recurringDayOfMonth: recurringDayOfMonth,
+      recurringUntil: recurringUntil ? recurringUntil.getTime() / 1000 : null,
+    };
+
+    Sentry.captureMessage(`Executing a payment with params: ${JSON.stringify(params)}`); // Useful for debugging purposes (for example, to see which params were used to calculate the spHash)
+
     let executeScheduledPayment = (nonce: BN) => {
       return new Promise<string>((resolve, reject) => {
         scheduledPaymentModule
           .executeScheduledPayment(
-            moduleAddress,
-            tokenAddress,
-            amount.toString(),
-            payeeAddress,
-            Number(feeFixedUsd),
-            Number(feePercentage),
-            Number(executionGasEstimation),
-            String(maxGasPrice),
-            gasTokenAddress,
-            salt,
-            String(currentGasPrice), // Contract will revert if this is larger than maxGasPrice
-            payAt!.getTime() / 1000, // getTime returns milliseconds, but we want seconds, thus divide by 1000
-            recurringDayOfMonth,
-            recurringUntil ? recurringUntil.getTime() / 1000 : null,
+            params.moduleAddress,
+            params.tokenAddress,
+            params.amount,
+            params.payeeAddress,
+            params.feeFixedUsd,
+            params.feePercentage,
+            params.executionGasEstimation,
+            params.maxGasPrice,
+            params.gasTokenAddress,
+            params.salt,
+            params.currentGasPrice,
+            params.payAt,
+            params.recurringDayOfMonth,
+            params.recurringUntil,
             {
               onTxnHash: async (txnHash: string) => resolve(txnHash),
               nonce: nonce,
