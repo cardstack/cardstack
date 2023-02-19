@@ -67,6 +67,75 @@ export default [
     anonymous: false,
     inputs: [
       {
+        indexed: true,
+        internalType: 'address',
+        name: 'initiator',
+        type: 'address',
+      },
+      {
+        indexed: true,
+        internalType: 'address',
+        name: 'owner',
+        type: 'address',
+      },
+      {
+        indexed: true,
+        internalType: 'address',
+        name: 'avatar',
+        type: 'address',
+      },
+      {
+        indexed: false,
+        internalType: 'address',
+        name: 'moduleAddress',
+        type: 'address',
+      },
+    ],
+    name: 'ClaimSettlementSetup',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: 'bytes32',
+        name: 'id',
+        type: 'bytes32',
+      },
+      {
+        indexed: true,
+        internalType: 'bytes32',
+        name: 'digest',
+        type: 'bytes32',
+      },
+      {
+        indexed: false,
+        internalType: 'bytes',
+        name: 'fullData',
+        type: 'bytes',
+      },
+    ],
+    name: 'Claimed',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
+        internalType: 'string',
+        name: 'configuration',
+        type: 'string',
+      },
+    ],
+    name: 'ConfigurationChanged',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
         indexed: false,
         internalType: 'uint8',
         name: 'version',
@@ -115,6 +184,149 @@ export default [
     type: 'event',
   },
   {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
+        internalType: 'address',
+        name: 'validator',
+        type: 'address',
+      },
+    ],
+    name: 'ValidatorAdded',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
+        internalType: 'address',
+        name: 'validator',
+        type: 'address',
+      },
+    ],
+    name: 'ValidatorRemoved',
+    type: 'event',
+  },
+  {
+    inputs: [],
+    name: 'ADDRESS_TYPEHASH',
+    outputs: [
+      {
+        internalType: 'bytes32',
+        name: '',
+        type: 'bytes32',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'EIP712DOMAIN_TYPEHASH',
+    outputs: [
+      {
+        internalType: 'bytes32',
+        name: '',
+        type: 'bytes32',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'NFTOWNER_TYPEHASH',
+    outputs: [
+      {
+        internalType: 'bytes32',
+        name: '',
+        type: 'bytes32',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'NONE_TYPEHASH',
+    outputs: [
+      {
+        internalType: 'bytes32',
+        name: '',
+        type: 'bytes32',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'TIMERANGEBLOCKS_TYPEHASH',
+    outputs: [
+      {
+        internalType: 'bytes32',
+        name: '',
+        type: 'bytes32',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'TIMERANGESECONDS_TYPEHASH',
+    outputs: [
+      {
+        internalType: 'bytes32',
+        name: '',
+        type: 'bytes32',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'TRANSFERERC20TOCALLER_TYPEHASH',
+    outputs: [
+      {
+        internalType: 'bytes32',
+        name: '',
+        type: 'bytes32',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'TRANSFERNFTTOCALLER_TYPEHASH',
+    outputs: [
+      {
+        internalType: 'bytes32',
+        name: '',
+        type: 'bytes32',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'address',
+        name: 'validator',
+        type: 'address',
+      },
+    ],
+    name: 'addValidator',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
     inputs: [],
     name: 'avatar',
     outputs: [
@@ -129,12 +341,79 @@ export default [
   },
   {
     inputs: [],
+    name: 'configuration',
+    outputs: [
+      {
+        internalType: 'string',
+        name: '',
+        type: 'string',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'domain',
+    outputs: [
+      {
+        internalType: 'string',
+        name: 'name',
+        type: 'string',
+      },
+      {
+        internalType: 'string',
+        name: 'version',
+        type: 'string',
+      },
+      {
+        internalType: 'uint256',
+        name: 'chainId',
+        type: 'uint256',
+      },
+      {
+        internalType: 'address',
+        name: 'verifyingContract',
+        type: 'address',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'domainSeparator',
+    outputs: [
+      {
+        internalType: 'bytes32',
+        name: '',
+        type: 'bytes32',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [],
     name: 'getGuard',
     outputs: [
       {
         internalType: 'address',
         name: '_guard',
         type: 'address',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'getValidators',
+    outputs: [
+      {
+        internalType: 'address[]',
+        name: '',
+        type: 'address[]',
       },
     ],
     stateMutability: 'view',
@@ -156,27 +435,22 @@ export default [
   {
     inputs: [
       {
-        internalType: 'uint8',
-        name: 'v',
-        type: 'uint8',
+        internalType: 'address',
+        name: 'caller',
+        type: 'address',
       },
       {
         internalType: 'bytes32',
-        name: 'r',
+        name: 'typehash',
         type: 'bytes32',
       },
       {
-        internalType: 'bytes32',
-        name: 's',
-        type: 'bytes32',
-      },
-      {
-        internalType: 'bytes32',
-        name: 'hash',
-        type: 'bytes32',
+        internalType: 'bytes',
+        name: 'callerData',
+        type: 'bytes',
       },
     ],
-    name: 'isSigned',
+    name: 'isValidCaller',
     outputs: [
       {
         internalType: 'bool',
@@ -190,22 +464,17 @@ export default [
   {
     inputs: [
       {
-        internalType: 'bytes1',
-        name: 'format',
-        type: 'bytes1',
+        internalType: 'bytes32',
+        name: 'typehash',
+        type: 'bytes32',
       },
       {
         internalType: 'bytes',
         name: 'validityData',
         type: 'bytes',
       },
-      {
-        internalType: 'bytes32',
-        name: 'leafHash',
-        type: 'bytes32',
-      },
     ],
-    name: 'isValid',
+    name: 'isValidState',
     outputs: [
       {
         internalType: 'bool',
@@ -219,35 +488,17 @@ export default [
   {
     inputs: [
       {
-        internalType: 'bytes1',
-        name: 'format',
-        type: 'bytes1',
-      },
-      {
-        internalType: 'bytes',
-        name: 'userData',
-        type: 'bytes',
+        internalType: 'address',
+        name: 'validator',
+        type: 'address',
       },
     ],
-    name: 'isValidUser',
+    name: 'isValidator',
     outputs: [
       {
         internalType: 'bool',
         name: '',
         type: 'bool',
-      },
-    ],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    inputs: [],
-    name: 'keySigner',
-    outputs: [
-      {
-        internalType: 'address',
-        name: '',
-        type: 'address',
       },
     ],
     stateMutability: 'view',
@@ -267,6 +518,19 @@ export default [
     type: 'function',
   },
   {
+    inputs: [
+      {
+        internalType: 'address',
+        name: 'validator',
+        type: 'address',
+      },
+    ],
+    name: 'removeValidator',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
     inputs: [],
     name: 'renounceOwnership',
     outputs: [],
@@ -282,6 +546,19 @@ export default [
       },
     ],
     name: 'setAvatar',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'string',
+        name: '_configuration',
+        type: 'string',
+      },
+    ],
+    name: 'setConfiguration',
     outputs: [],
     stateMutability: 'nonpayable',
     type: 'function',
@@ -328,28 +605,13 @@ export default [
   {
     inputs: [
       {
-        internalType: 'uint8',
-        name: 'v',
-        type: 'uint8',
-      },
-      {
-        internalType: 'bytes32',
-        name: 'r',
-        type: 'bytes32',
-      },
-      {
-        internalType: 'bytes32',
-        name: 's',
-        type: 'bytes32',
-      },
-      {
         internalType: 'bytes',
-        name: 'leaf',
+        name: 'signature',
         type: 'bytes',
       },
       {
         internalType: 'bytes',
-        name: 'extraData',
+        name: 'fullData',
         type: 'bytes',
       },
     ],
