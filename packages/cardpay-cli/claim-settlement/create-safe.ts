@@ -23,7 +23,7 @@ export default {
     let claimSettlementModule = await getSDK('ClaimSettlementModule', ethersProvider, signer);
     let blockExplorer = await getConstant('blockExplorer', ethersProvider);
 
-    console.log(`Create a new safe and install SP module and meta guard...`);
+    console.log(`Create a new safe and install Claim Settlement module and meta guard...`);
     let onTxnHash = (txnHash: string) => console.log(`Transaction hash: ${blockExplorer}/tx/${txnHash}`);
     let { safeAddress, moduleAddress, metaGuardAddress } = await claimSettlementModule.createSafeWithModuleAndGuard(
       txnHash,
