@@ -96,7 +96,7 @@ const GOERLI = {
   scheduledPaymentConfig: '0x856Bf7c80D9EAe82D9465F5590b5E846368745D7',
   scheduledPaymentExchange: '0x3c9abC74F5998805f6670C3fD61f7D24FE3D1790',
   scheduledPaymentModule: '0x4D14d82Bc37199B289db5B0bd185cB5b79893cDB',
-  claimSettlementModule: '0x132A72dB009eF2dcE6e61C8aD4DA3dcf1af3cAF4',
+  claimSettlementModule: '0xc7b2012dCb4c340409Fbed2667f3E1DE207ffac6',
   multiSend: '0xA238CBeb142c10Ef7Ad8442C6D1f9E89e07e7761',
   multiSendCallOnly: '0x40A2aCCbd92BCA938b02010E17A5b8929b49130D',
   moduleProxyFactory: '0x00000000000DC7F163742Eb4aBEf650037b1f588',
