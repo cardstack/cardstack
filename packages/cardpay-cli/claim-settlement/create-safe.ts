@@ -33,7 +33,7 @@ export default {
       console.log(`Failed to deploy new safe`);
     } else {
       console.log(`Safe deployed to: ${safeAddress}`);
-      console.log(`Scheduled payment module deployed to: ${moduleAddress}`);
+      console.log(`Claim settlement module deployed to: ${moduleAddress}`);
       console.log(`Meta guard deployed to: ${metaGuardAddress}`);
     }
   },
