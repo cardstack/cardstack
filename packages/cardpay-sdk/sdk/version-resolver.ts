@@ -19,6 +19,7 @@ import HubAuth from './hub-auth';
 import { SUPPORTED_ABIS } from '../generated/supported-abis'; // this file is code-generated during postinstall step and the constant is a property tree of version -> contract name -> contract ABI
 import ScheduledPaymentModule from './scheduled-payment-module';
 import JsonRpcProvider from '../providers/json-rpc-provider';
+import ClaimSettlementModule from './claim-settlement-module';
 
 export type SDK =
   | 'Assets'
@@ -34,7 +35,8 @@ export type SDK =
   | 'TokenBridgeForeignSide'
   | 'RewardPool'
   | 'RewardManager'
-  | 'ScheduledPaymentModule';
+  | 'ScheduledPaymentModule'
+  | 'ClaimSettlementModule';
 
 export type MapReturnType<T> = T extends 'Assets'
   ? Assets
@@ -64,6 +66,8 @@ export type MapReturnType<T> = T extends 'Assets'
   ? TokenBridgeForeignSide
   : T extends 'ScheduledPaymentModule'
   ? ScheduledPaymentModule
+  : T extends 'ClaimSettlementModule'
+  ? ClaimSettlementModule
   : never;
 export interface ContractMeta {
   apiVersions: Record<string, any>;
@@ -165,6 +169,9 @@ export async function getSDK<T extends SDK>(sdk: T, ...args: any[]): Promise<Map
       break;
     case 'ScheduledPaymentModule':
       apiClass = ScheduledPaymentModule;
+      break;
+    case 'ClaimSettlementModule':
+      apiClass = ClaimSettlementModule;
       break;
     default:
       assertNever(sdk as never);
