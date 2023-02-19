@@ -10,11 +10,10 @@ export default class ClaimSettlementModule extends SafeModule {
   constructor(ethersProvider: JsonRpcProvider, signer?: Signer) {
     super(ethersProvider, signer);
   }
-
-  async setupArgs(safeAddress: string, safeOwners: string[]): Promise<SetupArgs> {
+  async setupArgs(safeAddress: string): Promise<SetupArgs> {
     return {
-      types: ['address', 'address', 'address[]', 'address'],
-      values: [safeAddress, safeAddress, safeOwners, safeAddress],
+      types: ['address', 'address', 'address'],
+      values: [safeAddress, safeAddress, safeAddress],
     };
   }
 }
