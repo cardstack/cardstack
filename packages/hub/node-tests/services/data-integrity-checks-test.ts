@@ -165,6 +165,30 @@ describe('data integrity checks', function () {
         },
       });
 
+      // Below is a canceled scheduled payment that should not be considered unattempted
+      await prisma.scheduledPayment.create({
+        data: {
+          id: shortUuid.uuid(),
+          senderSafeAddress: '0xc0ffee254729296a45a3885639AC7E10F9d54979',
+          moduleAddress: '0x7E7d0B97D663e268bB403eb4d72f7C0C7650a6dd',
+          tokenAddress: '0xa455bbB2A81E09E0337c13326BBb302Cb37D7cf6',
+          gasTokenAddress: '0x6A50E3807FB9cD0B07a79F64e561B9873D3b132E',
+          amount: '100',
+          payeeAddress: '0x821f3Ee0FbE6D1aCDAC160b5d120390Fb8D2e9d3',
+          executionGasEstimation: 100000,
+          maxGasPrice: '1000000000',
+          feeFixedUsd: '0',
+          feePercentage: '0',
+          salt: '54lt',
+          payAt: subMinutes(nowUtc(), 61),
+          spHash: cryptoRandomString({ length: 10 }),
+          chainId: 1,
+          canceledAt: nowUtc(),
+          userAddress: '0x57022DA74ec3e6d8274918C732cf8864be7da833',
+          creationTransactionHash: '0x123',
+        },
+      });
+
       let result = await service.check();
 
       expect(result).to.deep.equal({
