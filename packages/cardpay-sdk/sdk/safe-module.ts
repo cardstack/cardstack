@@ -402,4 +402,16 @@ export default abstract class SafeModule {
       metaGuardAddress,
     };
   }
+
+  async getDetails(moduleAddress: string): Promise<any> {
+    const module = new Contract(moduleAddress, this.abi, this.ethersProvider);
+    const owner = await module.owner();
+    const target = await module.target();
+    const avatar = await module.avatar();
+    return {
+      owner,
+      target,
+      avatar,
+    };
+  }
 }
