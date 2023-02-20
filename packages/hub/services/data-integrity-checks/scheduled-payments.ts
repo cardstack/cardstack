@@ -109,6 +109,7 @@ export default class DataIntegrityChecksScheduledPayments {
           lt: subMinutes(nowUtc(), 60),
           gt: subMinutes(nowUtc(), UNATTEMPTED_ALLOWED_MINUTES),
         },
+        canceledAt: null,
         scheduledPaymentAttempts: {
           none: {
             startedAt: {
