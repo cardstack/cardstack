@@ -187,7 +187,9 @@ export default abstract class SafeModule {
     let decimals = await token.callStatic.decimals();
     if (balance.lt(gasCost)) {
       throw new Error(
-        `Safe does not have enough balance to enable scheduled payment module. The gas token ${gasTokenAddress} balance of the safe ${safeAddress} is ${utils.formatUnits(
+        `Safe does not have enough balance to enable ${
+          this.name
+        } module. The gas token ${gasTokenAddress} balance of the safe ${safeAddress} is ${utils.formatUnits(
           balance,
           decimals
         )}, the the gas cost is ${utils.formatUnits(gasCost, decimals)} ${symbol}`
