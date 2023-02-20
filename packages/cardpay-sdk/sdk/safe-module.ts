@@ -344,13 +344,8 @@ export default abstract class SafeModule {
 
   async generateEnableModuleTxs(safeAddress: string, safeOwners: string[] = []) {
     let masterCopy = new Contract(await getAddress(this.name, this.ethersProvider), this.abi, this.ethersProvider);
-    let args = await this.setupArgs(safeAddress, safeOwners);
-    let { transaction, expectedModuleAddress } = await deployAndSetUpModule(
-      this.ethersProvider,
-      masterCopy,
-      args,
-      this.salt
-    );
+    let args = this.setupArgs(safeAddress, safeOwners);
+    let { transaction, expectedModuleAddress } = await deployAndSetUpModule(this.ethersProvider, masterCopy, args);
     let safe = new Contract(safeAddress, GnosisSafeABI, this.ethersProvider);
     let enableModuleData = safe.interface.encodeFunctionData('enableModule', [expectedModuleAddress]);
     let enableModuleTransaction = {
@@ -370,15 +365,10 @@ export default abstract class SafeModule {
       MetaGuardABI,
       this.ethersProvider
     );
-    let { transaction, expectedModuleAddress } = await deployAndSetUpModule(
-      this.ethersProvider,
-      masterCopy,
-      {
-        types: ['address', 'address', 'uint256', 'address[]'],
-        values: [safeAddress, safeAddress, 0, []],
-      },
-      this.salt
-    );
+    let { transaction, expectedModuleAddress } = await deployAndSetUpModule(this.ethersProvider, masterCopy, {
+      types: ['address', 'address', 'uint256', 'address[]'],
+      values: [safeAddress, safeAddress, 0, []],
+    });
     let safe = new Contract(safeAddress, GnosisSafeABI, this.ethersProvider);
     let setGuardData = safe.interface.encodeFunctionData('setGuard', [expectedModuleAddress]);
     let setGuardTransaction = {
