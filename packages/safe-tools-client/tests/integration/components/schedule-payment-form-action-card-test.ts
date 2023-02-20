@@ -78,6 +78,10 @@ class ScheduledPaymentSDKServiceStub extends Service {
       },
     };
   }
+
+  async getUsdToken(): Promise<TokenDetail | undefined> {
+    return exampleGasTokens.find((gt) => gt.symbol === 'USDC');
+  }
 }
 
 class TokenToUsdServiceStub extends TokenToUsdService {
@@ -140,6 +144,14 @@ module(
           .containsText('Choose token');
       });
 
+      test('it initializes the gas token to usdc', async function (assert) {
+        await render(hbs`
+          <SchedulePaymentFormActionCard />
+        `);
+
+        assert.dom('[data-test-gas-token-select]').containsText('USDC');
+      });
+
       test('it shows tokens from the tokens service', async function (assert) {
         await render(hbs`
           <SchedulePaymentFormActionCard />
@@ -194,10 +206,6 @@ module(
           '[data-test-amount-input] [data-test-boxel-input-group-select-accessory-trigger]',
           'USDC'
         );
-
-        assert
-          .dom('[data-test-schedule-payment-form-submit-button]')
-          .isDisabled();
 
         // Choose USDC for the gas token
         await selectChoose('[data-test-gas-token-select]', 'USDC');
@@ -412,9 +420,7 @@ module(
         ];
         tokensService.stubGasTokens(exampleGasTokens3);
         await settled();
-        assert
-          .dom('[data-test-gas-token-select]')
-          .containsText('Choose a Gas Token');
+        assert.dom('[data-test-gas-token-select]').containsText('USDC');
       });
 
       test('when the network changes, the selected payment token is updated if needed', async function (assert) {
