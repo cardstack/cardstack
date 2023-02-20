@@ -18,3 +18,10 @@
 .boxel-dropdown-trigger {
   justify-content: space-between;
 }
+
+@media (max-width: 1556px) {
+  .safe-tools__dashboard-container-row {
+    display: flex;
+    flex-direction: column;
+  }
+}
