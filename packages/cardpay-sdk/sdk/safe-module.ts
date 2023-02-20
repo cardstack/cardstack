@@ -73,7 +73,7 @@ export default abstract class SafeModule {
     this.name = camelCase(this.constructor.name) as AddressKeys;
   }
 
-  abstract setupArgs(safeAddress: string, safeOwners?: string[]): Promise<SetupArgs>;
+  abstract setupArgs(safeAddress: string, safeOwners?: string[]): SetupArgs;
 
   async createSafeWithModuleAndGuardEstimation(contractOptions?: ContractOptions): Promise<BigNumber> {
     let signer = this.signer ? this.signer : this.ethersProvider.getSigner();
