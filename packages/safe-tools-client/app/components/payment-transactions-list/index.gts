@@ -187,13 +187,11 @@ class PaymentTransactionsList extends Component {
                   {{/if}}
                 </td>
                 <td class="table__cell" data-test-scheduled-payment-attempts-blockexplorer>
-                  {{#if paymentAttempt.transactionHash}}
-                    <BlockExplorerButton
-                      @networkSymbol={{this.network.symbol}}
-                      @transactionHash={{paymentAttempt.transactionHash}}
-                      data-test-scheduled-payment-attempts-item-explorer-button
-                    />
-                  {{/if}}
+                  <BlockExplorerButton
+                    @networkSymbol={{this.network.symbol}}
+                    @transactionHash={{paymentAttempt.transactionHash}}
+                    data-test-scheduled-payment-attempts-item-explorer-button
+                  />
                 </td>
                 {{!-- TODO: only show options for < 3 attempt, when this info is stored --}}
                 {{#if (and (eq paymentAttempt.status 'failed') (not paymentAttempt.scheduledPayment.isCanceled))}}
