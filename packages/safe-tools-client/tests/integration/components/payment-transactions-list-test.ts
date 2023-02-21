@@ -49,7 +49,7 @@ class ScheduledPaymentsStub extends Service {
           endedAt: addMinutes(subDays(now, 10), 120),
           status: 'failed',
           failureReason: '',
-          transactionHash: '',
+          transactionHash: undefined,
           scheduledPayment: {
             id: '01234',
             paymentTokenQuantity: addPaymentTokenQuantity('10000000'),
@@ -135,6 +135,7 @@ module('Integration | Component | payment-transactions-list', function (hooks) {
       'service:hub-authentication',
       HubAuthenticationServiceStub
     );
+    returnEmptyScheduledPaymentAttempts = false;
     returnScheduledPaymentAttemptsWithBlankTxHash = false;
   });
 
@@ -284,6 +285,7 @@ module('Integration | Component | payment-transactions-list', function (hooks) {
     await render(hbs`
       <PaymentTransactionsList />
     `);
+
     assert.strictEqual(
       document.querySelectorAll(`.block-explorer-button-disabled`).length,
       1

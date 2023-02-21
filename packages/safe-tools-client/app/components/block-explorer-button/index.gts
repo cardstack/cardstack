@@ -3,12 +3,13 @@ import BoxelButton from '@cardstack/boxel/components/boxel/button';
 import { getConstantByNetwork, TransactionHash } from '@cardstack/cardpay-sdk';
 import cn from '@cardstack/boxel/helpers/cn';
 import './index.css';
+import not from 'ember-truth-helpers/helpers/not';
 
 interface Signature {
   Element: HTMLAnchorElement | HTMLButtonElement;
   Args: {
     networkSymbol: string;
-    transactionHash: TransactionHash;
+    transactionHash?: TransactionHash;
     kind?: string;
   }
 }
@@ -35,20 +36,16 @@ export default class BlockExplorerButton extends Component<Signature> {
     return 'block explorer';
   }
 
-  get isEmptyTransactionHash(): boolean {
-    return this.args.transactionHash === null || this.args.transactionHash === undefined || this.args.transactionHash === '';
-  }
-
   <template>
     <BoxelButton
       @as="anchor"
       @size="extra-small"
       @kind={{@kind}}
       @href={{this.blockExplorerUrl}}
-      @disabled={{this.isEmptyTransactionHash}}
+      @disabled={{not @transactionHash}}
       target="_blank"
       rel="noopener"
-      class={{cn block-explorer-button-disabled=this.isEmptyTransactionHash}}
+      class={{cn block-explorer-button-disabled=(not @transactionHash)}}
       data-hover="Not submitted to blockchain"
       ...attributes
     >

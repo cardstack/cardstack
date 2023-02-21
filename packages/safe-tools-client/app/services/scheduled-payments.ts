@@ -47,7 +47,7 @@ export interface ScheduledPaymentAttempt {
   endedAt: Date;
   status: string;
   failureReason: string;
-  transactionHash: string;
+  transactionHash?: string;
   scheduledPayment: ScheduledPaymentBase;
 }
 
