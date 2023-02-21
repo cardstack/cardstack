@@ -1613,6 +1613,24 @@
       "request": "launch",
       "command": "yarn run start",
       "cwd": "${workspaceFolder}"
-    }
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Claim Settlement Module: Create safe",
+      "cwd": "${workspaceFolder}/packages/cardpay-cli",
+      "console": "integratedTerminal",
+      "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
+      "env": {},
+      "args": [
+        "index.ts",
+        "claim-settlement",
+        "create-safe",
+        "--network",
+        "goerli",
+        "--ethersMnemonic",
+        "${config:cardCli.mnemonic}"
+      ]
+    },
   ]
 }

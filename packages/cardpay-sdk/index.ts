@@ -74,3 +74,4 @@ export {
 } from './sdk/scheduled-payment-module';
 export { default as ScheduledPaymentModuleABI } from './contracts/abi/modules/scheduled-payment-module';
 export * as ClaimSettlement from './sdk/claim-settlement/utils';
+export { default as ClaimSettlementModule } from './sdk/claim-settlement-module';

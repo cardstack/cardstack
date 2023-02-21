@@ -18,7 +18,8 @@ export interface SetupArgs {
 export async function deployAndSetUpModule(
   ethersProvider: JsonRpcProvider,
   masterCopy: Contract,
-  setupArgs: SetupArgs
+  setupArgs: SetupArgs,
+  salt = 'cardstack-sp-deploy-module'
 ) {
   let factory = new Contract(
     await getAddress('moduleProxyFactory', ethersProvider),
@@ -28,7 +29,7 @@ export async function deployAndSetUpModule(
 
   let encodeInitParams = utils.defaultAbiCoder.encode(setupArgs.types, setupArgs.values);
   let moduleSetupData = masterCopy.interface.encodeFunctionData('setUp', [encodeInitParams]);
-  let saltNonce = generateSaltNonce('cardstack-sp-deploy-module');
+  let saltNonce = generateSaltNonce(salt);
   let expectedModuleAddress = await calculateProxyAddress(factory, masterCopy.address, moduleSetupData, saltNonce);
 
   let deployData = factory.interface.encodeFunctionData('deployModule', [
