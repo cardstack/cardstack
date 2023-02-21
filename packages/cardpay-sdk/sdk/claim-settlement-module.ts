@@ -7,7 +7,8 @@ import { Claim } from './claim-settlement/utils';
 import { ERC20ABI } from '..';
 
 export default class ClaimSettlementModule extends SafeModule {
-  salt = 'cardstack-cs-create-safe';
+  safeSalt = 'cardstack-cs-create-safe';
+  moduleSalt = 'cardstack-cs-create-safe';
   abi = ClaimSettlementABI;
   constructor(ethersProvider: JsonRpcProvider, signer?: Signer) {
     super(ethersProvider, signer);
