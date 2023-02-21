@@ -34,21 +34,29 @@ import BN from 'bn.js';
 import JsonRpcProvider from '../providers/json-rpc-provider';
 import { camelCase } from 'lodash';
 
-export interface EnableModuleAndGuardResult {
+export interface EnableModule {
   moduleAddress: string;
+}
+
+export interface EnableModuleAndGuardResult extends EnableModule {
   metaGuardAddress: string;
 }
 
-export interface CreateSafeWithModuleAndGuardResult {
+export interface CreateSafeWithModuleResult {
   safeAddress: string;
   moduleAddress: string;
+}
+export interface CreateSafeWithModuleAndGuardResult extends CreateSafeWithModuleResult {
   metaGuardAddress: string;
 }
 
-export interface CreateSafeWithModuleAndGuardTx {
+export interface CreateSafeWithModuleTx {
   multiSendCallOnlyTx: Transaction;
   expectedSafeAddress: string;
   expectedModuleAddress: string;
+}
+
+export interface CreateSafeWithModuleAndGuardTx extends CreateSafeWithModuleTx {
   expectedMetaGuardAddress: string;
 }
 
@@ -423,6 +431,111 @@ export default abstract class SafeModule {
       owner,
       target,
       avatar,
+    };
+  }
+
+  async createSafeWithModule(
+    txnHash?: string,
+    txnOptions?: TransactionOptions,
+    contractOptions?: ContractOptions
+  ): Promise<CreateSafeWithModuleResult> {
+    if (txnHash && isTransactionHash(txnHash)) {
+      let safeAddress = await this.getSafeAddressFromTxn(txnHash);
+      let { moduleAddress } = await this.getModuleAndGuardAddressFromTxn(txnHash);
+      return {
+        safeAddress,
+        moduleAddress,
+      };
+    }
+
+    let { onTxnHash } = txnOptions ?? {};
+    let signer = this.signer ? this.signer : this.ethersProvider.getSigner();
+    let from = contractOptions?.from ?? (await signer.getAddress());
+
+    let { multiSendCallOnlyTx, expectedSafeAddress, expectedModuleAddress } = await this.createSafeWithModuleTx(from);
+    let response = await signer.sendTransaction({
+      to: multiSendCallOnlyTx.to,
+      data: multiSendCallOnlyTx.data,
+    });
+
+    if (typeof onTxnHash === 'function') {
+      await onTxnHash(response.hash);
+    }
+
+    return {
+      safeAddress: expectedSafeAddress,
+      moduleAddress: expectedModuleAddress,
+    };
+  }
+
+  async createSafeWithModuleTx(from: string): Promise<CreateSafeWithModuleTx> {
+    let { expectedSafeAddress, create2SafeTx } = await generateCreate2SafeTx(
+      this.ethersProvider,
+      [from],
+      1,
+      AddressZero,
+      '0x',
+      AddressZero,
+      AddressZero,
+      '0',
+      AddressZero,
+      generateSaltNonce(this.safeSalt)
+    );
+    let enableModuleTxs = await this.generateEnableModuleTxs(expectedSafeAddress, [from]);
+
+    let multiSendTx = await encodeMultiSend(this.ethersProvider, [...enableModuleTxs.txs]);
+    let gnosisSafe = new Contract(expectedSafeAddress, GnosisSafeABI, this.ethersProvider);
+    let estimate = await gasEstimate(
+      this.ethersProvider,
+      await getAddress('gnosisSafeMasterCopy', this.ethersProvider),
+      multiSendTx.to,
+      multiSendTx.value,
+      multiSendTx.data,
+      multiSendTx.operation,
+      AddressZero,
+      true
+    );
+    let nonce = new BN('0');
+    let gasPrice = '0';
+    let [signature] = await signSafeTxAsBytes(
+      this.ethersProvider,
+      multiSendTx.to,
+      Number(multiSendTx.value),
+      multiSendTx.data,
+      multiSendTx.operation,
+      estimate.safeTxGas,
+      estimate.baseGas,
+      gasPrice,
+      estimate.gasToken,
+      estimate.refundReceiver,
+      nonce,
+      from,
+      gnosisSafe.address,
+      this.signer
+    );
+    let safeTxData = gnosisSafe.interface.encodeFunctionData('execTransaction', [
+      multiSendTx.to,
+      Number(multiSendTx.value),
+      multiSendTx.data,
+      multiSendTx.operation,
+      estimate.safeTxGas,
+      estimate.baseGas,
+      gasPrice,
+      estimate.gasToken,
+      estimate.refundReceiver,
+      signature,
+    ]);
+    let safeTx: Transaction = {
+      to: expectedSafeAddress,
+      value: '0',
+      data: safeTxData,
+      operation: Operation.CALL,
+    };
+    let multiSendCallOnlyTx = await encodeMultiSendCallOnly(this.ethersProvider, [create2SafeTx, safeTx]);
+    return {
+      multiSendCallOnlyTx,
+      expectedSafeAddress,
+      expectedModuleAddress: enableModuleTxs.expectedModuleAddress,
     };
   }
 }
