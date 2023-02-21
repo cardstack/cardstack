@@ -4,6 +4,7 @@ import GnosisSafeABI from '../contracts/abi/gnosis-safe';
 import MetaGuardABI from '../contracts/abi/modules/meta-guard';
 import ScheduledPaymentABI from '../contracts/abi/modules/scheduled-payment-module';
 import ScheduledPaymentConfigABI from '../contracts/abi/modules/scheduled-payment-config';
+import ScheduledPaymentExchangeABI from '../contracts/abi/modules/scheduled-payment-exchange';
 import { getAddress } from '../contracts/addresses';
 import { isAddress, toWei } from 'web3-utils';
 import {
@@ -1346,6 +1347,16 @@ export default class ScheduledPaymentModule {
     let configModuleAddress = await getAddress('scheduledPaymentConfig', this.ethersProvider);
     const scheduledPaymentConfig = new Contract(configModuleAddress, ScheduledPaymentConfigABI, this.ethersProvider);
     return await scheduledPaymentConfig.validForDays();
+  }
+
+  async getUsdToken(): Promise<string> {
+    let exchangeModuleAddress = await getAddress('scheduledPaymentExchange', this.ethersProvider);
+    const scheduledPaymentExchange = new Contract(
+      exchangeModuleAddress,
+      ScheduledPaymentExchangeABI,
+      this.ethersProvider
+    );
+    return await scheduledPaymentExchange.usdToken();
   }
 
   private composeFees(feeFixedUSD: number, feePercentage: number) {

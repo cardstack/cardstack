@@ -37,6 +37,12 @@ interface ConfiguredFeesState {
   error?: Error
 }
 
+interface ConfiguredUsdTokenState {
+  isLoading: boolean;
+  value?: TokenDetail,
+  error?: Error
+}
+
 interface FeesState {
   isLoading: boolean;
   isIndeterminate: boolean;
@@ -226,12 +232,12 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
   }
 
   get selectedGasToken(): TokenDetail | undefined {
-    let { value: gasTokens, isLoading } = this.tokens.gasTokens;
+    let { value: gasTokens } = this.tokens.gasTokens;
 
-    if (isLoading || gasTokens?.find(gt => gt.address === this._selectedGasToken?.address)) {
+    if (gasTokens?.find(gt => gt.address === this._selectedGasToken?.address)) {
       return this._selectedGasToken;
     }
-    return undefined;
+    return this.usdToken.value;
   }
 
   @tracked maxGasPrice: 'normal' | 'high' | 'max' = 'normal'
@@ -264,6 +270,26 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
         state.value = configuredFees;
       } catch (error) {
         console.error(error);
+        state.error = error;
+      } finally {
+        state.isLoading = false;
+      }
+    })();
+    return state;
+  });
+
+  @use usdToken = resource(() => {
+    const state: ConfiguredUsdTokenState = new TrackedObject({
+      isLoading: true,
+    });
+    if (!this.wallet.isConnected) {
+      return state;
+    }
+    (async () => {
+      try {
+        const usdToken = await this.scheduledPaymentSdk.getUsdToken();
+        state.value = usdToken;
+      } catch (error) {
         state.error = error;
       } finally {
         state.isLoading = false;
