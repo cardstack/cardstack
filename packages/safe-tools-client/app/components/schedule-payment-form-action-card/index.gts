@@ -282,8 +282,7 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
     const state: ConfiguredUsdTokenState = new TrackedObject({
       isLoading: true,
     });
-    let isWalletConnected = this.wallet.isConnected;
-    if (!isWalletConnected) {
+    if (!this.wallet.isConnected) {
       return state;
     }
     (async () => {
