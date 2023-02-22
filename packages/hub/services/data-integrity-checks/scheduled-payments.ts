@@ -5,6 +5,7 @@ import { nowUtc } from '../../utils/dates';
 import fetch from 'node-fetch';
 import { getConstantByNetwork, SchedulerCapableNetworks } from '@cardstack/cardpay-sdk';
 import { BigNumber, ethers, Wallet } from 'ethers';
+import { JsonRpcProvider } from '@cardstack/cardpay-sdk';
 
 export const CREATION_WITHOUT_TX_HASH_ALLOWED_MINUTES = 2;
 export const CREATION_UNMINED_ALLOWED_MINUTES = 3 * 60;
@@ -223,14 +224,27 @@ export default class DataIntegrityChecksScheduledPayments {
     let relayerFunderPublicKey = JSON.parse(responseText).settings.SAFE_TX_SENDER_PUBLIC_KEY;
 
     let provider = this.ethersProvider.getInstance(chainId);
-    return await provider.getBalance(relayerFunderPublicKey);
+    return await this.getBalanceWithRetry(provider, relayerFunderPublicKey);
   }
 
   async getCrankBalance(networkName: string): Promise<BigNumber> {
     let chainId = getConstantByNetwork('chainId', networkName);
     let crank = new Wallet(config.get('hubPrivateKey'));
     let provider = this.ethersProvider.getInstance(chainId);
-    return await provider.getBalance(crank.address);
+    return await this.getBalanceWithRetry(provider, crank.address);
+  }
+
+  // Every once in a while, the balance of the relayer funder or crank is reported as 0 while it is not actually 0 (confirmed by etherscan and similar)
+  // This is a workaround to retry the balance check after a short delay. Usually the balance is reported correctly on the second try.
+  async getBalanceWithRetry(provider: JsonRpcProvider, address: string): Promise<BigNumber> {
+    let sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+    let balance = await provider.getBalance(address);
+    if (balance.eq(0)) {
+      await sleep(1000);
+      balance = await provider.getBalance(address);
+    }
+    return balance;
   }
 }
 
