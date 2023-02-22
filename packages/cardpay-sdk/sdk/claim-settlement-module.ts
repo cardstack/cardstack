@@ -11,7 +11,8 @@ import { TransactionOptions, waitUntilTransactionMined } from './utils/general-u
 import { ContractOptions } from 'web3-eth-contract';
 import { signSafeTx } from './utils/signing-utils';
 import { AddressZero } from '@ethersproject/constants';
-// import { getAddress } from '../contracts/addresses';
+import GnosisSafeABI from '../contracts/abi/gnosis-safe';
+import { AbiItem } from 'web3-utils';
 
 export default class ClaimSettlementModule extends SafeModule {
   safeSalt = 'cardstack-cs-create-safe';
@@ -91,6 +92,12 @@ export default class ClaimSettlementModule extends SafeModule {
     let data = await module.interface.encodeFunctionData('addValidator', [validatorAddress]);
     let signer = this.signer ? this.signer : this.ethersProvider.getSigner();
     let from = contractOptions?.from ?? (await signer.getAddress());
+
+    let safe = new Contract(avatarAddress, GnosisSafeABI, this.ethersProvider);
+    const safeOwners = await safe.methods.getOwners();
+    if (!safeOwners.contain(signer)) {
+      throw new Error(`${signer} is not owner of avatar ${avatarAddress}`);
+    }
 
     let estimate = await gasEstimate(
       this.ethersProvider,
