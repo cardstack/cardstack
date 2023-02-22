@@ -33,7 +33,7 @@ export default {
     let claimSettlementModule = await getSDK('ClaimSettlementModule', ethersProvider, signer);
     let blockExplorer = await getConstant('blockExplorer', ethersProvider);
 
-    console.log(`Validating ${validatorAddress} on module ${moduleAddress} enabled on safe ${avatarAddress}`);
+    console.log(`Validator ${validatorAddress} on module ${moduleAddress} enabled on safe ${avatarAddress}`);
     let onTxnHash = (txnHash: string) => console.log(`Transaction hash: ${blockExplorer}/tx/${txnHash}`);
     await claimSettlementModule.addValidator(moduleAddress, avatarAddress, validatorAddress, {
       onTxnHash,
