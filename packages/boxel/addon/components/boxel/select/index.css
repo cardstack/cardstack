@@ -29,6 +29,29 @@
   cursor: pointer;
 }
 
+.boxel-select__dropdown .ember-power-select-search {
+  padding: 4px;
+}
+
+.boxel-select__dropdown .ember-power-select-search-input {
+  border: 1px solid #aaa;
+  border-radius: 0;
+  width: 100%;
+  font-size: inherit;
+  line-height: inherit;
+  padding: 0 5px;
+}
+
+.boxel-select__dropdown .ember-power-select-search-input:focus {
+  border: 1px solid var(--boxel-outline-color);
+  box-shadow: var(--boxel-box-shadow-hover);
+  outline: var(--boxel-outline);
+}
+
+.ember-power-select-option--no-matches-message {
+  padding: var(--boxel-sp-xxs) var(--boxel-sp-sm);
+}
+
 .boxel-select__item {
   font-weight: 600;
   font-size: var(--boxel-font-size-sm);

@@ -39,6 +39,7 @@ interface SelectActions extends DropdownActions {
   choose: (selected: any, e?: Event) => void;
   scrollTo: (option: any) => void;
 }
+
 export interface Select extends Dropdown {
   selected: any;
   highlighted: any;
@@ -71,8 +72,8 @@ export interface PowerSelectArgs {
   searchField?: string;
   searchEnabled?: boolean;
   tabindex?: number | string;
+  beforeOptionsComponent?: string | ComponentLike<BeforeOptionsArgs>;
   triggerComponent?: string;
-  beforeOptionsComponent?: string;
   optionsComponent?: string;
   groupComponent?: string;
   matcher?: MatcherFn;
@@ -101,6 +102,17 @@ import {
   BasicDropdownArgs,
   BasicDropdownTriggerArgs,
 } from 'ember-basic-dropdown/components/basic-dropdown';
+
+interface BeforeOptionsArgs {
+  select: Select;
+  onKeydown: (e: Event) => false | void;
+  autofocus?: boolean;
+}
+export class BeforeOptions extends Component<BeforeOptionsArgs> {
+  clearSearch(): void;
+  handleKeydown(e: KeyboardEvent): false | void;
+  focusInput(el: HTMLElement): void;
+}
 
 type SharedDropdownType = Pick<
   BasicDropdownArgs,
