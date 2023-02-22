@@ -141,10 +141,9 @@ export default class ClaimSettlementModule extends SafeModule {
     let id = utils.hexlify(utils.randomBytes(32));
     let startBlockNum = await this.ethersProvider.getBlockNumber();
     let startBlockTime = (await this.ethersProvider.getBlock(startBlockNum)).timestamp;
-    let validitySeconds = 86400;
-    let tokenAddress = '0x95093b8836ED53B4594EC748995E45b0Cd2b1389'; // CTST await getAddress('usdStableCoinToken', this.ethersProvider);
+    let validitySeconds = 86400; //1 day
+    let tokenAddress = '0x95093b8836ED53B4594EC748995E45b0Cd2b1389'; // CTST
     let transferAmount = BigNumber.from(utils.parseUnits('1', 'ether'));
-    // let callerAddress = '0xD7182E380b7dFa33C186358De7E1E5d0950fCAE7';
     return new Claim(
       id,
       this.ethersProvider.network.chainId.toString(),
