@@ -45,7 +45,7 @@ export default class BlockExplorerButton extends Component<Signature> {
       @disabled={{not @transactionHash}}
       target="_blank"
       rel="noopener"
-      class={{cn block-explorer-button-disabled=(not @transactionHash)}}
+      class={{cn "block-explorer-button" block-explorer-button--disabled=(not @transactionHash)}}
       data-hover="Not submitted to blockchain"
       ...attributes
     >

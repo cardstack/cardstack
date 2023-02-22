@@ -287,7 +287,7 @@ module('Integration | Component | payment-transactions-list', function (hooks) {
     `);
 
     assert.strictEqual(
-      document.querySelectorAll(`.block-explorer-button-disabled`).length,
+      document.querySelectorAll(`.block-explorer-button--disabled`).length,
       1
     );
   });
