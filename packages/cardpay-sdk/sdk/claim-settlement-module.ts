@@ -168,9 +168,6 @@ export default class ClaimSettlementModule extends SafeModule {
     if (!(await this.hasBalance(claim, moduleAddress))) {
       throw new Error(`Not enough balance`);
     }
-    if (!(await this.isValidator(moduleAddress, callerAddress))) {
-      throw new Error(`Signer ${callerAddress} is not a validator`);
-    }
   }
 
   async executeEOA(moduleAddress: string, txnOptions?: TransactionOptions): Promise<SuccessfulTransactionReceipt> {
@@ -179,6 +176,9 @@ export default class ClaimSettlementModule extends SafeModule {
 
     let signer = this.signer ? this.signer : this.ethersProvider.getSigner();
     let callerAddress = await signer.getAddress();
+    if (!(await this.isValidator(moduleAddress, callerAddress))) {
+      throw new Error(`Signer ${callerAddress} is not a validator`);
+    }
     let claim = await this.defaultClaim(moduleAddress, callerAddress);
 
     await this.checkValidity(claim, moduleAddress, callerAddress);
@@ -224,6 +224,9 @@ export default class ClaimSettlementModule extends SafeModule {
     let module = new Contract(moduleAddress, this.abi, this.ethersProvider);
     let signer = this.signer ? this.signer : this.ethersProvider.getSigner();
     let from = contractOptions?.from ?? (await signer.getAddress());
+    if (!(await this.isValidator(moduleAddress, from))) {
+      throw new Error(`Signer ${from} is not a validator`);
+    }
     let claim = await this.defaultClaim(moduleAddress, payeeSafeAddress);
 
     await this.checkValidity(claim, moduleAddress, payeeSafeAddress);
