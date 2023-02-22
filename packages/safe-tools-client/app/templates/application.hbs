@@ -46,12 +46,12 @@
 </Boxel::Dashboard>
 
 <NetworkConnectModal
-  @isOpen={{and (and this.isShowingConnectModal (not this.wallet.isConnected)) (not this.wallet.isConnectUnsupportedNetwork)}}
+  @isOpen={{and (and this.isShowingConnectModal (not this.wallet.isConnected)) (eq this.wallet.unsupportedConnectCache undefined)}}
   @onClose={{set this 'isShowingConnectModal' false}}
   @isConnected={{this.wallet.isConnected}}
 />
 
 <UnsupportedNetworkModal
-  @isOpen={{this.wallet.isConnectUnsupportedNetwork}}
-  @onClose={{set this.wallet 'isConnectUnsupportedNetwork' false}}
+  @isOpen={{not (eq this.wallet.unsupportedConnectCache undefined)}}
+  @onClose={{set this.wallet 'unsupportedConnectCache' undefined}}
 />

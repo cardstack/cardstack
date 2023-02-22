@@ -1,12 +1,15 @@
 import Component from '@glimmer/component';
 import { inject as service} from '@ember/service';
-import { tracked } from '@glimmer/tracking';
 import { on } from '@ember/modifier';
 import arrayJoin from '@cardstack/safe-tools-client/helpers/array-join';
 import NetworkService from '@cardstack/safe-tools-client/services/network';
+import WalletService from '@cardstack/safe-tools-client/services/wallet';
 import BoxelActionContainer from '@cardstack/boxel/components/boxel/action-container';
 import BoxelModal from '@cardstack/boxel/components/boxel/modal';
 import { noop } from '@cardstack/safe-tools-client/helpers/noop';
+import {
+  convertChainIdToName
+} from '@cardstack/cardpay-sdk';
 
 import './index.css';
 
@@ -17,13 +20,21 @@ interface Signature {
 
 class UnsupportedNetworkModal extends Component<Signature> {
   @service declare network: NetworkService;
+  @service declare wallet: WalletService;
 
-  @tracked chosenProviderId: string | undefined;
+  get providerName() {
+    return this.wallet.unsupportedConnectCache?.providerId === 'metamask' ? 'Metamask' : 'WalletConnect';
+  }
+
+  get networkName() {
+    const chainId = this.wallet.unsupportedConnectCache?.chainId;
+    return convertChainIdToName(chainId!) ?? 'an unknown';
+  }
 
   <template>
     <BoxelModal
       class='unsupported-network-modal'
-      @size='small'
+      @size='medium'
       @isOpen={{@isOpen}}
       @onClose={{noop}}
       data-test-unsupported-network-modal
@@ -34,8 +45,9 @@ class UnsupportedNetworkModal extends Component<Signature> {
         as |Section ActionChin|
       >
         <Section @title="Unsupported network!">
-          <span>Choose a supported one on your wallet and reconnect.</span>
-          <span>Supported networks: {{arrayJoin this.network.supportedNetworksName ','}}</span>
+          <p>Your {{this.providerName}} wallet is connected to {{this.networkName}} network, which we don't support.</p>
+          <p>In your wallet, please first connect to a supported network, and then reload the page.</p>
+          <p class="unsupported-network-modal__card__text-row">Supported networks: <p class="unsupported-network-modal__card__supported-chain">{{arrayJoin this.network.supportedNetworksName ','}}</p></p>
         </Section>
 
         <ActionChin @state='default'>
