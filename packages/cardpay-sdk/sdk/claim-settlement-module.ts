@@ -183,10 +183,10 @@ export default class ClaimSettlementModule extends SafeModule {
 
     await this.checkValidity(claim, moduleAddress, callerAddress);
 
-    let transferAmount = BigNumber.from(utils.parseUnits('1', 'ether'));
+    let minTokens = BigNumber.from(utils.parseUnits('0.1', 'ether'));
 
     let signature = await claim.sign(signer as VoidSigner);
-    let encoded = claim.abiEncode(['uint256'], [transferAmount]);
+    let encoded = claim.abiEncode(['uint256'], [minTokens]);
     let data = module.interface.encodeFunctionData('signedExecute', [signature, encoded]);
     let response = await signer.sendTransaction({
       to: moduleAddress,
@@ -228,8 +228,8 @@ export default class ClaimSettlementModule extends SafeModule {
 
     await this.checkValidity(claim, moduleAddress, payeeSafeAddress);
     let signature = await claim.sign(signer as VoidSigner);
-    let transferAmount = BigNumber.from(utils.parseUnits('1', 'ether'));
-    let encoded = claim.abiEncode(['uint256'], [transferAmount]);
+    let minTokens = BigNumber.from(utils.parseUnits('0.1', 'ether'));
+    let encoded = claim.abiEncode(['uint256'], [minTokens]);
     let data = await module.interface.encodeFunctionData('signedExecute', [signature, encoded]);
 
     let estimate = await gasEstimate(
