@@ -1,6 +1,6 @@
 import { Arguments, Argv, CommandModule } from 'yargs';
 import { getEthereumClients, getConnectionType, NETWORK_OPTION_ANY } from '../utils';
-import { getSDK } from '@cardstack/cardpay-sdk';
+import { getConstant, getSDK } from '@cardstack/cardpay-sdk';
 
 export default {
   command: 'execute <moduleAddress> <safeAddress> <payeeAddress>',
@@ -13,7 +13,7 @@ export default {
       })
       .positional('safeAddress', {
         type: 'string',
-        description: 'The address of the safe whose enables the scheduled payment module',
+        description: 'The address of the safe whose enables the claim settlement module',
       })
       .positional('payeeAddress', {
         type: 'string',
@@ -22,7 +22,7 @@ export default {
       .option('network', NETWORK_OPTION_ANY);
   },
   async handler(args: Arguments) {
-    let { network, moduleAddress, safeAddress, payeeAddress } = args as unknown as {
+    let { network, moduleAddress, safeAddress } = args as unknown as {
       network: string;
       moduleAddress: string;
       safeAddress: string;
@@ -30,7 +30,8 @@ export default {
     };
     let { ethersProvider, signer } = await getEthereumClients(network, getConnectionType(args));
     let claimSettlementModule = await getSDK('ClaimSettlementModule', ethersProvider, signer);
-    await claimSettlementModule.executeEOA(moduleAddress, safeAddress);
-    // await claimSettlementModule.executeSafe(moduleAddress, safeAddress);
+    let blockExplorer = await getConstant('blockExplorer', ethersProvider);
+    let onTxnHash = (txnHash: string) => console.log(`Transaction hash: ${blockExplorer}/tx/${txnHash}`);
+    await claimSettlementModule.executeEOA(moduleAddress, safeAddress, { onTxnHash });
   },
 } as CommandModule;
