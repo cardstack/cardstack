@@ -208,12 +208,14 @@ export default class ClaimSettlementModule extends SafeModule {
   async executeSafe(
     moduleAddress: string,
     payeeSafeAddress: string,
+    gasTokenAddress?: string,
     txnOptions?: TransactionOptions,
     contractOptions?: ContractOptions
   ): Promise<SuccessfulTransactionReceipt>;
   async executeSafe(
     moduleAddressOrTxnHash: string,
     payeeSafeAddress?: string,
+    gasTokenAddress?: string,
     txnOptions?: TransactionOptions,
     contractOptions?: ContractOptions
   ): Promise<SuccessfulTransactionReceipt> {
@@ -248,7 +250,7 @@ export default class ClaimSettlementModule extends SafeModule {
       '0',
       data,
       Operation.CALL,
-      AddressZero,
+      gasTokenAddress ?? AddressZero,
       true
     );
 
