@@ -47,7 +47,8 @@ export default class ClaimSettlementModule extends SafeModule {
     return module.used(claim.id);
   }
 
-  async hasBalance(claim: Claim, avatarAddress: string): Promise<any> {
+  async hasBalance(claim: Claim, moduleAddress: string): Promise<any> {
+    let { avatar: avatarAddress } = await this.getDetails(moduleAddress);
     let action = claim.action.asMapping();
     if (claim.action.structName == 'TransferERC20ToCaller') {
       let token = new Contract(action.token, ERC20ABI, this.ethersProvider);
@@ -154,12 +155,7 @@ export default class ClaimSettlementModule extends SafeModule {
     );
   }
 
-  async checkValidity(
-    claim: Claim,
-    moduleAddress: string,
-    avatarAddress: string,
-    callerAddress: string
-  ): Promise<void> {
+  async checkValidity(claim: Claim, moduleAddress: string, callerAddress: string): Promise<void> {
     if (await this.isUsed(claim, moduleAddress)) {
       throw new Error(`Root is used`);
     }
@@ -169,7 +165,7 @@ export default class ClaimSettlementModule extends SafeModule {
     if (!(await this.isValidState(claim, moduleAddress))) {
       throw new Error(`State not valid`);
     }
-    if (!(await this.hasBalance(claim, avatarAddress))) {
+    if (!(await this.hasBalance(claim, moduleAddress))) {
       throw new Error(`Not enough balance`);
     }
     if (!(await this.isValidator(moduleAddress, callerAddress))) {
@@ -177,11 +173,7 @@ export default class ClaimSettlementModule extends SafeModule {
     }
   }
 
-  async executeEOA(
-    moduleAddress: string,
-    avatarAddress: string,
-    txnOptions?: TransactionOptions
-  ): Promise<SuccessfulTransactionReceipt> {
+  async executeEOA(moduleAddress: string, txnOptions?: TransactionOptions): Promise<SuccessfulTransactionReceipt> {
     let { onTxnHash } = txnOptions ?? {};
     let module = new Contract(moduleAddress, this.abi, this.ethersProvider);
 
@@ -189,7 +181,7 @@ export default class ClaimSettlementModule extends SafeModule {
     let callerAddress = await signer.getAddress();
     let claim = await this.defaultClaim(moduleAddress, callerAddress);
 
-    await this.checkValidity(claim, moduleAddress, avatarAddress, callerAddress);
+    await this.checkValidity(claim, moduleAddress, callerAddress);
 
     let transferAmount = BigNumber.from(utils.parseUnits('1', 'ether'));
 
