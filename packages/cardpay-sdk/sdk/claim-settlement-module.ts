@@ -67,21 +67,21 @@ export default class ClaimSettlementModule extends SafeModule {
   async addValidator(txnHash: string): Promise<SuccessfulTransactionReceipt>;
   async addValidator(
     moduleAddress: string,
-    safeAddress: string,
+    avatarAddress: string,
     validatorAddress: string,
     txnOptions?: TransactionOptions,
     contractOptions?: ContractOptions
   ): Promise<SuccessfulTransactionReceipt>;
   async addValidator(
     moduleAddress: string,
-    safeAddress?: string,
+    avatarAddress?: string,
     validatorAddress?: string,
     txnOptions?: TransactionOptions,
     contractOptions?: ContractOptions
   ): Promise<SuccessfulTransactionReceipt> {
     //TODO: Multi-signature. Only supports adding single validator only
-    if (!safeAddress) {
-      throw new Error('safeAddress must be specified');
+    if (!avatarAddress) {
+      throw new Error('avatarAddress must be specified');
     }
     if (!validatorAddress) {
       throw new Error('validatorAddress must be specified');
@@ -94,7 +94,7 @@ export default class ClaimSettlementModule extends SafeModule {
 
     let estimate = await gasEstimate(
       this.ethersProvider,
-      safeAddress,
+      avatarAddress,
       module.address,
       '0',
       data,
@@ -112,7 +112,7 @@ export default class ClaimSettlementModule extends SafeModule {
 
     let gnosisTxn = await executeTransaction(
       this.ethersProvider,
-      safeAddress,
+      avatarAddress,
       module.address,
       data,
       Operation.CALL,
@@ -120,7 +120,7 @@ export default class ClaimSettlementModule extends SafeModule {
       nonce,
       await signSafeTx(
         this.ethersProvider,
-        safeAddress,
+        avatarAddress,
         module.address,
         data,
         Operation.CALL,

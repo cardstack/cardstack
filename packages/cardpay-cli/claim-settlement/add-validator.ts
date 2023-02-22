@@ -4,15 +4,15 @@ import { getEthereumClients, getConnectionType, NETWORK_OPTION_ANY } from '../ut
 import { Arguments, CommandModule } from 'yargs';
 
 export default {
-  command: 'add-validator <moduleAddress> <safeAddress> <validatorAddress>',
-  describe: 'Enable claim settlement module on the safe',
+  command: 'add-validator <moduleAddress> <avatarAddress> <validatorAddress>',
+  describe: 'Add validator that is enabled to sign transaction',
   builder(yargs: Argv) {
     return yargs
       .positional('moduleAddress', {
         type: 'string',
         description: 'Module address enabled on safe',
       })
-      .positional('safeAddress', {
+      .positional('avatarAddress', {
         type: 'string',
         description: 'The address of the safe whose enables the scheduled payment module',
       })
@@ -23,9 +23,9 @@ export default {
       .option('network', NETWORK_OPTION_ANY);
   },
   async handler(args: Arguments) {
-    let { network, safeAddress, moduleAddress, validatorAddress } = args as unknown as {
+    let { network, avatarAddress, moduleAddress, validatorAddress } = args as unknown as {
       network: string;
-      safeAddress: string;
+      avatarAddress: string;
       moduleAddress: string;
       validatorAddress: string;
     };
@@ -33,9 +33,9 @@ export default {
     let claimSettlementModule = await getSDK('ClaimSettlementModule', ethersProvider, signer);
     let blockExplorer = await getConstant('blockExplorer', ethersProvider);
 
-    console.log(`Validating ${validatorAddress} on module ${moduleAddress} enabled on safe ${safeAddress}`);
+    console.log(`Validating ${validatorAddress} on module ${moduleAddress} enabled on safe ${avatarAddress}`);
     let onTxnHash = (txnHash: string) => console.log(`Transaction hash: ${blockExplorer}/tx/${txnHash}`);
-    await claimSettlementModule.addValidator(moduleAddress, safeAddress, validatorAddress, {
+    await claimSettlementModule.addValidator(moduleAddress, avatarAddress, validatorAddress, {
       onTxnHash,
     });
   },
