@@ -10,9 +10,9 @@ import { SuccessfulTransactionReceipt } from './utils/successful-transaction-rec
 import { TransactionOptions, waitUntilTransactionMined } from './utils/general-utils';
 import { ContractOptions } from 'web3-eth-contract';
 import { signSafeTx } from './utils/signing-utils';
+/* eslint-disable node/no-extraneous-import */
 import { AddressZero } from '@ethersproject/constants';
 import GnosisSafeABI from '../contracts/abi/gnosis-safe';
-import { AbiItem } from 'web3-utils';
 
 export default class ClaimSettlementModule extends SafeModule {
   safeSalt = 'cardstack-cs-create-safe';
