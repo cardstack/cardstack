@@ -4,9 +4,9 @@ import { tracked } from '@glimmer/tracking';
 import { on } from '@ember/modifier';
 import arrayJoin from '@cardstack/safe-tools-client/helpers/array-join';
 import NetworkService from '@cardstack/safe-tools-client/services/network';
-import { svgJar } from '@cardstack/boxel/utils/svg-jar';
 import BoxelActionContainer from '@cardstack/boxel/components/boxel/action-container';
 import BoxelModal from '@cardstack/boxel/components/boxel/modal';
+import { noop } from '@cardstack/safe-tools-client/helpers/noop';
 
 import './index.css';
 
@@ -25,28 +25,27 @@ class UnsupportedNetworkModal extends Component<Signature> {
       class='unsupported-network-modal'
       @size='small'
       @isOpen={{@isOpen}}
-      @onClose={{@onClose}}
+      @onClose={{noop}}
       data-test-unsupported-network-modal
     >
-    <BoxelActionContainer
-          class='unsupported-network-modal__card'
-          tabindex='-1'
-          as |Section|
-        >
-          <button
-            class='unsupported-network-modal__close-button'
-            type='button'
-            aria-label='Close'
-            {{on 'click' @onClose}}
-          >
-            {{svgJar 'close' width='100%' height='100%' aria-hidden='true'}}
-          </button>
+      <BoxelActionContainer
+        class='unsupported-network-modal__card'
+        tabindex='-1'
+        as |Section ActionChin|
+      >
+        <Section @title="Unsupported network!">
+          <span>Choose a supported one on your wallet and reconnect.</span>
+          <span>Supported networks: {{arrayJoin this.network.supportedNetworksName ','}}</span>
+        </Section>
 
-          <Section @title="Unsupported network!">
-            <span>Choose a supported one on your wallet and reconnect.</span>
-            <span>Supported networks: {{arrayJoin this.network.supportedNetworksName ','}}</span>
-          </Section>
-        </BoxelActionContainer>
+        <ActionChin @state='default'>
+          <:default as |a|>
+            <a.ActionButton {{on "click" @onClose}}>
+              Close
+            </a.ActionButton>
+          </:default>
+        </ActionChin>
+      </BoxelActionContainer>
     </BoxelModal>
   </template>
 }
