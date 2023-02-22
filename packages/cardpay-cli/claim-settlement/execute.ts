@@ -3,7 +3,7 @@ import { getEthereumClients, getConnectionType, NETWORK_OPTION_ANY } from '../ut
 import { getConstant, getSDK } from '@cardstack/cardpay-sdk';
 
 export default {
-  command: 'execute <moduleAddress> <payeeAddress>',
+  command: 'execute <moduleAddress> [payeeSafeAddress]',
   describe: 'Execute a claim settlement',
   builder(yargs: Argv) {
     return yargs
