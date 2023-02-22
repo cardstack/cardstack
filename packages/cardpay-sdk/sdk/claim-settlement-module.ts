@@ -27,10 +27,9 @@ export default class ClaimSettlementModule extends SafeModule {
       values: [safeAddress, safeAddress, safeAddress],
     };
   }
-  async isValidator(moduleAddress: string, possibleValidator?: string) {
-    let signer = this.signer ? this.signer : this.ethersProvider.getSigner();
+  async isValidator(moduleAddress: string, possibleValidator: string) {
     let module = new Contract(moduleAddress, this.abi, this.ethersProvider);
-    return module.isValidator(possibleValidator ?? signer);
+    return module.isValidator(possibleValidator);
   }
 
   async isValidState(claim: Claim, moduleAddress: string) {
