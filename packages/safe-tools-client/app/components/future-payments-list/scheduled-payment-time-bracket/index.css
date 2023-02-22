@@ -7,3 +7,9 @@
   padding: 0;
   margin-bottom: var(--boxel-sp-xs);
 }
+
+@media only screen and (max-width: 1556px) {
+  .scheduled-payment-time-bracket__scheduled-payment-cards {
+    display: flex;
+  }
+}

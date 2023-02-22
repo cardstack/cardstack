@@ -58,3 +58,18 @@
 .future-payments-list__payments-section-time-brackets::-webkit-scrollbar {
   display: none;
 }
+
+@media only screen and (max-width: 1556px) {
+  .future-payments-list {
+    margin-top: 2rem;
+
+    max-width: 100%;
+    width: 100%;
+  }
+
+  .future-payments-list__payments-section-time-brackets {
+    position: relative;
+
+    display: flex;
+  }
+}

@@ -231,7 +231,6 @@ export class ChainConnectionManager {
 
   @action onConnect(accounts: string[]) {
     if (!this.strategy) return;
-    this.addProviderToStorage(this.chainId, this.strategy.providerId);
     this.emit('connected', accounts);
 
     if (this.providerId) {
@@ -245,6 +244,9 @@ export class ChainConnectionManager {
 
   @action onChainChanged(chainId: number) {
     this.emit('chain-changed', chainId);
+
+    if (!this.strategy) return;
+    this.addProviderToStorage(chainId, this.strategy.providerId);
   }
 
   @action onWebsocketDisconnected() {

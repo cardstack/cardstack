@@ -78,15 +78,25 @@ class ScheduledPaymentSDKServiceStub extends Service {
       },
     };
   }
+
+  async getUsdToken(): Promise<TokenDetail | undefined> {
+    return exampleGasTokens.find((gt) => gt.symbol === 'USDC');
+  }
 }
 
+let enableUsdConversion = true;
 class TokenToUsdServiceStub extends TokenToUsdService {
   // eslint-disable-next-line require-yield
   @task({ maxConcurrency: 1, enqueue: true }) *updateUsdcRate(
     tokenAddress: ChainAddress
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ): any {
-    this.usdcTokenRates.set(tokenAddress, FixedNumber.from(1));
+    if (enableUsdConversion) {
+      this.usdcTokenRates.set(tokenAddress, FixedNumber.from(1));
+    } else {
+      // eslint-disable-next-line ember/no-array-prototype-extensions
+      this.usdcTokenRates.clear();
+    }
   }
 }
 
@@ -138,6 +148,14 @@ module(
             '.boxel-input-selectable-token-amount [data-test-boxel-input-group-select-accessory-trigger]'
           )
           .containsText('Choose token');
+      });
+
+      test('it initializes the gas token to usdc', async function (assert) {
+        await render(hbs`
+          <SchedulePaymentFormActionCard />
+        `);
+
+        assert.dom('[data-test-gas-token-select]').containsText('USDC');
       });
 
       test('it shows tokens from the tokens service', async function (assert) {
@@ -195,10 +213,6 @@ module(
           'USDC'
         );
 
-        assert
-          .dom('[data-test-schedule-payment-form-submit-button]')
-          .isDisabled();
-
         // Choose USDC for the gas token
         await selectChoose('[data-test-gas-token-select]', 'USDC');
 
@@ -214,6 +228,37 @@ module(
         assert
           .dom('[data-test-schedule-payment-form-submit-button]')
           .isDisabled();
+      });
+
+      test('it disables submit button if usd conversion fails', async function (assert) {
+        enableUsdConversion = false;
+        await render(hbs`
+          <SchedulePaymentFormActionCard />
+        `);
+
+        await click('[data-test-payment-type="one-time"]');
+        await chooseTomorrow('[data-test-boxel-input-date-trigger]');
+        await chooseTime('[data-test-boxel-input-time-trigger]', 9, 0, 'am');
+        await fillIn('[data-test-payee-address-input]', EXAMPLE_PAYEE);
+        await fillIn('[data-test-amount-input] input', '15.0');
+
+        // Choose USDC for the transaction token
+        await selectChoose(
+          '[data-test-amount-input] [data-test-boxel-input-group-select-accessory-trigger]',
+          'USDC'
+        );
+
+        // Choose USDC for the gas token
+        await selectChoose('[data-test-gas-token-select]', 'USDC');
+
+        // After choosing the token if there's an usd conversion the btn should be enabled
+        // since gasPrice is set as normal by default, but we are failing the conversion
+        // to match this test case
+        assert
+          .dom('[data-test-schedule-payment-form-submit-button]')
+          .isDisabled();
+
+        enableUsdConversion = true;
       });
 
       test('it can switch to one-time payment once switches to monthly', async function (assert) {
@@ -412,9 +457,7 @@ module(
         ];
         tokensService.stubGasTokens(exampleGasTokens3);
         await settled();
-        assert
-          .dom('[data-test-gas-token-select]')
-          .containsText('Choose a Gas Token');
+        assert.dom('[data-test-gas-token-select]').containsText('USDC');
       });
 
       test('when the network changes, the selected payment token is updated if needed', async function (assert) {

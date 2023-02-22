@@ -61,3 +61,11 @@
   font: 500 var(--boxel-font-sm);
   color: var(--boxel-purple-400);
 }
+
+@media only screen and (max-width: 1556px) {
+  .scheduled-payment-card {
+    width: 300px;
+    margin-bottom: 0;
+    margin-right: var(--boxel-sp-xs);
+  }
+}
