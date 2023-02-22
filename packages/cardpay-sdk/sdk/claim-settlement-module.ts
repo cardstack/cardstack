@@ -48,7 +48,7 @@ export default class ClaimSettlementModule extends SafeModule {
   }
 
   async hasBalance(claim: Claim, avatarAddress: string): Promise<any> {
-    const action = claim.action.asMapping();
+    let action = claim.action.asMapping();
     if (claim.action.structName == 'TransferERC20ToCaller') {
       let token = new Contract(action.token, ERC20ABI, this.ethersProvider);
       let balance = await token.callStatic.balanceOf(avatarAddress);
@@ -138,14 +138,13 @@ export default class ClaimSettlementModule extends SafeModule {
   }
 
   async defaultClaim(moduleAddress: string, payeeAddress: string) {
-    const id = '0x0000000000000000000000000000000000000000000000000000000000000001';
-    // utils.hexlify(utils.randomBytes(32));
-    const startBlockNum = await this.ethersProvider.getBlockNumber();
-    const startBlockTime = (await this.ethersProvider.getBlock(startBlockNum)).timestamp;
-    const validitySeconds = 86400;
-    const tokenAddress = '0x95093b8836ED53B4594EC748995E45b0Cd2b1389'; // CTST await getAddress('usdStableCoinToken', this.ethersProvider);
-    const transferAmount = BigNumber.from(utils.parseUnits('1', 'ether'));
-    // const callerAddress = '0xD7182E380b7dFa33C186358De7E1E5d0950fCAE7';
+    let id = utils.hexlify(utils.randomBytes(32));
+    let startBlockNum = await this.ethersProvider.getBlockNumber();
+    let startBlockTime = (await this.ethersProvider.getBlock(startBlockNum)).timestamp;
+    let validitySeconds = 86400;
+    let tokenAddress = '0x95093b8836ED53B4594EC748995E45b0Cd2b1389'; // CTST await getAddress('usdStableCoinToken', this.ethersProvider);
+    let transferAmount = BigNumber.from(utils.parseUnits('1', 'ether'));
+    // let callerAddress = '0xD7182E380b7dFa33C186358De7E1E5d0950fCAE7';
     return new Claim(
       id,
       this.ethersProvider.network.chainId.toString(),
@@ -156,12 +155,12 @@ export default class ClaimSettlementModule extends SafeModule {
     );
   }
 
-  async executeEOA(moduleAddress: string, avatarAddress: string): Promise<void> {
-    let module = new Contract(moduleAddress, this.abi, this.ethersProvider);
-
-    let signer = this.signer ? this.signer : this.ethersProvider.getSigner();
-    let callerAddress = await signer.getAddress();
-    let claim = await this.defaultClaim(moduleAddress, callerAddress);
+  async checkValidity(
+    claim: Claim,
+    moduleAddress: string,
+    avatarAddress: string,
+    callerAddress: string
+  ): Promise<void> {
     if (await this.isUsed(claim, moduleAddress)) {
       throw new Error(`Root is used`);
     }
@@ -177,7 +176,23 @@ export default class ClaimSettlementModule extends SafeModule {
     if (!(await this.isValidator(moduleAddress, callerAddress))) {
       throw new Error(`Signer ${callerAddress} is not a validator`);
     }
-    const transferAmount = BigNumber.from(utils.parseUnits('1', 'ether'));
+  }
+
+  async executeEOA(
+    moduleAddress: string,
+    avatarAddress: string,
+    txnOptions?: TransactionOptions
+  ): Promise<SuccessfulTransactionReceipt> {
+    let { onTxnHash } = txnOptions ?? {};
+    let module = new Contract(moduleAddress, this.abi, this.ethersProvider);
+
+    let signer = this.signer ? this.signer : this.ethersProvider.getSigner();
+    let callerAddress = await signer.getAddress();
+    let claim = await this.defaultClaim(moduleAddress, callerAddress);
+
+    await this.checkValidity(claim, moduleAddress, avatarAddress, callerAddress);
+
+    let transferAmount = BigNumber.from(utils.parseUnits('1', 'ether'));
 
     let signature = await claim.sign(signer as VoidSigner);
     let encoded = claim.abiEncode(['uint256'], [transferAmount]);
@@ -185,9 +200,11 @@ export default class ClaimSettlementModule extends SafeModule {
     let response = await signer.sendTransaction({
       to: moduleAddress,
       data: data,
-      // gasLimit: 3e7,
     });
-    console.log(response);
+    if (typeof onTxnHash === 'function') {
+      await onTxnHash(response.hash);
+    }
+    return waitUntilTransactionMined(this.ethersProvider, response.hash);
   }
   // async executeSafe(safeAddress: string, payeeAddress: string): Promise<any> {}
   // async executeSafe(txnHash: string): Promise<SuccessfulTransactionReceipt>;
