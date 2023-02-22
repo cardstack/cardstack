@@ -197,92 +197,84 @@ export default class ClaimSettlementModule extends SafeModule {
     }
     return waitUntilTransactionMined(this.ethersProvider, response.hash);
   }
-  // async executeSafe(safeAddress: string, payeeAddress: string): Promise<any> {}
-  // async executeSafe(txnHash: string): Promise<SuccessfulTransactionReceipt>;
-  // async executeSafe(
-  //   moduleAddress: string,
-  //   safeAddress: string,
-  //   txnOptions?: TransactionOptions,
-  //   contractOptions?: ContractOptions
-  // ): Promise<SuccessfulTransactionReceipt>;
-  // async executeSafe(
-  //   moduleAddress: string,
-  //   safeAddress?: string,
-  //   txnOptions?: TransactionOptions,
-  //   contractOptions?: ContractOptions
-  // ): Promise<SuccessfulTransactionReceipt> {
-  //   //TODO: Multi-signature. Only supports adding single validator only
-  //   if (!safeAddress) {
-  //     throw new Error('safeAddress must be specified');
-  //   }
-  //   let { nonce, onNonce, onTxnHash } = txnOptions ?? {};
-  //   let module = new Contract(moduleAddress, this.abi, this.ethersProvider);
-  //   let signer = this.signer ? this.signer : this.ethersProvider.getSigner();
-  //   let from = contractOptions?.from ?? (await signer.getAddress());
-  //   // let callerAddress = '0xD7182E380b7dFa33C186358De7E1E5d0950fCAE7';
-  //   let claim = await this.defaultClaim(moduleAddress, safeAddress);
-  //   if (await this.isUsed(claim, moduleAddress)) {
-  //     throw new Error(`Root is used`);
-  //   }
-  //   if (!(await this.isValidCaller(claim, moduleAddress, from))) {
-  //     throw new Error(`Caller not valid`);
-  //   }
-  //   if (!(await this.isValidState(claim, moduleAddress))) {
-  //     throw new Error(`State not valid`);
-  //   }
-  //   if (!(await this.hasBalance(claim, safeAddress))) {
-  //     throw new Error(`Not enough balance`);
-  //   }
-  //   if (!(await this.isValidator(moduleAddress, from))) {
-  //     throw new Error(`Signer ${from} is not a validator`);
-  //   }
-  //   let signature = await claim.sign(signer as VoidSigner);
-  //   let encoded = claim.abiEncode(['uint256'], [100000]);
-  //   let data = await module.interface.encodeFunctionData('signedExecute', [signature, encoded]);
 
-  //   let estimate = await gasEstimate(
-  //     this.ethersProvider,
-  //     safeAddress,
-  //     module.address,
-  //     '0',
-  //     data,
-  //     Operation.CALL,
-  //     AddressZero,
-  //     true
-  //   );
+  async executeSafe(txnHash: string): Promise<SuccessfulTransactionReceipt>;
+  async executeSafe(
+    payeeSafeAddress: string,
+    moduleAddress: string,
+    txnOptions?: TransactionOptions,
+    contractOptions?: ContractOptions
+  ): Promise<SuccessfulTransactionReceipt>;
+  async executeSafe(
+    payeeSafeAddressOrTxnHash: string,
+    moduleAddress?: string,
+    txnOptions?: TransactionOptions,
+    contractOptions?: ContractOptions
+  ): Promise<SuccessfulTransactionReceipt> {
+    //TODO: Multi-signature. Only supports adding single validator only
+    let payeeSafeAddress = payeeSafeAddressOrTxnHash;
+    if (!payeeSafeAddress) {
+      throw new Error('payeeSafeAddress must be specified');
+    }
 
-  //   if (nonce == null) {
-  //     nonce = getNextNonceFromEstimate(estimate);
-  //     if (typeof onNonce === 'function') {
-  //       onNonce(nonce);
-  //     }
-  //   }
+    if (!moduleAddress) {
+      throw new Error('moduleAddress must be specified');
+    }
+    let { nonce, onNonce, onTxnHash } = txnOptions ?? {};
+    let module = new Contract(moduleAddress, this.abi, this.ethersProvider);
+    let signer = this.signer ? this.signer : this.ethersProvider.getSigner();
+    let from = contractOptions?.from ?? (await signer.getAddress());
+    let claim = await this.defaultClaim(moduleAddress, payeeSafeAddress);
 
-  //   let gnosisTxn = await executeTransaction(
-  //     this.ethersProvider,
-  //     safeAddress,
-  //     module.address,
-  //     data,
-  //     Operation.CALL,
-  //     estimate,
-  //     nonce,
-  //     await signSafeTx(
-  //       this.ethersProvider,
-  //       safeAddress,
-  //       module.address,
-  //       data,
-  //       Operation.CALL,
-  //       estimate,
-  //       nonce,
-  //       from,
-  //       this.signer
-  //     )
-  //   );
+    await this.checkValidity(claim, moduleAddress, payeeSafeAddress);
+    let signature = await claim.sign(signer as VoidSigner);
+    let transferAmount = BigNumber.from(utils.parseUnits('1', 'ether'));
+    let encoded = claim.abiEncode(['uint256'], [transferAmount]);
+    let data = await module.interface.encodeFunctionData('signedExecute', [signature, encoded]);
 
-  //   let txnHash = gnosisTxn.ethereumTx.txHash;
-  //   if (typeof onTxnHash === 'function') {
-  //     await onTxnHash(txnHash);
-  //   }
-  //   return await waitUntilTransactionMined(this.ethersProvider, txnHash);
-  // }
+    let estimate = await gasEstimate(
+      this.ethersProvider,
+      payeeSafeAddress,
+      module.address,
+      '0',
+      data,
+      Operation.CALL,
+      AddressZero,
+      true
+    );
+
+    if (nonce == null) {
+      nonce = getNextNonceFromEstimate(estimate);
+      if (typeof onNonce === 'function') {
+        onNonce(nonce);
+      }
+    }
+
+    let gnosisTxn = await executeTransaction(
+      this.ethersProvider,
+      payeeSafeAddress,
+      module.address,
+      data,
+      Operation.CALL,
+      estimate,
+      nonce,
+      await signSafeTx(
+        this.ethersProvider,
+        payeeSafeAddress,
+        module.address,
+        data,
+        Operation.CALL,
+        estimate,
+        nonce,
+        from,
+        this.signer
+      )
+    );
+
+    let txnHash = gnosisTxn.ethereumTx.txHash;
+    if (typeof onTxnHash === 'function') {
+      await onTxnHash(txnHash);
+    }
+    return await waitUntilTransactionMined(this.ethersProvider, txnHash);
+  }
 }
