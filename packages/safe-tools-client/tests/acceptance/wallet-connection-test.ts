@@ -15,6 +15,7 @@ import {
 } from '@ember/test-helpers';
 import percySnapshot from '@percy/ember';
 import { BigNumber } from 'ethers';
+import { setupWorker, rest, SetupWorkerApi } from 'msw';
 import { module, test } from 'qunit';
 
 import {
@@ -27,6 +28,7 @@ import {
 let currentAccount: string;
 module('Acceptance | wallet connection', function (hooks) {
   setupApplicationTest(hooks);
+  let mockServiceWorker: SetupWorkerApi;
 
   hooks.beforeEach(function (this: TestContext) {
     const safesService = this.owner.lookup('service:safes') as SafesService;
@@ -83,6 +85,34 @@ module('Acceptance | wallet connection', function (hooks) {
       return Promise.resolve([]);
     };
     currentAccount = TEST_ACCOUNT_1;
+
+    const handlers = [
+      rest.get('/hub-test/api/config', (_req, res, ctx) => {
+        return res(
+          ctx.status(200),
+          ctx.json({
+            data: {
+              attributes: {
+                web3: {
+                  schedulerNetworks: ['mainnet', 'polygon'],
+                },
+              },
+            },
+          })
+        );
+      }),
+    ];
+    mockServiceWorker = setupWorker(...handlers);
+    mockServiceWorker.start({
+      onUnhandledRequest(req, { warning }) {
+        if (
+          req.url.href.match(/trust-wallet.com|\.png|\.svg|\.ttf|\/assets\//)
+        ) {
+          return;
+        }
+        warning();
+      },
+    });
   });
 
   module('With Metamask', function () {
@@ -151,6 +181,25 @@ module('Acceptance | wallet connection', function (hooks) {
       assert.dom('[data-test-disconnect-button]').doesNotExist();
       assert.dom('[data-test-safe-address-label]').doesNotExist();
     });
+
+    test('connecting wallet to unsupported network', async function (assert) {
+      this.mockMetaMask.mockChainChanged('5');
+      await visit('/schedule');
+      await click('.connect-button__button');
+      await click('[data-test-wallet-option="metamask"]');
+
+      assert.dom(
+        '.boxel-radio-option__input boxel-radio-option__input--hidden-radio boxel-radio-option__input--checked'
+      );
+      assert
+        .dom('[data-test-schedule-form-connect-wallet-cta]')
+        .includesText('Step 1 - First connect your wallet');
+
+      await click('[data-test-connect-wallet-button-modal]');
+
+      assert.dom('.network-connect-modal').doesNotExist();
+      assert.dom('[data-test-unsupported-network-modal]').exists();
+    });
   });
 
   module('With Wallet Connect', function () {
@@ -184,6 +233,25 @@ module('Acceptance | wallet connection', function (hooks) {
       assert.dom('[data-test-token-balance="ETH"]').hasText('1 ETH');
       assert.dom('[data-test-token-balance="USDT"]').hasText('10 USDT');
     });
+  });
+
+  test('connecting wallet to unsupported network', async function (assert) {
+    this.mockWalletConnect.mockMainnet();
+    this.mockWalletConnect.mockChainChanged('5');
+    await visit('/schedule');
+    await click('.connect-button__button');
+
+    await click('[data-test-wallet-option="wallet-connect"]');
+
+    assert.dom(
+      '.boxel-radio-option__input boxel-radio-option__input--hidden-radio boxel-radio-option__input--checked'
+    );
+
+    await click('[data-test-connect-wallet-button-modal]');
+
+    await waitFor('[data-test-unsupported-network-modal]');
+    assert.dom('.network-connect-modal').doesNotExist();
+    assert.dom('[data-test-unsupported-network-modal]').exists();
   });
 });
 

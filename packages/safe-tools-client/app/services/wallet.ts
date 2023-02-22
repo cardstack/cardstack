@@ -30,6 +30,7 @@ export default class Wallet extends Service {
   @tracked providerId: WalletProviderId | undefined;
   @tracked address: string | undefined;
   @tracked isConnecting = false;
+  @tracked isConnectUnsupportedNetwork = false;
 
   @tracked nativeTokenBalance: Record<'symbol' | 'amount', string> | undefined;
   @tracked safes = [];
@@ -74,15 +75,14 @@ export default class Wallet extends Service {
     });
 
     this.chainConnectionManager.on('chain-changed', async (chainId: number) => {
-      const isSupported = await this.network.isSupportedNetwork(chainId);
+      this.isConnectUnsupportedNetwork =
+        !(await this.network.isSupportedNetwork(chainId));
 
-      if (!isSupported) {
-        // TODO: improve unsupported net handling
-        alert('Unsupported network! Choose a supported one and reconnect');
+      if (this.isConnectUnsupportedNetwork) {
         this.disconnect();
-        return;
+      } else {
+        this.network.onChainChanged(chainId);
       }
-      this.network.onChainChanged(chainId);
     });
 
     const providerId = this.chainConnectionManager.getProviderIdForChain(
