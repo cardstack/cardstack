@@ -200,19 +200,19 @@ export default class ClaimSettlementModule extends SafeModule {
 
   async executeSafe(txnHash: string): Promise<SuccessfulTransactionReceipt>;
   async executeSafe(
-    payeeSafeAddress: string,
     moduleAddress: string,
+    payeeSafeAddress: string,
     txnOptions?: TransactionOptions,
     contractOptions?: ContractOptions
   ): Promise<SuccessfulTransactionReceipt>;
   async executeSafe(
-    payeeSafeAddressOrTxnHash: string,
-    moduleAddress?: string,
+    moduleAddressOrTxnHash: string,
+    payeeSafeAddress?: string,
     txnOptions?: TransactionOptions,
     contractOptions?: ContractOptions
   ): Promise<SuccessfulTransactionReceipt> {
     //TODO: Multi-signature. Only supports adding single validator only
-    let payeeSafeAddress = payeeSafeAddressOrTxnHash;
+    let moduleAddress = moduleAddressOrTxnHash;
     if (!payeeSafeAddress) {
       throw new Error('payeeSafeAddress must be specified');
     }
