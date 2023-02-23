@@ -59,7 +59,7 @@
           @currentSafe={{this.safes.currentSafe}}
           @onSelectSafe={{this.safes.onSelectSafe}}
           @tokenBalances={{this.safes.tokenBalances}}
-          @isLoadingTokenBalances={{this.safes.isLoadingTokenBalances}}
+          @isLoadingTokenBalances={{and this.safes.isLoadingTokenBalances (not this.safes.tokenBalances)}}
           @onDepositClick={{set this 'isDepositModalOpen' true}}
           @safesLoadingError={{this.safes.safesResource.error}}
         />
