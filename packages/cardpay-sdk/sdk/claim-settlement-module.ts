@@ -93,7 +93,7 @@ export default class ClaimSettlementModule extends SafeModule {
     let from = contractOptions?.from ?? (await signer.getAddress());
 
     let safe = new Contract(avatarAddress, GnosisSafeABI, this.ethersProvider);
-    const safeOwners = await safe.methods.getOwners();
+    const safeOwners = await safe.getOwners();
     if (!safeOwners.contain(signer)) {
       throw new Error(`${signer} is not owner of avatar ${avatarAddress}`);
     }
