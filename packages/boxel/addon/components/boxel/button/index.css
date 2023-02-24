@@ -50,6 +50,7 @@ a.boxel-button.boxel-button--disabled-link {
   --boxel-button-color: var(--boxel-purple-300);
   --boxel-button-border: 1px solid var(--boxel-purple-300);
   --boxel-button-text-color: var(--boxel-purple-600);
+  cursor: default;
 }
 
 /* the a element does not have a disabled attribute. Clicking will still trigger event listeners */
@@ -71,4 +72,32 @@ a.boxel-button.boxel-button--disabled-link {
 /* overwrite the global style for links in global.css */
 a.boxel-button:hover {
   color: var(--boxel-button-text-color);
+}
+
+.boxel-button--with-tooltip {
+  pointer-events: unset !important;
+  position: relative;
+}
+
+.boxel-button--with-tooltip:hover::after {
+  opacity: 1;
+  visibility: visible;
+}
+
+.boxel-button--with-tooltip::after {
+  content: attr(data-hover);
+
+  opacity: 0;
+  background-color: var(--boxel-light);
+  box-shadow: 0 0 0 1px var(--boxel-light-500);
+  color: var(--boxel-dark);
+  text-align: center;
+  border-radius: var(--boxel-sp-sm);
+  padding: var(--boxel-sp-sm);
+  transition: opacity 1s ease-in-out;
+
+  position: absolute;
+  z-index: 1;
+  left: 0;
+  top: 110%;
 }
