@@ -13,6 +13,7 @@ import config from '@cardstack/safe-tools-client/config/environment';
 import SafesService, {
   Safe,
 } from '@cardstack/safe-tools-client/services/safes';
+import TokensService from '@cardstack/safe-tools-client/services/tokens';
 import WalletService from '@cardstack/safe-tools-client/services/wallet';
 import { action } from '@ember/object';
 import Service, { inject as service } from '@ember/service';
@@ -38,6 +39,7 @@ export interface ConfiguredScheduledPaymentFees {
 export default class SchedulePaymentSDKService extends Service {
   @service declare wallet: WalletService;
   @service declare safes: SafesService;
+  @service declare tokens: TokensService;
 
   estimatedSafeCreationGas: undefined | BigNumber;
 
@@ -200,6 +202,14 @@ export default class SchedulePaymentSDKService extends Service {
       fixedUSD,
       percentage,
     };
+  }
+
+  async getUsdToken(): Promise<TokenDetail | undefined> {
+    const scheduledPaymentModule = await this.getSchedulePaymentModule();
+    const usdTokenAddress = await scheduledPaymentModule.getUsdToken();
+    return this.tokens.transactionTokens.find(
+      (gt) => gt.address === usdTokenAddress
+    );
   }
 }
 

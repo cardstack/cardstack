@@ -11,6 +11,7 @@ import * as rewards from './rewards';
 import * as safe from './safe';
 import * as testing from './testing';
 import * as scheduledPayment from './scheduled-payment';
+import * as claimSettlement from './claim-settlement';
 
 export const commands: any = [
   assets,
@@ -26,4 +27,5 @@ export const commands: any = [
   safe,
   testing,
   scheduledPayment,
+  claimSettlement,
 ];
