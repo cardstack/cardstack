@@ -154,7 +154,7 @@ export default class ClaimSettlementModule extends SafeModule {
     let transferAmount = BigNumber.from(utils.parseUnits('1', 'ether'));
     return new Claim(
       id,
-      this.ethersProvider.network.chainId.toString(),
+      (await this.ethersProvider.getNetwork()).chainId.toString(),
       moduleAddress,
       new TimeRangeSeconds(startBlockTime, startBlockTime + validitySeconds),
       new Address(payeeAddress),
