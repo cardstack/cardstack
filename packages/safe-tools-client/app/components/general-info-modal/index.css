@@ -1,0 +1,13 @@
+.general-info-modal__card {
+  position: relative;
+  outline-color: transparent;
+  outline-style: solid;
+}
+
+.general-info-modal__card .boxel-action-container-section > * + * {
+  margin-top: 0;
+}
+
+.general-info-modal__card .boxel-action-container-section-title {
+  margin-bottom: var(--boxel-sp-sm);
+}

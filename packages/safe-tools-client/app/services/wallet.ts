@@ -91,6 +91,7 @@ export default class Wallet extends Service {
         };
         this.disconnect();
       } else {
+        this.unsupportedConnectCache = undefined;
         this.network.onChainChanged(chainId);
       }
     });
