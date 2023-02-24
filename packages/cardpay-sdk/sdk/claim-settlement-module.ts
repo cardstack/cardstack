@@ -13,6 +13,7 @@ import { signSafeTx } from './utils/signing-utils';
 /* eslint-disable node/no-extraneous-import */
 import { AddressZero } from '@ethersproject/constants';
 import GnosisSafeABI from '../contracts/abi/gnosis-safe';
+import { getAddress } from '../contracts/addresses';
 
 export default class ClaimSettlementModule extends SafeModule {
   safeSalt = 'cardstack-cs-create-safe';
@@ -149,7 +150,7 @@ export default class ClaimSettlementModule extends SafeModule {
     let startBlockNum = await this.ethersProvider.getBlockNumber();
     let startBlockTime = (await this.ethersProvider.getBlock(startBlockNum)).timestamp;
     let validitySeconds = 86400; //1 day
-    let tokenAddress = '0x95093b8836ED53B4594EC748995E45b0Cd2b1389'; // CTST goerli
+    let tokenAddress = await getAddress('cardToken', this.ethersProvider);
     let transferAmount = BigNumber.from(utils.parseUnits('1', 'ether'));
     return new Claim(
       id,
