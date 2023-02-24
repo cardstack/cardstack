@@ -19,6 +19,7 @@ export default class BoxelSelectUsage extends Component {
   @tracked renderInPlace = false;
   @tracked disabled = false;
   @tracked searchField = '';
+  @tracked searchEnabled = false;
 
   @cssVariable({ cssClassName: 'boxel-select__dropdown'}) declare boxelSelectCurrentColor: CSSVariableInfo;
   @cssVariable({ cssClassName: 'boxel-select__dropdown'}) declare boxelSelectSelectedColor: CSSVariableInfo;
@@ -42,6 +43,7 @@ export default class BoxelSelectUsage extends Component {
         </style>
         <BoxelSelect
           @placeholder={{this.placeholder}}
+          @searchEnabled={{this.searchEnabled}}
           @searchField={{this.searchField}}
           @selected={{this.selectedItem}}
           @onChange={{this.onSelectItem}}
@@ -86,6 +88,12 @@ export default class BoxelSelectUsage extends Component {
           @description="Placeholder for trigger component"
           @value={{this.placeholder}}
           @onInput={{fn (mut this.placeholder)}}
+        />
+        <Args.Bool
+          @name="searchEnabled"
+          @description="True to show a search box at the top of the list of items"
+          @value={{this.searchEnabled}}
+          @onInput={{fn (mut this.searchEnabled)}}
         />
         <Args.String
           @name="verticalPosition"

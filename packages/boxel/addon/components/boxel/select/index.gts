@@ -1,4 +1,4 @@
-import PowerSelect, { PatchedPowerSelectArgs }  from 'ember-power-select/components/power-select';
+import PowerSelect, { BeforeOptions, PatchedPowerSelectArgs }  from 'ember-power-select/components/power-select';
 import type { TemplateOnlyComponent } from '@ember/component/template-only';
 import cn from '@cardstack/boxel/helpers/cn';
 
@@ -9,16 +9,18 @@ type PartialBy<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>
 type BasePowerSelectArgs = PartialBy<Pick<
   PatchedPowerSelectArgs,
   | 'searchField'
+  | 'searchEnabled'
   | 'selected'
-  | 'selectedItemComponent'
+  | 'disabled'
   | 'placeholder'
   | 'onChange'
   | 'onBlur'
   | 'renderInPlace'
   | 'verticalPosition'
   | 'dropdownClass'
+  | 'beforeOptionsComponent'
+  | 'selectedItemComponent'
   | 'triggerComponent'
-  | 'disabled'
 >, 'disabled'|'renderInPlace'>;
 
 export interface BoxelSelectArgs<ItemT> extends BasePowerSelectArgs { 
@@ -52,6 +54,8 @@ const BoxelSelect: TemplateOnlyComponent<Signature> =
     @disabled={{@disabled}}
     @matchTriggerWidth={{false}}
     @eventType="click"
+    @searchEnabled={{@searchEnabled}}
+    @beforeOptionsComponent={{component BeforeOptions autofocus=false}}
     ...attributes
     as |item|
   >

@@ -40,6 +40,7 @@ export default class BoxelSelectableInputTokenAmountUsage extends Component {
   @tracked errorMessage = '';
   @tracked disabled = false;
   @tracked invalid = false;
+  @tracked searchEnabled = false;
   @tracked icon = 'card';
   @tracked symbol = 'CARD';
   @tracked token: SelectableToken | undefined;
@@ -76,6 +77,7 @@ export default class BoxelSelectableInputTokenAmountUsage extends Component {
           @helperText={{this.helperText}}
           @token={{this.token}}
           @tokens={{this.tokens}}
+          @searchEnabled={{this.searchEnabled}}
           @onChooseToken={{this.onChooseToken}}
           style={{cssVar
             boxel-input-selectable-token-amount-input-font-size=this.boxelInputSelectableTokenAmountInputFontSize.value
@@ -126,6 +128,13 @@ export default class BoxelSelectableInputTokenAmountUsage extends Component {
           @description="The available token list"
           @value={{this.tokens}}
           @hideControls={{true}}
+        />
+        <Args.Bool
+          @name="searchEnabled"
+          @description="Whether the select menu has a search field"
+          @defaultValue={{false}}
+          @onInput={{fn (mut this.searchEnabled)}}
+          @value={{this.searchEnabled}}
         />
         <Args.Action
           @name="onInput"

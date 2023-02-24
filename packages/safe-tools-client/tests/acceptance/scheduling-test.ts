@@ -519,7 +519,6 @@ module('Acceptance | scheduling', function (hooks) {
       await waitFor(`[data-test-safe-address-label][title="${SAFE_ADDRESS}"]`);
 
       await fillInSchedulePaymentFormWithValidInfo({ type: 'monthly' });
-
       await waitFor(`${SUBMIT_BUTTON}:not(:disabled)`);
 
       await click(SUBMIT_BUTTON);
