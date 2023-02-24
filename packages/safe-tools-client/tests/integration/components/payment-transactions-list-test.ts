@@ -21,12 +21,19 @@ class HubAuthenticationServiceStub extends Service {
   isAuthenticated = true;
 }
 
+class SafesServiceStub extends Service {
+  currentSafe = {
+    address: '0xc0ffee254729296a45a3885639AC7E10F9d54979',
+  };
+}
+
 let returnEmptyScheduledPaymentAttempts = false;
 const now = new Date();
 
 class ScheduledPaymentsStub extends Service {
   fetchScheduledPaymentAttempts = (
     chainId: number,
+    senderSafeAddress: string,
     status?: ScheduledPaymentAttemptStatus,
     startedAt?: Date
   ): Promise<ScheduledPaymentAttempt[]> => {
@@ -60,6 +67,7 @@ class ScheduledPaymentsStub extends Service {
             feePercentage: '0',
             gasTokenAddress: '0x123',
             chainId,
+            senderSafeAddress,
             payeeAddress: '0xeBCC5516d44FFf5E9aBa2AcaeB65BbB49bC3EBe1',
             payAt: addMinutes(subDays(now, 10), 120),
           },
@@ -77,6 +85,7 @@ class ScheduledPaymentsStub extends Service {
             feePercentage: '0',
             gasTokenAddress: '0x123',
             chainId,
+            senderSafeAddress,
             payeeAddress: '0xeBCC5516d44FFf5E9aBa2AcaeB65BbB49bC3EBe1',
             payAt: addMinutes(subDays(now, 20), 120),
           },
@@ -94,6 +103,7 @@ class ScheduledPaymentsStub extends Service {
             feePercentage: '0',
             gasTokenAddress: '0x123',
             chainId,
+            senderSafeAddress,
             payeeAddress: '0xeBCC5516d44FFf5E9aBa2AcaeB65BbB49bC3EBe1',
             payAt: addMinutes(subDays(now, 60), 120),
           },
@@ -115,6 +125,7 @@ module('Integration | Component | payment-transactions-list', function (hooks) {
       'service:hub-authentication',
       HubAuthenticationServiceStub
     );
+    this.owner.register('service:safes', SafesServiceStub);
   });
 
   test('It renders transactions', async function (assert) {

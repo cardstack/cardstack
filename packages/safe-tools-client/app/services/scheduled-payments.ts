@@ -3,6 +3,7 @@ import { ChainAddress, hubRequest, TokenDetail } from '@cardstack/cardpay-sdk';
 import config from '@cardstack/safe-tools-client/config/environment';
 import HubAuthenticationService from '@cardstack/safe-tools-client/services/hub-authentication';
 import NetworkService from '@cardstack/safe-tools-client/services/network';
+import SafesService from '@cardstack/safe-tools-client/services/safes';
 import TokensService from '@cardstack/safe-tools-client/services/tokens';
 import TokenQuantity from '@cardstack/safe-tools-client/utils/token-quantity';
 import { action } from '@ember/object';
@@ -150,13 +151,15 @@ export default class ScheduledPaymentsService extends Service {
   @service declare network: NetworkService;
   @service declare tokens: TokensService;
   @service declare date: DateService;
+  @service declare safes: SafesService;
 
   async fetchScheduledPaymentAttempts(
     chainId: number,
+    senderSafeAddress: string,
     status?: ScheduledPaymentAttemptStatus,
     startedAt?: Date
   ): Promise<ScheduledPaymentAttempt[]> {
-    let queryString = `filter[chain-id]=${chainId}`;
+    let queryString = `filter[chain-id]=${chainId}&filter[sender-safe-address]=${senderSafeAddress}`;
     if (status) {
       queryString += `&filter[status]=${status}`;
     }
@@ -215,9 +218,10 @@ export default class ScheduledPaymentsService extends Service {
 
   async fetchScheduledPayments(
     chainId: number,
+    senderSafeAddress: string,
     minPayAt?: Date
   ): Promise<ScheduledPayment[]> {
-    let queryString = `filter[chain-id]=${chainId}`;
+    let queryString = `filter[chain-id]=${chainId}&filter[sender-safe-address]=${senderSafeAddress}`;
     if (minPayAt) {
       queryString += `&filter[pay-at][gt]=${new Date().toISOString()}`;
     }
@@ -253,16 +257,19 @@ export default class ScheduledPaymentsService extends Service {
   }
 
   @task *loadScheduledPaymentTask(
-    chainId: number
+    chainId: number,
+    senderSafeAddress: string
   ): TaskGenerator<ScheduledPayment[]> {
     return yield this.fetchScheduledPayments(
       chainId,
+      senderSafeAddress,
       new Date(this.date.now())
     );
   }
 
   @use scheduledPaymentsResource = resource(() => {
-    if (!this.hubAuthentication.isAuthenticated) {
+    const senderSafeAddress = this.safes.currentSafe?.address;
+    if (!this.hubAuthentication.isAuthenticated || !senderSafeAddress) {
       return {
         error: false,
         isLoading: false,
@@ -282,7 +289,8 @@ export default class ScheduledPaymentsService extends Service {
 
         try {
           state.value = await taskFor(this.loadScheduledPaymentTask).perform(
-            chainId
+            chainId,
+            senderSafeAddress
           );
         } catch (error) {
           if (!didCancel(error)) {
