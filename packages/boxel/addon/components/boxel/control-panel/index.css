@@ -9,7 +9,7 @@
   padding: 0 var(--boxel-sp-sm);
 }
 
-.boxel-control-panel__item:last-child {
+.boxel-control-panel__item:last-of-type {
   border-bottom-width: 0;
 }
 

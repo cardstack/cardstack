@@ -70,19 +70,23 @@
   <section class='safe-tools__dashboard-container'>
     <ScheduleCollapsePanel @open={{not this.wallet.isConnected}} />
 
-      <div class="safe-tools__dashboard-container-row">
-        <SchedulePaymentFormActionCard />
+    <div class="safe-tools__dashboard-container-row">
+      <SchedulePaymentFormActionCard />
 
-        {{#if this.wallet.isConnected}}
-          <FuturePaymentsList @onDepositClick={{set this 'isDepositModalOpen' true}} />
-        {{/if}}
-      </div>
+      {{#if this.wallet.isConnected}}
+        <FuturePaymentsList @onDepositClick={{set this 'isDepositModalOpen' true}} />
+      {{/if}}
+    </div>
 
-      <div class="safe-tools__dashboard-container-row">
-        {{#if this.wallet.isConnected}}
-          <PaymentTransactionsList />
-        {{/if}}
-      </div>
+    <div class="safe-tools__dashboard-container-row">
+      {{#if this.wallet.isConnected}}
+        <PaymentTransactionsList />
+      {{/if}}
+    </div>
+
+    <div class="safe-tools__version">
+      {{this.versionString}}
+    </div>
   </section>
 </section>
 

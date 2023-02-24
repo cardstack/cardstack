@@ -11,8 +11,12 @@ module('Acceptance | accessibility', function (hooks) {
     assert.strictEqual(currentURL(), '/schedule');
     await a11yAudit({
       include: [['#ember-testing']],
-      // There's an issue within details tags where contrast is miscalculated
-      exclude: [['.collapse-panel']],
+      exclude: [
+        // There's an issue within details tags where contrast is miscalculated
+        ['.collapse-panel'],
+        // We intentionally want a low-contrast version number
+        ['.safe-tools__version'],
+      ],
     });
     assert.ok(true, 'no a11y errors found on app home page');
   });
