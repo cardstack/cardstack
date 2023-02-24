@@ -1,10 +1,9 @@
-.block-explorer-button--disabled {
+.block-explorer-button {
   position: relative;
-  pointer-events: unset !important;
+}
 
-  --boxel-button-color: transparent !important;
-  --boxel-button-border: 1px solid var(--boxel-purple-200) !important;
-  --boxel-button-text-color: var(--boxel-purple-300) !important;
+.block-explorer-button--disabled {
+  pointer-events: unset !important;
 }
 
 .block-explorer-button--disabled::after {
