@@ -365,7 +365,7 @@ export default class ClaimSettlementModule extends SafeModule {
     let accountRegistration = new Contract(accountRegistrationAddress, AccountRegistrationABI, this.ethersProvider);
     let count = (await accountRegistration.balanceOf(ownerAddress)).toNumber();
     let promises = [];
-    for (let i: number = 0; i < count; i++) {
+    for (let i = 0; i < count; i++) {
       promises.push(accountRegistration.tokenOfOwnerByIndex(ownerAddress, i));
     }
     let tokenIds = (await Promise.all(promises)).map((o) => o.toHexString());
