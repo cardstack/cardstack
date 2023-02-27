@@ -50,6 +50,7 @@ a.boxel-button.boxel-button--disabled-link {
   --boxel-button-color: var(--boxel-purple-300);
   --boxel-button-border: 1px solid var(--boxel-purple-300);
   --boxel-button-text-color: var(--boxel-purple-600);
+
   cursor: default;
 }
 
@@ -79,14 +80,8 @@ a.boxel-button:hover {
   position: relative;
 }
 
-.boxel-button--with-tooltip:hover::after {
-  opacity: 1;
-  visibility: visible;
-}
-
 .boxel-button--with-tooltip::after {
   content: attr(data-hover);
-
   opacity: 0;
   background-color: var(--boxel-light);
   box-shadow: 0 0 0 1px var(--boxel-light-500);
@@ -95,9 +90,13 @@ a.boxel-button:hover {
   border-radius: var(--boxel-sp-sm);
   padding: var(--boxel-sp-sm);
   transition: opacity 1s ease-in-out;
-
   position: absolute;
   z-index: 1;
   left: 0;
   top: 110%;
+}
+
+.boxel-button--with-tooltip:hover::after {
+  opacity: 1;
+  visibility: visible;
 }
