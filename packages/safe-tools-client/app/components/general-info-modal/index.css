@@ -11,3 +11,7 @@
 .general-info-modal__card .boxel-action-container-section-title {
   margin-bottom: var(--boxel-sp-sm);
 }
+
+.general-info-modal__card p {
+  margin-bottom: var(--boxel-sp-xxxs);
+}
