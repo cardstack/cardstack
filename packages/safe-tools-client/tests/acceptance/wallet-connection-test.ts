@@ -198,7 +198,7 @@ module('Acceptance | wallet connection', function (hooks) {
       await click('[data-test-connect-wallet-button-modal]');
 
       assert.dom('.network-connect-modal').doesNotExist();
-      assert.dom('[data-test-unsupported-network-modal]').exists();
+      assert.dom('[data-test-general-info-modal]').exists();
     });
   });
 
@@ -249,9 +249,9 @@ module('Acceptance | wallet connection', function (hooks) {
 
     await click('[data-test-connect-wallet-button-modal]');
 
-    await waitFor('[data-test-unsupported-network-modal]');
+    await waitFor('[data-test-general-info-modal]');
     assert.dom('.network-connect-modal').doesNotExist();
-    assert.dom('[data-test-unsupported-network-modal]').exists();
+    assert.dom('[data-test-general-info-modal]').exists();
   });
 });
 
