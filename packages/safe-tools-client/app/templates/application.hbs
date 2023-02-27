@@ -46,7 +46,18 @@
 </Boxel::Dashboard>
 
 <NetworkConnectModal
-  @isOpen={{and this.isShowingConnectModal (not this.wallet.isConnected)}}
+  @isOpen={{and (and this.isShowingConnectModal (not this.wallet.isConnected)) (not this.wallet.unsupportedNetworkCache)}}
   @onClose={{set this 'isShowingConnectModal' false}}
   @isConnected={{this.wallet.isConnected}}
 />
+
+<GeneralInfoModal
+  @isOpen={{not (eq this.wallet.unsupportedNetworkCache undefined)}}
+  @onClose={{set this.wallet 'unsupportedNetworkCache' undefined}}
+ as |Section| >
+  <Section @title="Unsupported network!">
+    <p>Your {{this.providerDisplayName}} wallet is connected to {{this.networkDisplayName}} network, which we don't support.</p>
+    <p>In your wallet, please first connect to a supported network, and then reload the page.</p>
+    <p>Supported networks: <b>{{array-join this.network.supportedNetworksName ','}}</b></p>
+  </Section>
+</GeneralInfoModal>
