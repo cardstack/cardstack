@@ -11,14 +11,14 @@ export default class ApplicationController extends Controller {
   @service declare network: NetworkService;
   @service declare wallet: WalletService;
 
-  get providerName() {
-    return this.wallet.unsupportedConnectCache?.providerId === 'metamask'
-      ? 'Metamask'
+  get providerDisplayName() {
+    return this.wallet.unsupportedNetworkCache?.providerId === 'metamask'
+      ? 'MetaMask'
       : 'WalletConnect';
   }
 
-  get networkName() {
-    const chainId = this.wallet.unsupportedConnectCache?.chainId;
+  get networkDisplayName() {
+    const chainId = this.wallet.unsupportedNetworkCache?.chainId;
     let networkName;
     if (chainId) {
       networkName = convertChainIdToName(chainId);

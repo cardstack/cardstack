@@ -42,9 +42,13 @@ export default class Wallet extends Service {
   @tracked ethersProvider: Web3Provider;
   chainConnectionManager: ChainConnectionManager;
 
-  //Record an action to unsupported network
-  //this will be used in unsupported network modal
-  @tracked unsupportedConnectCache: UnsupportedConnect | undefined;
+  // This is a supporting state that
+  // we use to conditionally show the "Unsupported network" modal
+  // for the case when the user tries to connect their wallet
+  // but their wallet is connected to a network that this app does not support.
+  // We store which unsupported network that is
+  // so that we can display it in the modal popup.
+  @tracked unsupportedNetworkCache: UnsupportedConnect | undefined;
 
   walletProviders = walletProviders.map((w) =>
     w.id === 'metamask'
@@ -85,13 +89,13 @@ export default class Wallet extends Service {
       const isSupported = await this.network.isSupportedNetwork(chainId);
 
       if (!isSupported) {
-        this.unsupportedConnectCache = {
+        this.unsupportedNetworkCache = {
           providerId: this.providerId,
           chainId,
         };
         this.disconnect();
       } else {
-        this.unsupportedConnectCache = undefined;
+        this.unsupportedNetworkCache = undefined;
         this.network.onChainChanged(chainId);
       }
     });
