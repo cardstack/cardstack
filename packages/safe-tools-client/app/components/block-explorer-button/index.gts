@@ -1,12 +1,14 @@
 import Component from '@glimmer/component';
 import BoxelButton from '@cardstack/boxel/components/boxel/button';
 import { getConstantByNetwork, TransactionHash } from '@cardstack/cardpay-sdk';
+import not from 'ember-truth-helpers/helpers/not';
+import cssVar from '@cardstack/boxel/helpers/css-var';
 
 interface Signature {
   Element: HTMLAnchorElement | HTMLButtonElement;
   Args: {
     networkSymbol: string;
-    transactionHash: TransactionHash;
+    transactionHash?: TransactionHash;
     kind?: string;
   }
 }
@@ -38,9 +40,16 @@ export default class BlockExplorerButton extends Component<Signature> {
       @as="anchor"
       @size="extra-small"
       @kind={{@kind}}
-      href={{this.blockExplorerUrl}} 
+      @href={{this.blockExplorerUrl}}
+      @disabled={{not @transactionHash}}
+      @tooltip={{if @transactionHash undefined "Not submitted to blockchain"}}
       target="_blank"
       rel="noopener"
+      style={{cssVar
+        boxel-button-color="transparent"
+        boxel-button-border=(if @transactionHash "1px solid var(--boxel-purple-300)" "1px solid var(--boxel-purple-200)")
+        boxel-button-text-color=(if @transactionHash "var(--boxel-dark);" "var(--boxel-purple-300)")
+      }}
       ...attributes
     >
       View on {{this.blockExplorerName}}

@@ -172,5 +172,17 @@ module('Integration | Component | Button', function (hooks) {
     assert.dom(LOADING_INDICATOR_SELECTOR).doesNotExist();
   });
 
+  test('When @tooltip is defined, it shows tooltip when mouse pointer is moved over the button', async function (assert) {
+    this.set('as', 'button');
+    this.set('tooltip', 'An extra information');
+    await render(hbs`
+      <Boxel::Button @as={{this.as}} @tooltip={{this.tooltip}}>
+        A button with tooltip
+      </Boxel::Button>
+    `);
+
+    assert.dom('.boxel-button--with-tooltip').isVisible();
+  });
+
   // we can't test for disabled links because programmatic clicks bypass pointer-events:none
 });

@@ -28,6 +28,7 @@ class SafesServiceStub extends Service {
 }
 
 let returnEmptyScheduledPaymentAttempts = false;
+let returnScheduledPaymentAttemptsWithBlankTxHash = false;
 const now = new Date();
 
 class ScheduledPaymentsStub extends Service {
@@ -37,10 +38,6 @@ class ScheduledPaymentsStub extends Service {
     status?: ScheduledPaymentAttemptStatus,
     startedAt?: Date
   ): Promise<ScheduledPaymentAttempt[]> => {
-    if (returnEmptyScheduledPaymentAttempts) {
-      return Promise.resolve([]);
-    }
-
     const paymentToken = {
       address: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
       symbol: 'USDC',
@@ -50,6 +47,29 @@ class ScheduledPaymentsStub extends Service {
 
     const addPaymentTokenQuantity = (amount: string) =>
       new TokenQuantity(paymentToken, BigNumber.from(amount));
+    if (returnEmptyScheduledPaymentAttempts) {
+      return Promise.resolve([]);
+    } else if (returnScheduledPaymentAttemptsWithBlankTxHash) {
+      return Promise.resolve([
+        {
+          startedAt: subDays(now, 10),
+          endedAt: addMinutes(subDays(now, 10), 120),
+          status: 'failed',
+          failureReason: '',
+          transactionHash: undefined,
+          scheduledPayment: {
+            id: '01234',
+            paymentTokenQuantity: addPaymentTokenQuantity('10000000'),
+            feeFixedUSD: '0',
+            feePercentage: '0',
+            gasTokenAddress: '0x123',
+            chainId,
+            payeeAddress: '0xeBCC5516d44FFf5E9aBa2AcaeB65BbB49bC3EBe1',
+            payAt: addMinutes(subDays(now, 10), 120),
+          },
+        },
+      ]);
+    }
 
     return Promise.resolve(
       [
@@ -125,6 +145,8 @@ module('Integration | Component | payment-transactions-list', function (hooks) {
       'service:hub-authentication',
       HubAuthenticationServiceStub
     );
+    returnEmptyScheduledPaymentAttempts = false;
+    returnScheduledPaymentAttemptsWithBlankTxHash = false;
     this.owner.register('service:safes', SafesServiceStub);
   });
 
@@ -266,5 +288,18 @@ module('Integration | Component | payment-transactions-list', function (hooks) {
     assert
       .dom('[data-test-scheduled-payment-attempts-empty]')
       .hasText('No payments found.');
+  });
+
+  test('It disables block-explorer-button if tx hash is blank', async function (assert) {
+    returnScheduledPaymentAttemptsWithBlankTxHash = true;
+
+    await render(hbs`
+      <PaymentTransactionsList />
+    `);
+
+    assert.strictEqual(
+      document.querySelectorAll(`.boxel-button--with-tooltip`).length,
+      1
+    );
   });
 });
