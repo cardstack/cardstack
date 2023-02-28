@@ -66,9 +66,9 @@ class Action extends SolidityStruct {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  defaultExtraData(): { type: string[]; data: any[] } {
+  defaultExtraData(): { types: string[]; data: any[] } {
     return {
-      type: [],
+      types: [],
       data: [],
     };
   }
@@ -96,7 +96,7 @@ export class TransferERC20ToCaller extends Action {
 
   defaultExtraData() {
     return {
-      type: ['uint256'],
+      types: ['uint256'],
       data: [this.amount],
     };
   }
