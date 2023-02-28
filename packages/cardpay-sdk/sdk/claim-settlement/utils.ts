@@ -47,6 +47,29 @@ class SolidityStruct {
   }
 }
 
+export class SolidityStructExtraData extends SolidityStruct {
+  extraProperties: { name: string; type: string }[];
+  extraValues: any[]; // eslint-disable-line @typescript-eslint/no-explicit-any
+  constructor(
+    structName: string,
+    properties: { name: string; type: string }[],
+    values: any[],
+    extraProperties: { name: string; type: string }[],
+    extraValues: any[] = []
+  ) {
+    super(structName, properties, values);
+    this.extraProperties = extraProperties;
+    this.extraValues = extraValues;
+  }
+
+  abiEncodeExtra() {
+    const abiCoder = new utils.AbiCoder();
+    return abiCoder.encode(
+      this.extraProperties.map((o) => o.type),
+      this.extraValues
+    );
+  }
+}
 export class TimeRangeSeconds extends SolidityStruct {
   constructor(validFromTime: number, validToTime: number) {
     super(
@@ -66,15 +89,17 @@ export class Address extends SolidityStruct {
   }
 }
 
-export class TransferERC20ToCaller extends SolidityStruct {
-  constructor(token: string, amount: BigNumber) {
+export class TransferERC20ToCaller extends SolidityStructExtraData {
+  constructor(token: string, amount: BigNumber, minAmount: BigNumber) {
     super(
       'TransferERC20ToCaller',
       [
         { name: 'token', type: 'address' },
         { name: 'amount', type: 'uint256' },
       ],
-      [token, amount]
+      [token, amount],
+      [{ name: 'minAmount', type: 'uint256' }],
+      [minAmount]
     );
   }
 }
@@ -111,7 +136,7 @@ export class Claim {
   address: string;
   stateCheck: SolidityStruct;
   callerCheck: SolidityStruct;
-  action: SolidityStruct;
+  action: SolidityStruct | SolidityStructExtraData;
 
   constructor(
     id: string,
@@ -151,7 +176,7 @@ export class Claim {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  abiEncode(extraTypes: string[] = [], extraData: any[] = []) {
+  abiEncode() {
     const abiCoder = new utils.AbiCoder();
     return abiCoder.encode(
       ['bytes32', 'bytes32', 'bytes32', 'bytes', 'bytes32', 'bytes', 'bytes32', 'bytes', 'bytes'],
@@ -164,7 +189,7 @@ export class Claim {
         this.callerCheck.abiEncode(),
         this.action.typeHash(),
         this.action.abiEncode(),
-        abiCoder.encode(extraTypes, extraData),
+        this.action instanceof SolidityStructExtraData ? this.action.abiEncodeExtra() : '0x',
       ]
     );
   }
