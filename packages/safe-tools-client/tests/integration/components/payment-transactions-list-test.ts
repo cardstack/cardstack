@@ -29,6 +29,7 @@ class SafesServiceStub extends Service {
 
 let returnEmptyScheduledPaymentAttempts = false;
 let returnScheduledPaymentAttemptsWithBlankTxHash = false;
+let returnScheduledPaymentAttemptsWithExceedMaxGasPriceError = false;
 const now = new Date();
 
 class ScheduledPaymentsStub extends Service {
@@ -57,12 +58,34 @@ class ScheduledPaymentsStub extends Service {
           status: 'failed',
           failureReason: '',
           transactionHash: undefined,
+          executionGasPrice: BigNumber.from('1000'),
           scheduledPayment: {
             id: '01234',
             paymentTokenQuantity: addPaymentTokenQuantity('10000000'),
             feeFixedUSD: '0',
             feePercentage: '0',
-            gasTokenAddress: '0x123',
+            gasToken: paymentToken,
+            chainId,
+            payeeAddress: '0xeBCC5516d44FFf5E9aBa2AcaeB65BbB49bC3EBe1',
+            payAt: addMinutes(subDays(now, 10), 120),
+          },
+        },
+      ]);
+    } else if (returnScheduledPaymentAttemptsWithExceedMaxGasPriceError) {
+      return Promise.resolve([
+        {
+          startedAt: subDays(now, 10),
+          endedAt: addMinutes(subDays(now, 10), 120),
+          status: 'failed',
+          failureReason: 'ExceedMaxGasPrice',
+          transactionHash: undefined,
+          executionGasPrice: BigNumber.from('1000'),
+          scheduledPayment: {
+            id: '01234',
+            paymentTokenQuantity: addPaymentTokenQuantity('10000000'),
+            feeFixedUSD: '0',
+            feePercentage: '0',
+            gasToken: paymentToken,
             chainId,
             payeeAddress: '0xeBCC5516d44FFf5E9aBa2AcaeB65BbB49bC3EBe1',
             payAt: addMinutes(subDays(now, 10), 120),
@@ -78,6 +101,7 @@ class ScheduledPaymentsStub extends Service {
           endedAt: addMinutes(subDays(now, 10), 120),
           status: 'succeeded',
           failureReason: '',
+          executionGasPrice: BigNumber.from('1000'),
           transactionHash:
             '0x6f7c54719c0901e30ef018206c37df4daa059224549a08d55acb3360f01094e2',
           scheduledPayment: {
@@ -85,7 +109,7 @@ class ScheduledPaymentsStub extends Service {
             paymentTokenQuantity: addPaymentTokenQuantity('10000000'),
             feeFixedUSD: '0',
             feePercentage: '0',
-            gasTokenAddress: '0x123',
+            gasToken: paymentToken,
             chainId,
             senderSafeAddress,
             payeeAddress: '0xeBCC5516d44FFf5E9aBa2AcaeB65BbB49bC3EBe1',
@@ -96,6 +120,7 @@ class ScheduledPaymentsStub extends Service {
           startedAt: subDays(now, 20),
           endedAt: addMinutes(subDays(now, 20), 120),
           status: 'failed',
+          executionGasPrice: BigNumber.from('1000'),
           failureReason: 'PaymentExecutionFailed',
           transactionHash: '0x123',
           scheduledPayment: {
@@ -103,7 +128,7 @@ class ScheduledPaymentsStub extends Service {
             paymentTokenQuantity: addPaymentTokenQuantity('10000000'),
             feeFixedUSD: '0',
             feePercentage: '0',
-            gasTokenAddress: '0x123',
+            gasToken: paymentToken,
             chainId,
             senderSafeAddress,
             payeeAddress: '0xeBCC5516d44FFf5E9aBa2AcaeB65BbB49bC3EBe1',
@@ -115,13 +140,14 @@ class ScheduledPaymentsStub extends Service {
           endedAt: addMinutes(subDays(now, 60), 120),
           status: 'succeeded',
           failureReason: '',
+          executionGasPrice: BigNumber.from('1000'),
           transactionHash: '0x123',
           scheduledPayment: {
             id: '323232',
             paymentTokenQuantity: addPaymentTokenQuantity('15000000'),
             feeFixedUSD: '0',
             feePercentage: '0',
-            gasTokenAddress: '0x123',
+            gasToken: paymentToken,
             chainId,
             senderSafeAddress,
             payeeAddress: '0xeBCC5516d44FFf5E9aBa2AcaeB65BbB49bC3EBe1',
@@ -147,6 +173,7 @@ module('Integration | Component | payment-transactions-list', function (hooks) {
     );
     returnEmptyScheduledPaymentAttempts = false;
     returnScheduledPaymentAttemptsWithBlankTxHash = false;
+    returnScheduledPaymentAttemptsWithExceedMaxGasPriceError = false;
     this.owner.register('service:safes', SafesServiceStub);
   });
 
@@ -301,5 +328,19 @@ module('Integration | Component | payment-transactions-list', function (hooks) {
       document.querySelectorAll(`.boxel-button--with-tooltip`).length,
       1
     );
+  });
+
+  test('It returns details of execution gas price', async function (assert) {
+    returnScheduledPaymentAttemptsWithExceedMaxGasPriceError = true;
+
+    await render(hbs`
+      <PaymentTransactionsList />
+    `);
+
+    assert
+      .dom('.transactions-table-item-status-failure-reason')
+      .hasText(
+        '(gas price exceeded the maximum specified, execution gas price: 0.001)'
+      );
   });
 });

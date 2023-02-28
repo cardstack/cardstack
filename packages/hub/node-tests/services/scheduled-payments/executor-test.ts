@@ -105,6 +105,7 @@ describe('executing scheduled payments', function () {
 
     expect(scheduledPaymentAttempts.length).to.equal(1);
     expect(scheduledPaymentAttempts[0].status).to.equal('inProgress');
+    expect(Number(scheduledPaymentAttempts[0].executionGasPrice)).to.lte(Number(scheduledPayment.maxGasPrice));
     expect(getJobIdentifiers()[0]).to.equal('scheduled-payment-on-chain-execution-waiter');
     expect(getJobPayloads()[0]).to.deep.equal({ scheduledPaymentAttemptId: scheduledPaymentAttempts[0].id });
   });

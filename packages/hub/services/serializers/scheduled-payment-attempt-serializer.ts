@@ -30,6 +30,7 @@ export default class ScheduledPaymentAttemptSerializer {
             status: model.status,
             'transaction-hash': model.transactionHash,
             'failure-reason': model.failureReason,
+            'execution-gas-price': model.executionGasPrice,
           },
           relationships: {
             'scheduled-payment': {

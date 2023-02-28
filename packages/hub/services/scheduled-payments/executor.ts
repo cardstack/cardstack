@@ -83,16 +83,6 @@ export default class ScheduledPaymentsExecutorService {
       }
     }
 
-    // Now that we know there is no payment attempt in progress, and that the payment is not too recent, we can create a new payment attempt
-    let paymentAttempt = await prisma.scheduledPaymentAttempt.create({
-      data: {
-        id: shortUUID.uuid(),
-        scheduledPaymentId: scheduledPayment.id,
-        status: 'inProgress',
-        startedAt: nowUtc(),
-      },
-    });
-
     let {
       moduleAddress,
       tokenAddress,
@@ -108,8 +98,18 @@ export default class ScheduledPaymentsExecutorService {
       recurringDayOfMonth,
       recurringUntil,
     } = scheduledPayment;
-
     let currentGasPrice = await this.getCurrentGasPrice(provider, gasTokenAddress);
+    // Now that we know there is no payment attempt in progress, and that the payment is not too recent, we can create a new payment attempt
+    let paymentAttempt = await prisma.scheduledPaymentAttempt.create({
+      data: {
+        id: shortUUID.uuid(),
+        scheduledPaymentId: scheduledPayment.id,
+        status: 'inProgress',
+        executionGasPrice: currentGasPrice.toString(),
+        startedAt: nowUtc(),
+      },
+    });
+
     let params = {
       moduleAddress,
       tokenAddress,
