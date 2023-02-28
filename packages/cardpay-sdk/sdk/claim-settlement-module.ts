@@ -12,7 +12,6 @@ import { ContractOptions } from 'web3-eth-contract';
 import { signSafeTx } from './utils/signing-utils';
 /* eslint-disable node/no-extraneous-import */
 import { AddressZero } from '@ethersproject/constants';
-import GnosisSafeABI from '../contracts/abi/gnosis-safe';
 import { getAddress } from '../contracts/addresses';
 
 export interface SignedClaim {
