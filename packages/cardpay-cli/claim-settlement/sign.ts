@@ -37,8 +37,7 @@ export default {
     let claimSettlementModule = await getSDK('ClaimSettlementModule', ethersProvider, signer);
     let claim = await claimSettlementModule.stakingClaim(moduleAddress, payeeAddress, tokenAddress, amountInEth);
     let { signature, encoded } = await claimSettlementModule.sign(claim);
-    let blockExplorer = await getConstant('blockExplorer', ethersProvider);
-    let onTxnHash = (txnHash: string) => console.log(`Transaction hash: ${blockExplorer}/tx/${txnHash}`);
-    await claimSettlementModule.executeEOA(moduleAddress, { signature, encoded }, { onTxnHash });
+    console.log(`signature: ${signature}`);
+    console.log(`encoded data: ${encoded}`);
   },
 } as CommandModule;
