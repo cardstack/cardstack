@@ -37,7 +37,7 @@ export default {
     let claimSettlementModule = await getSDK('ClaimSettlementModule', ethersProvider, signer);
     let claim = await claimSettlementModule.stakingClaim(moduleAddress, payeeAddress, tokenAddress, amountInEth);
     let { signature, encoded } = await claimSettlementModule.sign(claim);
-    console.log(`signature: ${signature}`);
     console.log(`encoded data: ${encoded}`);
+    console.log(`signature: ${signature}`);
   },
 } as CommandModule;
