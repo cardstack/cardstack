@@ -184,9 +184,8 @@ export default class ClaimSettlementModule extends SafeModule {
     let signer = this.signer ? this.signer : this.ethersProvider.getSigner();
     let callerAddress = await signer.getAddress();
     let claim = await this.defaultClaim(moduleAddress, callerAddress);
-    let minTokens = BigNumber.from(utils.parseUnits('0.1', 'ether'));
     let signature = await claim.sign(signer as VoidSigner);
-    let encoded = claim.abiEncode(['uint256'], [minTokens]);
+    let encoded = claim.abiEncode();
     let data = module.interface.encodeFunctionData('signedExecute', [signature, encoded]);
     await module.callStatic.signedExecute(signature, encoded, { from: callerAddress });
     let response = await signer.sendTransaction({
@@ -229,8 +228,7 @@ export default class ClaimSettlementModule extends SafeModule {
     let from = contractOptions?.from ?? (await signer.getAddress());
     let claim = await this.defaultClaim(moduleAddress, payeeSafeAddress);
     let signature = await claim.sign(signer as VoidSigner);
-    let minTokens = BigNumber.from(utils.parseUnits('0.1', 'ether'));
-    let encoded = claim.abiEncode(['uint256'], [minTokens]);
+    let encoded = claim.abiEncode();
     let data = await module.interface.encodeFunctionData('signedExecute', [signature, encoded]);
     await module.callStatic.signedExecute(signature, encoded, { from: payeeSafeAddress });
 
