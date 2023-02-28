@@ -3,7 +3,6 @@ import { inject } from '@cardstack/di';
 import { ScheduledPayment } from '@prisma/client';
 import { isBefore, subDays } from 'date-fns';
 import shortUUID from 'short-uuid';
-import { nowUtc } from '../../utils/dates';
 import config from 'config';
 import { Wallet } from 'ethers';
 import { JsonRpcProvider, gasPriceInToken, getConstant, ScheduledPaymentModule } from '@cardstack/cardpay-sdk';
@@ -16,6 +15,7 @@ export default class ScheduledPaymentsExecutorService {
   workerClient = inject('worker-client', { as: 'workerClient' });
   crankNonceLock = inject('crank-nonce-lock', { as: 'crankNonceLock' });
   ethersProvider = inject('ethers-provider', { as: 'ethersProvider' });
+  clock = inject('clock', { as: 'clock' });
 
   async getCurrentGasPrice(provider: JsonRpcProvider, gasTokenAddress: string) {
     // Wrapped in a method so that can be mocked in the tests
@@ -30,7 +30,7 @@ export default class ScheduledPaymentsExecutorService {
       let signer = new Wallet(config.get('hubPrivateKey'));
       let scheduledPaymentModule = await this.cardpay.getSDK('ScheduledPaymentModule', provider, signer);
       const validForDays = await scheduledPaymentModule.getValidForDays();
-      let scheduledPayments = await this.scheduledPaymentFetcher.fetchScheduledPayments(chainId, validForDays);
+      let scheduledPayments = await this.scheduledPaymentFetcher.fetchScheduledPayments(chainId);
 
       // Currently we do one by one, but we can do in parallel when we'll have a lot of scheduled payments
       for (let scheduledPayment of scheduledPayments) {
@@ -75,7 +75,7 @@ export default class ScheduledPaymentsExecutorService {
       let minDaysBetweenPayments = 28 - validForDays;
       if (
         lastSuccessfulPaymentAttempt &&
-        !isBefore(lastSuccessfulPaymentAttempt.startedAt!, subDays(nowUtc(), minDaysBetweenPayments))
+        !isBefore(lastSuccessfulPaymentAttempt.startedAt!, subDays(this.clock.utcNow(), minDaysBetweenPayments))
       ) {
         throw new Error(
           `Last payment was less than ${minDaysBetweenPayments} days ago. Looks like this scheduled payment is triggered too quickly.`
@@ -89,7 +89,25 @@ export default class ScheduledPaymentsExecutorService {
         id: shortUUID.uuid(),
         scheduledPaymentId: scheduledPayment.id,
         status: 'inProgress',
-        startedAt: nowUtc(),
+        startedAt: this.clock.utcNow(),
+      },
+    });
+
+    let scheduledPaymentAttemptsInLastPaymentCycleCount = (
+      await prisma.scheduledPaymentAttempt.findMany({
+        where: {
+          startedAt: {
+            gte: scheduledPayment.payAt!,
+          },
+        },
+      })
+    ).length;
+
+    scheduledPayment = await prisma.scheduledPayment.update({
+      where: { id: scheduledPayment.id },
+      data: {
+        lastScheduledPaymentAttemptId: paymentAttempt.id,
+        scheduledPaymentAttemptsInLastPaymentCycleCount,
       },
     });
 
@@ -109,55 +127,56 @@ export default class ScheduledPaymentsExecutorService {
       recurringUntil,
     } = scheduledPayment;
 
-    let currentGasPrice = await this.getCurrentGasPrice(provider, gasTokenAddress);
-    let params = {
-      moduleAddress,
-      tokenAddress,
-      amount: amount.toString(),
-      payeeAddress,
-      feeFixedUsd: Number(feeFixedUsd),
-      feePercentage: Number(feePercentage),
-      executionGasEstimation: Number(executionGasEstimation),
-      maxGasPrice: String(maxGasPrice),
-      gasTokenAddress,
-      salt,
-      currentGasPrice: String(currentGasPrice), // Contract will revert if this is larger than maxGasPrice
-      payAt: payAt!.getTime() / 1000, // getTime returns milliseconds, but we want seconds, thus divide by 1000
-      recurringDayOfMonth: recurringDayOfMonth,
-      recurringUntil: recurringUntil ? recurringUntil.getTime() / 1000 : null,
-    };
-
-    Sentry.captureMessage(`Executing a payment with params: ${JSON.stringify(params)}`); // Useful for debugging purposes (for example, to see which params were used to calculate the spHash)
-
-    let executeScheduledPayment = (nonce: BN) => {
-      return new Promise<string>((resolve, reject) => {
-        scheduledPaymentModule
-          .executeScheduledPayment(
-            params.moduleAddress,
-            params.tokenAddress,
-            params.amount,
-            params.payeeAddress,
-            params.feeFixedUsd,
-            params.feePercentage,
-            params.executionGasEstimation,
-            params.maxGasPrice,
-            params.gasTokenAddress,
-            params.salt,
-            params.currentGasPrice,
-            params.payAt,
-            params.recurringDayOfMonth,
-            params.recurringUntil,
-            {
-              onTxnHash: async (txnHash: string) => resolve(txnHash),
-              nonce: nonce,
-            }
-          )
-          .catch(async (error) => {
-            reject(error);
-          });
-      });
-    };
     try {
+      let currentGasPrice = await this.getCurrentGasPrice(provider, gasTokenAddress);
+      let params = {
+        moduleAddress,
+        tokenAddress,
+        amount: amount.toString(),
+        payeeAddress,
+        feeFixedUsd: Number(feeFixedUsd),
+        feePercentage: Number(feePercentage),
+        executionGasEstimation: Number(executionGasEstimation),
+        maxGasPrice: String(maxGasPrice),
+        gasTokenAddress,
+        salt,
+        currentGasPrice: String(currentGasPrice), // Contract will revert if this is larger than maxGasPrice
+        payAt: payAt!.getTime() / 1000, // getTime returns milliseconds, but we want seconds, thus divide by 1000
+        recurringDayOfMonth: recurringDayOfMonth,
+        recurringUntil: recurringUntil ? recurringUntil.getTime() / 1000 : null,
+      };
+
+      Sentry.captureMessage(`Executing a payment with params: ${JSON.stringify(params)}`); // Useful for debugging purposes (for example, to see which params were used to calculate the spHash)
+
+      let executeScheduledPayment = (nonce: BN) => {
+        return new Promise<string>((resolve, reject) => {
+          scheduledPaymentModule
+            .executeScheduledPayment(
+              params.moduleAddress,
+              params.tokenAddress,
+              params.amount,
+              params.payeeAddress,
+              params.feeFixedUsd,
+              params.feePercentage,
+              params.executionGasEstimation,
+              params.maxGasPrice,
+              params.gasTokenAddress,
+              params.salt,
+              params.currentGasPrice,
+              params.payAt,
+              params.recurringDayOfMonth,
+              params.recurringUntil,
+              {
+                onTxnHash: async (txnHash: string) => resolve(txnHash),
+                nonce: nonce,
+              }
+            )
+            .catch(async (error) => {
+              reject(error);
+            });
+        });
+      };
+
       let txnHash = await this.crankNonceLock.withNonce(scheduledPayment.chainId, executeScheduledPayment);
       await prisma.scheduledPaymentAttempt.update({
         data: {
@@ -175,10 +194,18 @@ export default class ScheduledPaymentsExecutorService {
         where: { id: paymentAttempt.id },
         data: {
           status: 'failed',
-          endedAt: nowUtc(),
+          endedAt: this.clock.utcNow(),
           failureReason: error.message,
         },
       });
+
+      await prisma.scheduledPayment.update({
+        where: { id: scheduledPayment.id },
+        data: {
+          nextRetryAttemptAt: this.scheduledPaymentFetcher.calculateNextRetryAttemptDate(scheduledPayment),
+        },
+      });
+
       throw error;
     }
   }

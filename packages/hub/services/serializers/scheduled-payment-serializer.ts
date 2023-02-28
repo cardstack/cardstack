@@ -1,7 +1,10 @@
 import { ScheduledPayment } from '@prisma/client';
 import { JSONAPIDocument } from '../../utils/jsonapi-document';
+import { inject } from '@cardstack/di';
 
 export default class ScheduledPaymentSerializer {
+  scheduledPaymentFetcher = inject('scheduled-payment-fetcher', { as: 'scheduledPaymentFetcher' });
+
   serialize(model: ScheduledPayment | ScheduledPayment[]): JSONAPIDocument {
     if (Array.isArray(model)) {
       return {
@@ -36,6 +39,11 @@ export default class ScheduledPaymentSerializer {
             'cancelation-transaction-hash': model.cancelationTransactionHash,
             'cancelation-block-number': model.cancelationBlockNumber,
             'canceled-at': model.canceledAt,
+            'next-retry-attempt-at': model.nextRetryAttemptAt,
+            'scheduled-payment-attempts-in-last-payment-cycle-count':
+              model.scheduledPaymentAttemptsInLastPaymentCycleCount,
+            'last-scheduled-payment-attempt-id': model.lastScheduledPaymentAttemptId,
+            'retries-left': this.scheduledPaymentFetcher.retriesLeft(model),
           },
         },
       };
