@@ -23,6 +23,7 @@ interface Signature {
     size?: string;
     href?: string;
     class?: string;
+    tooltip?: string;
   };
   Blocks: {
     'default': [],
@@ -38,12 +39,14 @@ export default class ButtonComponent extends Component<Signature> {
       @class
       (concat "boxel-button--size-" (or @size this.defaultSize))
       (concat "boxel-button--kind-" (or @kind this.defaultKind))
+      (if @tooltip "boxel-button--with-tooltip")
     ) as |classes|}}
       {{#if (or (not @as) (eq @as "button"))}}
         <button
           class={{cn classes (if @loading "boxel-button--loading")}}
           tabindex={{if @loading -1 0}}
           disabled={{@disabled}}
+          data-hover={{@tooltip}}
           data-test-boxel-button
           ...attributes
         >
@@ -57,6 +60,7 @@ export default class ButtonComponent extends Component<Signature> {
           class={{classes}}
           href={{unless @disabled @href}}
           data-test-boxel-button 
+          data-hover={{@tooltip}}
           ...attributes
         >
           {{yield}}
@@ -70,6 +74,7 @@ export default class ButtonComponent extends Component<Signature> {
           @disabled={{@disabled}}
           data-test-boxel-button 
           tabindex={{if @disabled -1 0}}
+          data-hover={{@tooltip}}
           ...attributes
         >
           {{yield}}

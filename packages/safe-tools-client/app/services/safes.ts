@@ -75,6 +75,8 @@ export default class SafesService extends Service {
     return this.safesResource.isLoading;
   }
 
+  lastTokenBalances: TokenBalance[] | undefined;
+
   get tokenBalances(): TokenBalance[] | undefined {
     return this.tokenBalancesResource.value;
   }
@@ -107,7 +109,7 @@ export default class SafesService extends Service {
 
     const state: TokenBalanceResourceState = new TrackedObject({
       isLoading: true,
-      value: [],
+      value: this.lastTokenBalances || [],
       error: undefined,
       load: async () => {
         state.isLoading = true;
@@ -125,6 +127,7 @@ export default class SafesService extends Service {
             tokenAddresses,
             this.wallet.ethersProvider
           );
+          this.lastTokenBalances = state.value;
         } catch (error) {
           console.log(error);
           state.error = error;

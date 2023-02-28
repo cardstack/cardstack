@@ -36,6 +36,7 @@ import tokenToUsd from '@cardstack/safe-tools-client/helpers/token-to-usd';
 import { type CurrentFees } from '../fee-calculator';
 import TokenQuantity from '@cardstack/safe-tools-client/utils/token-quantity';
 import MaxGasToggleButton from './max-gas-toggle-button';
+import gt from 'ember-truth-helpers/helpers/gt';
 
 interface Signature {
   Element: HTMLElement;
@@ -256,6 +257,7 @@ export default class SchedulePaymentFormActionCardUI extends Component<Signature
             @errorMessage={{@paymentAmountErrorMessage}}
             @token={{@paymentToken}}
             @tokens={{@paymentTokens}}
+            @searchEnabled={{gt @paymentTokens.length 3}}
             @disabled={{this.isFormInteractionDisabled}}
             @onChooseToken={{@onUpdatePaymentToken}}
             @onBlurToken={{set this 'hasBlurredPaymentAmount' true}}

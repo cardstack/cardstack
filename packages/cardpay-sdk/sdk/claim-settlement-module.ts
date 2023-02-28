@@ -14,11 +14,14 @@ import { signSafeTx } from './utils/signing-utils';
 import { AddressZero } from '@ethersproject/constants';
 import GnosisSafeABI from '../contracts/abi/gnosis-safe';
 import { getAddress } from '../contracts/addresses';
+<<<<<<< HEAD
 
 interface SignedClaim {
   signature: string;
   encoded: string;
 }
+=======
+>>>>>>> origin/main
 
 export default class ClaimSettlementModule extends SafeModule {
   safeSalt = 'cardstack-cs-create-safe';
@@ -150,6 +153,7 @@ export default class ClaimSettlementModule extends SafeModule {
     return await waitUntilTransactionMined(this.ethersProvider, txnHash);
   }
 
+<<<<<<< HEAD
   async defaultStakingClaim(moduleAddress: string, payeeAddress?: string): Promise<Claim> {
     let signer = this.signer ? this.signer : this.ethersProvider.getSigner();
     let callerAddress = await signer.getAddress();
@@ -168,6 +172,15 @@ export default class ClaimSettlementModule extends SafeModule {
     let startBlockNum = await this.ethersProvider.getBlockNumber();
     let startBlockTime = (await this.ethersProvider.getBlock(startBlockNum)).timestamp;
     let transferAmount = BigNumber.from(utils.parseUnits(amountInEth, 'ether'));
+=======
+  async defaultClaim(moduleAddress: string, payeeAddress: string) {
+    let id = utils.hexlify(utils.randomBytes(32));
+    let startBlockNum = await this.ethersProvider.getBlockNumber();
+    let startBlockTime = (await this.ethersProvider.getBlock(startBlockNum)).timestamp;
+    let validitySeconds = 86400; //1 day
+    let tokenAddress = await getAddress('cardToken', this.ethersProvider);
+    let transferAmount = BigNumber.from(utils.parseUnits('1', 'ether'));
+>>>>>>> origin/main
     return new Claim(
       id,
       (await this.ethersProvider.getNetwork()).chainId.toString(),
@@ -184,6 +197,7 @@ export default class ClaimSettlementModule extends SafeModule {
     }
     if (!(await this.isValidCaller(claim, moduleAddress, callerAddress))) {
       throw new Error(`Caller not valid`);
+<<<<<<< HEAD
     }
     if (!(await this.isValidState(claim, moduleAddress))) {
       throw new Error(`State not valid`);
@@ -307,5 +321,117 @@ export default class ClaimSettlementModule extends SafeModule {
       signature,
       encoded,
     };
+=======
+    }
+    if (!(await this.isValidState(claim, moduleAddress))) {
+      throw new Error(`State not valid`);
+    }
+    if (!(await this.hasBalance(claim, moduleAddress))) {
+      throw new Error(`Not enough balance`);
+    }
+  }
+
+  async executeEOA(moduleAddress: string, txnOptions?: TransactionOptions): Promise<SuccessfulTransactionReceipt> {
+    let { onTxnHash } = txnOptions ?? {};
+    let module = new Contract(moduleAddress, this.abi, this.ethersProvider);
+
+    let signer = this.signer ? this.signer : this.ethersProvider.getSigner();
+    let callerAddress = await signer.getAddress();
+    let claim = await this.defaultClaim(moduleAddress, callerAddress);
+    let minTokens = BigNumber.from(utils.parseUnits('0.1', 'ether'));
+    let signature = await claim.sign(signer as VoidSigner);
+    let encoded = claim.abiEncode(['uint256'], [minTokens]);
+    let data = module.interface.encodeFunctionData('signedExecute', [signature, encoded]);
+    await module.callStatic.signedExecute(signature, encoded, { from: callerAddress });
+    let response = await signer.sendTransaction({
+      to: moduleAddress,
+      data: data,
+    });
+    if (typeof onTxnHash === 'function') {
+      await onTxnHash(response.hash);
+    }
+    return waitUntilTransactionMined(this.ethersProvider, response.hash);
+  }
+
+  async executeSafe(txnHash: string): Promise<SuccessfulTransactionReceipt>;
+  async executeSafe(
+    moduleAddress: string,
+    payeeSafeAddress: string,
+    gasTokenAddress?: string,
+    txnOptions?: TransactionOptions,
+    contractOptions?: ContractOptions
+  ): Promise<SuccessfulTransactionReceipt>;
+  async executeSafe(
+    moduleAddressOrTxnHash: string,
+    payeeSafeAddress?: string,
+    gasTokenAddress?: string,
+    txnOptions?: TransactionOptions,
+    contractOptions?: ContractOptions
+  ): Promise<SuccessfulTransactionReceipt> {
+    //TODO: Multi-signature. Only supports adding single validator only
+    let moduleAddress = moduleAddressOrTxnHash;
+    if (!payeeSafeAddress) {
+      throw new Error('payeeSafeAddress must be specified');
+    }
+
+    if (!moduleAddress) {
+      throw new Error('moduleAddress must be specified');
+    }
+    let { nonce, onNonce, onTxnHash } = txnOptions ?? {};
+    let module = new Contract(moduleAddress, this.abi, this.ethersProvider);
+    let signer = this.signer ? this.signer : this.ethersProvider.getSigner();
+    let from = contractOptions?.from ?? (await signer.getAddress());
+    let claim = await this.defaultClaim(moduleAddress, payeeSafeAddress);
+    let signature = await claim.sign(signer as VoidSigner);
+    let minTokens = BigNumber.from(utils.parseUnits('0.1', 'ether'));
+    let encoded = claim.abiEncode(['uint256'], [minTokens]);
+    let data = await module.interface.encodeFunctionData('signedExecute', [signature, encoded]);
+    await module.callStatic.signedExecute(signature, encoded, { from: payeeSafeAddress });
+
+    let estimate = await gasEstimate(
+      this.ethersProvider,
+      payeeSafeAddress,
+      module.address,
+      '0',
+      data,
+      Operation.CALL,
+      gasTokenAddress ?? AddressZero,
+      true
+    );
+
+    if (nonce == null) {
+      nonce = getNextNonceFromEstimate(estimate);
+      if (typeof onNonce === 'function') {
+        onNonce(nonce);
+      }
+    }
+
+    let gnosisTxn = await executeTransaction(
+      this.ethersProvider,
+      payeeSafeAddress,
+      module.address,
+      data,
+      Operation.CALL,
+      estimate,
+      nonce,
+      await signSafeTx(
+        this.ethersProvider,
+        payeeSafeAddress,
+        module.address,
+        data,
+        Operation.CALL,
+        estimate,
+        nonce,
+        from,
+        this.signer
+      )
+    );
+
+    let txnHash = gnosisTxn.ethereumTx.txHash;
+    if (typeof onTxnHash === 'function') {
+      await onTxnHash(txnHash);
+    }
+    return await waitUntilTransactionMined(this.ethersProvider, txnHash);
+>>>>>>> origin/main
   }
 }

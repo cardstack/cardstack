@@ -26,6 +26,7 @@ import TokenQuantity from '@cardstack/safe-tools-client/utils/token-quantity';
 import * as Sentry from '@sentry/browser';
 import FeeCalculator, { type CurrentFees } from './fee-calculator';
 import config from '@cardstack/safe-tools-client/config/environment';
+import HubAuthenticationService from '@cardstack/safe-tools-client/services/hub-authentication';
 
 interface Signature {
   Element: HTMLElement;
@@ -64,6 +65,7 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
   @service declare wallet: WalletService;
   @service declare safes: SafesService;
   @service declare tokens: TokensService;
+  @service declare hubAuthentication: HubAuthenticationService;
   @service('token-to-usd') declare tokenToUsdService: TokenToUsdService;
   @service declare scheduledPaymentSdk: ScheduledPaymentSdkService;
   @service('scheduled-payments') declare scheduledPaymentsService: ScheduledPaymentsService;
@@ -439,6 +441,7 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
         params.payAt,
         params.recurringDayOfMonth,
         params.recurringUntil,
+        this.hubAuthentication.authToken!,
         {
           onScheduledPaymentIdReady(scheduledPaymentId: string) {
             self.lastScheduledPaymentId = scheduledPaymentId;

@@ -88,8 +88,8 @@ export default class FuturePaymentsList extends Component<Signature> {
       as |Section ActionChin|>
       {{#if (and (not this.isScheduledPaymentsLoading) (lt this.scheduledPayments.length 1))}}
         <Section class="future-payments-list__no-payments-section" data-test-no-future-payments-list>
-          <div class="future-payments-list__no-payments-title">Schedule your first payment</div>
-          <div class="future-payments-list__no-payments-description">Your future payments will show up here. This is where you can check on the status of your transactions and view important messages.</div>
+          <div class="future-payments-list__no-payments-title">Future payments</div>
+          <div class="future-payments-list__no-payments-description">Your upcoming scheduled payments will show up here. This is where you can check on what will be processed next.</div>
         </Section>
       {{else if (and (not this.isScheduledPaymentsLoading) (gt this.scheduledPayments.length 0))}}
         <Section @title="Future Payments" data-test-future-payments-list>

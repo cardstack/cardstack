@@ -34,6 +34,13 @@ class HubAuthenticationServiceStub extends Service {
   isAuthenticated = true;
 }
 
+class SafesServiceStub extends Service {
+  currentSafe = {
+    address: '0xc0ffee254729296a45a3885639AC7E10F9d54979',
+  };
+  reloadTokenBalances() {}
+}
+
 const NOW = new Date(2023, 0, 1);
 
 let returnEmptyScheduledPayments = false;
@@ -53,7 +60,11 @@ class TokenToUsdServiceStub extends TokenToUsdService {
 
 class ScheduledPaymentsStub extends ScheduledPaymentsService {
   // @ts-expect-error - we're overriding this method for testing purposes
-  fetchScheduledPayments = (chainId: number, minPayAt?: Date) => {
+  fetchScheduledPayments = (
+    chainId: number,
+    senderSafeAddress: string,
+    minPayAt?: Date
+  ) => {
     if (returnEmptyScheduledPayments || !minPayAt) {
       return Promise.resolve([]);
     }
@@ -98,6 +109,7 @@ class ScheduledPaymentsStub extends ScheduledPaymentsService {
         gasTokenAddress: '0x123',
         chainId,
         payeeAddress: '0xeBCC5516d44FFf5E9aBa2AcaeB65BbB49bC3EBe1',
+        senderSafeAddress,
         payAt: addMinutes(startOfToday, -2),
       },
       {
@@ -110,6 +122,7 @@ class ScheduledPaymentsStub extends ScheduledPaymentsService {
         gasTokenAddress: '0x123',
         chainId,
         payeeAddress: '0xeBCC5516d44FFf5E9aBa2AcaeB65BbB49bC3EBe1',
+        senderSafeAddress,
         payAt: startOfToday,
       },
       {
@@ -122,6 +135,7 @@ class ScheduledPaymentsStub extends ScheduledPaymentsService {
         gasTokenAddress: '0x123',
         chainId,
         payeeAddress: '0xeBCC5516d44FFf5E9aBa2AcaeB65BbB49bC3EBe1',
+        senderSafeAddress,
         payAt: addHours(startOfToday, 2),
       },
       {
@@ -134,6 +148,7 @@ class ScheduledPaymentsStub extends ScheduledPaymentsService {
         gasTokenAddress: '0x123',
         chainId,
         payeeAddress: '0xeBCC5516d44FFf5E9aBa2AcaeB65BbB49bC3EBe1',
+        senderSafeAddress,
         payAt: endOfToday,
       },
       {
@@ -146,6 +161,7 @@ class ScheduledPaymentsStub extends ScheduledPaymentsService {
         gasTokenAddress: '0x123',
         chainId,
         payeeAddress: '0xeBCC5516d44FFf5E9aBa2AcaeB65BbB49bC3EBe1',
+        senderSafeAddress,
         payAt: startOfTomorrow,
       },
       {
@@ -158,6 +174,7 @@ class ScheduledPaymentsStub extends ScheduledPaymentsService {
         gasTokenAddress: '0x123',
         chainId,
         payeeAddress: '0xeBCC5516d44FFf5E9aBa2AcaeB65BbB49bC3EBe1',
+        senderSafeAddress,
         payAt: endOfTomorrow,
       },
       {
@@ -170,6 +187,7 @@ class ScheduledPaymentsStub extends ScheduledPaymentsService {
         gasTokenAddress: '0x123',
         chainId,
         payeeAddress: '0xeBCC5516d44FFf5E9aBa2AcaeB65BbB49bC3EBe1',
+        senderSafeAddress,
         payAt: endOfThisMonth,
       },
       {
@@ -182,6 +200,7 @@ class ScheduledPaymentsStub extends ScheduledPaymentsService {
         gasTokenAddress: '0x123',
         chainId,
         payeeAddress: '0xeBCC5516d44FFf5E9aBa2AcaeB65BbB49bC3EBe1',
+        senderSafeAddress,
         payAt: addDays(endOfThisMonth, 1),
         recurringDayOfMonth: addDays(endOfThisMonth, 1).getTime(),
         recurringUntil: addMonths(addDays(endOfThisMonth, 1), 5),
@@ -215,6 +234,7 @@ module('Integration | Component | future-payments-list', function (hooks) {
       'service:hub-authentication',
       HubAuthenticationServiceStub
     );
+    this.owner.register('service:safes', SafesServiceStub);
 
     dateService = this.owner.lookup('service:date') as FakeDateService;
     await dateService.setNow(NOW.getTime());

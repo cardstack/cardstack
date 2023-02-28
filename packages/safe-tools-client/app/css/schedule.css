@@ -49,6 +49,7 @@
   justify-content: center;
   flex-direction: column;
   max-width: 75rem;
+  margin-bottom: 2em;
 }
 
 .safe-tools__dashboard-container > * + * {
@@ -127,4 +128,10 @@
 .safe-tools__current-network .boxel-icon-button:hover::after {
   opacity: 1;
   visibility: visible;
+}
+
+.safe-tools__version {
+  color: var(--boxel-purple-400);
+  font-size: var(--boxel-font-size-sm);
+  text-align: center;
 }

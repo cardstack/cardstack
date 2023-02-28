@@ -30,6 +30,7 @@ export default class ButtonUsage extends Component {
   @tracked kind = 'primary';
   @tracked disabled = false;
   @tracked loading = false;
+  @tracked tooltip: string | undefined = undefined;
 
   // for @as === 'anchor'
   @tracked href = '#';
@@ -55,6 +56,7 @@ export default class ButtonUsage extends Component {
             @loading={{this.loading}}
             @href={{this.href}}
             @route={{this.route}}
+            @tooltip={{this.tooltip}}
             {{on "click" this.alert}}
           >
             Button Text
@@ -127,6 +129,13 @@ export default class ButtonUsage extends Component {
           @onInput={{fn (mut this.loading)}}
           @value={{this.loading}}
         />
+        <Args.String
+          @name="tooltip"
+          @optional={{true}}
+          @value={{this.tooltip}}
+          @description="An extra information when the mouse pointer is moved over an element"
+          @onInput={{fn (mut this.tooltip)}}
+        />
         <Args.Yield @description="Contents of the button" />
       </:api>
       <:description>
@@ -156,6 +165,7 @@ export default class ButtonUsage extends Component {
                   <li><code>@kind</code></li>
                   <li><code>@disabled</code></li>
                   <li><code>@loading</code></li>
+                  <li><code>@tooltip</code></li>
                 </ul>
               </td>
               <td>
@@ -172,6 +182,7 @@ export default class ButtonUsage extends Component {
                   <li><code>@kind</code></li>
                   <li><code>@disabled</code></li>
                   <li><code>@href</code></li>
+                  <li><code>@tooltip</code></li>
                 </ul>
               </td>
               <td>
@@ -190,6 +201,7 @@ export default class ButtonUsage extends Component {
                   <li><code>@route</code></li>
                   <li><code>@models</code></li>
                   <li><code>@query</code></li>
+                  <li><code>@tooltip</code></li>
                 </ul>
                 <br />
                 <code>@route, @models,</code> and <code>@query</code> are passed to <code>LinkTo</code> directly
