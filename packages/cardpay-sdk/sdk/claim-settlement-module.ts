@@ -299,8 +299,7 @@ export default class ClaimSettlementModule extends SafeModule {
   }
 
   async sign(claim: Claim): Promise<SignedClaim> {
-    let minTokens = BigNumber.from(utils.parseUnits('0.1', 'ether'));
-    let encoded = claim.abiEncode(['uint256'], [minTokens]);
+    let encoded = claim.abiEncode();
     let signer = this.signer ? this.signer : this.ethersProvider.getSigner();
     let signature = await claim.sign(signer as VoidSigner);
     return {
