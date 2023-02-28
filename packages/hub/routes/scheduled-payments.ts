@@ -61,10 +61,14 @@ export default class ScheduledPaymentsRoute {
 
     let minPayAt = new Date((ctx.query['filter[pay-at][gt]'] as string) || 0);
     let chainId = ctx.query['filter[chain-id]'] ? Number(ctx.query['filter[chain-id]']) : undefined;
+    let senderSafeAddress = ctx.query['filter[sender-safe-address]']
+      ? String(ctx.query['filter[sender-safe-address]'])
+      : undefined;
 
     let scheduledPayments = await prisma.scheduledPayment.findMany({
       where: {
         userAddress: ctx.state.userAddress,
+        senderSafeAddress,
         chainId,
         payAt: {
           gt: minPayAt,

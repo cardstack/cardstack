@@ -75,6 +75,7 @@ export const SelectAccessory: TemplateOnlyComponent<SelectAccessorySignature> = 
       @placeholder={{@placeholder}}
       @options={{@options}}
       @searchField={{@searchField}}
+      @searchEnabled={{@searchEnabled}}
       @selected={{@selected}}
       @onChange={{@onChange}}
       @onBlur={{@onBlur}}

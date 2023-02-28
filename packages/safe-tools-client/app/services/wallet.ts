@@ -21,6 +21,10 @@ import { taskFor } from 'ember-concurrency-ts';
 import Web3 from 'web3';
 
 const ERR_METAMASK_UNKNOWN_NETWORK = 4902; // The requested chain has not been added by MetaMask
+interface UnsupportedConnect extends Record<PropertyKey, unknown> {
+  providerId?: WalletProviderId;
+  chainId: number;
+}
 
 export default class Wallet extends Service {
   @service declare network: NetworkService;
@@ -37,6 +41,14 @@ export default class Wallet extends Service {
   //@ts-expect-error  ethersProvider will be assigned in constructor
   @tracked ethersProvider: Web3Provider;
   chainConnectionManager: ChainConnectionManager;
+
+  // This is a supporting state that
+  // we use to conditionally show the "Unsupported network" modal
+  // for the case when the user tries to connect their wallet
+  // but their wallet is connected to a network that this app does not support.
+  // We store which unsupported network that is
+  // so that we can display it in the modal popup.
+  @tracked unsupportedNetworkCache: UnsupportedConnect | undefined;
 
   walletProviders = walletProviders.map((w) =>
     w.id === 'metamask'
@@ -77,12 +89,15 @@ export default class Wallet extends Service {
       const isSupported = await this.network.isSupportedNetwork(chainId);
 
       if (!isSupported) {
-        // TODO: improve unsupported net handling
-        alert('Unsupported network! Choose a supported one and reconnect');
+        this.unsupportedNetworkCache = {
+          providerId: this.providerId,
+          chainId,
+        };
         this.disconnect();
-        return;
+      } else {
+        this.unsupportedNetworkCache = undefined;
+        this.network.onChainChanged(chainId);
       }
-      this.network.onChainChanged(chainId);
     });
 
     const providerId = this.chainConnectionManager.getProviderIdForChain(

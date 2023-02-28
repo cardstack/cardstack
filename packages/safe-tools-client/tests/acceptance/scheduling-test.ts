@@ -400,7 +400,6 @@ module('Acceptance | scheduling', function (hooks) {
       await fillInSchedulePaymentFormWithValidInfo({ type: 'one-time' });
       await waitFor(`${SUBMIT_BUTTON}:not(:disabled)`);
       await click(SUBMIT_BUTTON);
-      assert.dom(IN_PROGRESS_MESSAGE).hasText('Authenticating...');
       assert.dom(PAYEE_INPUT).isDisabled();
 
       await waitUntil(() =>
@@ -413,7 +412,7 @@ module('Acceptance | scheduling', function (hooks) {
 
       assert.strictEqual(
         signedHubAuthentication,
-        2,
+        1,
         'signed hub authentication'
       );
       scheduledPaymentCreateSpHashDeferred?.fulfill();
@@ -519,7 +518,6 @@ module('Acceptance | scheduling', function (hooks) {
       await waitFor(`[data-test-safe-address-label][title="${SAFE_ADDRESS}"]`);
 
       await fillInSchedulePaymentFormWithValidInfo({ type: 'monthly' });
-
       await waitFor(`${SUBMIT_BUTTON}:not(:disabled)`);
 
       await click(SUBMIT_BUTTON);

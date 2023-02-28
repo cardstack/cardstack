@@ -39,6 +39,10 @@ export default class ScheduledPaymentAttemptsRoute {
       status = statusQuery as ScheduledPaymentAttemptStatusEnum;
     }
 
+    let senderSafeAddress = ctx.query['filter[sender-safe-address]']
+      ? String(ctx.query['filter[sender-safe-address]'])
+      : undefined;
+
     let chainId: number | undefined = undefined;
     let chainIdQuery = ctx.query['filter[chain-id]'] as string;
     if (!isNaN(chainIdQuery as unknown as number)) {
@@ -89,6 +93,7 @@ export default class ScheduledPaymentAttemptsRoute {
         },
         scheduledPayment: {
           userAddress: ctx.state.userAddress,
+          senderSafeAddress,
           chainId,
         },
       },

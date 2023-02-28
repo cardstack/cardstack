@@ -60,6 +60,12 @@ export interface CreateSafeWithModuleAndGuardTx extends CreateSafeWithModuleTx {
   expectedMetaGuardAddress: string;
 }
 
+export interface ModuleDetails {
+  owner: string;
+  avatar: string;
+  target: string;
+}
+
 type GasRange = Record<'slow' | 'standard' | 'fast', BigNumber>;
 export interface GasEstimationResult {
   gas: BigNumber;
@@ -422,7 +428,7 @@ export default abstract class SafeModule {
     };
   }
 
-  async getDetails(moduleAddress: string): Promise<any> {
+  async getDetails(moduleAddress: string): Promise<ModuleDetails> {
     const module = new Contract(moduleAddress, this.abi, this.ethersProvider);
     const owner = await module.owner();
     const target = await module.target();
