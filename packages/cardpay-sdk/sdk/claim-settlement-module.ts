@@ -15,6 +15,11 @@ import { AddressZero } from '@ethersproject/constants';
 import GnosisSafeABI from '../contracts/abi/gnosis-safe';
 import { getAddress } from '../contracts/addresses';
 
+export interface SignedClaim {
+  signature: string;
+  encoded: string;
+}
+
 export default class ClaimSettlementModule extends SafeModule {
   safeSalt = 'cardstack-cs-create-safe';
   moduleSalt = 'cardstack-cs-deploy-module';
@@ -145,13 +150,24 @@ export default class ClaimSettlementModule extends SafeModule {
     return await waitUntilTransactionMined(this.ethersProvider, txnHash);
   }
 
-  async defaultClaim(moduleAddress: string, payeeAddress: string) {
+  async defaultStakingClaim(moduleAddress: string, payeeAddress?: string): Promise<Claim> {
+    let signer = this.signer ? this.signer : this.ethersProvider.getSigner();
+    let callerAddress = await signer.getAddress();
+    let tokenAddress = await getAddress('cardToken', this.ethersProvider);
+    return this.stakingClaim(moduleAddress, payeeAddress ?? callerAddress, tokenAddress, '1');
+  }
+
+  async stakingClaim(
+    moduleAddress: string,
+    payeeAddress: string,
+    tokenAddress: string,
+    amountInEth: string,
+    validitySeconds = 86400
+  ): Promise<Claim> {
     let id = utils.hexlify(utils.randomBytes(32));
     let startBlockNum = await this.ethersProvider.getBlockNumber();
     let startBlockTime = (await this.ethersProvider.getBlock(startBlockNum)).timestamp;
-    let validitySeconds = 86400; //1 day
-    let tokenAddress = await getAddress('cardToken', this.ethersProvider);
-    let transferAmount = BigNumber.from(utils.parseUnits('1', 'ether'));
+    let transferAmount = BigNumber.from(utils.parseUnits(amountInEth, 'ether'));
     return new Claim(
       id,
       (await this.ethersProvider.getNetwork()).chainId.toString(),
@@ -177,16 +193,16 @@ export default class ClaimSettlementModule extends SafeModule {
     }
   }
 
-  async executeEOA(moduleAddress: string, txnOptions?: TransactionOptions): Promise<SuccessfulTransactionReceipt> {
+  async executeEOA(
+    moduleAddress: string,
+    signedClaim: SignedClaim,
+    txnOptions?: TransactionOptions
+  ): Promise<SuccessfulTransactionReceipt> {
     let { onTxnHash } = txnOptions ?? {};
     let module = new Contract(moduleAddress, this.abi, this.ethersProvider);
-
     let signer = this.signer ? this.signer : this.ethersProvider.getSigner();
     let callerAddress = await signer.getAddress();
-    let claim = await this.defaultClaim(moduleAddress, callerAddress);
-    let minTokens = BigNumber.from(utils.parseUnits('0.1', 'ether'));
-    let signature = await claim.sign(signer as VoidSigner);
-    let encoded = claim.abiEncode(['uint256'], [minTokens]);
+    let { signature, encoded } = signedClaim;
     let data = module.interface.encodeFunctionData('signedExecute', [signature, encoded]);
     await module.callStatic.signedExecute(signature, encoded, { from: callerAddress });
     let response = await signer.sendTransaction({
@@ -203,6 +219,7 @@ export default class ClaimSettlementModule extends SafeModule {
   async executeSafe(
     moduleAddress: string,
     payeeSafeAddress: string,
+    signedClaim: SignedClaim,
     gasTokenAddress?: string,
     txnOptions?: TransactionOptions,
     contractOptions?: ContractOptions
@@ -210,27 +227,28 @@ export default class ClaimSettlementModule extends SafeModule {
   async executeSafe(
     moduleAddressOrTxnHash: string,
     payeeSafeAddress?: string,
+    signedClaim?: SignedClaim,
     gasTokenAddress?: string,
     txnOptions?: TransactionOptions,
     contractOptions?: ContractOptions
   ): Promise<SuccessfulTransactionReceipt> {
     //TODO: Multi-signature. Only supports adding single validator only
     let moduleAddress = moduleAddressOrTxnHash;
-    if (!payeeSafeAddress) {
-      throw new Error('payeeSafeAddress must be specified');
-    }
-
     if (!moduleAddress) {
       throw new Error('moduleAddress must be specified');
     }
+    if (!payeeSafeAddress) {
+      throw new Error('payeeSafeAddress must be specified');
+    }
+    if (!signedClaim) {
+      throw new Error('signedClaim must be specified');
+    }
+
     let { nonce, onNonce, onTxnHash } = txnOptions ?? {};
     let module = new Contract(moduleAddress, this.abi, this.ethersProvider);
     let signer = this.signer ? this.signer : this.ethersProvider.getSigner();
     let from = contractOptions?.from ?? (await signer.getAddress());
-    let claim = await this.defaultClaim(moduleAddress, payeeSafeAddress);
-    let signature = await claim.sign(signer as VoidSigner);
-    let minTokens = BigNumber.from(utils.parseUnits('0.1', 'ether'));
-    let encoded = claim.abiEncode(['uint256'], [minTokens]);
+    let { signature, encoded } = signedClaim;
     let data = await module.interface.encodeFunctionData('signedExecute', [signature, encoded]);
     await module.callStatic.signedExecute(signature, encoded, { from: payeeSafeAddress });
 
@@ -278,5 +296,16 @@ export default class ClaimSettlementModule extends SafeModule {
       await onTxnHash(txnHash);
     }
     return await waitUntilTransactionMined(this.ethersProvider, txnHash);
+  }
+
+  async sign(claim: Claim): Promise<SignedClaim> {
+    let minTokens = BigNumber.from(utils.parseUnits('0.1', 'ether'));
+    let encoded = claim.abiEncode(['uint256'], [minTokens]);
+    let signer = this.signer ? this.signer : this.ethersProvider.getSigner();
+    let signature = await claim.sign(signer as VoidSigner);
+    return {
+      signature,
+      encoded,
+    };
   }
 }
