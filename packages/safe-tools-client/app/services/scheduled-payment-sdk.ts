@@ -155,6 +155,7 @@ export default class SchedulePaymentSDKService extends Service {
     payAt: number | null,
     recurringDayOfMonth: number | null,
     recurringUntil: number | null,
+    authToken: string,
     listener: SchedulePaymentProgressListener
   ): TaskGenerator<void> {
     const scheduledPaymentModule: ScheduledPaymentModule =
@@ -175,6 +176,7 @@ export default class SchedulePaymentSDKService extends Service {
       {
         hubUrl: config.hubUrl,
         listener,
+        authToken,
       }
     );
   }
