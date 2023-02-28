@@ -143,7 +143,7 @@ export default class ScheduledPaymentModule extends SafeModule {
       feePercentage != null ? feePercentage : (await getConstant('scheduledPaymentFeeFixedUSD', this.ethersProvider))!;
     let requiredGas = 0;
     try {
-      let module = new Contract(moduleAddress, ScheduledPaymentABI, this.ethersProvider);
+      let module = new Contract(moduleAddress, this.abi, this.ethersProvider);
       if (recurringDayOfMonth) {
         await module.estimateGas[
           'estimateExecutionGas(address,uint256,address,((uint256),(uint256)),uint256,address,string,uint256,uint256,uint256)'
@@ -224,7 +224,7 @@ export default class ScheduledPaymentModule extends SafeModule {
     let signer = this.signer ? this.signer : this.ethersProvider.getSigner();
     let from = contractOptions?.from ?? (await signer.getAddress());
 
-    let scheduledPaymentModule = new Contract(moduleAddress, ScheduledPaymentABI, this.ethersProvider);
+    let scheduledPaymentModule = new Contract(moduleAddress, this.abi, this.ethersProvider);
     let spHashes = await scheduledPaymentModule.getSpHashes();
     if (!spHashes.includes(spHash)) {
       throw new Error(`unknown spHash`);
@@ -310,7 +310,7 @@ export default class ScheduledPaymentModule extends SafeModule {
       throw new Error('When payAt is not null, recurringDayOfMonth and recurringUntil must be null');
 
     let spHash;
-    let module = new Contract(moduleAddress, ScheduledPaymentABI, this.ethersProvider);
+    let module = new Contract(moduleAddress, this.abi, this.ethersProvider);
     let feeFixedUSD = (await getConstant('scheduledPaymentFeeFixedUSD', this.ethersProvider))!;
     let feePercentage = (await getConstant('scheduledPaymentFeePercentage', this.ethersProvider))!;
     if (recurringUntil) {
@@ -353,7 +353,7 @@ export default class ScheduledPaymentModule extends SafeModule {
     gasTokenAddress: string,
     spHash: string
   ) {
-    let contract = new Contract(moduleAddress, ScheduledPaymentABI, this.ethersProvider);
+    let contract = new Contract(moduleAddress, this.abi, this.ethersProvider);
     let payload = contract.interface.encodeFunctionData('schedulePayment', [spHash]);
 
     let estimate = await gasEstimate(
@@ -394,7 +394,7 @@ export default class ScheduledPaymentModule extends SafeModule {
     gasTokenAddress: string,
     spHash: string
   ) {
-    let contract = new Contract(moduleAddress, ScheduledPaymentABI, this.ethersProvider);
+    let contract = new Contract(moduleAddress, this.abi, this.ethersProvider);
     let payload = contract.interface.encodeFunctionData('cancelScheduledPayment', [spHash]);
 
     let estimate = await gasEstimate(
@@ -883,7 +883,7 @@ export default class ScheduledPaymentModule extends SafeModule {
       throw new Error('When payAt is not null, recurringDayOfMonth and recurringUntil must be null');
 
     let { onTxnHash, nonce } = txnOptions ?? {};
-    let module = new Contract(moduleAddress, ScheduledPaymentABI, this.ethersProvider);
+    let module = new Contract(moduleAddress, this.abi, this.ethersProvider);
     let executeScheduledPaymentData;
     if (recurringUntil) {
       executeScheduledPaymentData = module.interface.encodeFunctionData(
@@ -946,7 +946,7 @@ export default class ScheduledPaymentModule extends SafeModule {
       // ExceedMaxGasPrice: gasPrice must be lower than or equal maxGasPrice
       // PaymentExecutionFailed: safe balance is not enough to make payments and pay fees
       // OutOfGas: executionGas to low to execute scheduled payment
-      throw new Error(extractSendTransactionErrorMessage(e, new Interface(ScheduledPaymentABI)));
+      throw new Error(extractSendTransactionErrorMessage(e, new Interface(this.abi)));
     }
   }
 
