@@ -1,6 +1,6 @@
 import { Arguments, Argv, CommandModule } from 'yargs';
 import { getEthereumClients, getConnectionType, NETWORK_OPTION_ANY } from '../utils';
-import { getConstant, getSDK } from '@cardstack/cardpay-sdk';
+import { getSDK } from '@cardstack/cardpay-sdk';
 
 export default {
   command: 'sign <moduleAddress> <payeeAddress> <tokenAddress> <amountInEth> [validitySeconds]',
