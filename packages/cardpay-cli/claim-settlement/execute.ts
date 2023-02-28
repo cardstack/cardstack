@@ -1,15 +1,24 @@
 import { Arguments, Argv, CommandModule } from 'yargs';
 import { getEthereumClients, getConnectionType, NETWORK_OPTION_ANY } from '../utils';
 import { getConstant, getSDK } from '@cardstack/cardpay-sdk';
+import { SignedClaim } from '@cardstack/cardpay-sdk/sdk/claim-settlement-module';
 
 export default {
-  command: 'execute <moduleAddress> [payeeSafeAddress] [gasTokenAddress]',
+  command: 'execute <moduleAddress> <encoded> <signature> [payeeSafeAddress] [gasTokenAddress]',
   describe: 'Execute a claim settlement',
   builder(yargs: Argv) {
     return yargs
       .positional('moduleAddress', {
         type: 'string',
         description: 'Module address enabled on safe',
+      })
+      .positional('encoded', {
+        type: 'string',
+        description: 'Encoded data of claim',
+      })
+      .positional('signature', {
+        type: 'string',
+        description: 'eip712 signature',
       })
       .option('payeeSafeAddress', {
         type: 'string',
@@ -22,9 +31,11 @@ export default {
       .option('network', NETWORK_OPTION_ANY);
   },
   async handler(args: Arguments) {
-    let { network, moduleAddress, payeeSafeAddress, gasTokenAddress } = args as unknown as {
+    let { network, moduleAddress, encoded, signature, payeeSafeAddress, gasTokenAddress } = args as unknown as {
       network: string;
       moduleAddress: string;
+      encoded: string;
+      signature: string;
       payeeSafeAddress: string;
       gasTokenAddress: string;
     };
@@ -32,8 +43,10 @@ export default {
     let claimSettlementModule = await getSDK('ClaimSettlementModule', ethersProvider, signer);
     let blockExplorer = await getConstant('blockExplorer', ethersProvider);
     let onTxnHash = (txnHash: string) => console.log(`Transaction hash: ${blockExplorer}/tx/${txnHash}`);
-    let claim = await claimSettlementModule.defaultStakingClaim(moduleAddress, payeeSafeAddress);
-    let signedClaim = await claimSettlementModule.sign(claim);
+    let signedClaim: SignedClaim = {
+      signature,
+      encoded,
+    };
     if (payeeSafeAddress) {
       await claimSettlementModule.executeSafe(moduleAddress, payeeSafeAddress, signedClaim, gasTokenAddress, {
         onTxnHash,
