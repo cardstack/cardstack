@@ -15,7 +15,7 @@ import { AddressZero } from '@ethersproject/constants';
 import GnosisSafeABI from '../contracts/abi/gnosis-safe';
 import { getAddress } from '../contracts/addresses';
 
-interface SignedClaim {
+export interface SignedClaim {
   signature: string;
   encoded: string;
 }
