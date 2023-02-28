@@ -1291,7 +1291,10 @@ CREATE TABLE public.scheduled_payments (
     user_address text NOT NULL,
     creation_transaction_error text,
     cancelation_transaction_error text,
-    gas_token_address text NOT NULL
+    gas_token_address text NOT NULL,
+    next_retry_attempt_at timestamp without time zone,
+    scheduled_payment_attempts_in_last_payment_cycle_count integer DEFAULT 0 NOT NULL,
+    last_scheduled_payment_attempt_id uuid
 );
 
 
