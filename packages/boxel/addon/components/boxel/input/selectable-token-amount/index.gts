@@ -20,6 +20,7 @@ interface Signature {
     errorMessage: string;
     token: SelectableToken | undefined;
     tokens: SelectableToken[];
+    searchEnabled?: boolean;
     onInput: (amount: string) => void;
     onChooseToken: (token: SelectableToken) => void;
     onBlurToken?: (event: FocusEvent) => void
@@ -60,6 +61,7 @@ export default class SelectableTokenAmount extends Component<Signature> {
           @options={{@tokens}}
           @selected={{@token}}
           @searchField="symbol"
+          @searchEnabled={{@searchEnabled}}
           @disabled={{@disabled}}
           @onChange={{@onChooseToken}}
           @onBlur={{this.onBlurToken}}

@@ -8,6 +8,8 @@ import Controller, { inject as controller } from '@ember/controller';
 import { inject as service } from '@ember/service';
 import { tracked } from '@glimmer/tracking';
 
+import config from '../config/environment';
+
 import '../css/schedule.css';
 
 export default class Schedule extends Controller {
@@ -52,6 +54,10 @@ export default class Schedule extends Controller {
           },
         }
       : undefined;
+  }
+
+  get versionString() {
+    return `v${config.APP.version}`;
   }
 }
 

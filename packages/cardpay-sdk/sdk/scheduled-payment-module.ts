@@ -106,6 +106,7 @@ export interface SchedulePaymentProgressListener {
 
 interface SchedulePaymentOptions {
   hubUrl?: string;
+  authToken?: string;
   listener?: SchedulePaymentProgressListener;
 }
 
@@ -973,8 +974,8 @@ export default class ScheduledPaymentModule {
   ) {
     options.listener?.onBeginHubAuthentication?.();
     let hubAuth = await getSDK('HubAuth', this.ethersProvider, options.hubUrl, this.signer);
-    let hubRootUrl = await hubAuth.getHubUrl();
-    let authToken = await hubAuth.authenticate();
+    let hubRootUrl = options.hubUrl ?? (await hubAuth.getHubUrl());
+    let authToken = options.authToken ?? (await hubAuth.authenticate());
     options.listener?.onEndHubAuthentication?.();
 
     let safeAddress: string;

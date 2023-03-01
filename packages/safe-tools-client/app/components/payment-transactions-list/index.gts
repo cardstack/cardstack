@@ -10,7 +10,9 @@ import BoxelMenu from '@cardstack/boxel/components/boxel/menu';
 import WalletService from '@cardstack/safe-tools-client/services/wallet';
 import NetworkService from '@cardstack/safe-tools-client/services/network';
 import HubAuthenticationService from '@cardstack/safe-tools-client/services/hub-authentication';
+import SafesService from '@cardstack/safe-tools-client/services/safes';
 import ScheduledPaymentsService, { ScheduledPaymentAttempt, type ScheduledPaymentAttemptStatus } from '@cardstack/safe-tools-client/services/scheduled-payments';
+import TokensService from '@cardstack/safe-tools-client/services/tokens';
 import PaymentOptionsDropdown from '@cardstack/safe-tools-client/components/payment-options-dropdown';
 import { inject as service } from '@ember/service';
 import { tracked } from '@glimmer/tracking';
@@ -24,7 +26,6 @@ import formatDate from '@cardstack/safe-tools-client/helpers/format-date';
 import { taskFor } from 'ember-concurrency-ts';
 import { task, TaskGenerator } from 'ember-concurrency';
 import paymentErrorMessage from '@cardstack/safe-tools-client/helpers/payment-error-message';
-import TokensService from '@cardstack/safe-tools-client/services/tokens';
 import { subDays } from 'date-fns';
 import { action } from '@ember/object';
 import map from 'ember-composable-helpers/helpers/map';
@@ -39,6 +40,7 @@ class PaymentTransactionsList extends Component {
   @service declare hubAuthentication: HubAuthenticationService;
   @service declare network: NetworkService;
   @service declare scheduledPayments: ScheduledPaymentsService;
+  @service declare safes: SafesService;
   @service declare tokens: TokensService;
   @service declare wallet: WalletService;
 
@@ -67,12 +69,13 @@ class PaymentTransactionsList extends Component {
     return this.scheduledPaymentAttemptsResource.value || []
   }
 
-  @task *loadScheduledPaymentAttemptsTask(chainId: number, status?: ScheduledPaymentAttemptStatus, startedAt?: Date): TaskGenerator<ScheduledPaymentAttempt[]> {
-    return yield this.scheduledPayments.fetchScheduledPaymentAttempts(chainId, status, startedAt);
+  @task *loadScheduledPaymentAttemptsTask(chainId: number, senderSafeAddress: string, status?: ScheduledPaymentAttemptStatus, startedAt?: Date): TaskGenerator<ScheduledPaymentAttempt[]> {
+    return yield this.scheduledPayments.fetchScheduledPaymentAttempts(chainId, senderSafeAddress, status, startedAt);
   }
 
   @use scheduledPaymentAttemptsResource = resource(() => {
-    if (!this.hubAuthentication.isAuthenticated) {
+    let senderSafeAddress = this.safes.currentSafe?.address;
+    if (!this.hubAuthentication.isAuthenticated || !senderSafeAddress) {
       return {
         error: false,
         isLoading: false,
@@ -90,7 +93,7 @@ class PaymentTransactionsList extends Component {
 
     (async () => {
       try {
-        state.value = await taskFor(this.loadScheduledPaymentAttemptsTask).perform(chainId, this.statusFilter.value ? this.statusFilter.value as ScheduledPaymentAttemptStatus : undefined, this.dateFilter.value);
+        state.value = await taskFor(this.loadScheduledPaymentAttemptsTask).perform(chainId, senderSafeAddress, this.statusFilter.value ? this.statusFilter.value as ScheduledPaymentAttemptStatus : undefined, this.dateFilter.value);
       } catch (error) {
         console.log(error);
         state.error = error;
@@ -187,13 +190,11 @@ class PaymentTransactionsList extends Component {
                   {{/if}}
                 </td>
                 <td class="table__cell" data-test-scheduled-payment-attempts-blockexplorer>
-                  {{#if paymentAttempt.transactionHash}}
-                    <BlockExplorerButton
-                      @networkSymbol={{this.network.symbol}}
-                      @transactionHash={{paymentAttempt.transactionHash}}
-                      data-test-scheduled-payment-attempts-item-explorer-button
-                    />
-                  {{/if}}
+                  <BlockExplorerButton
+                    @networkSymbol={{this.network.symbol}}
+                    @transactionHash={{paymentAttempt.transactionHash}}
+                    data-test-scheduled-payment-attempts-item-explorer-button
+                  />
                 </td>
                 {{!-- TODO: only show options for < 3 attempt, when this info is stored --}}
                 {{#if (and (eq paymentAttempt.status 'failed') (not paymentAttempt.scheduledPayment.isCanceled))}}
