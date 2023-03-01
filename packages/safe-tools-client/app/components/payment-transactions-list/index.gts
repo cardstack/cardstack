@@ -154,6 +154,7 @@ class PaymentTransactionsList extends Component {
               <th class="table__cell">Amount</th>
               <th class="table__cell">Status</th>
               <th class="table__cell">View details</th>
+              <th class="table__cell">Actions</th>
               <th></th>
             </tr>
           </thead>
@@ -196,10 +197,12 @@ class PaymentTransactionsList extends Component {
                     data-test-scheduled-payment-attempts-item-explorer-button
                   />
                 </td>
-                {{!-- TODO: only show options for < 3 attempt, when this info is stored --}}
-                {{#if (and (eq paymentAttempt.status 'failed') (not paymentAttempt.scheduledPayment.isCanceled))}}
-                  <PaymentOptionsDropdown @scheduledPayment={{paymentAttempt.scheduledPayment}}/>
-                {{/if}}
+                <td class="table__cell">
+                  {{!-- TODO: only show options for < 3 attempt, when this info is stored --}}
+                  {{#if (and (eq paymentAttempt.status 'failed') (not paymentAttempt.scheduledPayment.isCanceled))}}
+                    <PaymentOptionsDropdown @scheduledPayment={{paymentAttempt.scheduledPayment}}/>
+                  {{/if}}
+                </td>
               </tr>
             {{/each}}
           </tbody>

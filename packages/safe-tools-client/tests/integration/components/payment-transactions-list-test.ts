@@ -200,11 +200,12 @@ module('Integration | Component | payment-transactions-list', function (hooks) {
       .dom(
         '[data-test-scheduled-payment-attempts-item="0"] [data-test-scheduled-payment-attempts-item-explorer-button]'
       )
-      .hasText('View on Etherscan')
+      .hasText('Etherscan')
       .hasAttribute(
         'href',
         'https://etherscan.io/tx/0x6f7c54719c0901e30ef018206c37df4daa059224549a08d55acb3360f01094e2'
-      );
+      )
+      .hasAttribute('title', 'View transaction on Etherscan');
   });
 
   test('it can filter by status', async function (assert) {
@@ -213,7 +214,6 @@ module('Integration | Component | payment-transactions-list', function (hooks) {
     await render(hbs`
       <PaymentTransactionsList />
     `);
-
     assert
       .dom('[data-test-scheduled-payment-attempts-item]')
       .exists({ count: 2 });
