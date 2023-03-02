@@ -36,6 +36,20 @@ type FilterItem = {
   value: any | undefined
 };
 
+function ordinalize(n: number) {
+  if (Math.floor(n / 10) === 1) {
+    return n + 'th';
+  } else if (n % 10 === 1) {
+    return n + 'st';
+  } else if (n % 10 === 2) {
+    return n + 'nd';
+  } else if (n % 10 === 3) {
+    return n + 'rd';
+  } else {
+    return n + 'th';
+  }
+}
+
 class PaymentTransactionsList extends Component {
   @service declare hubAuthentication: HubAuthenticationService;
   @service declare network: NetworkService;
@@ -148,8 +162,8 @@ class PaymentTransactionsList extends Component {
         <table class="table" data-test-scheduled-payment-attempts>
           <thead class="table__header">
             <tr class="table__row">
-              <th class="table__cell">Time</th>
-              <th class="table__cell">Date</th>
+              <th class="table__cell">Transaction Date</th>
+              <th class="table__cell">Scheduled For</th>
               <th class="table__cell">To</th>
               <th class="table__cell">Amount</th>
               <th class="table__cell">Status</th>
@@ -162,11 +176,18 @@ class PaymentTransactionsList extends Component {
           <tbody>
             {{#each this.paymentAttempts as |paymentAttempt index|}}
               <tr class="table__row" data-test-scheduled-payment-attempts-item={{index}}>
-                <td class="table__cell" data-test-scheduled-payment-attempts-item-time>
-                  {{formatDate paymentAttempt.startedAt "HH:mm:ss"}}
-                </td>
-                <td class="table__cell" data-test-scheduled-payment-attempts-item-date>
+                <td class="table__cell" data-test-scheduled-payment-attempts-item-timestamp>
+                  {{formatDate paymentAttempt.startedAt "HH:mm:ss"}}<br>
                   {{formatDate paymentAttempt.startedAt "dd/MM/yyyy"}}
+                </td>
+                <td class="table__cell" data-test-scheduled-payment-attempts-item-scheduled>
+                  {{#if paymentAttempt.scheduledPayment.recurringDayOfMonth}}
+                    The {{ordinalize paymentAttempt.scheduledPayment.recurringDayOfMonth}} of each month
+                    <div class="payment-transactions-list__recurring">Recurring</div>
+                  {{else}}
+                    {{formatDate paymentAttempt.scheduledPayment.payAt 'HH:mm:ss dd/MM/yyyy'}}
+                    <div class="payment-transactions-list__one-time">One-time</div>
+                  {{/if}}
                 </td>
                 <td class="table__cell blockchain-address transactions-table-item-payee" data-test-scheduled-payment-attempts-item-payee>
                   {{paymentAttempt.scheduledPayment.payeeAddress}}

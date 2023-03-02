@@ -7,7 +7,7 @@ import {
 import TokenQuantity from '@cardstack/safe-tools-client/utils/token-quantity';
 import Service from '@ember/service';
 import { click, render, TestContext } from '@ember/test-helpers';
-import { subDays, addMinutes, format } from 'date-fns';
+import { addYears, subDays, addMinutes, format } from 'date-fns';
 import { BigNumber } from 'ethers';
 
 import hbs from 'htmlbars-inline-precompile';
@@ -68,6 +68,8 @@ class ScheduledPaymentsStub extends Service {
             chainId,
             payeeAddress: '0xeBCC5516d44FFf5E9aBa2AcaeB65BbB49bC3EBe1',
             payAt: addMinutes(subDays(now, 10), 120),
+            recurringDayOfMonth: undefined,
+            recurringUntil: undefined,
           },
         },
       ]);
@@ -92,6 +94,8 @@ class ScheduledPaymentsStub extends Service {
             senderSafeAddress,
             payeeAddress: '0xeBCC5516d44FFf5E9aBa2AcaeB65BbB49bC3EBe1',
             payAt: addMinutes(subDays(now, 10), 120),
+            recurringDayOfMonth: undefined,
+            recurringUntil: undefined,
           },
         },
         {
@@ -110,6 +114,8 @@ class ScheduledPaymentsStub extends Service {
             senderSafeAddress,
             payeeAddress: '0xeBCC5516d44FFf5E9aBa2AcaeB65BbB49bC3EBe1',
             payAt: addMinutes(subDays(now, 20), 120),
+            recurringDayOfMonth: subDays(now, 20).getDate(),
+            recurringUntil: addYears(now, 1),
           },
         },
         {
@@ -128,6 +134,8 @@ class ScheduledPaymentsStub extends Service {
             senderSafeAddress,
             payeeAddress: '0xeBCC5516d44FFf5E9aBa2AcaeB65BbB49bC3EBe1',
             payAt: addMinutes(subDays(now, 60), 120),
+            recurringDayOfMonth: undefined,
+            recurringUntil: undefined,
           },
         },
       ]
@@ -164,15 +172,15 @@ module('Integration | Component | payment-transactions-list', function (hooks) {
 
     assert
       .dom(
-        '[data-test-scheduled-payment-attempts-item="0"] [data-test-scheduled-payment-attempts-item-time]'
+        '[data-test-scheduled-payment-attempts-item="0"] [data-test-scheduled-payment-attempts-item-timestamp]'
       )
-      .hasText(format(now, 'HH:mm:ss'));
+      .containsText(format(now, 'HH:mm:ss'));
 
     assert
       .dom(
-        '[data-test-scheduled-payment-attempts-item="0"] [data-test-scheduled-payment-attempts-item-date]'
+        '[data-test-scheduled-payment-attempts-item="0"] [data-test-scheduled-payment-attempts-item-timestamp]'
       )
-      .hasText(format(subDays(now, 10), 'dd/MM/yyyy'));
+      .containsText(format(subDays(now, 10), 'dd/MM/yyyy'));
 
     assert
       .dom(
