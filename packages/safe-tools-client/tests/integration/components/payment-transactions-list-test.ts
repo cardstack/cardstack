@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
+import SchedulePaymentSDKService from '@cardstack/safe-tools-client/services/scheduled-payment-sdk';
 import {
   ScheduledPaymentAttempt,
   type ScheduledPaymentAttemptStatus,
@@ -25,6 +26,7 @@ class SafesServiceStub extends Service {
   currentSafe = {
     address: '0xc0ffee254729296a45a3885639AC7E10F9d54979',
   };
+  reloadTokenBalances() {}
 }
 
 let returnEmptyScheduledPaymentAttempts = false;
@@ -200,11 +202,12 @@ module('Integration | Component | payment-transactions-list', function (hooks) {
       .dom(
         '[data-test-scheduled-payment-attempts-item="0"] [data-test-scheduled-payment-attempts-item-explorer-button]'
       )
-      .hasText('View on Etherscan')
+      .hasText('Etherscan')
       .hasAttribute(
         'href',
         'https://etherscan.io/tx/0x6f7c54719c0901e30ef018206c37df4daa059224549a08d55acb3360f01094e2'
-      );
+      )
+      .hasAttribute('title', 'View transaction on Etherscan');
   });
 
   test('it can filter by status', async function (assert) {
@@ -213,7 +216,6 @@ module('Integration | Component | payment-transactions-list', function (hooks) {
     await render(hbs`
       <PaymentTransactionsList />
     `);
-
     assert
       .dom('[data-test-scheduled-payment-attempts-item]')
       .exists({ count: 2 });
@@ -301,5 +303,52 @@ module('Integration | Component | payment-transactions-list', function (hooks) {
       document.querySelectorAll(`.boxel-button--with-tooltip`).length,
       1
     );
+  });
+
+  test('It can cancel incomplete payment', async function (assert) {
+    this.set('wallet', { isConnected: true });
+    const scheduledPaymentSdkService = this.owner.lookup(
+      'service:scheduled-payment-sdk'
+    ) as SchedulePaymentSDKService;
+
+    scheduledPaymentSdkService.cancelScheduledPayment = (): Promise<void> => {
+      return Promise.resolve();
+    };
+
+    await render(hbs`
+      <PaymentTransactionsList />
+    `);
+    await click(
+      '[data-test-scheduled-payment-attempts-item="1"] [data-test-scheduled-payment-card-options-button]'
+    );
+    await click('[data-test-boxel-menu-item-text="Cancel Payment"]');
+    await click('[data-test-cancel-payment-button]');
+
+    assert
+      .dom('[data-test-cancel-scheduled-payment-modal]')
+      .includesText(
+        "Your scheduled payment was canceled and removed successfully, and it won't be attempted in the future."
+      );
+    assert.dom('[data-test-cancel-payment-button]').doesNotExist();
+  });
+
+  test('It cannot cancel a completed payment', async function (assert) {
+    const scheduledPaymentSdkService = this.owner.lookup(
+      'service:scheduled-payment-sdk'
+    ) as SchedulePaymentSDKService;
+
+    scheduledPaymentSdkService.cancelScheduledPayment = (): Promise<void> => {
+      return Promise.resolve();
+    };
+
+    this.set('wallet', { isConnected: true });
+
+    await render(hbs`
+      <PaymentTransactionsList />
+    `);
+    await click(
+      '[data-test-scheduled-payment-attempts-item="0"] [data-test-scheduled-payment-card-options-button]'
+    );
+    assert.dom('.boxel-menu__item--disabled').containsText('Cancel Payment');
   });
 });
