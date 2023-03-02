@@ -12,6 +12,7 @@ import { ContractOptions } from 'web3-eth-contract';
 import { signSafeTx } from './utils/signing-utils';
 /* eslint-disable node/no-extraneous-import */
 import { AddressZero } from '@ethersproject/constants';
+import AccountRegistrationABI from '../contracts/abi/account-registration-nft';
 import { getAddress } from '../contracts/addresses';
 
 export interface SignedClaim {
@@ -289,6 +290,97 @@ export default class ClaimSettlementModule extends SafeModule {
       await onTxnHash(txnHash);
     }
     return await waitUntilTransactionMined(this.ethersProvider, txnHash);
+  }
+
+  async registerAccount(txnHash: string): Promise<SuccessfulTransactionReceipt>;
+  async registerAccount(
+    safeAddress: string,
+    recipient?: string,
+    gasTokenAddress?: string,
+    txnOptions?: TransactionOptions,
+    contractOptions?: ContractOptions
+  ): Promise<SuccessfulTransactionReceipt>;
+  async registerAccount(
+    safeAddressOrTxnHash: string,
+    recipient?: string,
+    gasTokenAddress?: string,
+    txnOptions?: TransactionOptions,
+    contractOptions?: ContractOptions
+  ): Promise<SuccessfulTransactionReceipt> {
+    //TODO: Multi-signature. Only supports adding single validator only
+    let safeAddress = safeAddressOrTxnHash;
+    if (!safeAddress) {
+      throw new Error('safeAddress must be specified');
+    }
+    let accountRegistrationAddress = await getAddress('accountRegistrationNft', this.ethersProvider);
+
+    let { nonce, onNonce, onTxnHash } = txnOptions ?? {};
+    let accountRegistration = new Contract(accountRegistrationAddress, AccountRegistrationABI, this.ethersProvider);
+    let signer = this.signer ? this.signer : this.ethersProvider.getSigner();
+    let from = contractOptions?.from ?? (await signer.getAddress());
+
+    await accountRegistration.callStatic.register(safeAddress, recipient ?? safeAddress, { from: safeAddress });
+    let data = await accountRegistration.interface.encodeFunctionData('register', [
+      safeAddress,
+      recipient ?? safeAddress,
+    ]);
+
+    let estimate = await gasEstimate(
+      this.ethersProvider,
+      safeAddress,
+      accountRegistrationAddress,
+      '0',
+      data,
+      Operation.CALL,
+      gasTokenAddress ?? AddressZero,
+      true
+    );
+
+    if (nonce == null) {
+      nonce = getNextNonceFromEstimate(estimate);
+      if (typeof onNonce === 'function') {
+        onNonce(nonce);
+      }
+    }
+
+    let gnosisTxn = await executeTransaction(
+      this.ethersProvider,
+      safeAddress,
+      accountRegistrationAddress,
+      data,
+      Operation.CALL,
+      estimate,
+      nonce,
+      await signSafeTx(
+        this.ethersProvider,
+        safeAddress,
+        accountRegistrationAddress,
+        data,
+        Operation.CALL,
+        estimate,
+        nonce,
+        from,
+        this.signer
+      )
+    );
+
+    let txnHash = gnosisTxn.ethereumTx.txHash;
+    if (typeof onTxnHash === 'function') {
+      await onTxnHash(txnHash);
+    }
+    return await waitUntilTransactionMined(this.ethersProvider, txnHash);
+  }
+
+  async tokenIds(ownerAddress: string) {
+    let accountRegistrationAddress = await getAddress('accountRegistrationNft', this.ethersProvider);
+    let accountRegistration = new Contract(accountRegistrationAddress, AccountRegistrationABI, this.ethersProvider);
+    let count = (await accountRegistration.balanceOf(ownerAddress)).toNumber();
+    let promises = [];
+    for (let i = 0; i < count; i++) {
+      promises.push(accountRegistration.tokenOfOwnerByIndex(ownerAddress, i));
+    }
+    let tokenIds = (await Promise.all(promises)).map((o) => o.toHexString());
+    return tokenIds;
   }
 
   async sign(claim: Claim): Promise<SignedClaim> {
