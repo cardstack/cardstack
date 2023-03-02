@@ -38,7 +38,10 @@ export default class ScheduledPaymentCard extends Component<Signature> {
           </div>
         </div>
       </div>
-      <PaymentOptionsDropdown @scheduledPayment={{@scheduledPayment}}/>
+      <PaymentOptionsDropdown
+        @scheduledPayment={{@scheduledPayment}}
+        @canCancel={{true}}
+      />
     </BoxelCardContainer>
   </template>
 }

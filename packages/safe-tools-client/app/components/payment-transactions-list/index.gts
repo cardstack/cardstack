@@ -198,10 +198,10 @@ class PaymentTransactionsList extends Component {
                   />
                 </td>
                 <td class="table__cell">
-                  {{!-- TODO: only show options for < 3 attempt, when this info is stored --}}
-                  {{#if (and (eq paymentAttempt.status 'failed') (not paymentAttempt.scheduledPayment.isCanceled))}}
-                    <PaymentOptionsDropdown @scheduledPayment={{paymentAttempt.scheduledPayment}}/>
-                  {{/if}}
+                  <PaymentOptionsDropdown
+                    @scheduledPayment={{paymentAttempt.scheduledPayment}}
+                    @canCancel={{and (eq paymentAttempt.status 'failed') (not paymentAttempt.scheduledPayment.isCanceled)}}
+                  />
                 </td>
               </tr>
             {{/each}}

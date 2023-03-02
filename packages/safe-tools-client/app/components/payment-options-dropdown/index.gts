@@ -24,6 +24,7 @@ import BoxelMenu from '@cardstack/boxel/components/boxel/menu';
 import { type ActionChinState } from '@cardstack/boxel/components/boxel/action-chin/state'
 import menuItem from '@cardstack/boxel/helpers/menu-item'
 import { array, fn } from '@ember/helper';
+import not from 'ember-truth-helpers/helpers/not';
 import set from 'ember-set-helper/helpers/set';
 import ScheduledPaymentsService from '@cardstack/safe-tools-client/services/scheduled-payments';
 import { TaskGenerator } from 'ember-concurrency';
@@ -36,6 +37,7 @@ interface Signature {
   Element: HTMLElement;
   Args: {
     scheduledPayment: ScheduledPaymentBase;
+    canCancel: boolean;
   }
 }
 
@@ -102,7 +104,7 @@ export default class PaymentOptionsDropdown extends Component<Signature> {
           @closeMenu={{dd.close}}
           @items={{array
             (menuItem
-              "Cancel Payment" (set this 'isCancelPaymentModalOpen' true)
+              "Cancel Payment" (if this.args.canCancel (set this 'isCancelPaymentModalOpen' true) noop) disabled=(not this.args.canCancel)
             )
           }}
         />
