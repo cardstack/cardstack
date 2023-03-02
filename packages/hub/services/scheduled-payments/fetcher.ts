@@ -1,6 +1,6 @@
 import { inject } from '@cardstack/di';
 import { ScheduledPayment } from '@prisma/client';
-import { Prisma } from '@prisma/client';
+import { addDays, addMinutes } from 'date-fns';
 
 export default class ScheduledPaymentsFetcherService {
   prismaManager = inject('prisma-manager', { as: 'prismaManager' });
@@ -21,12 +21,12 @@ export default class ScheduledPaymentsFetcherService {
   // between attempts is defined in the calculateRetryBackoffsInMinutes method.
 
   // validForDays could be different for each chainId, so we pass them as parameters (defined in scheduledPaymentConfig contract)
-  async fetchScheduledPayments(chainId: number, validForDays: number, limit = 10): Promise<ScheduledPayment[]> {
+  async fetchScheduledPayments(chainId: number, limit = 10): Promise<ScheduledPayment[]> {
     let prisma = await this.prismaManager.getClient();
     let now = this.clock.utcNow();
     let nowString = now.toISOString(); // We use ISO string to make sure we operate on UTC dates only. Otherwise Prisma will use local time zone.
-    let retryBackoffsInMinutes = this.calculateRetryBackoffsInMinutes(validForDays);
-    let results: [{ id: string; started_at: Date }] = await prisma.$queryRaw`SELECT 
+
+    let results: [{ id: string; started_at: Date }] = await prisma.$queryRaw`SELECT
         scheduled_payments.id AS id,
         last_failed_payment_attempt.started_at
       FROM 
@@ -49,10 +49,10 @@ export default class ScheduledPaymentsFetcherService {
           AND scheduled_payments.creation_block_number > 0
           AND scheduled_payments.pay_at > DATE_TRUNC('day', ${nowString}::timestamp)::date - scheduled_payments.valid_for_days
           AND scheduled_payments.pay_at <= ${nowString}::timestamp
-          AND COALESCE(failed_attempts_count, 0) < ${retryBackoffsInMinutes.length}
-          AND ${nowString}::timestamp >= (COALESCE(last_failed_payment_attempt.started_at, to_timestamp(0)) + (interval '1 minute' * (ARRAY[${Prisma.join(
-      retryBackoffsInMinutes
-    )}])[COALESCE(failed_attempts_count + 1, 1)]))
+          AND (
+            (scheduled_payments.next_retry_attempt_at IS NULL AND scheduled_payments.scheduled_payment_attempts_in_last_payment_cycle_count = 0)
+            OR ${nowString}::timestamp >= scheduled_payments.next_retry_attempt_at
+          )
           AND (
             (
               scheduled_payments.recurring_day_of_month IS NULL
@@ -111,6 +111,42 @@ export default class ScheduledPaymentsFetcherService {
     let variablePartChunksCount = Math.floor((validForDays * 24 * ONE_HOUR - fixedPartSum) / TWELVE_HOURS);
     let variablePart = Array(variablePartChunksCount).fill(TWELVE_HOURS); // Then every 12 hours until we reach the end of validForDays
     return [...fixedPart, ...variablePart];
+  }
+
+  calculateNextRetryAttemptDate(scheduledPayment: ScheduledPayment) {
+    let now = this.clock.utcNow();
+
+    // Payment expired
+    if (addDays(scheduledPayment.payAt!, scheduledPayment.validForDays!) <= now) {
+      return null;
+    }
+
+    let backoffMinutes = this.calculateRetryBackoffsInMinutes(scheduledPayment.validForDays!);
+
+    // Can potentially happen if we change the exponential backoff schedule during the period when the payment is failing
+    if (scheduledPayment.scheduledPaymentAttemptsInLastPaymentCycleCount >= backoffMinutes.length) {
+      return null;
+    }
+
+    let minutesToWait = backoffMinutes[scheduledPayment.scheduledPaymentAttemptsInLastPaymentCycleCount];
+
+    let nextAttempt = addMinutes(now, minutesToWait);
+
+    return nextAttempt;
+  }
+
+  retriesLeft(scheduledPayment: ScheduledPayment) {
+    // This means there is no attempt yet in the last payment cycle (in case of recurring payment), or the last attempt was successful
+    // In this case, there is no need to retry the payment
+    if (
+      scheduledPayment.scheduledPaymentAttemptsInLastPaymentCycleCount === 0 &&
+      !scheduledPayment.nextRetryAttemptAt
+    ) {
+      return null;
+    }
+
+    let backoffMinutes = this.calculateRetryBackoffsInMinutes(scheduledPayment.validForDays!);
+    return Math.max(0, backoffMinutes.length - scheduledPayment.scheduledPaymentAttemptsInLastPaymentCycleCount);
   }
 }
 
