@@ -472,7 +472,7 @@ module('Acceptance | scheduling', function (hooks) {
             ),
             'max-gas-price': String(
               scheduledPaymentCreations[0].data.attributes['max-gas-price']
-            )
+            ),
           },
         },
       ];
