@@ -30,6 +30,7 @@ import { subDays } from 'date-fns';
 import { action } from '@ember/object';
 import map from 'ember-composable-helpers/helpers/map';
 import BoxelActionContainer from '@cardstack/boxel/components/boxel/action-container';
+import TruncatedBlockchainAddress from '@cardstack/safe-tools-client/components/truncated-blockchain-address';
 
 type FilterItem = {
   display: string,
@@ -190,7 +191,7 @@ class PaymentTransactionsList extends Component {
                   {{/if}}
                 </td>
                 <td class="table__cell blockchain-address transactions-table-item-payee" data-test-scheduled-payment-attempts-item-payee>
-                  {{paymentAttempt.scheduledPayment.payeeAddress}}
+                  <TruncatedBlockchainAddress @address={{paymentAttempt.scheduledPayment.payeeAddress}} @isCopyable={{true}} />
                 </td>
                 <td class="table__cell" data-test-scheduled-payment-attempts-item-amount>
                   <strong>{{paymentAttempt.scheduledPayment.paymentTokenQuantity.displayable}}</strong>

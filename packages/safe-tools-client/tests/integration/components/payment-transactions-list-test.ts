@@ -186,7 +186,7 @@ module('Integration | Component | payment-transactions-list', function (hooks) {
       .dom(
         '[data-test-scheduled-payment-attempts-item="0"] [data-test-scheduled-payment-attempts-item-payee]'
       )
-      .hasText('0xeBCC5516d44FFf5E9aBa2AcaeB65BbB49bC3EBe1');
+      .containsText('0xeBCC...EBe1');
 
     assert
       .dom(
