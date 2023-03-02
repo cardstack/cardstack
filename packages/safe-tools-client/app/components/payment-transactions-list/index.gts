@@ -182,7 +182,7 @@ class PaymentTransactionsList extends Component {
                     {{else}}
                       🔴 <span class="transactions-table-item-status-text">Failed</span>
                       <span class="transactions-table-item-status-failure-reason">
-                        ({{paymentErrorMessage paymentAttempt.failureReason paymentAttempt.executionGasPrice paymentAttempt.scheduledPayment.gasToken.decimals}})
+                        ({{paymentErrorMessage paymentAttempt.failureReason paymentAttempt.scheduledPayment.maxGasPrice paymentAttempt.executionGasPrice paymentAttempt.scheduledPayment.gasToken.decimals}})
                        </span>
                     {{/if}}
                   {{else}}

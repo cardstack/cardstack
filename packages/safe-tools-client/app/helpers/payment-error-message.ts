@@ -2,7 +2,7 @@ import { nativeUnitsToDecimal } from '@cardstack/safe-tools-client/helpers/nativ
 import { helper } from '@ember/component/helper';
 import { BigNumber } from 'ethers';
 
-type PositionalArgs = [string, BigNumber?, number?];
+type PositionalArgs = [string, BigNumber?, BigNumber?, number?];
 
 interface Signature {
   Args: {
@@ -13,9 +13,14 @@ interface Signature {
 
 export function paymentErrorMessage([
   failureReason,
+  maxGasPrice,
   executionGasPrice,
   decimals,
 ]: PositionalArgs) {
+  const maxGasPriceInBiggestUnit =
+    maxGasPrice && decimals
+      ? nativeUnitsToDecimal([maxGasPrice, decimals, 3])
+      : undefined;
   const executionGasPriceInBiggestUnit =
     executionGasPrice && decimals
       ? nativeUnitsToDecimal([executionGasPrice, decimals, 3])
@@ -29,9 +34,11 @@ export function paymentErrorMessage([
       // The user can't do anything to fix it but report it to support.
       return 'attempted at the incorrect time - contact support';
     if (failureReason.includes('ExceedMaxGasPrice'))
-      return executionGasPriceInBiggestUnit
-        ? `gas price exceeded the maximum specified, execution gas price: ${executionGasPriceInBiggestUnit}`
-        : 'gas price exceeded the maximum specified';
+      return `Gas cost exceeded the maximum you set. ${
+        maxGasPriceInBiggestUnit && executionGasPriceInBiggestUnit
+          ? `Actual: ${executionGasPriceInBiggestUnit} / Max allowed: ${maxGasPriceInBiggestUnit}`
+          : ''
+      }`;
     if (failureReason.includes('PaymentExecutionFailed'))
       // This error covers 3 different failure scenarios and it is currently not possible to know which we are
       // dealing with. It means insufficient funds for either of the: transfer amount, gas fee, service fee

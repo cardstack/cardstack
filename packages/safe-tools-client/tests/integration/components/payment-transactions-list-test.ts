@@ -58,7 +58,7 @@ class ScheduledPaymentsStub extends Service {
           status: 'failed',
           failureReason: '',
           transactionHash: undefined,
-          executionGasPrice: BigNumber.from('1000'),
+          executionGasPrice: BigNumber.from('10000'),
           scheduledPayment: {
             id: '01234',
             paymentTokenQuantity: addPaymentTokenQuantity('10000000'),
@@ -68,6 +68,7 @@ class ScheduledPaymentsStub extends Service {
             chainId,
             payeeAddress: '0xeBCC5516d44FFf5E9aBa2AcaeB65BbB49bC3EBe1',
             payAt: addMinutes(subDays(now, 10), 120),
+            maxGasPrice: BigNumber.from('10000'),
           },
         },
       ]);
@@ -79,7 +80,7 @@ class ScheduledPaymentsStub extends Service {
           status: 'failed',
           failureReason: 'ExceedMaxGasPrice',
           transactionHash: undefined,
-          executionGasPrice: BigNumber.from('1000'),
+          executionGasPrice: BigNumber.from('10000'),
           scheduledPayment: {
             id: '01234',
             paymentTokenQuantity: addPaymentTokenQuantity('10000000'),
@@ -89,6 +90,7 @@ class ScheduledPaymentsStub extends Service {
             chainId,
             payeeAddress: '0xeBCC5516d44FFf5E9aBa2AcaeB65BbB49bC3EBe1',
             payAt: addMinutes(subDays(now, 10), 120),
+            maxGasPrice: BigNumber.from('5000'),
           },
         },
       ]);
@@ -101,7 +103,7 @@ class ScheduledPaymentsStub extends Service {
           endedAt: addMinutes(subDays(now, 10), 120),
           status: 'succeeded',
           failureReason: '',
-          executionGasPrice: BigNumber.from('1000'),
+          executionGasPrice: BigNumber.from('10000'),
           transactionHash:
             '0x6f7c54719c0901e30ef018206c37df4daa059224549a08d55acb3360f01094e2',
           scheduledPayment: {
@@ -114,13 +116,14 @@ class ScheduledPaymentsStub extends Service {
             senderSafeAddress,
             payeeAddress: '0xeBCC5516d44FFf5E9aBa2AcaeB65BbB49bC3EBe1',
             payAt: addMinutes(subDays(now, 10), 120),
+            maxGasPrice: BigNumber.from('10000'),
           },
         },
         {
           startedAt: subDays(now, 20),
           endedAt: addMinutes(subDays(now, 20), 120),
           status: 'failed',
-          executionGasPrice: BigNumber.from('1000'),
+          executionGasPrice: BigNumber.from('10000'),
           failureReason: 'PaymentExecutionFailed',
           transactionHash: '0x123',
           scheduledPayment: {
@@ -133,6 +136,7 @@ class ScheduledPaymentsStub extends Service {
             senderSafeAddress,
             payeeAddress: '0xeBCC5516d44FFf5E9aBa2AcaeB65BbB49bC3EBe1',
             payAt: addMinutes(subDays(now, 20), 120),
+            maxGasPrice: BigNumber.from('10000'),
           },
         },
         {
@@ -140,7 +144,7 @@ class ScheduledPaymentsStub extends Service {
           endedAt: addMinutes(subDays(now, 60), 120),
           status: 'succeeded',
           failureReason: '',
-          executionGasPrice: BigNumber.from('1000'),
+          executionGasPrice: BigNumber.from('10000'),
           transactionHash: '0x123',
           scheduledPayment: {
             id: '323232',
@@ -152,6 +156,7 @@ class ScheduledPaymentsStub extends Service {
             senderSafeAddress,
             payeeAddress: '0xeBCC5516d44FFf5E9aBa2AcaeB65BbB49bC3EBe1',
             payAt: addMinutes(subDays(now, 60), 120),
+            maxGasPrice: BigNumber.from('10000'),
           },
         },
       ]

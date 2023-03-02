@@ -24,12 +24,12 @@ export interface ScheduledPaymentBase {
   payeeAddress: string;
   payAt: Date;
   chainId: number;
+  maxGasPrice: BigNumber;
   isCanceled?: boolean;
 }
 
 export interface ScheduledPayment extends ScheduledPaymentBase {
   executionGasEstimation: string;
-  maxGasPrice: string;
   salt: string;
   spHash: string;
   senderSafeAddress: string;
@@ -90,6 +90,7 @@ export interface ScheduledPaymentAttemptIncludedData {
   'payee-address': string;
   'pay-at': string;
   'chain-id': string;
+  'max-gas-price': string;
   'canceled-at': string;
 }
 
@@ -218,6 +219,7 @@ export default class ScheduledPaymentsService extends Service {
           chainId: Number(scheduledPayment!['chain-id']),
           payeeAddress: scheduledPayment!['payee-address'],
           payAt: new Date(scheduledPayment!['pay-at']),
+          maxGasPrice: BigNumber.from(scheduledPayment!['max-gas-price']),
           isCanceled: Boolean(scheduledPayment!['canceled-at']),
         },
       };
@@ -344,7 +346,7 @@ export default class ScheduledPaymentsService extends Service {
         payeeAddress: data.attributes['payee-address'],
         payAt: new Date(data.attributes['pay-at']),
         executionGasEstimation: data.attributes['execution-gas-estimation'],
-        maxGasPrice: data.attributes['max-gas-price'],
+        maxGasPrice: BigNumber.from(data.attributes['max-gas-price']),
         salt: data.attributes['salt'],
         spHash: data.attributes['sp-hash'],
         recurringDayOfMonth: Number(data.attributes['recurring-day-of-month']),
