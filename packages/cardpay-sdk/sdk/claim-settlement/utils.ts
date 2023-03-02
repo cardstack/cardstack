@@ -60,13 +60,28 @@ export class TimeRangeSeconds extends SolidityStruct {
   }
 }
 
+class Action extends SolidityStruct {
+  constructor(structName: string, properties: { name: string; type: string }[], values: any[]) {
+    super(structName, properties, values);
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  defaultExtraData(): { types: string[]; data: any[] } {
+    return {
+      types: [],
+      data: [],
+    };
+  }
+}
+
 export class Address extends SolidityStruct {
   constructor(caller: string) {
     super('Address', [{ name: 'caller', type: 'address' }], [caller]);
   }
 }
 
-export class TransferERC20ToCaller extends SolidityStruct {
+export class TransferERC20ToCaller extends Action {
+  amount: BigNumber;
   constructor(token: string, amount: BigNumber) {
     super(
       'TransferERC20ToCaller',
@@ -76,6 +91,14 @@ export class TransferERC20ToCaller extends SolidityStruct {
       ],
       [token, amount]
     );
+    this.amount = amount;
+  }
+
+  defaultExtraData() {
+    return {
+      types: ['uint256'],
+      data: [this.amount],
+    };
   }
 }
 
@@ -92,7 +115,7 @@ export class NFTOwner extends SolidityStruct {
   }
 }
 
-export class TransferNFTToCaller extends SolidityStruct {
+export class TransferNFTToCaller extends Action {
   constructor(token: string, tokenId: BigNumber) {
     super(
       'TransferNFTToCaller',
@@ -111,7 +134,7 @@ export class Claim {
   address: string;
   stateCheck: SolidityStruct;
   callerCheck: SolidityStruct;
-  action: SolidityStruct;
+  action: Action;
 
   constructor(
     id: string,
@@ -119,7 +142,7 @@ export class Claim {
     address: string,
     stateCheck: SolidityStruct,
     callerCheck: SolidityStruct,
-    action: SolidityStruct
+    action: Action
   ) {
     this.id = id;
     this.chainId = chainId;
@@ -151,8 +174,9 @@ export class Claim {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  abiEncode(extraTypes: string[] = [], extraData: any[] = []) {
+  abiEncode(extraActionData?: { types: string[]; data: any[] }) {
     const abiCoder = new utils.AbiCoder();
+    const actionData = extraActionData ? extraActionData : this.action.defaultExtraData();
     return abiCoder.encode(
       ['bytes32', 'bytes32', 'bytes32', 'bytes', 'bytes32', 'bytes', 'bytes32', 'bytes', 'bytes'],
       [
@@ -164,7 +188,7 @@ export class Claim {
         this.callerCheck.abiEncode(),
         this.action.typeHash(),
         this.action.abiEncode(),
-        abiCoder.encode(extraTypes, extraData),
+        abiCoder.encode(actionData.types, actionData.data),
       ]
     );
   }
