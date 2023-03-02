@@ -470,6 +470,9 @@ module('Acceptance | scheduling', function (hooks) {
             'token-address': String(
               scheduledPaymentCreations[0].data.attributes['token-address']
             ),
+            'max-gas-price': String(
+              scheduledPaymentCreations[0].data.attributes['max-gas-price']
+            )
           },
         },
       ];

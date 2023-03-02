@@ -345,7 +345,7 @@ module('Integration | Component | payment-transactions-list', function (hooks) {
     assert
       .dom('.transactions-table-item-status-failure-reason')
       .hasText(
-        '(gas price exceeded the maximum specified, execution gas price: 0.001)'
+        '(Gas cost exceeded the maximum you set. Actual: 0.010 / Max allowed: 0.005)'
       );
   });
 });
