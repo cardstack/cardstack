@@ -1,6 +1,8 @@
+import { nativeUnitsToDecimal } from '@cardstack/safe-tools-client/helpers/native-units-to-decimal';
 import { helper } from '@ember/component/helper';
+import { BigNumber } from 'ethers';
 
-type PositionalArgs = [string];
+type PositionalArgs = [string, BigNumber?, BigNumber?, number?];
 
 interface Signature {
   Args: {
@@ -9,7 +11,21 @@ interface Signature {
   Return: string;
 }
 
-export function paymentErrorMessage([failureReason]: PositionalArgs) {
+export function paymentErrorMessage([
+  failureReason,
+  maxGasPrice,
+  executionGasPrice,
+  decimals,
+]: PositionalArgs) {
+  const maxGasPriceInBiggestUnit =
+    maxGasPrice && decimals
+      ? nativeUnitsToDecimal([maxGasPrice, decimals, 3])
+      : undefined;
+  const executionGasPriceInBiggestUnit =
+    executionGasPrice && decimals
+      ? nativeUnitsToDecimal([executionGasPrice, decimals, 3])
+      : undefined;
+
   // Try to match the error message to a known error explained in a way that makes sense to the user
   if (failureReason) {
     if (failureReason.includes('InvalidPeriod'))
@@ -18,7 +34,11 @@ export function paymentErrorMessage([failureReason]: PositionalArgs) {
       // The user can't do anything to fix it but report it to support.
       return 'attempted at the incorrect time - contact support';
     if (failureReason.includes('ExceedMaxGasPrice'))
-      return 'gas price exceeded the maximum specified';
+      return `Gas cost exceeded the maximum you set. ${
+        maxGasPriceInBiggestUnit && executionGasPriceInBiggestUnit
+          ? `Actual: ${executionGasPriceInBiggestUnit} / Max allowed: ${maxGasPriceInBiggestUnit}`
+          : ''
+      }`;
     if (failureReason.includes('PaymentExecutionFailed'))
       // This error covers 3 different failure scenarios and it is currently not possible to know which we are
       // dealing with. It means insufficient funds for either of the: transfer amount, gas fee, service fee

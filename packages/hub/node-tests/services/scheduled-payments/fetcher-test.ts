@@ -66,6 +66,7 @@ describe('fetching scheduled payments that are due', function () {
         endedAt,
         status,
         scheduledPaymentId: scheduledPayment.id,
+        executionGasPrice: '10000',
       },
     });
   };

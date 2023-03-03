@@ -90,6 +90,7 @@ export default class ScheduledPaymentsExecutorService {
         scheduledPaymentId: scheduledPayment.id,
         status: 'inProgress',
         startedAt: this.clock.utcNow(),
+        executionGasPrice: '0',
       },
     });
 
@@ -126,9 +127,15 @@ export default class ScheduledPaymentsExecutorService {
       recurringDayOfMonth,
       recurringUntil,
     } = scheduledPayment;
-
     try {
       let currentGasPrice = await this.getCurrentGasPrice(provider, gasTokenAddress);
+      paymentAttempt = await prisma.scheduledPaymentAttempt.update({
+        where: { id: paymentAttempt.id },
+        data: {
+          executionGasPrice: currentGasPrice.toString(),
+        },
+      });
+
       let params = {
         moduleAddress,
         tokenAddress,
