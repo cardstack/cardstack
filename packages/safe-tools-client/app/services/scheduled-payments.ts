@@ -175,7 +175,30 @@ export default class ScheduledPaymentsService extends Service {
       'GET'
     );
 
-    return this.deserializeScheduledPaymentAttemptResponse(response);
+    const scheduledPaymentAttempts =
+      this.deserializeScheduledPaymentAttemptResponse(response);
+    const canceledScheduledPaymentIds: Record<string, boolean> = {};
+
+    // For canceled scheduled payment,
+    // include only the latest scheduled payment attempts.
+    const filteredScheduledPaymentAttempts: ScheduledPaymentAttempt[] = [];
+    for (const scheduledPaymentAttempt of scheduledPaymentAttempts) {
+      if (
+        !canceledScheduledPaymentIds[
+          scheduledPaymentAttempt.scheduledPayment.id
+        ]
+      ) {
+        filteredScheduledPaymentAttempts.push(scheduledPaymentAttempt);
+      }
+
+      if (scheduledPaymentAttempt.scheduledPayment.isCanceled) {
+        canceledScheduledPaymentIds[
+          scheduledPaymentAttempt.scheduledPayment.id
+        ] = true;
+      }
+    }
+
+    return filteredScheduledPaymentAttempts;
   }
 
   deserializeScheduledPaymentAttemptResponse(
