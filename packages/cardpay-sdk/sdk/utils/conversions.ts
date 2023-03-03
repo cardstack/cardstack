@@ -88,8 +88,8 @@ export async function gasPriceInToken(provider: JsonRpcProvider, tokenAddress: s
   // Since tokens can have different decimals, we need to use the scalar's denominator and numerator to adjust the rate
   return rateBN
     .mul(gasPriceInNativeTokenInWei)
-    .mul(new BN(rate.scalar.denominator.toString())) // scalar's denominator is 10**(decimals of native token), for example 10**18 for ETH
-    .div(new BN(rate.scalar.numerator.toString())); // scalar's numerator is 10**(decimals of given token), for example 10**6 for USDC
+    .mul(new BN(rate.scalar.denominator.toString())) // scalar's denominator 10**(decimals of given token), for example 10**6 for USDC
+    .div(new BN(rate.scalar.numerator.toString())); // scalar's numerator is 10**(decimals of native token), for example 10**18 for ETH
 }
 
 export async function getGasPricesInNativeWei(
