@@ -2055,6 +2055,7 @@ COPY public.pgmigrations (id, name, run_on) FROM stdin;
 50	20230104034916208_add-block-number-to-reward-root-index	2023-03-01 15:39:08.188411
 51	20230131060836816_alter-gas-estimation-results-fields	2023-03-01 15:39:08.201257
 52	20230228132252559_add-execution-gas-price-to-scheduled-payment-attempts	2023-03-01 15:39:08.246772
+53	20230227121110219_add-retry-info-to-scheduled-payments	2023-03-03 14:04:50.716275
 \.
 
 
@@ -2062,7 +2063,7 @@ COPY public.pgmigrations (id, name, run_on) FROM stdin;
 -- Name: pgmigrations_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.pgmigrations_id_seq', 52, true);
+SELECT pg_catalog.setval('public.pgmigrations_id_seq', 53, true);
 
 
 --

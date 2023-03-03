@@ -83,22 +83,6 @@ export default class ScheduledPaymentsExecutorService {
       }
     }
 
-    let {
-      moduleAddress,
-      tokenAddress,
-      amount,
-      payeeAddress,
-      feeFixedUsd,
-      feePercentage,
-      executionGasEstimation,
-      maxGasPrice,
-      gasTokenAddress,
-      salt,
-      payAt,
-      recurringDayOfMonth,
-      recurringUntil,
-    } = scheduledPayment;
-    let currentGasPrice = await this.getCurrentGasPrice(provider, gasTokenAddress);
     // Now that we know there is no payment attempt in progress, and that the payment is not too recent, we can create a new payment attempt
     let paymentAttempt = await prisma.scheduledPaymentAttempt.create({
       data: {
@@ -106,7 +90,7 @@ export default class ScheduledPaymentsExecutorService {
         scheduledPaymentId: scheduledPayment.id,
         status: 'inProgress',
         startedAt: this.clock.utcNow(),
-        executionGasPrice: currentGasPrice.toString(),
+        executionGasPrice: '0',
       },
     });
 
@@ -128,26 +112,30 @@ export default class ScheduledPaymentsExecutorService {
       },
     });
 
-    let params = {
+    let {
       moduleAddress,
       tokenAddress,
-      amount: amount.toString(),
+      amount,
       payeeAddress,
-      feeFixedUsd: Number(feeFixedUsd),
-      feePercentage: Number(feePercentage),
-      executionGasEstimation: Number(executionGasEstimation),
-      maxGasPrice: String(maxGasPrice),
+      feeFixedUsd,
+      feePercentage,
+      executionGasEstimation,
+      maxGasPrice,
       gasTokenAddress,
       salt,
-      currentGasPrice: String(currentGasPrice), // Contract will revert if this is larger than maxGasPrice
-      payAt: payAt!.getTime() / 1000, // getTime returns milliseconds, but we want seconds, thus divide by 1000
-      recurringDayOfMonth: recurringDayOfMonth,
-      recurringUntil: recurringUntil ? recurringUntil.getTime() / 1000 : null,
-    };
-
-    Sentry.captureMessage(`Executing a payment with params: ${JSON.stringify(params)}`); // Useful for debugging purposes (for example, to see which params were used to calculate the spHash)
-
+      payAt,
+      recurringDayOfMonth,
+      recurringUntil,
+    } = scheduledPayment;
     try {
+      let currentGasPrice = await this.getCurrentGasPrice(provider, gasTokenAddress);
+      paymentAttempt = await prisma.scheduledPaymentAttempt.update({
+        where: { id: paymentAttempt.id },
+        data: {
+          executionGasPrice: currentGasPrice.toString(),
+        },
+      });
+
       let params = {
         moduleAddress,
         tokenAddress,
