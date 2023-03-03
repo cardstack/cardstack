@@ -1,3 +1,4 @@
+import { ScheduledPayment } from '@prisma/client';
 import { expect } from 'chai';
 import cryptoRandomString from 'crypto-random-string';
 import { subDays, subMinutes, subSeconds } from 'date-fns';
@@ -98,9 +99,19 @@ describe('ScheduledPaymentOnChainExecutionWaiter', function () {
 
     expect(scheduledPaymentAttempt.status).to.eq('succeeded');
     expect(scheduledPaymentAttempt.endedAt).to.gt(subSeconds(nowUtc(), 1));
+
+    // Reload the payment to ensure that scheduledPaymentAttemptsInLastPaymentCycleCount and nextRetryAttemptAt were updated
+    scheduledPayment = (await prisma.scheduledPayment.findUnique({
+      where: {
+        id: scheduledPayment.id,
+      },
+    })) as ScheduledPayment;
+
+    expect(scheduledPayment.scheduledPaymentAttemptsInLastPaymentCycleCount).to.equal(0);
+    expect(scheduledPayment.nextRetryAttemptAt).to.be.null;
   });
 
-  it('spawns a new waiter if timeout occurrs', async function () {
+  it('spawns a new waiter if timeout occurs', async function () {
     sdkError = new Error('Transaction took too long to complete, waited 600 seconds. txn hash: 0x123');
 
     let prisma = await getPrisma();
@@ -256,5 +267,15 @@ describe('ScheduledPaymentOnChainExecutionWaiter', function () {
     expect(scheduledPaymentAttempt.status).to.eq('failed');
     expect(scheduledPaymentAttempt.failureReason).to.eq('ExceedMaxGasPrice');
     expect(scheduledPaymentAttempt.endedAt).to.not.be.null;
+
+    // Reload the payment to ensure that scheduledPaymentAttemptsInLastPaymentCycleCount and nextRetryAttemptAt were updated
+    scheduledPayment = (await prisma.scheduledPayment.findUnique({
+      where: {
+        id: scheduledPayment.id,
+      },
+    })) as ScheduledPayment;
+
+    expect(scheduledPayment.scheduledPaymentAttemptsInLastPaymentCycleCount).to.equal(0);
+    expect(scheduledPayment.nextRetryAttemptAt).to.be.null;
   });
 });

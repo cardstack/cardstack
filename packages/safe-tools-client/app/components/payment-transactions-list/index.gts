@@ -30,11 +30,26 @@ import { subDays } from 'date-fns';
 import { action } from '@ember/object';
 import map from 'ember-composable-helpers/helpers/map';
 import BoxelActionContainer from '@cardstack/boxel/components/boxel/action-container';
+import TruncatedBlockchainAddress from '@cardstack/safe-tools-client/components/truncated-blockchain-address';
 
 type FilterItem = {
   display: string,
   value: any | undefined
 };
+
+function ordinalize(n: number) {
+  if (Math.floor(n / 10) === 1) {
+    return n + 'th';
+  } else if (n % 10 === 1) {
+    return n + 'st';
+  } else if (n % 10 === 2) {
+    return n + 'nd';
+  } else if (n % 10 === 3) {
+    return n + 'rd';
+  } else {
+    return n + 'th';
+  }
+}
 
 class PaymentTransactionsList extends Component {
   @service declare hubAuthentication: HubAuthenticationService;
@@ -148,12 +163,13 @@ class PaymentTransactionsList extends Component {
         <table class="table" data-test-scheduled-payment-attempts>
           <thead class="table__header">
             <tr class="table__row">
-              <th class="table__cell">Time</th>
-              <th class="table__cell">Date</th>
+              <th class="table__cell">Transaction Date</th>
+              <th class="table__cell">Scheduled For</th>
               <th class="table__cell">To</th>
               <th class="table__cell">Amount</th>
               <th class="table__cell">Status</th>
               <th class="table__cell">View details</th>
+              <th class="table__cell">Actions</th>
               <th></th>
             </tr>
           </thead>
@@ -161,14 +177,21 @@ class PaymentTransactionsList extends Component {
           <tbody>
             {{#each this.paymentAttempts as |paymentAttempt index|}}
               <tr class="table__row" data-test-scheduled-payment-attempts-item={{index}}>
-                <td class="table__cell" data-test-scheduled-payment-attempts-item-time>
-                  {{formatDate paymentAttempt.startedAt "HH:mm:ss"}}
-                </td>
-                <td class="table__cell" data-test-scheduled-payment-attempts-item-date>
+                <td class="table__cell" data-test-scheduled-payment-attempts-item-timestamp>
+                  {{formatDate paymentAttempt.startedAt "HH:mm:ss"}}<br>
                   {{formatDate paymentAttempt.startedAt "dd/MM/yyyy"}}
                 </td>
+                <td class="table__cell" data-test-scheduled-payment-attempts-item-scheduled>
+                  {{#if paymentAttempt.scheduledPayment.recurringDayOfMonth}}
+                    The {{ordinalize paymentAttempt.scheduledPayment.recurringDayOfMonth}} of each month
+                    <div class="payment-transactions-list__recurring">Recurring</div>
+                  {{else}}
+                    {{formatDate paymentAttempt.scheduledPayment.payAt 'HH:mm:ss dd/MM/yyyy'}}
+                    <div class="payment-transactions-list__one-time">One-time</div>
+                  {{/if}}
+                </td>
                 <td class="table__cell blockchain-address transactions-table-item-payee" data-test-scheduled-payment-attempts-item-payee>
-                  {{paymentAttempt.scheduledPayment.payeeAddress}}
+                  <TruncatedBlockchainAddress @address={{paymentAttempt.scheduledPayment.payeeAddress}} @isCopyable={{true}} />
                 </td>
                 <td class="table__cell" data-test-scheduled-payment-attempts-item-amount>
                   <strong>{{paymentAttempt.scheduledPayment.paymentTokenQuantity.displayable}}</strong>
@@ -196,10 +219,12 @@ class PaymentTransactionsList extends Component {
                     data-test-scheduled-payment-attempts-item-explorer-button
                   />
                 </td>
-                {{!-- TODO: only show options for < 3 attempt, when this info is stored --}}
-                {{#if (and (eq paymentAttempt.status 'failed') (not paymentAttempt.scheduledPayment.isCanceled))}}
-                  <PaymentOptionsDropdown @scheduledPayment={{paymentAttempt.scheduledPayment}}/>
-                {{/if}}
+                <td class="table__cell">
+                  <PaymentOptionsDropdown
+                    @scheduledPayment={{paymentAttempt.scheduledPayment}}
+                    @canCancel={{and (eq paymentAttempt.status 'failed') (not paymentAttempt.scheduledPayment.isCanceled)}}
+                  />
+                </td>
               </tr>
             {{/each}}
           </tbody>

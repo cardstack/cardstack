@@ -26,6 +26,8 @@ export interface ScheduledPaymentBase {
   chainId: number;
   maxGasPrice: BigNumber;
   isCanceled?: boolean;
+  recurringDayOfMonth?: number;
+  recurringUntil?: Date;
 }
 
 export interface ScheduledPayment extends ScheduledPaymentBase {
@@ -34,8 +36,6 @@ export interface ScheduledPayment extends ScheduledPaymentBase {
   spHash: string;
   senderSafeAddress: string;
   moduleAddress: string;
-  recurringDayOfMonth?: number;
-  recurringUntil?: Date;
   creationTransactionHash?: string;
   creationBlockNumber?: number;
   creationTransactionError?: string;

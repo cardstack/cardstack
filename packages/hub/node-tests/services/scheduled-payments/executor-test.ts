@@ -7,6 +7,7 @@ import BN from 'bn.js';
 import CrankNonceLock from '../../../services/crank-nonce-lock';
 import cryptoRandomString from 'crypto-random-string';
 import shortUuid from 'short-uuid';
+import { ScheduledPayment } from '@prisma/client';
 
 let sdkError: Error | null = null;
 
@@ -108,6 +109,15 @@ describe('executing scheduled payments', function () {
     expect(Number(scheduledPaymentAttempts[0].executionGasPrice)).to.lte(Number(scheduledPayment.maxGasPrice));
     expect(getJobIdentifiers()[0]).to.equal('scheduled-payment-on-chain-execution-waiter');
     expect(getJobPayloads()[0]).to.deep.equal({ scheduledPaymentAttemptId: scheduledPaymentAttempts[0].id });
+
+    // Reload the payment to ensure that lastScheduledPaymentAttemptId is updated
+    scheduledPayment = (await prisma.scheduledPayment.findUnique({
+      where: {
+        id: scheduledPayment.id,
+      },
+    })) as ScheduledPayment;
+
+    expect(scheduledPayment.lastScheduledPaymentAttemptId).to.equal(scheduledPaymentAttempts[0].id);
   });
 
   it("sets the scheduled payment's status to 'failed' if the transaction fails", async function () {
@@ -146,5 +156,16 @@ describe('executing scheduled payments', function () {
     expect(scheduledPaymentAttempts.length).to.equal(1);
     expect(scheduledPaymentAttempts[0].status).to.equal('failed');
     expect(scheduledPaymentAttempts[0].failureReason).to.equal('UnknownHash');
+
+    // Reload the payment to ensure that scheduledPaymentAttemptsInLastPaymentCycleCount and nextRetryAttemptAt were updated
+    scheduledPayment = (await prisma.scheduledPayment.findUnique({
+      where: {
+        id: scheduledPayment.id,
+      },
+    })) as ScheduledPayment;
+
+    expect(scheduledPayment.scheduledPaymentAttemptsInLastPaymentCycleCount).to.equal(1);
+    expect(scheduledPayment.nextRetryAttemptAt).to.be.greaterThan(nowUtc());
+    expect(scheduledPayment.lastScheduledPaymentAttemptId).to.equal(scheduledPaymentAttempts[0].id);
   });
 });

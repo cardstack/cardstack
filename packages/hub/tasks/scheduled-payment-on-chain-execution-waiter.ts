@@ -9,6 +9,7 @@ export default class ScheduledPaymentOnChainExecutionWaiter {
   cardpay = inject('cardpay');
   workerClient = inject('worker-client', { as: 'workerClient' });
   ethersProvider = inject('ethers-provider', { as: 'ethersProvider' });
+  scheduledPaymentFetcher = inject('scheduled-payment-fetcher', { as: 'scheduledPaymentFetcher' });
 
   async perform(payload: { scheduledPaymentAttemptId: string }) {
     let prisma = await this.prismaManager.getClient();
@@ -29,9 +30,15 @@ export default class ScheduledPaymentOnChainExecutionWaiter {
 
     try {
       await scheduledPaymentModule.executeScheduledPayment(paymentAttempt.transactionHash); // Will wait until mined. If already mined, will return immediately
+
       await prisma.scheduledPaymentAttempt.update({
         where: { id: paymentAttempt.id },
         data: { status: 'succeeded', endedAt: nowUtc() },
+      });
+
+      await prisma.scheduledPayment.update({
+        where: { id: scheduledPayment.id },
+        data: { scheduledPaymentAttemptsInLastPaymentCycleCount: 0, nextRetryAttemptAt: null },
       });
 
       if (scheduledPayment.recurringDayOfMonth && scheduledPayment.recurringUntil) {
@@ -64,6 +71,13 @@ export default class ScheduledPaymentOnChainExecutionWaiter {
             scheduledPaymentAttemptId: paymentAttempt.id,
           });
         }
+
+        await prisma.scheduledPayment.update({
+          where: { id: scheduledPayment.id },
+          data: {
+            nextRetryAttemptAt: this.scheduledPaymentFetcher.calculateNextRetryAttemptDate(scheduledPayment),
+          },
+        });
 
         return;
       }

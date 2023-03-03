@@ -66,3 +66,16 @@
   width: 100%;
   max-width: 100%;
 }
+
+.payment-transactions-list__one-time,
+.payment-transactions-list__recurring {
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+.payment-transactions-list__one-time {
+  color: var(--boxel-teal);
+}
+.payment-transactions-list__recurring {
+  color: var(--boxel-fuschia);
+}
