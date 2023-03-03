@@ -368,6 +368,10 @@ module('Integration | Component | payment-transactions-list', function (hooks) {
       return Promise.resolve();
     };
 
+    await render(hbs`
+      <PaymentTransactionsList />
+    `);
+
     await click(
       '[data-test-scheduled-payment-attempts-item="1"] [data-test-scheduled-payment-card-options-button]'
     );
