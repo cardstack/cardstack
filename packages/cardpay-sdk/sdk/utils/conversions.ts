@@ -80,12 +80,16 @@ export async function gasPriceInToken(provider: JsonRpcProvider, tokenAddress: s
   if (tokenAddress === wrappedNativeToken) {
     return gasPriceInNativeTokenInWei;
   }
+
   let rate = await tokenPairRate(provider, tokenAddress, wrappedNativeToken);
-  let rateAdjusted = adjustRate(rate);
-  // Convert the current gas price which is in native token to the token we want to pay the gas with.
-  return gasPriceInNativeTokenInWei
-    .mul(new BN(rateAdjusted.numerator.toString()))
-    .div(new BN(rateAdjusted.denominator.toString()));
+  let rateFraction = new Fraction(rate.numerator, rate.denominator).multiply(rate.scalar);
+  let rateBN = new BN(rateFraction.numerator.toString()).div(new BN(rateFraction.denominator.toString()));
+
+  // Since tokens can have different decimals, we need to use the scalar's denominator and numerator to adjust the rate
+  return rateBN
+    .mul(gasPriceInNativeTokenInWei)
+    .mul(new BN(rate.scalar.denominator.toString())) // scalar's denominator 10**(decimals of given token), for example 10**6 for USDC
+    .div(new BN(rate.scalar.numerator.toString())); // scalar's numerator is 10**(decimals of native token), for example 10**18 for ETH
 }
 
 export async function getGasPricesInNativeWei(
