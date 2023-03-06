@@ -38,6 +38,17 @@ export default class BlockExplorerButton extends Component<Signature> {
     return 'block explorer';
   }
 
+  get textColor() {
+    if (this.args.kind == 'secondary-dark') {
+      return undefined;
+    }
+    if (this.args.transactionHash) {
+      return 'var(--boxel-dark)';
+    } else {
+      return 'var(--boxel-purple-300)'
+    }
+  }
+
   <template>
     <BoxelButton
       @as="anchor"
@@ -53,7 +64,7 @@ export default class BlockExplorerButton extends Component<Signature> {
       style={{cssVar
         boxel-button-color="transparent"
         boxel-button-border=(if @transactionHash "1px solid var(--boxel-purple-300)" "1px solid var(--boxel-purple-200)")
-        boxel-button-text-color=(if @transactionHash "var(--boxel-dark);" "var(--boxel-purple-300)")
+        boxel-button-text-color=this.textColor
       }}
       ...attributes
     >

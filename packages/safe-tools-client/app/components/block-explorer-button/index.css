@@ -1,3 +1,7 @@
 .BlockExplorerButton svg {
   margin-left: 2px;
 }
+
+.BlockExplorerButton svg path {
+  fill: var(--boxel-button-text-color);
+}
