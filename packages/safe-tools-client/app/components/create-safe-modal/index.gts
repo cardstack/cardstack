@@ -15,6 +15,7 @@ interface Signature {
   Args: {
     isOpen: boolean
     onClose: () => void;
+    onNext: () => void;
     hasEnoughBalance: boolean;
     gasCostDisplay: string;
     onProvisionClick: () => void;
@@ -102,10 +103,10 @@ export default class SetupSafeModal extends Component<Signature> {
           <:default as |ac|>
             {{#if @safeCreated}}
               <ac.ActionButton
-                {{on 'click' @onClose}}
-                data-test-create-safe-close-button
+                {{on 'click' @onNext}}
+                data-test-create-safe-next-button
               >
-                Close
+                Next
               </ac.ActionButton>
 
               {{#if @provisioningOrIndexingErrorMessage}}

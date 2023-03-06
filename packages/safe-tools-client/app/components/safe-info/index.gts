@@ -6,7 +6,7 @@ import gt from 'ember-truth-helpers/helpers/gt';
 import { on } from '@ember/modifier';
 import TruncatedBlockchainAddress from '@cardstack/safe-tools-client/components/truncated-blockchain-address';
 import nativeUnitsToDecimal from '@cardstack/safe-tools-client/helpers/native-units-to-decimal';
-import CreateSafe from '@cardstack/safe-tools-client/components/create-safe';
+import CreateSafeButton from '@cardstack/safe-tools-client/components/create-safe-button';
 import { Safe, TokenBalance } from '@cardstack/safe-tools-client/services/safes';
 import not from 'ember-truth-helpers/helpers/not';
 
@@ -95,7 +95,10 @@ export default class SafeInfo extends Component<Signature> {
     {{/if}}
     
     {{#if (not @isLoadingSafes)}}
-      <CreateSafe @currentSafe={{@currentSafe}} />
+      <CreateSafeButton
+        @currentSafe={{@currentSafe}}
+        @onNextAfterSafeCreated={{@onDepositClick}}
+      />
     {{/if}}
   </template>
 }
