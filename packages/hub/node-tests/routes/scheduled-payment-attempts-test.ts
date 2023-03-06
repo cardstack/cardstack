@@ -240,6 +240,7 @@ describe('GET /api/scheduled-payment-attempts', async function () {
             type: 'scheduled-payment-attempts',
             attributes: {
               'ended-at': '2022-11-22T13:14:25.000Z',
+              'execution-gas-price': '10000',
               'failure-reason': null,
               'started-at': '2022-11-22T12:14:25.000Z',
               status: 'succeeded',
@@ -259,6 +260,7 @@ describe('GET /api/scheduled-payment-attempts', async function () {
             type: 'scheduled-payment-attempts',
             attributes: {
               'ended-at': '2022-10-22T13:14:25.000Z',
+              'execution-gas-price': '10000',
               'failure-reason': null,
               'started-at': '2022-10-22T12:14:25.000Z',
               status: 'succeeded',

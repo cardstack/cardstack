@@ -285,7 +285,7 @@ model ScheduledPaymentAttempt {
   transactionHash    String?                           @map("transaction_hash")
   failureReason      String?                           @map("failure_reason")
   scheduledPaymentId String                            @map("scheduled_payment_id") @db.Uuid
-  executionGasPrice  String                            @map("execution_gas_price")
+  executionGasPrice  String                            @default("0") @map("execution_gas_price")
   scheduledPayment   ScheduledPayment                  @relation(fields: [scheduledPaymentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
   @@index([scheduledPaymentId], map: "scheduled_payment_attempts_scheduled_payment_id_index")
