@@ -29,6 +29,7 @@ export interface TokenBalance {
   symbol: string;
   balance: BigNumber;
   decimals: number;
+  tokenAddress?: string;
   isNativeToken?: boolean;
 }
 

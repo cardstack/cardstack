@@ -82,6 +82,28 @@ class ScheduledPaymentSDKServiceStub extends Service {
   async getUsdToken(): Promise<TokenDetail | undefined> {
     return exampleGasTokens.find((gt) => gt.symbol === 'USDC');
   }
+
+  async estimateGasTokenToSchedule(
+    _safeAddress: ChainAddress,
+    _moduleAddress: ChainAddress,
+    _tokenAddress: ChainAddress,
+    _amount: BigNumber,
+    _payeeAddress: ChainAddress,
+    _executionGas: number,
+    _maxGasPrice: string,
+    _gasTokenAddress: ChainAddress,
+    _salt: string,
+    _payAt: number | null,
+    _recurringDayOfMonth: number | null,
+    _recurringUntil: number | null
+  ): Promise<BigNumber> {
+    const token = exampleGasTokens.find(
+      (gt) => gt.address === _gasTokenAddress
+    );
+    return token
+      ? BigNumber.from('10').pow(token.decimals).mul('10')
+      : BigNumber.from('0');
+  }
 }
 
 let enableUsdConversion = true;
@@ -116,6 +138,19 @@ class SafeServiceStub extends Service {
   }
   get currentSafe() {
     return this.safes?.[0];
+  }
+  get tokenBalances() {
+    const usdcToken = exampleGasTokens.find((gt) => gt.symbol === 'USDC');
+    return [
+      {
+        symbol: usdcToken?.name,
+        balance: BigNumber.from('10')
+          .pow(usdcToken?.decimals ?? 6)
+          .mul('100'),
+        decimals: usdcToken?.decimals,
+        tokenAddress: usdcToken?.address,
+      },
+    ];
   }
 }
 
@@ -567,6 +602,63 @@ module(
         assert
           .dom('[data-test-max-gas-toggle] [data-toggle-group-option="max"]')
           .containsText('80.0 USDC');
+      });
+
+      test('it disables submit button if gas token balance insufficient', async function (assert) {
+        await render(hbs`
+          <SchedulePaymentFormActionCard />
+        `);
+        assert
+          .dom('[data-test-schedule-payment-form-submit-button]')
+          .isDisabled();
+
+        await click('[data-test-payment-type="one-time"]');
+
+        assert
+          .dom('[data-test-schedule-payment-form-submit-button]')
+          .isDisabled();
+
+        await chooseTomorrow('[data-test-boxel-input-date-trigger]');
+
+        await chooseTime('[data-test-boxel-input-time-trigger]', 9, 0, 'am');
+
+        assert
+          .dom('[data-test-schedule-payment-form-submit-button]')
+          .isDisabled();
+
+        await fillIn('[data-test-payee-address-input]', EXAMPLE_PAYEE);
+
+        assert
+          .dom('[data-test-schedule-payment-form-submit-button]')
+          .isDisabled();
+
+        await fillIn('[data-test-amount-input] input', '15.0');
+
+        assert
+          .dom('[data-test-schedule-payment-form-submit-button]')
+          .isDisabled();
+
+        // Choose USDC for the transaction token
+        await selectChoose(
+          '[data-test-amount-input] [data-test-boxel-input-group-select-accessory-trigger]',
+          'USDC'
+        );
+
+        // Choose WETH for the gas token
+        // Safe doesn't have weth balance
+        await selectChoose('[data-test-gas-token-select]', 'WETH');
+
+        // Button is enabled since max-gas defaults to normal
+        assert
+          .dom('[data-test-schedule-payment-form-submit-button]')
+          .isDisabled();
+        await click(
+          '[data-test-max-gas-toggle] [data-toggle-group-option="high"]'
+        );
+
+        assert
+          .dom('.schedule-payment-form-action-card__fees-value-error-message')
+          .exists();
       });
     });
 

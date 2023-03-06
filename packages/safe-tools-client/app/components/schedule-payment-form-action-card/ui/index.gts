@@ -11,6 +11,7 @@ import BoxelRadioInput from '@cardstack/boxel/components/boxel/radio-input';
 import BoxelToggleButtonGroup from '@cardstack/boxel/components/boxel/toggle-button-group';
 import BoxelTokenSelect from '@cardstack/boxel/components/boxel/input/token-select';
 import RangedNumberPicker from '@cardstack/boxel/components/boxel/input/ranged-number-picker';
+import cn from '@cardstack/boxel/helpers/cn';
 import { concat, fn } from '@ember/helper';
 import { on } from '@ember/modifier';
 import { svgJar } from '@cardstack/boxel/utils/svg-jar';
@@ -32,6 +33,7 @@ import WalletService from '@cardstack/safe-tools-client/services/wallet';
 import { inject as service } from '@ember/service';
 import { MaxGasDescriptionsState } from "..";
 import FailureIcon from '@cardstack/safe-tools-client/components/icons/failure';
+import InfoIcon from '@cardstack/safe-tools-client/components/icons/info';
 import tokenToUsd from '@cardstack/safe-tools-client/helpers/token-to-usd';
 import { type CurrentFees } from '../fee-calculator';
 import TokenQuantity from '@cardstack/safe-tools-client/utils/token-quantity';
@@ -79,6 +81,8 @@ interface Signature {
     isSafesEmpty: boolean;
     scheduleErrorMessage: string | undefined;
     walletProviderId: WalletProviderId | undefined;
+    requiredGasTokenToSchedulePayment: TokenQuantity | undefined;
+    isSufficientGasTokenBalance: boolean;
   }
 }
 
@@ -352,13 +356,35 @@ export default class SchedulePaymentFormActionCardUI extends Component<Signature
               </BoxelField>
             </div>
           </BoxelField>
+          <BoxelField @label="Scheduling This Payment" style={{cssVar boxel-field-label-align="top"}}>
+            <div>
+              <BoxelField @label="Estimated Gas" data-test-summary-recipient-receives @vertical={{true}} style={{cssVar boxel-field-label-justify-content="end"}}>
+                <div class="schedule-payment-form-action-card__fees-value">
+                  {{#if @requiredGasTokenToSchedulePayment}}
+                    <div class={{cn schedule-payment-form-action-card__fees-value-error=(not @isSufficientGasTokenBalance)}}>{{@requiredGasTokenToSchedulePayment.displayable}}</div>
+                    <div class="schedule-payment-form-action-card__fee-usd-estimate">{{tokenToUsd tokenQuantity=@requiredGasTokenToSchedulePayment}}</div>
+                    {{#if (not @isSufficientGasTokenBalance)}}
+                      <div class="schedule-payment-form-action-card__fees-value-error-message">
+                        <InfoIcon class='action-chin-info-icon' style={{cssVar info-icon-color="var(--boxel-red)"}} />
+                        <span>
+                          Your safe does not contain a sufficient {{@selectedGasToken.symbol}} balance
+                        </span>
+                      </div>
+                    {{/if}}
+                  {{else}}
+                    <div>Estimating schedule payment gas...</div>
+                  {{/if}}
+                </div>
+              </BoxelField>
+            </div>
+          </BoxelField>
         {{/if}}
       </Section>
       <ActionChin @state={{this.actionChinState}}>
         <:default as |ac|>
           {{#if (and this.wallet.isConnected (not @isSafesEmpty))}}
             <ac.ActionButton
-              @disabled={{not @isValid}}
+              @disabled={{or (not @isValid) (not @isSufficientGasTokenBalance)}}
               data-test-schedule-payment-form-submit-button
               {{on 'click' @onSchedulePayment}}
             >

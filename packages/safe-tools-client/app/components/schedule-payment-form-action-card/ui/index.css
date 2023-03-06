@@ -124,3 +124,17 @@
   font-weight: normal;
   font-size: var(--boxel-font-size-sm);
 }
+
+.schedule-payment-form-action-card__fees-value-error {
+  color: var(--boxel-error-100);
+}
+
+.schedule-payment-form-action-card__fees-value-error-message {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: var(--boxel-sp-xs);
+
+  color: var(--boxel-error-100);
+  font-weight: normal;
+  font-size: var(--boxel-font-size-xs);
+}

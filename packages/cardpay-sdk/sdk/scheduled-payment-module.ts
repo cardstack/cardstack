@@ -1089,6 +1089,48 @@ export default class ScheduledPaymentModule {
     await waitUntilSchedulePaymentTransactionMined(hubRootUrl, scheduledPaymentId, authToken, options.listener);
   }
 
+  async estimateGasTokenToSchedule(
+    safeAddress: string,
+    moduleAddress: string,
+    tokenAddress: string,
+    amount: string,
+    payeeAddress: string,
+    executionGas: number,
+    maxGasPrice: string,
+    gasTokenAddress: string,
+    salt: string,
+    payAt?: number | null,
+    recurringDayOfMonth?: number | null,
+    recurringUntil?: number | null
+  ) {
+    let spHash: string = await this.createSpHash(
+      moduleAddress,
+      tokenAddress,
+      amount,
+      payeeAddress,
+      executionGas,
+      maxGasPrice,
+      gasTokenAddress,
+      salt,
+      payAt,
+      recurringDayOfMonth,
+      recurringUntil
+    );
+    let contract = new Contract(moduleAddress, ScheduledPaymentABI, this.ethersProvider);
+    let payload = contract.interface.encodeFunctionData('schedulePayment', [spHash]);
+    let estimate = await gasEstimate(
+      this.ethersProvider,
+      safeAddress,
+      moduleAddress,
+      '0',
+      payload,
+      Operation.CALL,
+      gasTokenAddress,
+      true
+    );
+    return BigNumber.from(estimate.safeTxGas).add(estimate.baseGas).mul(estimate.gasPrice);
+  }
+
   async cancelPaymentOnChain(txnHash: string): Promise<SuccessfulTransactionReceipt>;
   async cancelPaymentOnChain(
     safeAddress: string,
