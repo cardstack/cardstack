@@ -60,6 +60,7 @@ export default class ScheduledPaymentAttemptsRoute {
         transactionHash: true,
         failureReason: true,
         scheduledPaymentId: true,
+        executionGasPrice: true,
         scheduledPayment: {
           select: {
             id: true,
