@@ -51,6 +51,7 @@ export interface ScheduledPaymentAttempt {
   executionGasPrice: BigNumber;
   transactionHash?: string;
   scheduledPayment: ScheduledPaymentBase;
+  isCanceled?: boolean;
 }
 
 export interface ScheduledPaymentAttemptResponseItem {
@@ -180,28 +181,24 @@ export default class ScheduledPaymentsService extends Service {
 
     const scheduledPaymentAttempts =
       this.deserializeScheduledPaymentAttemptResponse(response);
-    const canceledScheduledPaymentIds: Record<string, boolean> = {};
-
-    // For canceled scheduled payment,
-    // include only the latest scheduled payment attempts.
-    const filteredScheduledPaymentAttempts: ScheduledPaymentAttempt[] = [];
+    const isAlreadyFoundTheLattestAttempt: Record<string, boolean> = {};
     for (const scheduledPaymentAttempt of scheduledPaymentAttempts) {
       if (
-        !canceledScheduledPaymentIds[
+        !isAlreadyFoundTheLattestAttempt[
           scheduledPaymentAttempt.scheduledPayment.id
         ]
       ) {
-        filteredScheduledPaymentAttempts.push(scheduledPaymentAttempt);
-      }
-
-      if (scheduledPaymentAttempt.scheduledPayment.isCanceled) {
-        canceledScheduledPaymentIds[
+        isAlreadyFoundTheLattestAttempt[
           scheduledPaymentAttempt.scheduledPayment.id
         ] = true;
+
+        if (scheduledPaymentAttempt.scheduledPayment.isCanceled) {
+          scheduledPaymentAttempt.isCanceled = true;
+        }
       }
     }
 
-    return filteredScheduledPaymentAttempts;
+    return scheduledPaymentAttempts;
   }
 
   deserializeScheduledPaymentAttemptResponse(

@@ -517,7 +517,7 @@ module('Integration | Component | payment-transactions-list', function (hooks) {
     );
   });
 
-  test('It displays the latest attempts of canceled scheduled payment', async function (assert) {
+  test('It displays the latest attempts of canceled scheduled payment with status cancel', async function (assert) {
     returnScheduledPaymentAttemptsOfCanceledScheduledPayment = true;
     await render(hbs`
       <PaymentTransactionsList />
@@ -525,6 +525,9 @@ module('Integration | Component | payment-transactions-list', function (hooks) {
     await waitFor('[data-test-scheduled-payment-attempts-item]');
     assert
       .dom('[data-test-scheduled-payment-attempts-item]')
+      .exists({ count: 2 });
+    assert
+      .dom('[data-test-scheduled-payment-attempts-item-status-canceled]')
       .exists({ count: 1 });
   });
 
