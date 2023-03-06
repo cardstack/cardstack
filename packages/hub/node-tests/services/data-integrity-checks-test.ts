@@ -229,6 +229,7 @@ describe('data integrity checks', function () {
           status: 'inProgress',
           scheduledPaymentId: sp.id,
           transactionHash: '0x123',
+          executionGasPrice: '10000',
         },
       });
 
@@ -272,6 +273,7 @@ describe('data integrity checks', function () {
           status: 'inProgress',
           scheduledPaymentId: sp.id,
           transactionHash: null,
+          executionGasPrice: '10000',
         },
       });
 

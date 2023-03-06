@@ -77,6 +77,7 @@ describe('GET /api/scheduled-payment-attempts', async function () {
         status: 'succeeded',
         scheduledPaymentId: sp.id,
         transactionHash: '0x123',
+        executionGasPrice: '10000',
       },
     });
 
@@ -111,6 +112,7 @@ describe('GET /api/scheduled-payment-attempts', async function () {
         status: 'succeeded',
         scheduledPaymentId: spOtherUser.id,
         transactionHash: '0x123',
+        executionGasPrice: '10000',
       },
     });
 
@@ -145,6 +147,7 @@ describe('GET /api/scheduled-payment-attempts', async function () {
         status: 'succeeded',
         scheduledPaymentId: spOtherSafe.id,
         transactionHash: '0x123',
+        executionGasPrice: '10000',
       },
     });
 
@@ -157,6 +160,7 @@ describe('GET /api/scheduled-payment-attempts', async function () {
         status: 'succeeded',
         scheduledPaymentId: sp.id,
         transactionHash: '0x1234',
+        executionGasPrice: '10000',
       },
     });
 
@@ -169,6 +173,7 @@ describe('GET /api/scheduled-payment-attempts', async function () {
         status: 'failed',
         scheduledPaymentId: sp.id,
         transactionHash: '0x12345',
+        executionGasPrice: '10000',
       },
     });
 
@@ -181,6 +186,7 @@ describe('GET /api/scheduled-payment-attempts', async function () {
         status: 'failed',
         scheduledPaymentId: sp.id,
         transactionHash: '0x123',
+        executionGasPrice: '10000',
       },
     });
 
@@ -215,6 +221,7 @@ describe('GET /api/scheduled-payment-attempts', async function () {
         status: 'succeeded',
         scheduledPaymentId: spOtherChain.id,
         transactionHash: '0x123',
+        executionGasPrice: '10000',
       },
     });
 

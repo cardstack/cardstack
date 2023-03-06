@@ -20,22 +20,22 @@ export interface ScheduledPaymentBase {
   feeFixedUSD: string;
   feePercentage: string;
   paymentTokenQuantity: TokenQuantity;
-  gasTokenAddress: string;
+  gasToken: TokenDetail;
   payeeAddress: string;
   payAt: Date;
   chainId: number;
+  maxGasPrice: BigNumber;
   isCanceled?: boolean;
+  recurringDayOfMonth?: number;
+  recurringUntil?: Date;
 }
 
 export interface ScheduledPayment extends ScheduledPaymentBase {
   executionGasEstimation: string;
-  maxGasPrice: string;
   salt: string;
   spHash: string;
   senderSafeAddress: string;
   moduleAddress: string;
-  recurringDayOfMonth?: number;
-  recurringUntil?: Date;
   creationTransactionHash?: string;
   creationBlockNumber?: number;
   creationTransactionError?: string;
@@ -48,6 +48,7 @@ export interface ScheduledPaymentAttempt {
   endedAt: Date;
   status: string;
   failureReason: string;
+  executionGasPrice: BigNumber;
   transactionHash?: string;
   scheduledPayment: ScheduledPaymentBase;
 }
@@ -60,6 +61,7 @@ export interface ScheduledPaymentAttemptResponseItem {
     status: string;
     'failure-reason': string;
     'transaction-hash': string;
+    'execution-gas-price': string;
   };
   relationships: {
     'scheduled-payment': {
@@ -88,6 +90,7 @@ export interface ScheduledPaymentAttemptIncludedData {
   'payee-address': string;
   'pay-at': string;
   'chain-id': string;
+  'max-gas-price': string;
   'canceled-at': string;
 }
 
@@ -215,12 +218,17 @@ export default class ScheduledPaymentsService extends Service {
         this.tokens.tokenFromAddress(paymentTokenAddress) ||
         buildUnknownToken(paymentTokenAddress);
 
+      const gasTokenAddress = scheduledPayment!['gas-token-address'];
+      const gasToken =
+        this.tokens.tokenFromAddress(gasTokenAddress) ||
+        buildUnknownToken(gasTokenAddress);
       return {
         startedAt: new Date(s.attributes['started-at']),
         endedAt: new Date(s.attributes['ended-at']),
         status: s.attributes['status'],
         failureReason: s.attributes['failure-reason'],
         transactionHash: s.attributes['transaction-hash'],
+        executionGasPrice: BigNumber.from(s.attributes['execution-gas-price']),
         scheduledPayment: {
           id: scheduledPaymentId,
           paymentTokenQuantity: new TokenQuantity(
@@ -229,10 +237,11 @@ export default class ScheduledPaymentsService extends Service {
           ),
           feeFixedUSD: scheduledPayment!['fee-fixed-usd'],
           feePercentage: scheduledPayment!['fee-percentage'],
-          gasTokenAddress: scheduledPayment!['gas-token-address'],
+          gasToken,
           chainId: Number(scheduledPayment!['chain-id']),
           payeeAddress: scheduledPayment!['payee-address'],
           payAt: new Date(scheduledPayment!['pay-at']),
+          maxGasPrice: BigNumber.from(scheduledPayment!['max-gas-price']),
           isCanceled: Boolean(scheduledPayment!['canceled-at']),
         },
       };
@@ -338,6 +347,11 @@ export default class ScheduledPaymentsService extends Service {
       const paymentToken =
         this.tokens.tokenFromAddress(paymentTokenAddress) ||
         buildUnknownToken(paymentTokenAddress);
+
+      const gasTokenAddress = data.attributes!['gas-token-address'];
+      const gasToken =
+        this.tokens.tokenFromAddress(gasTokenAddress) ||
+        buildUnknownToken(gasTokenAddress);
       return {
         id: data.id,
         userAddress: data.attributes['user-address'],
@@ -349,12 +363,12 @@ export default class ScheduledPaymentsService extends Service {
         ),
         feeFixedUSD: data.attributes['fee-fixed-usd'],
         feePercentage: data.attributes['fee-percentage'],
-        gasTokenAddress: data.attributes['gas-token-address'],
+        gasToken,
         chainId: Number(data.attributes['chain-id']),
         payeeAddress: data.attributes['payee-address'],
         payAt: new Date(data.attributes['pay-at']),
         executionGasEstimation: data.attributes['execution-gas-estimation'],
-        maxGasPrice: data.attributes['max-gas-price'],
+        maxGasPrice: BigNumber.from(data.attributes['max-gas-price']),
         salt: data.attributes['salt'],
         spHash: data.attributes['sp-hash'],
         recurringDayOfMonth: Number(data.attributes['recurring-day-of-month']),

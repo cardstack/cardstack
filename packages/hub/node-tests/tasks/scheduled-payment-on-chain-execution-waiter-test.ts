@@ -85,6 +85,7 @@ describe('ScheduledPaymentOnChainExecutionWaiter', function () {
         status: 'inProgress',
         scheduledPaymentId: scheduledPayment.id,
         transactionHash: '0x123',
+        executionGasPrice: '10000',
       },
     });
 
@@ -145,6 +146,7 @@ describe('ScheduledPaymentOnChainExecutionWaiter', function () {
         status: 'inProgress',
         scheduledPaymentId: scheduledPayment.id,
         transactionHash: '0x123',
+        executionGasPrice: '10000',
       },
     });
 
@@ -196,6 +198,7 @@ describe('ScheduledPaymentOnChainExecutionWaiter', function () {
         status: 'inProgress',
         scheduledPaymentId: scheduledPayment.id,
         transactionHash: '0x123',
+        executionGasPrice: '10000',
       },
     });
 
@@ -249,6 +252,7 @@ describe('ScheduledPaymentOnChainExecutionWaiter', function () {
         status: 'inProgress',
         scheduledPaymentId: scheduledPayment.id,
         transactionHash: '0x123',
+        executionGasPrice: '10000',
       },
     });
 
