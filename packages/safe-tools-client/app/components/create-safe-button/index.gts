@@ -21,6 +21,7 @@ interface Signature {
   Element: HTMLElement;
   Args: {
     currentSafe: Safe | undefined;
+    onNextAfterSafeCreated: () => void
   }
 }
 
@@ -42,7 +43,12 @@ export default class CreateSafeButton extends Component<Signature> {
   }
 
   @action closeModal() {
-    this.isModalOpen = false
+    this.isModalOpen = false;
+  }
+
+  @action onNext() {
+    this.isModalOpen = false;
+    this.args.onNextAfterSafeCreated();
   }
 
   @task *createSafe(): TaskGenerator<{ safeAddress: string }> {
@@ -153,6 +159,7 @@ export default class CreateSafeButton extends Component<Signature> {
     <CreateSafeModal
       @isOpen={{this.isModalOpen}}
       @onClose={{this.closeModal}}
+      @onNext={{this.onNext}}
       @isLoadingGasInfo={{this.isLoadingGasInfo}}
       @isProvisioning={{this.isProvisioning}}
       @isIndexing={{this.isIndexing}}

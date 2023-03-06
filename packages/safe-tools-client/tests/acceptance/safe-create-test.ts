@@ -134,7 +134,14 @@ module('Acceptance | create safe', function (hooks) {
           'Your safe has been created and the module has been enabled. You can now schedule payments.'
         );
 
-      await click('[data-test-create-safe-close-button]');
+      await click('[data-test-create-safe-next-button]');
+      assert.dom('.boxel-modal').containsText('Deposit Instructions');
+      assert
+        .dom('.boxel-modal')
+        .containsText(
+          'The supported gas tokens for Ethereum Mainnet are: DAI, USDT, USDC, and WETH'
+        );
+      await click('[data-test-close-button]');
 
       assert
         .dom('[data-test-safe-address-label] .blockchain-address')
