@@ -391,61 +391,6 @@ app "hub-event-listener" {
   }
 }
 
-app "cardie" {
-  path = "./packages/cardie"
-
-  build {
-    use "pack" {
-      process_type = "worker"
-    }
-
-    registry {
-      use "aws-ecr" {
-        region     = "us-east-1"
-        repository = "cardie"
-        tag        = "latest"
-      }
-    }
-  }
-
-  deploy {
-    use "aws-ecs" {
-      region              = "us-east-1"
-      memory              = "512"
-      count               = 1
-      cluster             = "cardie"
-      subnets             = ["subnet-89968ba2"]
-      task_role_name      = "cardie-ecs-task"
-      execution_role_name = "cardie-ecs-task-execution"
-      security_group_ids  = ["sg-02a6d8349ceb4c13c"]
-      disable_alb         = true
-
-      static_environment = {
-        ENVIRONMENT = "staging"
-      }
-
-      secrets = {
-        DISCORD_TOKEN = "arn:aws:ssm:us-east-1:680542703984:parameter/staging/cardie/DISCORD_TOKEN"
-        GITHUB_TOKEN  = "arn:aws:ssm:us-east-1:680542703984:parameter/staging/cardie/GITHUB_TOKEN"
-      }
-    }
-
-    hook {
-      when    = "after"
-      command = ["node", "./scripts/waypoint-ecs-add-tags.mjs", "cardie"]
-    }
-
-    hook {
-      when    = "after"
-      command = ["node", "./scripts/wait-service-stable.mjs", "cardie"]
-    }
-  }
-
-  url {
-    auto_hostname = false
-  }
-}
-
 # This name has been chosen to be much shorter than 32 characters
 # If the name comes close to 32 characters there are unreliable
 # deployments. See
