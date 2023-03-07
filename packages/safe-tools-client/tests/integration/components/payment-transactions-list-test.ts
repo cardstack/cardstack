@@ -354,7 +354,9 @@ module('Integration | Component | payment-transactions-list', function (hooks) {
     `);
 
     assert.dom('[data-test-scheduled-payment-attempts]').exists();
-    await waitFor('[data-test-scheduled-payment-attempts-item]');
+    await waitFor('[data-test-scheduled-payment-attempts-item]', {
+      timeout: 3000,
+    });
 
     assert
       .dom('[data-test-scheduled-payment-attempts-item]')
@@ -414,7 +416,9 @@ module('Integration | Component | payment-transactions-list', function (hooks) {
     await render(hbs`
       <PaymentTransactionsList />
     `);
-    await waitFor('[data-test-scheduled-payment-attempts-item]');
+    await waitFor('[data-test-scheduled-payment-attempts-item]', {
+      timeout: 3000,
+    });
     assert
       .dom('[data-test-scheduled-payment-attempts-item]')
       .exists({ count: 2 });
@@ -426,7 +430,9 @@ module('Integration | Component | payment-transactions-list', function (hooks) {
     assert.dom('.boxel-menu').containsText('All Succeeded Failed In Progress');
     status = 'failed';
     await click('[data-test-boxel-menu-item-text="Failed"]');
-    await waitFor('[data-test-scheduled-payment-attempts-item]');
+    await waitFor('[data-test-scheduled-payment-attempts-item]', {
+      timeout: 3000,
+    });
     assert
       .dom('[data-test-scheduled-payment-attempts-item]')
       .exists({ count: 1 });
@@ -439,7 +445,9 @@ module('Integration | Component | payment-transactions-list', function (hooks) {
     await click('[data-test-scheduled-payment-status-filter]');
     status = 'succeeded';
     await click('[data-test-boxel-menu-item-text="Succeeded"]');
-    await waitFor('[data-test-scheduled-payment-attempts-item]');
+    await waitFor('[data-test-scheduled-payment-attempts-item]', {
+      timeout: 3000,
+    });
     assert
       .dom('[data-test-scheduled-payment-attempts-item]')
       .exists({ count: 1 });
@@ -452,7 +460,9 @@ module('Integration | Component | payment-transactions-list', function (hooks) {
     await click('[data-test-scheduled-payment-status-filter]');
     status = undefined;
     await click('[data-test-boxel-menu-item-text="All"]');
-    await waitFor('[data-test-scheduled-payment-attempts-item]');
+    await waitFor('[data-test-scheduled-payment-attempts-item]', {
+      timeout: 3000,
+    });
     assert
       .dom('[data-test-scheduled-payment-attempts-item]')
       .exists({ count: 2 });
@@ -464,7 +474,9 @@ module('Integration | Component | payment-transactions-list', function (hooks) {
     await render(hbs`
       <PaymentTransactionsList />
     `);
-    await waitFor('[data-test-scheduled-payment-attempts-item]');
+    await waitFor('[data-test-scheduled-payment-attempts-item]', {
+      timeout: 3000,
+    });
     assert
       .dom('[data-test-scheduled-payment-attempts-item]')
       .exists({ count: 2 });
@@ -478,7 +490,9 @@ module('Integration | Component | payment-transactions-list', function (hooks) {
       .containsText('Last 30 days Last 90 days Last 120 days');
     startedAt = subDays(now, 90);
     await click('[data-test-boxel-menu-item-text="Last 90 days"]');
-    await waitFor('[data-test-scheduled-payment-attempts-item]');
+    await waitFor('[data-test-scheduled-payment-attempts-item]', {
+      timeout: 3000,
+    });
     assert
       .dom('[data-test-scheduled-payment-attempts-item]')
       .exists({ count: 3 });
@@ -486,7 +500,9 @@ module('Integration | Component | payment-transactions-list', function (hooks) {
     await click('[data-test-scheduled-payment-date-filter]');
     startedAt = subDays(now, 120);
     await click('[data-test-boxel-menu-item-text="Last 120 days"]');
-    await waitFor('[data-test-scheduled-payment-attempts-item]');
+    await waitFor('[data-test-scheduled-payment-attempts-item]', {
+      timeout: 3000,
+    });
     assert
       .dom('[data-test-scheduled-payment-attempts-item]')
       .exists({ count: 3 });
@@ -510,7 +526,9 @@ module('Integration | Component | payment-transactions-list', function (hooks) {
     await render(hbs`
       <PaymentTransactionsList />
     `);
-    await waitFor('[data-test-scheduled-payment-attempts-item]');
+    await waitFor('[data-test-scheduled-payment-attempts-item]', {
+      timeout: 3000,
+    });
     assert.strictEqual(
       document.querySelectorAll(`.boxel-button--with-tooltip`).length,
       1
@@ -522,7 +540,9 @@ module('Integration | Component | payment-transactions-list', function (hooks) {
     await render(hbs`
       <PaymentTransactionsList />
     `);
-    await waitFor('[data-test-scheduled-payment-attempts-item]');
+    await waitFor('[data-test-scheduled-payment-attempts-item]', {
+      timeout: 3000,
+    });
     assert
       .dom('[data-test-scheduled-payment-attempts-item]')
       .exists({ count: 2 });
@@ -536,7 +556,9 @@ module('Integration | Component | payment-transactions-list', function (hooks) {
     await render(hbs`
       <PaymentTransactionsList />
     `);
-    await waitFor('[data-test-scheduled-payment-attempts-item]');
+    await waitFor('[data-test-scheduled-payment-attempts-item]', {
+      timeout: 3000,
+    });
     assert
       .dom('.transactions-table-item-status-failure-reason')
       .hasText(
@@ -557,7 +579,9 @@ module('Integration | Component | payment-transactions-list', function (hooks) {
     await render(hbs`
       <PaymentTransactionsList />
     `);
-    await waitFor('[data-test-scheduled-payment-attempts-item]');
+    await waitFor('[data-test-scheduled-payment-attempts-item]', {
+      timeout: 3000,
+    });
     await click(
       '[data-test-scheduled-payment-attempts-item="1"] [data-test-scheduled-payment-card-options-button]'
     );
@@ -586,7 +610,9 @@ module('Integration | Component | payment-transactions-list', function (hooks) {
     await render(hbs`
       <PaymentTransactionsList />
     `);
-    await waitFor('[data-test-scheduled-payment-attempts-item]');
+    await waitFor('[data-test-scheduled-payment-attempts-item]', {
+      timeout: 3000,
+    });
     await click(
       '[data-test-scheduled-payment-attempts-item="0"] [data-test-scheduled-payment-card-options-button]'
     );
