@@ -184,13 +184,10 @@ export default class ScheduledPaymentsService extends Service {
     const previouslySeenPayments: Record<string, boolean> = {};
     for (const scheduledPaymentAttempt of scheduledPaymentAttempts) {
       if (
-        !previouslySeenPayments[
-          scheduledPaymentAttempt.scheduledPayment.id
-        ]
+        !previouslySeenPayments[scheduledPaymentAttempt.scheduledPayment.id]
       ) {
-        previouslySeenPayments[
-          scheduledPaymentAttempt.scheduledPayment.id
-        ] = true;
+        previouslySeenPayments[scheduledPaymentAttempt.scheduledPayment.id] =
+          true;
 
         if (scheduledPaymentAttempt.scheduledPayment.isCanceled) {
           scheduledPaymentAttempt.isCanceled = true;
