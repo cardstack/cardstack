@@ -3,6 +3,7 @@ import { on } from '@ember/modifier';
 import { tracked } from '@glimmer/tracking';
 import { action } from '@ember/object';
 import { later } from '@ember/runloop';
+import { inject as service } from '@ember/service';
 import gt from 'ember-truth-helpers/helpers/gt';
 
 import { svgJar } from '@cardstack/boxel/utils/svg-jar';
@@ -12,6 +13,7 @@ import BoxelModal from '@cardstack/boxel/components/boxel/modal';
 import BoxelActionContainer from '@cardstack/boxel/components/boxel/action-container';
 import BoxelInputGroup from '@cardstack/boxel/components/boxel/input-group';
 import type { TemplateOnlyComponent } from '@ember/component/template-only';
+import TokensService from '@cardstack/safe-tools-client/services/tokens';
 
 import './index.css';
 
@@ -40,6 +42,15 @@ interface Signature {
 
 export default class DepositModal extends Component<Signature> {
   @tracked isShowingCopiedConfirmation = false;
+  @service declare tokens: TokensService;
+
+  get friendlyGasTokens() {
+    if (this.tokens.gasTokens.value) {
+      let gasTokenSymbols = this.tokens.gasTokens.value.map((gasToken) => gasToken.symbol);
+      return new Intl.ListFormat().format(gasTokenSymbols);
+    }
+    return '[loading...]';
+  }
 
   @action flashCopiedConfirmation() {
     this.isShowingCopiedConfirmation = true;
@@ -54,7 +65,10 @@ export default class DepositModal extends Component<Signature> {
         <Section @title="Deposit Instructions" class="deposit-modal__section">
           <p>
             It is your responsibility to ensure that sufficient funds are
-            present in your safe at the time of each transaction.
+            present in your safe at the time of each scheduled transaction.
+            In addition, you will need a balance of a supported gas token
+            in your safe in order to schedule a payment. The supported gas
+            tokens for {{@networkName}} are: {{this.friendlyGasTokens}}.
           </p>
           <p>To deposit into your {{@networkName}} safe, transfer tokens to:
             <br />
@@ -114,7 +128,7 @@ export default class DepositModal extends Component<Signature> {
         </Section>
         <ActionChin @state="default">
           <:default as |ac|>
-            <ac.ActionButton {{on "click" @onClose}}>
+            <ac.ActionButton {{on "click" @onClose}} data-test-close-button>
               Close
             </ac.ActionButton>
           </:default>
