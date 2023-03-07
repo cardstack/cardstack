@@ -181,14 +181,14 @@ export default class ScheduledPaymentsService extends Service {
 
     const scheduledPaymentAttempts =
       this.deserializeScheduledPaymentAttemptResponse(response);
-    const isAlreadyFoundTheLattestAttempt: Record<string, boolean> = {};
+    const previouslySeenPayments: Record<string, boolean> = {};
     for (const scheduledPaymentAttempt of scheduledPaymentAttempts) {
       if (
-        !isAlreadyFoundTheLattestAttempt[
+        !previouslySeenPayments[
           scheduledPaymentAttempt.scheduledPayment.id
         ]
       ) {
-        isAlreadyFoundTheLattestAttempt[
+        previouslySeenPayments[
           scheduledPaymentAttempt.scheduledPayment.id
         ] = true;
 
