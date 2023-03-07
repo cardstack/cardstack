@@ -179,7 +179,7 @@ class PaymentTransactionsList extends Component {
             {{#each this.paymentAttempts as |paymentAttempt index|}}
               <tr class="table__row" data-test-scheduled-payment-attempts-item={{index}}>
                 <td class="table__cell" data-test-scheduled-payment-attempts-item-timestamp>
-                  {{formatDate paymentAttempt.startedAt "HH:mm:ss"}}<br>
+                  {{formatDate paymentAttempt.startedAt "HH:mm"}}<br>
                   {{formatDate paymentAttempt.startedAt "dd/MM/yyyy"}}
                 </td>
                 <td class="table__cell" data-test-scheduled-payment-attempts-item-scheduled>
@@ -187,7 +187,7 @@ class PaymentTransactionsList extends Component {
                     The {{ordinalize paymentAttempt.scheduledPayment.recurringDayOfMonth}} of each month
                     <div class="payment-transactions-list__recurring">Recurring</div>
                   {{else}}
-                    {{formatDate paymentAttempt.scheduledPayment.payAt 'HH:mm:ss dd/MM/yyyy'}}
+                    {{formatDate paymentAttempt.scheduledPayment.payAt 'HH:mm dd/MM/yyyy'}}
                     <div class="payment-transactions-list__one-time">One-time</div>
                   {{/if}}
                 </td>
