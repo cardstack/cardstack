@@ -288,7 +288,7 @@ export async function signTypedData(
       signature = await signer._signTypedData(domain, types, message);
     } else if (isJsonRpcProvider(web3OrSignerOrEthersProvider)) {
       let ethersProvider = web3OrSignerOrEthersProvider;
-      return await ethersProvider.send('eth_signTypedData_v4', [account, JSON.stringify(data)]);
+      signature = await ethersProvider.send('eth_signTypedData_v4', [account, JSON.stringify(data)]);
     } else {
       signature = await signTypedDataWithWeb3(web3OrSignerOrEthersProvider, account, data);
     }
@@ -296,7 +296,7 @@ export async function signTypedData(
   if (!signature) {
     throw new Error(`unable to sign typed data for EOA ${account} with data ${JSON.stringify(data, null, 2)}`);
   }
-  return signature;
+  return signature.startsWith('0x') ? signature : '0x' + signature;
 }
 
 async function signTypedDataWithWeb3(web3: Web3, account: string, data: any): Promise<string> {
