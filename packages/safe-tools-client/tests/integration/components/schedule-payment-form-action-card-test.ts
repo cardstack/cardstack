@@ -26,7 +26,6 @@ import {
   addDays,
   subDays,
   addMonths,
-  addHours,
   subHours,
   isLastDayOfMonth,
 } from 'date-fns';
@@ -327,30 +326,29 @@ module(
           .isDisabled();
       });
 
-      test(`it disables times before one hour from now (one-time payment)`, async function (assert) {
+      test(`it disables times before now (one-time payment)`, async function (assert) {
         await render(hbs`
           <SchedulePaymentFormActionCard />
         `);
         const now = new Date();
-        const nextOneHour = addHours(now, 1);
         await click(`[data-test-payment-type="one-time"]`);
         await click(`[data-test-input-specific-payment-time]`);
 
         assert
           .dom(
             `[data-test-boxel-hour-menu] .boxel-menu__item--selected [data-test-boxel-menu-item-text="${format(
-              nextOneHour,
+              now,
               'h'
             )}"]`
           )
           .exists();
 
         //No disabled times if the nextOneHour is 00:00 or 12:00
-        if (nextOneHour.getHours() !== 0 && nextOneHour.getHours() !== 12) {
+        if (now.getHours() !== 0 && now.getHours() !== 12) {
           assert
             .dom(
               `[data-test-boxel-hour-menu] .boxel-menu__item--disabled [data-test-boxel-menu-item-text="${format(
-                subHours(nextOneHour, 1),
+                subHours(now, 1),
                 'h'
               )}"]`
             )

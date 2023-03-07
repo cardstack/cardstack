@@ -57,6 +57,9 @@ export default class SchedulePaymentFormValidator {
       if (!form.paymentDate) {
         return 'must choose a payment date and time';
       }
+      if (form.paymentDate.getTime() / 1000 < Math.round(Date.now() / 1000)) {
+        return 'payment time must be in the future';
+      }
     } else if (form.selectedPaymentType === 'monthly') {
       if (!form.paymentDayOfMonth) {
         return 'must choose a payment day of month';

@@ -27,6 +27,7 @@ import * as Sentry from '@sentry/browser';
 import FeeCalculator, { type CurrentFees } from './fee-calculator';
 import config from '@cardstack/safe-tools-client/config/environment';
 import HubAuthenticationService from '@cardstack/safe-tools-client/services/hub-authentication';
+import { addMinutes } from 'date-fns';
 
 interface Signature {
   Element: HTMLElement;
@@ -103,7 +104,7 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
   
   get minPaymentDate() {
     let now = new Date();
-    return new Date(now.setHours(now.getHours() + 1, 0, 0, 0));
+    return new Date(now.setHours(now.getHours(), now.getMinutes(), 0, 0));
   }
 
   get maxPaymentDate() {
@@ -115,7 +116,7 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
   @action onSelectPaymentType(paymentTypeId: string) {
     if (paymentTypeId === 'one-time') {
       if (!this.paymentDate) {
-        this.paymentDate = this.minPaymentDate;
+        this.paymentDate = addMinutes(this.minPaymentDate, 10);
       }
       
       this.selectedPaymentType = paymentTypeId;
