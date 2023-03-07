@@ -68,7 +68,7 @@ jobs:
         env:
           PERCY_TOKEN: ${{ secrets.PERCY_TOKEN_BOXEL }}
       - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v1
+        uses: aws-actions/configure-aws-credentials@v2.0.0
         with:
           role-to-assume: arn:aws:iam::680542703984:role/boxel
           aws-region: us-east-1
