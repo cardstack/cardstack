@@ -28,7 +28,10 @@ export interface ScheduledPaymentBase {
   isCanceled?: boolean;
   recurringDayOfMonth?: number;
   recurringUntil?: Date;
-  lastScheduledPaymentAttemptId?: string;
+  nextRetryAttemptAt: Date | null;
+  scheduledPaymentAttemptsInLastPaymentCycleCount: number;
+  lastScheduledPaymentAttemptId: string;
+  retriesLeft: number;
 }
 
 export interface ScheduledPayment extends ScheduledPaymentBase {
@@ -56,8 +59,8 @@ export interface ScheduledPaymentAttempt {
 }
 
 export interface ScheduledPaymentAttemptResponseItem {
+  id: string;
   attributes: {
-    id: string;
     'started-at': string;
     'ended-at': string;
     status: string;
@@ -94,7 +97,10 @@ export interface ScheduledPaymentAttemptIncludedData {
   'chain-id': string;
   'max-gas-price': string;
   'canceled-at': string;
+  'next-retry-attempt-at': string;
+  'scheduled-payment-attempts-in-last-payment-cycle-count': number;
   'last-scheduled-payment-attempt-id': string;
+  'retries-left': number;
 }
 
 export interface ScheduledPaymentAttemptResponseIncludedItem {
@@ -138,7 +144,10 @@ export interface ScheduledPaymentResponseItem {
     'creation-transaction-error': string;
     'cancelation-transaction-hash': string;
     'cancelation-block-number': string;
+    'next-retry-attempt-at': string;
+    'scheduled-payment-attempts-in-last-payment-cycle-count': number;
     'last-scheduled-payment-attempt-id': string;
+    'retries-left': number;
   };
 }
 
@@ -205,7 +214,7 @@ export default class ScheduledPaymentsService extends Service {
         buildUnknownToken(gasTokenAddress);
 
       return {
-        id: s.attributes['id'],
+        id: s.id,
         startedAt: new Date(s.attributes['started-at']),
         endedAt: new Date(s.attributes['ended-at']),
         status: s.attributes['status'],
@@ -226,8 +235,17 @@ export default class ScheduledPaymentsService extends Service {
           payAt: new Date(scheduledPayment!['pay-at']),
           maxGasPrice: BigNumber.from(scheduledPayment!['max-gas-price']),
           isCanceled: Boolean(scheduledPayment!['canceled-at']),
+          nextRetryAttemptAt: scheduledPayment!['next-retry-attempt-at']
+            ? new Date(scheduledPayment!['next-retry-attempt-at'])
+            : null,
+          scheduledPaymentAttemptsInLastPaymentCycleCount: Number(
+            scheduledPayment![
+              'scheduled-payment-attempts-in-last-payment-cycle-count'
+            ]
+          ),
           lastScheduledPaymentAttemptId:
             scheduledPayment!['last-scheduled-payment-attempt-id'],
+          retriesLeft: Number(scheduledPayment!['retries-left']),
         },
       };
     });
@@ -366,8 +384,17 @@ export default class ScheduledPaymentsService extends Service {
         cancelationBlockNumber: Number(
           data.attributes['cancelation-block-number']
         ),
+        nextRetryAttemptAt: data.attributes['next-retry-attempt-at']
+          ? new Date(data.attributes['next-retry-attempt-at'])
+          : null,
+        scheduledPaymentAttemptsInLastPaymentCycleCount: Number(
+          data.attributes[
+            'scheduled-payment-attempts-in-last-payment-cycle-count'
+          ]
+        ),
         lastScheduledPaymentAttemptId:
           data.attributes['last-scheduled-payment-attempt-id'],
+        retriesLeft: Number(data.attributes['retries-left']),
       };
     };
 

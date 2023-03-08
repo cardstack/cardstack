@@ -31,13 +31,21 @@
   font-size: var(--boxel-font-size-sm);
 }
 
-.transactions-table-item-status-text {
-  margin-left: var(--boxel-sp-xxs);
+.transactions-table-item-status-line {
+  white-space: nowrap;
 }
 
-.transactions-table-item-status-failure-reason {
+.transactions-table-item-status-line__info-icon {
+  margin-left: var(--boxel-sp-xxxs);
+}
+
+.transactions-table-item-status-failure-info {
   font-size: var(--boxel-font-size-xs);
   color: var(--boxel-purple-600);
+}
+
+.transactions-table-item-status-failure-info > div {
+  margin-top: var(--boxel-sp-xxxs);
 }
 
 .transactions-table-empty-explanation {
@@ -71,6 +79,7 @@
 .payment-transactions-list__recurring {
   text-transform: uppercase;
   font-weight: 600;
+  margin-top: var(--boxel-sp-xxxs);
 }
 
 .payment-transactions-list__one-time {
