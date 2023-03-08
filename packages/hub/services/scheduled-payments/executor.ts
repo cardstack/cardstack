@@ -100,6 +100,7 @@ export default class ScheduledPaymentsExecutorService {
           startedAt: {
             gte: scheduledPayment.payAt!,
           },
+          scheduledPaymentId: scheduledPayment.id,
         },
       })
     ).length;

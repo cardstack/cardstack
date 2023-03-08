@@ -123,6 +123,33 @@ describe('executing scheduled payments', function () {
   it("sets the scheduled payment's status to 'failed' if the transaction fails", async function () {
     sdkError = new Error('UnknownHash');
 
+    // We create otherScheduledPayment and make a failed payment attempt so that we can test that scheduledPaymentAttemptsInLastPaymentCycleCount on the scheduledPayment is updated correctly and
+    // it doesn't include the failed payment attempt from otherScheduledPayment
+    let otherScheduledPayment = await prisma.scheduledPayment.create({
+      data: {
+        id: shortUuid.uuid(),
+        senderSafeAddress: '0xc0ffee254729296a45a3885639AC7E10F9d54979',
+        moduleAddress: '0x7E7d0B97D663e268bB403eb4d72f7C0C7650a6dd',
+        tokenAddress: '0xa455bbB2A81E09E0337c13326BBb302Cb37D7cf6',
+        gasTokenAddress: '0x6A50E3807FB9cD0B07a79F64e561B9873D3b132E',
+        amount: '100',
+        payeeAddress: '0x821f3Ee0FbE6D1aCDAC160b5d120390Fb8D2e9d3',
+        executionGasEstimation: 100000,
+        maxGasPrice: '1000000000',
+        feeFixedUsd: '0',
+        feePercentage: '0',
+        salt: '54lt',
+        payAt: nowUtc(),
+        spHash: cryptoRandomString({ length: 10 }),
+        chainId: 1,
+        userAddress: '0x57022DA74ec3e6d8274918C732cf8864be7da833',
+        creationTransactionHash: null,
+      },
+    });
+
+    await expect(subject.executePayment(otherScheduledPayment, 3, {} as any, stubbedSchedulePaymentModule as any)).to.be
+      .rejected;
+
     let scheduledPayment = await prisma.scheduledPayment.create({
       data: {
         id: shortUuid.uuid(),
