@@ -14,8 +14,8 @@ declare namespace Intl {
 
   class ListFormat {
     constructor(locales?: string | string[], options?: ListFormatOptions);
-    format(values: any[]): string;
-    formatToParts(values: any[]): ListFormatPart[];
+    format(values: unknown[]): string;
+    formatToParts(values: unknown[]): ListFormatPart[];
     supportedLocalesOf(
       locales: string | string[],
       options?: ListFormatOptions
