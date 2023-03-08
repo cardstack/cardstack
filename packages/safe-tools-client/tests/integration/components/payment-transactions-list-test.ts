@@ -32,6 +32,7 @@ class SafesServiceStub extends Service {
 let returnEmptyScheduledPaymentAttempts = false;
 let returnScheduledPaymentAttemptsWithBlankTxHash = false;
 let returnScheduledPaymentAttemptsWithExceedMaxGasPriceError = false;
+let returnScheduledPaymentAttemptsOfCanceledScheduledPayment = false;
 const now = new Date();
 
 class ScheduledPaymentsStub extends Service {
@@ -55,6 +56,7 @@ class ScheduledPaymentsStub extends Service {
     } else if (returnScheduledPaymentAttemptsWithBlankTxHash) {
       return Promise.resolve([
         {
+          id: '1',
           startedAt: subDays(now, 10),
           endedAt: addMinutes(subDays(now, 10), 120),
           status: 'failed',
@@ -77,6 +79,7 @@ class ScheduledPaymentsStub extends Service {
     } else if (returnScheduledPaymentAttemptsWithExceedMaxGasPriceError) {
       return Promise.resolve([
         {
+          id: '1',
           startedAt: subDays(now, 10),
           endedAt: addMinutes(subDays(now, 10), 120),
           status: 'failed',
@@ -98,36 +101,12 @@ class ScheduledPaymentsStub extends Service {
           },
         },
       ]);
-    }
-
-    return Promise.resolve(
-      [
+    } else if (returnScheduledPaymentAttemptsOfCanceledScheduledPayment) {
+      return Promise.resolve([
         {
+          id: '1',
           startedAt: subDays(now, 10),
           endedAt: addMinutes(subDays(now, 10), 120),
-          status: 'succeeded',
-          failureReason: '',
-          executionGasPrice: BigNumber.from('10000'),
-          transactionHash:
-            '0x6f7c54719c0901e30ef018206c37df4daa059224549a08d55acb3360f01094e2',
-          scheduledPayment: {
-            id: '01234',
-            paymentTokenQuantity: addPaymentTokenQuantity('10000000'),
-            feeFixedUSD: '0',
-            feePercentage: '0',
-            gasToken: paymentToken,
-            chainId,
-            senderSafeAddress,
-            payeeAddress: '0xeBCC5516d44FFf5E9aBa2AcaeB65BbB49bC3EBe1',
-            payAt: addMinutes(subDays(now, 10), 120),
-            maxGasPrice: BigNumber.from('10000'),
-            recurringDayOfMonth: undefined,
-            recurringUntil: undefined,
-          },
-        },
-        {
-          startedAt: subDays(now, 20),
-          endedAt: addMinutes(subDays(now, 20), 120),
           status: 'failed',
           executionGasPrice: BigNumber.from('10000'),
           failureReason: 'PaymentExecutionFailed',
@@ -141,16 +120,19 @@ class ScheduledPaymentsStub extends Service {
             chainId,
             senderSafeAddress,
             payeeAddress: '0xeBCC5516d44FFf5E9aBa2AcaeB65BbB49bC3EBe1',
-            payAt: addMinutes(subDays(now, 20), 120),
+            payAt: addMinutes(subDays(now, 10), 120),
             maxGasPrice: BigNumber.from('10000'),
-            recurringDayOfMonth: subDays(now, 20).getDate(),
-            recurringUntil: addYears(now, 1),
+            recurringDayOfMonth: undefined,
+            recurringUntil: undefined,
+            lastScheduledPaymentAttemptId: '1',
+            isCanceled: true,
           },
         },
         {
-          startedAt: subDays(now, 60),
-          endedAt: addMinutes(subDays(now, 60), 120),
-          status: 'succeeded',
+          id: '2',
+          startedAt: subDays(now, 10),
+          endedAt: addMinutes(subDays(now, 10), 100),
+          status: 'failed',
           failureReason: '',
           executionGasPrice: BigNumber.from('10000'),
           transactionHash: '0x123',
@@ -163,16 +145,93 @@ class ScheduledPaymentsStub extends Service {
             chainId,
             senderSafeAddress,
             payeeAddress: '0xeBCC5516d44FFf5E9aBa2AcaeB65BbB49bC3EBe1',
-            payAt: addMinutes(subDays(now, 60), 120),
+            payAt: addMinutes(subDays(now, 10), 120),
             maxGasPrice: BigNumber.from('10000'),
             recurringDayOfMonth: undefined,
             recurringUntil: undefined,
+            lastScheduledPaymentAttemptId: '1',
+            isCanceled: true,
           },
         },
-      ]
-        .filter((r) => (startedAt ? r.startedAt > startedAt : true))
-        .filter((r) => (status ? r.status === status : true))
-    );
+      ]);
+    } else {
+      return Promise.resolve(
+        [
+          {
+            id: '1',
+            startedAt: subDays(now, 10),
+            endedAt: addMinutes(subDays(now, 10), 120),
+            status: 'succeeded',
+            failureReason: '',
+            executionGasPrice: BigNumber.from('10000'),
+            transactionHash:
+              '0x6f7c54719c0901e30ef018206c37df4daa059224549a08d55acb3360f01094e2',
+            scheduledPayment: {
+              id: '01234',
+              paymentTokenQuantity: addPaymentTokenQuantity('10000000'),
+              feeFixedUSD: '0',
+              feePercentage: '0',
+              gasToken: paymentToken,
+              chainId,
+              senderSafeAddress,
+              payeeAddress: '0xeBCC5516d44FFf5E9aBa2AcaeB65BbB49bC3EBe1',
+              payAt: addMinutes(subDays(now, 10), 120),
+              maxGasPrice: BigNumber.from('10000'),
+              recurringDayOfMonth: undefined,
+              recurringUntil: undefined,
+            },
+          },
+          {
+            id: '2',
+            startedAt: subDays(now, 20),
+            endedAt: addMinutes(subDays(now, 20), 120),
+            status: 'failed',
+            executionGasPrice: BigNumber.from('10000'),
+            failureReason: 'PaymentExecutionFailed',
+            transactionHash: '0x123',
+            scheduledPayment: {
+              id: '34234',
+              paymentTokenQuantity: addPaymentTokenQuantity('10000000'),
+              feeFixedUSD: '0',
+              feePercentage: '0',
+              gasToken: paymentToken,
+              chainId,
+              senderSafeAddress,
+              payeeAddress: '0xeBCC5516d44FFf5E9aBa2AcaeB65BbB49bC3EBe1',
+              payAt: addMinutes(subDays(now, 20), 120),
+              maxGasPrice: BigNumber.from('10000'),
+              recurringDayOfMonth: subDays(now, 20).getDate(),
+              recurringUntil: addYears(now, 1),
+            },
+          },
+          {
+            id: '3',
+            startedAt: subDays(now, 60),
+            endedAt: addMinutes(subDays(now, 60), 120),
+            status: 'succeeded',
+            failureReason: '',
+            executionGasPrice: BigNumber.from('10000'),
+            transactionHash: '0x123',
+            scheduledPayment: {
+              id: '323232',
+              paymentTokenQuantity: addPaymentTokenQuantity('15000000'),
+              feeFixedUSD: '0',
+              feePercentage: '0',
+              gasToken: paymentToken,
+              chainId,
+              senderSafeAddress,
+              payeeAddress: '0xeBCC5516d44FFf5E9aBa2AcaeB65BbB49bC3EBe1',
+              payAt: addMinutes(subDays(now, 60), 120),
+              maxGasPrice: BigNumber.from('10000'),
+              recurringDayOfMonth: undefined,
+              recurringUntil: undefined,
+            },
+          },
+        ]
+          .filter((r) => (startedAt ? r.startedAt > startedAt : true))
+          .filter((r) => (status ? r.status === status : true))
+      );
+    }
   };
 }
 
@@ -189,6 +248,7 @@ module('Integration | Component | payment-transactions-list', function (hooks) {
     returnEmptyScheduledPaymentAttempts = false;
     returnScheduledPaymentAttemptsWithBlankTxHash = false;
     returnScheduledPaymentAttemptsWithExceedMaxGasPriceError = false;
+    returnScheduledPaymentAttemptsOfCanceledScheduledPayment = false;
     this.owner.register('service:safes', SafesServiceStub);
   });
 
@@ -404,5 +464,19 @@ module('Integration | Component | payment-transactions-list', function (hooks) {
       '[data-test-scheduled-payment-attempts-item="0"] [data-test-scheduled-payment-card-options-button]'
     );
     assert.dom('.boxel-menu__item--disabled').containsText('Cancel Payment');
+  });
+
+  test('It displays the latest attempts of canceled scheduled payment with status cancel', async function (assert) {
+    returnScheduledPaymentAttemptsOfCanceledScheduledPayment = true;
+    await render(hbs`
+      <PaymentTransactionsList />
+    `);
+
+    assert
+      .dom('[data-test-scheduled-payment-attempts-item]')
+      .exists({ count: 2 });
+    assert
+      .dom('[data-test-scheduled-payment-attempts-item-status-canceled]')
+      .exists({ count: 1 });
   });
 });

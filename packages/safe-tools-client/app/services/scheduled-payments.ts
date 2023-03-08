@@ -28,6 +28,7 @@ export interface ScheduledPaymentBase {
   isCanceled?: boolean;
   recurringDayOfMonth?: number;
   recurringUntil?: Date;
+  lastScheduledPaymentAttemptId?: string;
 }
 
 export interface ScheduledPayment extends ScheduledPaymentBase {
@@ -44,6 +45,7 @@ export interface ScheduledPayment extends ScheduledPaymentBase {
 }
 
 export interface ScheduledPaymentAttempt {
+  id: string;
   startedAt: Date;
   endedAt: Date;
   status: string;
@@ -92,6 +94,7 @@ export interface ScheduledPaymentAttemptIncludedData {
   'chain-id': string;
   'max-gas-price': string;
   'canceled-at': string;
+  'last-scheduled-payment-attempt-id': string;
 }
 
 export interface ScheduledPaymentAttemptResponseIncludedItem {
@@ -135,6 +138,7 @@ export interface ScheduledPaymentResponseItem {
     'creation-transaction-error': string;
     'cancelation-transaction-hash': string;
     'cancelation-block-number': string;
+    'last-scheduled-payment-attempt-id': string;
   };
 }
 
@@ -201,6 +205,7 @@ export default class ScheduledPaymentsService extends Service {
         buildUnknownToken(gasTokenAddress);
 
       return {
+        id: s.attributes['id'],
         startedAt: new Date(s.attributes['started-at']),
         endedAt: new Date(s.attributes['ended-at']),
         status: s.attributes['status'],
@@ -221,6 +226,8 @@ export default class ScheduledPaymentsService extends Service {
           payAt: new Date(scheduledPayment!['pay-at']),
           maxGasPrice: BigNumber.from(scheduledPayment!['max-gas-price']),
           isCanceled: Boolean(scheduledPayment!['canceled-at']),
+          lastScheduledPaymentAttemptId:
+            scheduledPayment!['last-scheduled-payment-attempt-id'],
         },
       };
     });
@@ -359,6 +366,8 @@ export default class ScheduledPaymentsService extends Service {
         cancelationBlockNumber: Number(
           data.attributes['cancelation-block-number']
         ),
+        lastScheduledPaymentAttemptId:
+          data.attributes['last-scheduled-payment-attempt-id'],
       };
     };
 

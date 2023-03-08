@@ -376,6 +376,7 @@ module('Acceptance | scheduling', function (hooks) {
       ]);
     };
   });
+
   hooks.afterEach(function () {
     mockServiceWorker.stop();
   });
