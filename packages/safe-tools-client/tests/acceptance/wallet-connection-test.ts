@@ -115,6 +115,10 @@ module('Acceptance | wallet connection', function (hooks) {
     });
   });
 
+  hooks.afterEach(function () {
+    mockServiceWorker.stop();
+  });
+
   module('With Metamask', function () {
     // eslint-disable-next-line qunit/require-expect
     test('connecting wallet', async function (assert) {

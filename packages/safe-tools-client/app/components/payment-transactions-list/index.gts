@@ -81,6 +81,7 @@ class PaymentTransactionsList extends Component {
   }
 
   get paymentAttempts() {
+    console.log(this.scheduledPaymentAttemptsResource.value);
     return this.scheduledPaymentAttemptsResource.value || []
   }
 
@@ -200,13 +201,13 @@ class PaymentTransactionsList extends Component {
                   {{#if (eq paymentAttempt.status 'succeeded')}}
                     🟢 <span class="transactions-table-item-status-text">Confirmed</span>
                   {{else if (eq paymentAttempt.status 'failed')}}
-                    {{#if paymentAttempt.scheduledPayment.isCanceled}}
-                      🟠 <span class="transactions-table-item-status-text">Canceled</span>
+                    {{#if (and paymentAttempt.scheduledPayment.isCanceled (eq paymentAttempt.id paymentAttempt.scheduledPayment.lastScheduledPaymentAttemptId))}}
+                    🟠 <span class="transactions-table-item-status-text" data-test-scheduled-payment-attempts-item-status-canceled>Canceled</span>
                     {{else}}
-                      🔴 <span class="transactions-table-item-status-text">Failed</span>
+                    🔴 <span class="transactions-table-item-status-text">Failed</span>
                       <span class="transactions-table-item-status-failure-reason">
                         ({{paymentErrorMessage paymentAttempt.failureReason paymentAttempt.scheduledPayment.maxGasPrice paymentAttempt.executionGasPrice paymentAttempt.scheduledPayment.gasToken.decimals}})
-                       </span>
+                      </span>
                     {{/if}}
                   {{else}}
                     🔵 <span class="transactions-table-item-status-text">Pending</span>
