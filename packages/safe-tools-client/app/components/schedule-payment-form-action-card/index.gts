@@ -60,7 +60,6 @@ export interface MaxGasDescriptionsState {
 
 export interface RequiredGasTokenToSchedulePaymentState {
   isLoading: boolean;
-  isIndeterminate: boolean;
   value?: TokenQuantity
   error?: Error
 }
@@ -386,19 +385,17 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
   @use requiredGasTokenToSchedulePayment = resource(() => {
     const state: RequiredGasTokenToSchedulePaymentState = new TrackedObject({
       isLoading: false,
-      isIndeterminate: false
     });
     
     let params = this.composeSchedulePaymentParams();
     if (!this.isValid || !params) {
-      state.isIndeterminate = true;
       return state;
     }
 
     (async () => {
       try {
         state.isLoading = true;
-        let amount = await this.scheduledPaymentSdk.estimateGasTokenToSchedule(
+        let amount = await this.scheduledPaymentSdk.estimateSchedulePaymentInGasToken(
           params.safeAddress,
           params.spModuleAddress,
           params.tokenAddress,

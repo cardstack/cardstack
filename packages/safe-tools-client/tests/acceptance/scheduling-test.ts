@@ -387,7 +387,7 @@ module('Acceptance | scheduling', function (hooks) {
     const scheduledPaymentSdkService = this.owner.lookup(
       'service:scheduled-payment-sdk'
     ) as ScheduledPaymentSdk;
-    scheduledPaymentSdkService.estimateGasTokenToSchedule = async (
+    scheduledPaymentSdkService.estimateSchedulePaymentInGasToken = async (
       _safeAddress: ChainAddress,
       _moduleAddress: ChainAddress,
       _tokenAddress: ChainAddress,

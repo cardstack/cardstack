@@ -1089,7 +1089,7 @@ export default class ScheduledPaymentModule {
     await waitUntilSchedulePaymentTransactionMined(hubRootUrl, scheduledPaymentId, authToken, options.listener);
   }
 
-  async estimateGasTokenToSchedule(
+  async estimateSchedulePaymentInGasToken(
     safeAddress: string,
     moduleAddress: string,
     tokenAddress: string,

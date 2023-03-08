@@ -83,7 +83,7 @@ class ScheduledPaymentSDKServiceStub extends Service {
     return exampleGasTokens.find((gt) => gt.symbol === 'USDC');
   }
 
-  async estimateGasTokenToSchedule(
+  async estimateSchedulePaymentInGasToken(
     _safeAddress: ChainAddress,
     _moduleAddress: ChainAddress,
     _tokenAddress: ChainAddress,

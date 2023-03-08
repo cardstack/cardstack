@@ -214,7 +214,7 @@ export default class SchedulePaymentSDKService extends Service {
     );
   }
 
-  async estimateGasTokenToSchedule(
+  async estimateSchedulePaymentInGasToken(
     safeAddress: ChainAddress,
     moduleAddress: ChainAddress,
     tokenAddress: ChainAddress,
@@ -230,7 +230,7 @@ export default class SchedulePaymentSDKService extends Service {
   ): Promise<BigNumber> {
     const scheduledPaymentModule = await this.getSchedulePaymentModule();
     const estimatedGasToken =
-      await scheduledPaymentModule.estimateGasTokenToSchedule(
+      await scheduledPaymentModule.estimateSchedulePaymentInGasToken(
         safeAddress,
         moduleAddress,
         tokenAddress,
