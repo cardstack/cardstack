@@ -494,6 +494,7 @@ module('Acceptance | scheduling', function (hooks) {
           // @ts-expect-error intentionally omitting attributes because they are not needed for this test
           attributes: {
             'pay-at': addDays(Date.now(), 1).toISOString(),
+            'payee-address': '0xb794f5ea0ba39494ce839613fffba74279579268',
             amount: String(
               scheduledPaymentCreations[0].data.attributes['amount']
             ),
