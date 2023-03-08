@@ -9,7 +9,6 @@ import Service from '@ember/service';
 import { click, render, TestContext } from '@ember/test-helpers';
 import { addYears, subDays, addMinutes, format } from 'date-fns';
 import { BigNumber } from 'ethers';
-
 import hbs from 'htmlbars-inline-precompile';
 import { module, test } from 'qunit';
 
@@ -73,7 +72,7 @@ class ScheduledPaymentsStub extends Service {
             payeeAddress: '0xeBCC5516d44FFf5E9aBa2AcaeB65BbB49bC3EBe1',
             payAt: addMinutes(subDays(now, 10), 120),
             maxGasPrice: BigNumber.from('10000'),
-            nextRetryAttemptAt: new Date('2022-11-11T21:00Z'),
+            nextRetryAttemptAt: new Date('2022-11-11T01:00Z'),
             scheduledPaymentAttemptsInLastPaymentCycleCount: 2,
             lastScheduledPaymentAttemptId: '1',
             retriesLeft: 2,
@@ -102,7 +101,7 @@ class ScheduledPaymentsStub extends Service {
             maxGasPrice: BigNumber.from('5000'),
             recurringDayOfMonth: undefined,
             recurringUntil: undefined,
-            nextRetryAttemptAt: new Date('2022-11-11T21:00Z'),
+            nextRetryAttemptAt: new Date('2022-11-11T01:00Z'),
             scheduledPaymentAttemptsInLastPaymentCycleCount: 2,
             lastScheduledPaymentAttemptId: '11',
             retriesLeft: 2,
@@ -133,7 +132,7 @@ class ScheduledPaymentsStub extends Service {
             recurringDayOfMonth: undefined,
             recurringUntil: undefined,
             isCanceled: true,
-            nextRetryAttemptAt: new Date('2022-11-11T21:00Z'),
+            nextRetryAttemptAt: new Date('2022-11-11T01:00Z'),
             scheduledPaymentAttemptsInLastPaymentCycleCount: 2,
             lastScheduledPaymentAttemptId: '111',
             retriesLeft: 2,
@@ -161,7 +160,7 @@ class ScheduledPaymentsStub extends Service {
             recurringDayOfMonth: undefined,
             recurringUntil: undefined,
             isCanceled: true,
-            nextRetryAttemptAt: new Date('2022-11-11T21:00Z'),
+            nextRetryAttemptAt: new Date('2022-11-11T01:00Z'),
             scheduledPaymentAttemptsInLastPaymentCycleCount: 2,
             lastScheduledPaymentAttemptId: '222',
             retriesLeft: 2,
@@ -220,7 +219,7 @@ class ScheduledPaymentsStub extends Service {
               maxGasPrice: BigNumber.from('10000'),
               recurringDayOfMonth: subDays(now, 20).getDate(),
               recurringUntil: addYears(now, 1),
-              nextRetryAttemptAt: new Date('2022-11-11T21:00Z'),
+              nextRetryAttemptAt: new Date('2022-11-11T01:00Z'),
               scheduledPaymentAttemptsInLastPaymentCycleCount: 2,
               lastScheduledPaymentAttemptId: '2',
               retriesLeft: 2,
@@ -324,7 +323,12 @@ module('Integration | Component | payment-transactions-list', function (hooks) {
       )
       .includesText('Failed')
       .includesText('Insufficient funds to execute the payment')
-      .includesText('Next retry: 22:00 11/11/2022')
+      .includesText(
+        `Next retry: ${format(
+          new Date('2022-11-11T01:00Z'),
+          'HH:mm dd/MM/yyyy'
+        )}`
+      )
       .includesText('Retries left: 2');
 
     assert
