@@ -25,3 +25,13 @@
     flex-direction: column;
   }
 }
+
+@media only percy {
+  .hide-in-percy {
+    visibility: hidden;
+  }
+
+  .remove-in-percy {
+    display: none;
+  }
+}
