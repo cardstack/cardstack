@@ -372,7 +372,7 @@ export default class SchedulePaymentFormActionCardUI extends Component<Signature
                       </div>
                     {{/if}}
                   {{else}}
-                    <div>Estimating schedule payment gas...</div>
+                    <div>Estimating gas cost needed to schedule a payment...</div>
                   {{/if}}
                 </div>
               </BoxelField>
