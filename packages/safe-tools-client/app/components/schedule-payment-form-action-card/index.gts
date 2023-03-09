@@ -122,7 +122,8 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
   @action onSelectPaymentType(paymentTypeId: string) {
     if (paymentTypeId === 'one-time') {
       if (!this.paymentDate) {
-        this.paymentDate = addMinutes(this.minPaymentDate, 10);
+        let now = new Date();
+        this.paymentDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 12); // Tomorrow noon
       }
       
       this.selectedPaymentType = paymentTypeId;
