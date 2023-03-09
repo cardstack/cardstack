@@ -74,12 +74,13 @@ describe('locking the nonce', function () {
 
   it(`retrieves nonce to the blockchain because account nonce in database is expired`, async function () {
     let currentNonce = 2;
+    let createdAt = subSeconds(nowUtc(), subject.nonceTTL + 60);
     await prisma.crankNonce.create({
       data: {
         chainId: chainId,
         nonce: currentNonce,
-        createdAt: subSeconds(nowUtc(), subject.nonceTTL + 60),
-        updatedAt: subSeconds(nowUtc(), subject.nonceTTL + 60),
+        createdAt,
+        updatedAt: createdAt,
       },
     });
     let testFunc = async (nonce: BN) => {
@@ -92,6 +93,7 @@ describe('locking the nonce', function () {
     });
     expect(crankNonce).not.undefined;
     expect(Number(crankNonce?.nonce ?? 0)).equal(10);
+    expect(crankNonce?.updatedAt).greaterThan(createdAt);
   });
 
   it(`increases current nonce in database`, async function () {
