@@ -359,7 +359,7 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
     (async () => {
       try {
         state.isLoading = true;
-        this.gasEstimation = await this.scheduledPaymentSdk.getScheduledPaymentGasEstimation(scenario, selectedGasToken);
+        this.gasEstimation = await this.scheduledPaymentSdk.getScheduledPaymentGasEstimation(scenario, paymentToken, selectedGasToken);
         const { gasRangeInGasTokenUnits } = this.gasEstimation;
         state.value = {
           normal: new TokenQuantity(selectedGasToken, gasRangeInGasTokenUnits.normal),
