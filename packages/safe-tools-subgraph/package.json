@@ -5,7 +5,6 @@
     "codegen": "graph codegen",
     "build": "graph build",
     "deploy:goerli": "graph deploy --product hosted-service cardstack/safe-tools-goerli",
-    "deploy:mumbai": "graph deploy --product hosted-service cardstack/safe-tools-mumbai",
     "deploy:polygon": "graph deploy --product hosted-service cardstack/safe-tools-polygon",
     "deploy:mainnet": "graph deploy --product hosted-service cardstack/safe-tools-mainnet",
     "create-local": "graph create --node http://localhost:8020/ cardstack/safe-tools",
