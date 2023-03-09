@@ -37,8 +37,12 @@ describe('GasEstimationValidator', function () {
       safeAddress: [
         `safe address is required in ${GasEstimationResultsScenarioEnum.execute_one_time_payment} scenario`,
       ],
-      tokenAddress: [`token address is required in ${GasEstimationResultsScenarioEnum.execute_one_time_payment} scenario`],
-      gasTokenAddress: [`gas token address is required in ${GasEstimationResultsScenarioEnum.execute_one_time_payment} scenario`],
+      tokenAddress: [
+        `token address is required in ${GasEstimationResultsScenarioEnum.execute_one_time_payment} scenario`,
+      ],
+      gasTokenAddress: [
+        `gas token address is required in ${GasEstimationResultsScenarioEnum.execute_one_time_payment} scenario`,
+      ],
     });
   });
 

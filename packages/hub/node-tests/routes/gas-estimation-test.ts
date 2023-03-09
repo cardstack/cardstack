@@ -213,7 +213,7 @@ describe('POST /api/gas-estimation', function () {
             },
             status: '422',
             title: 'Invalid attribute',
-          }
+          },
         ],
       });
   });

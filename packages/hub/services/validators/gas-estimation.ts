@@ -6,7 +6,7 @@ import { GasEstimationParams } from '../gas-estimation';
 import { isSupportedChain } from '@cardstack/cardpay-sdk';
 const { isAddress } = Web3.utils;
 
-type GasEstimationAttribute = 'scenario' | 'chainId' | 'safeAddress' | 'tokenAddress' | 'gasTokenAddress';;
+type GasEstimationAttribute = 'scenario' | 'chainId' | 'safeAddress' | 'tokenAddress' | 'gasTokenAddress';
 
 type GasEstimationErrors = Record<GasEstimationAttribute, string[]>;
 
@@ -46,7 +46,9 @@ export default class GasEstimationValidator {
       let executionMandatoryAttributes: GasEstimationAttribute[] = ['tokenAddress', 'gasTokenAddress'];
       for (let attribute of executionMandatoryAttributes) {
         if (gasEstimationParams[attribute] == null) {
-          errors[attribute].push(`${startCase(attribute).toLowerCase()} is required in ${gasEstimationParams.scenario} scenario`);
+          errors[attribute].push(
+            `${startCase(attribute).toLowerCase()} is required in ${gasEstimationParams.scenario} scenario`
+          );
         }
       }
 

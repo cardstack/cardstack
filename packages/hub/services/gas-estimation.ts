@@ -65,7 +65,7 @@ export default class GasEstimationService {
       },
       update: {
         gas: gas,
-        updatedAt: nowUtc()
+        updatedAt: nowUtc(),
       },
     });
 

@@ -1309,7 +1309,7 @@ export default class ScheduledPaymentModule {
           'chain-id': chainId,
           'safe-address': options.safeAddress,
           'token-address': options.tokenAddress,
-          'gas-token-address': options.gasTokenAddress
+          'gas-token-address': options.gasTokenAddress,
         },
       },
     };
