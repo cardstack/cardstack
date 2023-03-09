@@ -9,7 +9,6 @@ import Service from '@ember/service';
 import { click, render, TestContext } from '@ember/test-helpers';
 import { addYears, subDays, addMinutes, format } from 'date-fns';
 import { BigNumber } from 'ethers';
-
 import hbs from 'htmlbars-inline-precompile';
 import { module, test } from 'qunit';
 
@@ -73,13 +72,17 @@ class ScheduledPaymentsStub extends Service {
             payeeAddress: '0xeBCC5516d44FFf5E9aBa2AcaeB65BbB49bC3EBe1',
             payAt: addMinutes(subDays(now, 10), 120),
             maxGasPrice: BigNumber.from('10000'),
+            nextRetryAttemptAt: new Date('2022-11-11T01:00Z'),
+            scheduledPaymentAttemptsInLastPaymentCycleCount: 2,
+            lastScheduledPaymentAttemptId: '1',
+            retriesLeft: 2,
           },
         },
       ]);
     } else if (returnScheduledPaymentAttemptsWithExceedMaxGasPriceError) {
       return Promise.resolve([
         {
-          id: '1',
+          id: '11',
           startedAt: subDays(now, 10),
           endedAt: addMinutes(subDays(now, 10), 120),
           status: 'failed',
@@ -98,13 +101,17 @@ class ScheduledPaymentsStub extends Service {
             maxGasPrice: BigNumber.from('5000'),
             recurringDayOfMonth: undefined,
             recurringUntil: undefined,
+            nextRetryAttemptAt: new Date('2022-11-11T01:00Z'),
+            scheduledPaymentAttemptsInLastPaymentCycleCount: 2,
+            lastScheduledPaymentAttemptId: '11',
+            retriesLeft: 2,
           },
         },
       ]);
     } else if (returnScheduledPaymentAttemptsOfCanceledScheduledPayment) {
       return Promise.resolve([
         {
-          id: '1',
+          id: '111',
           startedAt: subDays(now, 10),
           endedAt: addMinutes(subDays(now, 10), 120),
           status: 'failed',
@@ -124,8 +131,11 @@ class ScheduledPaymentsStub extends Service {
             maxGasPrice: BigNumber.from('10000'),
             recurringDayOfMonth: undefined,
             recurringUntil: undefined,
-            lastScheduledPaymentAttemptId: '1',
             isCanceled: true,
+            nextRetryAttemptAt: new Date('2022-11-11T01:00Z'),
+            scheduledPaymentAttemptsInLastPaymentCycleCount: 2,
+            lastScheduledPaymentAttemptId: '111',
+            retriesLeft: 2,
           },
         },
         {
@@ -149,8 +159,11 @@ class ScheduledPaymentsStub extends Service {
             maxGasPrice: BigNumber.from('10000'),
             recurringDayOfMonth: undefined,
             recurringUntil: undefined,
-            lastScheduledPaymentAttemptId: '1',
             isCanceled: true,
+            nextRetryAttemptAt: new Date('2022-11-11T01:00Z'),
+            scheduledPaymentAttemptsInLastPaymentCycleCount: 2,
+            lastScheduledPaymentAttemptId: '222',
+            retriesLeft: 2,
           },
         },
       ]);
@@ -179,6 +192,10 @@ class ScheduledPaymentsStub extends Service {
               maxGasPrice: BigNumber.from('10000'),
               recurringDayOfMonth: undefined,
               recurringUntil: undefined,
+              nextRetryAttemptAt: null,
+              scheduledPaymentAttemptsInLastPaymentCycleCount: 1,
+              lastScheduledPaymentAttemptId: '1',
+              retriesLeft: 0,
             },
           },
           {
@@ -202,6 +219,10 @@ class ScheduledPaymentsStub extends Service {
               maxGasPrice: BigNumber.from('10000'),
               recurringDayOfMonth: subDays(now, 20).getDate(),
               recurringUntil: addYears(now, 1),
+              nextRetryAttemptAt: new Date('2022-11-11T01:00Z'),
+              scheduledPaymentAttemptsInLastPaymentCycleCount: 2,
+              lastScheduledPaymentAttemptId: '2',
+              retriesLeft: 2,
             },
           },
           {
@@ -225,6 +246,10 @@ class ScheduledPaymentsStub extends Service {
               maxGasPrice: BigNumber.from('10000'),
               recurringDayOfMonth: undefined,
               recurringUntil: undefined,
+              nextRetryAttemptAt: null,
+              scheduledPaymentAttemptsInLastPaymentCycleCount: 1,
+              lastScheduledPaymentAttemptId: '1',
+              retriesLeft: 0,
             },
           },
         ]
@@ -266,7 +291,7 @@ module('Integration | Component | payment-transactions-list', function (hooks) {
       .dom(
         '[data-test-scheduled-payment-attempts-item="0"] [data-test-scheduled-payment-attempts-item-timestamp]'
       )
-      .containsText(format(now, 'HH:mm:ss'));
+      .containsText(format(now, 'HH:mm'));
 
     assert
       .dom(
@@ -296,7 +321,15 @@ module('Integration | Component | payment-transactions-list', function (hooks) {
       .dom(
         '[data-test-scheduled-payment-attempts-item="1"] [data-test-scheduled-payment-attempts-item-status]'
       )
-      .includesText('Failed (insufficient funds to execute the payment)');
+      .includesText('Failed')
+      .includesText('Insufficient funds to execute the payment')
+      .includesText(
+        `Next retry: ${format(
+          new Date('2022-11-11T01:00Z'),
+          'HH:mm dd/MM/yyyy'
+        )}`
+      )
+      .includesText('Retries left: 2');
 
     assert
       .dom(
@@ -332,7 +365,7 @@ module('Integration | Component | payment-transactions-list', function (hooks) {
       .dom(
         '[data-test-scheduled-payment-attempts-item="0"] [data-test-scheduled-payment-attempts-item-status]'
       )
-      .includesText('Failed (insufficient funds to execute the payment)');
+      .includesText('Failed');
     await click('[data-test-scheduled-payment-status-filter]');
     await click('[data-test-boxel-menu-item-text="Succeeded"]');
 
@@ -412,9 +445,9 @@ module('Integration | Component | payment-transactions-list', function (hooks) {
     `);
 
     assert
-      .dom('.transactions-table-item-status-failure-reason')
-      .hasText(
-        '(Gas cost exceeded the maximum you set. Actual: 0.010 / Max allowed: 0.005)'
+      .dom('.transactions-table-item-status-line')
+      .includesText(
+        'Gas cost exceeded the maximum you set. Actual: 0.010 / Max allowed: 0.005'
       );
   });
 

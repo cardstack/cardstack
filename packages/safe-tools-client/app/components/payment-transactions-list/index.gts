@@ -31,6 +31,8 @@ import { action } from '@ember/object';
 import map from 'ember-composable-helpers/helpers/map';
 import BoxelActionContainer from '@cardstack/boxel/components/boxel/action-container';
 import TruncatedBlockchainAddress from '@cardstack/safe-tools-client/components/truncated-blockchain-address';
+import { svgJar } from '@cardstack/boxel/utils/svg-jar';
+import { capitalize } from '@ember/string';
 
 type FilterItem = {
   display: string,
@@ -179,7 +181,7 @@ class PaymentTransactionsList extends Component {
             {{#each this.paymentAttempts as |paymentAttempt index|}}
               <tr class="table__row" data-test-scheduled-payment-attempts-item={{index}}>
                 <td class="table__cell" data-test-scheduled-payment-attempts-item-timestamp>
-                  {{formatDate paymentAttempt.startedAt "HH:mm:ss"}}<br>
+                  {{formatDate paymentAttempt.startedAt "HH:mm"}}<br>
                   {{formatDate paymentAttempt.startedAt "dd/MM/yyyy"}}
                 </td>
                 <td class="table__cell" data-test-scheduled-payment-attempts-item-scheduled>
@@ -187,7 +189,7 @@ class PaymentTransactionsList extends Component {
                     The {{ordinalize paymentAttempt.scheduledPayment.recurringDayOfMonth}} of each month
                     <div class="payment-transactions-list__recurring">Recurring</div>
                   {{else}}
-                    {{formatDate paymentAttempt.scheduledPayment.payAt 'HH:mm:ss dd/MM/yyyy'}}
+                    {{formatDate paymentAttempt.scheduledPayment.payAt 'HH:mm dd/MM/yyyy'}}
                     <div class="payment-transactions-list__one-time">One-time</div>
                   {{/if}}
                 </td>
@@ -199,18 +201,33 @@ class PaymentTransactionsList extends Component {
                 </td>
                 <td class="table__cell" data-test-scheduled-payment-attempts-item-status>
                   {{#if (eq paymentAttempt.status 'succeeded')}}
-                    🟢 <span class="transactions-table-item-status-text">Confirmed</span>
+                    <div class="transactions-table-item-status-line">🟢 Confirmed</div>
                   {{else if (eq paymentAttempt.status 'failed')}}
                     {{#if (and paymentAttempt.scheduledPayment.isCanceled (eq paymentAttempt.id paymentAttempt.scheduledPayment.lastScheduledPaymentAttemptId))}}
                     🟠 <span class="transactions-table-item-status-text" data-test-scheduled-payment-attempts-item-status-canceled>Canceled</span>
                     {{else}}
-                    🔴 <span class="transactions-table-item-status-text">Failed</span>
-                      <span class="transactions-table-item-status-failure-reason">
-                        ({{paymentErrorMessage paymentAttempt.failureReason paymentAttempt.scheduledPayment.maxGasPrice paymentAttempt.executionGasPrice paymentAttempt.scheduledPayment.gasToken.decimals}})
-                      </span>
+                      <div class="transactions-table-item-status-line">🔴 Failed
+                        <div class="tooltip">
+                          {{svgJar "info" width="14px" height="14px" class="transactions-table-item-status-line__info-icon"}}
+                          <span class="tooltip-text">{{capitalize (paymentErrorMessage paymentAttempt.failureReason paymentAttempt.scheduledPayment.maxGasPrice paymentAttempt.executionGasPrice paymentAttempt.scheduledPayment.gasToken.decimals)}}</span>
+                        </div>
+                      </div>
+                      <div class="transactions-table-item-status-failure-info">
+                        {{#if (eq paymentAttempt.id paymentAttempt.scheduledPayment.lastScheduledPaymentAttemptId)}}
+                          {{#if paymentAttempt.scheduledPayment.nextRetryAttemptAt}}
+                            <div>
+                              Next retry: <b>{{formatDate paymentAttempt.scheduledPayment.nextRetryAttemptAt "HH:mm dd/MM/yyyy"}}</b>
+                            </div>
+                          {{/if}}
+
+                          <div>
+                            Retries left: <b>{{paymentAttempt.scheduledPayment.retriesLeft}}</b>
+                          </div>
+                        {{/if}}
+                      </div>
                     {{/if}}
                   {{else}}
-                    🔵 <span class="transactions-table-item-status-text">Pending</span>
+                    <div class="transactions-table-item-status-line"> 🔵 Pending</div>
                   {{/if}}
                 </td>
                 <td class="table__cell" data-test-scheduled-payment-attempts-blockexplorer>
