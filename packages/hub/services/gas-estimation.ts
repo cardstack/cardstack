@@ -4,12 +4,13 @@ import { nowUtc } from '../utils/dates';
 import config from 'config';
 import { Wallet } from 'ethers';
 import { GasEstimationResultsScenarioEnum } from '@prisma/client';
-import { getAddress } from '@cardstack/cardpay-sdk';
 
 export interface GasEstimationParams {
   scenario: GasEstimationResultsScenarioEnum;
   chainId: number;
   safeAddress?: string;
+  tokenAddress?: string;
+  gasTokenAddress?: string;
 }
 
 export default class GasEstimationService {
@@ -48,18 +49,23 @@ export default class GasEstimationService {
 
     gasLimit = await prisma.gasEstimationResult.upsert({
       where: {
-        chainId_scenario: {
+        chainId_scenario_tokenAddress_gasTokenAddress: {
           chainId: params.chainId,
           scenario: params.scenario,
+          tokenAddress: params.tokenAddress ?? '',
+          gasTokenAddress: params.gasTokenAddress ?? '',
         },
       },
       create: {
         chainId: params.chainId,
         scenario: params.scenario,
+        tokenAddress: params.tokenAddress,
+        gasTokenAddress: params.gasTokenAddress,
         gas: gas,
       },
       update: {
         gas: gas,
+        updatedAt: nowUtc(),
       },
     });
 
@@ -69,6 +75,15 @@ export default class GasEstimationService {
   private async estimatePaymentExecution(params: GasEstimationParams) {
     if (!params.safeAddress) {
       throw Error(`safeAddress is required in ${params.scenario}`);
+    }
+
+    if (
+      !params.tokenAddress ||
+      params.tokenAddress === '' ||
+      !params.gasTokenAddress ||
+      params.gasTokenAddress === ''
+    ) {
+      throw Error(`tokenAddress and gasTokenAddress is required in ${params.scenario}`);
     }
 
     let spModuleAddress = await this.getSpModuleAddress(params.chainId, params.safeAddress);
@@ -84,16 +99,15 @@ export default class GasEstimationService {
     // then we would have to deposit an adequate amount of tokens to the safe in order for
     // the estimation process to work.
     let gas;
-    let usdTokenAddress = await getAddress('usdStableCoinToken', provider);
     switch (params.scenario) {
       case GasEstimationResultsScenarioEnum.execute_one_time_payment:
         gas = await scheduledPaymentModule.estimateExecutionGas(
           spModuleAddress,
-          usdTokenAddress,
+          params.tokenAddress,
           '0',
           signer.address,
           '0',
-          usdTokenAddress,
+          params.gasTokenAddress,
           'salt1',
           '0',
           Math.round(nowUtc().getTime() / 1000),
@@ -106,11 +120,11 @@ export default class GasEstimationService {
       case GasEstimationResultsScenarioEnum.execute_recurring_payment:
         gas = await scheduledPaymentModule.estimateExecutionGas(
           spModuleAddress,
-          usdTokenAddress,
+          params.tokenAddress,
           '0',
           signer.address,
           '0',
-          usdTokenAddress,
+          params.gasTokenAddress,
           'salt1',
           '0',
           null,
