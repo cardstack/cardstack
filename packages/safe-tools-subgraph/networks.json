@@ -1,7 +1,7 @@
 {
   "goerli": {
     "ScheduledPaymentModule": {
-      "startBlock": 7921489
+      "startBlock": 8403969
     },
     "GnosisSafe": {
       "startBlock": 7921489
@@ -17,7 +17,7 @@
   },
   "matic": {
     "ScheduledPaymentModule": {
-      "startBlock": 36621581
+      "startBlock": 38743683
     },
     "GnosisSafe": {
       "startBlock": 36621581
@@ -25,7 +25,7 @@
   },
   "mainnet": {
     "ScheduledPaymentModule": {
-      "startBlock": 16119342
+      "startBlock": 16532738
     },
     "GnosisSafe": {
       "startBlock": 16119342
