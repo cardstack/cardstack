@@ -33,6 +33,7 @@ export default class CrankNonceLock {
       },
       update: {
         nonce: BigInt(nextNonce.toString()),
+        updatedAt: nowUtc(),
       },
     });
 
