@@ -1,5 +1,5 @@
 .scheduled-payment-card {
-  padding: var(--boxel-sp-sm) var(--boxel-sp);
+  padding: var(--boxel-sp-sm) var(--boxel-sp-lg) var(--boxel-sp-sm) var(--boxel-sp);
   margin-bottom: var(--boxel-sp-xs);
 }
 
