@@ -436,8 +436,6 @@ module('Acceptance | scheduling', function (hooks) {
           'Calculating payment hash'
         )
       );
-
-      //scheduledPaymentCreateSpHashDelay = scheduledPaymentCreateSpHashDeferred?.promise;
       assert.dom(IN_PROGRESS_MESSAGE).hasText('Calculating payment hash...');
       assert.dom(PAYEE_INPUT).isDisabled();
 
