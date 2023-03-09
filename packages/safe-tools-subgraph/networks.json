@@ -7,14 +7,6 @@
       "startBlock": 7921489
     }
   },
-  "mumbai": {
-    "ScheduledPaymentModule": {
-      "startBlock": 29044929
-    },
-    "GnosisSafe": {
-      "startBlock": 29044929
-    }
-  },
   "matic": {
     "ScheduledPaymentModule": {
       "startBlock": 38743683
