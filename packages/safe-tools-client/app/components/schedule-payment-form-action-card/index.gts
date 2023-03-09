@@ -59,6 +59,12 @@ export interface MaxGasDescriptionsState {
   error?: Error
 }
 
+export interface RequiredGasTokenToSchedulePaymentState {
+  isLoading: boolean;
+  value?: TokenQuantity
+  error?: Error
+}
+
 const INTERVAL = config.environment === 'test' ? 1000 : 60 * 1000;
 
 export default class SchedulePaymentFormActionCard extends Component<Signature> implements ValidatableForm {
@@ -377,6 +383,51 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
     return state;
   });
 
+  @use requiredGasTokenToSchedulePayment = resource(() => {
+    const state: RequiredGasTokenToSchedulePaymentState = new TrackedObject({
+      isLoading: false,
+    });
+    
+    let params = this.composeSchedulePaymentParams();
+    if (!this.isValid || !params) {
+      return state;
+    }
+
+    (async () => {
+      try {
+        state.isLoading = true;
+        let amount = await this.scheduledPaymentSdk.estimateSchedulePaymentInGasToken(
+          params.safeAddress,
+          params.spModuleAddress,
+          params.tokenAddress,
+          params.amount,
+          params.payeeAddress,
+          params.executionGas,
+          params.maxGasPrice,
+          params.gasToken.address,
+          params.salt,
+          params.payAt,
+          params.recurringDayOfMonth,
+          params.recurringUntil,
+        );
+        state.value = new TokenQuantity(params.gasToken, amount);
+      } catch (error) {
+        state.error = error;
+      } finally {
+        state.isLoading = false;
+      }
+    })();
+    return state;
+  });
+
+  get isSufficientGasTokenBalance() {
+    let gasTokenBalance = this.safes.tokenBalances?.find(t => t.tokenAddress == this.selectedGasToken?.address);
+    if (this.requiredGasTokenToSchedulePayment.value && this.selectedGasToken && this.selectedGasToken.address === this.requiredGasTokenToSchedulePayment.value.address && gasTokenBalance) {
+      return gasTokenBalance.balance.gte(this.requiredGasTokenToSchedulePayment.value.count);
+    }
+    return false;
+  }
+
   get gasEstimateInGasTokenUnits(): BigNumber {
     return this.gasEstimation?.gasRangeInGasTokenUnits.normal || BigNumber.from('0');
   }
@@ -389,44 +440,9 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
   }
 
   @task *schedulePaymentTask() {
-    if (
-      !this.isValid ||
-       // Redundant to validation check but including it to narrow types for Typescript
-      !this.paymentTokenQuantity || !this.selectedGasToken || !this.safes.currentSafe || !this.gasEstimation
-    ) return;
-
-    const defaultGas = BigNumber.from(0);
-    const gasRangeByMaxPrice = this.gasEstimation.gasRangeInGasTokenUnits[this.maxGasPrice];
-
-    const maxGasPriceString = String(gasRangeByMaxPrice.div(this.gasEstimation.gas) || defaultGas);
-
-    const array = new Uint8Array(32);
-    window.crypto.getRandomValues(array);
-    const salt = btoa(String.fromCharCode.apply(null, array));
-    const self = this;
-
-    this.scheduleErrorMessage = undefined;
-
-    const { currentSafe } = this.safes;
-
-    let payAt = this.selectedPaymentType === 'one-time' ? Math.round(this.paymentDate!.getTime() / 1000) : null;
-    let recurringDayOfMonth = this.selectedPaymentType === 'monthly' ? this.paymentDayOfMonth! : null;
-    let recurringUntil = this.selectedPaymentType === 'monthly' ? Math.round(this.monthlyUntil!.getTime() / 1000) : null
-
-    let params = {
-      safeAddress: currentSafe.address,
-      spModuleAddress: currentSafe.spModuleAddress,
-      tokenAddress: this.paymentTokenQuantity.address,
-      amount: this.paymentTokenQuantity.count,
-      payeeAddress: this.payeeAddress,
-      executionGas: Number(this.gasEstimation.gas),
-      maxGasPrice: maxGasPriceString,
-      gasTokenAddress: this.selectedGasToken.address,
-      salt,
-      payAt,
-      recurringDayOfMonth,
-      recurringUntil
-    }
+    let params = this.composeSchedulePaymentParams();
+    let self = this;
+    if (!this.isValid || !params) return;
 
     try {
       yield taskFor(this.scheduledPaymentSdk.schedulePayment).perform(
@@ -437,7 +453,7 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
         params.payeeAddress,
         params.executionGas,
         params.maxGasPrice,
-        params.gasTokenAddress,
+        params.gasToken.address,
         params.salt,
         params.payAt,
         params.recurringDayOfMonth,
@@ -507,6 +523,42 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
     }
 
     Sentry.captureMessage(`Scheduled a payment with params: ${JSON.stringify(params)}`); // Useful for debugging purposes (for example, to see which params were used to calculate the spHash)
+  }
+
+  composeSchedulePaymentParams() {
+    if (!this.paymentTokenQuantity || !this.selectedGasToken || !this.safes.currentSafe || !this.gasEstimation) return undefined;
+
+    const defaultGas = BigNumber.from(0);
+    const gasRangeByMaxPrice = this.gasEstimation.gasRangeInGasTokenUnits[this.maxGasPrice];
+
+    const maxGasPriceString = String(gasRangeByMaxPrice.div(this.gasEstimation.gas) || defaultGas);
+
+    const array = new Uint8Array(32);
+    window.crypto.getRandomValues(array);
+    const salt = btoa(String.fromCharCode.apply(null, array));
+
+    this.scheduleErrorMessage = undefined;
+
+    const { currentSafe } = this.safes;
+
+    let payAt = this.selectedPaymentType === 'one-time' ? Math.round(this.paymentDate!.getTime() / 1000) : null;
+    let recurringDayOfMonth = this.selectedPaymentType === 'monthly' ? this.paymentDayOfMonth! : null;
+    let recurringUntil = this.selectedPaymentType === 'monthly' ? Math.round(this.monthlyUntil!.getTime() / 1000) : null
+
+    return {
+      safeAddress: currentSafe.address,
+      spModuleAddress: currentSafe.spModuleAddress,
+      tokenAddress: this.paymentTokenQuantity.address,
+      amount: this.paymentTokenQuantity.count,
+      payeeAddress: this.payeeAddress,
+      executionGas: Number(this.gasEstimation.gas),
+      maxGasPrice: maxGasPriceString,
+      gasToken: this.selectedGasToken,
+      salt,
+      payAt,
+      recurringDayOfMonth,
+      recurringUntil
+    }
   }
 
   @action resetForm() {
@@ -579,6 +631,8 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
       @configuredFees={{this.configuredFees.value}}
       @isSafesEmpty={{this.isSafesEmpty}}
       @currentFees={{this.fees.value}}
+      @requiredGasTokenToSchedulePayment={{this.requiredGasTokenToSchedulePayment.value}}
+      @isSufficientGasTokenBalance={{this.isSufficientGasTokenBalance}}
     />
   </template>
 }

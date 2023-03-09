@@ -14,7 +14,7 @@ export default class InfoIcon extends Component<Signature> {
       {{svgJar
         'info'
         style=(cssVar
-          icon-color='var(--boxel-light)'
+          icon-color='var(--info-icon-color, --boxel-light)'
         )
       }}
     </div>
