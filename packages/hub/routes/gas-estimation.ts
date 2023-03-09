@@ -19,6 +19,8 @@ export default class GasEstimationRoute {
       scenario: attrs['scenario'],
       chainId: attrs['chain-id'],
       safeAddress: attrs['safe-address'],
+      tokenAddress: attrs['token-address'],
+      gasTokenAddress: attrs['gas-token-address'],
     } as unknown as GasEstimationParams;
     let errors = await this.gasEstimationValidator.validate(params);
     let hasErrors = Object.values(errors).flatMap((i) => i).length > 0;

@@ -101,6 +101,7 @@ export default class SchedulePaymentSDKService extends Service {
   @action
   async getScheduledPaymentGasEstimation(
     scenario: GasEstimationScenario,
+    token: TokenDetail,
     gasToken: TokenDetail
   ): Promise<ServiceGasEstimationResult> {
     const scheduledPaymentModule = await this.getSchedulePaymentModule();
@@ -109,6 +110,8 @@ export default class SchedulePaymentSDKService extends Service {
       scenario,
       {
         safeAddress: this.safes.currentSafe?.address,
+        tokenAddress: token.address,
+        gasTokenAddress: gasToken.address,
         hubUrl: config.hubUrl,
       }
     );

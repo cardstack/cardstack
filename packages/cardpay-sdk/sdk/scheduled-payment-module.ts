@@ -1337,6 +1337,8 @@ export default class ScheduledPaymentModule {
     scenario: GasEstimationScenario,
     options: {
       safeAddress?: string | null;
+      tokenAddress?: string | null;
+      gasTokenAddress?: string | null;
       hubUrl?: string | null;
     }
   ): Promise<GasEstimationResult> {
@@ -1348,6 +1350,8 @@ export default class ScheduledPaymentModule {
           scenario: scenario,
           'chain-id': chainId,
           'safe-address': options.safeAddress,
+          'token-address': options.tokenAddress,
+          'gas-token-address': options.gasTokenAddress,
         },
       },
     };

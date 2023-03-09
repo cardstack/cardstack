@@ -66,6 +66,7 @@ class ScheduledPaymentSDKServiceStub extends Service {
 
   async getScheduledPaymentGasEstimation(
     _scenario: GasEstimationScenario,
+    _tokenAddress: ChainAddress,
     _gasTokenAddress: ChainAddress
   ): Promise<ServiceGasEstimationResult> {
     return {

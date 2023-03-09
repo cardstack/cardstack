@@ -19,6 +19,8 @@ describe('GasEstimationValidator', function () {
       scenario: ['scenario is required'],
       chainId: ['chain id is required'],
       safeAddress: [],
+      tokenAddress: [],
+      gasTokenAddress: [],
     });
   });
 
@@ -35,6 +37,12 @@ describe('GasEstimationValidator', function () {
       safeAddress: [
         `safe address is required in ${GasEstimationResultsScenarioEnum.execute_one_time_payment} scenario`,
       ],
+      tokenAddress: [
+        `token address is required in ${GasEstimationResultsScenarioEnum.execute_one_time_payment} scenario`,
+      ],
+      gasTokenAddress: [
+        `gas token address is required in ${GasEstimationResultsScenarioEnum.execute_one_time_payment} scenario`,
+      ],
     });
   });
 
@@ -43,6 +51,8 @@ describe('GasEstimationValidator', function () {
       scenario: GasEstimationResultsScenarioEnum.execute_one_time_payment,
       chainId: 1,
       safeAddress: 'wrong address',
+      tokenAddress: 'wrong address',
+      gasTokenAddress: 'wrong address',
     };
 
     let errors = await subject.validate(gasEstimationParams);
@@ -50,6 +60,8 @@ describe('GasEstimationValidator', function () {
       scenario: [],
       chainId: [],
       safeAddress: [`safe address is not a valid address`],
+      tokenAddress: ['token address is not a valid address'],
+      gasTokenAddress: ['gas token address is not a valid address'],
     });
   });
 });

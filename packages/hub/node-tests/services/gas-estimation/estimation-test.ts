@@ -67,6 +67,8 @@ describe('estimate gas', function () {
     expect(gasEstimationResult.scenario).to.equal(gasEstimationParams.scenario);
     expect(gasEstimationResult.chainId).to.equal(gasEstimationParams.chainId);
     expect(gasEstimationResult.gas).to.equal(createSafeGas);
+    expect(gasEstimationResult.tokenAddress).to.equal('');
+    expect(gasEstimationResult.gasTokenAddress).to.equal('');
   });
 
   it('estimates gas for execute scheduled one-time payment scenario', async function () {
@@ -75,6 +77,8 @@ describe('estimate gas', function () {
       scenario: GasEstimationResultsScenarioEnum.execute_one_time_payment,
       chainId: 5,
       safeAddress: '0x71C7656EC7ab88b098defB751B7401B5f6d8976F',
+      tokenAddress: '0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6',
+      gasTokenAddress: '0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6',
     };
     let gasEstimationResult = await subject.estimate(gasEstimationParams);
 
@@ -89,6 +93,8 @@ describe('estimate gas', function () {
       scenario: GasEstimationResultsScenarioEnum.execute_recurring_payment,
       chainId: 5,
       safeAddress: '0x71C7656EC7ab88b098defB751B7401B5f6d8976F',
+      tokenAddress: '0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6',
+      gasTokenAddress: '0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6',
     };
     let gasEstimationResult = await subject.estimate(gasEstimationParams);
 
@@ -150,7 +156,37 @@ describe('estimate gas', function () {
       scenario: GasEstimationResultsScenarioEnum.execute_recurring_payment,
       chainId: 5,
       safeAddress: '0x71C7656EC7ab88b098defB751B7401B5f6d8976F',
+      tokenAddress: '0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6',
+      gasTokenAddress: '0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6',
     };
     await expect(subject.estimate(gasEstimationParams)).to.be.rejectedWith(`cannot find SP module in this safe`);
+  });
+
+  it('throws error if tokenAddress and gasTokenAddress are undefined in execution scenario', async function () {
+    executionGas = 1000000;
+
+    let gasEstimationParams: GasEstimationParams = {
+      scenario: GasEstimationResultsScenarioEnum.execute_one_time_payment,
+      chainId: 5,
+      safeAddress: '0x71C7656EC7ab88b098defB751B7401B5f6d8976F',
+    };
+    await expect(subject.estimate(gasEstimationParams)).to.be.rejectedWith(
+      'tokenAddress and gasTokenAddress is required in execute_one_time_payment'
+    );
+  });
+
+  it('throws error if tokenAddress and gasTokenAddress are blank string in execution scenario', async function () {
+    executionGas = 1000000;
+
+    let gasEstimationParams: GasEstimationParams = {
+      scenario: GasEstimationResultsScenarioEnum.execute_recurring_payment,
+      chainId: 5,
+      safeAddress: '0x71C7656EC7ab88b098defB751B7401B5f6d8976F',
+      tokenAddress: '',
+      gasTokenAddress: '',
+    };
+    await expect(subject.estimate(gasEstimationParams)).to.be.rejectedWith(
+      'tokenAddress and gasTokenAddress is required in execute_recurring_payment'
+    );
   });
 });
