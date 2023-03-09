@@ -1256,7 +1256,7 @@ CREATE TABLE public.scheduled_payment_attempts (
     transaction_hash text,
     failure_reason text,
     scheduled_payment_id uuid NOT NULL,
-    execution_gas_price text NOT NULL
+    execution_gas_price text DEFAULT '0'::text NOT NULL
 );
 
 
