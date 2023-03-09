@@ -525,6 +525,47 @@ export default class ScheduledPaymentModule {
     return requiredGas + PROXY_GAS + OLD_CALL_GAS;
   }
 
+  async estimateExecutionGasWithNoAmount(
+    moduleAddress: string,
+    tokenAddress: string,
+    payeeAddress: string,
+    gasTokenAddress: string,
+    salt: string,
+    payAt?: number | null,
+    recurringDayOfMonth?: number | null,
+    recurringUntil?: number | null
+  ): Promise<number> {
+    let gas = await this.estimateExecutionGas(
+      moduleAddress,
+      tokenAddress,
+      '0',
+      payeeAddress,
+      '0',
+      gasTokenAddress,
+      salt,
+      '0',
+      payAt,
+      recurringDayOfMonth,
+      recurringUntil,
+      0,
+      0
+    );
+
+    let exchangeGas = BigNumber.from(0);
+    if (gasTokenAddress.toLowerCase() !== (await this.getUsdToken()).toLowerCase()) {
+      let exchangeModuleAddress = await getAddress('scheduledPaymentExchange', this.ethersProvider);
+      const scheduledPaymentExchange = new Contract(
+        exchangeModuleAddress,
+        ScheduledPaymentExchangeABI,
+        this.ethersProvider
+      );
+      exchangeGas = await scheduledPaymentExchange.estimateGas['exchangeRateOf(address)'](gasTokenAddress);
+    }
+
+    let TRANSFER_WITH_AMOUNT_GAS = 30000;
+    return BigNumber.from(TRANSFER_WITH_AMOUNT_GAS).add(exchangeGas).add(gas).toNumber();
+  }
+
   async cancelScheduledPaymentOnChain(txnHash: string): Promise<SuccessfulTransactionReceipt>;
   async cancelScheduledPaymentOnChain(
     safeAddress: string,

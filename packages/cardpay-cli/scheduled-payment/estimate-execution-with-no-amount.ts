@@ -4,8 +4,7 @@ import { getEthereumClients, getConnectionType, NETWORK_OPTION_ANY } from '../ut
 import { Arguments, CommandModule } from 'yargs';
 
 export default {
-  command:
-    'estimate-execution <moduleAddress> <tokenAddress> <amount> <payeeAddress> <maxGasPrice> <gasTokenAddress> <salt>',
+  command: 'estimate-execution-with-no-amount <moduleAddress> <tokenAddress> <payeeAddress> <gasTokenAddress> <salt>',
   describe: 'Estimate gas for scheduled payment execution',
   builder(yargs: Argv) {
     return yargs
@@ -17,17 +16,17 @@ export default {
         type: 'string',
         description: 'The address of the token being transferred',
       })
-      .positional('amount', {
-        type: 'string',
-        description: 'Amount of tokens you would like transferred (in the smallest units of token)',
-      })
       .positional('payeeAddress', {
         type: 'string',
         description: 'The address of the payee of scheduled payment',
       })
-      .positional('maxGasPrice', {
-        type: 'string',
-        description: 'Maximum gas price (in the smallest units of gas token)',
+      .positional('fixedUSDFee', {
+        type: 'number',
+        description: 'Fixed USD fee (e.g. 0.25)',
+      })
+      .positional('percentageFee', {
+        type: 'number',
+        description: 'Percentage fee (e.g. 5%, 0.05)',
       })
       .positional('gasTokenAddress', {
         type: 'string',
@@ -56,9 +55,7 @@ export default {
       network,
       moduleAddress,
       tokenAddress,
-      amount,
       payeeAddress,
-      maxGasPrice,
       gasTokenAddress,
       salt,
       payAt,
@@ -68,9 +65,7 @@ export default {
       network: string;
       moduleAddress: string;
       tokenAddress: string;
-      amount: string;
       payeeAddress: string;
-      maxGasPrice: string;
       gasTokenAddress: string;
       salt: string;
       payAt?: number | null;
@@ -88,15 +83,12 @@ export default {
 
     console.log(`Estimate scheduled payment execution gas ...`);
 
-    let requiredGas = await scheduledPaymentModule.estimateExecutionGas(
+    let requiredGas = await scheduledPaymentModule.estimateExecutionGasWithNoAmount(
       moduleAddress,
       tokenAddress,
-      amount,
       payeeAddress,
-      maxGasPrice,
       gasTokenAddress,
       salt,
-      maxGasPrice,
       payAt,
       recurringDayOfMonth,
       recurringUntil
