@@ -213,6 +213,39 @@ export default class SchedulePaymentSDKService extends Service {
       (gt) => gt.address === usdTokenAddress
     );
   }
+
+  async estimateSchedulePaymentInGasToken(
+    safeAddress: ChainAddress,
+    moduleAddress: ChainAddress,
+    tokenAddress: ChainAddress,
+    amount: BigNumber,
+    payeeAddress: ChainAddress,
+    executionGas: number,
+    maxGasPrice: string,
+    gasTokenAddress: ChainAddress,
+    salt: string,
+    payAt: number | null,
+    recurringDayOfMonth: number | null,
+    recurringUntil: number | null
+  ): Promise<BigNumber> {
+    const scheduledPaymentModule = await this.getSchedulePaymentModule();
+    const estimatedGasToken =
+      await scheduledPaymentModule.estimateSchedulePaymentInGasToken(
+        safeAddress,
+        moduleAddress,
+        tokenAddress,
+        amount.toString(),
+        payeeAddress,
+        executionGas,
+        maxGasPrice,
+        gasTokenAddress,
+        salt,
+        payAt,
+        recurringDayOfMonth,
+        recurringUntil
+      );
+    return estimatedGasToken;
+  }
 }
 
 declare module '@ember/service' {

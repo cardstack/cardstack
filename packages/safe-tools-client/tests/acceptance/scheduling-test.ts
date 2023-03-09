@@ -1,7 +1,9 @@
+import { type ChainAddress } from '@cardstack/cardpay-sdk';
 import { Deferred } from '@cardstack/ember-shared';
 import SafesService, {
   TokenBalance,
 } from '@cardstack/safe-tools-client/services/safes';
+import ScheduledPaymentSdk from '@cardstack/safe-tools-client/services/scheduled-payment-sdk';
 import { ScheduledPaymentResponseItem } from '@cardstack/safe-tools-client/services/scheduled-payments';
 import { MockLocalStorage } from '@cardstack/safe-tools-client/utils/browser-mocks';
 import {
@@ -373,7 +375,33 @@ module('Acceptance | scheduling', function (hooks) {
           balance: BigNumber.from('10000000'),
           decimals: 6,
         } as unknown as TokenBalance,
+        {
+          tokenAddress: USDC_TOKEN_ADDRESS,
+          symbol: 'USDC',
+          balance: BigNumber.from('10000000'),
+          decimals: 6,
+        } as unknown as TokenBalance,
       ]);
+    };
+
+    const scheduledPaymentSdkService = this.owner.lookup(
+      'service:scheduled-payment-sdk'
+    ) as ScheduledPaymentSdk;
+    scheduledPaymentSdkService.estimateSchedulePaymentInGasToken = async (
+      _safeAddress: ChainAddress,
+      _moduleAddress: ChainAddress,
+      _tokenAddress: ChainAddress,
+      _amount: BigNumber,
+      _payeeAddress: ChainAddress,
+      _executionGas: number,
+      _maxGasPrice: string,
+      _gasTokenAddress: ChainAddress,
+      _salt: string,
+      _payAt: number | null,
+      _recurringDayOfMonth: number | null,
+      _recurringUntil: number | null
+    ): Promise<BigNumber> => {
+      return Promise.resolve(BigNumber.from('60000'));
     };
   });
 
@@ -399,6 +427,7 @@ module('Acceptance | scheduling', function (hooks) {
       await waitUntil(() => find('[data-test-hub-auth-modal]') === null);
 
       await fillInSchedulePaymentFormWithValidInfo({ type: 'one-time' });
+      scheduledPaymentCreateSpHashDeferred?.fulfill();
       await waitFor(`${SUBMIT_BUTTON}:not(:disabled)`);
       await click(SUBMIT_BUTTON);
       assert.dom(PAYEE_INPUT).isDisabled();
@@ -522,6 +551,7 @@ module('Acceptance | scheduling', function (hooks) {
       await waitFor(`[data-test-safe-address-label][title="${SAFE_ADDRESS}"]`);
 
       await fillInSchedulePaymentFormWithValidInfo({ type: 'monthly' });
+      scheduledPaymentCreateSpHashDeferred?.fulfill();
       await waitFor(`${SUBMIT_BUTTON}:not(:disabled)`);
 
       await click(SUBMIT_BUTTON);
