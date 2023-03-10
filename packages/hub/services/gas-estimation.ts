@@ -101,48 +101,35 @@ export default class GasEstimationService {
     let gas;
     switch (params.scenario) {
       case GasEstimationResultsScenarioEnum.execute_one_time_payment:
-        gas = await scheduledPaymentModule.estimateExecutionGas(
+        gas = await scheduledPaymentModule.estimateExecutionGasWithNoAmount(
           spModuleAddress,
           params.tokenAddress,
-          '0',
           signer.address,
-          '0',
           params.gasTokenAddress,
           'salt1',
-          '0',
           Math.round(nowUtc().getTime() / 1000),
           null,
-          null,
-          0,
-          0
+          null
         );
         break;
       case GasEstimationResultsScenarioEnum.execute_recurring_payment:
-        gas = await scheduledPaymentModule.estimateExecutionGas(
+        gas = await scheduledPaymentModule.estimateExecutionGasWithNoAmount(
           spModuleAddress,
           params.tokenAddress,
-          '0',
           signer.address,
-          '0',
           params.gasTokenAddress,
           'salt1',
-          '0',
           null,
           28,
-          Math.round(addDays(nowUtc(), 30).getTime() / 1000),
-          0,
-          0
+          Math.round(addDays(nowUtc(), 30).getTime() / 1000)
         );
         break;
       default:
         throw Error('unknown estimation scenario');
     }
 
-    // Add 25500 to handle transfer amount and gas token is not zero.
-    // Add 30000 to make the payment gas is high enough to be executed.
-    // Other tokens have different transfer logic
-    // and will be executed through the USD conversion process.
-    return gas + 25500 + 30000;
+    // Add 10000 to make the payment gas is high enough to be executed.
+    return gas + 10000;
   }
 
   private async getSpModuleAddress(chainId: number, safeAddress: string): Promise<string> {

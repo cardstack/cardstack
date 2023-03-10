@@ -27,7 +27,6 @@ import * as Sentry from '@sentry/browser';
 import FeeCalculator, { type CurrentFees } from './fee-calculator';
 import config from '@cardstack/safe-tools-client/config/environment';
 import HubAuthenticationService from '@cardstack/safe-tools-client/services/hub-authentication';
-import { addMinutes } from 'date-fns';
 
 interface Signature {
   Element: HTMLElement;
