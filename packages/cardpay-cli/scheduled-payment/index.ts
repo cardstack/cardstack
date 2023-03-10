@@ -7,6 +7,7 @@ export const command = 'scheduled-payment <command>';
 export const desc = 'Commands to interact with the scheduled payment module';
 import enableModule from './enable-module';
 import estimateExecution from './estimate-execution';
+import estimateExecutionWithNoAmount from './estimate-execution-with-no-amount';
 import estimateGas from './estimate-gas';
 import execute from './execute';
 import schedulePayment from './schedule-payment';
@@ -19,6 +20,7 @@ export const builder = function (yargs: Argv) {
     createSpHash,
     enableModule,
     estimateExecution,
+    estimateExecutionWithNoAmount,
     estimateGas,
     execute,
     schedulePayment,

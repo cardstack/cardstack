@@ -13,12 +13,10 @@ class StubCardpaySDK {
     switch (sdk) {
       case 'ScheduledPaymentModule':
         return Promise.resolve({
-          estimateExecutionGas: async (
+          estimateExecutionGasWithNoAmount: async (
             _moduleAddress: string,
             _tokenAddress: string,
-            _amount: string,
             _payeeAddress: string,
-            _maxGasPrice: string,
             _gasTokenAddress: string,
             _salt: string,
             _gasPrice: string,
@@ -84,7 +82,7 @@ describe('estimate gas', function () {
 
     expect(gasEstimationResult.scenario).to.equal(gasEstimationParams.scenario);
     expect(gasEstimationResult.chainId).to.equal(gasEstimationParams.chainId);
-    expect(gasEstimationResult.gas).to.equal(executionGas + 30000 + 25500);
+    expect(gasEstimationResult.gas).to.equal(executionGas + 10000);
   });
 
   it('estimates gas for execute scheduled recurring payment scenario', async function () {
@@ -100,7 +98,7 @@ describe('estimate gas', function () {
 
     expect(gasEstimationResult.scenario).to.equal(gasEstimationParams.scenario);
     expect(gasEstimationResult.chainId).to.equal(gasEstimationParams.chainId);
-    expect(gasEstimationResult.gas).to.equal(executionGas + 30000 + 25500);
+    expect(gasEstimationResult.gas).to.equal(executionGas + 10000);
   });
 
   it('retrieves gas from DB if gas exist in DB and still in valid TTL', async function () {

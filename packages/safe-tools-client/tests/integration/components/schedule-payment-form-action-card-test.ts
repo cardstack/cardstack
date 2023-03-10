@@ -368,6 +368,8 @@ module(
         `);
         const now = new Date();
         await click(`[data-test-payment-type="one-time"]`);
+        await click(`[data-test-input-payment-date]`);
+        await click(`[data-date="${format(now, 'yyyy-MM-dd')}"]`);
         await click(`[data-test-input-specific-payment-time]`);
 
         assert
