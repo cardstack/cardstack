@@ -5,7 +5,8 @@ This project includes the subgraph necessary to generate a GraphQL based query s
 The subgraph is hosted at:
 
 - goerli: https://thegraph.com/hosted-service/subgraph/cardstack/safe-tools-goerli
-- mumbai: https://thegraph.com/hosted-service/subgraph/cardstack/safe-tools-mumbai
+- polygon: https://thegraph.com/hosted-service/subgraph/cardstack/safe-tools-polygon
+- mainnet: https://thegraph.com/hosted-service/subgraph/cardstack/safe-tools-mainnet
 
 Currently we are indexing safes that users provision using the safe tools interface. We're saving the account's address, safe address, and the scheduled payment module address and keep track of their ownership. This data is used by the safe tools for creating scheduled payments.
 
