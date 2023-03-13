@@ -32,12 +32,20 @@
   letter-spacing: var(--boxel-lsp-xl);
 }
 
-.scheduled-payment-card__payee {
+.scheduled-payment-card__payee,
+.scheduled-payment-card__memo {
   display: flex;
 
   font: 600 var(--boxel-font-sm);
   letter-spacing: var(--boxel-lsp-xl);
   color: var(--boxel-purple-400);
+}
+
+.scheduled-payment-card__memo {
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+  display: block;
 }
 
 .scheduled-payment-card__payee-to {

@@ -204,6 +204,11 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
     this.payeeAddress = val;
   }
 
+  @tracked privateMemo = '';
+  @action onUpdatePrivateMemo(val: string) {
+    this.privateMemo = val;
+  }
+
   @tracked paymentAmountRaw: string = '';
 
   get paymentTokens(): TokenDetail[] {
@@ -408,7 +413,7 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
           params.salt,
           params.payAt,
           params.recurringDayOfMonth,
-          params.recurringUntil,
+          params.recurringUntil
         );
         state.value = new TokenQuantity(params.gasToken, amount);
       } catch (error) {
@@ -451,6 +456,7 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
         params.tokenAddress,
         params.amount,
         params.payeeAddress,
+        params.privateMemo,
         params.executionGas,
         params.maxGasPrice,
         params.gasToken.address,
@@ -551,6 +557,7 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
       tokenAddress: this.paymentTokenQuantity.address,
       amount: this.paymentTokenQuantity.count,
       payeeAddress: this.payeeAddress,
+      privateMemo: this.privateMemo,
       executionGas: Number(this.gasEstimation.gas),
       maxGasPrice: maxGasPriceString,
       gasToken: this.selectedGasToken,
@@ -600,6 +607,8 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
       @isPayeeAddressInvalid={{not this.validator.isPayeeAddressValid}}
       @payeeAddressErrorMessage={{this.validator.payeeAddressErrorMessage}}
       @onUpdatePayeeAddress={{this.onUpdatePayeeAddress}}
+      @privateMemo={{this.privateMemo}}
+      @onUpdatePrivateMemo={{this.onUpdatePrivateMemo}}
       @paymentAmountRaw={{this.paymentAmountRaw}}
       @onUpdatePaymentAmount={{this.onUpdatePaymentAmount}}
       @isPaymentAmountInvalid={{not this.validator.isAmountValid}}

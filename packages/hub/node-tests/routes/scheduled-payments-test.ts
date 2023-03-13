@@ -240,6 +240,7 @@ describe('POST /api/scheduled-payments', async function () {
             'chain-id': 1,
             userAddress: stubUserAddress,
             'canceled-at': null,
+            'private-memo': 'A note about this payment',
           },
         },
       })
@@ -282,6 +283,7 @@ describe('POST /api/scheduled-payments', async function () {
             'next-retry-attempt-at': null,
             'retries-left': null,
             'scheduled-payment-attempts-in-last-payment-cycle-count': 0,
+            'private-memo': 'A note about this payment',
           },
         },
       })
@@ -317,6 +319,7 @@ describe('POST /api/scheduled-payments', async function () {
             'chain-id': 1,
             userAddress: stubUserAddress,
             'canceled-at': null,
+            'private-memo': 'A note about this payment',
           },
         },
       })
@@ -361,6 +364,7 @@ describe('POST /api/scheduled-payments', async function () {
             'next-retry-attempt-at': null,
             'retries-left': null,
             'scheduled-payment-attempts-in-last-payment-cycle-count': 0,
+            'private-memo': 'A note about this payment',
           },
         },
       })
@@ -489,6 +493,7 @@ describe('GET /api/scheduled-payments', async function () {
               'next-retry-attempt-at': null,
               'retries-left': null,
               'scheduled-payment-attempts-in-last-payment-cycle-count': 0,
+              'private-memo': null,
             },
           },
         ],
@@ -798,6 +803,7 @@ describe('GET /api/scheduled-payments/:id', async function () {
             'next-retry-attempt-at': null,
             'retries-left': null,
             'scheduled-payment-attempts-in-last-payment-cycle-count': 0,
+            'private-memo': null,
           },
         },
       })
@@ -906,6 +912,7 @@ describe('PATCH /api/scheduled-payments/:id', async function () {
             'next-retry-attempt-at': null,
             'retries-left': null,
             'scheduled-payment-attempts-in-last-payment-cycle-count': 0,
+            'private-memo': null,
           },
         },
       })
@@ -987,6 +994,7 @@ describe('PATCH /api/scheduled-payments/:id', async function () {
             'next-retry-attempt-at': null,
             'retries-left': null,
             'scheduled-payment-attempts-in-last-payment-cycle-count': 0,
+            'private-memo': null,
           },
         },
       })

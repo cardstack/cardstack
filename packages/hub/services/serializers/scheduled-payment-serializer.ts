@@ -44,6 +44,7 @@ export default class ScheduledPaymentSerializer {
               model.scheduledPaymentAttemptsInLastPaymentCycleCount,
             'last-scheduled-payment-attempt-id': model.lastScheduledPaymentAttemptId,
             'retries-left': this.scheduledPaymentFetcher.retriesLeft(model),
+            'private-memo': model.privateMemo,
           },
         },
       };

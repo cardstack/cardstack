@@ -22,6 +22,7 @@ export interface ScheduledPaymentBase {
   paymentTokenQuantity: TokenQuantity;
   gasToken: TokenDetail;
   payeeAddress: string;
+  privateMemo: string | null;
   payAt: Date;
   chainId: number;
   maxGasPrice: BigNumber;
@@ -101,6 +102,7 @@ export interface ScheduledPaymentAttemptIncludedData {
   'scheduled-payment-attempts-in-last-payment-cycle-count': number;
   'last-scheduled-payment-attempt-id': string;
   'retries-left': number;
+  'private-memo': string | null;
 }
 
 export interface ScheduledPaymentAttemptResponseIncludedItem {
@@ -148,6 +150,7 @@ export interface ScheduledPaymentResponseItem {
     'scheduled-payment-attempts-in-last-payment-cycle-count': number;
     'last-scheduled-payment-attempt-id': string;
     'retries-left': number;
+    'private-memo': string | null;
   };
 }
 
@@ -246,6 +249,7 @@ export default class ScheduledPaymentsService extends Service {
           lastScheduledPaymentAttemptId:
             scheduledPayment!['last-scheduled-payment-attempt-id'],
           retriesLeft: Number(scheduledPayment!['retries-left']),
+          privateMemo: scheduledPayment!['private-memo'],
         },
       };
     });
@@ -369,6 +373,7 @@ export default class ScheduledPaymentsService extends Service {
         gasToken,
         chainId: Number(data.attributes['chain-id']),
         payeeAddress: data.attributes['payee-address'],
+        privateMemo: data.attributes['private-memo'],
         payAt: new Date(data.attributes['pay-at']),
         executionGasEstimation: data.attributes['execution-gas-estimation'],
         maxGasPrice: BigNumber.from(data.attributes['max-gas-price']),

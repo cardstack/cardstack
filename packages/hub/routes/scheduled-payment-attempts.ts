@@ -69,6 +69,7 @@ export default class ScheduledPaymentAttemptsRoute {
             moduleAddress: true,
             amount: true,
             payeeAddress: true,
+            privateMemo: true,
             executionGasEstimation: true,
             maxGasPrice: true,
             feeFixedUsd: true,

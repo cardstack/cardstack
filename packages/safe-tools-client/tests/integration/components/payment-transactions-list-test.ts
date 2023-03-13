@@ -76,6 +76,7 @@ class ScheduledPaymentsStub extends Service {
             scheduledPaymentAttemptsInLastPaymentCycleCount: 2,
             lastScheduledPaymentAttemptId: '1',
             retriesLeft: 2,
+            privateMemo: null,
           },
         },
       ]);
@@ -105,6 +106,7 @@ class ScheduledPaymentsStub extends Service {
             scheduledPaymentAttemptsInLastPaymentCycleCount: 2,
             lastScheduledPaymentAttemptId: '11',
             retriesLeft: 2,
+            privateMemo: null,
           },
         },
       ]);
@@ -136,6 +138,7 @@ class ScheduledPaymentsStub extends Service {
             scheduledPaymentAttemptsInLastPaymentCycleCount: 2,
             lastScheduledPaymentAttemptId: '111',
             retriesLeft: 2,
+            privateMemo: null,
           },
         },
         {
@@ -164,6 +167,7 @@ class ScheduledPaymentsStub extends Service {
             scheduledPaymentAttemptsInLastPaymentCycleCount: 2,
             lastScheduledPaymentAttemptId: '222',
             retriesLeft: 2,
+            privateMemo: null,
           },
         },
       ]);
@@ -196,6 +200,7 @@ class ScheduledPaymentsStub extends Service {
               scheduledPaymentAttemptsInLastPaymentCycleCount: 1,
               lastScheduledPaymentAttemptId: '1',
               retriesLeft: 0,
+              privateMemo: null,
             },
           },
           {
@@ -223,6 +228,7 @@ class ScheduledPaymentsStub extends Service {
               scheduledPaymentAttemptsInLastPaymentCycleCount: 2,
               lastScheduledPaymentAttemptId: '2',
               retriesLeft: 2,
+              privateMemo: null,
             },
           },
           {
@@ -250,6 +256,7 @@ class ScheduledPaymentsStub extends Service {
               scheduledPaymentAttemptsInLastPaymentCycleCount: 1,
               lastScheduledPaymentAttemptId: '1',
               retriesLeft: 0,
+              privateMemo: null,
             },
           },
         ]
