@@ -1,9 +1,0 @@
-{{cardstack-query-editor query=query update=(action (mut query))}}
-
-<pre>{{pretty-json query}}</pre>
-
-<ul>
-  {{#cardstack-search query=query as |content|}}
-    <li>{{content.name}}</li>
-  {{/cardstack-search}}
-</ul>

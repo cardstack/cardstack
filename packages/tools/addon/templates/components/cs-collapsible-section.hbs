@@ -1,9 +1,0 @@
-<header {{action "toggle" }}>
-  <label>{{title}}</label>
-  <button>
-    {{cs-svg "toggle-arrow"}}
-  </button>
-</header>
-{{#liquid-if opened rules=animationRules growDuration=250 growPixelsPerSecond=1}}
-  {{yield}}
-{{/liquid-if}}

@@ -1,7 +1,0 @@
-<header>Select Content Type</header>
-
-<ul>
-  {{#each availableTypes as |type|}}
-    <li {{action "create" type}} >{{cs-humanize type.id}}<button>Add +</button></li>
-  {{/each}}
-</ul>

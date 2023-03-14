@@ -1,7 +1,0 @@
-/node_modules
-/packages/*/node_modules
-.vagrant
-.nvmrc
-*.log
-lerna-debug.log
-tmp
