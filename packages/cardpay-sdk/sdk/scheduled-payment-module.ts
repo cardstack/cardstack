@@ -49,7 +49,7 @@ import BN from 'bn.js';
 import { Interface } from 'ethers/lib/utils';
 import JsonRpcProvider from '../providers/json-rpc-provider';
 import { getConstant, getConstantByNetwork } from './constants';
-import { getGasPricesInNativeWei, getNativeWeiInToken } from './utils/conversions';
+import { applyRateToAmount, getGasPricesInNativeWei, getNativeToTokenRate } from './utils/conversions';
 
 export interface EnableModuleAndGuardResult {
   scheduledPaymentModuleAddress: string;
@@ -1417,11 +1417,11 @@ export default class ScheduledPaymentModule {
 
     let usdStableCoinToken = await getAddress('usdStableCoinToken', this.ethersProvider);
     if (!usdStableCoinToken) throw Error('USD Stable Coin token not found');
-    let priceWeiInUSD = String(await getNativeWeiInToken(this.ethersProvider, usdStableCoinToken));
+    let nativeInUSDRate = await getNativeToTokenRate(this.ethersProvider, usdStableCoinToken);
     let gasRangeInUSD = {
-      slow: gasRangeInWei.slow.mul(priceWeiInUSD),
-      standard: gasRangeInWei.standard.mul(priceWeiInUSD),
-      fast: gasRangeInWei.fast.mul(priceWeiInUSD),
+      slow: applyRateToAmount(nativeInUSDRate, gasRangeInWei.slow),
+      standard: applyRateToAmount(nativeInUSDRate, gasRangeInWei.standard),
+      fast: applyRateToAmount(nativeInUSDRate, gasRangeInWei.fast),
     };
 
     return {

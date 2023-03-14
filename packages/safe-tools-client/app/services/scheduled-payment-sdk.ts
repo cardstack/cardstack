@@ -3,11 +3,12 @@ import {
   type ChainAddress,
   getSDK,
   ScheduledPaymentModule,
-  getNativeWeiInToken,
+  getNativeToTokenRate,
   poll,
   SchedulePaymentProgressListener,
   getConstant,
   TokenDetail,
+  applyRateToAmount,
 } from '@cardstack/cardpay-sdk';
 import config from '@cardstack/safe-tools-client/config/environment';
 import SafesService, {
@@ -116,31 +117,25 @@ export default class SchedulePaymentSDKService extends Service {
       }
     );
     const { gasRangeInWei } = gasEstimationResult;
-    const priceWeiInGasToken = String(
-      await getNativeWeiInToken(this.wallet.ethersProvider, gasToken.address)
+    const nativeToTokenRate = await getNativeToTokenRate(
+      this.wallet.ethersProvider,
+      gasToken.address
     );
-
-    const ten = BigNumber.from(10);
-    const nativeTokenUnits = ten.pow(18);
-    const gasTokenUnits = ten.pow(gasToken.decimals);
     return {
       gas: gasEstimationResult.gas,
       gasRangeInGasTokenUnits: {
-        normal: gasRangeInWei.standard
-          .mul(priceWeiInGasToken)
-          .mul(GAS_RANGE_NORMAL_MULTIPLIER)
-          .mul(gasTokenUnits)
-          .div(nativeTokenUnits),
-        high: gasRangeInWei.standard
-          .mul(priceWeiInGasToken)
-          .mul(GAS_RANGE_HIGH_MULTIPLIER)
-          .mul(gasTokenUnits)
-          .div(nativeTokenUnits),
-        max: gasRangeInWei.standard
-          .mul(priceWeiInGasToken)
-          .mul(GAS_RANGE_MAX_MULTIPLIER)
-          .mul(gasTokenUnits)
-          .div(nativeTokenUnits),
+        normal: applyRateToAmount(
+          nativeToTokenRate,
+          gasRangeInWei.standard.mul(GAS_RANGE_NORMAL_MULTIPLIER)
+        ),
+        high: applyRateToAmount(
+          nativeToTokenRate,
+          gasRangeInWei.standard.mul(GAS_RANGE_HIGH_MULTIPLIER)
+        ),
+        max: applyRateToAmount(
+          nativeToTokenRate,
+          gasRangeInWei.standard.mul(GAS_RANGE_MAX_MULTIPLIER)
+        ),
       },
     };
   }

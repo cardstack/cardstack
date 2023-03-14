@@ -50,11 +50,7 @@ export default class TokenToUsdHelper extends Helper<Signature> {
     this.ensureTimer(tokenQuantity.address);
     const usdcAmount = this.tokenToUsdService.toUsdc(tokenQuantity);
     if (usdcAmount) {
-      return `$ ${nativeUnitsToDecimal([
-        usdcAmount,
-        tokenQuantity.decimals,
-        2,
-      ])}`;
+      return `$ ${nativeUnitsToDecimal([usdcAmount, 6, 2])}`;
     }
     return 'Converting to USD...';
   }

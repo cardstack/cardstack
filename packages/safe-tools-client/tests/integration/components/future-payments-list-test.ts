@@ -54,7 +54,13 @@ class TokenToUsdServiceStub extends TokenToUsdService {
     tokenAddress: ChainAddress
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ): any {
-    this.usdcTokenRates.set(tokenAddress, FixedNumber.from(1000));
+    this.usdcToTokenRates.set(tokenAddress, {
+      tokenInAddress: '0x0',
+      tokenOutAddress: '0x0',
+      tokenInDecimals: 6,
+      tokenOutDecimals: 18,
+      rate: FixedNumber.from('0.001'),
+    });
   }
 }
 
