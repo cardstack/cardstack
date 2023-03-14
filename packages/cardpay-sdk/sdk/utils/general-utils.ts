@@ -109,20 +109,29 @@ export function waitUntilTransactionMined(
         receipt = await web3OrEthersProvider.eth.getTransactionReceipt(txnHash);
       }
 
-      if (receipt?.status) {
+      if (!receipt) {
+        if (Number(new Date()) > endTime) {
+          throw new Error(
+            `Transaction took too long to complete, waited ${duration / 1000} seconds. txn hash: ${txnHash}`
+          );
+        } else {
+          setTimeout(function () {
+            return transactionReceiptAsync(txnHash, resolve, reject);
+          }, POLL_INTERVAL);
+        }
+        return;
+      }
+
+      // Ethers has a number status while web3 has a boolean status
+      let transactionSuccessful = receipt.status === true || receipt.status == 1;
+
+      if (transactionSuccessful) {
+        receipt.status = true;
         let successfulReceipt = receipt as SuccessfulTransactionReceipt;
         receiptCache.set(txnHash, successfulReceipt);
         resolve(successfulReceipt);
-      } else if (receipt?.status === false) {
-        throw new Error(`Transaction with hash "${txnHash}" was reverted`);
-      } else if (Number(new Date()) > endTime) {
-        throw new Error(
-          `Transaction took too long to complete, waited ${duration / 1000} seconds. txn hash: ${txnHash}`
-        );
       } else {
-        setTimeout(function () {
-          return transactionReceiptAsync(txnHash, resolve, reject);
-        }, POLL_INTERVAL);
+        throw new Error(`Transaction with hash "${txnHash}" was reverted`);
       }
     } catch (e) {
       reject(e);
