@@ -16,6 +16,12 @@
 <li><a href="../modules/_cardstack_cardpay_sdk.html">@cardstack/cardpay-sdk</a></li>
 <li><a href="_cardstack_cardpay_sdk.AssetsClass.html">AssetsClass</a></li></ul>
 <h1>Class AssetsClass</h1></div>
+<section class="tsd-panel tsd-comment">
+<div class="tsd-comment tsd-typography"><p>Thie <code>Assets</code> API is used issue queries for native coin balances and ERC-20 token balances, as well as to get ERC-20 token info. The <code>Assets</code> API can be obtained from <code>getSDK()</code> with a <code>Web3</code> instance that is configured to operate on either layer 1 or layer 2, depending on where the asset you wish to query lives.</p>
+
+<h3>Example</h3><pre><code class="language-ts"><span class="hl-4">import</span><span class="hl-2"> { </span><span class="hl-1">getSDK</span><span class="hl-2"> } </span><span class="hl-4">from</span><span class="hl-2"> </span><span class="hl-5">&quot;@cardstack/cardpay-sdk&quot;</span><span class="hl-2">;</span><br/><span class="hl-6">let</span><span class="hl-2"> </span><span class="hl-1">web3</span><span class="hl-2"> = </span><span class="hl-6">new</span><span class="hl-2"> </span><span class="hl-7">Web3</span><span class="hl-2">(</span><span class="hl-1">myProvider</span><span class="hl-2">);</span><br/><span class="hl-6">let</span><span class="hl-2"> </span><span class="hl-1">assetAPI</span><span class="hl-2"> = </span><span class="hl-4">await</span><span class="hl-2"> </span><span class="hl-7">getSDK</span><span class="hl-2">(</span><span class="hl-5">&#39;Assets&#39;</span><span class="hl-2">, </span><span class="hl-1">web3</span><span class="hl-2">);</span>
+</code></pre>
+</div></section>
 <section class="tsd-panel tsd-hierarchy">
 <h4>Hierarchy</h4>
 <ul class="tsd-hierarchy">
@@ -25,7 +31,7 @@
 <ul class="tsd-hierarchy">
 <li><a href="../interfaces/_cardstack_cardpay_sdk.IAssets.html" class="tsd-signature-type" data-tsd-kind="Interface">IAssets</a></li></ul></section><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/cardstack/cardstack/blob/5257bdf/packages/cardpay-sdk/sdk/assets.ts#L14">packages/cardpay-sdk/sdk/assets.ts:14</a></li></ul></aside>
+<li>Defined in <a href="https://github.com/cardstack/cardstack/blob/f316cf6/packages/cardpay-sdk/sdk/assets.ts#L25">packages/cardpay-sdk/sdk/assets.ts:25</a></li></ul></aside>
 <section class="tsd-panel-group tsd-index-group">
 <section class="tsd-panel tsd-index-panel">
 <details class="tsd-index-content tsd-index-accordion" open><summary class="tsd-accordion-summary tsd-index-summary">
@@ -59,14 +65,14 @@
 <h5>web3: <span class="tsd-signature-type">default</span></h5></li></ul></div>
 <h4 class="tsd-returns-title">Returns <a href="_cardstack_cardpay_sdk.AssetsClass.html" class="tsd-signature-type" data-tsd-kind="Class">AssetsClass</a></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/cardstack/cardstack/blob/5257bdf/packages/cardpay-sdk/sdk/assets.ts#L15">packages/cardpay-sdk/sdk/assets.ts:15</a></li></ul></aside></li></ul></section></section>
+<li>Defined in <a href="https://github.com/cardstack/cardstack/blob/f316cf6/packages/cardpay-sdk/sdk/assets.ts#L26">packages/cardpay-sdk/sdk/assets.ts:26</a></li></ul></aside></li></ul></section></section>
 <section class="tsd-panel-group tsd-member-group">
 <h2>Properties</h2>
 <section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-private"><a id="web3" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagPrivate">Private</code> <span>web3</span><a href="#web3" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <div class="tsd-signature">web3<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">default</span></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/cardstack/cardstack/blob/5257bdf/packages/cardpay-sdk/sdk/assets.ts#L15">packages/cardpay-sdk/sdk/assets.ts:15</a></li></ul></aside></section></section>
+<li>Defined in <a href="https://github.com/cardstack/cardstack/blob/f316cf6/packages/cardpay-sdk/sdk/assets.ts#L26">packages/cardpay-sdk/sdk/assets.ts:26</a></li></ul></aside></section></section>
 <section class="tsd-panel-group tsd-member-group">
 <h2>Methods</h2>
 <section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class"><a id="getBalanceForToken" class="tsd-anchor"></a>
@@ -74,6 +80,14 @@
 <ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
 <li class="tsd-signature tsd-anchor-link" id="getBalanceForToken.getBalanceForToken-1">get<wbr/>Balance<wbr/>For<wbr/>Token<span class="tsd-signature-symbol">(</span>tokenAddress<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, tokenHolderAddress<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">&gt;</span><a href="#getBalanceForToken.getBalanceForToken-1" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></li>
 <li class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>This call returns the balance in for an ERC-20 token from the specified address.</p>
+
+<h3>Returns</h3><p>a promise for the token amount as a string in native units of the token (usually) <code>wei</code>).
+If no token holder address is provided, then the balance of the first address in the wallet will be retrieved.</p>
+
+<h3>Example</h3><pre><code class="language-ts"><span class="hl-6">let</span><span class="hl-2"> </span><span class="hl-1">assetsAPI</span><span class="hl-2"> = </span><span class="hl-4">await</span><span class="hl-2"> </span><span class="hl-7">getSDK</span><span class="hl-2">(</span><span class="hl-5">&#39;Assets&#39;</span><span class="hl-2">, </span><span class="hl-1">web3</span><span class="hl-2">);</span><br/><span class="hl-6">let</span><span class="hl-2"> </span><span class="hl-1">cardBalance</span><span class="hl-2"> = </span><span class="hl-4">await</span><span class="hl-2"> </span><span class="hl-1">assetsAPI</span><span class="hl-2">.</span><span class="hl-7">getBalanceForToken</span><span class="hl-2">(</span><span class="hl-1">cardTokenAddress</span><span class="hl-2">, </span><span class="hl-1">walletAddress</span><span class="hl-2">);</span>
+</code></pre>
+</div>
 <div class="tsd-parameters">
 <h4 class="tsd-parameters-title">Parameters</h4>
 <ul class="tsd-parameter-list">
@@ -84,12 +98,20 @@
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">&gt;</span></h4><aside class="tsd-sources">
 <p>Implementation of <a href="../interfaces/_cardstack_cardpay_sdk.IAssets.html">IAssets</a>.<a href="../interfaces/_cardstack_cardpay_sdk.IAssets.html#getBalanceForToken">getBalanceForToken</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/cardstack/cardstack/blob/5257bdf/packages/cardpay-sdk/sdk/assets.ts#L29">packages/cardpay-sdk/sdk/assets.ts:29</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/cardstack/cardstack/blob/f316cf6/packages/cardpay-sdk/sdk/assets.ts#L62">packages/cardpay-sdk/sdk/assets.ts:62</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class"><a id="getNativeTokenBalance" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>get<wbr/>Native<wbr/>Token<wbr/>Balance</span><a href="#getNativeTokenBalance" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
 <li class="tsd-signature tsd-anchor-link" id="getNativeTokenBalance.getNativeTokenBalance-1">get<wbr/>Native<wbr/>Token<wbr/>Balance<span class="tsd-signature-symbol">(</span>userAddress<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">&gt;</span><a href="#getNativeTokenBalance.getNativeTokenBalance-1" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></li>
 <li class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>This call returns the balance in native token for the specified address. So in Ethereum mainnet, this would be the ether balance. In Gnosis Chain this would be the XDAI token balance.</p>
+
+<h3>Returns</h3><p>promise for the native token amount as a string in native units (usually <code>wei</code>).
+If no address is provided, then the balance of the first address in the wallet will be retrieved.</p>
+
+<h3>Example</h3><pre><code class="language-ts"><span class="hl-6">let</span><span class="hl-2"> </span><span class="hl-1">assetsAPI</span><span class="hl-2"> = </span><span class="hl-4">await</span><span class="hl-2"> </span><span class="hl-7">getSDK</span><span class="hl-2">(</span><span class="hl-5">&#39;Assets&#39;</span><span class="hl-2">, </span><span class="hl-1">web3</span><span class="hl-2">);</span><br/><span class="hl-6">let</span><span class="hl-2"> </span><span class="hl-1">etherBalance</span><span class="hl-2"> = </span><span class="hl-4">await</span><span class="hl-2"> </span><span class="hl-1">assetsAPI</span><span class="hl-2">.</span><span class="hl-7">getNativeTokenBalance</span><span class="hl-2">(</span><span class="hl-1">walletAddress</span><span class="hl-2">);</span>
+</code></pre>
+</div>
 <div class="tsd-parameters">
 <h4 class="tsd-parameters-title">Parameters</h4>
 <ul class="tsd-parameter-list">
@@ -98,12 +120,17 @@
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">&gt;</span></h4><aside class="tsd-sources">
 <p>Implementation of <a href="../interfaces/_cardstack_cardpay_sdk.IAssets.html">IAssets</a>.<a href="../interfaces/_cardstack_cardpay_sdk.IAssets.html#getNativeTokenBalance">getNativeTokenBalance</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/cardstack/cardstack/blob/5257bdf/packages/cardpay-sdk/sdk/assets.ts#L17">packages/cardpay-sdk/sdk/assets.ts:17</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/cardstack/cardstack/blob/f316cf6/packages/cardpay-sdk/sdk/assets.ts#L39">packages/cardpay-sdk/sdk/assets.ts:39</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class"><a id="getTokenInfo" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>get<wbr/>Token<wbr/>Info</span><a href="#getTokenInfo" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
 <li class="tsd-signature tsd-anchor-link" id="getTokenInfo.getTokenInfo-1">get<wbr/>Token<wbr/>Info<span class="tsd-signature-symbol">(</span>tokenAddress<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-symbol">{ </span><br/><span>    </span>decimals<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">; </span><br/><span>    </span>name<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span><br/><span>    </span>symbol<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span><br/><span class="tsd-signature-symbol">}</span><span class="tsd-signature-symbol">&gt;</span><a href="#getTokenInfo.getTokenInfo-1" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></li>
 <li class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>This call returns ERC-20 token information: the token name, the token symbol, and the token decimals for an ERC-20 token.</p>
+
+<h3>Example</h3><pre><code class="language-ts"><span class="hl-6">let</span><span class="hl-2"> </span><span class="hl-1">assetsAPI</span><span class="hl-2"> = </span><span class="hl-4">await</span><span class="hl-2"> </span><span class="hl-7">getSDK</span><span class="hl-2">(</span><span class="hl-5">&#39;Assets&#39;</span><span class="hl-2">, </span><span class="hl-1">web3</span><span class="hl-2">);</span><br/><span class="hl-6">let</span><span class="hl-2"> { </span><span class="hl-1">name</span><span class="hl-2">, </span><span class="hl-1">symbol</span><span class="hl-2">, </span><span class="hl-1">decimals</span><span class="hl-2"> } = </span><span class="hl-4">await</span><span class="hl-2"> </span><span class="hl-1">assetsAPI</span><span class="hl-2">.</span><span class="hl-7">getTokenInfo</span><span class="hl-2">(</span><span class="hl-1">cardTokenAddress</span><span class="hl-2">);</span>
+</code></pre>
+</div>
 <div class="tsd-parameters">
 <h4 class="tsd-parameters-title">Parameters</h4>
 <ul class="tsd-parameter-list">
@@ -112,7 +139,7 @@
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-symbol">{ </span><br/><span>    </span>decimals<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">; </span><br/><span>    </span>name<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span><br/><span>    </span>symbol<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span><br/><span class="tsd-signature-symbol">}</span><span class="tsd-signature-symbol">&gt;</span></h4><aside class="tsd-sources">
 <p>Implementation of <a href="../interfaces/_cardstack_cardpay_sdk.IAssets.html">IAssets</a>.<a href="../interfaces/_cardstack_cardpay_sdk.IAssets.html#getTokenInfo">getTokenInfo</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/cardstack/cardstack/blob/5257bdf/packages/cardpay-sdk/sdk/assets.ts#L36">packages/cardpay-sdk/sdk/assets.ts:36</a></li></ul></aside></li></ul></section></section></div>
+<li>Defined in <a href="https://github.com/cardstack/cardstack/blob/f316cf6/packages/cardpay-sdk/sdk/assets.ts#L78">packages/cardpay-sdk/sdk/assets.ts:78</a></li></ul></aside></li></ul></section></section></div>
 <div class="col-4 col-menu menu-sticky-wrap menu-highlight">
 <div class="tsd-navigation settings">
 <details class="tsd-index-accordion"><summary class="tsd-accordion-summary">

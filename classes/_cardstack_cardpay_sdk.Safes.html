@@ -16,6 +16,12 @@
 <li><a href="../modules/_cardstack_cardpay_sdk.html">@cardstack/cardpay-sdk</a></li>
 <li><a href="_cardstack_cardpay_sdk.Safes.html">Safes</a></li></ul>
 <h1>Class Safes</h1></div>
+<section class="tsd-panel tsd-comment">
+<div class="tsd-comment tsd-typography"><p>The <code>Safes</code> API is used to query the card protocol about the gnosis safes in the layer 2 network in which the Card Protocol runs. This can includes safes in which bridged tokens are deposited as well as prepaid cards (which in turn are actually gnosis safes). The <code>Safes</code> API can be obtained from <code>getSDK()</code> with a <code>Web3</code> instance that is configured to operate on a layer 2 network (like Gnosis Chain or Sokol).</p>
+
+<h3>Example</h3><pre><code class="language-ts"><span class="hl-4">import</span><span class="hl-2"> { </span><span class="hl-1">getSDK</span><span class="hl-2"> } </span><span class="hl-4">from</span><span class="hl-2"> </span><span class="hl-5">&quot;@cardstack/cardpay-sdk&quot;</span><span class="hl-2">;</span><br/><span class="hl-6">let</span><span class="hl-2"> </span><span class="hl-1">web3</span><span class="hl-2"> = </span><span class="hl-6">new</span><span class="hl-2"> </span><span class="hl-7">Web3</span><span class="hl-2">(</span><span class="hl-1">myProvider</span><span class="hl-2">); </span><span class="hl-0">// Layer 2 web3 instance</span><br/><span class="hl-6">let</span><span class="hl-2"> </span><span class="hl-1">safes</span><span class="hl-2"> = </span><span class="hl-4">await</span><span class="hl-2"> </span><span class="hl-7">getSDK</span><span class="hl-2">(</span><span class="hl-5">&#39;Safes&#39;</span><span class="hl-2">, </span><span class="hl-1">web3</span><span class="hl-2">);</span>
+</code></pre>
+</div></section>
 <section class="tsd-panel tsd-hierarchy">
 <h4>Hierarchy</h4>
 <ul class="tsd-hierarchy">
@@ -25,7 +31,7 @@
 <ul class="tsd-hierarchy">
 <li><a href="../interfaces/_cardstack_cardpay_sdk.ISafes.html" class="tsd-signature-type" data-tsd-kind="Interface">ISafes</a></li></ul></section><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/cardstack/cardstack/blob/5257bdf/packages/cardpay-sdk/sdk/safes.ts#L232">packages/cardpay-sdk/sdk/safes.ts:232</a></li></ul></aside>
+<li>Defined in <a href="https://github.com/cardstack/cardstack/blob/f316cf6/packages/cardpay-sdk/sdk/safes.ts#L242">packages/cardpay-sdk/sdk/safes.ts:242</a></li></ul></aside>
 <section class="tsd-panel-group tsd-index-group">
 <section class="tsd-panel tsd-index-panel">
 <details class="tsd-index-content tsd-index-accordion" open><summary class="tsd-accordion-summary tsd-index-summary">
@@ -67,35 +73,35 @@
 <h5><code class="tsd-tag ts-flagOptional">Optional</code> layer2Signer: <span class="tsd-signature-type">Signer</span></h5></li></ul></div>
 <h4 class="tsd-returns-title">Returns <a href="_cardstack_cardpay_sdk.Safes.html" class="tsd-signature-type" data-tsd-kind="Class">Safes</a></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/cardstack/cardstack/blob/5257bdf/packages/cardpay-sdk/sdk/safes.ts#L233">packages/cardpay-sdk/sdk/safes.ts:233</a></li></ul></aside></li></ul></section></section>
+<li>Defined in <a href="https://github.com/cardstack/cardstack/blob/f316cf6/packages/cardpay-sdk/sdk/safes.ts#L243">packages/cardpay-sdk/sdk/safes.ts:243</a></li></ul></aside></li></ul></section></section>
 <section class="tsd-panel-group tsd-member-group">
 <h2>Properties</h2>
 <section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-private"><a id="layer2Signer" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagPrivate">Private</code> <code class="tsd-tag ts-flagOptional">Optional</code> <span>layer2<wbr/>Signer</span><a href="#layer2Signer" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <div class="tsd-signature">layer2<wbr/>Signer<span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">Signer</span></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/cardstack/cardstack/blob/5257bdf/packages/cardpay-sdk/sdk/safes.ts#L233">packages/cardpay-sdk/sdk/safes.ts:233</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/cardstack/cardstack/blob/f316cf6/packages/cardpay-sdk/sdk/safes.ts#L243">packages/cardpay-sdk/sdk/safes.ts:243</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-private"><a id="layer2Web3" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagPrivate">Private</code> <span>layer2<wbr/>Web3</span><a href="#layer2Web3" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <div class="tsd-signature">layer2<wbr/>Web3<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">default</span></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/cardstack/cardstack/blob/5257bdf/packages/cardpay-sdk/sdk/safes.ts#L233">packages/cardpay-sdk/sdk/safes.ts:233</a></li></ul></aside></section></section>
+<li>Defined in <a href="https://github.com/cardstack/cardstack/blob/f316cf6/packages/cardpay-sdk/sdk/safes.ts#L243">packages/cardpay-sdk/sdk/safes.ts:243</a></li></ul></aside></section></section>
 <section class="tsd-panel-group tsd-member-group">
 <h2>Methods</h2>
 <section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class"><a id="createSafe" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>create<wbr/>Safe</span><a href="#createSafe" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
-<li class="tsd-signature tsd-anchor-link" id="createSafe.createSafe-1">create<wbr/>Safe<span class="tsd-signature-symbol">(</span>txnHash<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">CreateSafeResult</span><span class="tsd-signature-symbol">&gt;</span><a href="#createSafe.createSafe-1" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></li>
+<li class="tsd-signature tsd-anchor-link" id="createSafe.createSafe-1">create<wbr/>Safe<span class="tsd-signature-symbol">(</span>txnHash<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/_cardstack_cardpay_sdk.CreateSafeResult.html" class="tsd-signature-type" data-tsd-kind="Interface">CreateSafeResult</a><span class="tsd-signature-symbol">&gt;</span><a href="#createSafe.createSafe-1" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></li>
 <li class="tsd-description">
 <div class="tsd-parameters">
 <h4 class="tsd-parameters-title">Parameters</h4>
 <ul class="tsd-parameter-list">
 <li>
 <h5>txnHash: <span class="tsd-signature-type">string</span></h5></li></ul></div>
-<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">CreateSafeResult</span><span class="tsd-signature-symbol">&gt;</span></h4><aside class="tsd-sources">
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/_cardstack_cardpay_sdk.CreateSafeResult.html" class="tsd-signature-type" data-tsd-kind="Interface">CreateSafeResult</a><span class="tsd-signature-symbol">&gt;</span></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/cardstack/cardstack/blob/5257bdf/packages/cardpay-sdk/sdk/safes.ts#L235">packages/cardpay-sdk/sdk/safes.ts:235</a></li></ul></aside></li>
-<li class="tsd-signature tsd-anchor-link" id="createSafe.createSafe-2">create<wbr/>Safe<span class="tsd-signature-symbol">(</span>tokenAddress<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, owners<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span>, threshold<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span>, saltNonce<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span>, txnOptions<span class="tsd-signature-symbol">?: </span><a href="../interfaces/_cardstack_cardpay_sdk.TransactionOptions.html" class="tsd-signature-type" data-tsd-kind="Interface">TransactionOptions</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">CreateSafeResult</span><span class="tsd-signature-symbol">&gt;</span><a href="#createSafe.createSafe-2" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></li>
+<li>Defined in <a href="https://github.com/cardstack/cardstack/blob/f316cf6/packages/cardpay-sdk/sdk/safes.ts#L245">packages/cardpay-sdk/sdk/safes.ts:245</a></li></ul></aside></li>
+<li class="tsd-signature tsd-anchor-link" id="createSafe.createSafe-2">create<wbr/>Safe<span class="tsd-signature-symbol">(</span>tokenAddress<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, owners<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span>, threshold<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span>, saltNonce<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span>, txnOptions<span class="tsd-signature-symbol">?: </span><a href="../interfaces/_cardstack_cardpay_sdk.TransactionOptions.html" class="tsd-signature-type" data-tsd-kind="Interface">TransactionOptions</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/_cardstack_cardpay_sdk.CreateSafeResult.html" class="tsd-signature-type" data-tsd-kind="Interface">CreateSafeResult</a><span class="tsd-signature-symbol">&gt;</span><a href="#createSafe.createSafe-2" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></li>
 <li class="tsd-description">
 <div class="tsd-parameters">
 <h4 class="tsd-parameters-title">Parameters</h4>
@@ -110,9 +116,9 @@
 <h5><code class="tsd-tag ts-flagOptional">Optional</code> saltNonce: <span class="tsd-signature-type">string</span></h5></li>
 <li>
 <h5><code class="tsd-tag ts-flagOptional">Optional</code> txnOptions: <a href="../interfaces/_cardstack_cardpay_sdk.TransactionOptions.html" class="tsd-signature-type" data-tsd-kind="Interface">TransactionOptions</a></h5></li></ul></div>
-<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">CreateSafeResult</span><span class="tsd-signature-symbol">&gt;</span></h4><aside class="tsd-sources">
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/_cardstack_cardpay_sdk.CreateSafeResult.html" class="tsd-signature-type" data-tsd-kind="Interface">CreateSafeResult</a><span class="tsd-signature-symbol">&gt;</span></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/cardstack/cardstack/blob/5257bdf/packages/cardpay-sdk/sdk/safes.ts#L236">packages/cardpay-sdk/sdk/safes.ts:236</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/cardstack/cardstack/blob/f316cf6/packages/cardpay-sdk/sdk/safes.ts#L246">packages/cardpay-sdk/sdk/safes.ts:246</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class"><a id="getSafeAddressFromTransferTxn" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>get<wbr/>Safe<wbr/>Address<wbr/>From<wbr/>Transfer<wbr/>Txn</span><a href="#getSafeAddressFromTransferTxn" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
@@ -125,12 +131,22 @@
 <h5>txnHash: <span class="tsd-signature-type">string</span></h5></li></ul></div>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">&gt;</span></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/cardstack/cardstack/blob/5257bdf/packages/cardpay-sdk/sdk/safes.ts#L293">packages/cardpay-sdk/sdk/safes.ts:293</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/cardstack/cardstack/blob/f316cf6/packages/cardpay-sdk/sdk/safes.ts#L303">packages/cardpay-sdk/sdk/safes.ts:303</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class"><a id="sendTokens" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>send<wbr/>Tokens</span><a href="#sendTokens" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
 <li class="tsd-signature tsd-anchor-link" id="sendTokens.sendTokens-1">send<wbr/>Tokens<span class="tsd-signature-symbol">(</span>txnHash<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">SuccessfulTransactionReceipt</span><span class="tsd-signature-symbol">&gt;</span><a href="#sendTokens.sendTokens-1" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></li>
 <li class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>This call is used to send tokens from a gnosis safe to an arbitrary address in the layer 2 network. Note that the gas will be paid with the token you are transferring so there must be enough token balance in teh safe to cover both the transferred amount of tokens and gas.</p>
+
+<h3>Returns</h3><p>a promise for a web3 transaction receipt.</p>
+
+<h3>Example</h3><pre><code class="language-ts"><span class="hl-6">let</span><span class="hl-2"> </span><span class="hl-1">cardCpxd</span><span class="hl-2"> = </span><span class="hl-4">await</span><span class="hl-2"> </span><span class="hl-7">getAddress</span><span class="hl-2">(</span><span class="hl-5">&#39;cardCpxd&#39;</span><span class="hl-2">, </span><span class="hl-1">web3</span><span class="hl-2">);</span><br/><span class="hl-6">let</span><span class="hl-2"> </span><span class="hl-1">result</span><span class="hl-2"> = </span><span class="hl-4">await</span><span class="hl-2"> </span><span class="hl-1">safes</span><span class="hl-2">.</span><span class="hl-7">sendTokens</span><span class="hl-2">(</span><br/><span class="hl-2"> </span><span class="hl-1">depotSafeAddress</span><span class="hl-2">,</span><br/><span class="hl-2"> </span><span class="hl-1">cardCpxd</span><span class="hl-2">,</span><br/><span class="hl-2"> </span><span class="hl-1">relayTxnFunderAddress</span><br/><span class="hl-2"> [</span><span class="hl-9">10000000000000000000000</span><span class="hl-2">]</span><br/><span class="hl-2">);</span>
+</code></pre>
+
+<h3>Remarks</h3><p>Note that the returned amount is in units of the token specified in the
+function params, tokenAddress</p>
+</div>
 <div class="tsd-parameters">
 <h4 class="tsd-parameters-title">Parameters</h4>
 <ul class="tsd-parameter-list">
@@ -139,7 +155,7 @@
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">SuccessfulTransactionReceipt</span><span class="tsd-signature-symbol">&gt;</span></h4><aside class="tsd-sources">
 <p>Implementation of <a href="../interfaces/_cardstack_cardpay_sdk.ISafes.html">ISafes</a>.<a href="../interfaces/_cardstack_cardpay_sdk.ISafes.html#sendTokens">sendTokens</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/cardstack/cardstack/blob/5257bdf/packages/cardpay-sdk/sdk/safes.ts#L414">packages/cardpay-sdk/sdk/safes.ts:414</a></li></ul></aside></li>
+<li>Defined in <a href="https://github.com/cardstack/cardstack/blob/f316cf6/packages/cardpay-sdk/sdk/safes.ts#L469">packages/cardpay-sdk/sdk/safes.ts:469</a></li></ul></aside></li>
 <li class="tsd-signature tsd-anchor-link" id="sendTokens.sendTokens-2">send<wbr/>Tokens<span class="tsd-signature-symbol">(</span>safeAddress<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, tokenAddress<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, recipient<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, amount<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span>, txnOptions<span class="tsd-signature-symbol">?: </span><a href="../interfaces/_cardstack_cardpay_sdk.TransactionOptions.html" class="tsd-signature-type" data-tsd-kind="Interface">TransactionOptions</a>, contractOptions<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">ContractOptions</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">SuccessfulTransactionReceipt</span><span class="tsd-signature-symbol">&gt;</span><a href="#sendTokens.sendTokens-2" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></li>
 <li class="tsd-description">
 <div class="tsd-parameters">
@@ -160,35 +176,48 @@
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">SuccessfulTransactionReceipt</span><span class="tsd-signature-symbol">&gt;</span></h4><aside class="tsd-sources">
 <p>Implementation of <a href="../interfaces/_cardstack_cardpay_sdk.ISafes.html">ISafes</a>.<a href="../interfaces/_cardstack_cardpay_sdk.ISafes.html#sendTokens">sendTokens</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/cardstack/cardstack/blob/5257bdf/packages/cardpay-sdk/sdk/safes.ts#L415">packages/cardpay-sdk/sdk/safes.ts:415</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/cardstack/cardstack/blob/f316cf6/packages/cardpay-sdk/sdk/safes.ts#L470">packages/cardpay-sdk/sdk/safes.ts:470</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class"><a id="sendTokensGasEstimate" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>send<wbr/>Tokens<wbr/>Gas<wbr/>Estimate</span><a href="#sendTokensGasEstimate" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
 <li class="tsd-signature tsd-anchor-link" id="sendTokensGasEstimate.sendTokensGasEstimate-1">send<wbr/>Tokens<wbr/>Gas<wbr/>Estimate<span class="tsd-signature-symbol">(</span>safeAddress<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, tokenAddress<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, recipient<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, amount<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">&gt;</span><a href="#sendTokensGasEstimate.sendTokensGasEstimate-1" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></li>
 <li class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>This call will return the gas estimate for sending tokens from a safe.</p>
+
+<h3>Remarks</h3><p>Note that the returned amount is in units of the token specified in the
+function params, tokenAddress</p>
+</div>
 <div class="tsd-parameters">
 <h4 class="tsd-parameters-title">Parameters</h4>
 <ul class="tsd-parameter-list">
 <li>
-<h5>safeAddress: <span class="tsd-signature-type">string</span></h5></li>
+<h5>safeAddress: <span class="tsd-signature-type">string</span></h5>
+<div class="tsd-comment tsd-typography"><p>the address of the gnosis safe</p>
+</div></li>
 <li>
-<h5>tokenAddress: <span class="tsd-signature-type">string</span></h5></li>
+<h5>tokenAddress: <span class="tsd-signature-type">string</span></h5>
+<div class="tsd-comment tsd-typography"><p>the address of the token contract</p>
+</div></li>
 <li>
-<h5>recipient: <span class="tsd-signature-type">string</span></h5></li>
+<h5>recipient: <span class="tsd-signature-type">string</span></h5>
+<div class="tsd-comment tsd-typography"><p>the address of the recipient</p>
+</div></li>
 <li>
-<h5>amount: <span class="tsd-signature-type">string</span></h5></li></ul></div>
+<h5>amount: <span class="tsd-signature-type">string</span></h5>
+<div class="tsd-comment tsd-typography"><p>optionally,  amount of tokens to send as a string in native units of the token (e.g. <code>wei</code>)</p>
+</div></li></ul></div>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">&gt;</span></h4><aside class="tsd-sources">
 <p>Implementation of <a href="../interfaces/_cardstack_cardpay_sdk.ISafes.html">ISafes</a>.<a href="../interfaces/_cardstack_cardpay_sdk.ISafes.html#sendTokensGasEstimate">sendTokensGasEstimate</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/cardstack/cardstack/blob/5257bdf/packages/cardpay-sdk/sdk/safes.ts#L386">packages/cardpay-sdk/sdk/safes.ts:386</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/cardstack/cardstack/blob/f316cf6/packages/cardpay-sdk/sdk/safes.ts#L421">packages/cardpay-sdk/sdk/safes.ts:421</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-private"><a id="transferEventABI" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagPrivate">Private</code> <span>transfer<wbr/>EventABI</span><a href="#transferEventABI" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-private">
-<li class="tsd-signature tsd-anchor-link" id="transferEventABI.transferEventABI-1">transfer<wbr/>EventABI<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">EventABI</span><a href="#transferEventABI.transferEventABI-1" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></li>
+<li class="tsd-signature tsd-anchor-link" id="transferEventABI.transferEventABI-1">transfer<wbr/>EventABI<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../interfaces/_cardstack_cardpay_sdk.EventABI.html" class="tsd-signature-type" data-tsd-kind="Interface">EventABI</a><a href="#transferEventABI.transferEventABI-1" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></li>
 <li class="tsd-description">
-<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">EventABI</span></h4><aside class="tsd-sources">
+<h4 class="tsd-returns-title">Returns <a href="../interfaces/_cardstack_cardpay_sdk.EventABI.html" class="tsd-signature-type" data-tsd-kind="Interface">EventABI</a></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/cardstack/cardstack/blob/5257bdf/packages/cardpay-sdk/sdk/safes.ts#L299">packages/cardpay-sdk/sdk/safes.ts:299</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/cardstack/cardstack/blob/f316cf6/packages/cardpay-sdk/sdk/safes.ts#L309">packages/cardpay-sdk/sdk/safes.ts:309</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-private"><a id="transferTokenPayload" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagPrivate">Private</code> <span>transfer<wbr/>Token<wbr/>Payload</span><a href="#transferTokenPayload" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-private">
@@ -205,21 +234,28 @@
 <h5>amount: <span class="tsd-signature-type">BN</span></h5></li></ul></div>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">string</span></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/cardstack/cardstack/blob/5257bdf/packages/cardpay-sdk/sdk/safes.ts#L552">packages/cardpay-sdk/sdk/safes.ts:552</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/cardstack/cardstack/blob/f316cf6/packages/cardpay-sdk/sdk/safes.ts#L607">packages/cardpay-sdk/sdk/safes.ts:607</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class"><a id="view" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>view</span><a href="#view" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
-<li class="tsd-signature tsd-anchor-link" id="view.view-1">view<span class="tsd-signature-symbol">(</span>options<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">Partial</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Options</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/_cardstack_cardpay_sdk.ViewSafesResult.html" class="tsd-signature-type" data-tsd-kind="Interface">ViewSafesResult</a><span class="tsd-signature-symbol">&gt;</span><a href="#view.view-1" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></li>
+<li class="tsd-signature tsd-anchor-link" id="view.view-1">view<span class="tsd-signature-symbol">(</span>options<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">Partial</span><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/_cardstack_cardpay_sdk.Options.html" class="tsd-signature-type" data-tsd-kind="Interface">Options</a><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/_cardstack_cardpay_sdk.ViewSafesResult.html" class="tsd-signature-type" data-tsd-kind="Interface">ViewSafesResult</a><span class="tsd-signature-symbol">&gt;</span><a href="#view.view-1" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></li>
 <li class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>This call is used to view all the gnosis safes owned by a particular address in the layer 2 network in which the Card Protocol runs.</p>
+
+<h3>Returns</h3><p>a promise that includes an array of all the gnosis safes owned by the specified address. The result is an object contains a <code>Safe[]</code> type which conforms to the <code>Safe</code> shape below, and the block number at which the subgraph was last indexed:</p>
+
+<h3>Example</h3><pre><code class="language-ts"><span class="hl-6">let</span><span class="hl-2"> </span><span class="hl-1">safeDetails</span><span class="hl-2"> = </span><span class="hl-4">await</span><span class="hl-2"> </span><span class="hl-1">safes</span><span class="hl-2">.</span><span class="hl-7">view</span><span class="hl-2">(); </span><span class="hl-0">// returns { safes: Safe[]; blockNumber: number; }</span>
+</code></pre>
+</div>
 <div class="tsd-parameters">
 <h4 class="tsd-parameters-title">Parameters</h4>
 <ul class="tsd-parameter-list">
 <li>
-<h5><code class="tsd-tag ts-flagOptional">Optional</code> options: <span class="tsd-signature-type">Partial</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Options</span><span class="tsd-signature-symbol">&gt;</span></h5></li></ul></div>
+<h5><code class="tsd-tag ts-flagOptional">Optional</code> options: <span class="tsd-signature-type">Partial</span><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/_cardstack_cardpay_sdk.Options.html" class="tsd-signature-type" data-tsd-kind="Interface">Options</a><span class="tsd-signature-symbol">&gt;</span></h5></li></ul></div>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/_cardstack_cardpay_sdk.ViewSafesResult.html" class="tsd-signature-type" data-tsd-kind="Interface">ViewSafesResult</a><span class="tsd-signature-symbol">&gt;</span></h4><aside class="tsd-sources">
 <p>Implementation of <a href="../interfaces/_cardstack_cardpay_sdk.ISafes.html">ISafes</a>.<a href="../interfaces/_cardstack_cardpay_sdk.ISafes.html#view">view</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/cardstack/cardstack/blob/5257bdf/packages/cardpay-sdk/sdk/safes.ts#L332">packages/cardpay-sdk/sdk/safes.ts:332</a></li></ul></aside></li>
+<li>Defined in <a href="https://github.com/cardstack/cardstack/blob/f316cf6/packages/cardpay-sdk/sdk/safes.ts#L360">packages/cardpay-sdk/sdk/safes.ts:360</a></li></ul></aside></li>
 <li class="tsd-signature tsd-anchor-link" id="view.view-2">view<span class="tsd-signature-symbol">(</span>owner<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/_cardstack_cardpay_sdk.ViewSafesResult.html" class="tsd-signature-type" data-tsd-kind="Interface">ViewSafesResult</a><span class="tsd-signature-symbol">&gt;</span><a href="#view.view-2" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></li>
 <li class="tsd-description">
 <div class="tsd-parameters">
@@ -230,8 +266,8 @@
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/_cardstack_cardpay_sdk.ViewSafesResult.html" class="tsd-signature-type" data-tsd-kind="Interface">ViewSafesResult</a><span class="tsd-signature-symbol">&gt;</span></h4><aside class="tsd-sources">
 <p>Implementation of <a href="../interfaces/_cardstack_cardpay_sdk.ISafes.html">ISafes</a>.<a href="../interfaces/_cardstack_cardpay_sdk.ISafes.html#view">view</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/cardstack/cardstack/blob/5257bdf/packages/cardpay-sdk/sdk/safes.ts#L333">packages/cardpay-sdk/sdk/safes.ts:333</a></li></ul></aside></li>
-<li class="tsd-signature tsd-anchor-link" id="view.view-3">view<span class="tsd-signature-symbol">(</span>owner<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span>, options<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">Partial</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Options</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/_cardstack_cardpay_sdk.ViewSafesResult.html" class="tsd-signature-type" data-tsd-kind="Interface">ViewSafesResult</a><span class="tsd-signature-symbol">&gt;</span><a href="#view.view-3" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></li>
+<li>Defined in <a href="https://github.com/cardstack/cardstack/blob/f316cf6/packages/cardpay-sdk/sdk/safes.ts#L361">packages/cardpay-sdk/sdk/safes.ts:361</a></li></ul></aside></li>
+<li class="tsd-signature tsd-anchor-link" id="view.view-3">view<span class="tsd-signature-symbol">(</span>owner<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span>, options<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">Partial</span><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/_cardstack_cardpay_sdk.Options.html" class="tsd-signature-type" data-tsd-kind="Interface">Options</a><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/_cardstack_cardpay_sdk.ViewSafesResult.html" class="tsd-signature-type" data-tsd-kind="Interface">ViewSafesResult</a><span class="tsd-signature-symbol">&gt;</span><a href="#view.view-3" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></li>
 <li class="tsd-description">
 <div class="tsd-parameters">
 <h4 class="tsd-parameters-title">Parameters</h4>
@@ -239,16 +275,23 @@
 <li>
 <h5><code class="tsd-tag ts-flagOptional">Optional</code> owner: <span class="tsd-signature-type">string</span></h5></li>
 <li>
-<h5><code class="tsd-tag ts-flagOptional">Optional</code> options: <span class="tsd-signature-type">Partial</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Options</span><span class="tsd-signature-symbol">&gt;</span></h5></li></ul></div>
+<h5><code class="tsd-tag ts-flagOptional">Optional</code> options: <span class="tsd-signature-type">Partial</span><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/_cardstack_cardpay_sdk.Options.html" class="tsd-signature-type" data-tsd-kind="Interface">Options</a><span class="tsd-signature-symbol">&gt;</span></h5></li></ul></div>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/_cardstack_cardpay_sdk.ViewSafesResult.html" class="tsd-signature-type" data-tsd-kind="Interface">ViewSafesResult</a><span class="tsd-signature-symbol">&gt;</span></h4><aside class="tsd-sources">
 <p>Implementation of <a href="../interfaces/_cardstack_cardpay_sdk.ISafes.html">ISafes</a>.<a href="../interfaces/_cardstack_cardpay_sdk.ISafes.html#view">view</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/cardstack/cardstack/blob/5257bdf/packages/cardpay-sdk/sdk/safes.ts#L334">packages/cardpay-sdk/sdk/safes.ts:334</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/cardstack/cardstack/blob/f316cf6/packages/cardpay-sdk/sdk/safes.ts#L362">packages/cardpay-sdk/sdk/safes.ts:362</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class"><a id="viewSafe" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>view<wbr/>Safe</span><a href="#viewSafe" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
 <li class="tsd-signature tsd-anchor-link" id="viewSafe.viewSafe-1">view<wbr/>Safe<span class="tsd-signature-symbol">(</span>safeAddress<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/_cardstack_cardpay_sdk.ViewSafeResult.html" class="tsd-signature-type" data-tsd-kind="Interface">ViewSafeResult</a><span class="tsd-signature-symbol">&gt;</span><a href="#viewSafe.viewSafe-1" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></li>
 <li class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>This call is used to view a specific safe in the layer 2 network in which the Card Protocol runs.</p>
+
+<h3>Returns</h3><p>promise for an object that contains a <code>Safe</code> and the block number at which the subgraph was last indexed:</p>
+
+<h3>Example</h3><pre><code class="language-ts"><span class="hl-6">let</span><span class="hl-2"> </span><span class="hl-1">safeDetails</span><span class="hl-2"> = </span><span class="hl-4">await</span><span class="hl-2"> </span><span class="hl-1">safes</span><span class="hl-2">.</span><span class="hl-7">viewSafe</span><span class="hl-2">(</span><span class="hl-1">safeAddress</span><span class="hl-2">); </span><span class="hl-0">// returns { safe: Safe | undefined; blockNumber: number; }</span>
+</code></pre>
+</div>
 <div class="tsd-parameters">
 <h4 class="tsd-parameters-title">Parameters</h4>
 <ul class="tsd-parameter-list">
@@ -257,7 +300,7 @@
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/_cardstack_cardpay_sdk.ViewSafeResult.html" class="tsd-signature-type" data-tsd-kind="Interface">ViewSafeResult</a><span class="tsd-signature-symbol">&gt;</span></h4><aside class="tsd-sources">
 <p>Implementation of <a href="../interfaces/_cardstack_cardpay_sdk.ISafes.html">ISafes</a>.<a href="../interfaces/_cardstack_cardpay_sdk.ISafes.html#viewSafe">viewSafe</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/cardstack/cardstack/blob/5257bdf/packages/cardpay-sdk/sdk/safes.ts#L321">packages/cardpay-sdk/sdk/safes.ts:321</a></li></ul></aside></li></ul></section></section></div>
+<li>Defined in <a href="https://github.com/cardstack/cardstack/blob/f316cf6/packages/cardpay-sdk/sdk/safes.ts#L340">packages/cardpay-sdk/sdk/safes.ts:340</a></li></ul></aside></li></ul></section></section></div>
 <div class="col-4 col-menu menu-sticky-wrap menu-highlight">
 <div class="tsd-navigation settings">
 <details class="tsd-index-accordion"><summary class="tsd-accordion-summary">

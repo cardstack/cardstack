@@ -16,6 +16,12 @@
 <li><a href="../modules/_cardstack_cardpay_sdk.html">@cardstack/cardpay-sdk</a></li>
 <li><a href="_cardstack_cardpay_sdk.TokenBridgeHomeSideClass.html">TokenBridgeHomeSideClass</a></li></ul>
 <h1>Class TokenBridgeHomeSideClass</h1></div>
+<section class="tsd-panel tsd-comment">
+<div class="tsd-comment tsd-typography"><p>The <code>TokenBridgeHomeSide</code> API is used to bridge tokens into the layer 2 network in which the Card Protocol runs. The <code>TokenBridgeHomeSide</code> API can be obtained from <code>getSDK()</code> with a <code>Web3</code> instance that is configured to operate on a layer 2 network (like Gnosis Chain or Sokol). *</p>
+
+<h3>Example</h3><pre><code class="language-ts"><span class="hl-4">import</span><span class="hl-2"> { </span><span class="hl-1">getSDK</span><span class="hl-2"> } </span><span class="hl-4">from</span><span class="hl-2"> </span><span class="hl-5">&quot;@cardstack/cardpay-sdk&quot;</span><span class="hl-2">;</span><br/><span class="hl-6">let</span><span class="hl-2"> </span><span class="hl-1">web3</span><span class="hl-2"> = </span><span class="hl-6">new</span><span class="hl-2"> </span><span class="hl-7">Web3</span><span class="hl-2">(</span><span class="hl-1">myProvider</span><span class="hl-2">); </span><span class="hl-0">// Layer 2 web3 instance</span><br/><span class="hl-6">let</span><span class="hl-2"> </span><span class="hl-1">tokenBridge</span><span class="hl-2"> = </span><span class="hl-4">await</span><span class="hl-2"> </span><span class="hl-7">getSDK</span><span class="hl-2">(</span><span class="hl-5">&#39;TokenBridgeHomeSide&#39;</span><span class="hl-2">, </span><span class="hl-1">web3</span><span class="hl-2">);</span>
+</code></pre>
+</div></section>
 <section class="tsd-panel tsd-hierarchy">
 <h4>Hierarchy</h4>
 <ul class="tsd-hierarchy">
@@ -25,7 +31,7 @@
 <ul class="tsd-hierarchy">
 <li><a href="../interfaces/_cardstack_cardpay_sdk.ITokenBridgeHomeSide.html" class="tsd-signature-type" data-tsd-kind="Interface">ITokenBridgeHomeSide</a></li></ul></section><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/cardstack/cardstack/blob/5257bdf/packages/cardpay-sdk/sdk/token-bridge-home-side.ts#L53">packages/cardpay-sdk/sdk/token-bridge-home-side.ts:53</a></li></ul></aside>
+<li>Defined in <a href="https://github.com/cardstack/cardstack/blob/f316cf6/packages/cardpay-sdk/sdk/token-bridge-home-side.ts#L61">packages/cardpay-sdk/sdk/token-bridge-home-side.ts:61</a></li></ul></aside>
 <section class="tsd-panel-group tsd-index-group">
 <section class="tsd-panel tsd-index-panel">
 <details class="tsd-index-content tsd-index-accordion" open><summary class="tsd-accordion-summary tsd-index-summary">
@@ -63,19 +69,19 @@
 <h5><code class="tsd-tag ts-flagOptional">Optional</code> layer2Signer: <span class="tsd-signature-type">Signer</span></h5></li></ul></div>
 <h4 class="tsd-returns-title">Returns <a href="_cardstack_cardpay_sdk.TokenBridgeHomeSideClass.html" class="tsd-signature-type" data-tsd-kind="Class">TokenBridgeHomeSideClass</a></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/cardstack/cardstack/blob/5257bdf/packages/cardpay-sdk/sdk/token-bridge-home-side.ts#L54">packages/cardpay-sdk/sdk/token-bridge-home-side.ts:54</a></li></ul></aside></li></ul></section></section>
+<li>Defined in <a href="https://github.com/cardstack/cardstack/blob/f316cf6/packages/cardpay-sdk/sdk/token-bridge-home-side.ts#L62">packages/cardpay-sdk/sdk/token-bridge-home-side.ts:62</a></li></ul></aside></li></ul></section></section>
 <section class="tsd-panel-group tsd-member-group">
 <h2>Properties</h2>
 <section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-private"><a id="layer2Signer" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagPrivate">Private</code> <code class="tsd-tag ts-flagOptional">Optional</code> <span>layer2<wbr/>Signer</span><a href="#layer2Signer" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <div class="tsd-signature">layer2<wbr/>Signer<span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">Signer</span></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/cardstack/cardstack/blob/5257bdf/packages/cardpay-sdk/sdk/token-bridge-home-side.ts#L54">packages/cardpay-sdk/sdk/token-bridge-home-side.ts:54</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/cardstack/cardstack/blob/f316cf6/packages/cardpay-sdk/sdk/token-bridge-home-side.ts#L62">packages/cardpay-sdk/sdk/token-bridge-home-side.ts:62</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-private"><a id="layer2Web3" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagPrivate">Private</code> <span>layer2<wbr/>Web3</span><a href="#layer2Web3" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <div class="tsd-signature">layer2<wbr/>Web3<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">default</span></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/cardstack/cardstack/blob/5257bdf/packages/cardpay-sdk/sdk/token-bridge-home-side.ts#L54">packages/cardpay-sdk/sdk/token-bridge-home-side.ts:54</a></li></ul></aside></section></section>
+<li>Defined in <a href="https://github.com/cardstack/cardstack/blob/f316cf6/packages/cardpay-sdk/sdk/token-bridge-home-side.ts#L62">packages/cardpay-sdk/sdk/token-bridge-home-side.ts:62</a></li></ul></aside></section></section>
 <section class="tsd-panel-group tsd-member-group">
 <h2>Methods</h2>
 <section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class"><a id="getWithdrawalLimits" class="tsd-anchor"></a>
@@ -83,6 +89,12 @@
 <ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
 <li class="tsd-signature tsd-anchor-link" id="getWithdrawalLimits.getWithdrawalLimits-1">get<wbr/>Withdrawal<wbr/>Limits<span class="tsd-signature-symbol">(</span>tokenAddress<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-symbol">{ </span><br/><span>    </span>max<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span><br/><span>    </span>min<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span><br/><span class="tsd-signature-symbol">}</span><span class="tsd-signature-symbol">&gt;</span><a href="#getWithdrawalLimits.getWithdrawalLimits-1" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></li>
 <li class="tsd-description">
+<div class="tsd-comment tsd-typography">
+<h3>Returns</h3><p>the minimum and maximum withdrawal limits as a string in token units (we assume 18 decimals, i.e. <code>wei</code>) for bridging a token to layer 1. This method is invoked with the layer 2 CPXD token address of the CPXD token being withdrawn.</p>
+
+<h3>Example</h3><pre><code class="language-js"><span class="hl-6">let</span><span class="hl-2"> { </span><span class="hl-1">min</span><span class="hl-2">, </span><span class="hl-1">max</span><span class="hl-2"> } = </span><span class="hl-4">await</span><span class="hl-2"> </span><span class="hl-1">tokenBridge</span><span class="hl-2">.</span><span class="hl-7">getWithdrawalLimits</span><span class="hl-2">(</span><span class="hl-1">daiTokenAddress</span><span class="hl-2">);</span>
+</code></pre>
+</div>
 <div class="tsd-parameters">
 <h4 class="tsd-parameters-title">Parameters</h4>
 <ul class="tsd-parameter-list">
@@ -90,12 +102,24 @@
 <h5>tokenAddress: <span class="tsd-signature-type">string</span></h5></li></ul></div>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-symbol">{ </span><br/><span>    </span>max<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span><br/><span>    </span>min<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span><br/><span class="tsd-signature-symbol">}</span><span class="tsd-signature-symbol">&gt;</span></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/cardstack/cardstack/blob/5257bdf/packages/cardpay-sdk/sdk/token-bridge-home-side.ts#L56">packages/cardpay-sdk/sdk/token-bridge-home-side.ts:56</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/cardstack/cardstack/blob/f316cf6/packages/cardpay-sdk/sdk/token-bridge-home-side.ts#L71">packages/cardpay-sdk/sdk/token-bridge-home-side.ts:71</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class"><a id="relayTokens" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>relay<wbr/>Tokens</span><a href="#relayTokens" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
 <li class="tsd-signature tsd-anchor-link" id="relayTokens.relayTokens-1">relay<wbr/>Tokens<span class="tsd-signature-symbol">(</span>txnHash<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">SuccessfulTransactionReceipt</span><span class="tsd-signature-symbol">&gt;</span><a href="#relayTokens.relayTokens-1" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></li>
 <li class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>This call will invoke the token bridge contract to relay tokens from a layer 2 safe into the account specified in layer 1.</p>
+<p>This method is invoked with the following parameters:</p>
+<ul>
+<li>The layer 2 safe address that contains the tokens to be relayed to layer 1</li>
+<li>The layer 2 token address of the tokens to be relayed</li>
+<li>The address of the layer 1 recipient that will receive the tokens in layer 1</li>
+<li>The amount of tokens to relay as a string in native units of the token (e.g. <code>wei</code>). Note that in addition to the amount of tokens being relayed, the safe will also be changed the layer 2 gas costs for performing the relay as well (the gas cost will be charged in the same tokens as is being relayed). So the safe must have a balance that includes both the amount being relayed as well as the layer 2 gas charged in order to perform the relay.</li>
+</ul>
+
+<h3>Example</h3><pre><code class="language-js"><span class="hl-6">let</span><span class="hl-2"> </span><span class="hl-1">result</span><span class="hl-2"> = </span><span class="hl-4">await</span><span class="hl-2"> </span><span class="hl-1">tokenBridge</span><span class="hl-2">.</span><span class="hl-7">relayTokens</span><span class="hl-2">(</span><br/><span class="hl-2">  </span><span class="hl-1">layer2SafeAddress</span><span class="hl-2">,</span><br/><span class="hl-2">  </span><span class="hl-1">tokenAddress</span><span class="hl-2">,</span><br/><span class="hl-2">  </span><span class="hl-1">layer1RecipientAddress</span><span class="hl-2">,</span><br/><span class="hl-2">  </span><span class="hl-1">amountInWei</span><br/><span class="hl-2">);</span>
+</code></pre>
+</div>
 <div class="tsd-parameters">
 <h4 class="tsd-parameters-title">Parameters</h4>
 <ul class="tsd-parameter-list">
@@ -103,7 +127,7 @@
 <h5>txnHash: <span class="tsd-signature-type">string</span></h5></li></ul></div>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">SuccessfulTransactionReceipt</span><span class="tsd-signature-symbol">&gt;</span></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/cardstack/cardstack/blob/5257bdf/packages/cardpay-sdk/sdk/token-bridge-home-side.ts#L68">packages/cardpay-sdk/sdk/token-bridge-home-side.ts:68</a></li></ul></aside></li>
+<li>Defined in <a href="https://github.com/cardstack/cardstack/blob/f316cf6/packages/cardpay-sdk/sdk/token-bridge-home-side.ts#L101">packages/cardpay-sdk/sdk/token-bridge-home-side.ts:101</a></li></ul></aside></li>
 <li class="tsd-signature tsd-anchor-link" id="relayTokens.relayTokens-2">relay<wbr/>Tokens<span class="tsd-signature-symbol">(</span>safeAddress<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, tokenAddress<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, recipientAddress<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, amount<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, txnOptions<span class="tsd-signature-symbol">?: </span><a href="../interfaces/_cardstack_cardpay_sdk.TransactionOptions.html" class="tsd-signature-type" data-tsd-kind="Interface">TransactionOptions</a>, contractOptions<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">ContractOptions</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">SuccessfulTransactionReceipt</span><span class="tsd-signature-symbol">&gt;</span><a href="#relayTokens.relayTokens-2" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></li>
 <li class="tsd-description">
 <div class="tsd-parameters">
@@ -123,12 +147,26 @@
 <h5><code class="tsd-tag ts-flagOptional">Optional</code> contractOptions: <span class="tsd-signature-type">ContractOptions</span></h5></li></ul></div>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">SuccessfulTransactionReceipt</span><span class="tsd-signature-symbol">&gt;</span></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/cardstack/cardstack/blob/5257bdf/packages/cardpay-sdk/sdk/token-bridge-home-side.ts#L69">packages/cardpay-sdk/sdk/token-bridge-home-side.ts:69</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/cardstack/cardstack/blob/f316cf6/packages/cardpay-sdk/sdk/token-bridge-home-side.ts#L102">packages/cardpay-sdk/sdk/token-bridge-home-side.ts:102</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class"><a id="waitForBridgingToLayer2Completed" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>wait<wbr/>For<wbr/>Bridging<wbr/>To<wbr/>Layer2<wbr/>Completed</span><a href="#waitForBridgingToLayer2Completed" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
 <li class="tsd-signature tsd-anchor-link" id="waitForBridgingToLayer2Completed.waitForBridgingToLayer2Completed-1">wait<wbr/>For<wbr/>Bridging<wbr/>To<wbr/>Layer2<wbr/>Completed<span class="tsd-signature-symbol">(</span>recipientAddress<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, fromBlock<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">SuccessfulTransactionReceipt</span><span class="tsd-signature-symbol">&gt;</span><a href="#waitForBridgingToLayer2Completed.waitForBridgingToLayer2Completed-1" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></li>
 <li class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>This call will listen for a <code>TokensBridgedToSafe</code> event emitted by the TokenBridge home contract that has a recipient matching the specified address. The starting layer 2 block height should be captured before the call to relayTokens is made to begin bridging. It is used to focus the search and avoid matching on a previous bridging for this user.</p>
+<p>This method is invoked with the following parameters:</p>
+<ul>
+<li>The address of the layer 2 account that will own the resulting safe (passed as receiver to relayTokens call)</li>
+<li>The block height of layer 2 before the relayTokens call was initiated on the foreign side of the bridge. Get it with <code>await layer2Web3.eth.getBlockNumber()</code></li>
+</ul>
+
+<h3>Returns</h3><p>promise that includes a web3 transaction receipt for the layer 2 transaction, from which you can obtain the transaction hash, ethereum events, and other details about the transaction <a href="https://web3js.readthedocs.io/en/v1.3.4/web3-eth-contract.html#id37">https://web3js.readthedocs.io/en/v1.3.4/web3-eth-contract.html#id37</a>.</p>
+
+<h3>Remarks</h3><p>We use the subgraph to act as our indicator that bridging has completed, as this is the same mechanism that is populating the card wallet&#39;s displayed token balances</p>
+
+<h3>Example</h3><pre><code class="language-ts"><br/><span class="hl-6">let</span><span class="hl-2"> </span><span class="hl-1">txnReceipt</span><span class="hl-2"> = </span><span class="hl-4">await</span><span class="hl-2"> </span><span class="hl-1">tokenBridge</span><span class="hl-2">.</span><span class="hl-7">waitForBridgingToLayer2Completed</span><span class="hl-2">(</span><br/><span class="hl-1">recipientAddress</span><br/><span class="hl-1">startingBlockHeight</span><span class="hl-2">,</span><br/><span class="hl-2">);</span>
+</code></pre>
+</div>
 <div class="tsd-parameters">
 <h4 class="tsd-parameters-title">Parameters</h4>
 <ul class="tsd-parameter-list">
@@ -139,12 +177,22 @@
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">SuccessfulTransactionReceipt</span><span class="tsd-signature-symbol">&gt;</span></h4><aside class="tsd-sources">
 <p>Implementation of <a href="../interfaces/_cardstack_cardpay_sdk.ITokenBridgeHomeSide.html">ITokenBridgeHomeSide</a>.<a href="../interfaces/_cardstack_cardpay_sdk.ITokenBridgeHomeSide.html#waitForBridgingToLayer2Completed">waitForBridgingToLayer2Completed</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/cardstack/cardstack/blob/5257bdf/packages/cardpay-sdk/sdk/token-bridge-home-side.ts#L231">packages/cardpay-sdk/sdk/token-bridge-home-side.ts:231</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/cardstack/cardstack/blob/f316cf6/packages/cardpay-sdk/sdk/token-bridge-home-side.ts#L295">packages/cardpay-sdk/sdk/token-bridge-home-side.ts:295</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class"><a id="waitForBridgingValidation" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>wait<wbr/>For<wbr/>Bridging<wbr/>Validation</span><a href="#waitForBridgingValidation" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
 <li class="tsd-signature tsd-anchor-link" id="waitForBridgingValidation.waitForBridgingValidation-1">wait<wbr/>For<wbr/>Bridging<wbr/>Validation<span class="tsd-signature-symbol">(</span>fromBlock<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, bridgingTxnHash<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/_cardstack_cardpay_sdk.BridgeValidationResult.html" class="tsd-signature-type" data-tsd-kind="Interface">BridgeValidationResult</a><span class="tsd-signature-symbol">&gt;</span><a href="#waitForBridgingValidation.waitForBridgingValidation-1" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></li>
 <li class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>This call waits for the token bridge validators to perform their necessary signatures on the token bridge request from layer 2 to layer 1. After the bridge validators have signed the bridging request, this call will return a <code>messageId</code>, <code>encodedData</code>, and <code>signatures</code> for the bridging request. These items can then be used to claim the bridged tokens in layer 1.</p>
+<p>This method is invoked with:</p>
+<ul>
+<li>The block height of layer 2 before the relayTokens call was initiated on the home side of the bridge. Get it with <code>await layer2Web3.eth.getBlockNumber()</code></li>
+<li>The layer 2 transaction hash for the bridging transaction (the result of <code>TokenBridgeHomeSide.relayTokens</code>).</li>
+</ul>
+
+<h3>Example</h3><pre><code class="language-ts"><span class="hl-6">let</span><span class="hl-2"> {</span><br/><span class="hl-2">  </span><span class="hl-1">messageId</span><span class="hl-2">,</span><br/><span class="hl-2">  </span><span class="hl-1">encodedData</span><span class="hl-2">,</span><br/><span class="hl-2">  </span><span class="hl-1">signatures</span><br/><span class="hl-2">} = </span><span class="hl-4">await</span><span class="hl-2"> </span><span class="hl-1">tokenBridge</span><span class="hl-2">.</span><span class="hl-7">waitForBridgingValidation</span><span class="hl-2">(</span><span class="hl-1">fromBlock</span><span class="hl-2">, </span><span class="hl-1">txnHash</span><span class="hl-2">);</span>
+</code></pre>
+</div>
 <div class="tsd-parameters">
 <h4 class="tsd-parameters-title">Parameters</h4>
 <ul class="tsd-parameter-list">
@@ -154,7 +202,7 @@
 <h5>bridgingTxnHash: <span class="tsd-signature-type">string</span></h5></li></ul></div>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/_cardstack_cardpay_sdk.BridgeValidationResult.html" class="tsd-signature-type" data-tsd-kind="Interface">BridgeValidationResult</a><span class="tsd-signature-symbol">&gt;</span></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/cardstack/cardstack/blob/5257bdf/packages/cardpay-sdk/sdk/token-bridge-home-side.ts#L163">packages/cardpay-sdk/sdk/token-bridge-home-side.ts:163</a></li></ul></aside></li></ul></section></section></div>
+<li>Defined in <a href="https://github.com/cardstack/cardstack/blob/f316cf6/packages/cardpay-sdk/sdk/token-bridge-home-side.ts#L212">packages/cardpay-sdk/sdk/token-bridge-home-side.ts:212</a></li></ul></aside></li></ul></section></section></div>
 <div class="col-4 col-menu menu-sticky-wrap menu-highlight">
 <div class="tsd-navigation settings">
 <details class="tsd-index-accordion"><summary class="tsd-accordion-summary">

@@ -16,12 +16,18 @@
 <li><a href="../modules/_cardstack_cardpay_sdk.html">@cardstack/cardpay-sdk</a></li>
 <li><a href="_cardstack_cardpay_sdk.LayerTwoOracle.html">LayerTwoOracle</a></li></ul>
 <h1>Class LayerTwoOracle</h1></div>
+<section class="tsd-panel tsd-comment">
+<div class="tsd-comment tsd-typography"><p>The <code>LayerTwoOracle</code> API is used to get the current exchange rates in USD and ETH for the various stablecoin that we support. These rates are fed by the Chainlink price feeds for the stablecoin rates and the DIA oracle for the CARD token rates. As we onboard new stablecoin we&#39;ll add more exchange rates. The price oracles that we use reside in layer 2, so please supply a layer 2 web3 instance obtaining an <code>LayerTwoOracle</code> API from <code>getSDK()</code>.</p>
+
+<h3>Example</h3><pre><code class="language-ts"><span class="hl-4">import</span><span class="hl-2"> { </span><span class="hl-1">getSDK</span><span class="hl-2"> } </span><span class="hl-4">from</span><span class="hl-2"> </span><span class="hl-5">&quot;@cardstack/cardpay-sdk&quot;</span><span class="hl-2">;</span><br/><span class="hl-6">let</span><span class="hl-2"> </span><span class="hl-1">web3</span><span class="hl-2"> = </span><span class="hl-6">new</span><span class="hl-2"> </span><span class="hl-7">Web3</span><span class="hl-2">(</span><span class="hl-1">myProvider</span><span class="hl-2">); </span><span class="hl-0">// Layer 2 web3 instance</span><br/><span class="hl-6">let</span><span class="hl-2"> </span><span class="hl-1">layerTwoOracle</span><span class="hl-2"> = </span><span class="hl-4">await</span><span class="hl-2"> </span><span class="hl-7">getSDK</span><span class="hl-2">(</span><span class="hl-5">&#39;LayerTwoOracle&#39;</span><span class="hl-2">, </span><span class="hl-1">web3</span><span class="hl-2">);</span>
+</code></pre>
+</div></section>
 <section class="tsd-panel tsd-hierarchy">
 <h4>Hierarchy</h4>
 <ul class="tsd-hierarchy">
 <li><span class="target">LayerTwoOracle</span></li></ul></section><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/cardstack/cardstack/blob/5257bdf/packages/cardpay-sdk/sdk/layer-two-oracle/base.ts#L13">packages/cardpay-sdk/sdk/layer-two-oracle/base.ts:13</a></li></ul></aside>
+<li>Defined in <a href="https://github.com/cardstack/cardstack/blob/f316cf6/packages/cardpay-sdk/sdk/layer-two-oracle/base.ts#L23">packages/cardpay-sdk/sdk/layer-two-oracle/base.ts:23</a></li></ul></aside>
 <section class="tsd-panel-group tsd-index-group">
 <section class="tsd-panel tsd-index-panel">
 <details class="tsd-index-content tsd-index-accordion" open><summary class="tsd-accordion-summary tsd-index-summary">
@@ -60,14 +66,14 @@
 <h5>layer2Web3: <span class="tsd-signature-type">default</span></h5></li></ul></div>
 <h4 class="tsd-returns-title">Returns <a href="_cardstack_cardpay_sdk.LayerTwoOracle.html" class="tsd-signature-type" data-tsd-kind="Class">LayerTwoOracle</a></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/cardstack/cardstack/blob/5257bdf/packages/cardpay-sdk/sdk/layer-two-oracle/base.ts#L14">packages/cardpay-sdk/sdk/layer-two-oracle/base.ts:14</a></li></ul></aside></li></ul></section></section>
+<li>Defined in <a href="https://github.com/cardstack/cardstack/blob/f316cf6/packages/cardpay-sdk/sdk/layer-two-oracle/base.ts#L24">packages/cardpay-sdk/sdk/layer-two-oracle/base.ts:24</a></li></ul></aside></li></ul></section></section>
 <section class="tsd-panel-group tsd-member-group">
 <h2>Properties</h2>
 <section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-private"><a id="layer2Web3" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagPrivate">Private</code> <span>layer2<wbr/>Web3</span><a href="#layer2Web3" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <div class="tsd-signature">layer2<wbr/>Web3<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">default</span></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/cardstack/cardstack/blob/5257bdf/packages/cardpay-sdk/sdk/layer-two-oracle/base.ts#L14">packages/cardpay-sdk/sdk/layer-two-oracle/base.ts:14</a></li></ul></aside></section></section>
+<li>Defined in <a href="https://github.com/cardstack/cardstack/blob/f316cf6/packages/cardpay-sdk/sdk/layer-two-oracle/base.ts#L24">packages/cardpay-sdk/sdk/layer-two-oracle/base.ts:24</a></li></ul></aside></section></section>
 <section class="tsd-panel-group tsd-member-group">
 <h2>Methods</h2>
 <section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class"><a id="convertFromSpend" class="tsd-anchor"></a>
@@ -84,12 +90,17 @@
 <h5>amount: <span class="tsd-signature-type">number</span></h5></li></ul></div>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">&gt;</span></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/cardstack/cardstack/blob/5257bdf/packages/cardpay-sdk/sdk/layer-two-oracle/base.ts#L27">packages/cardpay-sdk/sdk/layer-two-oracle/base.ts:27</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/cardstack/cardstack/blob/f316cf6/packages/cardpay-sdk/sdk/layer-two-oracle/base.ts#L45">packages/cardpay-sdk/sdk/layer-two-oracle/base.ts:45</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class"><a id="convertToSpend" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>convert<wbr/>To<wbr/>Spend</span><a href="#convertToSpend" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
 <li class="tsd-signature tsd-anchor-link" id="convertToSpend.convertToSpend-1">convert<wbr/>To<wbr/>Spend<span class="tsd-signature-symbol">(</span>token<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, amount<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">&gt;</span><a href="#convertToSpend.convertToSpend-1" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></li>
 <li class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>This call will convert a SPEND amount into the specified token amount, where the result is a string that represents the token in units of <code>wei</code>. Since SPEND tokens represent $0.01 USD, it is safe to represent SPEND as a number when providing the input value.</p>
+
+<h3>Example</h3><pre><code class="language-ts"><span class="hl-6">let</span><span class="hl-2"> </span><span class="hl-1">weiAmount</span><span class="hl-2"> = </span><span class="hl-4">await</span><span class="hl-2"> </span><span class="hl-1">layerTwoOracle</span><span class="hl-2">.</span><span class="hl-7">convertFromSpend</span><span class="hl-2">(</span><span class="hl-1">daicpxdAddress</span><span class="hl-2">, </span><span class="hl-9">10000</span><span class="hl-2">); </span><span class="hl-0">// convert 10000 SPEND into DAI</span><br/><span class="hl-1">console</span><span class="hl-2">.</span><span class="hl-7">log</span><span class="hl-2">(</span><span class="hl-5">`DAI value </span><span class="hl-6">${</span><span class="hl-7">fromWei</span><span class="hl-8">(</span><span class="hl-1">weiAmount</span><span class="hl-8">)</span><span class="hl-6">}</span><span class="hl-5">`</span><span class="hl-2">);</span>
+</code></pre>
+</div>
 <div class="tsd-parameters">
 <h4 class="tsd-parameters-title">Parameters</h4>
 <ul class="tsd-parameter-list">
@@ -99,12 +110,17 @@
 <h5>amount: <span class="tsd-signature-type">string</span></h5></li></ul></div>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">&gt;</span></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/cardstack/cardstack/blob/5257bdf/packages/cardpay-sdk/sdk/layer-two-oracle/base.ts#L16">packages/cardpay-sdk/sdk/layer-two-oracle/base.ts:16</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/cardstack/cardstack/blob/f316cf6/packages/cardpay-sdk/sdk/layer-two-oracle/base.ts#L34">packages/cardpay-sdk/sdk/layer-two-oracle/base.ts:34</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class"><a id="getETHPrice" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>getETHPrice</span><a href="#getETHPrice" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
 <li class="tsd-signature tsd-anchor-link" id="getETHPrice.getETHPrice-1">getETHPrice<span class="tsd-signature-symbol">(</span>token<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, amount<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">&gt;</span><a href="#getETHPrice.getETHPrice-1" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></li>
 <li class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>This call will return the ETH value for the specified amount of the specified token. If we do not have an exchange rate for the token, then an exception will be thrown. This API requires that the token amount be specified in <code>wei</code> (10<sup>18</sup> <code>wei</code> = 1 token) as a string, and will return a string that represents the ETH value in units of <code>wei</code> as well. You can easily convert a token value to wei by using the <code>Web3.utils.toWei()</code> function. You can also easily convert units of <code>wei</code> back into <code>ethers</code> by using the <code>Web3.utils.fromWei()</code> function. Currently, we assume 18 decimals so only tokens conforming to this can be supported.</p>
+
+<h3>Example</h3><pre><code class="language-ts"><span class="hl-6">let</span><span class="hl-2"> </span><span class="hl-1">layerTwoOracle</span><span class="hl-2"> = </span><span class="hl-4">await</span><span class="hl-2"> </span><span class="hl-7">getSDK</span><span class="hl-2">(</span><span class="hl-5">&#39;LayerTwoOracle&#39;</span><span class="hl-2">, </span><span class="hl-1">web3</span><span class="hl-2">);</span><br/><span class="hl-6">let</span><span class="hl-2"> </span><span class="hl-1">ethWeiPrice</span><span class="hl-2"> = </span><span class="hl-4">await</span><span class="hl-2"> </span><span class="hl-1">layerTwoOracle</span><span class="hl-2">.</span><span class="hl-7">getETHPrice</span><span class="hl-2">(</span><span class="hl-5">&quot;CARD&quot;</span><span class="hl-2">, </span><span class="hl-1">amountInWei</span><span class="hl-2">);</span><br/><span class="hl-1">console</span><span class="hl-2">.</span><span class="hl-7">log</span><span class="hl-2">(</span><span class="hl-5">`ETH value: </span><span class="hl-6">${</span><span class="hl-7">fromWei</span><span class="hl-8">(</span><span class="hl-1">ethWeiPrice</span><span class="hl-8">)</span><span class="hl-6">}</span><span class="hl-5"> ETH`</span><span class="hl-2">);</span>
+</code></pre>
+</div>
 <div class="tsd-parameters">
 <h4 class="tsd-parameters-title">Parameters</h4>
 <ul class="tsd-parameter-list">
@@ -114,7 +130,7 @@
 <h5>amount: <span class="tsd-signature-type">string</span></h5></li></ul></div>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">&gt;</span></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/cardstack/cardstack/blob/5257bdf/packages/cardpay-sdk/sdk/layer-two-oracle/base.ts#L63">packages/cardpay-sdk/sdk/layer-two-oracle/base.ts:63</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/cardstack/cardstack/blob/f316cf6/packages/cardpay-sdk/sdk/layer-two-oracle/base.ts#L108">packages/cardpay-sdk/sdk/layer-two-oracle/base.ts:108</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-private"><a id="getOracleContract" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagPrivate">Private</code> <span>get<wbr/>Oracle<wbr/>Contract</span><a href="#getOracleContract" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-private">
@@ -127,7 +143,7 @@
 <h5>token: <span class="tsd-signature-type">string</span></h5></li></ul></div>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Contract</span><span class="tsd-signature-symbol">&gt;</span></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/cardstack/cardstack/blob/5257bdf/packages/cardpay-sdk/sdk/layer-two-oracle/base.ts#L77">packages/cardpay-sdk/sdk/layer-two-oracle/base.ts:77</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/cardstack/cardstack/blob/f316cf6/packages/cardpay-sdk/sdk/layer-two-oracle/base.ts#L131">packages/cardpay-sdk/sdk/layer-two-oracle/base.ts:131</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class"><a id="getRateLock" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>get<wbr/>Rate<wbr/>Lock</span><a href="#getRateLock" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
@@ -140,12 +156,17 @@
 <h5>tokenAddress: <span class="tsd-signature-type">string</span></h5></li></ul></div>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">&gt;</span></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/cardstack/cardstack/blob/5257bdf/packages/cardpay-sdk/sdk/layer-two-oracle/base.ts#L35">packages/cardpay-sdk/sdk/layer-two-oracle/base.ts:35</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/cardstack/cardstack/blob/f316cf6/packages/cardpay-sdk/sdk/layer-two-oracle/base.ts#L53">packages/cardpay-sdk/sdk/layer-two-oracle/base.ts:53</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class"><a id="getUSDConverter" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>getUSDConverter</span><a href="#getUSDConverter" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
 <li class="tsd-signature tsd-anchor-link" id="getUSDConverter.getUSDConverter-1">getUSDConverter<span class="tsd-signature-symbol">(</span>token<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">(</span>amountInWei<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">&gt;</span><a href="#getUSDConverter.getUSDConverter-1" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></li>
 <li class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>This returns a function that converts an amount of a token in wei to USD. Similar to <code>LayerTwoOracle.getUSDPrice</code>, an exception will be thrown if we don&#39;t have the exchange rate for the token. The returned function accepts a string that represents an amount in wei and returns a number that represents the USD value of that amount of the token. Currently, we assume 18 decimals so only tokens conforming to this can be supported.</p>
+
+<h3>Example</h3><pre><code class="language-ts"><span class="hl-6">let</span><span class="hl-2"> </span><span class="hl-1">layerTwoOracle</span><span class="hl-2"> = </span><span class="hl-4">await</span><span class="hl-2"> </span><span class="hl-7">getSDK</span><span class="hl-2">(</span><span class="hl-5">&#39;LayerTwoOracle&#39;</span><span class="hl-2">, </span><span class="hl-1">web3</span><span class="hl-2">);</span><br/><span class="hl-6">let</span><span class="hl-2"> </span><span class="hl-1">converter</span><span class="hl-2"> = </span><span class="hl-4">await</span><span class="hl-2"> </span><span class="hl-1">layerTwoOracle</span><span class="hl-2">.</span><span class="hl-7">getUSDConverter</span><span class="hl-2">(</span><span class="hl-5">&quot;DAI&quot;</span><span class="hl-2">);</span><br/><span class="hl-1">console</span><span class="hl-2">.</span><span class="hl-7">log</span><span class="hl-2">(</span><span class="hl-5">`USD value: $</span><span class="hl-6">${</span><span class="hl-7">converter</span><span class="hl-8">(</span><span class="hl-1">amountInWei</span><span class="hl-8">)</span><span class="hl-6">}</span><span class="hl-5"> USD`</span><span class="hl-2">);</span>
+</code></pre>
+</div>
 <div class="tsd-parameters">
 <h4 class="tsd-parameters-title">Parameters</h4>
 <ul class="tsd-parameter-list">
@@ -153,12 +174,17 @@
 <h5>token: <span class="tsd-signature-type">string</span></h5></li></ul></div>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">(</span>amountInWei<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">&gt;</span></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/cardstack/cardstack/blob/5257bdf/packages/cardpay-sdk/sdk/layer-two-oracle/base.ts#L44">packages/cardpay-sdk/sdk/layer-two-oracle/base.ts:44</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/cardstack/cardstack/blob/f316cf6/packages/cardpay-sdk/sdk/layer-two-oracle/base.ts#L71">packages/cardpay-sdk/sdk/layer-two-oracle/base.ts:71</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class"><a id="getUSDPrice" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>getUSDPrice</span><a href="#getUSDPrice" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
 <li class="tsd-signature tsd-anchor-link" id="getUSDPrice.getUSDPrice-1">getUSDPrice<span class="tsd-signature-symbol">(</span>token<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, amount<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">&gt;</span><a href="#getUSDPrice.getUSDPrice-1" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></li>
 <li class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>This call will return the USD value for the specified amount of the specified token. If we do not have an exchange rate for the token, then an exception will be thrown. This API requires that the token amount be specified in <code>wei</code> (10<sup>18</sup> <code>wei</code> = 1 token) as a string, and will return a floating point value in units of USD. You can easily convert a token value to wei by using the <code>Web3.utils.toWei()</code> function. Currently, we assume 18 decimals so only tokens conforming to this can be supported.</p>
+
+<h3>Example</h3><pre><code class="language-ts"><span class="hl-6">let</span><span class="hl-2"> </span><span class="hl-1">layerTwoOracle</span><span class="hl-2"> = </span><span class="hl-4">await</span><span class="hl-2"> </span><span class="hl-7">getSDK</span><span class="hl-2">(</span><span class="hl-5">&#39;LayerTwoOracle&#39;</span><span class="hl-2">, </span><span class="hl-1">web3</span><span class="hl-2">);</span><br/><span class="hl-6">let</span><span class="hl-2"> </span><span class="hl-1">usdPrice</span><span class="hl-2"> = </span><span class="hl-4">await</span><span class="hl-2"> </span><span class="hl-1">layerTwoOracleRate</span><span class="hl-2">.</span><span class="hl-7">getUSDPrice</span><span class="hl-2">(</span><span class="hl-5">&quot;DAI&quot;</span><span class="hl-2">, </span><span class="hl-1">amountInWei</span><span class="hl-2">);</span><br/><span class="hl-1">console</span><span class="hl-2">.</span><span class="hl-7">log</span><span class="hl-2">(</span><span class="hl-5">`USD value: $</span><span class="hl-6">${</span><span class="hl-1">usdPrice</span><span class="hl-8">.</span><span class="hl-7">toFixed</span><span class="hl-8">(</span><span class="hl-9">2</span><span class="hl-8">)</span><span class="hl-6">}</span><span class="hl-5"> USD`</span><span class="hl-2">);</span>
+</code></pre>
+</div>
 <div class="tsd-parameters">
 <h4 class="tsd-parameters-title">Parameters</h4>
 <ul class="tsd-parameter-list">
@@ -168,12 +194,17 @@
 <h5>amount: <span class="tsd-signature-type">string</span></h5></li></ul></div>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">&gt;</span></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/cardstack/cardstack/blob/5257bdf/packages/cardpay-sdk/sdk/layer-two-oracle/base.ts#L55">packages/cardpay-sdk/sdk/layer-two-oracle/base.ts:55</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/cardstack/cardstack/blob/f316cf6/packages/cardpay-sdk/sdk/layer-two-oracle/base.ts#L91">packages/cardpay-sdk/sdk/layer-two-oracle/base.ts:91</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class"><a id="getUpdatedAt" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>get<wbr/>Updated<wbr/>At</span><a href="#getUpdatedAt" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
 <li class="tsd-signature tsd-anchor-link" id="getUpdatedAt.getUpdatedAt-1">get<wbr/>Updated<wbr/>At<span class="tsd-signature-symbol">(</span>token<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Date</span><span class="tsd-signature-symbol">&gt;</span><a href="#getUpdatedAt.getUpdatedAt-1" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></li>
 <li class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>This call will return a <code>Date</code> instance that indicates the date the token rate was last updated.</p>
+
+<h3>Example</h3><pre><code class="language-ts"><span class="hl-6">let</span><span class="hl-2"> </span><span class="hl-1">layerTwoOracle</span><span class="hl-2"> = </span><span class="hl-4">await</span><span class="hl-2"> </span><span class="hl-7">getSDK</span><span class="hl-2">(</span><span class="hl-5">&#39;LayerTwoOracle&#39;</span><span class="hl-2">, </span><span class="hl-1">web3</span><span class="hl-2">);</span><br/><span class="hl-6">let</span><span class="hl-2"> </span><span class="hl-1">date</span><span class="hl-2"> = </span><span class="hl-4">await</span><span class="hl-2"> </span><span class="hl-1">layerTwoOracle</span><span class="hl-2">.</span><span class="hl-7">getUpdatedAt</span><span class="hl-2">(</span><span class="hl-5">&quot;DAI&quot;</span><span class="hl-2">);</span><br/><span class="hl-1">console</span><span class="hl-2">.</span><span class="hl-7">log</span><span class="hl-2">(</span><span class="hl-5">`The </span><span class="hl-6">${</span><span class="hl-1">token</span><span class="hl-6">}</span><span class="hl-5"> rate was last updated at </span><span class="hl-6">${</span><span class="hl-1">date</span><span class="hl-8">.</span><span class="hl-7">toString</span><span class="hl-8">()</span><span class="hl-6">}</span><span class="hl-5">`</span><span class="hl-2">);</span>
+</code></pre>
+</div>
 <div class="tsd-parameters">
 <h4 class="tsd-parameters-title">Parameters</h4>
 <ul class="tsd-parameter-list">
@@ -181,7 +212,7 @@
 <h5>token: <span class="tsd-signature-type">string</span></h5></li></ul></div>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Date</span><span class="tsd-signature-symbol">&gt;</span></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/cardstack/cardstack/blob/5257bdf/packages/cardpay-sdk/sdk/layer-two-oracle/base.ts#L71">packages/cardpay-sdk/sdk/layer-two-oracle/base.ts:71</a></li></ul></aside></li></ul></section></section></div>
+<li>Defined in <a href="https://github.com/cardstack/cardstack/blob/f316cf6/packages/cardpay-sdk/sdk/layer-two-oracle/base.ts#L125">packages/cardpay-sdk/sdk/layer-two-oracle/base.ts:125</a></li></ul></aside></li></ul></section></section></div>
 <div class="col-4 col-menu menu-sticky-wrap menu-highlight">
 <div class="tsd-navigation settings">
 <details class="tsd-index-accordion"><summary class="tsd-accordion-summary">
