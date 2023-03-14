@@ -61,6 +61,10 @@ export default {
         description:
           'Unix UTC time in seconds that represents the point in time when the recurring payment should be stopped. Used for recurring scheduled payments. Should not be provided when payAt is set',
       })
+      .option('privateMemo', {
+        type: 'string',
+        description: 'Private memo field. Only seen by the scheduler, not by the recipient.',
+      })
       .option('network', NETWORK_OPTION_ANY);
   },
   async handler(args: Arguments) {
@@ -71,6 +75,7 @@ export default {
       tokenAddress,
       amount,
       payeeAddress,
+      privateMemo,
       executionGas,
       maxGasPrice,
       gasTokenAddress,
@@ -85,6 +90,7 @@ export default {
       tokenAddress: string;
       amount: string;
       payeeAddress: string;
+      privateMemo: string | null;
       executionGas: number;
       maxGasPrice: string;
       gasTokenAddress: string;
@@ -109,6 +115,7 @@ export default {
       tokenAddress,
       amount,
       payeeAddress,
+      privateMemo,
       executionGas,
       maxGasPrice,
       gasTokenAddress,

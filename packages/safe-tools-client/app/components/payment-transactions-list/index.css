@@ -88,3 +88,14 @@
 .payment-transactions-list__recurring {
   color: var(--boxel-fuschia);
 }
+
+.payment-transactions-list__memo {
+  color: var(--boxel-purple-400);
+  display: block;
+  font: 600 var(--boxel-font-sm);
+  letter-spacing: var(--boxel-lsp-xl);
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

@@ -168,7 +168,7 @@ class PaymentTransactionsList extends Component {
             <tr class="table__row">
               <th class="table__cell">Transaction Date</th>
               <th class="table__cell">Scheduled For</th>
-              <th class="table__cell">To</th>
+              <th class="table__cell">To / Memo</th>
               <th class="table__cell">Amount</th>
               <th class="table__cell">Status</th>
               <th class="table__cell">View details</th>
@@ -195,6 +195,9 @@ class PaymentTransactionsList extends Component {
                 </td>
                 <td class="table__cell blockchain-address transactions-table-item-payee" data-test-scheduled-payment-attempts-item-payee>
                   <TruncatedBlockchainAddress @address={{paymentAttempt.scheduledPayment.payeeAddress}} @isCopyable={{true}} />
+                  <div class="payment-transactions-list__memo" title={{paymentAttempt.scheduledPayment.privateMemo}}>
+                    {{paymentAttempt.scheduledPayment.privateMemo}}
+                  </div>
                 </td>
                 <td class="table__cell" data-test-scheduled-payment-attempts-item-amount>
                   <strong>{{paymentAttempt.scheduledPayment.paymentTokenQuantity.displayable}}</strong>

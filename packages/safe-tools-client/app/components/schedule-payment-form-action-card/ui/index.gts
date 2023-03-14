@@ -47,6 +47,7 @@ interface Signature {
     currentFees: CurrentFees | undefined;
     gasEstimateTokenQuantity: TokenQuantity | undefined;
     gasTokenErrorMessage: string;
+    privateMemo: string | null;
     gasTokens: TokenDetail[] | undefined;
     isGasTokenInvalid: boolean;
     isMaxGasPriceInvalid: boolean;
@@ -68,6 +69,7 @@ interface Signature {
     onSetPaymentTime: (time: Time) => void;
     onUpdateMaxGasPrice: (val: string) => void;
     onUpdatePayeeAddress: (val: string) => void;
+    onUpdatePrivateMemo: (val: string) => void;
     onUpdatePaymentAmount: (val: string) => void;
     onUpdatePaymentToken: (val: TokenDetail) => void;
     payeeAddressErrorMessage: string;
@@ -265,6 +267,19 @@ export default class SchedulePaymentFormActionCardUI extends Component<Signature
             @disabled={{this.isFormInteractionDisabled}}
             @onChooseToken={{@onUpdatePaymentToken}}
             @onBlurToken={{set this 'hasBlurredPaymentAmount' true}}
+          />
+        </BoxelField>
+        <BoxelField @label="Private Memo" @tag="label" for="schedule-payment-form-private-memo">
+          <BoxelInput
+            placeholder="Memo about this payment"
+            data-test-private-memo-input
+            @id="schedule-payment-form-private-memo"
+            @value={{or @privateMemo ''}}
+            @invalid={{false}}
+            @helperText="Optional. Visible only to you."
+            @errorMessage={{undefined}}
+            @disabled={{this.isFormInteractionDisabled}}
+            @onInput={{@onUpdatePrivateMemo}}
           />
         </BoxelField>
         <BoxelField @label="Gas">

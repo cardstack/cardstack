@@ -285,7 +285,7 @@ model ScheduledPaymentAttempt {
   transactionHash    String?                           @map("transaction_hash")
   failureReason      String?                           @map("failure_reason")
   scheduledPaymentId String                            @map("scheduled_payment_id") @db.Uuid
-  executionGasPrice  String                            @map("execution_gas_price")
+  executionGasPrice  String                            @default("0") @map("execution_gas_price")
   scheduledPayment   ScheduledPayment                  @relation(fields: [scheduledPaymentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
   @@index([scheduledPaymentId], map: "scheduled_payment_attempts_scheduled_payment_id_index")
@@ -324,6 +324,7 @@ model ScheduledPayment {
   nextRetryAttemptAt                              DateTime?                 @map("next_retry_attempt_at") @db.Timestamp(6)
   scheduledPaymentAttemptsInLastPaymentCycleCount Int                       @default(0) @map("scheduled_payment_attempts_in_last_payment_cycle_count")
   lastScheduledPaymentAttemptId                   String?                   @map("last_scheduled_payment_attempt_id") @db.Uuid
+  privateMemo                                     String?                   @map("private_memo")
   scheduledPaymentAttempts                        ScheduledPaymentAttempt[]
 
   @@index([senderSafeAddress], map: "scheduled_payments_sender_safe_address_index")

@@ -290,6 +290,7 @@ describe('GET /api/scheduled-payment-attempts', async function () {
               'max-gas-price': '1000000000',
               'module-address': '0x7E7d0B97D663e268bB403eb4d72f7C0C7650a6dd',
               'payee-address': '0x821f3Ee0FbE6D1aCDAC160b5d120390Fb8D2e9d3',
+              'private-memo': null,
               'pay-at': '2022-11-14T18:49:13.000Z',
               'recurring-day-of-month': null,
               'recurring-until': null,
