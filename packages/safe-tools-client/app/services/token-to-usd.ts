@@ -2,6 +2,7 @@ import {
   applyRateToAmount,
   ChainAddress,
   getUsdcToTokenRate,
+  TokenPairRate,
   TokenDetail,
 } from '@cardstack/cardpay-sdk';
 import config from '@cardstack/safe-tools-client/config/environment';
@@ -17,9 +18,9 @@ import { TrackedMap } from 'tracked-built-ins';
 const INTERVAL = config.environment === 'test' ? 3000 : 60 * 3000;
 
 export default class TokenToUsdService extends Service {
-  @tracked usdcTokenRates = new TrackedMap<
+  @tracked usdcToTokenRates = new TrackedMap<
     ChainAddress, // token address
-    FixedNumber // token to usd rate
+    TokenPairRate // token to usd rate
   >();
   ratesLastUpdate: Record<ChainAddress, Date> = {};
   @service declare wallet: WalletService;
@@ -34,7 +35,7 @@ export default class TokenToUsdService extends Service {
       !this.ratesLastUpdate[tokenAddress] ||
       addMilliseconds(this.ratesLastUpdate[tokenAddress], INTERVAL) < now
     ) {
-      this.usdcTokenRates.set(
+      this.usdcToTokenRates.set(
         tokenAddress,
         yield getUsdcToTokenRate(this.wallet.ethersProvider, tokenAddress)
       );
@@ -43,24 +44,15 @@ export default class TokenToUsdService extends Service {
   }
 
   toUsdc(tokenQuantity: TokenQuantity): BigNumber | undefined {
-    const rate = this.usdcTokenRates.get(tokenQuantity.address);
+    const rate = this.usdcToTokenRates.get(tokenQuantity.address);
     if (!rate) {
       return undefined;
     }
-    return applyRateToAmount(rate, tokenQuantity.count);
-  }
-
-  getTokenToUsdcRate(token: TokenDetail): FixedNumber | undefined {
-    return this.usdcTokenRates.get(token.address);
+    return applyRateToAmount(rate, tokenQuantity.count, true);
   }
 
   getUsdcToTokenRate(token: TokenDetail): FixedNumber | undefined {
-    const gasTokenToUsdcRate = this.usdcTokenRates.get(token.address);
-    if (gasTokenToUsdcRate) {
-      return FixedNumber.from(1).divUnsafe(gasTokenToUsdcRate);
-    } else {
-      return undefined;
-    }
+    return this.usdcToTokenRates.get(token.address)?.rate;
   }
 }
 

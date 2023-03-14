@@ -55,11 +55,12 @@ export type { ExternalProvider } from './providers/web3-provider';
 export { default as Web3Provider } from './providers/web3-provider';
 export { MIN_PAYMENT_AMOUNT_IN_SPEND as MIN_PAYMENT_AMOUNT_IN_SPEND__PREFER_ON_CHAIN_WHEN_POSSIBLE } from './sdk/do-not-use-on-chain-constants';
 export { protocolVersions } from './contracts/addresses';
+export type { TokenPairRate } from './sdk/utils/conversions';
 export {
   applyRateToAmount,
   gasPriceInToken,
   getGasPricesInNativeWei,
-  getNativeWeiInToken,
+  getNativeToTokenRate,
   getUsdcToTokenRate,
 } from './sdk/utils/conversions';
 export * from './sdk/network-config-utils';

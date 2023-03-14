@@ -12,6 +12,7 @@ import * as safe from './safe';
 import * as testing from './testing';
 import * as scheduledPayment from './scheduled-payment';
 import * as claimSettlement from './claim-settlement';
+import * as uniswapConversion from './uniswap-conversion';
 
 export const commands: any = [
   assets,
@@ -28,4 +29,5 @@ export const commands: any = [
   testing,
   scheduledPayment,
   claimSettlement,
+  uniswapConversion,
 ];
