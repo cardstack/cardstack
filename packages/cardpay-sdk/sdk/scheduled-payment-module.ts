@@ -1352,7 +1352,8 @@ export default class ScheduledPaymentModule {
       let response = await signer.sendTransaction({
         to: executeScheduledPaymentTx.to,
         data: executeScheduledPaymentTx.data,
-        nonce: nonce ? BigNumber.from(nonce.toString()) : undefined,
+        nonce: nonce?.toString(),
+        gasPrice: txnOptions?.gasPrice?.toString(),
       });
       if (typeof onTxnHash === 'function') {
         await onTxnHash(response.hash);

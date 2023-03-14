@@ -4,8 +4,14 @@ import { ScheduledPayment } from '@prisma/client';
 import { isBefore, subDays } from 'date-fns';
 import shortUUID from 'short-uuid';
 import config from 'config';
-import { Wallet } from 'ethers';
-import { JsonRpcProvider, gasPriceInToken, getConstant, ScheduledPaymentModule } from '@cardstack/cardpay-sdk';
+import { Wallet, BigNumber } from 'ethers';
+import {
+  JsonRpcProvider,
+  getNativeToTokenRate,
+  getConstant,
+  ScheduledPaymentModule,
+  applyRateToAmount,
+} from '@cardstack/cardpay-sdk';
 import BN from 'bn.js';
 
 export default class ScheduledPaymentsExecutorService {
@@ -16,10 +22,27 @@ export default class ScheduledPaymentsExecutorService {
   crankNonceLock = inject('crank-nonce-lock', { as: 'crankNonceLock' });
   ethersProvider = inject('ethers-provider', { as: 'ethersProvider' });
   clock = inject('clock', { as: 'clock' });
+  gasStation = inject('gas-station-service', { as: 'gasStation' });
 
-  async getCurrentGasPrice(provider: JsonRpcProvider, gasTokenAddress: string) {
-    // Wrapped in a method so that can be mocked in the tests
-    return gasPriceInToken(provider, gasTokenAddress);
+  async getCurrentGasPrice(provider: JsonRpcProvider, scheduledPayment: ScheduledPayment) {
+    let gasPrices = await this.gasStation.getGasPriceByChainId(scheduledPayment.chainId);
+    let nativeToTokenRate = await getNativeToTokenRate(provider, scheduledPayment.gasTokenAddress);
+    let standardGasPriceInGasToken = applyRateToAmount(nativeToTokenRate, BigNumber.from(gasPrices.standard));
+    let fastGasPriceInGasToken = applyRateToAmount(nativeToTokenRate, BigNumber.from(gasPrices.fast));
+    let maxGasPrice = BigNumber.from(scheduledPayment.maxGasPrice);
+
+    if (maxGasPrice.gte(fastGasPriceInGasToken)) {
+      return {
+        gasPrice: gasPrices.fast,
+        gasPriceInGasToken: fastGasPriceInGasToken.toString(),
+      };
+    } else {
+      // If gasPrice more than maxGasPrice the smart contract will return an error
+      return {
+        gasPrice: gasPrices.standard,
+        gasPriceInGasToken: standardGasPriceInGasToken.toString(),
+      };
+    }
   }
 
   async executeScheduledPayments() {
@@ -129,11 +152,11 @@ export default class ScheduledPaymentsExecutorService {
       recurringUntil,
     } = scheduledPayment;
     try {
-      let currentGasPrice = await this.getCurrentGasPrice(provider, gasTokenAddress);
+      let currentGasPrice = await this.getCurrentGasPrice(provider, scheduledPayment);
       paymentAttempt = await prisma.scheduledPaymentAttempt.update({
         where: { id: paymentAttempt.id },
         data: {
-          executionGasPrice: currentGasPrice.toString(),
+          executionGasPrice: currentGasPrice.gasPriceInGasToken,
         },
       });
 
@@ -177,6 +200,7 @@ export default class ScheduledPaymentsExecutorService {
               {
                 onTxnHash: async (txnHash: string) => resolve(txnHash),
                 nonce: nonce,
+                gasPrice: new BN(currentGasPrice.gasPrice),
               }
             )
             .catch(async (error) => {
