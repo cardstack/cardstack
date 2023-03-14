@@ -62,7 +62,12 @@ describe('executing scheduled payments', function () {
 
   this.beforeEach(async function () {
     subject = (await getContainer().lookup('scheduled-payment-executor')) as ScheduledPaymentsExecutorService;
-    subject.getCurrentGasPrice = async () => new BN('1000000000');
+    subject.getCurrentGasPrice = async () => {
+      return {
+        gasPrice: '1000',
+        gasPriceInGasToken: '1000000000',
+      };
+    };
     prisma = await getPrisma();
     crankNonceLock = (await getContainer().lookup('crank-nonce-lock')) as CrankNonceLock;
     crankNonceLock.withNonce = async (chainId: number, cb: (nonce: BN) => Promise<any>) => {
