@@ -241,6 +241,7 @@ describe('ScheduledPaymentOnChainExecutionWaiter', function () {
         chainId: 1,
         userAddress: '0x57022DA74ec3e6d8274918C732cf8864be7da833',
         creationTransactionHash: '0xc13d7905be5c989378a945487cd2a1193627ae606009e28e296d48ddaec66162',
+        scheduledPaymentAttemptsInLastPaymentCycleCount: 1,
       },
     });
 
@@ -268,14 +269,14 @@ describe('ScheduledPaymentOnChainExecutionWaiter', function () {
     expect(scheduledPaymentAttempt.failureReason).to.eq('ExceedMaxGasPrice');
     expect(scheduledPaymentAttempt.endedAt).to.not.be.null;
 
-    // Reload the payment to ensure that scheduledPaymentAttemptsInLastPaymentCycleCount and nextRetryAttemptAt were updated
+    // Reload the payment to ensure that nextRetryAttemptAt were updated
     scheduledPayment = (await prisma.scheduledPayment.findUnique({
       where: {
         id: scheduledPayment.id,
       },
     })) as ScheduledPayment;
 
-    expect(scheduledPayment.scheduledPaymentAttemptsInLastPaymentCycleCount).to.equal(0);
-    expect(scheduledPayment.nextRetryAttemptAt).to.be.null;
+    expect(scheduledPayment.nextRetryAttemptAt).to.not.be.null;
+    expect(scheduledPayment.scheduledPaymentAttemptsInLastPaymentCycleCount).to.equal(1);
   });
 });
