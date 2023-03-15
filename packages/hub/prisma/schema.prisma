@@ -324,6 +324,7 @@ model ScheduledPayment {
   nextRetryAttemptAt                              DateTime?                 @map("next_retry_attempt_at") @db.Timestamp(6)
   scheduledPaymentAttemptsInLastPaymentCycleCount Int                       @default(0) @map("scheduled_payment_attempts_in_last_payment_cycle_count")
   lastScheduledPaymentAttemptId                   String?                   @map("last_scheduled_payment_attempt_id") @db.Uuid
+  privateMemo                                     String?                   @map("private_memo")
   scheduledPaymentAttempts                        ScheduledPaymentAttempt[]
 
   @@index([senderSafeAddress], map: "scheduled_payments_sender_safe_address_index")

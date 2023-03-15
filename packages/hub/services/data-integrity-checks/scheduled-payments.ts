@@ -111,6 +111,9 @@ export default class DataIntegrityChecksScheduledPayments {
           gt: subMinutes(nowUtc(), UNATTEMPTED_ALLOWED_MINUTES),
         },
         canceledAt: null,
+        creationTransactionError: {
+          equals: null,
+        },
         scheduledPaymentAttempts: {
           none: {
             startedAt: {

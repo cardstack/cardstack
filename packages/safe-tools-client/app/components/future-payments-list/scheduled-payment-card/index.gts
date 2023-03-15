@@ -30,6 +30,9 @@ export default class ScheduledPaymentCard extends Component<Signature> {
           <span class="scheduled-payment-card__payee-to">To:</span> 
           <TruncatedBlockchainAddress @address={{@scheduledPayment.payeeAddress}} @isCopyable={{true}} @copyIconColor='var(--boxel-purple-400)'/>
         </div>
+        <div class="scheduled-payment-card__memo" title={{@scheduledPayment.privateMemo}}>
+          {{@scheduledPayment.privateMemo}}
+        </div>
         <div class="scheduled-payment-card__payment-detail">
           <img class="scheduled-payment-card__token-symbol" src={{@scheduledPayment.paymentTokenQuantity.token.logoURI}} />
           <div class="scheduled-payment-card__token-amounts">

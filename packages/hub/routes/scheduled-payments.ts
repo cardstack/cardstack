@@ -124,6 +124,7 @@ export default class ScheduledPaymentsRoute {
       recurringDayOfMonth: attrs['recurring-day-of-month'],
       recurringUntil: parseDate(attrs['recurring-until']),
       validForDays: attrs['valid-for-days'],
+      privateMemo: attrs['private-memo'],
     } as unknown as ScheduledPayment;
 
     if (params.recurringDayOfMonth != null) {

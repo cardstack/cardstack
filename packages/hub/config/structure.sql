@@ -1297,7 +1297,8 @@ CREATE TABLE public.scheduled_payments (
     gas_token_address text NOT NULL,
     next_retry_attempt_at timestamp without time zone,
     scheduled_payment_attempts_in_last_payment_cycle_count integer DEFAULT 0 NOT NULL,
-    last_scheduled_payment_attempt_id uuid
+    last_scheduled_payment_attempt_id uuid,
+    private_memo text
 );
 
 
@@ -2059,6 +2060,7 @@ COPY public.pgmigrations (id, name, run_on) FROM stdin;
 52	20230228132252559_add-execution-gas-price-to-scheduled-payment-attempts	2023-03-01 15:39:08.246772
 53	20230227121110219_add-retry-info-to-scheduled-payments	2023-03-03 14:04:50.716275
 54	20230308143158157_add-token-and-gas-token-address-to-gas-estimation-results	2023-03-08 14:50:17.546358
+55	20230313142122856_add-memo-to-scheduled-payments	2023-03-13 14:24:
 \.
 
 
@@ -2066,7 +2068,7 @@ COPY public.pgmigrations (id, name, run_on) FROM stdin;
 -- Name: pgmigrations_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.pgmigrations_id_seq', 54, true);
+SELECT pg_catalog.setval('public.pgmigrations_id_seq', 55, true);
 
 
 --
