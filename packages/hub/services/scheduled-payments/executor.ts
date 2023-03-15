@@ -192,6 +192,7 @@ export default class ScheduledPaymentsExecutorService {
                 onTxnHash: async (txnHash: string) => resolve(txnHash),
                 nonce: nonce,
                 gasPrice: new BN(currentGasPrice.gasPrice),
+                gasLimit: new BN(params.executionGasEstimation),
               }
             )
             .catch(async (error) => {
