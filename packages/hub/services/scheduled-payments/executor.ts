@@ -162,7 +162,7 @@ export default class ScheduledPaymentsExecutorService {
         maxGasPrice: String(maxGasPrice),
         gasTokenAddress,
         salt,
-        currentGasPrice: String(currentGasPrice), // Contract will revert if this is larger than maxGasPrice
+        currentGasPrice: String(currentGasPrice.gasPriceInGasToken), // Contract will revert if this is larger than maxGasPrice
         payAt: payAt!.getTime() / 1000, // getTime returns milliseconds, but we want seconds, thus divide by 1000
         recurringDayOfMonth: recurringDayOfMonth,
         recurringUntil: recurringUntil ? recurringUntil.getTime() / 1000 : null,
