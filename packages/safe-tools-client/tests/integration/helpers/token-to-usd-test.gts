@@ -19,9 +19,15 @@ class TokenToUsdServiceStub extends TokenToUsdService {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ): any {
     if (returnUndefinedConversionRate) {
-      this.usdcTokenRates.delete(tokenAddress);
+      this.usdcToTokenRates.delete(tokenAddress);
     } else {
-      this.usdcTokenRates.set(tokenAddress, FixedNumber.from(1000));
+      this.usdcToTokenRates.set(tokenAddress, {
+        tokenInAddress: '0x0',
+        tokenOutAddress: '0x0',
+        tokenInDecimals: 6,
+        tokenOutDecimals: 18,
+        rate: FixedNumber.from("0.001")
+      });
     }
   }
 }

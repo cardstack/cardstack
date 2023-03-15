@@ -17,6 +17,13 @@ import ERC20ABI from '../../contracts/abi/erc-20';
 import IUniswapV2Pair from '@uniswap/v2-core/build/IUniswapV2Pair.json';
 
 type GasPrice = Record<'slow' | 'standard' | 'fast', BN>;
+export interface TokenPairRate {
+  tokenInAddress: string;
+  tokenOutAddress: string;
+  tokenInDecimals: number;
+  tokenOutDecimals: number;
+  rate: FixedNumber; // an adjusted rate, in the biggest units of token out.
+}
 
 async function fetchTokenData(chainId: number, tokenAddress: string, provider: BaseProvider): Promise<Token> {
   let tokenContract = new Contract(tokenAddress, ERC20ABI, provider);
@@ -42,27 +49,27 @@ async function fetchPairData(
   );
 }
 
-//Adjustment of the difference in coin decimals, for example WETH has 18 decimals, USDT and USDC have 6.
-function adjustRate(rate: Price<Token, Token>): Fraction {
+// Returns a rate in the biggest units of destination token not the smallest units.
+export function adjustRate(rate: Price<Token, Token>): FixedNumber {
   let fraction = new Fraction(rate.numerator, rate.denominator);
-  return fraction.multiply(rate.scalar);
+  return FixedNumber.from(fraction.multiply(rate.scalar).toSignificant(6));
 }
 
-async function tokenPairRate(
+async function getTokenPairRate(
   provider: JsonRpcProvider,
-  token1Address: string,
-  token2Address: string
+  tokenInAddress: string,
+  tokenOutAddress: string
 ): Promise<Price<Token, Token>> {
   let network = await provider.getNetwork();
-  let token1 = await fetchTokenData(network.chainId, token1Address, provider as unknown as BaseProvider);
-  let token2 = await fetchTokenData(network.chainId, token2Address, provider as unknown as BaseProvider);
+  let tokenIn = await fetchTokenData(network.chainId, tokenInAddress, provider as unknown as BaseProvider);
+  let tokenOut = await fetchTokenData(network.chainId, tokenOutAddress, provider as unknown as BaseProvider);
 
   let networkName = convertChainIdToName(network.chainId);
   let uniswapV2Factory = getAddressByNetwork('uniswapV2Factory', networkName);
   let initCodeHash = getConstantByNetwork('uniswapPairInitCodeHash', networkName as SchedulerCapableNetworks);
-  let pair = await fetchPairData(token1, token2, uniswapV2Factory, initCodeHash, provider);
+  let pair = await fetchPairData(tokenIn, tokenOut, uniswapV2Factory, initCodeHash, provider);
 
-  let route = new Route([pair], token2, token1);
+  let route = new Route([pair], tokenIn, tokenOut);
 
   return route.midPrice; // How many "token 1" we can get for one "token 2" in Uniswap
 }
@@ -81,7 +88,7 @@ export async function gasPriceInToken(provider: JsonRpcProvider, tokenAddress: s
     return gasPriceInNativeTokenInWei;
   }
 
-  let rate = await tokenPairRate(provider, tokenAddress, wrappedNativeToken);
+  let rate = await getTokenPairRate(provider, wrappedNativeToken, tokenAddress);
   let rateFraction = new Fraction(rate.numerator, rate.denominator).multiply(rate.scalar);
   let rateBN = new BN(rateFraction.numerator.toString()).div(new BN(rateFraction.denominator.toString()));
 
@@ -117,40 +124,88 @@ export async function getGasPricesInNativeWei(
   };
 }
 
-export async function getNativeWeiInToken(provider: JsonRpcProvider, tokenAddress: string): Promise<BN> {
+// Example:
+// provider.getNetwork().chainId: 1 (Mainnet)
+// tokenAddress: 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48 (USDC)
+// result:
+// {
+//   tokenInAddress: "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2", (WETH)
+//   tokenOutAddress: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48", (USDC)
+//   tokenInDecimals: 18,
+//   tokenOutDecimals: 6,
+//   rate: 1716.06, (1 ETH = 1716.06 USDC) => (1 x (10^18) WEI = 1716.06 x (10^6) USDC (in the smallest units))
+// };
+export async function getNativeToTokenRate(provider: JsonRpcProvider, tokenAddress: string): Promise<TokenPairRate> {
   let network = await networkName(provider);
-  let wrappedNativeToken = getAddressByNetwork('wrappedNativeToken', network);
-  if (tokenAddress === wrappedNativeToken) {
-    return new BN(1);
+  let wrappedNativeTokenAddress = getAddressByNetwork('wrappedNativeToken', network);
+  let wrappedNativeToken = new Contract(wrappedNativeTokenAddress, ERC20ABI, provider);
+  let token = new Contract(tokenAddress, ERC20ABI, provider);
+  let tokenPairRate = {
+    tokenInAddress: wrappedNativeTokenAddress,
+    tokenOutAddress: tokenAddress,
+    tokenInDecimals: await wrappedNativeToken.callStatic.decimals(),
+    tokenOutDecimals: await token.callStatic.decimals(),
+    rate: FixedNumber.from(1),
+  };
+
+  if (wrappedNativeTokenAddress.toLowerCase() !== tokenAddress.toLowerCase()) {
+    tokenPairRate.rate = adjustRate(await getTokenPairRate(provider, wrappedNativeTokenAddress, tokenAddress));
   }
 
-  let rate = await tokenPairRate(provider, tokenAddress, wrappedNativeToken);
-  let rateAdjusted = adjustRate(rate);
-  return new BN(rateAdjusted.numerator.toString()).div(new BN(rateAdjusted.denominator.toString()));
+  return tokenPairRate;
 }
 
-export async function getUsdcToTokenRate(provider: JsonRpcProvider, tokenAddress: string): Promise<FixedNumber> {
+// Example:
+// provider.getNetwork().chainId: 1 (Mainnet)
+// tokenAddress: 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2 (WETH)
+// result:
+// {
+//   tokenInAddress: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48", (USDC)
+//   tokenOutAddress: "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2", (WETH)
+//   tokenInDecimals: 6,
+//   tokenOutDecimals: 18,
+//   rate: 0.000583026, (1 USDC = 0.000583026 ETH) => (1 x (10^6) USDC (in the smallest units) = 0.000583026 x (10^18) WEI)
+// };
+export async function getUsdcToTokenRate(provider: JsonRpcProvider, tokenAddress: string): Promise<TokenPairRate> {
   let network = await networkName(provider);
-  let usdStableCoinToken = getAddressByNetwork('usdStableCoinToken', network);
+  let usdcAddress = getAddressByNetwork('usdStableCoinToken', network);
+  let usdc = new Contract(usdcAddress, ERC20ABI, provider);
+  let token = new Contract(tokenAddress, ERC20ABI, provider);
+  let tokenPairRate = {
+    tokenInAddress: usdcAddress,
+    tokenOutAddress: tokenAddress,
+    tokenInDecimals: await usdc.callStatic.decimals(),
+    tokenOutDecimals: await token.callStatic.decimals(),
+    rate: FixedNumber.from(1),
+  };
 
-  if (usdStableCoinToken.toLowerCase() === tokenAddress.toLowerCase()) {
-    return FixedNumber.from(1);
+  if (usdcAddress.toLowerCase() !== tokenAddress.toLowerCase()) {
+    tokenPairRate.rate = adjustRate(await getTokenPairRate(provider, usdcAddress, tokenAddress));
   }
 
-  let rate = await tokenPairRate(provider, usdStableCoinToken, tokenAddress);
-  let numerator = FixedNumber.from(rate.numerator.toString());
-  let denominator = FixedNumber.from(rate.denominator.toString());
-  let scalar = FixedNumber.from(rate.scalar.numerator.toString()).divUnsafe(
-    FixedNumber.from(rate.scalar.denominator.toString())
-  );
-  const rateAdjusted = numerator.divUnsafe(denominator).mulUnsafe(scalar);
-  return rateAdjusted;
+  return tokenPairRate;
 }
 
-export function applyRateToAmount(rate: FixedNumber, amount: BigNumber): BigNumber {
+// return an amount in the smallest units of output token
+// if invert false, amount is the value of tokenIn in the smallest units
+// else amount is the value of tokenOut in the smallest units
+export function applyRateToAmount(tokenRate: TokenPairRate, amount: BigNumber, invert = false): BigNumber {
   if (amount.isZero()) {
     return BigNumber.from(0);
   }
-  const convertedAmount = FixedNumber.from(amount.toString()).mulUnsafe(rate);
-  return BigNumber.from(convertedAmount.round(0).toString().split('.')[0]);
+  let ten = BigNumber.from(10);
+  let tokenInSmallestUnits = ten.pow(tokenRate.tokenInDecimals);
+  let tokenOutSmallestUnits = ten.pow(tokenRate.tokenOutDecimals);
+  if (invert) {
+    return amount
+      .mul(tokenInSmallestUnits)
+      .div(BigNumber.from(tokenRate.rate.mulUnsafe(FixedNumber.from(tokenOutSmallestUnits)).toString().split('.')[0]));
+  }
+  return BigNumber.from(
+    tokenRate.rate
+      .mulUnsafe(FixedNumber.from(amount))
+      .mulUnsafe(FixedNumber.from(tokenOutSmallestUnits))
+      .toString()
+      .split('.')[0]
+  ).div(tokenInSmallestUnits);
 }

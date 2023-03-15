@@ -141,7 +141,7 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
 
   @tracked paymentDate: Date | undefined;
   @action onSetPaymentDate(day: Day) {
-    let selectedDate = new Date(day.getFullYear(), day.getMonth(), day.getDate(), this.paymentDate?.getHours(), this.paymentDate?.getMinutes());
+    let selectedDate = new Date(day.getFullYear(), day.getMonth(), day.getDate(), this.minPaymentDate.getDate() < day.getDate() ? this.paymentDate?.getHours() : 0, this.minPaymentDate.getDate() < day.getDate() ? this.paymentDate?.getMinutes() : 0);
     if (selectedDate < this.minPaymentDate) {
       this.paymentDate = this.minPaymentDate;
     } else {

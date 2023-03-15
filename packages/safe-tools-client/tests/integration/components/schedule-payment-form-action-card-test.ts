@@ -114,10 +114,19 @@ class TokenToUsdServiceStub extends TokenToUsdService {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ): any {
     if (enableUsdConversion) {
-      this.usdcTokenRates.set(tokenAddress, FixedNumber.from(1));
+      this.usdcToTokenRates.set(tokenAddress, {
+        tokenInAddress: '0x0',
+        tokenOutAddress: '0x0',
+        tokenInDecimals: 6,
+        tokenOutDecimals:
+          tokenAddress === '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48'
+            ? 6
+            : 18,
+        rate: FixedNumber.from(1),
+      });
     } else {
       // eslint-disable-next-line ember/no-array-prototype-extensions
-      this.usdcTokenRates.clear();
+      this.usdcToTokenRates.clear();
     }
   }
 }
