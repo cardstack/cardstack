@@ -1357,6 +1357,7 @@ export default class ScheduledPaymentModule {
         data: executeScheduledPaymentTx.data,
         nonce: nonce?.toString(),
         gasPrice: txnOptions?.gasPrice?.toString(),
+        gasLimit: txnOptions?.gasLimit?.toString(),
       });
       if (typeof onTxnHash === 'function') {
         await onTxnHash(response.hash);

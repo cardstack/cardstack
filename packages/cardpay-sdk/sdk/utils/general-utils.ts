@@ -39,6 +39,7 @@ export type TransactionHash = string;
 export interface TransactionOptions {
   nonce?: BN;
   gasPrice?: BN;
+  gasLimit?: BN;
   onNonce?: (nonce: BN) => void;
   onTxnHash?: (txnHash: TransactionHash) => unknown;
 }
