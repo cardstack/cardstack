@@ -4,7 +4,8 @@ import { setupServer } from 'msw/node';
 import { rest } from 'msw';
 import BN from 'bn.js';
 import fetch from 'node-fetch';
-import { getGasPricesInNativeWei } from '../sdk/utils/conversions';
+import { applyRateToAmount, getGasPricesInNativeWei, TokenPairRate } from '../sdk/utils/conversions';
+import { BigNumber, FixedNumber } from 'ethers';
 
 if (!globalThis.fetch) {
   //@ts-ignore polyfilling fetch
@@ -47,5 +48,54 @@ describe('getGasPricesInNativeWei', () => {
     chai.expect(fast).to.be.instanceOf(BN);
     chai.expect(fast.toString()).to.eq(expectedFast);
     chai.expect(slow.toString()).to.eq(expectedSlow);
+  });
+});
+
+let token1Address = '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48';
+let token2Address = '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2';
+const ten = BigNumber.from('10');
+describe.only('applyRateToAmount', () => {
+  let tokenPairRate: TokenPairRate;
+  it('applies rate for two tokens with same decimals', () => {
+    tokenPairRate = {
+      tokenInAddress: token1Address,
+      tokenOutAddress: token2Address,
+      tokenInDecimals: 18,
+      tokenOutDecimals: 18,
+      rate: FixedNumber.from('1000'),
+    };
+
+    //invert: false
+    //token1Amount: 2 x (10^18)
+    chai
+      .expect(applyRateToAmount(tokenPairRate, ten.pow(tokenPairRate.tokenInDecimals).mul('2'), false).toString())
+      .to.eq(ten.pow(tokenPairRate.tokenInDecimals).mul('2').mul('1000').toString());
+
+    //invert: true
+    //token2Amount: 2 x (10^18)
+    chai
+      .expect(applyRateToAmount(tokenPairRate, ten.pow(tokenPairRate.tokenOutDecimals).mul('2'), true).toString())
+      .to.eq(ten.pow(tokenPairRate.tokenOutDecimals).mul('2').div('1000').toString());
+  });
+
+  it('applies rate for two tokens with different decimals', () => {
+    tokenPairRate = {
+      tokenInAddress: token1Address,
+      tokenOutAddress: token2Address,
+      tokenInDecimals: 18,
+      tokenOutDecimals: 6,
+      rate: FixedNumber.from('1000'),
+    };
+    //invert: false
+    //token1Amount: 2 x (10^6)
+    chai
+      .expect(applyRateToAmount(tokenPairRate, ten.pow(tokenPairRate.tokenInDecimals).mul('2'), false).toString())
+      .to.eq(ten.pow(tokenPairRate.tokenOutDecimals).mul('2').mul('1000').toString());
+
+    //invert: true
+    //token2Amount: 2 x (10^18)
+    chai
+      .expect(applyRateToAmount(tokenPairRate, ten.pow(tokenPairRate.tokenOutDecimals).mul('2'), true).toString())
+      .to.eq(ten.pow(tokenPairRate.tokenInDecimals).mul('2').div('1000').toString());
   });
 });
