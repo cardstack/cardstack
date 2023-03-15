@@ -28,7 +28,8 @@ app "hub" {
     use "aws-ecs" {
       service_port        = 3000
       region              = "us-east-1"
-      memory              = "512"
+      cpu                 = "512"
+      memory              = "1024"
       cluster             = "hub-prod"
       count               = 2
       subnets             = ["subnet-0c22641bd41cbdd1e", "subnet-01d36d7bcd0334fc0"]
