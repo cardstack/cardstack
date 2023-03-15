@@ -269,7 +269,7 @@ describe('ScheduledPaymentOnChainExecutionWaiter', function () {
     expect(scheduledPaymentAttempt.failureReason).to.eq('ExceedMaxGasPrice');
     expect(scheduledPaymentAttempt.endedAt).to.not.be.null;
 
-    // Reload the payment to ensure that nextRetryAttemptAt were updated
+    // Reload the payment to ensure that nextRetryAttemptAt was updated
     scheduledPayment = (await prisma.scheduledPayment.findUnique({
       where: {
         id: scheduledPayment.id,
