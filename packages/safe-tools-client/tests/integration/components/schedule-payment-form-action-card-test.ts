@@ -559,7 +559,7 @@ module(
         });
         assert
           .dom('[data-test-summary-recipient-receives]')
-          .containsText('15.0 WETH');
+          .containsText('15 WETH');
         await waitUntil(() => {
           return find(
             '[data-test-summary-recipient-receives]'
@@ -572,11 +572,9 @@ module(
         await waitUntil(() => {
           return find(
             '[data-test-summary-estimated-gas]'
-          )?.textContent?.includes('20.0 USDC');
+          )?.textContent?.includes('20 USDC');
         });
-        assert
-          .dom('[data-test-summary-estimated-gas]')
-          .containsText('20.0 USDC');
+        assert.dom('[data-test-summary-estimated-gas]').containsText('20 USDC');
         assert.dom('[data-test-summary-estimated-gas]').containsText('$ 20.00');
         await waitUntil(() => {
           return find('[data-test-summary-fixed-fee]')?.textContent?.includes(
@@ -605,13 +603,13 @@ module(
         });
         assert
           .dom('[data-test-max-gas-toggle] [data-toggle-group-option="normal"]')
-          .containsText('20.0 USDC');
+          .containsText('20 USDC');
         assert
           .dom('[data-test-max-gas-toggle] [data-toggle-group-option="high"]')
-          .containsText('40.0 USDC');
+          .containsText('40 USDC');
         assert
           .dom('[data-test-max-gas-toggle] [data-toggle-group-option="max"]')
-          .containsText('80.0 USDC');
+          .containsText('80 USDC');
       });
 
       test('it disables submit button if gas token balance insufficient', async function (assert) {

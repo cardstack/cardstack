@@ -1,6 +1,8 @@
 import { TokenDetail } from '@cardstack/cardpay-sdk';
 import { BigNumber, utils as ethersUtils } from 'ethers';
 
+const SIGNIFICANT_DIGITS = 6;
+
 export default class TokenQuantity {
   // Count is the number of tokens, denominated in the smallest unit of the token. e.g. wei for Ethereum
   constructor(public token: TokenDetail, public count: BigNumber) {}
@@ -16,7 +18,11 @@ export default class TokenQuantity {
   }
 
   get decimalString() {
-    return ethersUtils.formatUnits(this.count, this.decimals);
+    const value = ethersUtils.formatUnits(this.count, this.decimals);
+    const formattedValue = parseFloat(value)
+      .toPrecision(SIGNIFICANT_DIGITS)
+      .replace(/\.?0+$/, '');
+    return formattedValue;
   }
 
   get symbol() {
