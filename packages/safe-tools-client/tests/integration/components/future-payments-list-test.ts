@@ -59,13 +59,11 @@ class TokenToUsdServiceStub extends TokenToUsdService {
       tokenOutAddress: '0x0',
       tokenInDecimals: 6,
       tokenOutDecimals:
-          tokenAddress === '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48'
-            ? 6
-            : 18,
+        tokenAddress === '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48' ? 6 : 18,
       rate:
-          tokenAddress === '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48'
-            ? FixedNumber.from('1')
-            : FixedNumber.from('0.001'),
+        tokenAddress === '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48'
+          ? FixedNumber.from('1')
+          : FixedNumber.from('0.001'),
     });
   }
 }
