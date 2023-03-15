@@ -562,7 +562,7 @@ export default class ScheduledPaymentModule {
       exchangeGas = await scheduledPaymentExchange.estimateGas['exchangeRateOf(address)'](gasTokenAddress);
     }
 
-    let TRANSFER_WITH_AMOUNT_GAS = 30000;
+    let TRANSFER_WITH_AMOUNT_GAS = 50000;
     return BigNumber.from(TRANSFER_WITH_AMOUNT_GAS).add(exchangeGas).add(gas).toNumber();
   }
 

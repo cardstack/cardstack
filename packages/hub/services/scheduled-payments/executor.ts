@@ -27,22 +27,13 @@ export default class ScheduledPaymentsExecutorService {
   async getCurrentGasPrice(provider: JsonRpcProvider, scheduledPayment: ScheduledPayment) {
     let gasPrices = await this.gasStation.getGasPriceByChainId(scheduledPayment.chainId);
     let nativeToTokenRate = await getNativeToTokenRate(provider, scheduledPayment.gasTokenAddress);
-    let standardGasPriceInGasToken = applyRateToAmount(nativeToTokenRate, BigNumber.from(gasPrices.standard));
     let fastGasPriceInGasToken = applyRateToAmount(nativeToTokenRate, BigNumber.from(gasPrices.fast));
-    let maxGasPrice = BigNumber.from(scheduledPayment.maxGasPrice);
 
-    if (maxGasPrice.gte(fastGasPriceInGasToken)) {
-      return {
-        gasPrice: gasPrices.fast,
-        gasPriceInGasToken: fastGasPriceInGasToken.toString(),
-      };
-    } else {
-      // If gasPrice more than maxGasPrice the smart contract will return an error
-      return {
-        gasPrice: gasPrices.standard,
-        gasPriceInGasToken: standardGasPriceInGasToken.toString(),
-      };
-    }
+    // Use fast gas price, if not transaction could be stuck
+    return {
+      gasPrice: gasPrices.fast,
+      gasPriceInGasToken: fastGasPriceInGasToken.toString(),
+    };
   }
 
   async executeScheduledPayments() {
