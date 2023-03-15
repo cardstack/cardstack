@@ -1,12 +1,12 @@
 import { Argv } from 'yargs';
-import { getNativeToTokenRate } from '@cardstack/cardpay-sdk';
+import { getUsdcToTokenRate } from '@cardstack/cardpay-sdk';
 import { getEthereumClients, getConnectionType, NETWORK_OPTION_ANY } from '../utils';
 import { Arguments, CommandModule } from 'yargs';
 import { applyRateToAmount } from '@cardstack/cardpay-sdk';
 import { BigNumber, utils as ethersUtils } from 'ethers';
 
 export default {
-  command: 'native-to-token <tokenAddress> <amount> <invert>',
+  command: 'usdc-to-token <tokenAddress> <amount> <invert>',
   describe: 'Convert native token amount to units of any other token',
   builder(yargs: Argv) {
     return yargs
@@ -34,21 +34,21 @@ export default {
     };
     let { ethersProvider } = await getEthereumClients(network, getConnectionType(args));
 
-    console.log(`Converting native token to token with address ${tokenAddress} ...`);
-    let tokenPairRate = await getNativeToTokenRate(ethersProvider, tokenAddress);
+    console.log(`Converting usdc token to token with address ${tokenAddress} ...`);
+    let tokenPairRate = await getUsdcToTokenRate(ethersProvider, tokenAddress);
     let result = applyRateToAmount(tokenPairRate, BigNumber.from(amount), Boolean(invert));
 
-    console.log(`Rate native token to token: ${tokenPairRate.rate.toString()}`);
+    console.log(`Rate usdc token to token: ${tokenPairRate.rate.toString()}`);
     if (invert) {
       console.log(
         `${ethersUtils.formatUnits(amount, tokenPairRate.tokenOutDecimals)} token is ${ethersUtils.formatUnits(
           result,
           tokenPairRate.tokenInDecimals
-        )} native token`
+        )} usdc token`
       );
     } else {
       console.log(
-        `${ethersUtils.formatUnits(amount, tokenPairRate.tokenInDecimals)} native token is ${ethersUtils.formatUnits(
+        `${ethersUtils.formatUnits(amount, tokenPairRate.tokenInDecimals)} usdc token is ${ethersUtils.formatUnits(
           result,
           tokenPairRate.tokenOutDecimals
         )} token`

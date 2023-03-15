@@ -22,7 +22,7 @@ export interface TokenPairRate {
   tokenOutAddress: string;
   tokenInDecimals: number;
   tokenOutDecimals: number;
-  rate: FixedNumber;
+  rate: FixedNumber; // an adjusted rate, in the biggest units of token out.
 }
 
 async function fetchTokenData(chainId: number, tokenAddress: string, provider: BaseProvider): Promise<Token> {
@@ -124,6 +124,17 @@ export async function getGasPricesInNativeWei(
   };
 }
 
+// Example:
+// provider.getNetwork().chainId: 1 (Mainnet)
+// tokenAddress: 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48 (USDC)
+// result:
+// {
+//   tokenInAddress: "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2", (WETH)
+//   tokenOutAddress: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48", (USDC)
+//   tokenInDecimals: 18,
+//   tokenOutDecimals: 6,
+//   rate: 1716.06, (1 ETH = 1716.06 USDC) => (1 x (10^18) WEI = 1716.06 x (10^6) USDC (in the smallest units))
+// };
 export async function getNativeToTokenRate(provider: JsonRpcProvider, tokenAddress: string): Promise<TokenPairRate> {
   let network = await networkName(provider);
   let wrappedNativeTokenAddress = getAddressByNetwork('wrappedNativeToken', network);
@@ -144,6 +155,17 @@ export async function getNativeToTokenRate(provider: JsonRpcProvider, tokenAddre
   return tokenPairRate;
 }
 
+// Example:
+// provider.getNetwork().chainId: 1 (Mainnet)
+// tokenAddress: 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2 (WETH)
+// result:
+// {
+//   tokenInAddress: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48", (USDC)
+//   tokenOutAddress: "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2", (WETH)
+//   tokenInDecimals: 6,
+//   tokenOutDecimals: 18,
+//   rate: 0.000583026, (1 USDC = 0.000583026 ETH) => (1 x (10^6) USDC (in the smallest units) = 0.000583026 x (10^18) WEI)
+// };
 export async function getUsdcToTokenRate(provider: JsonRpcProvider, tokenAddress: string): Promise<TokenPairRate> {
   let network = await networkName(provider);
   let usdcAddress = getAddressByNetwork('usdStableCoinToken', network);
@@ -167,7 +189,7 @@ export async function getUsdcToTokenRate(provider: JsonRpcProvider, tokenAddress
 // return an amount in the smallest units of output token
 // if invert false, amount is the value of tokenIn in the smallest units
 // else amount is the value of tokenOut in the smallest units
-export function applyRateToAmount(tokenRate: TokenPairRate, amount: BigNumber, invert?: boolean | null): BigNumber {
+export function applyRateToAmount(tokenRate: TokenPairRate, amount: BigNumber, invert = false): BigNumber {
   if (amount.isZero()) {
     return BigNumber.from(0);
   }
