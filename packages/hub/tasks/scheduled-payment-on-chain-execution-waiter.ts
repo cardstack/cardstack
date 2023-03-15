@@ -90,7 +90,7 @@ export default class ScheduledPaymentOnChainExecutionWaiter {
       // - PaymentExecutionFailed: safe balance is not enough to make payments and pay fees
       // - OutOfGas: executionGas to low to execute scheduled payment
       //
-      // In these cases we want to mark the payment attempt as failed and let the scheduler's logic to figure out when to try again.
+      // In these cases we want to mark the payment attempt as failed and set the next retry attempt date
       await prisma.scheduledPaymentAttempt.update({
         data: {
           status: 'failed',
@@ -99,6 +99,13 @@ export default class ScheduledPaymentOnChainExecutionWaiter {
         },
         where: {
           id: paymentAttempt.id,
+        },
+      });
+
+      await prisma.scheduledPayment.update({
+        where: { id: scheduledPayment.id },
+        data: {
+          nextRetryAttemptAt: this.scheduledPaymentFetcher.calculateNextRetryAttemptDate(scheduledPayment),
         },
       });
 
