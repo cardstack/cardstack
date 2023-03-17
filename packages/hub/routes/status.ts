@@ -133,12 +133,12 @@ export default class StatusRoute {
     return null;
   }
 
-  async withTimeout(p: Promise<any>): Promise<any> {
+  withTimeout(p: Promise<any>): Promise<any> {
     const t = new Promise((resolve) => {
       setTimeout(() => resolve(null), STATUS_TIMEOUT);
     });
 
-    return await Promise.race([t, p]);
+    return Promise.race([t, p]);
   }
 }
 
