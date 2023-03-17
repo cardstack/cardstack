@@ -372,6 +372,8 @@ app "hub-event-listener" {
         POLYGON_GAS_STATION_URL          = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_polygon_gas_station_url-cUpbHc"
         POLYGON_RPC_NODE_HTTPS_URL       = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_evm_polygon_infura_https_url-wIF3tU"
         POLYGON_RPC_NODE_WSS_URL         = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_evm_polygon_infura_wss_url-UvdYiF"
+        POLYGON_HUB_RPC_NODE_HTTPS_URL   = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_evm_polygon_infura_https_url-wIF3tU"
+        ETHEREUM_HUB_RPC_NODE_HTTPS_URL   = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_evm_infura_https_url-aCpG9I"
       }
     }
 
