@@ -118,5 +118,10 @@
   },
   "rewardsIndexer": {
     "enabled": "REWARDS_INDEXER_ENABLED"
+  },
+  "hubRpcNodes": {
+    "polygon": {
+      "rpcNodeHttpsUrl": "POLYGON_HUB_RPC_NODE_HTTPS_URL"
+    }
   }
 }
