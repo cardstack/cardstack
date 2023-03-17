@@ -11,7 +11,7 @@ export default class EthersProvider {
     let networkName = convertChainIdToName(chainId);
     let hubRpcNodeKey = `hubRpcNodes.${networkName}.rpcNodeHttpsUrl`;
     if (config.has(hubRpcNodeKey)) {
-      rpcUrl = config.get('hubRpcNodes.polygon.rpcNodeHttpsUrl');
+      rpcUrl = config.get(hubRpcNodeKey);
     } else {
       rpcUrl = getWeb3ConfigByNetwork({ web3: config.get('web3') }, chainId).rpcNodeHttpsUrl;
     }
