@@ -5,6 +5,7 @@ import * as Sentry from '@sentry/node';
 import { JSONAPIDocument } from '../utils/jsonapi-document';
 
 export const DEGRADED_THRESHOLD = 10;
+const STATUS_TIMEOUT = 10 * 1000;
 
 export default class StatusRoute {
   clock = inject('clock');
@@ -17,51 +18,56 @@ export default class StatusRoute {
   }
 
   async get(ctx: Koa.Context) {
-    let subgraphBlockNumber = null;
+    let [subgraph, exchangeRates] = await Promise.all([this.getSubgraphStatus(), this.getExchangeRateStatus()]);
 
-    try {
-      let subgraphMeta = await this.subgraph.getMeta();
-      subgraphBlockNumber = subgraphMeta?.data?._meta?.block?.number;
-    } catch (e) {
-      Sentry.captureException(e, {
-        tags: {
-          action: 'status-route',
+    let body: JSONAPIDocument = {
+      data: {
+        type: 'status',
+        attributes: {
+          subgraph,
+          exchangeRates,
         },
-      });
-    }
+      },
+    };
 
-    let rpcBlockNumber = null;
+    ctx.status = 200;
+    ctx.body = body;
+    ctx.type = 'application/vnd.api+json';
+  }
 
-    try {
-      rpcBlockNumber = await this.web3.getInstance().eth.getBlockNumber();
-    } catch (e) {
-      Sentry.captureException(e, {
-        tags: {
-          action: 'status-route',
-        },
-      });
-    }
+  async getSubgraphStatus() {
+    let [subgraphBlockNumber, rpcBlockNumber] = await Promise.all([
+      this.getSubgraphBlockNumber(),
+      this.getRpcBlockNumber(),
+    ]);
 
-    let subgraphStatus;
-    let subgraphStatusDetails;
+    let status;
+    let details;
 
     if (rpcBlockNumber && subgraphBlockNumber && rpcBlockNumber - subgraphBlockNumber < DEGRADED_THRESHOLD) {
-      subgraphStatus = 'operational';
+      status = 'operational';
     } else if (!rpcBlockNumber || !subgraphBlockNumber) {
-      subgraphStatusDetails = 'Error checking status';
-      subgraphStatus = 'unknown';
+      details = 'Error checking status';
+      status = 'unknown';
     } else {
-      subgraphStatusDetails = 'Experiencing slow service';
-      subgraphStatus = 'degraded';
+      details = 'Experiencing slow service';
+      status = 'degraded';
     }
 
-    let exchangeRatesValue = null;
+    let subgraphStatus = {
+      status,
+      subgraphBlockNumber,
+      rpcBlockNumber,
+      details,
+    };
+
+    return subgraphStatus;
+  }
+
+  async getSubgraphBlockNumber() {
     try {
-      exchangeRatesValue = await this.exchangeRates.fetchExchangeRates(
-        'USD',
-        ['BTC', 'ETH'],
-        this.clock.dateStringNow()
-      );
+      let subgraphMeta = await this.withTimeout(this.subgraph.getMeta());
+      return subgraphMeta?.data?._meta?.block?.number;
     } catch (e) {
       Sentry.captureException(e, {
         tags: {
@@ -69,6 +75,27 @@ export default class StatusRoute {
         },
       });
     }
+
+    return null;
+  }
+
+  async getRpcBlockNumber(): Promise<number | null> {
+    try {
+      let rpcBlockNumber = await this.withTimeout(this.web3.getInstance().eth.getBlockNumber());
+      return rpcBlockNumber;
+    } catch (e) {
+      Sentry.captureException(e, {
+        tags: {
+          action: 'status-route',
+        },
+      });
+    }
+
+    return null;
+  }
+
+  async getExchangeRateStatus() {
+    let exchangeRatesValue = await this.getExchangeRateValue();
 
     if (exchangeRatesValue && exchangeRatesValue.Response === 'Error') {
       Sentry.captureException(exchangeRatesValue.Message, {
@@ -79,36 +106,39 @@ export default class StatusRoute {
       exchangeRatesValue = null;
     }
 
-    let exchangeRatesStatus = 'unknown';
+    let status;
     if (exchangeRatesValue) {
-      exchangeRatesStatus = 'operational';
-    } else if (!exchangeRatesValue) {
-      exchangeRatesStatus = 'unknown';
+      status = 'operational';
+    } else {
+      status = 'unknown';
     }
 
-    let body: JSONAPIDocument = {
-      data: {
-        type: 'status',
-        attributes: {
-          subgraph: {
-            status: subgraphStatus,
-            subgraphBlockNumber,
-            rpcBlockNumber,
-          },
-          exchangeRates: {
-            status: exchangeRatesStatus,
-          },
+    return { status };
+  }
+
+  async getExchangeRateValue() {
+    try {
+      const exchangeRatesValue = await this.withTimeout(
+        this.exchangeRates.fetchExchangeRates('USD', ['BTC', 'ETH'], this.clock.dateStringNow())
+      );
+      return exchangeRatesValue;
+    } catch (e) {
+      Sentry.captureException(e, {
+        tags: {
+          action: 'status-route',
         },
-      },
-    };
-
-    if (subgraphStatusDetails) {
-      body.data.attributes.subgraph.details = subgraphStatusDetails;
+      });
     }
 
-    ctx.status = 200;
-    ctx.body = body;
-    ctx.type = 'application/vnd.api+json';
+    return null;
+  }
+
+  async withTimeout(p: Promise<any>): Promise<any> {
+    const t = new Promise((resolve) => {
+      setTimeout(() => resolve(null), STATUS_TIMEOUT);
+    });
+
+    return await Promise.race([t, p]);
   }
 }
 
