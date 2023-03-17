@@ -155,4 +155,12 @@ module.exports = {
   rewardsIndexer: {
     enabled: false,
   },
+  hubRpcNodes: {
+    polygon: {
+      rpcNodeHttpsUrl: null,
+    },
+    ethereum: {
+      rpcNodeHttpsUrl: null,
+    },
+  },
 };
