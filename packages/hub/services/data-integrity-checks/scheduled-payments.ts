@@ -114,6 +114,9 @@ export default class DataIntegrityChecksScheduledPayments {
         creationTransactionError: {
           equals: null,
         },
+        creationBlockNumber: {
+          not: null,
+        },
         scheduledPaymentAttempts: {
           none: {
             startedAt: {
