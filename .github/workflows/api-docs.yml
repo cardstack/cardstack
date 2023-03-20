@@ -22,7 +22,7 @@ jobs:
       - name: Install dependencies
         run: yarn --prefer-offline --frozen-lockfile
       - name: Run typedoc
-        run: yarn build:docs:html
+        run: yarn build:docs
         shell: bash
         working-directory: .
       - name: Deploy 🚀
