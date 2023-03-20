@@ -52,7 +52,6 @@ export default class ScheduledPaymentOnChainExecutionWaiter {
       }
     } catch (error: any) {
       // Known errors are:
-      // - Transaction took too long to complete
       // - Transaction with hash "${txnHash}" was reverted
       // - UnknownHash: payment details generate unregistered spHash
       // - InvalidPeriod: payment executed outside of valid date or period
@@ -60,7 +59,6 @@ export default class ScheduledPaymentOnChainExecutionWaiter {
       // - PaymentExecutionFailed: safe balance is not enough to make payments and pay fees
       // - OutOfGas: executionGas to low to execute scheduled payment
       let knownErrors = [
-        'took too long',
         'was reverted',
         'UnknownHash',
         'InvalidPeriod',
@@ -69,12 +67,13 @@ export default class ScheduledPaymentOnChainExecutionWaiter {
         'OutOfGas',
       ];
       let isKnownError = knownErrors.find((knownError) => error.message.includes(knownError));
-      if (isKnownError) {
+      let isWaitTooLongError = error.message.includes('took too long') && isBefore(paymentAttempt.startedAt!, subDays(nowUtc(), 1));
+      if (isKnownError || isWaitTooLongError) {
         await prisma.scheduledPaymentAttempt.update({
           data: {
             status: 'failed',
             failureReason:
-              error.message.includes('took too long') && isBefore(paymentAttempt.startedAt!, subDays(nowUtc(), 1))
+              isWaitTooLongError
                 ? "Waited for more than 1 day for the transaction to be mined, but it wasn't"
                 : error.message,
             endedAt: nowUtc(),
