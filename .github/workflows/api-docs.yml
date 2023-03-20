@@ -4,6 +4,10 @@ on:
   push:
     branches: ["add-version-to-monorepo"]
   workflow_dispatch:
+  workflow_run:
+    workflows: ["Manual publish"]
+    types:
+      - completed
 
 permissions:
   contents: write
