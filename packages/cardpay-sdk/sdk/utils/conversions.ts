@@ -17,6 +17,10 @@ import ERC20ABI from '../../contracts/abi/erc-20';
 import IUniswapV2Pair from '@uniswap/v2-core/build/IUniswapV2Pair.json';
 
 type GasPrice = Record<'slow' | 'standard' | 'fast', BN>;
+/**
+ * @group Utils
+ * @category Conversion
+ */
 export interface TokenPairRate {
   tokenInAddress: string;
   tokenOutAddress: string;
