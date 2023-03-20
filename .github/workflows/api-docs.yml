@@ -1,8 +1,6 @@
 name: Deploy api docs
 
 on:
-  push:
-    branches: ["typedoc-sdk"]
   workflow_dispatch:
 
 permissions:
