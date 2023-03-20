@@ -5,7 +5,6 @@ import { getConstant } from '../constants';
 
 /**
  * @group Utils
- * @category Graphql
  */
 export async function query(
   network: string,
