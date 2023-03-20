@@ -74,7 +74,14 @@ export {
   type SchedulePaymentProgressListener,
 } from './sdk/scheduled-payment-module';
 export { default as ScheduledPaymentModuleABI } from './contracts/abi/modules/scheduled-payment-module';
-export * as ClaimSettlement from './sdk/claim-settlement/utils';
+export {
+  Address,
+  TransferERC20ToCaller,
+  NFTOwner,
+  TransferNFTToCaller,
+  Claim,
+  getTypedData,
+} from './sdk/claim-settlement/utils';
 export { default as ClaimSettlementModule } from './sdk/claim-settlement-module';
 
 // add these classes for typedoc to display documentation
