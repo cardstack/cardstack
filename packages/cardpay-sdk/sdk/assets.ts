@@ -24,6 +24,7 @@ export interface IAssets {
  * let assetAPI = await getSDK('Assets', web3);
  * ```
  * @group Cardpay
+ * @category Main
  */
 export default class Assets implements IAssets {
   constructor(private web3: Web3) {}

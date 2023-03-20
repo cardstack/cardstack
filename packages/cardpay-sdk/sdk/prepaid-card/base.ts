@@ -49,6 +49,7 @@ export const MAX_PREPAID_CARD_AMOUNT = 10;
  * let prepaidCard = await getSDK('PrepaidCard', web3);
  * ```
  * @group Cardpay
+ * @group Main
  */
 export default class PrepaidCard {
   private prepaidCardManager: Contract | undefined;

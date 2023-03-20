@@ -19,6 +19,7 @@ const ten = new BN('10');
  * let layerTwoOracle = await getSDK('LayerTwoOracle', web3);
  * ```
  * @group Cardpay
+ * @category Main
  */
 export default class LayerTwoOracle {
   constructor(private layer2Web3: Web3) {}

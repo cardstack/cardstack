@@ -49,6 +49,7 @@ export interface RevenueTokenBalance {
  * let revenuePool = await getSDK('RevenuePool', web3);
  * ```
  * @group Cardpay
+ * @category Main
  */
 export default class RevenuePool {
   private revenuePool: Contract | undefined;

@@ -105,6 +105,7 @@ export type WithSymbol<T extends HasTokenAddress> = T & {
 /**
  * The `RewardPool` API is used to interact with tally (an offchain service similar to relayer) and the reward pool contract. As customers use their prepaid card they will be given rewards based the amount of spend they use and a reward-based algorithm.
  * @group Cardpay
+ * @category Main
  */
 export default class RewardPool {
   private rewardPool: Contract | undefined;

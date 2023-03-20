@@ -277,6 +277,7 @@ export async function viewSafe(network: 'gnosis' | 'sokol', safeAddress: string)
  *let safes = await getSDK('Safes', web3);
  * ```
  * @group Cardpay
+ * @category Main
  */
 export default class Safes implements ISafes {
   constructor(private layer2Web3: Web3, private layer2Signer?: Signer) {}

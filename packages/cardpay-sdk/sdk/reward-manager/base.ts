@@ -77,6 +77,7 @@ const rewardProgramQuery = `
  *
  * The `RewardManager` API is used to interact to manage reward program. Those intending to offer or receive rewards have to register using this sdk.
  *  @group Cardpay
+ *  @category Main
  */
 export default class RewardManager {
   private rewardManager: Contract | undefined;

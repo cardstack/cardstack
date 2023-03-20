@@ -26,6 +26,7 @@ const ten = new BN('10');
  * let layerOneOracle = await getSDK('LayerOneOracle', web3);
  * ```
  * @group Cardpay
+ * @category Main
  */
 export default class LayerOneOracle implements ILayerOneOracle {
   constructor(private layer1Web3: Web3) {}
