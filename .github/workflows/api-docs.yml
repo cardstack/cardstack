@@ -1,6 +1,8 @@
 name: Deploy api docs
 
 on:
+  push:
+    branches: ["add-version-to-monorepo"]
   workflow_dispatch:
 
 permissions:
@@ -20,7 +22,7 @@ jobs:
       - name: Install dependencies
         run: yarn --prefer-offline --frozen-lockfile
       - name: Run typedoc
-        run: yarn build:docs
+        run: jq ".version" lerna.json | xargs yarn typedoc . --rootPackageVersion
         shell: bash
         working-directory: .
       - name: Deploy 🚀
