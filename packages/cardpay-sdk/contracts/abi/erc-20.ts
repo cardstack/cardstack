@@ -1,3 +1,6 @@
+/**
+ * @category ABI
+ */
 export default [
   {
     inputs: [{ internalType: 'uint256', name: 'chainId_', type: 'uint256' }],

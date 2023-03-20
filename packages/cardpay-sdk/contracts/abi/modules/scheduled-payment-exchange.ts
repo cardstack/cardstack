@@ -1,3 +1,6 @@
+/**
+ * @category ABI
+ */
 export default [
   {
     inputs: [],
