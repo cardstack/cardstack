@@ -98,9 +98,9 @@ export { default as TokenBridgeHomeSideClass } from './sdk/token-bridge-home-sid
 export { default as TokenBridgeForeignSideClass } from './sdk/token-bridge-foreign-side';
 export { default as RewardManagerClass } from './sdk/reward-manager/base';
 export { default as RewardPoolClass } from './sdk/reward-pool/base';
-export { Estimate, SendPayload, GnosisExecTx, EventABI, BalanceSummary } from './sdk/utils/safe-utils';
-export { Options, CreateSafeResult } from './sdk/safes';
-export {
+export type { Estimate, SendPayload, GnosisExecTx, EventABI, BalanceSummary } from './sdk/utils/safe-utils';
+export type { Options, CreateSafeResult } from './sdk/safes';
+export type {
   TransactionParams,
   SchedulePaymentOptions,
   GasEstimationResult,
@@ -108,17 +108,17 @@ export {
   CreateSafeWithModuleAndGuardTx,
   CreateSafeWithModuleAndGuardResult,
 } from './sdk/scheduled-payment-module'; //TODO use safe-module
-export { Safe as ScheduledPaymentSafe } from './sdk/scheduled-payment/safes';
-export { Signature } from './sdk//utils/signing-utils';
-export { SDK } from './sdk/version-resolver';
-export { RequiredNetworkConstants } from './sdk/constants';
-export { MerchantPaymentURLParams } from './sdk/utils/merchant';
-export { Asset } from './sdk/currency-utils/formatting-plus-plus';
-export { TokenTransferDetail, FullLeaf } from './sdk/reward-pool/base';
-export { RuleJson } from './sdk/reward-manager/base';
-export { RevenueTokenBalance } from './sdk/revenue-pool/base';
-export { ModuleDetails } from './sdk/safe-module';
-export { SignedClaim } from './sdk/claim-settlement-module';
-export { RpcNodeUrl } from './sdk/hub-config';
-export { SetupArgs } from './sdk/utils/module-utils';
-export { NonceResponse } from './sdk/hub-auth';
+export type { Safe as ScheduledPaymentSafe } from './sdk/scheduled-payment/safes';
+export type { Signature } from './sdk//utils/signing-utils';
+export type { SDK } from './sdk/version-resolver';
+export type { RequiredNetworkConstants } from './sdk/constants';
+export type { MerchantPaymentURLParams } from './sdk/utils/merchant';
+export type { Asset } from './sdk/currency-utils/formatting-plus-plus';
+export type { TokenTransferDetail, FullLeaf } from './sdk/reward-pool/base';
+export type { RuleJson } from './sdk/reward-manager/base';
+export type { RevenueTokenBalance } from './sdk/revenue-pool/base';
+export type { ModuleDetails } from './sdk/safe-module';
+export type { SignedClaim } from './sdk/claim-settlement-module';
+export type { RpcNodeUrl } from './sdk/hub-config';
+export type { SetupArgs } from './sdk/utils/module-utils';
+export type { NonceResponse } from './sdk/hub-auth';
