@@ -12,6 +12,10 @@
       "types": "./dist/index.d.ts"
     }
   },
+  "typedoc": {
+    "entryPoint": "./index.ts",
+    "readmeFile": "./README.md"
+  },
   "dependencies": {
     "@cardstack/did-resolver": "1.0.42",
     "@ethersproject/contracts": "^5.7.0",

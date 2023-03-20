@@ -4,6 +4,10 @@
   "description": "A javascript resolver for the cardstack DID method",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
+  "typedoc": {
+    "entryPoint": "./index.ts",
+    "readmeFile": "./README.md"
+  },
   "author": "Cardstack Team",
   "license": "MIT",
   "private": false,

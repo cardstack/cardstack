@@ -5,6 +5,9 @@
   "author": "Hassan Abdel-Rahman @habdelra",
   "repository": "cardstack/cardstack",
   "license": "MIT",
+  "typedoc": {
+    "entryPoint": "./index.ts"
+  },
   "dependencies": {
     "@cardstack/di": "1.0.42",
     "config": "^3.3.6",

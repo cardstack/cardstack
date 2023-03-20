@@ -5,6 +5,10 @@
   "author": "Hassan Abdel-Rahman @habdelra",
   "license": "MIT",
   "main": "./index.ts",
+  "typedoc": {
+    "entryPoint": "./index.ts",
+    "readmeFile": "./README.md"
+  },
   "dependencies": {
     "@cardstack/cardpay-sdk": "1.0.42",
     "@cardstack/db": "1.0.42",
