@@ -70,7 +70,7 @@ const SHAKE_128_OUTPUT_BITS = 64;
 const HASH_LENGTH = SHAKE_128_OUTPUT_BITS / 4;
 const hashFunc = (data: string) => shake_128(data, SHAKE_128_OUTPUT_BITS);
 
-class CardstackIdentifier {
+export class CardstackIdentifier {
   version: number;
   type: CardstackIdentifierType;
   uniqueId: string;
