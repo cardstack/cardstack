@@ -94,13 +94,14 @@ export default class TokenBridgeHomeSide implements ITokenBridgeHomeSide {
   /**
    * This call will invoke the token bridge contract to relay tokens from a layer 2 safe into the account specified in layer 1.
    *
-   *This method is invoked with the following parameters:
-   *- The layer 2 safe address that contains the tokens to be relayed to layer 1
-   *- The layer 2 token address of the tokens to be relayed
-   *- The address of the layer 1 recipient that will receive the tokens in layer 1
-   *- The amount of tokens to relay as a string in native units of the token (e.g. `wei`). Note that in addition to the amount of tokens being relayed, the safe will also be changed the layer 2 gas costs for performing the relay as well (the gas cost will be charged in the same tokens as is being relayed). So the safe must have a balance that includes both the amount being relayed as well as the layer 2 gas charged in order to perform the relay.
+   *@param safeAddress The layer 2 safe address that contains the tokens to be relayed to layer 1
+   *@param tokenAddress The layer 2 token address of the tokens to be relayed
+   *@param recipientAddress The address of the layer 1 recipient that will receive the tokens in layer 1
+   *@param amount The amount of tokens to relay as a string in native units of the token (e.g. `wei`). Note that in addition to the amount of tokens being relayed, the safe will also be changed the layer 2 gas costs for performing the relay as well (the gas cost will be charged in the same tokens as is being relayed). So the safe must have a balance that includes both the amount being relayed as well as the layer 2 gas charged in order to perform the relay.
+   * @param txnOptions You can optionally provide an object that specifies the nonce, onNonce callback, and/or onTxnHash callback as a fourth argument.
+   * @param contractOptions You can optionally provide an object that specifies the from address, gas limit, and/or gas price as a fifth argument.
    * @example
-   * ```js
+   * ```ts
    * let result = await tokenBridge.relayTokens(
    *   layer2SafeAddress,
    *   tokenAddress,
@@ -289,9 +290,8 @@ export default class TokenBridgeHomeSide implements ITokenBridgeHomeSide {
    *
    * This call will listen for a `TokensBridgedToSafe` event emitted by the TokenBridge home contract that has a recipient matching the specified address. The starting layer 2 block height should be captured before the call to relayTokens is made to begin bridging. It is used to focus the search and avoid matching on a previous bridging for this user.
    *
-   * This method is invoked with the following parameters:
-   * - The address of the layer 2 account that will own the resulting safe (passed as receiver to relayTokens call)
-   * - The block height of layer 2 before the relayTokens call was initiated on the foreign side of the bridge. Get it with `await layer2Web3.eth.getBlockNumber()`
+   * @param recipientAddress The address of the layer 2 account that will own the resulting safe (passed as receiver to relayTokens call)
+   * @param fromBlock The block height of layer 2 before the relayTokens call was initiated on the foreign side of the bridge. Get it with `await layer2Web3.eth.getBlockNumber()`
    * @returns promise that includes a web3 transaction receipt for the layer 2 transaction, from which you can obtain the transaction hash, ethereum events, and other details about the transaction https://web3js.readthedocs.io/en/v1.3.4/web3-eth-contract.html#id37.
    * @remarks We use the subgraph to act as our indicator that bridging has completed, as this is the same mechanism that is populating the card wallet's displayed token balances
    * @example

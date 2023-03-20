@@ -170,12 +170,11 @@ export default class TokenBridgeForeignSide implements ITokenBridgeForeignSide {
   /**
    * This call will invoke the token bridge contract to relay tokens that have been unlocked in layer 1 and relay them to layer 2. It is always a good idea to relay the same number of tokens that were just unlocked. So if you unlocked 10 tokens, then you should subsequently relay 10 tokens. Once the tokens have been relayed to the layer 2 network they will be deposited in a Gnosis safe that you control in layer 2. You can use the `Safes.view` to obtain the address of the safe that you control in layer 2. Your safe will be reused for any subsequent tokens that you bridge into layer 2.
    *
-   * This method is invoked with the following parameters:
-   * - The layer 1 contract address of the token that you are unlocking. Note that the token address must be a supported stable coin token. Use the `TokenBridgeForeignSide.getSupportedTokens` method to get a list of supported tokens.
-   * - The address of the layer 2 account that should own the resulting safe
-   * - The amount of tokens to unlock. This amount should be in native units of the token (e.g. `wei`) and as a string.
-   * - You can optionally provide an object that specifies the nonce, onNonce callback, and/or onTxnHash callback as a fourth argument.
-   * - You can optionally provide an object that specifies the from address, gas limit, and/or gas price as a fifth argument.
+   * @param tokenAddress The layer 1 contract address of the token that you are unlocking. Note that the token address must be a supported stable coin token. Use the `TokenBridgeForeignSide.getSupportedTokens` method to get a list of supported tokens.
+   * @param recipientAddress The address of the layer 2 account that should own the resulting safe
+   * @param amount The amount of tokens to unlock. This amount should be in native units of the token (e.g. `wei`) and as a string.
+   * @param txnOptions You can optionally provide an object that specifies the nonce, onNonce callback, and/or onTxnHash callback as a fourth argument.
+   * @param contractOptions You can optionally provide an object that specifies the from address, gas limit, and/or gas price as a fifth argument.
    *
    * @returns a promise that includes a web3 transaction receipt, from which you can obtain the transaction hash, ethereum events, and other details about the transaction https://web3js.readthedocs.io/en/v1.3.4/web3-eth-contract.html#id37.
    * @example
@@ -281,10 +280,12 @@ export default class TokenBridgeForeignSide implements ITokenBridgeForeignSide {
   /**
    *
    * This call will allow the recipient of tokens bridge from layer 2 to layer 1 to be able to claim their bridge tokens in layer 1.
-   * This method is invoked with the following parameters (which are output from `TokenBridgeHomeSide.waitForBridgingValidation`):
-   * - The `messageId` of the bridging request
-   * - The `encodedData` of the bridging request
-   * - The `signatures` of the bridge validators
+
+   * @param messageId The `messageId` of the bridging request
+   * @param encodedData The `encodedData` of the bridging request
+   * @param signatures The `signatures` of the bridge validators
+   * @param txnOptions You can optionally provide an object that specifies the nonce, onNonce callback, and/or onTxnHash callback as a fourth argument.
+   * @param contractOptions You can optionally provide an object that specifies the from address, gas limit, and/or gas price as a fifth argument.
    * @example
    * ```ts
    * let txnReceipt = await tokenBridge.claimBridgedTokens(messageId, encodedData, signatures);
