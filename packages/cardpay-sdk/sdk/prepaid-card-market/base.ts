@@ -36,7 +36,7 @@ import { Signer } from 'ethers';
  * let prepaidCardMarket = await getSDK('PrepaidCardMarket', web3);
  * ```
  * @group Cardpay
- * @group Main
+ * @category Main
  */
 export default class PrepaidCardMarket {
   constructor(private layer2Web3: Web3, private layer2Signer?: Signer) {}
