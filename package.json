@@ -106,7 +106,7 @@
     "waypoint-vars": "node ./scripts/waypoint-vars.js",
     "update-relay-gas-tokens": "ts-node --esm scripts/update-relay-server-gas-tokens.ts",
     "aws:update-ecr-lifecycle-policy": "ts-node --esm scripts/ecr-lifecycle.ts",
-    "build:docs:": "typedoc ."
+    "build:docs": "typedoc ."
   },
   "resolutions": {
     "ember-a11y-testing": "4.0.3",
