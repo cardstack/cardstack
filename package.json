@@ -135,6 +135,7 @@
   },
   "devDependencies": {
     "typedoc": "^0.23.26",
-    "typedoc-plugin-resolve-crossmodule-references": "^0.3.3"
+    "typedoc-plugin-resolve-crossmodule-references": "^0.3.3",
+    "typedoc-plugin-versions": "https://github.com/tintinthong/typedoc-plugin-versions.git#add-custom-root-package-version"
   }
 }
