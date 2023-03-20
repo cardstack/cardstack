@@ -67,15 +67,15 @@ export default class ScheduledPaymentOnChainExecutionWaiter {
         'OutOfGas',
       ];
       let isKnownError = knownErrors.find((knownError) => error.message.includes(knownError));
-      let isWaitTooLongError = error.message.includes('took too long') && isBefore(paymentAttempt.startedAt!, subDays(nowUtc(), 1));
+      let isWaitTooLongError =
+        error.message.includes('took too long') && isBefore(paymentAttempt.startedAt!, subDays(nowUtc(), 1));
       if (isKnownError || isWaitTooLongError) {
         await prisma.scheduledPaymentAttempt.update({
           data: {
             status: 'failed',
-            failureReason:
-              isWaitTooLongError
-                ? "Waited for more than 1 day for the transaction to be mined, but it wasn't"
-                : error.message,
+            failureReason: isWaitTooLongError
+              ? "Waited for more than 1 day for the transaction to be mined, but it wasn't"
+              : error.message,
             endedAt: nowUtc(),
           },
           where: {
