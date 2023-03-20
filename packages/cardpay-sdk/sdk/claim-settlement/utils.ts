@@ -1,5 +1,11 @@
 import { BigNumber, utils, VoidSigner } from 'ethers';
 
+/**
+ *
+ * @group Utils
+ * @category Rewards
+ * @alpha
+ */
 class SolidityStruct {
   properties: { name: string; type: string }[];
   values: any[]; // eslint-disable-line @typescript-eslint/no-explicit-any
@@ -47,6 +53,12 @@ class SolidityStruct {
   }
 }
 
+/**
+ *
+ * @group Utils
+ * @category Rewards
+ * @alpha
+ */
 export class TimeRangeSeconds extends SolidityStruct {
   constructor(validFromTime: number, validToTime: number) {
     super(
@@ -74,12 +86,22 @@ class Action extends SolidityStruct {
   }
 }
 
+/**
+ * @group Utils
+ * @category Rewards
+ * @alpha
+ */
 export class Address extends SolidityStruct {
   constructor(caller: string) {
     super('Address', [{ name: 'caller', type: 'address' }], [caller]);
   }
 }
 
+/**
+ * @group Utils
+ * @category Rewards
+ * @alpha
+ */
 export class TransferERC20ToCaller extends Action {
   amount: BigNumber;
   constructor(token: string, amount: BigNumber) {
@@ -102,6 +124,12 @@ export class TransferERC20ToCaller extends Action {
   }
 }
 
+/**
+ *
+ * @group Utils
+ * @category Rewards
+ * @alpha
+ */
 export class NFTOwner extends SolidityStruct {
   constructor(nftContract: string, tokenId: BigNumber) {
     super(
@@ -115,6 +143,12 @@ export class NFTOwner extends SolidityStruct {
   }
 }
 
+/**
+ *
+ * @group Utils
+ * @category Rewards
+ * @alpha
+ */
 export class TransferNFTToCaller extends Action {
   constructor(token: string, tokenId: BigNumber) {
     super(
@@ -128,6 +162,12 @@ export class TransferNFTToCaller extends Action {
   }
 }
 
+/**
+ *
+ * @group Utils
+ * @category Rewards
+ * @alpha
+ */
 export class Claim {
   id: string;
   chainId: string;
@@ -194,6 +234,12 @@ export class Claim {
   }
 }
 
+/**
+ *
+ * @group Utils
+ * @category Rewards
+ * @alpha
+ */
 export const getTypedData = (
   chainId: string,
   address: string,

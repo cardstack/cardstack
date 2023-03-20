@@ -10,11 +10,19 @@ import { generateSaltNonce, Transaction } from './general-utils';
 import { Log } from 'web3-core';
 import JsonRpcProvider from '../../providers/json-rpc-provider';
 
+/**
+ * @group Utils
+ * @category Safe Module
+ */
 export interface SetupArgs {
   types: string[];
   values: any[];
 }
 
+/**
+ * @group Utils
+ * @category Safe Module
+ */
 export async function deployAndSetUpModule(
   ethersProvider: JsonRpcProvider,
   masterCopy: Contract,
@@ -49,6 +57,10 @@ export async function deployAndSetUpModule(
   };
 }
 
+/**
+ * @group Utils
+ * @category Safe Module
+ */
 export async function calculateProxyAddress(
   factory: Contract,
   masterCopyAddress: string,
@@ -66,6 +78,10 @@ export async function calculateProxyAddress(
   return ethers.utils.getCreate2Address(factory.address, salt, ethers.utils.keccak256(byteCode));
 }
 
+/**
+ * @group Utils
+ * @category Safe Module
+ */
 export async function encodeMultiSend(
   ethersProvider: JsonRpcProvider,
   transactions: readonly Transaction[]
@@ -83,6 +99,10 @@ export async function encodeMultiSend(
   };
 }
 
+/**
+ * @group Utils
+ * @category Safe Module
+ */
 export async function encodeMultiSendCallOnly(
   ethersProvider: JsonRpcProvider,
   transactions: readonly Transaction[]
@@ -115,6 +135,10 @@ function remove0x(hexString: string) {
   return hexString.replace(/^0x/, '');
 }
 
+/**
+ * @group Utils
+ * @category Safe Module
+ */
 export async function getModuleProxyCreationEvent(
   ethersProvider: JsonRpcProvider,
   logs: Log[]

@@ -7,6 +7,9 @@ export type { RewardProgramInfo } from './base';
 
 // add more versions as we go, but also please do drop version that we don't
 // want to maintain simultaneously
+/**
+ * @hidden
+ */
 export type RewardManager = v0_9_0;
 
 export const rewardManagerMeta = {

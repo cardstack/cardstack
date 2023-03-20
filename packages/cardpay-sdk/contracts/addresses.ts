@@ -17,6 +17,9 @@ import RegisterRewardeeHandlerABI from './abi/v0.9.0/register-rewardee-handler';
 import SupplierManagerABI from './abi/v0.9.0/supplier-manager';
 import JsonRpcProvider from '../providers/json-rpc-provider';
 
+/**
+ * @group Config
+ */
 export const protocolVersions = ['v0.9.0', 'v0.8.7'];
 
 function consumeModule(_module: any) {}
@@ -215,6 +218,9 @@ const addresses: {
   polygon: POLYGON,
 });
 
+/**
+ * @group Config
+ */
 export type AddressKeys =
   | keyof typeof SOKOL
   | keyof typeof KOVAN
@@ -223,8 +229,14 @@ export type AddressKeys =
   | keyof typeof GOERLI
   | keyof typeof MUMBAI;
 
+/**
+ * @group Config
+ */
 export default addresses;
 
+/**
+ * @group Config
+ */
 export function getAddressByNetwork(contractName: AddressKeys, network: string): string {
   let address = addresses[network][contractName];
   if (!address) {
@@ -236,6 +248,18 @@ export function getAddressByNetwork(contractName: AddressKeys, network: string):
   return address;
 }
 
+/**
+ * `getAddress` is a utility that will retrieve the contract address for a contract that is part of the Card Protocol in the specified network. The easiest way to use this function is to just pass your web3 instance to the function, and the function will query the web3 instance to see what network it is currently using. You can also just pass in the network name.
+ * @example
+ * ```ts
+ * let daiCpxdToken = await getAddress("daiCpxd", web3);
+ * let daiToken = await getAddress("daiToken", web3);
+ * let foreignBridge = await getAddress("foreignBridge", web3);
+ * let homeBridge = await getAddress("homeBridge", web3);
+ * let prepaidCardManager = await getAddress("prepaidCardManager", web3);
+ * ```
+ * @group Config
+ */
 export async function getAddress(contractName: AddressKeys, web3: Web3): Promise<string>;
 export async function getAddress(contractName: AddressKeys, ethersProvider: JsonRpcProvider): Promise<string>;
 export async function getAddress(
@@ -246,6 +270,9 @@ export async function getAddress(
   return getAddressByNetwork(contractName, network);
 }
 
+/**
+ * @group Config
+ */
 export function getOracleByNetwork(tokenName: string, network: string): string {
   let oracles = addresses[network].oracles;
   if (!oracles) {
@@ -260,7 +287,15 @@ export function getOracleByNetwork(tokenName: string, network: string): string {
   }
   return address;
 }
-
+/**
+ * `getOracle` is a utility that will retrieve the contract address for a price oracle for the specified token in the specified network. The easiest way to use this function is to just pass your web3 instance to the function, and the function will query the web3 instance to see what network it is currently using. You can also just pass in the network name. Please omit the ".CPXD" suffix in the token name that you provide.
+ * @example
+ * ```ts
+ * let daiOracle = await getOracle("DAI", web3);
+ * let cardOracle = await getOracle("CARD", web3);
+ * ```
+ * @group Config
+ */
 export async function getOracle(tokenName: string, web3: Web3): Promise<string> {
   let network = await networkName(web3);
   return getOracleByNetwork(tokenName, network);

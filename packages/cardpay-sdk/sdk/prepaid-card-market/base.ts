@@ -27,9 +27,30 @@ import { getSDK } from '../version-resolver';
 import { MAX_PREPAID_CARD_AMOUNT } from '../prepaid-card/base';
 import { Signer } from 'ethers';
 
+/**
+ * The `PrepaidCardMarket` API is used to manage the inventory prepaid cards in the market contract, whose purpose is to provision prepaid cards to consumers who buy them. This API is used within the layer 2 network in which the Card Protocol runs. The `PrepaidCardMaket` API can be obtained from `getSDK()` with a `Web3` instance that is configured to operate on a layer 2 network (like Gnosis Chain or Sokol).
+ * @example
+ * ```ts
+ * import { getSDK } from "@cardstack/cardpay-sdk";
+ * let web3 = new Web3(myProvider); // Layer 2 web3 instance
+ * let prepaidCardMarket = await getSDK('PrepaidCardMarket', web3);
+ * ```
+ * @group Cardpay
+ */
 export default class PrepaidCardMarket {
   constructor(private layer2Web3: Web3, private layer2Signer?: Signer) {}
 
+  /**
+   * This call returns the prepaid card inventory for a particular SKU.
+   * @param sku The SKU in question
+   * @param marketAddressptionally the address of the market contract (the default Cardstack market contract will be used if not provided)
+   * @returns a promise for an array of `PrepaidCardSafe` objects (from `Safes.View`)
+   * @example
+   * ```ts
+   * let prepaidCards = await prepaidCardMarket.getInventory(sku1000SPENDCards);
+   * ```
+   * @group Cardpay
+   */
   async getInventory(sku: string, marketAddress?: string): Promise<PrepaidCardSafe[]> {
     let prepaidCardAPI = await getSDK('PrepaidCard', this.layer2Web3);
     marketAddress = marketAddress ?? (await getAddress('prepaidCardMarket', this.layer2Web3));
@@ -38,12 +59,35 @@ export default class PrepaidCardMarket {
     return await prepaidCardAPI.resolvePrepaidCards(prepaidCardAddresses);
   }
 
+  /**
+   * This call returns whether or not the PrepaidCardMarket contract is currently paused.
+   * @example
+   * ```ts
+   * let isPaused = await prepaidCardMarket.isPaused();
+   * ```
+   */
   async isPaused(marketAddress?: string): Promise<boolean> {
     marketAddress = marketAddress ?? (await getAddress('prepaidCardMarket', this.layer2Web3));
     let contract = new this.layer2Web3.eth.Contract(PrepaidCardMarketABI as AbiItem[], marketAddress);
     return await contract.methods.paused().call();
   }
 
+  /**
+   * This call obtains the details for the prepaid cards associated with a particular SKU.
+   * @param sku The SKU in question
+   * @param marketAddress Optionally the address of the market contract (the default
+   * @example
+   * ```ts
+   * let {
+   * issuer,
+   * issuingToken,
+   * faceValue,
+   * customizationDID,
+   * askPrice // in the native units of the issuing token (e.g. wei)
+   * } = await prepaidCardMarket.getSKUInfo(sku1000SPENDCards);
+   *
+   * ```
+   */
   async getSKUInfo(
     sku: string,
     marketAddress?: string
@@ -76,6 +120,19 @@ export default class PrepaidCardMarket {
     };
   }
 
+  /**
+   * This call adds the specified prepaid card address to the inventory.
+   * @param fundingPrepaidCard The prepaid card that is used to pay for the gas for this transaction
+   * @param prepaidCardToAdd The prepaid card address to add to inventory
+   * @param marketAddress Optionally the address of the market contract (the default Cardstack market contract will be used if not provided)
+   * @param txnOptions You can optionally provide a TransactionOptions argument, to obtain the nonce or transaction hash of the operation before the creation process is complete
+   * @param contractOptions You can optionally provide an object that specifies the "from" address. The gas price and gas limit will be calculated by the card protocol and are not configurable.
+   * @returns a promise for a web3 transaction receipt.
+   * @example
+   * ```ts
+   * let result = await prepaidCardsMarket.addToInventory(fundingPrepaidCard, cardToAdd);
+   * ```
+   */
   async addToInventory(txnHash: string): Promise<SuccessfulTransactionReceipt>;
   async addToInventory(
     fundingPrepaidCard: string,
@@ -169,6 +226,19 @@ export default class PrepaidCardMarket {
     return await waitForTransactionConsistency(this.layer2Web3, txnHash, fundingPrepaidCard, nonce!);
   }
 
+  /**
+   * This call removes the specified prepaid card addresses from inventory and returns them back to the prepaid card issuer.
+   * @param fundingPrepaidCard The prepaid card that is used to pay for the gas for this transaction
+   * @param prepaidCardAddresses he prepaid card addresses to remove from inventory
+   * @param marketAddress Optionally the address of the market contract (the default Cardstack market contract will be used if not provided)
+   * @param txnOptions You can optionally provide a TransactionOptions argument, to obtain the nonce or transaction hash of the operation before the creation process is complete
+   * @param contractOptions You can optionally provide an object that specifies the "from" address. The gas price and gas limit will be calculated by the card protocol and are not configurable.
+   * @returns a promise for a web3 transaction receipt.
+   * @example
+   * ```ts
+   * let result = await prepaidCardsMarket.removeFromInventory(fundingPrepaidCard, cardsToRemove);
+   * ```
+   */
   async removeFromInventory(txnHash: string): Promise<SuccessfulTransactionReceipt>;
   async removeFromInventory(
     fundingPrepaidCard: string,
@@ -236,6 +306,23 @@ export default class PrepaidCardMarket {
     return await waitForTransactionConsistency(this.layer2Web3, txnHash, fundingPrepaidCard, nonce!);
   }
 
+  /**
+   *This call sets the ask price for the prepaid cards the belong to the specified SKU. The ask price is specified as a string in units of `wei` based on the issuing token for the prepaid cards in the specified SKU.
+   * @param prepaidCard The prepaid card that is used to pay for the gas for issuing the transaction
+   * @param sku he SKU whose ask price you are setting
+   * @param askPrice The ask price as a string in the native units of the SKU's issuing token (e.g. `wei`)
+   * @param marketAddress Optionally the address of the market contract (the default Cardstack market contract will be used if not provided)
+   * @param txnOptions You can optionally provide a TransactionOptions argument, to obtain the nonce or transaction hash of the operation before the creation process is complete
+   * @param contractOptions You can optionally provide an object that specifies the "from" address. The gas price and gas limit will be calculated by the card protocol and are not configurable.
+   * @returns  a promise for a web3 transaction receipt.
+   * @example
+   * ```ts
+   * let result = await prepaidCardMarket.setAsk(
+   * fundingPrepaidCard,
+   * sku1000SPENDCards,
+   * toWei("10"));
+   * ```
+   */
   async setAsk(txnHash: string): Promise<SuccessfulTransactionReceipt>;
   async setAsk(
     prepaidCard: string,

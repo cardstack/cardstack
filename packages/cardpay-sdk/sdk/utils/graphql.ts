@@ -3,6 +3,10 @@
 import Web3 from 'web3';
 import { getConstant } from '../constants';
 
+/**
+ * @group Utils
+ * @category Graphql
+ */
 export async function query(
   network: string,
   graphQLQuery: string,

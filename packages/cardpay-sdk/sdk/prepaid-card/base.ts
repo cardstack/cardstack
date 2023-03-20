@@ -40,16 +40,43 @@ const TIMEOUT = 1000 * 60 * 5;
 export const MAXIMUM_PAYMENT_AMOUNT = 10000 * 100;
 export const MAX_PREPAID_CARD_AMOUNT = 10;
 
+/**
+ * The `PrepaidCard` API is used to create and interact with prepaid cards within the layer 2 network in which the Card Protocol runs. The `PrepaidCard` API can be obtained from `getSDK()` with a `Web3` instance that is configured to operate on a layer 2 network (like Gnosis Chain or Sokol).
+ * @example
+ * ```ts
+ * import { getSDK } from "@cardstack/cardpay-sdk";
+ * let web3 = new Web3(myProvider); // Layer 2 web3 instance
+ * let prepaidCard = await getSDK('PrepaidCard', web3);
+ * ```
+ * @group Cardpay
+ */
 export default class PrepaidCard {
   private prepaidCardManager: Contract | undefined;
   constructor(protected layer2Web3: Web3, private layer2Signer?: Signer) {}
 
+  /**
+   * This call will return the price in terms of the specified token of how much it costs to have a face value in the specified units of SPEND (**§**). This takes into account both the exchange rate of the specified token as well as gas fees that are deducted from the face value when creating a prepaid card. Note though, that the face value of the prepaid card in SPEND will drift based on the exchange rate of the underlying token used to create the prepaid card. (However, this drift should be very slight since we are using *stable* coins to purchase prepaid cards (emphasis on "stable"). Since the units of SPEND are very small relative to wei (**§** 1 === $0.01 USD), the face value input is a number type. This API returns the amount of tokens required to achieve a particular face value as a string in native units of the specified token (e.g. `wei`).
+   * @example
+   * ```ts
+   * // You must send 'amountInDai' to the prepaidCardManager contract
+   * // to achieve a prepaid card with §5000 face value
+   * let amountInDAI = await prepaidCard.priceForFaceValue(daiCpxdAddress, 5000);
+   * ```
+   * @remarks Note that if you are creating multiple cards or splitting cards, use this API to ensure the amount to provision for each prepaid card you want to create in order to achieve teh desired face values for each of the prepaid cards created.
+   */
   async priceForFaceValue(tokenAddress: string, spendFaceValue: number): Promise<string> {
     return await (await this.getPrepaidCardMgr()).methods
       .priceForFaceValue(tokenAddress, String(spendFaceValue))
       .call();
   }
 
+  /**
+   * This call will return the gas fee in terms of the specified token for the creation of a prepaid card. All prepaid cards will be seeded with some `CARD.CPXD` in order to pay our gnosis safe relayer for gas. In order to offset these costs, a small fee will be charged when creating or splitting a prepaid card. The gas fee that is charged is returned as a string value in native units of the specified token (e.g. `wei`). This is the same fee that is accounted for in the `PrepaidCard.priceForFaceValue` API.
+   * @example
+   * ```ts
+   * let gasFeeInDai = await prepaidCard.gasFee(daiCpxdAddress);
+   * ```
+   */
   async gasFee(tokenAddress: string): Promise<string> {
     return await (await this.getPrepaidCardMgr()).methods.gasFee(tokenAddress).call();
   }
@@ -62,11 +89,25 @@ export default class PrepaidCard {
     return (await (await this.getPrepaidCardMgr()).methods.cardDetails(prepaidCardAddress).call()).customizationDID;
   }
 
+  /**
+   * This call will return a promise for the most current face value of a prepaid card.
+   * @example
+   * ```ts
+   * let faceValue = await prepaidCard.faceValue(prepaidCardAddress);
+   * ```
+   */
   async faceValue(prepaidCardAddress: string): Promise<number> {
     let faceValue = await (await this.getPrepaidCardMgr()).methods.faceValue(prepaidCardAddress).call();
     return parseInt(faceValue.toString());
   }
 
+  /**
+   * This call will return a promise for a boolean indicating if the prepaid card can be split.
+   * @example
+   * ```ts
+   *let canSplit = await prepaidCard.canSplit(prepaidCardAddress);
+   * ```
+   */
   async canSplit(prepaidCard: string): Promise<boolean> {
     let prepaidCardMgr = await this.getPrepaidCardMgr();
     let owner = await prepaidCardMgr.methods.getPrepaidCardOwner(prepaidCard).call();
@@ -74,6 +115,13 @@ export default class PrepaidCard {
     return owner === issuer && owner !== ZERO_ADDRESS;
   }
 
+  /**
+   * This call will return a promise for a boolean indicating if the prepaid card can be transferred.
+   * @example
+   * ```ts
+   * let canTransfer = await prepaidCard.canTransfer(prepaidCardAddress);
+   * ```
+   */
   async canTransfer(prepaidCard: string): Promise<boolean> {
     let prepaidCardMgr = await this.getPrepaidCardMgr();
     let owner = await prepaidCardMgr.methods.getPrepaidCardOwner(prepaidCard).call();
@@ -82,14 +130,37 @@ export default class PrepaidCard {
     return !hasBeenUsed && owner === issuer && owner !== ZERO_ADDRESS;
   }
 
-  // since the limits are in units of SPEND, it is totally safe to represent as
-  // a number vs a string
+  /**
+   * This call will return the prepaid card payment limits in units of SPEND (we return a number types since it is safe to represent SPEND as a number in javascript).
+   * @returns a promise object containing min and max number
+   * @example
+   * ```ts
+   * let { min, max } = await prepaidCard.getPaymentLimits();
+   * ```
+   * @remarks since the limits are in units of SPEND, it is totally safe to represent as
+   * a number vs a string
+   */
   async getPaymentLimits(): Promise<{ min: number; max: number }> {
     let prepaidCardMgr = await this.getPrepaidCardMgr();
     let min = await prepaidCardMgr.methods.MINIMUM_MERCHANT_PAYMENT().call();
     return { min: parseInt(min.toString()), max: MAXIMUM_PAYMENT_AMOUNT };
   }
 
+  /**
+   * This call will pay a merchant from a prepaid card.
+   * @param merchantSafe The safe address of the merchant that will be receiving payment
+   * @param prepaidCardAddress The prepaid card address to use to pay the merchant
+   * @param spendAmount The amount of **§** SPEND to pay the merchant.
+   * @param txnOptions You can optionally provide a TransactionOptions argument, to obtain the nonce or transaction hash of the operation before the creation process is complete
+   * @param contractOptions You can optionally provide an object that specifies the "from" address. The gas price and gas limit will be calculated by the card protocol and are not configurable.
+   * @returns  a promise for a web3 transaction receipt.
+   * @example
+   * ```ts
+   * let { min, max } = await prepaidCard.getPaymentLimits();
+   * ```
+   * @remarks since the limits are in units of SPEND, it is totally safe to represent as
+   * a number vs a string
+   */
   async payMerchant(txnHash: string): Promise<SuccessfulTransactionReceipt>;
   async payMerchant(
     merchantSafe: string,
@@ -167,6 +238,18 @@ export default class PrepaidCard {
     return await waitForTransactionConsistency(this.layer2Web3, txnHash, prepaidCardAddress, nonce!);
   }
 
+  /**
+   * This call will transfer a prepaid card from an issuer to a customer. Note that currently, once a prepaid card has been transferred to a customer (and EOA that did not create the prepaid card), then it becomes no longer transferrable. Additionally, if a prepaid card was used to fund a prepaid card split, the funding prepaid card also becomes non-transferrable, as it is considered the issuer's own personal prepaid card at that point.
+   * @param prepaidCardAddress The address of the prepaid card to be transferred
+   * @param newOwner The address of the new prepaid card owner
+   * @param txnOptions You can optionally provide a TransactionOptions argument, to obtain the nonce or transaction hash of the operation before the creation process is complete
+   * @param contractOptions You can optionally provide an object that specifies the "from" address. The gas price and gas limit will be calculated by the card protocol and are not configurable.
+   * @returns  a promise for a web3 transaction receipt.
+   * @example
+   * ```ts
+   * let result = await prepaidCard.transfer(prepaidCardAddress, newOwner);
+   * ```
+   */
   async transfer(txnHash: string): Promise<SuccessfulTransactionReceipt>;
   async transfer(
     prepaidCardAddress: string,
@@ -260,6 +343,24 @@ export default class PrepaidCard {
     return await waitForTransactionConsistency(this.layer2Web3, txnHash, prepaidCardAddress, transferNonce);
   }
 
+  /**
+   * This call will use a prepaid card as the source of funds when creating more prepaid cards, in effect "splitting" the prepaid card being used to fund the transaction. Prepaid cards created from the split command are automatically placed in the PrepaidCardInventory. (Note that the prepaid card that is used to fund the creation of more prepaid cards may not be transferred and is considered the issuer's own personal prepaid card.) The creation mechanisms for prepaid cards created via a `PrepaidCard.split` are identical to `PrepaidCard.create` in terms of the total cost and gas charges.
+   * @param prepaidCardAddress The address of the prepaid card that you are using to fund the creation of more prepaid cards
+   * @param faceValues An array of face values in units of **§** SPEND as numbers. Note there is a maximum of 15 prepaid cards that can be created in a single transaction and a minimum face value of **§100** is enforced for each card.
+   * @param marketAddress The address of the prepaid card market to create the prepaid card within. Set to `undefined` to place the newly created prepaid cards in the default market (Cardstack issuer via Wyre). Note that all split cards must go into a market.
+   * @param customizationDID A DID string that represents the customization for the prepaid card. The customization for a prepaid card can be retrieved using a DID resolver with this DID. If there is no customization an `undefined` value can be specified here.
+   * @param txnOption You can optionally provide a TransactionOptions argument, to obtain the nonce or transaction hash of the operation before the creation process is complete
+   * @param contractOptions You can optionally provide an object that specifies the "from" address. The gas price and gas limit will be calculated by the card protocol and are not configurable.
+   * @example
+   * ```ts
+   *let result = await prepaidCard.split(
+   * prepaidCardAddress,
+   * [5000, 4000], // split into 2 cards: §5000 SPEND face value and §4000 SPEND face value
+   * undefined,
+   * "did:cardstack:56d6fc54-d399-443b-8778-d7e4512d3a49"
+   *);
+   *```
+   */
   async split(
     txnHash: string
   ): Promise<{ prepaidCards: PrepaidCardSafe[]; sku: string; txReceipt: SuccessfulTransactionReceipt }>;
@@ -386,6 +487,35 @@ export default class PrepaidCard {
     };
   }
 
+  /**
+   * This call will create a new prepaid card from a gnosis safe, specifically a gnosis safe that holds tokens that were bridged to the layer 2 network from teh `TokenBridge` api. From this call you can create 1 or more prepaid cards from the `*.CPXD` layer 2 tokens (in the Gnosis Chain network, for example). When a token is bridged to a layer 2 network like Gnosis Chain, it will obtain a `*.CPXD` suffix, indicating that it can participate in the Card Protocol on Gnosis Chain. The face value for the prepaid card does not include the amount of tokens consumed by the gas to create the card as well as fees to create a prepaid card. (Note that the XD in CPXD originally comes from "XDai" the former name of Gnosis Chain.)
+   *
+   * ```
+   *total cost in *.CPXD = (Face value in § * token exchange rate) + fees + gas
+   *```
+   *
+   * Note that gas is charged in the `*.CPXD` token which will be deducted from your safe. You can use the `PrepaidCard.costForFaceValue` method to determine what the final cost for a card with a particular face value in units of **§** will be in the token of your choosing. You can use this amount to create the desired face value for your prepaid card.
+   * @param
+   * @param safeAddress The address of the safe that you are using to pay for the prepaid card
+   *@param tokenAddress The contract address of the token that you wish to use to pay for the prepaid card. Note that the face value of the prepaid card will fluctuate based on the exchange rate of this token and the **§** unit.
+   * @parma faceValues An array of face values in units of **§** SPEND as numbers. Note there is a maximum of 15 prepaid cards that can be created in a single transaction and a minimum face value of **§100** is enforced for each card.
+   * @param marketAddress The address of the prepaid card market to create the prepaid card within. Set to `undefined` to not place to newly created prepaid card in the market
+   * @param customizationDID A DID string that represents the customization for the prepaid card. The customization for a prepaid card can be retrieved using a DID resolver with this DID. If there is no customization an `undefined` value can be specified here.
+   * @param txnOptions You can optionally provide a TransactionOptions argument, to obtain the nonce or transaction hash of the operation before the creation process is complete
+   * @param contractOptions You can optionally provide an object that specifies the "from" address. The gas price and gas limit will be calculated by the card protocol and are not configurable
+   * @param force force a prepaid card to be created when DAI Oracle is not snapped to USD rate
+   * @example
+   * ```ts
+   * let daicpxd = await getAddress('daiCpxd', web3);
+   *let result = await prepaidCard.create(
+   *  safeAddress,
+   *  daicpxd,
+   *  [5000], // §5000 SPEND face value
+   *  undefined,
+   *  "did:cardstack:56d6fc54-d399-443b-8778-d7e4512d3a49"
+   *);
+   *```
+   */
   async create(txnHash: string): Promise<{ prepaidCards: PrepaidCardSafe[]; txnReceipt: SuccessfulTransactionReceipt }>;
   async create(
     safeAddress: string,

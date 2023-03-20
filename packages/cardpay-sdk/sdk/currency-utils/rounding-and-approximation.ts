@@ -20,6 +20,8 @@ import { lessThan } from './comparison';
  * @param decimals - number of decimals
  *
  * @returns value rounded to the number of decimals specified
+ * @group Utils
+ * @category Currency
  */
 export const toFixedDecimals = (value: BigNumberish, decimals: number): string =>
   new BigNumber(value).toFixed(decimals);
@@ -29,6 +31,8 @@ export const toFixedDecimals = (value: BigNumberish, decimals: number): string =
  * @see {@link toFixedDecimals}
  * , this function fulfils a similar purpose but does not cut off trailing zeroes
  * in decimals if they are within the decimals specified
+ * @group Utils
+ * @category Currency
  */
 export const formatFixedDecimals = (value: BigNumberish, decimals: number): string => {
   const _value = convertNumberToString(value);
@@ -48,8 +52,11 @@ export const formatFixedDecimals = (value: BigNumberish, decimals: number): stri
  * 3. If `r` is not 0 return `amount` rounded to `x + 2` decimal places,
  *     rounding up if `roundUp` is true and rounding down otherwise
  * 4. If `r` is 0, instead return `amount` truncated (not rounded) to 1 significant digit
+ * @group Utils
+ * @category Currency
  *
- * ```
+ * @example
+ * ```ts
  * updatePrecisionToDisplay(0.000357, 0.1) // '0.0003'
  * updatePrecisionToDisplay(0.000357, 10) // '0.0003'
  * updatePrecisionToDisplay(0.000357, 100) // '0.00035'
@@ -75,12 +82,16 @@ export const updatePrecisionToDisplay = (amount: BigNumberish, nativePrice: BigN
 
 /**
  * Calculates `numberOne * buffer`, rounded to an integer
+ * @group Utils
+ * @category Currency
  */
 export const addBuffer = (numberOne: BigNumberish, buffer: BigNumberish = '1.2'): string =>
   new BigNumber(numberOne).times(buffer).toFixed(0);
 
 /**
  * Rounds `value` to the number of decimals specified by the native currency (see `currencies.ts`)
+ * @group Utils
+ * @category Currency
  */
 export const roundAmountToNativeCurrencyDecimals = (
   value: BigNumberish,
@@ -110,8 +121,10 @@ export const roundAmountToNativeCurrencyDecimals = (
  * Otherwise returns `value` rounded to the smaller of `buffer` and `decimals`
  *
  * The returned value will have a minimum of 2 decimal places.
- *
- * ```
+ * @group Utils
+ * @category Currency
+ * @example
+ * ```ts
  * handleSignificantDecimals(0.123456789, 2, 3) // '0.123' - 0 decimal place to reach first significant digit, then buffer of 3
  * handleSignificantDecimals(0.0123456789, 2, 3) // '0.0123' - 1 decimal places to reach first significant digit, then buffer of 3
  * handleSignificantDecimals(0.123456789, 2, 4) // '0.1235' - 0 decimal place to reach first significant digit, then buffer of 4
@@ -141,13 +154,16 @@ export const handleSignificantDecimals = (value: BigNumberish, decimals: number,
  * If inputTwo has more than 8 significant decimals, returns inputOne with as many significant decimals as possible up to the same amount as inputTwo
  * Otherwise returns inputOne with as many significant decimals as possible, up to 8
  *
- * ```
+ * @param inputOne - BigNumberish
+ * @param inputTwo - BigNumberish
+ * @group Utils
+ * @category Currency
+ * @example
+ * ```ts
  * formatInputDecimals(1.123456789123, 2.123456789000) // '1.123456789'
  * formatInputDecimals(1.123456789123, 2.12345678912) // '1.12345678912'
  * formatInputDecimals(1.123456789123, 2.1) // '1.12345679'
  * ```
- * @param inputOne - BigNumberish
- * @param inputTwo - BigNumberish
  */
 // TODO revisit logic, at least rename so it is not native amount dp
 export const formatInputDecimals = (inputOne: BigNumberish, inputTwo: BigNumberish): string => {

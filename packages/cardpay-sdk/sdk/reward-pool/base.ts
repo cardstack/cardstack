@@ -26,6 +26,9 @@ import GnosisSafeABI from '../../contracts/abi/gnosis-safe';
 import { Signer } from 'ethers';
 import { query } from '../utils/graphql';
 
+/**
+ * @group Cardpay
+ */
 export interface Proof {
   rootHash: string;
   paymentCycle: number;
@@ -41,11 +44,17 @@ export interface Proof {
   parsedExplanation?: string;
 }
 
+/**
+ * @group Cardpay
+ */
 export interface ClaimableProof extends Proof {
   safeAddress: string;
   gasEstimate: GasEstimate;
 }
 
+/**
+ * @group Cardpay
+ */
 export interface Leaf {
   rewardProgramId: string;
   paymentCycleNumber: number;
@@ -56,28 +65,47 @@ export interface Leaf {
   transferData: string;
 }
 
+/**
+ * @group Cardpay
+ */
 export interface TokenTransferDetail {
   token: string;
   amount: BN;
 }
 
+/**
+ * @group Cardpay
+ */
 export interface FullLeaf extends Partial<TokenTransferDetail>, Leaf {}
 
 const DEFAULT_PAGE_SIZE = 1000000;
 
+/**
+ * @group Cardpay
+ */
 export interface RewardTokenBalance {
   rewardProgramId: string;
   tokenAddress: string;
   balance: BN;
 }
 
+/**
+ * @group Cardpay
+ */
 export interface HasTokenAddress {
   tokenAddress: string;
 }
+/**
+ * @group Cardpay
+ */
 export type WithSymbol<T extends HasTokenAddress> = T & {
   tokenSymbol: string;
 };
 
+/**
+ * The `RewardPool` API is used to interact with tally (an offchain service similar to relayer) and the reward pool contract. As customers use their prepaid card they will be given rewards based the amount of spend they use and a reward-based algorithm.
+ * @group Cardpay
+ */
 export default class RewardPool {
   private rewardPool: Contract | undefined;
 
@@ -97,6 +125,14 @@ export default class RewardPool {
     return await tokenContract.methods.balanceOf(rewardPoolAddress).call();
   }
 
+  /**
+   * The `GetProofs` API is used to retrieve proofs that are used to claim rewards from tally; proofs are similar arcade coupons that are collected to claim a prize. A proof can only be used by the EOA-owner. Once a proof is used (i.e. `knownClaimed=true`) it cannot be re-used. `isValid` is a flag that checks if a proof is still valid. Assuming a proof has not been claimed, `isValid=false` means that a proof can no longer be claimed -- typically, to mean that the proof has expired.
+   * @example
+   * ```ts
+   * let rewardPool = await getSDK('RewardPool', web3);
+   * await rewardPool.getProofs(address, rewardProgramId, safeAddress?, tokenAddress?, knownClaimed?)
+   * ```
+   */
   async getProofs(
     address: string,
     rewardProgramId: string,
@@ -289,6 +325,17 @@ export default class RewardPool {
     return leafs;
   }
 
+  /**
+   * @returns the balance of ALL tokens in the RewardPool for prepaid card owners address.
+   * This function takes in a parameter of the prepaid card owner address and , reward token address, and reward program id. This balance also accounts for the claims of a prepaid card owner in the past. The tokens that are part of the rewards are CARDPXD and DAICPXD -- federated tokens of the card protocol.
+   * The `RewardPool` API is used to interact with tally (an offchain service similar to relayer) and the reward pool contract. As customers use their prepaid card they will be given rewards based the amount of spend they use and a reward-based algorithm.
+   * @example
+   * ```ts
+   * let rewardPool = await getSDK('RewardPool', web3);
+   * let balanceForAllTokens = await rewardPool.rewardTokenBalances(address, rewardProgramId)
+   *
+   * ```
+   */
   async rewardTokenBalances(address: string, rewardProgramId: string): Promise<WithSymbol<RewardTokenBalance>[]> {
     const unclaimedValidProofs = await this.getUnclaimedValidProofs(address, rewardProgramId);
     const tokenBalances = unclaimedValidProofs.map((o: Proof) => {
@@ -301,6 +348,14 @@ export default class RewardPool {
     return this.addTokenSymbol(aggregateBalance(tokenBalances));
   }
 
+  /**
+   * This call is exactly the same as `RewardPool.rewardTokenBalances` except it excludes `rewardAmount < gasFees` (crypto dust).
+   * @example
+   * ```ts
+   * let rewardPool = await getSDK('RewardPool', web3);
+   * let balanceForAllTokens = await rewardPool.rewardTokenBalancesWithoutDust(address, rewardProgramId, rewardSafe)
+   * ```
+   */
   async rewardTokenBalancesWithoutDust(
     address: string,
     rewardProgramId: string,
@@ -317,6 +372,14 @@ export default class RewardPool {
     return this.addTokenSymbol(aggregateBalance(tokenBalances));
   }
 
+  /**
+   * The `AddRewardTokens` API is used to refill the reward pool for a particular reward program with any single owner safe. Currently, the sdk supports using single-owner safe like depot safe or merchant safe to send funds (the protocol supports prepaid card payments too). If a reward program doesn't have any funds inside of the pool rewardees will be unable to claim. Anyone can call this function not only the rewardProgramAdmin.
+   * @example
+   * ```ts
+   * let rewardPool = await getSDK('RewardPool', web3);
+   * await rewardPool.addRewardTokens(safe, rewardProgramId, tokenAddress, amount)
+   * ```
+   */
   async addRewardTokens(txnHash: string): Promise<SuccessfulTransactionReceipt>;
   async addRewardTokens(
     safeAddress: string,
@@ -411,6 +474,24 @@ export default class RewardPool {
     return await waitForTransactionConsistency(this.layer2Web3, gnosisTxn.ethereumTx.txHash, safeAddress, nonce);
   }
 
+  /**
+   *
+   * The `Claim` API is used by the rewardee to claim rewards from an associated reward program.
+   * Pre-requisite for this action:
+   * - reward program has to be registered
+   * - rewardee has to register and create safe for that particular reward program. The funds will be claimed into this safe -- reward safe
+   * - rewardee must get an existing proof and leaf from tally api  -- look at `rewardPool.getProofs`
+   * - reward pool has to be filled with reward token for that reward program
+   *
+   * @example
+   * ```ts
+   * let rewardPool = await getSDK('RewardPool', web3);
+   * await rewardPool.claim(safe, leaf, proofArray, acceptPartialClaim)
+   *
+   * ```
+   * The leaf item contains most information about the claim, such as the reward program (`rewardProgramId`), the expiry of the proof (`validFrom`, `validTo`), the type of token of the reward (`tokenType`, `transferData`), the eoa owner of the safe (`payee`). This information can be decoded easily.
+   * `acceptPartialClaim` is a special scenario whereby a rewardee is willing to compromise his full reward compensation for a partial one. This scneario occurs, for example, when rewardee has 10 card in his proof but the reward pool only has 5 card, the rewardee may opt to just accepting that 5 card by setting `acceptPartialClaim=true`.
+   */
   async claim(txnHash: string): Promise<SuccessfulTransactionReceipt>;
   async claim(
     safeAddress: string,
@@ -572,6 +653,16 @@ The reward program ${rewardProgramId} has balance equals ${fromWei(
     return await waitForTransactionConsistency(this.layer2Web3, gnosisTxn.ethereumTx.txHash, safeAddress, nonce);
   }
 
+  /**
+   *
+   * The `claimAll` is used by the rewardee to claim all rewards from a list of proofs. The looping occurs as separate transactions so the failure of one transaction will lead to the failure of all transactions after it (transactions before it will stil succeed). Proofs which have claims `rewardAmount < gasFees` (crypto dust) will be excluded; this filter is to decrease the probability of `claimAll` failing.
+   *
+   * @example
+   * ```ts
+   * let rewardManagerAPI = await getSDK('RewardManager', web3);
+   * await rewardManagerAPI.claimAll(rewardSafe, rewardProgramId, tokenAddress?)
+   * ```
+   */
   async claimAll(
     safeAddress: string,
     rewardProgramId: string,
@@ -627,6 +718,15 @@ The reward program ${rewardProgramId} has balance equals ${fromWei(
     return true;
   }
 
+  /**
+   *
+   * The `claimGasEstimate` returns a gas estimate a claim of a reward. The gas is paid out in tokens of the reward received. For example, if a person recieves 10 CARD, they will receive `10 CARD - (gas fees in CARD)` into their reward safe.
+   * @example
+   * ```ts
+   * let rewardManagerAPI = await getSDK('RewardManager', web3);
+   * await rewardManagerAPI.claimGasEstimate(rewardSafeAddress, leaf, proofArray, acceptPartialClaim)
+   * ```
+   */
   async claimGasEstimate(
     rewardSafeAddress: string,
     leaf: string,
@@ -676,6 +776,15 @@ The reward program ${rewardProgramId} has balance equals ${fromWei(
       amount,
     };
   }
+  /**
+   *
+   * The `RecoverTokens` API is used by the rewardProgramAdmin to recover the tokens that are previously added inside the pool. This function can be called at anytime throughout the lifecycle of the reward program. The funds recovered will be used to pay for the gas fees to execute the transaction.
+   * @example
+   * ```ts
+   * let rewardPool = await getSDK('RewardPool', web3);
+   * await rewardPool.recoverTokens(safe, rewardProgramId, tokenAddress, amount?)
+   * ```
+   */
   async recoverTokens(txnHash: string): Promise<SuccessfulTransactionReceipt>;
   async recoverTokens(
     safeAddress: string,
@@ -789,6 +898,15 @@ but the balance is the reward pool is ${fromWei(rewardPoolBalanceForRewardProgra
     return await waitForTransactionConsistency(this.layer2Web3, txnHash, safeAddress, nonce);
   }
 
+  /**
+   *
+   * The `rewardProgramBalances` API is used to query the token balances inside the reward pool for a particular reward program. This is useful if a rewardProgramAdmin wants to assess how much is left inside the pool for the reward program they manage.
+   * @example
+   * ```ts
+   * let rewardPool = await getSDK('RewardPool', web3);
+   * await rewardPool.rewardProgramBalances(rewardProgramId)
+   * ```
+   */
   async rewardProgramBalances(rewardProgramId: string): Promise<WithSymbol<RewardTokenBalance>[]> {
     const tokensAvailable = await this.getRewardTokens();
     let promises = tokensAvailable.map((tokenAddress) => {

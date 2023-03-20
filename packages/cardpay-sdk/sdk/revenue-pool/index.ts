@@ -5,6 +5,9 @@ import v0_9_0 from './v0.9.0';
 
 // add more versions as we go, but also please do drop version that we don't
 // want to maintain simultaneously
+/**
+ * @hidden
+ */
 export type RevenuePool = v0_9_0;
 
 export const revenuePoolMeta = {

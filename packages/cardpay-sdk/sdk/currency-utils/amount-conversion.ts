@@ -14,7 +14,8 @@ import { convertStringToNumber } from './type-conversion';
 /**
  * Converts a human-readable amount to an amount friendly for specifying on-chain transactions.
  * Returns `value * 10**decimals`
- *
+ * @group Utils
+ * @category Currency
  * @see {@link convertRawAmountToDecimalFormat}
  */
 export const convertAmountToRawAmount = (value: BigNumberish, decimals: number | string): string =>
@@ -23,6 +24,8 @@ export const convertAmountToRawAmount = (value: BigNumberish, decimals: number |
 /**
  * Calculates `value / priceUnit`, rounded down to specified `decimals` (default 18).
  * Handles division by zero by returning zero
+ * @group Utils
+ * @category Currency
  */
 export const convertAmountFromNativeValue = (
   value: BigNumberish,
@@ -35,6 +38,8 @@ export const convertAmountFromNativeValue = (
 
 /**
  * This is basically multiply, but more intent-revealing when used in the wallet?
+ * @group Utils
+ * @category Currency
  * @see {@link multiply}
  */
 export const convertAmountToNativeAmount = (amount: BigNumberish, priceUnit: BigNumberish): string =>
@@ -42,18 +47,24 @@ export const convertAmountToNativeAmount = (amount: BigNumberish, priceUnit: Big
 
 /**
  * Returns `value / 100`, rounded to specified `decimals`
+ * @group Utils
+ * @category Currency
  */
 export const convertBipsToPercentage = (value: BigNumberish, decimals = 2): string =>
   new BigNumber(value).shiftedBy(-2).toFixed(decimals);
 
 /**
  * Returns `value / 10**decimals`. See {@link BigNumber.dividedBy} for detailed information on how division is handled.
+ * @group Utils
+ * @category Currency
  */
 export const convertRawAmountToDecimalFormat = (value: BigNumberish, decimals = 18): string =>
   new BigNumber(value).dividedBy(new BigNumber(10).pow(decimals)).toFixed();
 
 /**
  * Converts wei to ether - Returns `number / 10**18`. NOTE: the assumption of 18 decimals here can be incorrect in some situations. Use with care.
+ * @group Utils
+ * @category Currency
  */
 export const fromWei = (number: BigNumberish): string => convertRawAmountToDecimalFormat(number, 18);
 
@@ -62,6 +73,8 @@ const SPEND_TO_USD_RATE = 0.01;
  * Converts SPEND to USD by multiplying `amountInSpend` by 0.01
  * Returns `0` if `amountInSpend` is an empty string,
  * and otherwise `undefined` if amountInSpend is not a number.
+ * @group Utils
+ * @category Currency
  *
  */
 export const spendToUsd = (amountInSpend: number): number | undefined => {
@@ -83,6 +96,8 @@ export const spendToUsd = (amountInSpend: number): number | undefined => {
  * @param usdRate Exchange rate for this currency vs usd (amount of this currency equivalent to 1 USD)
  *
  * @returns integer spend amount
+ * @group Utils
+ * @category Currency
  */
 export const convertToSpend = (amount: number, currency: string, usdRate: number) => {
   return Math.ceil(

@@ -7,6 +7,10 @@ import {
 import Url from 'url-parse';
 import { isCardPaySupportedNetwork } from '../network-config-utils';
 
+/**
+ * @group Utils
+ * @category Merchant
+ */
 export function validateMerchantId(value: string) {
   const subdomainFriendlyLength = 50;
   if (!value.trim().length) return 'This field is required';
@@ -19,7 +23,11 @@ export function validateMerchantId(value: string) {
 const isUniversalDomain = (domain: string) =>
   [MERCHANT_PAYMENT_UNIVERSAL_LINK_HOSTNAME, MERCHANT_PAYMENT_UNIVERSAL_LINK_STAGING_HOSTNAME].includes(domain);
 
-interface MerchantPaymentURLParams {
+/**
+ * @group Utils
+ * @category Merchant
+ */
+export interface MerchantPaymentURLParams {
   domain?: string;
   merchantSafeID: string;
   amount?: number;
@@ -27,6 +35,10 @@ interface MerchantPaymentURLParams {
   currency?: string;
 }
 
+/**
+ * @group Utils
+ * @category Merchant
+ */
 export const generateMerchantPaymentUrl = ({
   domain = `${CARDWALLET_SCHEME}:/`,
   merchantSafeID,
@@ -40,13 +52,21 @@ export const generateMerchantPaymentUrl = ({
   return `${https}${domain}/pay/${network}/${merchantSafeID}${handleAmountAndCurrency}`;
 };
 
-// see https://github.com/cardstack/cardstack/pull/2095 for test cases used during dev
+/**
+ * see https://github.com/cardstack/cardstack/pull/2095 for test cases used during dev
+ * @group Utils
+ * @category Merchant
+ */
 export const isValidMerchantPaymentUrl = (merchantPaymentUrl: string) => {
   let url = new Url(merchantPaymentUrl);
 
   return isValidCustomProtocolMerchantPaymentUrl(url) || isValidUniversalLinkMerchantPaymentUrl(url);
 };
 
+/**
+ * @group Utils
+ * @category Merchant
+ */
 export const isValidUniversalLinkMerchantPaymentUrl = (url: Url) => {
   const usesCorrectProtocol = url.protocol === `https:`;
   const hasCorrectHostname = isUniversalDomain(url.hostname);
@@ -59,6 +79,10 @@ export const isValidUniversalLinkMerchantPaymentUrl = (url: Url) => {
   return usesCorrectProtocol && hasCorrectHostname && hasCorrectPath;
 };
 
+/**
+ * @group Utils
+ * @category Merchant
+ */
 export const isValidCustomProtocolMerchantPaymentUrl = (url: Url) => {
   let usesCorrectProtocol = url.protocol === `${CARDWALLET_SCHEME}:`;
   let parts = url.pathname.split('/');

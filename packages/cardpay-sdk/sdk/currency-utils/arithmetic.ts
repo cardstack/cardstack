@@ -15,12 +15,16 @@ import { BigNumberish } from './types';
  * Subtracts numberTwo from numberOne
  *
  * @returns String representation of the number obtained from subtracting numberTwo from numberOne
+ * @group Utils
+ * @category Arithmetic
  */
 export const subtract = (numberOne: BigNumberish, numberTwo: BigNumberish): string =>
   new BigNumber(numberOne).minus(new BigNumber(numberTwo)).toFixed();
 
 /**
  * Calculates numberOne % numberTwo
+ * @group Utils
+ * @category Arithmetic
  */
 export const mod = (numberOne: BigNumberish, numberTwo: BigNumberish): string =>
   new BigNumber(numberOne).mod(new BigNumber(numberTwo)).toFixed();
@@ -28,31 +32,40 @@ export const mod = (numberOne: BigNumberish, numberTwo: BigNumberish): string =>
 /**
  * Divides numberOne by numberTwo and takes the integer portion of the calculated value
  *
- * ```
+ * @param  {Number}   numberOne
+ * @param  {Number}   numberTwo
+ * @group Utils
+ * @category Arithmetic
+ * @example
+ * ```ts
  * floorDivide(5, 3) // '1'
  * floorDivide(7, 3) // '2'
  * floorDivide(-10, 3) // '-3'
  * ```
- * @param  {Number}   numberOne
- * @param  {Number}   numberTwo
  */
 export const floorDivide = (numberOne: BigNumberish, numberTwo: BigNumberish): string =>
   new BigNumber(numberOne).dividedToIntegerBy(new BigNumber(numberTwo)).toFixed();
 
 /**
  * Calculates `numberOne + numberTwo`
+ * @group Utils
+ * @category Arithmetic
  */
 export const add = (numberOne: BigNumberish, numberTwo: BigNumberish): string =>
   new BigNumber(numberOne).plus(numberTwo).toFixed();
 
 /**
  * Calculates `numberOne * numberTwo`
+ * @group Utils
+ * @category Arithmetic
  */
 export const multiply = (numberOne: BigNumberish, numberTwo: BigNumberish): string =>
   new BigNumber(numberOne).times(numberTwo).toFixed();
 
 /**
  * Calculates `numberOne / numberTwo`. Handles division by zero by returning zero
+ * @group Utils
+ * @category Arithmetic
  *
  */
 export const divide = (numberOne: BigNumberish, numberTwo: BigNumberish): string => {
@@ -63,6 +76,8 @@ export const divide = (numberOne: BigNumberish, numberTwo: BigNumberish): string
 /**
  * Calculates `target * numerator / denominator`, rounded to an integer.
  * Handles division by zero by returning zero
+ * @group Utils
+ * @category Arithmetic
  */
 export const fraction = (target: BigNumberish, numerator: BigNumberish, denominator: BigNumberish): string => {
   if (!target || !numerator || !denominator) return '0';

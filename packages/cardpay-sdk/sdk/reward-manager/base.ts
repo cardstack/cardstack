@@ -40,6 +40,9 @@ import { query } from '../utils/graphql';
 import { Signer } from 'ethers';
 import { get } from 'lodash';
 
+/**
+ * @group Cardpay
+ */
 export interface RewardProgramInfo {
   rewardProgramId: string;
   rewardProgramAdmin: string;
@@ -49,6 +52,9 @@ export interface RewardProgramInfo {
   programExplainer: string;
 }
 
+/**
+ * @group Cardpay
+ */
 export interface RuleJson {
   explanation: any;
   rules: any[];
@@ -67,12 +73,25 @@ const rewardProgramQuery = `
   }
 `;
 
+/**
+ *
+ * The `RewardManager` API is used to interact to manage reward program. Those intending to offer or receive rewards have to register using this sdk.
+ *  @group Cardpay
+ */
 export default class RewardManager {
   private rewardManager: Contract | undefined;
   private rewardSafeDelegate: Contract | undefined;
 
   constructor(private layer2Web3: Web3, private layer2Signer?: Signer) {}
 
+  /**
+   * The `RegisterRewardProgram` API is used to register a reward program using a prepaid card. The call can specify an EOA admin account -- it defaults to the owner of the prepaid card itself. The reward program admin will then be able to manage the reward program using other api functions like`lockRewardProgram`, `addRewardRule`, `updateRewardProgramAdmin`. A fee of 500 spend is charged when registering a reward program. Currently, tally only gives rewards to a single reward program (sokol: "0x4767D0D74356433d54880Fcd7f083751d64388aF").
+   * @example
+   * ```ts
+   * let rewardManagerAPI = await getSDK('RewardManager', web3);
+   * await rewardManagerAPI.registerRewardProgram(prepaidCard, admin)
+   * ```
+   */
   async registerRewardProgram(
     txnHash: string
   ): Promise<{ rewardProgramId: string; txReceipt: SuccessfulTransactionReceipt }>;
@@ -163,6 +182,15 @@ export default class RewardManager {
     };
   }
 
+  /**
+   * The `RegisterRewardee` API is used to register a rewardee for a reward program using a prepaid card. The purpose of registering is not to "be considered to receive rewards" rather to "be able to claim rewards that have been given". By registering, the owner of the prepaid card is given ownership of a reward safe that will be used to retrieve rewards from the reward pool. A rewardee/eoa is eligible to only have one reward safe for each reward program; any attempts to re-register will result in a revert error. There is no fee in registering a reward safe, the prepaid card will pay the gas fees to execute the transaction.
+   *
+   * @example
+   * ```ts
+   * let rewardManagerAPI = await getSDK(RewardManager, web3);
+   * await rewardManagerAPI.registerRewardee(prepaidCard , rewardProgramId)
+   * ```
+   */
   async registerRewardee(txnHash: string): Promise<{ rewardSafe: string; txReceipt: SuccessfulTransactionReceipt }>;
   async registerRewardee(
     prepaidCardAddress: string,
@@ -229,6 +257,14 @@ export default class RewardManager {
     };
   }
 
+  /**
+   * The `registerRewardeeGasEstimate` returns a gas estimate for the prepaid card send transaction when registering a rewardee.
+   * @example
+   * ```ts
+   * let rewardManagerAPI = await getSDK('RewardManager', web3);
+   * await rewardManagerAPI.registerRewardeeGasEstimate(prepaidCard, rewardProgramId)
+   * ```
+   */
   async registerRewardeeGasEstimate(prepaidCardAddress: string, rewardProgramId: string): Promise<GasEstimate> {
     let layerTwoOracle = await getSDK('LayerTwoOracle', this.layer2Web3);
     let prepaidCardManager = new this.layer2Web3.eth.Contract(
@@ -244,6 +280,15 @@ export default class RewardManager {
     };
   }
 
+  /**
+   * The `LockRewardProgram` API is used to to lock a reward program using a prepaid card. When a reward program is locked, tally will choose to stop calculating rewards for reward reward program from that point forward. This doesn't stop the unclaimed rewards from being claimed, i.e. unused proofs. The prepaid card will pay for the gas fees to execute the transaction. Only the reward program admin can call this function. Executing this function again will unlock the reward program, which will allow tally to restart calculating rewards.
+   * @example
+   * ```ts
+   * let rewardManagerAPI = await getSDK(RewardManager, web3);
+   * await rewardManagerAPI.lockRewardProgram(prepaidCard , rewardProgramId)
+   * ```
+   * @group Cardpay
+   */
   async lockRewardProgram(txnHash: string): Promise<SuccessfulTransactionReceipt>;
   async lockRewardProgram(
     prepaidCardAddress: string,
@@ -305,6 +350,14 @@ export default class RewardManager {
     return await waitForTransactionConsistency(this.layer2Web3, txnHash, prepaidCardAddress, nonce!);
   }
 
+  /**
+   * The `UpdateRewardProgramAdmin` API is used to update the reward program admin of a reward program using a prepaid card. The prepaid card will pay for the gas fees to execute the transaction. Only the reward program admin can call this function.
+   * @example
+   * ```ts
+   * let rewardManagerAPI = await getSDK(RewardManager, web3);
+   * await rewardManagerAPI.updateRewardProgramAdmin(prepaidCard , rewardProgramId, newAdmin)
+   * ```
+   */
   async updateRewardProgramAdmin(txnHash: string): Promise<SuccessfulTransactionReceipt>;
   async updateRewardProgramAdmin(
     prepaidCardAddress: string,
@@ -377,6 +430,15 @@ export default class RewardManager {
     return await waitForTransactionConsistency(this.layer2Web3, txnHash, prepaidCardAddress, nonce!);
   }
 
+  /**
+   *
+   * The `AddRewardRule` API is used to add a reward rule for a reward program using a prepaid card. The reward rule is specified as a blob of bytes which tally will parse to understand how to compute rewards for the reward program. Each reward program will only ever have a single reward rule -- a single blob. The prepaid card will pay for the gas fees to execute the transaction. Only the reward program admin can call this function.
+   * @example
+   * ```ts
+   * let rewardManagerAPI = await getSDK('RewardManager', web3);
+   * await rewardManagerAPI.addRewardRule(prepaidCard, rewardProgramId, blob)
+   * ```
+   */
   async addRewardRule(txnHash: string): Promise<SuccessfulTransactionReceipt>;
   async addRewardRule(
     prepaidCardAddress: string,
@@ -443,6 +505,17 @@ export default class RewardManager {
     }
     return await waitForTransactionConsistency(this.layer2Web3, txnHash, prepaidCardAddress, nonce!);
   }
+  /**
+   *
+   * The `Withdraw` API is used to withdraw ERC677 tokens earned in a reward safe to any other destination address -- it is simlar to a transfer function. The gas fees in the withdrawal will be paid out of the balance of the safe -- similar to `Safe.sendTokens`.
+   *
+   * `amount` is an optional param. When `amount` is included, one must ensure that there is sufficient balance leftover to pay for gas of the transaction, .i.e `safeBalance < amount - estimatedGasCost`. The scenario which this occurs is when the user specifies `amount` that is close to `safeBalance`. The client should make this check. When `amount` is excluded, the whole balance of the safe is withdrawn which is automatically taxed for gas, .i.e the gas deduction occurs internally within the sdk function. It is recommended when the client expects to withdraw the "max" balance that it doesn't specify `amount`.
+   * @example
+   * ```ts
+   * let rewardManagerAPI = await getSDK(RewardManager, web3);
+   *  await rewardManagerAPI.withdraw(rewardSafe , to, token, amount)
+   * ```
+   */
   async withdraw(txnHash: string): Promise<SuccessfulTransactionReceipt>;
   async withdraw(
     safeAddress: string,
@@ -614,6 +687,15 @@ The owner of reward safe ${safeAddress} is ${rewardSafeOwner}, but the signer is
     return await waitForTransactionConsistency(this.layer2Web3, gnosisTxn.ethereumTx.txHash, safeAddress, nonce);
   }
 
+  /**
+   *
+   * The `withdrawGasEstimate` returns a gas estimate for withdrawing a reward.
+   * @example
+   * ```ts
+   * let rewardManagerAPI = await getSDK('RewardManager', web3);
+   * await rewardManagerAPI.withdrawGasEstimate(rewardSafeAddress, to, tokenAddress, amount)
+   * ```
+   */
   async withdrawGasEstimate(
     rewardSafeAddress: string,
     to: string,
@@ -998,6 +1080,15 @@ The owner of reward safe ${safeAddress} is ${rewardSafeOwner}, but the signer is
     };
   }
 
+  /**
+   * The `getRewardProgramsInfo` is a catch-all query that enlist all information about reward programs that have been registered.
+   *
+   * @example
+   * ```ts
+   * let rewardManagerAPI = await getSDK('RewardManager', web3);
+   * await rewardManagerAPI.getRewardProgramsInfo()
+   * ```
+   */
   async getRewardProgramsInfo(): Promise<RewardProgramInfo[]> {
     let rewardProgramIds = await this.getRewardPrograms();
     let promises: Promise<RewardProgramInfo>[] = [];
@@ -1083,6 +1174,14 @@ The owner of reward safe ${safeAddress} is ${rewardSafeOwner}, but the signer is
     }
   }
 
+  /**
+   * The `getRuleJson` returns the rule structure of a particular reward program. The rule json will include on-chaain "explanation" block which is the lookup map for explanation of each reward. A client can use this map alongside `explanationId` and `explanationData` returned by the reward api.
+   * @example
+   * ```ts
+   * let rewardManagerAPI = await getSDK('RewardManager', web3);
+   * await rewardManagerAPI.getRuleJson(rewardProgramId)
+   * ```
+   */
   async getRuleJson(rewardProgramId: string): Promise<RuleJson> {
     const did = await this.getRuleDid(rewardProgramId);
     if (did) {

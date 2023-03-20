@@ -20,6 +20,9 @@ const { fromWei } = Web3.utils;
 // The Native or Home network has fast and inexpensive operations. All bridge operations to collect validator confirmations are performed on this side of the bridge.
 // The Foreign network can be any chain, but generally refers to the Ethereum mainnet.
 
+/**
+ * @group Cardpay
+ */
 export interface ITokenBridgeForeignSide {
   unlockTokens(txnHash: string): Promise<SuccessfulTransactionReceipt>;
   unlockTokens(
@@ -52,12 +55,40 @@ export interface ITokenBridgeForeignSide {
 // for performing withdrawals.
 const CLAIM_BRIDGED_TOKENS_GAS_LIMIT = 350000;
 
-// Note:  To accommodate the fix for infura block mismatch errors (made in
-// CS-2391), we are waiting one extra block for all layer 1 transactions.
+/**
+ *
+ * The `TokenBridgeForeignSide` API is used to bridge tokens into the layer 2 network in which the Card Protocol runs. The `TokenBridgeForeignSide` API can be obtained from `getSDK()` with a `Web3` instance that is configured to operate on a layer 1 network (like Ethereum Mainnet or Kovan).
+ * @group Cardpay
+ * @example
+ * ```ts
+ * import { getSDK } from "@cardstack/cardpay-sdk";
+ * let web3 = new Web3(myProvider); // Layer 1 web3 instance
+ * let tokenBridge = await getSDK('TokenBridgeForeignSide', web3);
+ * ```
+ *
+ * @remarks Note:  To accommodate the fix for infura block mismatch errors (made in CS-2391), we are waiting one extra block for all layer 1 transactions.
+ */
 export default class TokenBridgeForeignSide implements ITokenBridgeForeignSide {
   private foreignBridge: Contract | undefined;
   constructor(private layer1Web3: Web3) {}
 
+  /**
+   * This call will perform an ERC-20 `approve` action on the tokens to grant the Token Bridge contract the ability bridge your tokens. This method is invoked with:
+   * - The contract address of the token that you are unlocking. Note that the token address must be a supported stable coin token. Use the `TokenBridgeForeignSide.getSupportedTokens` method to get a list of supported tokens.
+   * - The amount of tokens to unlock. This amount should be in native units of the token (e.g. `wei`) and as string.
+   * - You can optionally provide an object that specifies the nonce, onNonce callback, and/or onTxnHash callback as a third argument.
+   * - You can optionally provide an object that specifies the from address, gas limit, and/or gas price as a fourth argument.
+   *
+   * @returns a promise that includes a web3 transaction receipt, from which you can obtain the transaction hash, ethereum events, and other details about the transaction https://web3js.readthedocs.io/en/v1.3.4/web3-eth-contract.html#id37.
+   *
+   * @example
+   * ```ts
+   * let txnReceipt = await tokenBridge.unlockTokens(
+   *   "0x4F96Fe3b7A6Cf9725f59d353F723c1bDb64CA6Aa",
+   *   new BN("1000000000000000000") // this is 1 token in wei
+   * );
+   * ```
+   */
   async unlockTokens(txnHash: string): Promise<SuccessfulTransactionReceipt>;
   async unlockTokens(
     tokenAddress: string,
@@ -136,6 +167,26 @@ export default class TokenBridgeForeignSide implements ITokenBridgeForeignSide {
     });
   }
 
+  /**
+   * This call will invoke the token bridge contract to relay tokens that have been unlocked in layer 1 and relay them to layer 2. It is always a good idea to relay the same number of tokens that were just unlocked. So if you unlocked 10 tokens, then you should subsequently relay 10 tokens. Once the tokens have been relayed to the layer 2 network they will be deposited in a Gnosis safe that you control in layer 2. You can use the `Safes.view` to obtain the address of the safe that you control in layer 2. Your safe will be reused for any subsequent tokens that you bridge into layer 2.
+   *
+   * This method is invoked with the following parameters:
+   * - The layer 1 contract address of the token that you are unlocking. Note that the token address must be a supported stable coin token. Use the `TokenBridgeForeignSide.getSupportedTokens` method to get a list of supported tokens.
+   * - The address of the layer 2 account that should own the resulting safe
+   * - The amount of tokens to unlock. This amount should be in native units of the token (e.g. `wei`) and as a string.
+   * - You can optionally provide an object that specifies the nonce, onNonce callback, and/or onTxnHash callback as a fourth argument.
+   * - You can optionally provide an object that specifies the from address, gas limit, and/or gas price as a fifth argument.
+   *
+   * @returns a promise that includes a web3 transaction receipt, from which you can obtain the transaction hash, ethereum events, and other details about the transaction https://web3js.readthedocs.io/en/v1.3.4/web3-eth-contract.html#id37.
+   * @example
+   * ```js
+   * let txnReceipt = await tokenBridge.relayTokens(
+   *   "0x4F96Fe3b7A6Cf9725f59d353F723c1bDb64CA6Aa", // token address
+   *   "0x7cc103485069bbba15799f5dac5c42e7bbb48b4d064e61548022bf04db1bfc19", // layer 2 recipient address
+   *   new BN("1000000000000000000") // this is 1 token in wei
+   * );
+   * ```
+   */
   async relayTokens(txnHash: string): Promise<SuccessfulTransactionReceipt>;
   async relayTokens(
     tokenAddress: string,
@@ -227,6 +278,20 @@ export default class TokenBridgeForeignSide implements ITokenBridgeForeignSide {
     return estimatedGasInWei.divRound(rounder).mul(rounder);
   }
 
+  /**
+   *
+   * This call will allow the recipient of tokens bridge from layer 2 to layer 1 to be able to claim their bridge tokens in layer 1.
+   * This method is invoked with the following parameters (which are output from `TokenBridgeHomeSide.waitForBridgingValidation`):
+   * - The `messageId` of the bridging request
+   * - The `encodedData` of the bridging request
+   * - The `signatures` of the bridge validators
+   * @example
+   * ```ts
+   * let txnReceipt = await tokenBridge.claimBridgedTokens(messageId, encodedData, signatures);
+   * ```
+   *
+   * @returns a promise for a web3 transaction receipt.
+   */
   async claimBridgedTokens(txnHash: string): Promise<SuccessfulTransactionReceipt>;
   async claimBridgedTokens(
     messageId: string,
