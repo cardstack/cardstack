@@ -51,26 +51,38 @@ export default class ScheduledPaymentOnChainExecutionWaiter {
         }
       }
     } catch (error: any) {
-      // waitUntilTransactionMined will return "Transaction took too long to complete" in case it wasn't mined in 60 minutes.
-      // In this case we want to restart the task and wait some more. We could throw an error here so that the worker would restart the task, but
-      // due to the exponential-backoff it could take some time before the waiting can start again. That's why we just spawn a new task directly.
-      if (error.message.includes('took too long')) {
-        if (isBefore(paymentAttempt.startedAt!, subDays(nowUtc(), 1))) {
-          await prisma.scheduledPaymentAttempt.update({
-            data: {
-              status: 'failed',
-              failureReason: "Waited for more than 1 day for the transaction to be mined, but it wasn't",
-              endedAt: nowUtc(),
-            },
-            where: {
-              id: paymentAttempt.id,
-            },
-          });
-        } else {
-          await this.workerClient.addJob('scheduled-payment-on-chain-execution-waiter', {
-            scheduledPaymentAttemptId: paymentAttempt.id,
-          });
-        }
+      // Known errors are:
+      // - Transaction took too long to complete
+      // - Transaction with hash "${txnHash}" was reverted
+      // - UnknownHash: payment details generate unregistered spHash
+      // - InvalidPeriod: payment executed outside of valid date or period
+      // - ExceedMaxGasPrice: gasPrice must be lower than or equal maxGasPrice
+      // - PaymentExecutionFailed: safe balance is not enough to make payments and pay fees
+      // - OutOfGas: executionGas to low to execute scheduled payment
+      let knownErrors = [
+        'took too long',
+        'was reverted',
+        'UnknownHash',
+        'InvalidPeriod',
+        'ExceedMaxGasPrice',
+        'PaymentExecutionFailed',
+        'OutOfGas',
+      ];
+      let isKnownError = knownErrors.find((knownError) => error.message.includes(knownError));
+      if (isKnownError) {
+        await prisma.scheduledPaymentAttempt.update({
+          data: {
+            status: 'failed',
+            failureReason:
+              error.message.includes('took too long') && isBefore(paymentAttempt.startedAt!, subDays(nowUtc(), 1))
+                ? "Waited for more than 1 day for the transaction to be mined, but it wasn't"
+                : error.message,
+            endedAt: nowUtc(),
+          },
+          where: {
+            id: paymentAttempt.id,
+          },
+        });
 
         await prisma.scheduledPayment.update({
           where: { id: scheduledPayment.id },
@@ -78,37 +90,11 @@ export default class ScheduledPaymentOnChainExecutionWaiter {
             nextRetryAttemptAt: this.scheduledPaymentFetcher.calculateNextRetryAttemptDate(scheduledPayment),
           },
         });
-
-        return;
+      } else {
+        await this.workerClient.addJob('scheduled-payment-on-chain-execution-waiter', {
+          scheduledPaymentAttemptId: paymentAttempt.id,
+        });
       }
-
-      // Known errors are:
-      // - Transaction with hash "${txnHash}" was reverted
-      // - UnknownHash: payment details generate unregistered spHash
-      // - InvalidPeriod: payment executed outside of valid date or period
-      // - ExceedMaxGasPrice: gasPrice must be lower than or equal maxGasPrice
-      // - PaymentExecutionFailed: safe balance is not enough to make payments and pay fees
-      // - OutOfGas: executionGas to low to execute scheduled payment
-      //
-      // In these cases we want to mark the payment attempt as failed and set the next retry attempt date
-      await prisma.scheduledPaymentAttempt.update({
-        data: {
-          status: 'failed',
-          failureReason: error.message,
-          endedAt: nowUtc(),
-        },
-        where: {
-          id: paymentAttempt.id,
-        },
-      });
-
-      await prisma.scheduledPayment.update({
-        where: { id: scheduledPayment.id },
-        data: {
-          nextRetryAttemptAt: this.scheduledPaymentFetcher.calculateNextRetryAttemptDate(scheduledPayment),
-        },
-      });
-
       return; // We don't want to throw an error here because we don't want the task to be retried - the transaction has obviously failed
     }
   }
