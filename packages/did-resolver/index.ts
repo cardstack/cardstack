@@ -8,7 +8,7 @@ import * as uuidv4 from 'uuid';
 export const CURRENT_VERSION = 1;
 export const UUIDV5_NAMESPACE = '1b671a64-40d5-491e-99b0-da01ff1f3341';
 
-type CardstackIdentifierType = 'PrepaidCardCustomization' | 'MerchantInfo' | 'SupplierInfo' | 'RewardRule';
+export type CardstackIdentifierType = 'PrepaidCardCustomization' | 'MerchantInfo' | 'SupplierInfo' | 'RewardRule';
 
 /* eslint-disable @typescript-eslint/naming-convention */
 const DID_TYPE_TO_SHORT_TYPE: Record<CardstackIdentifierType, string> = {
@@ -70,7 +70,7 @@ const SHAKE_128_OUTPUT_BITS = 64;
 const HASH_LENGTH = SHAKE_128_OUTPUT_BITS / 4;
 const hashFunc = (data: string) => shake_128(data, SHAKE_128_OUTPUT_BITS);
 
-class CardstackIdentifier {
+export class CardstackIdentifier {
   version: number;
   type: CardstackIdentifierType;
   uniqueId: string;

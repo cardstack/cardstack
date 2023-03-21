@@ -51,17 +51,29 @@ import JsonRpcProvider from '../providers/json-rpc-provider';
 import { getConstant, getConstantByNetwork } from './constants';
 import { applyRateToAmount, getGasPricesInNativeWei, getNativeToTokenRate } from './utils/conversions';
 
+/**
+ * @group Champer
+ * @category Scheduler
+ */
 export interface EnableModuleAndGuardResult {
   scheduledPaymentModuleAddress: string;
   metaGuardAddress: string;
 }
 
+/**
+ * @group Champer
+ * @category Scheduler
+ */
 export interface CreateSafeWithModuleAndGuardResult {
   safeAddress: string;
   scheduledPaymentModuleAddress: string;
   metaGuardAddress: string;
 }
 
+/**
+ * @group Champer
+ * @category Scheduler
+ */
 export interface CreateSafeWithModuleAndGuardTx {
   multiSendCallOnlyTx: Transaction;
   expectedSafeAddress: string;
@@ -70,19 +82,32 @@ export interface CreateSafeWithModuleAndGuardTx {
 }
 
 type GasRange = Record<'slow' | 'standard' | 'fast', BigNumber>;
+
+/**
+ * @group Champer
+ * @category Scheduler
+ */
 export interface GasEstimationResult {
   gas: BigNumber;
   gasRangeInWei: GasRange;
   gasRangeInUSD: GasRange;
 }
 
-interface TransactionParams {
+/**
+ * @group Champer
+ * @category Scheduler
+ */
+export interface TransactionParams {
   nonce: BN;
   estimate: Estimate;
   payload: any;
   signature: Signature;
 }
 
+/**
+ * @group Champer
+ * @category Scheduler
+ */
 export interface SchedulePaymentProgressListener {
   onBeginHubAuthentication?: () => unknown;
   onEndHubAuthentication?: () => unknown;
@@ -104,12 +129,20 @@ export interface SchedulePaymentProgressListener {
   onEndRemovePaymentFromHub?: () => unknown;
 }
 
-interface SchedulePaymentOptions {
+/**
+ * @group Champer
+ * @category Scheduler
+ */
+export interface SchedulePaymentOptions {
   hubUrl?: string;
   authToken?: string;
   listener?: SchedulePaymentProgressListener;
 }
 
+/**
+ * @group Champer
+ * @category Scheduler
+ */
 export default class ScheduledPaymentModule {
   constructor(private ethersProvider: JsonRpcProvider, private signer?: Signer) {
     this.signer = signer ? signer.connect(ethersProvider) : signer;

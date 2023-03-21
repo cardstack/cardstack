@@ -16,6 +16,9 @@ export class Revert extends Error {
 
 // This is a patched HttpProvider that will allow an HDWalletProvider to send
 // transactions
+/**
+ * @group Provider
+ */
 export default class HttpProvider {
   constructor(url: string) {
     let engine = new ProviderEngine();

@@ -16,11 +16,19 @@ const safesQuery = `
 
 const spModuleAddressBySafeAddressQuery = 'query($safe: ID!) {safe(id: $safe) {id spModule}}';
 
-interface Safe {
+/**
+ * @group Champer
+ * @category Scheduler
+ */
+export interface Safe {
   address: string;
   spModuleAddress: string;
 }
 
+/**
+ * @group Utils
+ * @category Scheduler
+ */
 export async function getSafesWithSpModuleEnabled(chainId: number, accountAddress: string): Promise<Safe[]> {
   let networkName = convertChainIdToName(chainId);
   let result = await query(networkName, safesQuery, { account: accountAddress });
@@ -33,6 +41,10 @@ export async function getSafesWithSpModuleEnabled(chainId: number, accountAddres
   });
 }
 
+/**
+ * @group Utils
+ * @category Scheduler
+ */
 export async function getSpModuleAddressBySafeAddress(
   chainId: number,
   safeAddress: string

@@ -3,11 +3,23 @@
 import { getConstant, supportedChains, Network, networks, supportedChainsArray } from './constants';
 import { HubConfigResponse, RpcNodeUrl } from './hub-config';
 
+/**
+ * @group Utils
+ * @category Network Config
+ */
 export type Networkish = string | number | Network;
 
+/**
+ * @group Utils
+ * @category Network Config
+ */
 export const convertChainIdToName = (network: Networkish) =>
   typeof network === 'number' ? networks[network] : network;
 
+/**
+ * @group Utils
+ * @category Network Config
+ */
 export const getWeb3ConfigByNetwork = (config: HubConfigResponse, network: Networkish): RpcNodeUrl => {
   const networkName = convertChainIdToName(network);
 
@@ -18,10 +30,22 @@ export const getWeb3ConfigByNetwork = (config: HubConfigResponse, network: Netwo
   throw new Error(`Unsupported network: ${network}`);
 };
 
+/**
+ * @group Utils
+ * @category Network Config
+ */
 export const isSupportedChain = (network: Networkish) => supportedChainsArray.includes(convertChainIdToName(network));
 
+/**
+ * @group Utils
+ * @category Network Config
+ */
 export const isCardPaySupportedNetwork = (network: Network | string) => supportedChains.gnosis.includes(network);
 
+/**
+ * @group Utils
+ * @category Network Config
+ */
 export interface TokenDetail {
   address: string;
   name: string;
@@ -47,6 +71,10 @@ interface RelayServerTokensResponse {
   }[];
 }
 
+/**
+ * @group Utils
+ * @category Network Config
+ */
 export const fetchSupportedGasTokens = async (network: Networkish): Promise<TokenDetail[]> => {
   const networkName = convertChainIdToName(network);
   let relayServiceURL = await getConstant('relayServiceURL', networkName);

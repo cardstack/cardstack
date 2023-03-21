@@ -13,13 +13,24 @@ import { signSafeTx } from './utils/signing-utils';
 /* eslint-disable node/no-extraneous-import */
 import { AddressZero } from '@ethersproject/constants';
 import AccountRegistrationABI from '../contracts/abi/account-registration-nft';
+
 import { getAddress } from '../contracts/addresses';
 
+/**
+ * @group Champer
+ * @category Rewards
+ * @alpha
+ */
 export interface SignedClaim {
   signature: string;
   encoded: string;
 }
 
+/**
+ * @group Champer
+ * @category Rewards
+ * @alpha
+ */
 export default class ClaimSettlementModule extends SafeModule {
   safeSalt = 'cardstack-cs-create-safe';
   moduleSalt = 'cardstack-cs-deploy-module';

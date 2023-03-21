@@ -21,6 +21,9 @@ import ScheduledPaymentModule from './scheduled-payment-module';
 import JsonRpcProvider from '../providers/json-rpc-provider';
 import ClaimSettlementModule from './claim-settlement-module';
 
+/**
+ * @group SDK
+ */
 export type SDK =
   | 'Assets'
   | 'LayerOneOracle'
@@ -38,6 +41,9 @@ export type SDK =
   | 'ScheduledPaymentModule'
   | 'ClaimSettlementModule';
 
+/**
+ * @group SDK
+ */
 export type MapReturnType<T> = T extends 'Assets'
   ? Assets
   : T extends 'HubAuth'
@@ -69,6 +75,9 @@ export type MapReturnType<T> = T extends 'Assets'
   : T extends 'ClaimSettlementModule'
   ? ClaimSettlementModule
   : never;
+/**
+ * @group SDK
+ */
 export interface ContractMeta {
   apiVersions: Record<string, any>;
   contractName: AddressKeys;
@@ -109,6 +118,9 @@ const VersionManagerABI: AbiItem[] = [
   },
 ];
 
+/**
+ * @group SDK
+ */
 export async function getABI(contractName: string, web3: Web3): Promise<AbiItem[]> {
   let versionManager = new web3.eth.Contract(VersionManagerABI, await getAddress('versionManager', web3));
   let protocolVersion = await versionManager.methods.version().call();
@@ -120,6 +132,17 @@ export async function getABI(contractName: string, web3: Web3): Promise<AbiItem[
   return abi;
 }
 
+/**
+ * The cardpay SDK will automatically obtain the latest API version that works with the on-chain contracts. In order to obtain an API you need to leverage the `getSDK()` function and pass to it the API that you wish to work with, as well as any parameters necessary for obtaining an API (usually just an instance of Web3).
+ * @returns a promise for the requested API.
+ *
+ * @example
+ * ```ts
+ * import { getSDK } from "@cardstack/cardpay-sdk";
+ * let safesAPI = await getSDK('Safes', web3);
+ * ```
+ * @group SDK
+ */
 export async function getSDK<T extends SDK>(sdk: T, ...args: any[]): Promise<MapReturnType<T>> {
   let [web3OrEthersProvider] = args;
   let apiClass;

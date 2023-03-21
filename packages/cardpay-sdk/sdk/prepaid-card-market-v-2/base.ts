@@ -25,6 +25,9 @@ import ERC677ABI from '../../contracts/abi/erc-677';
 import { SuccessfulTransactionReceipt } from '../utils/successful-transaction-receipt';
 import { getAddress } from '../..';
 
+/**
+ * @group Cardpay
+ */
 export default class PrepaidCardMarketV2 {
   constructor(private layer2Web3: Web3, private layer2Signer?: Signer) {}
 

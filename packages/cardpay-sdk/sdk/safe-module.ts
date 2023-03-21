@@ -34,32 +34,53 @@ import BN from 'bn.js';
 import JsonRpcProvider from '../providers/json-rpc-provider';
 import { camelCase } from 'lodash';
 
+/**
+ * @hidden
+ */
 export interface EnableModule {
   moduleAddress: string;
 }
 
+/**
+ * @hidden
+ */
 export interface EnableModuleAndGuardResult extends EnableModule {
   metaGuardAddress: string;
 }
 
+/**
+ * @hidden
+ */
 export interface CreateSafeWithModuleResult {
   safeAddress: string;
   moduleAddress: string;
 }
+/**
+ * @hidden
+ */
 export interface CreateSafeWithModuleAndGuardResult extends CreateSafeWithModuleResult {
   metaGuardAddress: string;
 }
 
+/**
+ * @hidden
+ */
 export interface CreateSafeWithModuleTx {
   multiSendCallOnlyTx: Transaction;
   expectedSafeAddress: string;
   expectedModuleAddress: string;
 }
 
+/**
+ * @hidden
+ */
 export interface CreateSafeWithModuleAndGuardTx extends CreateSafeWithModuleTx {
   expectedMetaGuardAddress: string;
 }
 
+/**
+ * @hidden
+ */
 export interface ModuleDetails {
   owner: string;
   avatar: string;
@@ -67,15 +88,27 @@ export interface ModuleDetails {
 }
 
 type GasRange = Record<'slow' | 'standard' | 'fast', BigNumber>;
+/**
+ * @hidden
+ */
 export interface GasEstimationResult {
   gas: BigNumber;
   gasRangeInWei: GasRange;
   gasRangeInUSD: GasRange;
 }
 
+/**
+ * @hidden
+ */
 export const FEE_BASE_POW = new BN(18);
+/**
+ * @hidden
+ */
 export const FEE_BASE = new BN(10).pow(FEE_BASE_POW);
 
+/**
+ * @hidden
+ */
 export default abstract class SafeModule {
   public name: AddressKeys;
   public abstract safeSalt: string;
