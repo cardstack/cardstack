@@ -1352,6 +1352,16 @@ export default class ScheduledPaymentModule {
     };
     try {
       let signer = this.signer ? this.signer : this.ethersProvider.getSigner();
+      //Since the gas limit is defined,
+      //sendTransaction won't execute the estimateGas.
+      //So we can't capture the error before the transaction is sent.
+      //To prevent that, we need to manually call the estimateGas here.
+      await signer.estimateGas({
+        to: executeScheduledPaymentTx.to,
+        data: executeScheduledPaymentTx.data,
+        nonce: nonce?.toString(),
+      });
+
       let response = await signer.sendTransaction({
         to: executeScheduledPaymentTx.to,
         data: executeScheduledPaymentTx.data,
