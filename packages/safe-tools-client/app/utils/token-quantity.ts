@@ -19,9 +19,18 @@ export default class TokenQuantity {
 
   get decimalString() {
     const value = ethersUtils.formatUnits(this.count, this.decimals);
-    const formattedValue = parseFloat(value)
-      .toPrecision(SIGNIFICANT_DIGITS)
-      .replace(/\.?0+$/, '');
+    let formattedValue = parseFloat(value).toPrecision(SIGNIFICANT_DIGITS);
+    if (formattedValue.match(/e-\d/)) {
+      formattedValue = parseFloat(value)
+        .toFixed(12)
+        .replace(/\.?0+$/, '');
+    } else if (formattedValue.match(/e\+\d/)) {
+      formattedValue = parseFloat(value)
+        .toString()
+        .replace(/\.\d+$/, '');
+    } else {
+      formattedValue = formattedValue.replace(/\.?0+$/, '');
+    }
     return formattedValue;
   }
 
