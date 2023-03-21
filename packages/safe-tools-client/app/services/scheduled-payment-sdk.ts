@@ -21,6 +21,7 @@ import Service, { inject as service } from '@ember/service';
 import { TaskGenerator } from 'ember-concurrency';
 import { task } from 'ember-concurrency-decorators';
 import { BigNumber } from 'ethers';
+import { retry } from 'ts-retry-promise';
 
 const GAS_RANGE_NORMAL_MULTIPLIER = 2;
 const GAS_RANGE_HIGH_MULTIPLIER = 4;
@@ -105,39 +106,41 @@ export default class SchedulePaymentSDKService extends Service {
     token: TokenDetail,
     gasToken: TokenDetail
   ): Promise<ServiceGasEstimationResult> {
-    const scheduledPaymentModule = await this.getSchedulePaymentModule();
-
-    const gasEstimationResult = await scheduledPaymentModule.estimateGas(
-      scenario,
-      {
-        safeAddress: this.safes.currentSafe?.address,
-        tokenAddress: token.address,
-        gasTokenAddress: gasToken.address,
-        hubUrl: config.hubUrl,
-      }
-    );
-    const { gasRangeInWei } = gasEstimationResult;
-    const nativeToTokenRate = await getNativeToTokenRate(
-      this.wallet.ethersProvider,
-      gasToken.address
-    );
-    return {
-      gas: gasEstimationResult.gas,
-      gasRangeInGasTokenUnits: {
-        normal: applyRateToAmount(
-          nativeToTokenRate,
-          gasRangeInWei.standard.mul(GAS_RANGE_NORMAL_MULTIPLIER)
-        ),
-        high: applyRateToAmount(
-          nativeToTokenRate,
-          gasRangeInWei.standard.mul(GAS_RANGE_HIGH_MULTIPLIER)
-        ),
-        max: applyRateToAmount(
-          nativeToTokenRate,
-          gasRangeInWei.standard.mul(GAS_RANGE_MAX_MULTIPLIER)
-        ),
-      },
+    const getGasEstimation = async (): Promise<ServiceGasEstimationResult> => {
+      const scheduledPaymentModule = await this.getSchedulePaymentModule();
+      const gasEstimationResult = await scheduledPaymentModule.estimateGas(
+        scenario,
+        {
+          safeAddress: this.safes.currentSafe?.address,
+          tokenAddress: token.address,
+          gasTokenAddress: gasToken.address,
+          hubUrl: config.hubUrl,
+        }
+      );
+      const { gasRangeInWei } = gasEstimationResult;
+      const nativeToTokenRate = await getNativeToTokenRate(
+        this.wallet.ethersProvider,
+        gasToken.address
+      );
+      return {
+        gas: gasEstimationResult.gas,
+        gasRangeInGasTokenUnits: {
+          normal: applyRateToAmount(
+            nativeToTokenRate,
+            gasRangeInWei.standard.mul(GAS_RANGE_NORMAL_MULTIPLIER)
+          ),
+          high: applyRateToAmount(
+            nativeToTokenRate,
+            gasRangeInWei.standard.mul(GAS_RANGE_HIGH_MULTIPLIER)
+          ),
+          max: applyRateToAmount(
+            nativeToTokenRate,
+            gasRangeInWei.standard.mul(GAS_RANGE_MAX_MULTIPLIER)
+          ),
+        },
+      };
     };
+    return await retry(getGasEstimation, { retries: 10 });
   }
 
   @task *schedulePayment(
