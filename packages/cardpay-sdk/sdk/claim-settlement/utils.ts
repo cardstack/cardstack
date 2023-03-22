@@ -1,7 +1,6 @@
 import { BigNumber, utils, VoidSigner } from 'ethers';
 
 /**
- *
  * @group Utils
  * @category Rewards
  * @alpha
@@ -54,7 +53,7 @@ class SolidityStruct {
 }
 
 /**
- *
+ * Check: Specify when a claim is valid
  * @group Utils
  * @category Rewards
  * @alpha
@@ -87,6 +86,7 @@ class Action extends SolidityStruct {
 }
 
 /**
+ * Check: Specify address of caller
  * @group Utils
  * @category Rewards
  * @alpha
@@ -98,6 +98,7 @@ export class Address extends SolidityStruct {
 }
 
 /**
+ * Action: Transfer token to caller
  * @group Utils
  * @category Rewards
  * @alpha
@@ -125,7 +126,7 @@ export class TransferERC20ToCaller extends Action {
 }
 
 /**
- *
+ * Check: Specify nft that the caller must hold
  * @group Utils
  * @category Rewards
  * @alpha
@@ -144,7 +145,7 @@ export class NFTOwner extends SolidityStruct {
 }
 
 /**
- *
+ * Transfer token to an NFT holder/caller
  * @group Utils
  * @category Rewards
  * @alpha
@@ -163,7 +164,7 @@ export class TransferNFTToCaller extends Action {
 }
 
 /**
- *
+ * Class that represents the type of claim a user can execute
  * @group Utils
  * @category Rewards
  * @alpha
@@ -208,11 +209,18 @@ export class Claim {
     return utils.keccak256(utils.toUtf8Bytes(this.typeString()));
   }
 
+  /**
+   * Signs Claim data using EIP712
+   */
   sign(signer: VoidSigner) {
     const data = this.typedData();
     return signer._signTypedData(data.domain, data.types, data.message);
   }
 
+  /**
+   * @remarks this abi encoded data is eventually decoded at the smart contract level.
+   * We have to encode Claim because ethereum contract have limits to the number of arguments they can handle
+   */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   abiEncode(extraActionData?: { types: string[]; data: any[] }) {
     const abiCoder = new utils.AbiCoder();
@@ -235,7 +243,7 @@ export class Claim {
 }
 
 /**
- *
+ * Util function to get typed data as based on schema defined in the module contract
  * @group Utils
  * @category Rewards
  * @alpha

@@ -81,6 +81,9 @@ export default class ClaimSettlementModule extends SafeModule {
     return true;
   }
 
+  /**
+   * A validator is an 3rd-party address who can sign a Claim
+   */
   async addValidator(txnHash: string): Promise<SuccessfulTransactionReceipt>;
   async addValidator(
     moduleAddress: string,
@@ -198,6 +201,9 @@ export default class ClaimSettlementModule extends SafeModule {
     }
   }
 
+  /**
+   * Execute SignedClaim from an EOA
+   */
   async executeEOA(
     moduleAddress: string,
     signedClaim: SignedClaim,
@@ -220,6 +226,10 @@ export default class ClaimSettlementModule extends SafeModule {
     return waitUntilTransactionMined(this.ethersProvider, response.hash);
   }
 
+  /**
+   * Execute SignedClaim from a safe
+   * Caller can pay for gas with a gas token
+   */
   async executeSafe(txnHash: string): Promise<SuccessfulTransactionReceipt>;
   async executeSafe(
     moduleAddress: string,
@@ -303,6 +313,14 @@ export default class ClaimSettlementModule extends SafeModule {
     return await waitUntilTransactionMined(this.ethersProvider, txnHash);
   }
 
+  /**
+   * Registers an address by
+   * - claiming to own address
+   * - transferring to another address
+   * the holder of the nft will then be eventually to access rewards or other benefits
+   * @remarks The nft is unique to the address of the caller. If the caller transfers the nft to another address, the caller cannot register again
+   * Caller can pay for gas with a gas token
+   */
   async registerAccount(txnHash: string): Promise<SuccessfulTransactionReceipt>;
   async registerAccount(
     safeAddress: string,
@@ -382,6 +400,10 @@ export default class ClaimSettlementModule extends SafeModule {
     return await waitUntilTransactionMined(this.ethersProvider, txnHash);
   }
 
+  /**
+   * ERC721 token utility to list token ids that an owner has
+   * This only works with [OpenZeppelin's ERC721Enumerable](https://github.com/OpenZeppelin/openzeppelin-contracts/blob/v4.8.2/contracts/token/ERC721/extensions/ERC721Enumerable.sol)
+   */
   async tokenIds(ownerAddress: string) {
     let accountRegistrationAddress = await getAddress('accountRegistrationNft', this.ethersProvider);
     let accountRegistration = new Contract(accountRegistrationAddress, AccountRegistrationABI, this.ethersProvider);
