@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/ember-shared",
-  "version": "1.0.43",
+  "version": "1.0.44",
   "description": "Ember.js helpers used across Cardstack ember apps.",
   "keywords": [
     "ember-addon"
