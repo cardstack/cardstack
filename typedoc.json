@@ -32,5 +32,11 @@
     "./packages/cardpay-subgraph",
     "./scripts"
   ],
-  "sort": ["instance-first"]
+  "sort": ["instance-first"],
+  "visibilityFilters": {
+    "protected": false,
+    "private": false,
+    "inherited": false,
+    "external": false
+  }
 }
