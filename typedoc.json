@@ -5,7 +5,7 @@
   "entryPointStrategy": "packages",
   "readme": "./README.md",
   "includeVersion": true,
-  "plugin": ["typedoc-plugin-resolve-crossmodule-references"],
+  "plugin": ["typedoc-plugin-resolve-crossmodule-references", "typedoc-plugin-versions"],
   "exclude": [
     "./packages/hub",
     "./packages/cardpay-cli",

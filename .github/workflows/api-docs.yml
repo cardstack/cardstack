@@ -2,6 +2,10 @@ name: Deploy api docs
 
 on:
   workflow_dispatch:
+  workflow_run:
+    workflows: ["Manual publish"]
+    types:
+      - completed
 
 permissions:
   contents: write
@@ -20,7 +24,7 @@ jobs:
       - name: Install dependencies
         run: yarn --prefer-offline --frozen-lockfile
       - name: Run typedoc
-        run: yarn build:docs
+        run: jq ".version" lerna.json | xargs yarn typedoc . --rootPackageVersion
         shell: bash
         working-directory: .
       - name: Deploy 🚀

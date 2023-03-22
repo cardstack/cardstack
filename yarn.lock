@@ -32747,6 +32747,13 @@ typedoc-plugin-resolve-crossmodule-references@^0.3.3:
   resolved "https://registry.yarnpkg.com/typedoc-plugin-resolve-crossmodule-references/-/typedoc-plugin-resolve-crossmodule-references-0.3.3.tgz#812a6e7083f46031c69fe0021bb3913b10bd68cb"
   integrity sha512-ZWWBy2WR8z9a6iXYGlyB3KrpV+JDdZv1mndYU6Eh6mInrfMCrQJi3Y5K9ihMBfuaBGB//le1nEmQLgzU3IO+dw==
 
+"typedoc-plugin-versions@https://github.com/tintinthong/typedoc-plugin-versions.git#add-custom-root-package-version":
+  version "0.2.3"
+  resolved "https://github.com/tintinthong/typedoc-plugin-versions.git#43a5d8c4f4667b5b745705951017950de7832c6a"
+  dependencies:
+    fs-extra "^10.1.0"
+    semver "^7.3.7"
+
 typedoc@^0.23.26:
   version "0.23.28"
   resolved "https://registry.yarnpkg.com/typedoc/-/typedoc-0.23.28.tgz#3ce9c36ef1c273fa849d2dea18651855100d3ccd"
