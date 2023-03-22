@@ -426,8 +426,8 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
   });
 
   get isSufficientGasTokenBalance() {
-    let gasTokenBalance = this.safes.tokenBalances?.find(t => t.tokenAddress == this.selectedGasToken?.address);
-    if (this.requiredGasTokenToSchedulePayment.value && this.selectedGasToken && this.selectedGasToken.address === this.requiredGasTokenToSchedulePayment.value.address && gasTokenBalance) {
+    let gasTokenBalance = this.safes.tokenBalances?.find(t => t.tokenAddress?.toLowerCase() == this.selectedGasToken?.address?.toLowerCase());
+    if (this.requiredGasTokenToSchedulePayment.value && this.selectedGasToken && this.selectedGasToken.address.toLowerCase() === this.requiredGasTokenToSchedulePayment.value.address.toLowerCase() && gasTokenBalance) {
       return gasTokenBalance.balance.gte(this.requiredGasTokenToSchedulePayment.value.count);
     }
     return false;
