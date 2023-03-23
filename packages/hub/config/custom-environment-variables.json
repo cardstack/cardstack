@@ -78,7 +78,16 @@
     "apiKey": "CRYPTOCOMPARE_API_KEY"
   },
   "relay": {
-    "provisionerSecret": "PROVISIONER_SECRET"
+    "provisionerSecret": "PROVISIONER_SECRET",
+    "goerli": {
+      "aboutPageKey": "GOERLI_RELAYER_ABOUT_PAGE_SECRET"
+    },
+    "polygon": {
+      "aboutPageKey": "POLYGON_RELAYER_ABOUT_PAGE_SECRET"
+    },
+    "ethereum": {
+      "aboutPageKey": "ETHEREUM_RELAYER_ABOUT_PAGE_SECRET"
+    }
   },
   "cardDrop": {
     "sku": "CARD_DROP_SKU",
