@@ -3,7 +3,7 @@
 import BN from 'bn.js';
 import Web3 from 'web3';
 import { TransactionReceipt, Log } from 'web3-core';
-import { getConstant, ZERO_ADDRESS } from '../constants';
+import { getConstant } from '../constants';
 import { getSDK } from '../version-resolver';
 import { Signature } from './signing-utils';
 import PrepaidCardManagerABI from '../../contracts/abi/v0.9.0/prepaid-card-manager';
@@ -125,11 +125,6 @@ export interface GnosisExecTx extends RelayTransaction {
   safeTxHash: string;
   txHash: string;
   transactionHash: string;
-}
-
-export interface ExecTransactionOptions {
-  eip1271Data?: string;
-  refundReceiver?: string;
 }
 
 /**
@@ -300,7 +295,7 @@ export async function executeTransaction(
   estimate: Estimate,
   nonce: BN,
   signatures: any,
-  execTransactionOptions?: ExecTransactionOptions
+  eip1271Data?: string
 ): Promise<GnosisExecTx> {
   let relayServiceURL = await getConstant('relayServiceURL', web3OrEthersProvider);
   const url = `${relayServiceURL}/v1/safes/${from}/transactions/`;
@@ -322,8 +317,8 @@ export async function executeTransaction(
       nonce: nonce.toString(),
       signatures,
       gasToken: estimate.gasToken,
-      refundReceiver: execTransactionOptions?.refundReceiver ?? ZERO_ADDRESS,
-      eip1271Data: execTransactionOptions?.eip1271Data,
+      refundReceiver: estimate.refundReceiver,
+      eip1271Data,
     }),
   };
   let response = await fetch(url, options);

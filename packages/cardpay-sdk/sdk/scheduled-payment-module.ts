@@ -230,10 +230,8 @@ export default class ScheduledPaymentModule {
         estimate,
         nonce,
         from,
-        this.signer,
-        estimate.refundReceiver
-      ),
-      { refundReceiver: estimate.refundReceiver }
+        this.signer
+      )
     );
 
     if (typeof onTxnHash === 'function') {
@@ -696,10 +694,8 @@ export default class ScheduledPaymentModule {
         estimate,
         nonce,
         from,
-        this.signer,
-        estimate.refundReceiver
-      ),
-      { refundReceiver: estimate.refundReceiver }
+        this.signer
+      )
     );
 
     if (typeof onTxnHash === 'function') {
@@ -797,8 +793,7 @@ export default class ScheduledPaymentModule {
         estimate,
         nonce,
         from,
-        this.signer,
-        estimate.refundReceiver
+        this.signer
       )
     )[0];
 
@@ -839,8 +834,7 @@ export default class ScheduledPaymentModule {
         estimate,
         nonce,
         from,
-        this.signer,
-        estimate.refundReceiver
+        this.signer
       )
     )[0];
 
@@ -1009,8 +1003,7 @@ export default class ScheduledPaymentModule {
       Operation.CALL,
       estimate,
       nonce,
-      [signature],
-      { refundReceiver: estimate.refundReceiver }
+      [signature]
     );
 
     let txnHash = gnosisTxn.ethereumTx.txHash;
@@ -1275,8 +1268,7 @@ export default class ScheduledPaymentModule {
       Operation.CALL,
       estimate,
       nonce,
-      [signature],
-      { refundReceiver: estimate.refundReceiver }
+      [signature]
     );
 
     let txnHash = gnosisTxn.ethereumTx.txHash;

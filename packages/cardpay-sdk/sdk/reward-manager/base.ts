@@ -680,7 +680,7 @@ The owner of reward safe ${safeAddress} is ${rewardSafeOwner}, but the signer is
       estimate,
       nonce,
       fullSignature,
-      { eip1271Data }
+      eip1271Data
     );
     if (typeof onTxnHash === 'function') {
       await onTxnHash(gnosisTxn.ethereumTx.txHash);
@@ -858,7 +858,7 @@ The owner of reward safe ${safeAddress} is ${rewardSafeOwner}, but the signer is
       estimate,
       nonce,
       fullSignature,
-      { eip1271Data }
+      eip1271Data
     );
     if (typeof onTxnHash === 'function') {
       await onTxnHash(gnosisTxn.ethereumTx.txHash);
