@@ -395,19 +395,7 @@ export default class SchedulePaymentFormActionCardUI extends Component<Signature
       </Section>
       <ActionChin @state={{this.actionChinState}}>
         <:default as |ac|>
-            <ac.ActionButton
-              @disabled={{true}}
-              data-test-schedule-payment-form-submit-button
-              {{on 'click' @onSchedulePayment}}
-            >
-              Schedule Payment
-            </ac.ActionButton>
-
-            <span style="margin-left: 10px;">
-              Scheduling payments is currently disabled due to maintenance. It will be available again shortly.
-            </span>
-
-          {{!-- {{#if (and this.wallet.isConnected (not @isSafesEmpty))}}
+          {{#if (and this.wallet.isConnected (not @isSafesEmpty))}}
             <ac.ActionButton
               @disabled={{or (not @isValid) (not @isSufficientGasTokenBalance)}}
               data-test-schedule-payment-form-submit-button
@@ -481,7 +469,7 @@ export default class SchedulePaymentFormActionCardUI extends Component<Signature
                 Step 2 - Create a payments safe
               </div>
             </div>
-          {{/if}} --}}
+          {{/if}}
         </:default>
         <:inProgress as |ac|>
           <ac.ActionStatusArea @icon={{concat @walletProviderId "-logo" }} style={{cssVar status-icon-size="2.5rem"}}>
