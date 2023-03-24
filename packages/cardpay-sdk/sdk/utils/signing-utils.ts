@@ -72,7 +72,8 @@ export async function signSafeTx(
   estimate: Estimate,
   nonce: BN,
   from: string,
-  signer?: Signer
+  signer?: Signer,
+  refundReceiver?: string
 ): Promise<Signature[]> {
   let signatures = await signSafeTxAsRSV(
     web3OrEthersProvider,
@@ -84,7 +85,7 @@ export async function signSafeTx(
     estimate.dataGas,
     estimate.gasPrice,
     estimate.gasToken,
-    ZERO_ADDRESS,
+    refundReceiver ?? ZERO_ADDRESS,
     nonce,
     from,
     safeAddress,

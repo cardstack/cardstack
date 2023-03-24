@@ -127,6 +127,11 @@ export interface GnosisExecTx extends RelayTransaction {
   transactionHash: string;
 }
 
+export interface ExecTransactionOptions {
+  eip1271Data?: string;
+  refundReceiver?: string;
+}
+
 /**
  * @group Utils
  * @category Safe
@@ -295,7 +300,7 @@ export async function executeTransaction(
   estimate: Estimate,
   nonce: BN,
   signatures: any,
-  eip1271Data?: string
+  execTransactionOptions?: ExecTransactionOptions
 ): Promise<GnosisExecTx> {
   let relayServiceURL = await getConstant('relayServiceURL', web3OrEthersProvider);
   const url = `${relayServiceURL}/v1/safes/${from}/transactions/`;
@@ -317,8 +322,8 @@ export async function executeTransaction(
       nonce: nonce.toString(),
       signatures,
       gasToken: estimate.gasToken,
-      refundReceiver: ZERO_ADDRESS,
-      eip1271Data,
+      refundReceiver: execTransactionOptions?.refundReceiver ?? ZERO_ADDRESS,
+      eip1271Data: execTransactionOptions?.eip1271Data,
     }),
   };
   let response = await fetch(url, options);

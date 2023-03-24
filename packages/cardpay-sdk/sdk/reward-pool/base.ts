@@ -646,7 +646,7 @@ The reward program ${rewardProgramId} has balance equals ${fromWei(
       estimate,
       nonce,
       fullSignature,
-      eip1271Data
+      { eip1271Data }
     );
     if (typeof onTxnHash === 'function') {
       await onTxnHash(gnosisTxn.ethereumTx.txHash);
