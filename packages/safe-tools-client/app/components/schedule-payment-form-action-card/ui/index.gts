@@ -17,6 +17,7 @@ import { on } from '@ember/modifier';
 import { svgJar } from '@cardstack/boxel/utils/svg-jar';
 import { tracked } from '@glimmer/tracking';
 import eq from 'ember-truth-helpers/helpers/eq';
+import and from 'ember-truth-helpers/helpers/and';
 import not from 'ember-truth-helpers/helpers/not';
 import or from 'ember-truth-helpers/helpers/or';
 import set from 'ember-set-helper/helpers/set';
@@ -31,6 +32,7 @@ import formatUsd from '@cardstack/safe-tools-client/helpers/format-usd';
 import WalletService from '@cardstack/safe-tools-client/services/wallet';
 import { inject as service } from '@ember/service';
 import { MaxGasDescriptionsState } from "..";
+import FailureIcon from '@cardstack/safe-tools-client/components/icons/failure';
 import InfoIcon from '@cardstack/safe-tools-client/components/icons/info';
 import tokenToUsd from '@cardstack/safe-tools-client/helpers/token-to-usd';
 import { type CurrentFees } from '../fee-calculator';
@@ -395,19 +397,7 @@ export default class SchedulePaymentFormActionCardUI extends Component<Signature
       </Section>
       <ActionChin @state={{this.actionChinState}}>
         <:default as |ac|>
-            <ac.ActionButton
-              @disabled={{true}}
-              data-test-schedule-payment-form-submit-button
-              {{on 'click' @onSchedulePayment}}
-            >
-              Schedule Payment
-            </ac.ActionButton>
-
-            <span style="margin-left: 10px;">
-              Scheduling payments is currently disabled due to maintenance. It will be available again shortly.
-            </span>
-
-          {{!-- {{#if (and this.wallet.isConnected (not @isSafesEmpty))}}
+          {{#if (and this.wallet.isConnected (not @isSafesEmpty))}}
             <ac.ActionButton
               @disabled={{or (not @isValid) (not @isSufficientGasTokenBalance)}}
               data-test-schedule-payment-form-submit-button
@@ -481,7 +471,7 @@ export default class SchedulePaymentFormActionCardUI extends Component<Signature
                 Step 2 - Create a payments safe
               </div>
             </div>
-          {{/if}} --}}
+          {{/if}}
         </:default>
         <:inProgress as |ac|>
           <ac.ActionStatusArea @icon={{concat @walletProviderId "-logo" }} style={{cssVar status-icon-size="2.5rem"}}>
