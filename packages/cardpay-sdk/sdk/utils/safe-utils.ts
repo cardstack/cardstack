@@ -3,7 +3,7 @@
 import BN from 'bn.js';
 import Web3 from 'web3';
 import { TransactionReceipt, Log } from 'web3-core';
-import { getConstant, ZERO_ADDRESS } from '../constants';
+import { getConstant } from '../constants';
 import { getSDK } from '../version-resolver';
 import { Signature } from './signing-utils';
 import PrepaidCardManagerABI from '../../contracts/abi/v0.9.0/prepaid-card-manager';
@@ -317,7 +317,7 @@ export async function executeTransaction(
       nonce: nonce.toString(),
       signatures,
       gasToken: estimate.gasToken,
-      refundReceiver: ZERO_ADDRESS,
+      refundReceiver: estimate.refundReceiver,
       eip1271Data,
     }),
   };

@@ -5,7 +5,6 @@ import PrepaidCardManagerABI from '../../contracts/abi/v0.9.0/prepaid-card-manag
 import { AbiItem, padLeft, toHex, numberToHex, hexToBytes } from 'web3-utils';
 
 import { getAddress } from '../../contracts/addresses';
-import { ZERO_ADDRESS } from '../constants';
 
 import { isJsonRpcProvider, networkName } from './general-utils';
 import { networkIds } from '../constants';
@@ -84,7 +83,7 @@ export async function signSafeTx(
     estimate.dataGas,
     estimate.gasPrice,
     estimate.gasToken,
-    ZERO_ADDRESS,
+    estimate.refundReceiver,
     nonce,
     from,
     safeAddress,
