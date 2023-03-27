@@ -1,6 +1,6 @@
 import { Networkish, TokenDetail } from '@cardstack/cardpay-sdk';
 import { PrismaClient } from '@prisma/client';
-import { addHours, subDays } from 'date-fns';
+import { addHours, subDays, subHours } from 'date-fns';
 import shortUuid from 'short-uuid';
 import { nowUtc } from '../../utils/dates';
 import { calculateNextPayAt } from '../../utils/scheduled-payments';
@@ -373,6 +373,92 @@ describe('POST /api/scheduled-payments', async function () {
         let payAt = new Date(responsePayAt);
         let delta = Math.abs(payAt.getTime() - calculatedPayAt.getTime());
         expect(delta).to.be.lessThan(2000);
+      });
+  });
+
+  it('persists a recurring scheduled payment with payAt lower than recurringUntil', async function () {
+    let now = new Date();
+    let recurringUntil = subHours(now, 2);
+    let spHash = cryptoRandomString({ length: 10 });
+    let responsePayAt: string;
+
+    await request()
+      .post('/api/scheduled-payments')
+      .send({
+        data: {
+          type: 'scheduled-payments',
+          attributes: {
+            'sender-safe-address': '0xc0ffee254729296a45a3885639AC7E10F9d54979',
+            'module-address': '0x7E7d0B97D663e268bB403eb4d72f7C0C7650a6dd',
+            'token-address': '0xa455bbB2A81E09E0337c13326BBb302Cb37D7cf6',
+            'gas-token-address': '0x26F2319Fbb44772e0ED58fB7c99cf8da59e2b5BE',
+            amount: '100',
+            'payee-address': '0x821f3Ee0FbE6D1aCDAC160b5d120390Fb8D2e9d3',
+            'execution-gas-estimation': 100000,
+            'max-gas-price': '1000000000',
+            'fee-fixed-usd': 0.25,
+            'fee-percentage': 0.1,
+            salt: '54lt',
+            'pay-at': null,
+            'recurring-day-of-month': now.getDate(),
+            'recurring-until': recurringUntil.toISOString(),
+            'sp-hash': spHash,
+            'chain-id': 1,
+            userAddress: stubUserAddress,
+            'canceled-at': null,
+            'private-memo': 'A note about this payment',
+          },
+        },
+      })
+      .set('Accept', 'application/vnd.api+json')
+      .set('Authorization', 'Bearer abc123--def456--ghi789')
+      .set('Content-Type', 'application/vnd.api+json')
+      .expect(201)
+      .expect(function (res) {
+        res.body.data.id = 'id';
+        responsePayAt = res.body.data.attributes['pay-at'];
+        res.body.data.attributes['pay-at'] = null; // pay_at from the response could be a off by at least a second due to async nature of the test, so we check for the acceptable delta later in then()
+      })
+      .expect({
+        data: {
+          id: 'id',
+          type: 'scheduled-payments',
+          attributes: {
+            'sender-safe-address': '0xc0ffee254729296a45a3885639AC7E10F9d54979',
+            'module-address': '0x7E7d0B97D663e268bB403eb4d72f7C0C7650a6dd',
+            'token-address': '0xa455bbB2A81E09E0337c13326BBb302Cb37D7cf6',
+            'gas-token-address': '0x26F2319Fbb44772e0ED58fB7c99cf8da59e2b5BE',
+            amount: '100',
+            'payee-address': '0x821f3Ee0FbE6D1aCDAC160b5d120390Fb8D2e9d3',
+            'execution-gas-estimation': 100000,
+            'max-gas-price': '1000000000',
+            'fee-fixed-usd': '0.25',
+            'fee-percentage': '0.1',
+            salt: '54lt',
+            'pay-at': null, // manipulated in response - we check it in then()
+            'sp-hash': spHash,
+            'chain-id': 1,
+            'user-address': stubUserAddress,
+            'creation-transaction-hash': null,
+            'creation-block-number': null,
+            'creation-transaction-error': null,
+            'cancelation-transaction-hash': null,
+            'cancelation-block-number': null,
+            'recurring-day-of-month': now.getDate(),
+            'recurring-until': recurringUntil.toISOString(),
+            'canceled-at': null,
+            'last-scheduled-payment-attempt-id': null,
+            'next-retry-attempt-at': null,
+            'retries-left': null,
+            'scheduled-payment-attempts-in-last-payment-cycle-count': 0,
+            'private-memo': 'A note about this payment',
+          },
+        },
+      })
+      .expect('Content-Type', 'application/vnd.api+json')
+      .then(() => {
+        let payAt = new Date(responsePayAt);
+        expect(payAt).to.be.lessThan(recurringUntil);
       });
   });
 });

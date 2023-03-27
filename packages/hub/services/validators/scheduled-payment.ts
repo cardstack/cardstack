@@ -95,6 +95,10 @@ export default class ScheduledPaymentValidator {
       if (isAfter(scheduledPayment.payAt, aYearFromNow)) {
         errors['payAt'].push(`payment date cannot be further than 1 year in the future`);
       }
+
+      if (scheduledPayment.recurringUntil && isAfter(scheduledPayment.payAt, scheduledPayment.recurringUntil)) {
+        errors['payAt'].push(`payment date cannot be more than recurring payment end date`);
+      }
     }
 
     if (scheduledPayment.recurringUntil) {

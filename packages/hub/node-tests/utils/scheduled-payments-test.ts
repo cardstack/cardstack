@@ -1,3 +1,4 @@
+import { subHours } from 'date-fns';
 import { calculateNextPayAt } from '../../utils/scheduled-payments';
 
 describe('ScheduledPaymentUtils', function () {
@@ -27,6 +28,14 @@ describe('ScheduledPaymentUtils', function () {
     let nextPayAt = calculateNextPayAt(prevPayAt, recurringDay);
 
     expect(nextPayAt.toISOString()).to.equal('2022-03-05T00:00:00.000Z');
+  });
+
+  it('calculates next pay at when recurring until is lower than created date', function () {
+    let createdDate = new Date(Date.parse('2022-02-05T00:00:00.000Z'));
+    let recurringUntil = subHours(createdDate, 1);
+    let nextPayAt = calculateNextPayAt(createdDate, recurringUntil.getDate(), recurringUntil);
+
+    expect(nextPayAt).to.lte(recurringUntil);
   });
 
   it('throws an error when recurring day is not in the range of 1-31', function () {
