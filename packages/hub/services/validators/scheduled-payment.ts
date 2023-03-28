@@ -97,7 +97,7 @@ export default class ScheduledPaymentValidator {
       }
 
       if (scheduledPayment.recurringUntil && isAfter(scheduledPayment.payAt, scheduledPayment.recurringUntil)) {
-        errors['payAt'].push(`payment date cannot be more than recurring payment end date`);
+        errors['payAt'].push(`payment date cannot be later than recurring payment end date`);
       }
     }
 
