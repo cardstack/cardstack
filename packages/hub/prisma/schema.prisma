@@ -396,6 +396,36 @@ model RewardProof {
   @@map("reward_proofs")
 }
 
+model Claim {
+  id                    String @id @db.Uuid
+  chainId               String @map("chain_id")
+  moduleAddress         String @map("module_address")
+  typeHash              String @map("type_hash")
+  stateCheckStructName  String @map("state_check_struct_name")
+  stateCheckTypeHash    String @map("state_check_type_hash")
+  stateCheckData        Json   @map("state_check_data")
+  callerCheckStructName String @map("caller_check_struct_name")
+  callerCheckTypeHash   String @map("caller_check_type_hash")
+  callerCheckData       Json   @map("caller_check_data")
+  actionStructName      String @map("action_struct_name")
+  actionTypeHash        String @map("action_type_hash")
+  actionData            Json   @map("action_data")
+
+  @@index([callerCheckTypeHash], map: "claims_caller_check_type_hash_index")
+  @@map("claims")
+}
+
+model SignedClaim {
+  id        String @id @db.Uuid
+  claimId   String @map("claim_id") @db.Uuid
+  signature String
+  encoded   String
+  validator String
+
+  @@index([claimId], map: "signed_claims_claim_id_index")
+  @@map("signed_claims")
+}
+
 enum DiscordBotsStatusEnum {
   connecting
   connected
