@@ -88,6 +88,15 @@ module.exports = {
   },
   relay: {
     provisionerSecret: null,
+    goerli: {
+      aboutPageKey: null,
+    },
+    polygon: {
+      aboutPageKey: null,
+    },
+    ethereum: {
+      aboutPageKey: null,
+    },
   },
   web3: {
     layer1Network: 'kovan',
