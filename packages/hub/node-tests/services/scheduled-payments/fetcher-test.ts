@@ -202,7 +202,8 @@ describe('fetching scheduled payments that are due', function () {
       await createScheduledPayment({
         recurringDayOfMonth: now.getDate(),
         payAt: now,
-        recurringUntil: subDays(now, 1),
+        recurringUntil: subDays(now, 2),
+        validForDays: 1,
       });
 
       expect(await subject.fetchScheduledPayments(chainId)).to.be.empty;
