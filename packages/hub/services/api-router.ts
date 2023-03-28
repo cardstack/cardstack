@@ -53,6 +53,7 @@ export default class APIRouter {
   gasStationRoute = inject('gas-station-route', { as: 'gasStationRoute' });
   gasEstimationRoute = inject('gas-estimation-route', { as: 'gasEstimationRoute' });
   rewardProofsRoute = inject('reward-proofs-route', { as: 'rewardProofsRoute' });
+  claimsRoute = inject('claims-route', { as: 'claimsRoute' });
 
   routes() {
     let {
@@ -81,6 +82,7 @@ export default class APIRouter {
       gasStationRoute,
       gasEstimationRoute,
       rewardProofsRoute,
+      claimsRoute,
     } = this;
     let apiSubrouter = new Router();
     apiSubrouter.get('/boom', boomRoute.get);
@@ -159,6 +161,9 @@ export default class APIRouter {
     apiSubrouter.get('/gas-station/:chain_id', gasStationRoute.get);
     apiSubrouter.post('/gas-estimation', parseBody, gasEstimationRoute.estimate);
     apiSubrouter.get('/rewards/proofs/:payee', rewardProofsRoute.get);
+    apiSubrouter.get('/claims', claimsRoute.get);
+    apiSubrouter.post('/claims', claimsRoute.post);
+    apiSubrouter.post('/claims/:claim_id/sign', claimsRoute.postSign);
     apiSubrouter.all('/(.*)', notFound);
 
     let apiRouter = new Router();
