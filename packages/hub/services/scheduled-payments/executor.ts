@@ -24,12 +24,12 @@ export default class ScheduledPaymentsExecutorService {
   clock = inject('clock', { as: 'clock' });
   gasStation = inject('gas-station-service', { as: 'gasStation' });
 
-  async getCurrentGasPrice(provider: JsonRpcProvider, scheduledPayment: ScheduledPayment) {
-    let gasPrices = await this.gasStation.getGasPriceByChainId(scheduledPayment.chainId);
-    let nativeToTokenRate = await getNativeToTokenRate(provider, scheduledPayment.gasTokenAddress);
+  async getCurrentGasPrice(provider: JsonRpcProvider, gasTokenAddress: string) {
+    let gasPrices = await this.gasStation.getGasPriceByChainId(provider.network.chainId);
+    let nativeToTokenRate = await getNativeToTokenRate(provider, gasTokenAddress);
     let fastGasPriceInGasToken = applyRateToAmount(nativeToTokenRate, BigNumber.from(gasPrices.fast));
 
-    // Use fast gas price, if not transaction could be stuck
+    // Use fast gas price for better chances of getting the transaction accepted
     return {
       gasPrice: gasPrices.fast,
       gasPriceInGasToken: fastGasPriceInGasToken.toString(),
@@ -97,6 +97,13 @@ export default class ScheduledPaymentsExecutorService {
       }
     }
 
+    let currentGasPrice = await this.getCurrentGasPrice(provider, scheduledPayment.gasTokenAddress);
+
+    if (!BigNumber.from(currentGasPrice.gasPriceInGasToken).gt(BigNumber.from('0'))) {
+      // Otherwise the crank will execute transactions for free (0 fee will be reimbursed)
+      throw new Error('Gas price in gas token should be greater than 0');
+    }
+
     // Now that we know there is no payment attempt in progress, and that the payment is not too recent, we can create a new payment attempt
     let paymentAttempt = await prisma.scheduledPaymentAttempt.create({
       data: {
@@ -104,7 +111,7 @@ export default class ScheduledPaymentsExecutorService {
         scheduledPaymentId: scheduledPayment.id,
         status: 'inProgress',
         startedAt: this.clock.utcNow(),
-        executionGasPrice: '0',
+        executionGasPrice: currentGasPrice.gasPriceInGasToken,
       },
     });
 
@@ -142,15 +149,8 @@ export default class ScheduledPaymentsExecutorService {
       recurringDayOfMonth,
       recurringUntil,
     } = scheduledPayment;
-    try {
-      let currentGasPrice = await this.getCurrentGasPrice(provider, scheduledPayment);
-      paymentAttempt = await prisma.scheduledPaymentAttempt.update({
-        where: { id: paymentAttempt.id },
-        data: {
-          executionGasPrice: currentGasPrice.gasPriceInGasToken,
-        },
-      });
 
+    try {
       let params = {
         moduleAddress,
         tokenAddress,
