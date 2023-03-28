@@ -98,4 +98,26 @@ describe.only('applyRateToAmount', () => {
       .expect(applyRateToAmount(tokenPairRate, ten.pow(tokenPairRate.tokenOutDecimals).mul('2'), true).toString())
       .to.eq(ten.pow(tokenPairRate.tokenInDecimals).mul('2').div('1000').toString());
   });
+
+  it('applies rate for two tokens with different decimals when conversion result is too low for the smallest unit', () => {
+    // We are converting amount of WMATIC to USDC using the rate of 1.04902.
+    // This means 1 WMATIC is worth 1.04902 USDC.
+    let pairRate = {
+      rate: FixedNumber.from('1.04902'),
+      tokenInAddress: '0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270', // WMATIC
+      tokenInDecimals: 18,
+      tokenOutAddress: '0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174', // USDC
+      tokenOutDecimals: 6,
+    };
+
+    let amount = BigNumber.from('1768028730'); // 0.000000001768029 WMATIC
+
+    // Using the rate of 1.04902, we can calculate the amount of USDC that 0.000000001768029 WMATIC is worth.
+    // We multiply the rate and the amount of WMATIC, and the result is 0.000000001854698 USDC.
+    // To calculate the smallest unit representation using 6 decimals, we multiply the result by 10^6.
+    // This comes to 0.001854698 in smallest units of USDC but this is below the minimum amount of the token in smallest units, which is 1.
+    // We want to round this up to 1 in smallest units. With this test we want to avoid the common pitfall of
+    // BigNumber divisions in conversion functions where the conversion result would be 0 in this case
+    chai.expect(applyRateToAmount(pairRate, amount).toString()).to.eq('1');
+  });
 });
