@@ -6,7 +6,7 @@ import { BigNumber, utils, VoidSigner } from 'ethers';
  * @category Rewards
  * @alpha
  */
-class SolidityStruct {
+export class SolidityStruct {
   properties: { name: string; type: string }[];
   values: any[]; // eslint-disable-line @typescript-eslint/no-explicit-any
   structName: string;
@@ -72,7 +72,12 @@ export class TimeRangeSeconds extends SolidityStruct {
   }
 }
 
-class Action extends SolidityStruct {
+export interface TimeRangeSecondsMap {
+  validFromTime: string;
+  validToTime: string;
+}
+
+export class Action extends SolidityStruct {
   constructor(structName: string, properties: { name: string; type: string }[], values: any[]) {
     super(structName, properties, values);
   }
@@ -90,6 +95,7 @@ class Action extends SolidityStruct {
  * @group Utils
  * @category Rewards
  * @alpha
+ * @see {@link NFTOwner}
  */
 export class Address extends SolidityStruct {
   constructor(caller: string) {
@@ -97,10 +103,15 @@ export class Address extends SolidityStruct {
   }
 }
 
+export interface AddressMap {
+  caller: string;
+}
+
 /**
  * @group Utils
  * @category Rewards
  * @alpha
+ * @see {@link TransferNFTToCaller}
  */
 export class TransferERC20ToCaller extends Action {
   amount: BigNumber;
@@ -124,11 +135,17 @@ export class TransferERC20ToCaller extends Action {
   }
 }
 
+export interface TransferERC20ToCallerMap {
+  token: string;
+  amount: string;
+}
+
 /**
  *
  * @group Utils
  * @category Rewards
  * @alpha
+ * @see {@link Address}
  */
 export class NFTOwner extends SolidityStruct {
   constructor(nftContract: string, tokenId: BigNumber) {
@@ -143,11 +160,17 @@ export class NFTOwner extends SolidityStruct {
   }
 }
 
+export interface NFTOwnerMap {
+  nftContract: string;
+  tokenId: string;
+}
+
 /**
  *
  * @group Utils
  * @category Rewards
  * @alpha
+ * @see {@link TransferERC20ToCaller}
  */
 export class TransferNFTToCaller extends Action {
   constructor(token: string, tokenId: BigNumber) {
@@ -160,6 +183,11 @@ export class TransferNFTToCaller extends Action {
       [token, tokenId]
     );
   }
+}
+
+export interface TransferNFTToCallerMap {
+  token: string;
+  tokenId: string;
 }
 
 /**

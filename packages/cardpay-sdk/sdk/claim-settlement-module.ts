@@ -3,7 +3,13 @@ import SafeModule from './safe-module';
 import { BigNumber, Contract, Signer, VoidSigner, utils } from 'ethers';
 import ClaimSettlementABI from '../contracts/abi/modules/claim-settlement-module';
 import { SetupArgs } from './utils/module-utils';
-import { Address, Claim, TimeRangeSeconds, TransferERC20ToCaller } from './claim-settlement/utils';
+import {
+  Address,
+  Claim,
+  TimeRangeSeconds,
+  TransferERC20ToCaller,
+  TransferERC20ToCallerMap,
+} from './claim-settlement/utils';
 import ERC20ABI from '../contracts/abi/erc-20';
 import { executeTransaction, gasEstimate, getNextNonceFromEstimate, Operation } from './utils/safe-utils';
 import { SuccessfulTransactionReceipt } from './utils/successful-transaction-receipt';
@@ -25,7 +31,6 @@ export interface SignedClaim {
   signature: string;
   encoded: string;
 }
-
 /**
  * @group Champer
  * @category Rewards
@@ -64,10 +69,10 @@ export default class ClaimSettlementModule extends SafeModule {
     return module.used(claim.id);
   }
 
-  async hasBalance(claim: Claim, moduleAddress: string): Promise<any> {
+  async hasBalance(claim: Claim, moduleAddress: string): Promise<boolean> {
     let { avatar: avatarAddress } = await this.getDetails(moduleAddress);
-    let action = claim.action.asMapping();
     if (claim.action.structName == 'TransferERC20ToCaller') {
+      let action = claim.action.asMapping() as TransferERC20ToCallerMap;
       let token = new Contract(action.token, ERC20ABI, this.ethersProvider);
       let balance = await token.callStatic.balanceOf(avatarAddress);
       if (balance.lt(action.amount)) {
