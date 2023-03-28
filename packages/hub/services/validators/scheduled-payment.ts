@@ -3,7 +3,7 @@ import { ScheduledPayment } from '@prisma/client';
 import { startCase } from 'lodash';
 import { convertChainIdToName, isSupportedChain, SchedulerCapableNetworks } from '@cardstack/cardpay-sdk';
 import { inject } from '@cardstack/di';
-import { addMonths, isAfter } from 'date-fns';
+import { addMonths, isAfter, isBefore } from 'date-fns';
 const { isAddress } = Web3.utils;
 
 type ScheduledPaymentAttribute =
@@ -104,6 +104,10 @@ export default class ScheduledPaymentValidator {
     if (scheduledPayment.recurringUntil) {
       if (isAfter(scheduledPayment.recurringUntil, aYearFromNow)) {
         errors['recurringUntil'].push(`recurring payment end date cannot be further than 1 year in the future`);
+      }
+
+      if (isBefore(scheduledPayment.recurringUntil, new Date())) {
+        errors['recurringUntil'].push(`recurring payment end date must be in the future`);
       }
     }
 
