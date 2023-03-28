@@ -81,6 +81,7 @@ export {
   TransferNFTToCaller,
   Claim,
   getTypedData,
+  TimeRangeSeconds,
 } from './sdk/claim-settlement/utils';
 export { default as ClaimSettlementModule } from './sdk/claim-settlement-module';
 
