@@ -183,16 +183,8 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
   }
 
   get minMonthlyUntil() {
-    let minMonthlyUntil;
     let now = new Date();
-
-    if (this.paymentDayOfMonth && this.paymentDayOfMonth < now.getDate()) {
-      minMonthlyUntil = new Date(now.getFullYear(), now.getMonth() + 1, this.paymentDayOfMonth);
-    } else {
-      minMonthlyUntil = now;
-    }
-
-    return minMonthlyUntil;
+    return new Date(now.getFullYear(), now.getMonth() + 1, this.paymentDayOfMonth);
   }
 
   get maxMonthlyUntil() {
