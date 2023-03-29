@@ -1,3 +1,4 @@
+import { startOfDay } from 'date-fns';
 import { convertDateToUTC } from './dates';
 
 // This function will return the next payment date based on the frequency.
@@ -19,6 +20,7 @@ export function calculateNextPayAt(fromDate: Date, recurringDay: number, recurri
     nextPayAtUtc.setUTCMonth(nextPayAtUtc.getUTCMonth() + 1);
     nextPayAtUtc.setUTCDate(Math.min(recurringDay, daysInMonth(nextPayAtUtc)));
   }
+  nextPayAtUtc = startOfDay(nextPayAtUtc);
 
   let recurringUntilUtc = convertDateToUTC(recurringUntil);
   if (nextPayAtUtc <= recurringUntilUtc) {
