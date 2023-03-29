@@ -127,10 +127,6 @@ export default class ScheduledPaymentsRoute {
       privateMemo: attrs['private-memo'],
     } as unknown as ScheduledPayment;
 
-    if (params.recurringDayOfMonth != null && params.recurringUntil != null) {
-      params.payAt = calculateNextPayAt(new Date(), params.recurringDayOfMonth, params.recurringUntil);
-    }
-
     let errors = await this.scheduledPaymentValidator.validate(params);
     let hasErrors = Object.values(errors).flatMap((i) => i).length > 0;
     if (hasErrors) {
@@ -139,6 +135,11 @@ export default class ScheduledPaymentsRoute {
         errors: serializeErrors(errors),
       };
     } else {
+      if (params.recurringDayOfMonth != null && params.recurringUntil != null) {
+        params.payAt = calculateNextPayAt(new Date(), params.recurringDayOfMonth, params.recurringUntil);
+        if (!params.payAt) throw new Error(`cannot calculate next payment date`);
+      }
+
       let prisma = await this.prismaManager.getClient();
 
       let scheduledPayment = await prisma.scheduledPayment.create({

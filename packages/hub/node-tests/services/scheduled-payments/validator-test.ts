@@ -64,15 +64,15 @@ describe('ScheduledPaymentValidator', function () {
       executionGasEstimation: ['execution gas estimation is required'],
       maxGasPrice: ['max gas price is required'],
       feeFixedUsd: ['fee fixed usd is required'],
-      payAt: ['pay at is required'],
+      payAt: ['pay at is required for one-time payment'],
       feePercentage: ['fee percentage is required'],
       gasTokenAddress: ['gas token address is required'],
       salt: ['salt is required'],
       spHash: ['sp hash is required'],
       chainId: ['chain id is required'],
       userAddress: ['user address is required'],
-      recurringDayOfMonth: [],
-      recurringUntil: [],
+      recurringDayOfMonth: ['recurring day of month is required for recurring payment'],
+      recurringUntil: ['recurring until is required for recurring payment'],
       validForDays: [],
     });
   });
@@ -188,6 +188,7 @@ describe('ScheduledPaymentValidator', function () {
 
     const scheduledPaymentWithValidRecurringUntil: Partial<ScheduledPayment> = {
       chainId: 1, //Mainnet
+      recurringDayOfMonth: validDate.getDate(),
       recurringUntil: validDate,
     };
     let errors = await subject.validate(scheduledPaymentWithValidRecurringUntil);
@@ -195,6 +196,7 @@ describe('ScheduledPaymentValidator', function () {
 
     const scheduledPaymentWithInvalidRecuringUntil: Partial<ScheduledPayment> = {
       chainId: 1, //Mainnet
+      recurringDayOfMonth: invalidDate.getDate(),
       recurringUntil: invalidDate,
     };
 

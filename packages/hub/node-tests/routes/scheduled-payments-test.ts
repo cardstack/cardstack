@@ -181,9 +181,25 @@ describe('POST /api/scheduled-payments', async function () {
             title: 'Invalid attribute',
           },
           {
-            detail: 'pay at is required',
+            detail: 'pay at is required for one-time payment',
             source: {
               pointer: '/data/attributes/pay-at',
+            },
+            status: '422',
+            title: 'Invalid attribute',
+          },
+          {
+            detail: 'recurring day of month is required for recurring payment',
+            source: {
+              pointer: '/data/attributes/recurring-day-of-month',
+            },
+            status: '422',
+            title: 'Invalid attribute',
+          },
+          {
+            detail: 'recurring until is required for recurring payment',
+            source: {
+              pointer: '/data/attributes/recurring-until',
             },
             status: '422',
             title: 'Invalid attribute',
@@ -417,14 +433,6 @@ describe('POST /api/scheduled-payments', async function () {
       .expect(422)
       .expect({
         errors: [
-          {
-            detail: 'pay at is required',
-            source: {
-              pointer: '/data/attributes/pay-at',
-            },
-            status: '422',
-            title: 'Invalid attribute',
-          },
           {
             detail: 'recurring payment end date must be in the future',
             source: {

@@ -62,7 +62,6 @@ export default class ScheduledPaymentValidator {
       'executionGasEstimation',
       'maxGasPrice',
       'feeFixedUsd',
-      'payAt',
       'feePercentage',
       'salt',
       'spHash',
@@ -75,6 +74,12 @@ export default class ScheduledPaymentValidator {
       if (scheduledPayment[attribute] == null) {
         errors[attribute].push(`${startCase(attribute).toLowerCase()} is required`);
       }
+    }
+
+    if (!scheduledPayment.payAt && (!scheduledPayment.recurringDayOfMonth || !scheduledPayment.recurringUntil)) {
+      errors['payAt'].push(`pay at is required for one-time payment`);
+      errors['recurringDayOfMonth'].push(`recurring day of month is required for recurring payment`);
+      errors['recurringUntil'].push(`recurring until is required for recurring payment`);
     }
 
     let addressAttributes: ScheduledPaymentAttribute[] = [
