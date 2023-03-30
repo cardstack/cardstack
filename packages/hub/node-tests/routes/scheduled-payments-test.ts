@@ -1,6 +1,7 @@
 import { Networkish, TokenDetail } from '@cardstack/cardpay-sdk';
 import { PrismaClient } from '@prisma/client';
-import { addHours, subDays } from 'date-fns';
+import { addHours, addMonths, format, subDays, subHours } from 'date-fns';
+import { utcToZonedTime } from 'date-fns-tz';
 import shortUuid from 'short-uuid';
 import { nowUtc } from '../../utils/dates';
 import { calculateNextPayAt } from '../../utils/scheduled-payments';
@@ -180,9 +181,28 @@ describe('POST /api/scheduled-payments', async function () {
             title: 'Invalid attribute',
           },
           {
-            detail: 'pay at is required',
+            detail:
+              'you must either set pay at for one time payment, or both recurring day of month and recurring until for recurring payments',
             source: {
               pointer: '/data/attributes/pay-at',
+            },
+            status: '422',
+            title: 'Invalid attribute',
+          },
+          {
+            detail:
+              'you must either set pay at for one time payment, or both recurring day of month and recurring until for recurring payments',
+            source: {
+              pointer: '/data/attributes/recurring-day-of-month',
+            },
+            status: '422',
+            title: 'Invalid attribute',
+          },
+          {
+            detail:
+              'you must either set pay at for one time payment, or both recurring day of month and recurring until for recurring payments',
+            source: {
+              pointer: '/data/attributes/recurring-until',
             },
             status: '422',
             title: 'Invalid attribute',
@@ -291,7 +311,8 @@ describe('POST /api/scheduled-payments', async function () {
   });
 
   it('persists a recurring scheduled payment', async function () {
-    let calculatedPayAt = calculateNextPayAt(new Date(), 1);
+    let now = new Date();
+    let calculatedPayAt = calculateNextPayAt(now, 1, addMonths(now, 5));
     let spHash = cryptoRandomString({ length: 10 });
     let responsePayAt: string;
 
@@ -314,7 +335,7 @@ describe('POST /api/scheduled-payments', async function () {
             salt: '54lt',
             'pay-at': null,
             'recurring-day-of-month': 1,
-            'recurring-until': '2022-12-31T00:00:00.000Z',
+            'recurring-until': addMonths(now, 5).toUTCString(),
             'sp-hash': spHash,
             'chain-id': 1,
             userAddress: stubUserAddress,
@@ -358,7 +379,7 @@ describe('POST /api/scheduled-payments', async function () {
             'cancelation-transaction-hash': null,
             'cancelation-block-number': null,
             'recurring-day-of-month': 1,
-            'recurring-until': '2022-12-31T00:00:00.000Z',
+            'recurring-until': format(utcToZonedTime(addMonths(now, 5), 'UTC'), "yyyy-MM-dd'T'HH:mm:ss'.000Z'"),
             'canceled-at': null,
             'last-scheduled-payment-attempt-id': null,
             'next-retry-attempt-at': null,
@@ -371,8 +392,67 @@ describe('POST /api/scheduled-payments', async function () {
       .expect('Content-Type', 'application/vnd.api+json')
       .then(() => {
         let payAt = new Date(responsePayAt);
-        let delta = Math.abs(payAt.getTime() - calculatedPayAt.getTime());
+        let delta = Math.abs(payAt.getTime() - (calculatedPayAt?.getTime() ?? 0));
         expect(delta).to.be.lessThan(2000);
+      });
+  });
+
+  it('throws errors if recurring until is before date now', async function () {
+    let now = new Date();
+    let recurringUntil = subHours(now, 2);
+    let spHash = cryptoRandomString({ length: 10 });
+
+    await request()
+      .post('/api/scheduled-payments')
+      .send({
+        data: {
+          type: 'scheduled-payments',
+          attributes: {
+            'sender-safe-address': '0xc0ffee254729296a45a3885639AC7E10F9d54979',
+            'module-address': '0x7E7d0B97D663e268bB403eb4d72f7C0C7650a6dd',
+            'token-address': '0xa455bbB2A81E09E0337c13326BBb302Cb37D7cf6',
+            'gas-token-address': '0x26F2319Fbb44772e0ED58fB7c99cf8da59e2b5BE',
+            amount: '100',
+            'payee-address': '0x821f3Ee0FbE6D1aCDAC160b5d120390Fb8D2e9d3',
+            'execution-gas-estimation': 100000,
+            'max-gas-price': '1000000000',
+            'fee-fixed-usd': 0.25,
+            'fee-percentage': 0.1,
+            salt: '54lt',
+            'pay-at': null,
+            'recurring-day-of-month': now.getDate(),
+            'recurring-until': recurringUntil.toUTCString(),
+            'sp-hash': spHash,
+            'chain-id': 1,
+            userAddress: stubUserAddress,
+            'canceled-at': null,
+            'private-memo': 'A note about this payment',
+          },
+        },
+      })
+      .set('Accept', 'application/vnd.api+json')
+      .set('Authorization', 'Bearer abc123--def456--ghi789')
+      .set('Content-Type', 'application/vnd.api+json')
+      .expect(422)
+      .expect({
+        errors: [
+          {
+            detail: 'must be later than the recurring date',
+            source: {
+              pointer: '/data/attributes/recurring-until',
+            },
+            status: '422',
+            title: 'Invalid attribute',
+          },
+          {
+            status: '422',
+            source: {
+              pointer: '/data/attributes/recurring-until',
+            },
+            title: 'Invalid attribute',
+            detail: 'recurring payment end date must be in the future',
+          },
+        ],
       });
   });
 });

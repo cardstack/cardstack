@@ -68,6 +68,7 @@
     "crypto-random-string": "^4.0.0",
     "dag-map": "^2.0.2",
     "date-fns": "^2.23.0",
+    "date-fns-tz": "^2.0.0",
     "did-resolver": "^3.1.0",
     "dotenv": "^10.0.0",
     "eth-sig-util": "^3.0.1",

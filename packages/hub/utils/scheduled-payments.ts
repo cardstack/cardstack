@@ -1,9 +1,11 @@
+import { startOfDay } from 'date-fns';
 import { convertDateToUTC } from './dates';
 
 // This function will return the next payment date based on the frequency.
 // fromDate will be either the current date when a recurring scheduled is created,
 // or the date of the last payment.
-export function calculateNextPayAt(fromDate: Date, recurringDay: number) {
+// When a recurring scheduled is created the recurringUntil parameter must be not undefined.
+export function calculateNextPayAt(fromDate: Date, recurringDay: number, recurringUntil: Date) {
   if (recurringDay < 1 || recurringDay > 31) {
     throw new Error('Recurring day must be in the range of 1-31');
   }
@@ -18,8 +20,14 @@ export function calculateNextPayAt(fromDate: Date, recurringDay: number) {
     nextPayAtUtc.setUTCMonth(nextPayAtUtc.getUTCMonth() + 1);
     nextPayAtUtc.setUTCDate(Math.min(recurringDay, daysInMonth(nextPayAtUtc)));
   }
+  nextPayAtUtc = startOfDay(nextPayAtUtc);
 
-  return nextPayAtUtc;
+  let recurringUntilUtc = convertDateToUTC(recurringUntil);
+  if (nextPayAtUtc <= recurringUntilUtc) {
+    return nextPayAtUtc;
+  } else {
+    return null; // Recurring payment expired, there is no next pay date
+  }
 }
 
 function daysInMonth(date: Date) {

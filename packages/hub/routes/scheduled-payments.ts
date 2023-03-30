@@ -127,8 +127,8 @@ export default class ScheduledPaymentsRoute {
       privateMemo: attrs['private-memo'],
     } as unknown as ScheduledPayment;
 
-    if (params.recurringDayOfMonth != null) {
-      params.payAt = calculateNextPayAt(new Date(), params.recurringDayOfMonth);
+    if (params.recurringDayOfMonth != null && params.recurringUntil != null) {
+      params.payAt = calculateNextPayAt(new Date(), params.recurringDayOfMonth, params.recurringUntil);
     }
 
     let errors = await this.scheduledPaymentValidator.validate(params);

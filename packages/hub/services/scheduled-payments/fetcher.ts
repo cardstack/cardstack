@@ -77,7 +77,7 @@ export default class ScheduledPaymentsFetcherService {
             ) 
             OR (
               scheduled_payments.recurring_day_of_month > 0
-              AND scheduled_payments.recurring_until >= ${nowString}::timestamp
+              AND DATE_TRUNC('day', scheduled_payments.recurring_until::timestamp)::date + scheduled_payments.valid_for_days  >= ${nowString}::timestamp
               AND (
                 scheduled_payments.id
               ) NOT IN (

@@ -2,7 +2,7 @@ import { ScheduledPayment } from '@prisma/client';
 import { Decimal } from '@prisma/client/runtime';
 import { registry, setupHub } from '../../helpers/server';
 import { Networkish, TokenDetail } from '@cardstack/cardpay-sdk';
-import { addDays, addMonths } from 'date-fns';
+import { addDays, addMonths, subMonths } from 'date-fns';
 
 class StubCardpaySDK {
   getConstantByNetwork(name: string, network: Networkish) {
@@ -64,15 +64,21 @@ describe('ScheduledPaymentValidator', function () {
       executionGasEstimation: ['execution gas estimation is required'],
       maxGasPrice: ['max gas price is required'],
       feeFixedUsd: ['fee fixed usd is required'],
-      payAt: ['pay at is required'],
+      payAt: [
+        'you must either set pay at for one time payment, or both recurring day of month and recurring until for recurring payments',
+      ],
       feePercentage: ['fee percentage is required'],
       gasTokenAddress: ['gas token address is required'],
       salt: ['salt is required'],
       spHash: ['sp hash is required'],
       chainId: ['chain id is required'],
       userAddress: ['user address is required'],
-      recurringDayOfMonth: [],
-      recurringUntil: [],
+      recurringDayOfMonth: [
+        'you must either set pay at for one time payment, or both recurring day of month and recurring until for recurring payments',
+      ],
+      recurringUntil: [
+        'you must either set pay at for one time payment, or both recurring day of month and recurring until for recurring payments',
+      ],
       validForDays: [],
     });
   });
@@ -188,14 +194,18 @@ describe('ScheduledPaymentValidator', function () {
 
     const scheduledPaymentWithValidRecurringUntil: Partial<ScheduledPayment> = {
       chainId: 1, //Mainnet
+      recurringDayOfMonth: validDate.getDate(),
       recurringUntil: validDate,
+      payAt: subMonths(validDate, 11),
     };
     let errors = await subject.validate(scheduledPaymentWithValidRecurringUntil);
     expect(errors.recurringUntil).deep.equal([]);
 
     const scheduledPaymentWithInvalidRecuringUntil: Partial<ScheduledPayment> = {
       chainId: 1, //Mainnet
+      recurringDayOfMonth: invalidDate.getDate(),
       recurringUntil: invalidDate,
+      payAt: subMonths(validDate, 11),
     };
 
     errors = await subject.validate(scheduledPaymentWithInvalidRecuringUntil);

@@ -27,6 +27,7 @@ import * as Sentry from '@sentry/browser';
 import FeeCalculator, { type CurrentFees } from './fee-calculator';
 import config from '@cardstack/safe-tools-client/config/environment';
 import HubAuthenticationService from '@cardstack/safe-tools-client/services/hub-authentication';
+import { endOfDay } from 'date-fns';
 
 interface Signature {
   Element: HTMLElement;
@@ -182,16 +183,8 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
   }
 
   get minMonthlyUntil() {
-    let minMonthlyUntil;
     let now = new Date();
-
-    if (this.paymentDayOfMonth && this.paymentDayOfMonth < now.getDate()) {
-      minMonthlyUntil = new Date(now.getFullYear(), now.getMonth() + 1, this.paymentDayOfMonth);
-    } else {
-      minMonthlyUntil = now;
-    }
-
-    return minMonthlyUntil;
+    return new Date(now.getFullYear(), now.getMonth() + 1, this.paymentDayOfMonth);
   }
 
   get maxMonthlyUntil() {
@@ -554,8 +547,7 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
 
     let payAt = this.selectedPaymentType === 'one-time' ? Math.round(this.paymentDate!.getTime() / 1000) : null;
     let recurringDayOfMonth = this.selectedPaymentType === 'monthly' ? this.paymentDayOfMonth! : null;
-    let recurringUntil = this.selectedPaymentType === 'monthly' ? Math.round(this.monthlyUntil!.getTime() / 1000) : null
-
+    let recurringUntil = this.selectedPaymentType === 'monthly' ? Math.round(endOfDay(this.monthlyUntil!).getTime() / 1000) : null;
     return {
       safeAddress: currentSafe.address,
       spModuleAddress: currentSafe.spModuleAddress,
