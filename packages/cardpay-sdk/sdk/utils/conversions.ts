@@ -231,11 +231,14 @@ export function applyRateToAmount(tokenRate: TokenPairRate, amount: BigNumber, i
       .mul(tokenInSmallestUnits)
       .div(BigNumber.from(tokenRate.rate.mulUnsafe(FixedNumber.from(tokenOutSmallestUnits)).toString().split('.')[0]));
   }
+
   return BigNumber.from(
     tokenRate.rate
       .mulUnsafe(FixedNumber.from(amount))
       .mulUnsafe(FixedNumber.from(tokenOutSmallestUnits))
+      .divUnsafe(FixedNumber.from(tokenInSmallestUnits))
+      .ceiling() // Round up for case when result is between 0 and 1 (we don't want the conversion result to be 0)
       .toString()
       .split('.')[0]
-  ).div(tokenInSmallestUnits);
+  );
 }

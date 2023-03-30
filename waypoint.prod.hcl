@@ -67,6 +67,8 @@ app "hub" {
         WYRE_ACCOUNT_ID       = "arn:aws:ssm:us-east-1:120317779495:parameter/production/hub/WYRE_ACCOUNT_ID"
         WYRE_API_KEY          = "arn:aws:ssm:us-east-1:120317779495:parameter/production/hub/WYRE_API_KEY"
         WYRE_SECRET_KEY       = "arn:aws:ssm:us-east-1:120317779495:parameter/production/hub/WYRE_SECRET_KEY"
+        ETHEREUM_RELAYER_ABOUT_PAGE_SECRET = "arn:aws:ssm:us-east-1:120317779495:parameter/production/safe-relay/ethereum/about_page_secret"
+        POLYGON_RELAYER_ABOUT_PAGE_SECRET  = "arn:aws:ssm:us-east-1:120317779495:parameter/production/safe-relay/polygon/about_page_secret"
 
         # secrets manager
         CHECKLY_WEBHOOK_SECRET                        = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_hub_checkly_webhook_secret-1VZEgk"

@@ -73,8 +73,16 @@ describe('fetching scheduled payments that are due', function () {
 
   let createFailedScheduledPaymentAttemptWithExecutor = async (scheduledPayment: ScheduledPayment) => {
     let getCurrentGasPrice = executor.getCurrentGasPrice;
+    let withNonce = executor.crankNonceLock.withNonce; // Just some method at the appropriate spot in the executor to blow up intentionally to get into the catch block
 
+    // @ts-ignore param types
     executor.getCurrentGasPrice = async () => {
+      return {
+        gasPriceInGasToken: '10000',
+      };
+    };
+
+    executor.crankNonceLock.withNonce = async () => {
       throw new Error(
         'intentional error to get into the catch block of the executor so that nextRetryAttemptAt is updated'
       );
@@ -91,7 +99,8 @@ describe('fetching scheduled payments that are due', function () {
       // ignore
     }
 
-    executor.getCurrentGasPrice = getCurrentGasPrice; // Restore executor
+    executor.crankNonceLock.withNonce = withNonce; // Restore
+    executor.getCurrentGasPrice = getCurrentGasPrice; // Restore
   };
 
   describe('one-time scheduled payments', function () {
