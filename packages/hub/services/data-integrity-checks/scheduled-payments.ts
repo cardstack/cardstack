@@ -98,7 +98,7 @@ export default class DataIntegrityChecksScheduledPayments {
         canceledAt: {
           lt: subMinutes(nowUtc(), CANCELATION_UNMINED_ALLOWED_MINUTES),
         },
-        creationTransactionError: null,
+        cancelationTransactionError: null,
       },
     });
 
