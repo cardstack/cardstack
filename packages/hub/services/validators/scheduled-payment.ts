@@ -77,10 +77,16 @@ export default class ScheduledPaymentValidator {
     }
 
     if (!scheduledPayment.payAt && !scheduledPayment.recurringDayOfMonth && !scheduledPayment.recurringUntil) {
-      errors['payAt'].push(`you must either set pay at for one time payment, or both recurring day of month and recurring until for recurring payments`);
-      errors['recurringDayOfMonth'].push(`you must either set pay at for one time payment, or both recurring day of month and recurring until for recurring payments`);
-      errors['recurringUntil'].push(`you must either set pay at for one time payment, or both recurring day of month and recurring until for recurring payments`);
-    }  else if (scheduledPayment.recurringDayOfMonth && !scheduledPayment.recurringUntil) {
+      errors['payAt'].push(
+        `you must either set pay at for one time payment, or both recurring day of month and recurring until for recurring payments`
+      );
+      errors['recurringDayOfMonth'].push(
+        `you must either set pay at for one time payment, or both recurring day of month and recurring until for recurring payments`
+      );
+      errors['recurringUntil'].push(
+        `you must either set pay at for one time payment, or both recurring day of month and recurring until for recurring payments`
+      );
+    } else if (scheduledPayment.recurringDayOfMonth && !scheduledPayment.recurringUntil) {
       errors['recurringUntil'].push(`recurring until is required when recurring day of month is set`);
     } else if (!scheduledPayment.recurringDayOfMonth && scheduledPayment.recurringUntil) {
       errors['recurringDayOfMonth'].push(`recurring day of month is required when recurring until is set`);

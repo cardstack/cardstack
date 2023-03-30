@@ -130,7 +130,7 @@ export default class ScheduledPaymentsRoute {
     if (params.recurringDayOfMonth != null && params.recurringUntil != null) {
       params.payAt = calculateNextPayAt(new Date(), params.recurringDayOfMonth, params.recurringUntil);
     }
-    
+
     let errors = await this.scheduledPaymentValidator.validate(params);
     let hasErrors = Object.values(errors).flatMap((i) => i).length > 0;
     if (hasErrors) {

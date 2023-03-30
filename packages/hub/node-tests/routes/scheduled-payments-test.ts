@@ -181,7 +181,8 @@ describe('POST /api/scheduled-payments', async function () {
             title: 'Invalid attribute',
           },
           {
-            detail: 'pay at is required for one-time payment',
+            detail:
+              'you must either set pay at for one time payment, or both recurring day of month and recurring until for recurring payments',
             source: {
               pointer: '/data/attributes/pay-at',
             },
@@ -189,7 +190,8 @@ describe('POST /api/scheduled-payments', async function () {
             title: 'Invalid attribute',
           },
           {
-            detail: 'recurring day of month is required for recurring payment',
+            detail:
+              'you must either set pay at for one time payment, or both recurring day of month and recurring until for recurring payments',
             source: {
               pointer: '/data/attributes/recurring-day-of-month',
             },
@@ -197,7 +199,8 @@ describe('POST /api/scheduled-payments', async function () {
             title: 'Invalid attribute',
           },
           {
-            detail: 'recurring until is required for recurring payment',
+            detail:
+              'you must either set pay at for one time payment, or both recurring day of month and recurring until for recurring payments',
             source: {
               pointer: '/data/attributes/recurring-until',
             },
@@ -434,12 +437,20 @@ describe('POST /api/scheduled-payments', async function () {
       .expect({
         errors: [
           {
-            detail: 'recurring payment end date must be in the future',
+            detail: 'must be later than the recurring date',
             source: {
               pointer: '/data/attributes/recurring-until',
             },
             status: '422',
             title: 'Invalid attribute',
+          },
+          {
+            status: '422',
+            source: {
+              pointer: '/data/attributes/recurring-until',
+            },
+            title: 'Invalid attribute',
+            detail: 'recurring payment end date must be in the future',
           },
         ],
       });
