@@ -15,39 +15,43 @@ interface GasTokenResourceState extends Record<PropertyKey, unknown> {
   error?: Error;
   isLoading: boolean;
   value?: TokenDetail[];
+  load: () => Promise<void>;
 }
 
 export default class TokensService extends Service {
   @service declare network: NetworkService;
 
   @use gasTokens = resource(() => {
-    const state: GasTokenResourceState = new TrackedObject({
-      isLoading: true,
-    });
-
     // because networkInfo is tracked, anytime the network switches,
     // this resource will re-run
     const chainId = this.network.networkInfo.chainId;
     const stubbedGasTokens = this._stubbedGasTokens;
-    (async () => {
-      try {
-        if (stubbedGasTokens) {
-          state.value = stubbedGasTokens;
-        } else {
-          let gasTokens = await fetchSupportedGasTokens(chainId);
-          const { transactionTokens } = this;
-          gasTokens = gasTokens.map(
-            (gt) =>
-              transactionTokens.find((tt) => tt.address === gt.address) || gt
-          );
-          state.value = gasTokens;
+
+    const state: GasTokenResourceState = new TrackedObject({
+      isLoading: true,
+      load: async () => {
+        state.isLoading = true;
+        try {
+          if (stubbedGasTokens) {
+            state.value = stubbedGasTokens;
+          } else {
+            let gasTokens = await fetchSupportedGasTokens(chainId);
+            const { transactionTokens } = this;
+            gasTokens = gasTokens.map(
+              (gt) =>
+                transactionTokens.find((tt) => tt.address === gt.address) || gt
+            );
+            state.value = gasTokens;
+          }
+        } catch (error) {
+          state.error = error;
+        } finally {
+          state.isLoading = false;
         }
-      } catch (error) {
-        state.error = error;
-      } finally {
-        state.isLoading = false;
-      }
-    })();
+      },
+    });
+
+    state.load();
     return state;
   });
 
@@ -76,8 +80,16 @@ export default class TokensService extends Service {
     this._stubbedTransactionTokens = val;
   }
 
-  tokenFromAddress(address: ChainAddress): TokenDetail | undefined {
-    return this.transactionTokens.find((t) => t.address === address);
+  async tokenFromAddress(
+    address: ChainAddress
+  ): Promise<TokenDetail | undefined> {
+    if (!this.gasTokens.value || this.gasTokens.isLoading) {
+      await this.gasTokens.load();
+    }
+    return [
+      ...this.transactionTokens,
+      ...(this.gasTokens.value as TokenDetail[]),
+    ].find((t) => t.address === address);
   }
 }
 

@@ -197,62 +197,66 @@ export default class ScheduledPaymentsService extends Service {
     return this.deserializeScheduledPaymentAttemptResponse(response);
   }
 
-  deserializeScheduledPaymentAttemptResponse(
+  async deserializeScheduledPaymentAttemptResponse(
     response: ScheduledPaymentAttemptResponse
-  ): ScheduledPaymentAttempt[] {
-    return response.data.map((s) => {
-      const scheduledPaymentId = s.relationships['scheduled-payment'].data.id;
-      const scheduledPayment = response.included.find(
-        (i) => i.id === scheduledPaymentId && i.type === 'scheduled-payments'
-      )?.attributes;
+  ): Promise<ScheduledPaymentAttempt[]> {
+    return Promise.all(
+      response.data.map(async (s) => {
+        const scheduledPaymentId = s.relationships['scheduled-payment'].data.id;
+        const scheduledPayment = response.included.find(
+          (i) => i.id === scheduledPaymentId && i.type === 'scheduled-payments'
+        )?.attributes;
 
-      const paymentTokenAddress = scheduledPayment!['token-address'];
-      const paymentToken =
-        this.tokens.tokenFromAddress(paymentTokenAddress) ||
-        buildUnknownToken(paymentTokenAddress);
+        const paymentTokenAddress = scheduledPayment!['token-address'];
+        const paymentToken =
+          (await this.tokens.tokenFromAddress(paymentTokenAddress)) ||
+          buildUnknownToken(paymentTokenAddress);
 
-      const gasTokenAddress = scheduledPayment!['gas-token-address'];
-      const gasToken =
-        this.tokens.tokenFromAddress(gasTokenAddress) ||
-        buildUnknownToken(gasTokenAddress);
+        const gasTokenAddress = scheduledPayment!['gas-token-address'];
+        const gasToken =
+          (await this.tokens.tokenFromAddress(gasTokenAddress)) ||
+          buildUnknownToken(gasTokenAddress);
 
-      return {
-        id: s.id,
-        startedAt: new Date(s.attributes['started-at']),
-        endedAt: new Date(s.attributes['ended-at']),
-        status: s.attributes['status'],
-        failureReason: s.attributes['failure-reason'],
-        transactionHash: s.attributes['transaction-hash'],
-        executionGasPrice: BigNumber.from(s.attributes['execution-gas-price']),
-        scheduledPayment: {
-          id: scheduledPaymentId,
-          paymentTokenQuantity: new TokenQuantity(
-            paymentToken,
-            BigNumber.from(scheduledPayment!.amount)
+        return {
+          id: s.id,
+          startedAt: new Date(s.attributes['started-at']),
+          endedAt: new Date(s.attributes['ended-at']),
+          status: s.attributes['status'],
+          failureReason: s.attributes['failure-reason'],
+          transactionHash: s.attributes['transaction-hash'],
+          executionGasPrice: BigNumber.from(
+            s.attributes['execution-gas-price']
           ),
-          feeFixedUSD: scheduledPayment!['fee-fixed-usd'],
-          feePercentage: scheduledPayment!['fee-percentage'],
-          gasToken,
-          chainId: Number(scheduledPayment!['chain-id']),
-          payeeAddress: scheduledPayment!['payee-address'],
-          payAt: new Date(scheduledPayment!['pay-at']),
-          maxGasPrice: BigNumber.from(scheduledPayment!['max-gas-price']),
-          isCanceled: Boolean(scheduledPayment!['canceled-at']),
-          nextRetryAttemptAt: scheduledPayment!['next-retry-attempt-at']
-            ? new Date(scheduledPayment!['next-retry-attempt-at'])
-            : null,
-          scheduledPaymentAttemptsInLastPaymentCycleCount: Number(
-            scheduledPayment![
-              'scheduled-payment-attempts-in-last-payment-cycle-count'
-            ]
-          ),
-          lastScheduledPaymentAttemptId:
-            scheduledPayment!['last-scheduled-payment-attempt-id'],
-          retriesLeft: Number(scheduledPayment!['retries-left']),
-          privateMemo: scheduledPayment!['private-memo'],
-        },
-      };
-    });
+          scheduledPayment: {
+            id: scheduledPaymentId,
+            paymentTokenQuantity: new TokenQuantity(
+              paymentToken,
+              BigNumber.from(scheduledPayment!.amount)
+            ),
+            feeFixedUSD: scheduledPayment!['fee-fixed-usd'],
+            feePercentage: scheduledPayment!['fee-percentage'],
+            gasToken,
+            chainId: Number(scheduledPayment!['chain-id']),
+            payeeAddress: scheduledPayment!['payee-address'],
+            payAt: new Date(scheduledPayment!['pay-at']),
+            maxGasPrice: BigNumber.from(scheduledPayment!['max-gas-price']),
+            isCanceled: Boolean(scheduledPayment!['canceled-at']),
+            nextRetryAttemptAt: scheduledPayment!['next-retry-attempt-at']
+              ? new Date(scheduledPayment!['next-retry-attempt-at'])
+              : null,
+            scheduledPaymentAttemptsInLastPaymentCycleCount: Number(
+              scheduledPayment![
+                'scheduled-payment-attempts-in-last-payment-cycle-count'
+              ]
+            ),
+            lastScheduledPaymentAttemptId:
+              scheduledPayment!['last-scheduled-payment-attempt-id'],
+            retriesLeft: Number(scheduledPayment!['retries-left']),
+            privateMemo: scheduledPayment!['private-memo'],
+          },
+        };
+      })
+    );
   }
 
   async fetchScheduledPayments(
@@ -271,9 +275,9 @@ export default class ScheduledPaymentsService extends Service {
       'GET'
     );
 
-    return this.deserializeScheduledPaymentResponse(
+    return (await this.deserializeScheduledPaymentResponse(
       response
-    ) as ScheduledPayment[];
+    )) as ScheduledPayment[];
   }
 
   async fetchScheduledPayment(
@@ -286,9 +290,9 @@ export default class ScheduledPaymentsService extends Service {
       'GET'
     );
 
-    return this.deserializeScheduledPaymentResponse(
+    return (await this.deserializeScheduledPaymentResponse(
       response
-    ) as ScheduledPayment;
+    )) as ScheduledPayment;
   }
 
   @action async reloadScheduledPayments() {
@@ -346,18 +350,18 @@ export default class ScheduledPaymentsService extends Service {
     return state;
   });
 
-  deserializeScheduledPaymentResponse(
+  async deserializeScheduledPaymentResponse(
     response: ScheduledPaymentResponse
-  ): ScheduledPayment | ScheduledPayment[] {
-    const deserialize = (data: ScheduledPaymentResponseItem) => {
+  ): Promise<ScheduledPayment | ScheduledPayment[]> {
+    const deserialize = async (data: ScheduledPaymentResponseItem) => {
       const paymentTokenAddress = data.attributes['token-address'];
       const paymentToken =
-        this.tokens.tokenFromAddress(paymentTokenAddress) ||
+        (await this.tokens.tokenFromAddress(paymentTokenAddress)) ||
         buildUnknownToken(paymentTokenAddress);
 
       const gasTokenAddress = data.attributes!['gas-token-address'];
       const gasToken =
-        this.tokens.tokenFromAddress(gasTokenAddress) ||
+        (await this.tokens.tokenFromAddress(gasTokenAddress)) ||
         buildUnknownToken(gasTokenAddress);
       return {
         id: data.id,
@@ -404,7 +408,7 @@ export default class ScheduledPaymentsService extends Service {
     };
 
     if (Array.isArray(response.data)) {
-      return response.data.map(deserialize);
+      return Promise.all(response.data.map(deserialize));
     } else {
       return deserialize(response.data);
     }
