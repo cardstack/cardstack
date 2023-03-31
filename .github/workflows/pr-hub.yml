@@ -25,7 +25,7 @@ jobs:
       CORDE_BOT_TOKEN: ${{ secrets.CORDE_BOT_TOKEN }}
     services:
       postgres:
-        image: postgres:14
+        image: postgres:13
         env:
           POSTGRES_DB: postgres
           POSTGRES_PASSWORD: postgres
