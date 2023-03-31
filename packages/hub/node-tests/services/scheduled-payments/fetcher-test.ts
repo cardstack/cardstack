@@ -172,11 +172,11 @@ describe('fetching scheduled payments that are due', function () {
         payAt: subDays(now, validForDays + 1),
       });
 
-      // valid to retry
+      // valid to retry, passes recurring end date but still in the valid period
       let sp1 = await createScheduledPayment({
-        recurringUntil: addMonths(now, 6),
+        recurringUntil: subDays(now, 1),
         recurringDayOfMonth: subDays(now, 1).getDate(),
-        payAt: subDays(now, 1),
+        payAt: subHours(subDays(now, 1), 1),
       });
 
       // due now
@@ -193,18 +193,7 @@ describe('fetching scheduled payments that are due', function () {
         payAt: addDays(now, 1),
       });
 
-      //passes recurring end date but still in the valid period
-      let sp3 = await createScheduledPayment({
-        recurringUntil: subDays(now, 1),
-        recurringDayOfMonth: subDays(now, 1).getDate(),
-        payAt: subHours(subDays(now, 1), 1),
-      });
-
-      expect((await subject.fetchScheduledPayments(chainId)).map((sp) => sp.id)).to.deep.equal([
-        sp1.id,
-        sp2.id,
-        sp3.id,
-      ]);
+      expect((await subject.fetchScheduledPayments(chainId)).map((sp) => sp.id)).to.deep.equal([sp1.id, sp2.id]);
     });
 
     it('does not fetch payments that have recurringUntil in the past', async function () {
