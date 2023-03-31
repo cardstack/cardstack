@@ -170,6 +170,8 @@ export default class ScheduledPaymentsExecutorService {
 
       Sentry.captureMessage(`Executing a payment with params: ${JSON.stringify(params)}`); // Useful for debugging purposes (for example, to see which params were used to calculate the spHash)
 
+      let isRecurring = !!recurringDayOfMonth;
+
       let executeScheduledPayment = (nonce: BN) => {
         return new Promise<string>((resolve, reject) => {
           scheduledPaymentModule
@@ -185,7 +187,7 @@ export default class ScheduledPaymentsExecutorService {
               params.gasTokenAddress,
               params.salt,
               params.currentGasPrice,
-              params.payAt,
+              isRecurring ? null : params.payAt, // Contract will revert if both payAt and recurringDayOfMonth are set
               params.recurringDayOfMonth,
               params.recurringUntil,
               {
