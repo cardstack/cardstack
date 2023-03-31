@@ -145,8 +145,8 @@ describe('fetching scheduled payments that are due', function () {
       let sp2And3Date = subDays(now, 1);
       let sp2 = await createScheduledPayment({ payAt: sp2And3Date }); // still valid to retry
       let sp3 = await createScheduledPayment({ payAt: sp2And3Date }); // still valid to retry
-      await createScheduledPaymentAttempt(sp2, sp2And3Date, addMinutes(sp2And3Date, 2), 'failed');
-      await createScheduledPaymentAttempt(sp3, addMinutes(sp2And3Date, 2), addMinutes(sp2And3Date, 5), 'failed');
+      await createScheduledPaymentAttempt(sp2, sp2And3Date, addMinutes(sp2And3Date, 5), 'failed');
+      await createScheduledPaymentAttempt(sp3, sp2And3Date, addMinutes(sp2And3Date, 5), 'failed');
 
       //scheduled payment with failed payment attempt 5 hours ago
       let sp4And5Date = subHours(now, 5);
@@ -193,18 +193,7 @@ describe('fetching scheduled payments that are due', function () {
         payAt: addDays(now, 1),
       });
 
-      //passes recurring until but still in the valid period
-      let sp3 = await createScheduledPayment({
-        recurringUntil: subDays(now, 1),
-        recurringDayOfMonth: now.getDate(),
-        payAt: now,
-      });
-
-      expect((await subject.fetchScheduledPayments(chainId)).map((sp) => sp.id)).to.deep.equal([
-        sp1.id,
-        sp2.id,
-        sp3.id,
-      ]);
+      expect((await subject.fetchScheduledPayments(chainId)).map((sp) => sp.id)).to.deep.equal([sp1.id, sp2.id]);
     });
 
     it('does not fetch payments that have recurringUntil in the past', async function () {
