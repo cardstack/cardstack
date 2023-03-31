@@ -185,7 +185,7 @@ export default class ScheduledPaymentsExecutorService {
               params.gasTokenAddress,
               params.salt,
               params.currentGasPrice,
-              params.payAt,
+              params.recurringDayOfMonth ? null : params.payAt, // SDK will throw an error if both payAt and recurringDayOfMonth are set
               params.recurringDayOfMonth,
               params.recurringUntil,
               {
