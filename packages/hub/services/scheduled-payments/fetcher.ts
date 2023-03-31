@@ -99,7 +99,12 @@ export default class ScheduledPaymentsFetcherService {
         ORDER BY last_failed_payment_attempt.started_at ASC NULLS FIRST
         LIMIT ${limit};`;
 
-    return prisma.scheduledPayment.findMany({ where: { id: { in: results.map((result) => result.id) } } });
+    let ids = results.map((result) => result.id);
+
+    // Make sure the collection is sorted in the same order as the ids array
+    return (await prisma.scheduledPayment.findMany({ where: { id: { in: ids } } })).sort(
+      (sp1, sp2) => ids.indexOf(sp1.id) - ids.indexOf(sp2.id)
+    );
   }
 
   calculateRetryBackoffsInMinutes(validForDays: number) {
