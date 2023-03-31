@@ -252,7 +252,7 @@ describe('fetching scheduled payments that are due', function () {
         payAt: sp2And3Date,
       }); // still valid to retry
       await createScheduledPaymentAttempt(sp2, sp2And3Date, addMinutes(sp2And3Date, 5), 'failed');
-      await createScheduledPaymentAttempt(sp3, sp2And3Date, addMinutes(sp2And3Date, 5), 'failed');
+      await createScheduledPaymentAttempt(sp3, addMinutes(sp2And3Date, 1), addMinutes(sp2And3Date, 5), 'failed');
 
       //scheduled payment with failed payment attempt 5 hours ago
       let sp4And5Date = subHours(now, 5);
@@ -268,7 +268,7 @@ describe('fetching scheduled payments that are due', function () {
         payAt: sp4And5Date,
       }); // still valid to retry
       await createScheduledPaymentAttempt(sp4, sp4And5Date, addMinutes(sp4And5Date, 5), 'failed');
-      await createScheduledPaymentAttempt(sp5, sp4And5Date, addMinutes(sp4And5Date, 5), 'failed');
+      await createScheduledPaymentAttempt(sp5, addMinutes(sp4And5Date, 1), addMinutes(sp4And5Date, 5), 'failed');
 
       expect((await subject.fetchScheduledPayments(chainId, 3)).map((sp) => sp.id)).to.deep.equal([
         sp1.id,
