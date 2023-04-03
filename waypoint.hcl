@@ -541,7 +541,9 @@ app "reward-submit-lambda" {
       region = "us-east-1"
 
       static_environment = {
-        ENVIRONMENT = "staging"
+        ENVIRONMENT           = "staging"
+        REWARD_POOL_ADDRESS   = "0xc9A238Ee71A65554984234DF9721dbdA873F84FA"
+        REWARD_PROGRAM_OUTPUT = "s3://cardpay-staging-reward-programs/"
       }
     }
   }
