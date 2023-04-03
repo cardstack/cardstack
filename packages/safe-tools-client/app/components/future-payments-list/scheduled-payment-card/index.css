@@ -20,6 +20,11 @@
   display: flex;
 }
 
+.scheduled-payment-card__status {
+  margin-left: auto;
+  margin-top: var(--boxel-sp-sm);
+}
+
 .scheduled-payment-card__token-symbol {
   margin-right: var(--boxel-sp-xs);
   vertical-align: bottom;
@@ -68,6 +73,10 @@
 .scheduled-payment-card__usd-amount {
   font: 500 var(--boxel-font-sm);
   color: var(--boxel-purple-400);
+}
+
+.scheduled_payment_card__tooltip {
+  font-size: var(--boxel-font-size-sm);
 }
 
 @media only screen and (max-width: 1556px) {
