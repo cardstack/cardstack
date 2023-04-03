@@ -182,11 +182,10 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
     }
   }
 
-  //The minimum monthly until value is the month following the first month of execution.
-  //So the minimum execution of monthly payment is two times.
+  //The minimum monthly until value is the first date of execution.
   get minMonthlyUntil() {
-    let recurringStartMonth = addMonths(new Date(), 1);
-    if (this.paymentDayOfMonth && this.paymentDayOfMonth <= recurringStartMonth.getDate()) {
+    let recurringStartMonth = new Date();
+    if (this.paymentDayOfMonth && this.paymentDayOfMonth < recurringStartMonth.getDate()) {
       recurringStartMonth = addMonths(recurringStartMonth, 1);
     }
     let daysInRecurringStartMonth = getDaysInMonth(recurringStartMonth);

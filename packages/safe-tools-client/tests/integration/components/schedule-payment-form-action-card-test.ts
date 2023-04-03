@@ -412,10 +412,10 @@ module(
         let minMonthlyUntil;
         if (paymentDayOfMonth < now.getDate()) {
           minMonthlyUntil = new Date(
-            addMonths(now, 2).setDate(paymentDayOfMonth)
+            addMonths(now, 1).setDate(paymentDayOfMonth)
           );
         } else {
-          minMonthlyUntil = addMonths(now, 1);
+          minMonthlyUntil = now;
         }
 
         await click(`[data-test-payment-type="monthly"]`);
