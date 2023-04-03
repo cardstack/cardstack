@@ -28,6 +28,7 @@ interface Proof {
   validTo: number;
   explanationId: string[];
   explanationData: string;
+  root: string;
 }
 
 let log = Logger('task:process-reward-root');
@@ -54,7 +55,7 @@ export default class ProcessRewardRoot {
         return (
           '(' +
           pgFormat(
-            '%L, %L, %L, %L, ARRAY[%L]::text[], %L, %L, %L, %L, %L',
+            '%L, %L, %L, %L, ARRAY[%L]::text[], %L, %L, %L, %L, %L, %L',
             o.rewardProgramID,
             o.payee,
             o.leaf,
@@ -64,7 +65,8 @@ export default class ProcessRewardRoot {
             o.validFrom,
             o.validTo,
             o.explanationId,
-            o.explanationData
+            o.explanationData,
+            o.root
           ) +
           ')'
         );
@@ -76,7 +78,7 @@ export default class ProcessRewardRoot {
       if (rows.length > 0) {
         const proofsQuery = `
       INSERT INTO reward_proofs(
-        reward_program_id, payee, leaf, payment_cycle, proof_bytes, token_type,  valid_from, valid_to, explanation_id, explanation_data
+        reward_program_id, payee, leaf, payment_cycle, proof_bytes, token_type,  valid_from, valid_to, explanation_id, explanation_data, root_hash
       ) VALUES %s;
     `;
         const proofsSql = pgFormat(proofsQuery, rows.join());
@@ -112,7 +114,7 @@ declare module '@cardstack/hub/tasks' {
 }
 
 const FIELDS_EXCEPT_EXPLANATION_DATA =
-  'rewardProgramID,paymentCycle,validFrom,validTo,tokenType,payee,root,leaf,proof,explanationId';
+  'rewardProgramID,paymentCycle,validFrom,validTo,tokenType,payee,root,leaf,proof,explanationId,root';
 
 const queryParquet = async (
   s3Client: S3Client,
