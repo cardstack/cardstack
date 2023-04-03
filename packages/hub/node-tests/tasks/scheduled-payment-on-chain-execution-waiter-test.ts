@@ -43,7 +43,7 @@ class StubCardpaySDK {
   }
 }
 
-describe.only('ScheduledPaymentOnChainExecutionWaiter', function () {
+describe('ScheduledPaymentOnChainExecutionWaiter', function () {
   let { getJobIdentifiers, getJobPayloads } = setupStubWorkerClient(this);
 
   this.beforeEach(async function () {
