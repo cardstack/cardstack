@@ -27,7 +27,7 @@ import * as Sentry from '@sentry/browser';
 import FeeCalculator, { type CurrentFees } from './fee-calculator';
 import config from '@cardstack/safe-tools-client/config/environment';
 import HubAuthenticationService from '@cardstack/safe-tools-client/services/hub-authentication';
-import { endOfDay } from 'date-fns';
+import { addMonths, endOfDay, getDaysInMonth, startOfMonth } from 'date-fns';
 
 interface Signature {
   Element: HTMLElement;
@@ -182,9 +182,17 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
     }
   }
 
+  //The minimum monthly until value is the month following the first month of execution.
+  //So the minimum execution of monthly payment is two times.
   get minMonthlyUntil() {
-    let now = new Date();
-    return new Date(now.getFullYear(), now.getMonth() + 1, this.paymentDayOfMonth);
+    let recurringStartMonth = addMonths(new Date(), 1);
+    if (this.paymentDayOfMonth && this.paymentDayOfMonth <= recurringStartMonth.getDate()) {
+      recurringStartMonth = addMonths(recurringStartMonth, 1);
+    }
+    let daysInRecurringStartMonth = getDaysInMonth(recurringStartMonth);
+    let recurrsDay = Math.min(daysInRecurringStartMonth, this.paymentDayOfMonth ?? 1);
+
+    return new Date(recurringStartMonth.getFullYear(), recurringStartMonth.getMonth(), recurrsDay);
   }
 
   get maxMonthlyUntil() {
