@@ -1,0 +1,30 @@
+.tooltip {
+  position: relative;
+  display: inline-block;
+  cursor: pointer;
+  white-space: initial;
+}
+
+.tooltip__content {
+  visibility: hidden;
+  width: 220px;
+  position: absolute;
+  z-index: 2;
+  bottom: 100%;
+  left: 50%;
+  margin-left: -110px;
+  background-color: var(--boxel-light);
+  box-shadow: 0 0 0 1px var(--boxel-light-500);
+  color: var(--boxel-dark);
+  text-align: center;
+  border-radius: var(--boxel-sp-sm);
+  padding: var(--boxel-sp-sm);
+  margin-bottom: var(--boxel-sp-xs);
+  opacity: 0;
+  transition: ease-in-out 0.5s;
+}
+
+.tooltip__trigger:hover + .tooltip__content {
+  visibility: visible;
+  opacity: 1;
+}
