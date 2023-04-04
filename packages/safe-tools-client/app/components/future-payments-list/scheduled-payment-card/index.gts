@@ -11,7 +11,6 @@ import Tooltip from '@cardstack/safe-tools-client/components/tooltip';
 import NetworkService from '@cardstack/safe-tools-client/services/network';
 import { inject as service } from '@ember/service';
 import not from 'ember-truth-helpers/helpers/not';
-import and from 'ember-truth-helpers/helpers/and';
 
 import './index.css';
 
