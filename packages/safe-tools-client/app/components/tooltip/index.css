@@ -6,7 +6,6 @@
 }
 
 .tooltip__content {
-  visibility: hidden;
   width: 220px;
   position: absolute;
   z-index: 2;
@@ -20,11 +19,5 @@
   border-radius: var(--boxel-sp-sm);
   padding: var(--boxel-sp-sm);
   margin-bottom: var(--boxel-sp-xs);
-  opacity: 0;
   transition: ease-in-out 0.5s;
-}
-
-.tooltip__trigger:hover + .tooltip__content {
-  visibility: visible;
-  opacity: 1;
 }
