@@ -914,6 +914,12 @@ export default class ScheduledPaymentModule {
     );
 
     let scheduledPayment = scheduledPaymentResponse.data.attributes;
+
+    if (scheduledPayment['creation-transaction-error']) {
+      // When trying to cancel a payment that failed to be registered on the blockchain, we just delete it from the hub
+      return await hubRequest(hubRootUrl, `api/scheduled-payments/${scheduledPaymentId}`, authToken, 'DELETE');
+    }
+
     let safeAddress = scheduledPayment['sender-safe-address'];
     let moduleAddress = scheduledPayment['module-address'];
     let cancelationBlockNumber = scheduledPayment['cancelation-block-number'];

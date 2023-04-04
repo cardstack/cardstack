@@ -10,6 +10,8 @@ import BlockExplorerButton from '@cardstack/safe-tools-client/components/block-e
 import Tooltip from '@cardstack/safe-tools-client/components/tooltip';
 import NetworkService from '@cardstack/safe-tools-client/services/network';
 import { inject as service } from '@ember/service';
+import not from 'ember-truth-helpers/helpers/not';
+import and from 'ember-truth-helpers/helpers/and';
 
 import './index.css';
 
@@ -89,7 +91,7 @@ export default class ScheduledPaymentCard extends Component<Signature> {
                       The transaction to register this payment on blockchain has failed. This payment will not be attempted.
                     </p>
                     <p>
-                      Please delete it and schedule again.
+                      Please delete the schedule payment and try to schedule it again.
                     </p>
 
                     <p>
@@ -109,7 +111,7 @@ export default class ScheduledPaymentCard extends Component<Signature> {
       </div>
       <PaymentOptionsDropdown
         @scheduledPayment={{@scheduledPayment}}
-        @canCancel={{true}}
+        @canCancel={{not this.onChainCreationPending}}
       />
     </BoxelCardContainer>
   </template>
