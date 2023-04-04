@@ -625,9 +625,7 @@ module('Acceptance | scheduling', function (hooks) {
         'Scheduled Payment updated via PATCH to API'
       );
       await waitUntil(() =>
-        find(IN_PROGRESS_MESSAGE)?.textContent?.includes(
-          'Awaiting consensus'
-        )
+        find(IN_PROGRESS_MESSAGE)?.textContent?.includes('Awaiting consensus')
       );
       assert.dom(IN_PROGRESS_MESSAGE).hasText('Awaiting consensus...');
 
