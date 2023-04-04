@@ -48,11 +48,10 @@ export default class Tooltip extends Component<Signature> {
       <div class="tooltip__trigger" data-test-tooltip-trigger {{on "mouseenter" this.showTooltip}}>
         {{yield to="trigger"}}
       </div>
-      {{#if this.tooltipShown}}
-        <div class="tooltip__content" data-test-tooltip-content {{on "mouseenter" this.showTooltip}}>
-          {{yield to="content"}}
-        </div>
-      {{/if}}
+
+      <div class="tooltip__content {{if this.tooltipShown '' 'tooltip__content--hidden'}}" data-test-tooltip-content data-test-tooltip-content-is-shown="{{this.tooltipShown}}" {{on "mouseenter" this.showTooltip}}>
+        {{yield to="content"}}
+      </div>
     </div>
   </template>
 }

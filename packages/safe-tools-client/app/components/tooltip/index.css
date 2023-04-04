@@ -21,3 +21,7 @@
   margin-bottom: var(--boxel-sp-xs);
   transition: ease-in-out 0.5s;
 }
+
+.tooltip__content--hidden {
+  display: none;
+}
