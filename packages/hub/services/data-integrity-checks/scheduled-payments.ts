@@ -27,12 +27,12 @@ function addToMessages(collection: any, message: string, messages: string[]) {
 // 2. Crank (i.e the hub) needs native token funds to pay for scheduled payment execution transaction gas.
 //    This gets reimbursed to the fee receiver using the user safe's gas token balance.
 function lowBalanceThreshold(networkName: SchedulerCapableNetworks) {
-  // These values are rougly defined by looking at the current average transaction gas cost and multiplying it by 1000, then rounded.
-  // This means that the relayer and the crank should have enough funds to pay for around 1000 transactions before running out of funds.
+  // These values are rougly defined by looking at the current average transaction gas cost on each network
+  // and defining them to have enough funds to pay for at least around 200-300 transactions before running out of funds, when the threshold is reached.
   // This is a very rough estimate and it should be revisited in the future when there is more activity in the payments system.
   let minThresholdBalances: Record<SchedulerCapableNetworks, BigNumber> = {
     goerli: ethers.utils.parseEther('0.5'), // goerli ether
-    mainnet: ethers.utils.parseEther('0.5'), // mainnet ether
+    mainnet: ethers.utils.parseEther('0.3'), // mainnet ether
     polygon: ethers.utils.parseEther('30'), // MATIC
   };
 
