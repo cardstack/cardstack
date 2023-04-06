@@ -42,6 +42,7 @@
     "semver": "^7.3.5",
     "url-parse": "^1.5.3",
     "uuid": "^9.0.0",
+    "web-did-resolver": "^2.0.21",
     "web3": "1.5.2",
     "web3-core": "1.7.3",
     "web3-eth": "1.5.2",

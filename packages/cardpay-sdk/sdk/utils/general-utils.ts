@@ -13,7 +13,9 @@ import JsonRpcProvider from '../../providers/json-rpc-provider';
 
 import { BytesLike, Interface } from 'ethers/lib/utils';
 import { utils } from 'ethers';
-import { getResolver } from '@cardstack/did-resolver';
+import { getResolver as getCardstackDIDResolver } from '@cardstack/did-resolver';
+import { getResolver as getWebDIDResolver } from 'web-did-resolver';
+
 import { Resolver } from 'did-resolver';
 
 export type ChainAddress = string;
@@ -485,12 +487,26 @@ export async function wait(ms = 1000) {
 }
 
 export async function resolveDoc(did: string) {
-  let didResolver = new Resolver(getResolver());
-  let didResult = await didResolver.resolve(did);
-  if (!didResult.didDocument?.alsoKnownAs) {
-    throw new Error('No alsoKnownAs found for DID');
+  let didResolver = new Resolver({
+    ...getCardstackDIDResolver(),
+    ...getWebDIDResolver(),
   }
-  let urlResponse = await global.fetch(didResult.didDocument?.alsoKnownAs[0]);
+    );
+  let didResult = await didResolver.resolve(did);
+  console.log(didResult);
+  let subjectLocation;
+  for (var service of didResult.didDocument?.service || []) {
+    // Select the first service that is a valid ResourceService
+    if (service.type === 'ResourceService' && service.serviceEndpoint) {
+      subjectLocation = service.serviceEndpoint;
+      break;
+    }
+  }
+  subjectLocation = subjectLocation || didResult.didDocument?.alsoKnownAs?.[0];
+  if (!subjectLocation) {
+    throw new Error('No alsoKnownAs or service found for DID');
+  }
+  let urlResponse = await global.fetch(subjectLocation);
   let content = await urlResponse.json();
   return content;
 }
