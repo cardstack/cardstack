@@ -11,6 +11,9 @@ import JsonRpcProvider from './json-rpc-provider';
 const logger = new Logger(version);
 
 // Exported Types
+/**
+ * @group Provider
+ */
 export interface ExternalProvider {
   isMetaMask?: boolean;
   isStatus?: boolean;
@@ -26,6 +29,9 @@ export interface ExternalProvider {
 
 let _nextId = 1;
 
+/**
+ * @group Provider
+ */
 export type JsonRpcFetchFunc = (method: string, params: any[]) => Promise<any>;
 
 type Web3LegacySend = (request: any, callback: (error: Error, response: any) => void) => void;
@@ -83,6 +89,9 @@ function buildEip1193Fetcher(provider: ExternalProvider): JsonRpcFetchFunc {
 // with existing cardpay WalletConnectProvider
 // and extend from JSONRpcProvider
 // to get the same behavior on handling error messages
+/**
+ * @group Provider
+ */
 export default class Web3Provider extends JsonRpcProvider {
   readonly provider: ExternalProvider;
   readonly jsonRpcFetchFunc: JsonRpcFetchFunc;

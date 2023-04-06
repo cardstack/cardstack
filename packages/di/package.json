@@ -1,10 +1,13 @@
 {
   "name": "@cardstack/di",
   "description": "dependency injection support for cardstack hub",
-  "version": "1.0.42",
+  "version": "1.0.46",
   "author": "Hassan Abdel-Rahman @habdelra",
   "repository": "cardstack/cardstack",
   "license": "MIT",
+  "typedoc": {
+    "entryPoint": "./index.ts"
+  },
   "dependencies": {
     "typescript-memoize": "^1.0.1"
   }

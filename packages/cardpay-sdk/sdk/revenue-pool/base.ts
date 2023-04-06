@@ -30,22 +30,59 @@ const { fromWei } = Web3.utils;
 const POLL_INTERVAL = 500;
 const TIMEOUT = 1000 * 60 * 5;
 
-interface RevenueTokenBalance {
+/**
+ * @group Cardpay
+ */
+export interface RevenueTokenBalance {
   tokenSymbol: string;
   tokenAddress: string;
   balance: string; // balance is in native units of the token (e.g. wei)
 }
 
+/**
+ *
+ * The `RevenuePool` API is used register merchants and view/claim merchant revenue from prepaid card payments within the layer 2 network in which the Card Protocol runs. The `RevenuePool` API can be obtained from `getSDK()` with a `Web3` instance that is configured to operate on a layer 2 network (like Gnosis Chain or Sokol).
+ * @example
+ * ```ts
+ * import { getSDK } from "@cardstack/cardpay-sdk";
+ * let web3 = new Web3(myProvider); // Layer 2 web3 instance
+ * let revenuePool = await getSDK('RevenuePool', web3);
+ * ```
+ * @group Cardpay
+ * @category Main
+ */
 export default class RevenuePool {
   private revenuePool: Contract | undefined;
 
   constructor(private layer2Web3: Web3, private layer2Signer?: Signer) {}
 
+  /**
+   *
+   * This call will return the fee in SPEND to register as a merchant.
+   * @returns a promise for a number which represents the amount of SPEND it costs to register as a merchant.
+   * @example
+   * ```ts
+   *   let registrationFeeInSpend = await revenuePool.merchantRegistrationFee();
+   *  registrationFee = 1000
+   * ```
+   */
   async merchantRegistrationFee(): Promise<number> {
     // this is a SPEND amount which is a safe number to represent in javascript
     return Number(await (await this.getRevenuePool()).methods.merchantRegistrationFeeInSPEND().call());
   }
 
+  /**
+   *
+   * This call returns the balance in the RevenuePool for a merchant's safe address. As customers pay merchants with their prepaid cards, the payments accumulate as revenue that the merchants can claim using their merchant safes. This function reveals the revenue that has accumulated for the merchant. This function takes in a parameter, which is the merchant's safe address and returns a promise that is a list balances aggregated by token address (a merchant can accumulate balances for all the stable coin CPXD tokens that are allowed in the cardpay protocol).
+   * @returns he amount of the tokens specified as the token address in the parameters that are estimated to be used to pay for gas as a string in units of `wei`.
+   * @example
+   * ```ts
+   * let balances = await revenuePool.balances(merchantSafeAddress);
+   * for (let balanceInfo of balances) {
+   *   console.log(`${balanceInfo.tokenSymbol} balance is ${fromWei(balanceInfo.balance)}`)
+   * }
+   * ```
+   */
   async balances(merchantSafeAddress: string): Promise<RevenueTokenBalance[]> {
     let revenuePool = new this.layer2Web3.eth.Contract(
       RevenuePoolABI as AbiItem[],
@@ -69,9 +106,18 @@ export default class RevenuePool {
     return result;
   }
 
-  // We'll probably want to add this capability for the other API's...
-  // Note that the returned amount is in units of the token specified in the
-  // function params, tokenAddress
+  /**
+   *
+   * This call will return the gas estimate for claiming revenue.
+   * @returns a promise for the amount of the tokens specified as the token address in the parameters that are estimated to be used to pay for gas as a string in units of `wei`
+   * @param merchantSafeAddress The merchant's safe address
+   * @param tokenAddress The token address of the tokens the merchant is claiming
+   * @param amount The amount of tokens that are being claimed as a string in native units of the token (e.g. `wei`)
+   * @example
+   * ```ts
+   * let result = await revenuePool.claimGasEstimate(merchantSafeAddress, tokenAddress, claimAmountInWei);
+   * ```
+   */
   async claimGasEstimate(merchantSafeAddress: string, tokenAddress: string, amount: string): Promise<string> {
     let revenuePoolAddress = await getAddress('revenuePool', this.layer2Web3);
     let revenuePool = new this.layer2Web3.eth.Contract(RevenuePoolABI as AbiItem[], revenuePoolAddress);
@@ -96,6 +142,19 @@ export default class RevenuePool {
     return gasInToken(estimate).toString();
   }
 
+  /**
+   *
+   * This call will transfer unclaimed merchant revenue from the revenue pool into the merchant's safe, thereby "claiming" the merchant's revenue earned from prepaid card payments.
+   * @returns This method returns a promise for a web3 transaction receipt
+   * @param merchantSafeAddress The merchant's safe address
+   * @param tokenAddress The token address of the tokens the merchant is claiming
+   * @param amount The amount of tokens that are being claimed as a string in native units of the token (e.g. `wei`)
+   * `amount` is an optional param. When `amount` is excluded, the entire `revenueBalance` of a merchant safe is claimed.
+   * @example
+   * ```ts
+   * let result = await revenuePool.claim(merchantSafeAddress, tokenAddress, claimAmountInWei);
+   * ```
+   */
   async claim(txnHash: string): Promise<SuccessfulTransactionReceipt>;
   async claim(
     merchantSafeAddress: string,
@@ -189,6 +248,19 @@ export default class RevenuePool {
     return await waitForTransactionConsistency(this.layer2Web3, txnHash, merchantSafeAddress, nonce);
   }
 
+  /**
+   *
+   * This call will register a merchant with the Revenue Pool. In order to register as a merchant a prepaid card is used to pay the merchant registration fee. As part of merchant registration a gnosis safe will be created for the merchant specifically to claim revenue from prepaid card payments from the Revenue Pool. When customers pay a merchant they must specify the merchant safe (created from this call) as the recipient for merchant payments.
+   * The parameters to this function are:
+   * - The merchant's prepaid card address that will be paying the merchant registration fee
+   * - The merchant's info DID which is an identifier string that can resolve merchant details like their name, URL, logo, etc.
+   * @example
+   * ```ts
+   *   let { merchantSafe } = await revenuePool.registerMerchant(merchantsPrepaidCardAddress, infoDID);
+   * ```
+   * This call takes in as a parameter the prepaid card address that the merchant is using to pay the registration fee for becoming a new merchant.
+   * @returns promise for a web3 transaction receipt.
+   */
   async registerMerchant(
     txnHash: string
   ): Promise<{ merchantSafe: MerchantSafe; txReceipt: SuccessfulTransactionReceipt }>;

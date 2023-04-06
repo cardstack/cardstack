@@ -1,0 +1,36 @@
+name: Deploy api docs
+
+on:
+  workflow_dispatch:
+  workflow_run:
+    workflows: ["Manual publish"]
+    types:
+      - completed
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-deploy:
+    concurrency: ci-${{ github.ref }} # Recommended if you intend to make multiple deployments in quick succession.
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout 🛎️
+        uses: actions/checkout@v3
+      - uses: volta-cli/action@v4
+      - uses: ./.github/actions/setup-node-modules-cache
+        with:
+          yarn_lock_md5: ${{ hashFiles('yarn.lock') }}
+      - name: Install dependencies
+        run: yarn --prefer-offline --frozen-lockfile
+      - name: Run typedoc
+        run: jq ".version" lerna.json | xargs yarn typedoc . --rootPackageVersion
+        shell: bash
+        working-directory: .
+      - name: Deploy 🚀
+        id: deployment
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          folder: docs
+          target-folder: docs
+          branch: gh-pages

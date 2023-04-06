@@ -29,6 +29,9 @@ import {
 import { Signer } from 'ethers';
 const { fromWei } = Web3.utils;
 
+/**
+ * @group Cardpay
+ */
 export interface ISafes {
   viewSafe(safeAddress: string): Promise<ViewSafeResult>;
   view(options?: Partial<Options>): Promise<ViewSafesResult>;
@@ -46,6 +49,9 @@ export interface ISafes {
   ): Promise<SuccessfulTransactionReceipt>;
 }
 
+/**
+ * @group Cardpay
+ */
 export type Safe = DepotSafe | PrepaidCardSafe | MerchantSafe | RewardSafe | ExternalSafe;
 interface BaseSafe {
   address: string;
@@ -53,10 +59,16 @@ interface BaseSafe {
   tokens: TokenInfo[];
   owners: string[];
 }
+/**
+ * @group Cardpay
+ */
 export interface DepotSafe extends BaseSafe {
   type: 'depot';
   infoDID?: string;
 }
+/**
+ * @group Cardpay
+ */
 export interface MerchantSafe extends BaseSafe {
   type: 'merchant';
   accumulatedSpendValue: number;
@@ -64,14 +76,23 @@ export interface MerchantSafe extends BaseSafe {
   infoDID?: string;
 }
 
+/**
+ * @group Cardpay
+ */
 export interface RewardSafe extends BaseSafe {
   type: 'reward';
   rewardProgramId: string;
 }
 
+/**
+ * @group Cardpay
+ */
 export interface ExternalSafe extends BaseSafe {
   type: 'external';
 }
+/**
+ * @group Cardpay
+ */
 export interface PrepaidCardSafe extends BaseSafe {
   type: 'prepaid-card';
   issuingToken: string;
@@ -83,6 +104,9 @@ export interface PrepaidCardSafe extends BaseSafe {
   transferrable: boolean;
   customizationDID?: string;
 }
+/**
+ * @group Cardpay
+ */
 export interface TokenInfo {
   tokenAddress: string;
   token: {
@@ -93,20 +117,32 @@ export interface TokenInfo {
   balance: string; // balance is in native units of the token (e.g. wei)
 }
 
+/**
+ * @group Cardpay
+ */
 export interface Options {
   viewAll: boolean;
   type?: Safe['type'];
 }
 const defaultOptions: Options = { viewAll: false };
 
+/**
+ * @group Cardpay
+ */
 export interface CreateSafeResult {
   safeAddress: string;
 }
 
+/**
+ * @group Cardpay
+ */
 export interface ViewSafeResult {
   safe: Safe | undefined;
   blockNumber: number;
 }
+/**
+ * @group Cardpay
+ */
 export interface ViewSafesResult {
   safes: Safe[];
   blockNumber: number;
@@ -219,6 +255,9 @@ const safesFilteredQuery = `
   }
 `;
 
+/**
+ * @group Cardpay
+ */
 export async function viewSafe(network: 'gnosis' | 'sokol', safeAddress: string): Promise<ViewSafeResult> {
   let {
     data: { safe, _meta },
@@ -229,6 +268,17 @@ export async function viewSafe(network: 'gnosis' | 'sokol', safeAddress: string)
   };
 }
 
+/**
+ * The `Safes` API is used to query the card protocol about the gnosis safes in the layer 2 network in which the Card Protocol runs. This can includes safes in which bridged tokens are deposited as well as prepaid cards (which in turn are actually gnosis safes). The `Safes` API can be obtained from `getSDK()` with a `Web3` instance that is configured to operate on a layer 2 network (like Gnosis Chain or Sokol).
+ * @example
+ * ```ts
+ *import { getSDK } from "@cardstack/cardpay-sdk";
+ *let web3 = new Web3(myProvider); // Layer 2 web3 instance
+ *let safes = await getSDK('Safes', web3);
+ * ```
+ * @group Cardpay
+ * @category Main
+ */
 export default class Safes implements ISafes {
   constructor(private layer2Web3: Web3, private layer2Signer?: Signer) {}
 
@@ -318,6 +368,15 @@ export default class Safes implements ISafes {
     };
   }
 
+  /**
+   * This call is used to view a specific safe in the layer 2 network in which the Card Protocol runs.
+   * @param safeAddress
+   * @returns promise for an object that contains a `Safe` and the block number at which the subgraph was last indexed:
+   * @example
+   * ```ts
+   * let safeDetails = await safes.viewSafe(safeAddress); // returns { safe: Safe | undefined; blockNumber: number; }
+   * ```
+   */
   async viewSafe(safeAddress: string): Promise<ViewSafeResult> {
     let {
       data: { safe, _meta },
@@ -329,6 +388,15 @@ export default class Safes implements ISafes {
     };
   }
 
+  /**
+   * This call is used to view all the gnosis safes owned by a particular address in the layer 2 network in which the Card Protocol runs.
+   * @param owner Optionally the address of a safe owner. If no address is supplied, then the default account in your web3 provider's wallet will be used.
+   * @returns a promise that includes an array of all the gnosis safes owned by the specified address. The result is an object contains a `Safe[]` type which conforms to the `Safe` shape below, and the block number at which the subgraph was last indexed:
+   * @example
+   * ```ts
+   * let safeDetails = await safes.view(); // returns { safes: Safe[]; blockNumber: number; }
+   * ```
+   */
   async view(options?: Partial<Options>): Promise<ViewSafesResult>;
   async view(owner?: string): Promise<ViewSafesResult>;
   async view(owner?: string, options?: Partial<Options>): Promise<ViewSafesResult>;
@@ -381,8 +449,15 @@ export default class Safes implements ISafes {
     };
   }
 
-  // Note that the returned amount is in units of the token specified in the
-  // function params, tokenAddress
+  /**
+   * This call will return the gas estimate for sending tokens from a safe.
+   * @param safeAddress  the address of the gnosis safe
+   * @param tokenAddress  the address of the token contract
+   * @param recipient the address of the recipient
+   * @param amount optionally,  amount of tokens to send as a string in native units of the token (e.g. `wei`)
+   * @remarks Note that the returned amount is in units of the token specified in the
+   * function params, tokenAddress
+   */
   async sendTokensGasEstimate(
     safeAddress: string,
     tokenAddress: string,
@@ -411,6 +486,26 @@ export default class Safes implements ISafes {
     return gasInToken(estimate).toString();
   }
 
+  /**
+   * This call is used to send tokens from a gnosis safe to an arbitrary address in the layer 2 network. Note that the gas will be paid with the token you are transferring so there must be enough token balance in teh safe to cover both the transferred amount of tokens and gas.
+   * @param safeAddress  the address of the gnosis safe
+   * @param tokenAddress  the address of the token contract
+   * @param recipient the address of the recipient
+   * @param amount optionally,  amount of tokens to send as a string in native units of the token (e.g. `wei`)
+   * @returns a promise for a web3 transaction receipt.
+   * @example
+   * ```ts
+   * let cardCpxd = await getAddress('cardCpxd', web3);
+   *let result = await safes.sendTokens(
+   *  depotSafeAddress,
+   *  cardCpxd,
+   *  relayTxnFunderAddress
+   *  [10000000000000000000000]
+   *);
+   * ```
+   * @remarks Note that the returned amount is in units of the token specified in the
+   * function params, tokenAddress
+   */
   async sendTokens(txnHash: string): Promise<SuccessfulTransactionReceipt>;
   async sendTokens(
     safeAddress: string,

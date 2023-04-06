@@ -1,13 +1,26 @@
 import { SchedulePaymentProgressListener } from '../scheduled-payment-module';
 import { hubRequest, poll } from '../utils/general-utils';
 
+/**
+ * @group Utils
+ * @category Scheduler
+ */
 export const GAS_ESTIMATION_SCENARIOS = [
   'create_safe_with_module',
   'execute_one_time_payment',
   'execute_recurring_payment',
 ] as const;
+
+/**
+ * @group Utils
+ * @category Scheduler
+ */
 export type GasEstimationScenario = typeof GAS_ESTIMATION_SCENARIOS[number];
 
+/**
+ * @group Utils
+ * @category Scheduler
+ */
 export async function waitUntilSchedulePaymentTransactionMined(
   hubRootUrl: string,
   scheduledPaymentId: string,
@@ -30,6 +43,10 @@ export async function waitUntilSchedulePaymentTransactionMined(
   listener?.onEndWaitingForTransactionConfirmation?.();
 }
 
+/**
+ * @group Utils
+ * @category Scheduler
+ */
 export async function waitUntilCancelPaymentTransactionMined(
   hubRootUrl: string,
   scheduledPaymentId: string,

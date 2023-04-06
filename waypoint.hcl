@@ -64,6 +64,7 @@ app "hub" {
         WYRE_ACCOUNT_ID       = "arn:aws:ssm:us-east-1:680542703984:parameter/staging/hub/WYRE_ACCOUNT_ID"
         WYRE_API_KEY          = "arn:aws:ssm:us-east-1:680542703984:parameter/staging/hub/WYRE_API_KEY"
         WYRE_SECRET_KEY       = "arn:aws:ssm:us-east-1:680542703984:parameter/staging/hub/WYRE_SECRET_KEY"
+        GOERLI_RELAYER_ABOUT_PAGE_SECRET = "arn:aws:ssm:us-east-1:680542703984:parameter/staging/safe-relay/goerli/about_page_secret"
 
         # secrets manager
         CHECKLY_WEBHOOK_SECRET                        = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_hub_checkly_webhook_secret-etKeUa"
@@ -90,6 +91,8 @@ app "hub" {
         POLYGON_GAS_STATION_URL                       = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_polygon_gas_station_url-cUpbHc"
         POLYGON_RPC_NODE_HTTPS_URL                    = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_evm_polygon_infura_https_url-wIF3tU"
         POLYGON_RPC_NODE_WSS_URL                      = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_evm_polygon_infura_wss_url-UvdYiF"
+        POLYGON_HUB_RPC_NODE_HTTPS_URL                = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_evm_polygon_infura_https_url-wIF3tU"
+        ETHEREUM_HUB_RPC_NODE_HTTPS_URL               = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_evm_infura_https_url-aCpG9I"
 
         # The below is a distribution in the production AWS account
         HUB_STORAGE_CLOUDFRONT_DISTRIBUTION = "arn:aws:secretsmanager:us-east-1:680542703984:secret:hub_storage_cloudfront_distribution-Frtsb3"
@@ -187,6 +190,8 @@ app "hub-worker" {
         POLYGON_GAS_STATION_URL          = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_polygon_gas_station_url-cUpbHc"
         POLYGON_RPC_NODE_HTTPS_URL       = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_evm_polygon_infura_https_url-wIF3tU"
         POLYGON_RPC_NODE_WSS_URL         = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_evm_polygon_infura_wss_url-UvdYiF"
+        POLYGON_HUB_RPC_NODE_HTTPS_URL   = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_evm_polygon_infura_https_url-wIF3tU"
+        ETHEREUM_HUB_RPC_NODE_HTTPS_URL  = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_evm_infura_https_url-aCpG9I"
 
         # The below is a distribution in the production AWS account
         HUB_STORAGE_CLOUDFRONT_DISTRIBUTION = "arn:aws:secretsmanager:us-east-1:680542703984:secret:hub_storage_cloudfront_distribution-Frtsb3"
@@ -372,6 +377,8 @@ app "hub-event-listener" {
         POLYGON_GAS_STATION_URL          = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_polygon_gas_station_url-cUpbHc"
         POLYGON_RPC_NODE_HTTPS_URL       = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_evm_polygon_infura_https_url-wIF3tU"
         POLYGON_RPC_NODE_WSS_URL         = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_evm_polygon_infura_wss_url-UvdYiF"
+        POLYGON_HUB_RPC_NODE_HTTPS_URL   = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_evm_polygon_infura_https_url-wIF3tU"
+        ETHEREUM_HUB_RPC_NODE_HTTPS_URL   = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_evm_infura_https_url-aCpG9I"
       }
     }
 
@@ -534,7 +541,9 @@ app "reward-submit-lambda" {
       region = "us-east-1"
 
       static_environment = {
-        ENVIRONMENT = "staging"
+        ENVIRONMENT           = "staging"
+        REWARD_POOL_ADDRESS   = "0xc9A238Ee71A65554984234DF9721dbdA873F84FA"
+        REWARD_PROGRAM_OUTPUT = "s3://cardpay-staging-reward-programs/"
       }
     }
   }

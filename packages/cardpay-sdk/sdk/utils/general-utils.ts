@@ -18,6 +18,10 @@ import { getResolver as getWebDIDResolver } from 'web-did-resolver';
 
 import { Resolver } from 'did-resolver';
 
+/**
+ * @group Utils
+ * @category General
+ */
 export type ChainAddress = string;
 
 const POLL_INTERVAL = 500;
@@ -29,6 +33,10 @@ const BuiltinErrors: { [name: string]: ErrorFragment } = {
   '0x4e487b71': { signature: 'Panic(uint256)', name: 'Panic', inputs: ['uint256'] },
 };
 
+/**
+ * @group Utils
+ * @category General
+ */
 export interface Transaction {
   to: string;
   value: string;
@@ -36,32 +44,65 @@ export interface Transaction {
   operation: Operation;
 }
 
+/**
+ * @group Utils
+ * @category General
+ */
 export type TransactionHash = string;
 
+/**
+ *
+ * All the APIs that mutate the state of the blockchain have an overload that accepts a transaction hash
+as a single argument. This overload allows for resuming interrupted calls with a consistent return type.
+
+In addition, the normal overloads of these APIs accept a TransactionOptions arg with options related to
+nonce and the transaction hash.
+ * @group Utils
+ * @category General
+ */
 export interface TransactionOptions {
+  /** The purpose of these nonce parameters are to allow the client to reattempt sending the transaction. Specifically this can be used to handle re-requesting a wallet to sign a transaction. When the `nonce` parameter is not specified, then the SDK will use the next available nonce for the transaction based on the transaction count for the EOA or safe (as the case may be).  */
   nonce?: BN;
   gasPrice?: BN;
   gasLimit?: BN;
+  /** The `onNonce` callback will return the next available nonce (which is the nonce included in the signing request for the wallet). If the caller wishes to re-attempt sending the same transaction, the caller can specify the `nonce` to use when re-signing the transaction based on the nonce that was provided from the original `onNonce` callback. This will prevent the scenarios where the nonce will be increased on when the caller wants to force the wallet to resign the transaction. Care should be take though not to reuse a `nonce` value associated with a completed transaction. Such a situation could lead to the transaction being rejected because the nonce value is too low, or because the txn hash is identical to an already mined transaction.*/
   onNonce?: (nonce: BN) => void;
+  /** The promise returned by all the API's that mutate the state of the blockchain will resolve after the transaction has been mined with a transaction receipt. In order for callers of the SDK to obtain the transaction hash (for purposes of tracking the transaction) before the transaction has been mined, all API's that mutate the state of the blockchain will also contain a callback `onTxnHash` that callers can use to obtain the transaction hash as soon as it is available.*/
   onTxnHash?: (txnHash: TransactionHash) => unknown;
 }
 
+/**
+ * @group Utils
+ * @category General
+ */
 export interface RevertError extends Error {
   data: string;
   reason: string;
   error: any | undefined;
 }
 
+/**
+ * @group Utils
+ * @category General
+ */
 export interface ErrorFragment {
   signature: string;
   name: string;
   inputs: string[];
 }
 
+/**
+ * @group Utils
+ * @category General
+ */
 export function isJsonRpcProvider(web3OrEthersProvider: any): web3OrEthersProvider is JsonRpcProvider {
   return !!web3OrEthersProvider.getNetwork;
 }
 
+/**
+ * @group Utils
+ * @category General
+ */
 export async function networkName(web3OrEthersProvider: Web3 | JsonRpcProvider): Promise<string> {
   let id = isJsonRpcProvider(web3OrEthersProvider)
     ? (await web3OrEthersProvider.getNetwork()).chainId
@@ -73,8 +114,12 @@ export async function networkName(web3OrEthersProvider: Web3 | JsonRpcProvider):
   return name;
 }
 
-// Used to prevent block mismatch errors in infura (layer 1)
-// https://github.com/88mphapp/ng88mph-frontend/issues/55#issuecomment-940414832
+/**
+ *  Used to prevent block mismatch errors in infura (layer 1)
+ * https://github.com/88mphapp/ng88mph-frontend/issues/55#issuecomment-940414832
+ * @group Utils
+ * @category General
+ */
 export async function safeContractCall(
   web3: Web3,
   contract: Contract,
@@ -88,6 +133,10 @@ export async function safeContractCall(
   return await contract.methods[method](...args).call();
 }
 
+/**
+ * @group Utils
+ * @category General
+ */
 export function waitUntilTransactionMined(
   web3OrEthersProvider: Web3 | JsonRpcProvider,
   txnHash: TransactionHash,
@@ -147,6 +196,10 @@ export function waitUntilTransactionMined(
   });
 }
 
+/**
+ * @group Utils
+ * @category General
+ */
 export function waitUntilBlock(web3: Web3, blockNumber: number, duration = 60 * 10 * 1000): Promise<void> {
   let endTime = Number(new Date()) + duration;
 
@@ -176,12 +229,20 @@ export function waitUntilBlock(web3: Web3, blockNumber: number, duration = 60 * 
   });
 }
 
+/**
+ * @group Utils
+ * @category General
+ */
 export async function waitUntilOneBlockAfterTxnMined(web3: Web3, txnHash: TransactionHash) {
   let receipt = await waitUntilTransactionMined(web3, txnHash);
   await waitUntilBlock(web3, receipt.blockNumber + 1);
   return receipt;
 }
 
+/**
+ * @group Utils
+ * @category General
+ */
 export function waitForEvent(contract: Contract, eventName: string, opts: PastEventOptions): Promise<EventData> {
   let eventDataAsync = async function (
     resolve: (value: EventData | Promise<EventData>) => void,
@@ -221,6 +282,10 @@ interface TransactionQuerySubgraph {
   };
 }
 
+/**
+ * @group Utils
+ * @category General
+ */
 export async function waitForSubgraphIndex(txnHash: TransactionHash, network: string, duration?: number): Promise<void>;
 export async function waitForSubgraphIndex(txnHash: TransactionHash, web3: Web3, duration?: number): Promise<void>;
 export async function waitForSubgraphIndex(
@@ -277,6 +342,10 @@ async function waitForSafeNonceAdvance(
   }
 }
 
+/**
+ * @group Utils
+ * @category General
+ */
 export async function waitForTransactionConsistency(
   web3: Web3,
   txnHash: TransactionHash,
@@ -337,19 +406,31 @@ export async function waitForTransactionConsistency(
   return txnReceipt;
 }
 
-// because BN does not handle floating point, and the numbers from ethereum
-// might be too large for JS to handle, we'll use string manipulation to move
-// the decimal point. After this operation, the number should be safely in JS's
-// territory.
+/**
+ * @group Utils
+ * @category General
+ * @remarks because BN does not handle floating point, and the numbers from ethereum
+ * might be too large for JS to handle, we'll use string manipulation to move
+ * the decimal point. After this operation, the number should be safely in JS's
+ * territory.
+ */
 export function safeFloatConvert(rawAmount: BN, decimals: number): number {
   let amountStr = rawAmount.toString().padStart(decimals, '0');
   return Number(`${amountStr.slice(0, -1 * decimals)}.${amountStr.slice(-1 * decimals)}`);
 }
 
+/**
+ * @group Utils
+ * @category General
+ */
 export function isTransactionHash(candidate: string): boolean {
   return !!candidate.match(/^0x[0-9a-f]{64}$/);
 }
 
+/**
+ * @group Utils
+ * @category General
+ */
 export async function sendTransaction(web3: Web3, transaction: Transaction): Promise<string> {
   /* eslint-disable no-async-promise-executor */
   let txHash: string = await new Promise(async (resolve, reject) => {
@@ -365,6 +446,10 @@ export async function sendTransaction(web3: Web3, transaction: Transaction): Pro
   return txHash;
 }
 
+/**
+ * @group Utils
+ * @category General
+ */
 export function extractSendTransactionErrorMessage(revert: RevertError, abiInterface: Interface) {
   let error;
   let bytes = extractBytesLikeFromError(revert);
@@ -380,6 +465,10 @@ export function extractSendTransactionErrorMessage(revert: RevertError, abiInter
   return error;
 }
 
+/**
+ * @group Utils
+ * @category General
+ */
 export function extractBytesLikeFromError(revert: RevertError) {
   let bytes;
   if (revert.data) {
@@ -424,12 +513,20 @@ function extractErrorMessageFromBytesLike(bytesLike: BytesLike, abiInterface: In
   return error;
 }
 
+/**
+ * @group Utils
+ * @category General
+ */
 export function generateSaltNonce(prefix: string) {
   let uuid = prefix + '-' + v4();
   let result = [...uuid].reduce((result, char) => result + String(char.charCodeAt(0)), '');
   return result.substring(0, 77);
 }
 
+/**
+ * @group Utils
+ * @category General
+ */
 export async function hubRequest(
   hubUrl: string,
   path: string,
@@ -455,6 +552,10 @@ export async function hubRequest(
   return response.json();
 }
 
+/**
+ * @group Utils
+ * @category General
+ */
 export async function poll(
   fn: () => Promise<unknown>,
   fnCondition: (arg: unknown) => boolean,
@@ -480,12 +581,20 @@ export async function poll(
   ]);
 }
 
+/**
+ * @group Utils
+ * @category General
+ */
 export async function wait(ms = 1000) {
   return new Promise((resolve) => {
     setTimeout(resolve, ms);
   });
 }
 
+/**
+ * @group Utils
+ * @category General
+ */
 export async function resolveDoc(did: string) {
   let didResolver = new Resolver({
     ...getCardstackDIDResolver(),
@@ -511,6 +620,10 @@ export async function resolveDoc(did: string) {
   return content;
 }
 
+/**
+ * @group Utils
+ * @category General
+ */
 export function nonNullable<T>(value: T): value is NonNullable<T> {
   return Boolean(value);
 }

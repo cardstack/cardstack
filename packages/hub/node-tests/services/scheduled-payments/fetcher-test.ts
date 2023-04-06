@@ -73,8 +73,16 @@ describe('fetching scheduled payments that are due', function () {
 
   let createFailedScheduledPaymentAttemptWithExecutor = async (scheduledPayment: ScheduledPayment) => {
     let getCurrentGasPrice = executor.getCurrentGasPrice;
+    let withNonce = executor.crankNonceLock.withNonce; // Just some method at the appropriate spot in the executor to blow up intentionally to get into the catch block
 
+    // @ts-ignore param types
     executor.getCurrentGasPrice = async () => {
+      return {
+        gasPriceInGasToken: '10000',
+      };
+    };
+
+    executor.crankNonceLock.withNonce = async () => {
       throw new Error(
         'intentional error to get into the catch block of the executor so that nextRetryAttemptAt is updated'
       );
@@ -91,7 +99,8 @@ describe('fetching scheduled payments that are due', function () {
       // ignore
     }
 
-    executor.getCurrentGasPrice = getCurrentGasPrice; // Restore executor
+    executor.crankNonceLock.withNonce = withNonce; // Restore
+    executor.getCurrentGasPrice = getCurrentGasPrice; // Restore
   };
 
   describe('one-time scheduled payments', function () {
@@ -136,8 +145,8 @@ describe('fetching scheduled payments that are due', function () {
       let sp2And3Date = subDays(now, 1);
       let sp2 = await createScheduledPayment({ payAt: sp2And3Date }); // still valid to retry
       let sp3 = await createScheduledPayment({ payAt: sp2And3Date }); // still valid to retry
-      await createScheduledPaymentAttempt(sp2, sp2And3Date, addMinutes(sp2And3Date, 5), 'failed');
-      await createScheduledPaymentAttempt(sp3, sp2And3Date, addMinutes(sp2And3Date, 5), 'failed');
+      await createScheduledPaymentAttempt(sp2, sp2And3Date, addMinutes(sp2And3Date, 2), 'failed');
+      await createScheduledPaymentAttempt(sp3, addMinutes(sp2And3Date, 2), addMinutes(sp2And3Date, 5), 'failed');
 
       //scheduled payment with failed payment attempt 5 hours ago
       let sp4And5Date = subHours(now, 5);
@@ -184,14 +193,26 @@ describe('fetching scheduled payments that are due', function () {
         payAt: addDays(now, 1),
       });
 
-      expect((await subject.fetchScheduledPayments(chainId)).map((sp) => sp.id)).to.deep.equal([sp1.id, sp2.id]);
+      //passes recurring until but still in the valid period
+      let sp3 = await createScheduledPayment({
+        recurringUntil: subDays(now, 1),
+        recurringDayOfMonth: now.getDate(),
+        payAt: now,
+      });
+
+      expect((await subject.fetchScheduledPayments(chainId)).map((sp) => sp.id)).to.deep.equal([
+        sp1.id,
+        sp2.id,
+        sp3.id,
+      ]);
     });
 
     it('does not fetch payments that have recurringUntil in the past', async function () {
       await createScheduledPayment({
         recurringDayOfMonth: now.getDate(),
         payAt: now,
-        recurringUntil: subDays(now, 1),
+        recurringUntil: subDays(now, 2),
+        validForDays: 1,
       });
 
       expect(await subject.fetchScheduledPayments(chainId)).to.be.empty;
@@ -231,7 +252,7 @@ describe('fetching scheduled payments that are due', function () {
         payAt: sp2And3Date,
       }); // still valid to retry
       await createScheduledPaymentAttempt(sp2, sp2And3Date, addMinutes(sp2And3Date, 5), 'failed');
-      await createScheduledPaymentAttempt(sp3, sp2And3Date, addMinutes(sp2And3Date, 5), 'failed');
+      await createScheduledPaymentAttempt(sp3, addMinutes(sp2And3Date, 1), addMinutes(sp2And3Date, 5), 'failed');
 
       //scheduled payment with failed payment attempt 5 hours ago
       let sp4And5Date = subHours(now, 5);
@@ -247,7 +268,7 @@ describe('fetching scheduled payments that are due', function () {
         payAt: sp4And5Date,
       }); // still valid to retry
       await createScheduledPaymentAttempt(sp4, sp4And5Date, addMinutes(sp4And5Date, 5), 'failed');
-      await createScheduledPaymentAttempt(sp5, sp4And5Date, addMinutes(sp4And5Date, 5), 'failed');
+      await createScheduledPaymentAttempt(sp5, addMinutes(sp4And5Date, 1), addMinutes(sp4And5Date, 5), 'failed');
 
       expect((await subject.fetchScheduledPayments(chainId, 3)).map((sp) => sp.id)).to.deep.equal([
         sp1.id,

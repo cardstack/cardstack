@@ -9,26 +9,59 @@ import sokolTokenList from '../token-lists/sokol-tokenlist.json';
 import gnosisTokenList from '../token-lists/gnosis-tokenlist.json';
 import { type TokenList } from '@uniswap/token-lists';
 
+/**
+ * @group Config
+ */
 export const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000';
 
+/**
+ * @group Config
+ */
 export const MERCHANT_PAYMENT_UNIVERSAL_LINK_HOSTNAME = 'wallet.cardstack.com';
+/**
+ * @group Config
+ */
 export const MERCHANT_PAYMENT_UNIVERSAL_LINK_STAGING_HOSTNAME = 'wallet-staging.stack.cards';
+/**
+ * @group Config
+ */
 export const CARDWALLET_SCHEME = 'cardwallet';
 
+/**
+ * @group Config
+ */
 export const supportedChains = {
   ethereum: ['mainnet', 'goerli'],
   gnosis: ['gnosis', 'sokol'],
   polygon: ['polygon'],
 };
 
+/**
+ * @group Config
+ */
 export const supportedChainsArray = Object.values(supportedChains).flat();
 
+/**
+ * @group Config
+ */
 export type CardPayCapableNetworks = 'sokol' | 'gnosis';
+/**
+ * @group Config
+ */
 export type SchedulerCapableNetworks = 'mainnet' | 'goerli' | 'polygon';
+/**
+ * @group Config
+ */
 export type CardPayRequiredLayer1Networks = 'kovan' | 'mainnet';
+/**
+ * @group Config
+ */
 export type SchedulerAndCardPayL1Networks = CardPayRequiredLayer1Networks & SchedulerCapableNetworks;
 
-interface RequiredNetworkConstants {
+/**
+ * @group Config
+ */
+export interface RequiredNetworkConstants {
   apiBaseUrl: string;
   blockExplorer: string;
   chainId: number;
@@ -86,6 +119,9 @@ type NetworkConstants<N> = RequiredNetworkConstants &
     ? CardPayRequiredLayer1NetworkConstants
     : unknown);
 
+/**
+ * @group Config
+ */
 export type Network = CardPayCapableNetworks | SchedulerCapableNetworks | CardPayRequiredLayer1Networks;
 
 type NetworkConstantsKeys<N> = keyof NetworkConstants<N>;
@@ -239,8 +275,23 @@ const constants: {
   },
 };
 
+/**
+ * @group Config
+ */
 export const networkNames = Object.keys(constants);
 
+/**
+ * `networkIds` is a POJO that maps a network name to it's ethereum network ID.
+ * @example
+ * ```ts
+ * let networkId = networkIds["sokol"]; // 77
+ * ```
+ * Also, `networks` is an inverted `networkIds` POJO if you need to go in the other direction.
+ * ```ts
+ * let networkName = networks[77]; // "sokol"
+ * ```
+ * @group Config
+ */
 export const networkIds: Record<string, number> = Object.freeze(
   networkNames.reduce(
     (netIds, networkName) => ({
@@ -251,9 +302,15 @@ export const networkIds: Record<string, number> = Object.freeze(
   )
 );
 
-// invert the networkIds object, so { mainnet: 1, ... } becomes { '1': 'mainnet', ... }
+/**
+ * invert the networkIds object, so { mainnet: 1, ... } becomes { '1': 'mainnet', ... }
+ * @group Config
+ */
 export const networks: Record<string, string> = invert(networkIds);
 
+/**
+ * @group Config
+ */
 export function getConstantByNetwork<K extends NetworkConstantsKeys<N>, N extends Network | string>(
   name: K,
   network: N
@@ -268,6 +325,15 @@ export function getConstantByNetwork<K extends NetworkConstantsKeys<N>, N extend
   return value;
 }
 
+/**
+ * `getConstant` is a utility that will retrieve a network sensitive constant. The easiest way to use this function is to just pass your web3 instance to the function, and the function will query the web3 instance to see what network it is currently using. You can also just pass in the network name.
+ * @example
+ * ```ts
+ * let blockExplorer = await getConstant("blockExplorer", web3);
+ * let relayServiceURL = await getConstant("relayServiceURL", web3);
+ * ```
+ * @group Config
+ */
 export async function getConstant<K extends ConstantKeys>(
   name: K,
   web3OrNetworkOrEthersProvider: Web3 | string | JsonRpcProvider

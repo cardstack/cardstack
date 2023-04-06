@@ -1,6 +1,12 @@
+/**
+ * @group Hub
+ */
 export interface HubConfigResponse {
   web3: Web3HubConfig;
 }
+/**
+ * @group Hub
+ */
 export interface Web3HubConfig {
   layer1Network: string;
   layer1RpcNodeHttpsUrl: string;
@@ -14,11 +20,17 @@ export interface Web3HubConfig {
   schedulerNetworks: string[];
 }
 
+/**
+ * @group Hub
+ */
 export interface RpcNodeUrl {
   rpcNodeHttpsUrl: string;
   rpcNodeWssUrl: string;
 }
 
+/**
+ * @group Hub
+ */
 export default class HubConfig {
   constructor(private hubRootUrl: string) {}
   #cachedConfigResponse: HubConfigResponse | null = null;

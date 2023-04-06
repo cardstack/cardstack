@@ -27,6 +27,7 @@ import * as Sentry from '@sentry/browser';
 import FeeCalculator, { type CurrentFees } from './fee-calculator';
 import config from '@cardstack/safe-tools-client/config/environment';
 import HubAuthenticationService from '@cardstack/safe-tools-client/services/hub-authentication';
+import { endOfDay } from 'date-fns';
 
 interface Signature {
   Element: HTMLElement;
@@ -182,16 +183,8 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
   }
 
   get minMonthlyUntil() {
-    let minMonthlyUntil;
     let now = new Date();
-
-    if (this.paymentDayOfMonth && this.paymentDayOfMonth < now.getDate()) {
-      minMonthlyUntil = new Date(now.getFullYear(), now.getMonth() + 1, this.paymentDayOfMonth);
-    } else {
-      minMonthlyUntil = now;
-    }
-
-    return minMonthlyUntil;
+    return new Date(now.getFullYear(), now.getMonth() + 1, this.paymentDayOfMonth);
   }
 
   get maxMonthlyUntil() {
@@ -426,8 +419,8 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
   });
 
   get isSufficientGasTokenBalance() {
-    let gasTokenBalance = this.safes.tokenBalances?.find(t => t.tokenAddress == this.selectedGasToken?.address);
-    if (this.requiredGasTokenToSchedulePayment.value && this.selectedGasToken && this.selectedGasToken.address === this.requiredGasTokenToSchedulePayment.value.address && gasTokenBalance) {
+    let gasTokenBalance = this.safes.tokenBalances?.find(t => t.tokenAddress?.toLowerCase() == this.selectedGasToken?.address?.toLowerCase());
+    if (this.requiredGasTokenToSchedulePayment.value && this.selectedGasToken && this.selectedGasToken.address.toLowerCase() === this.requiredGasTokenToSchedulePayment.value.address.toLowerCase() && gasTokenBalance) {
       return gasTokenBalance.balance.gte(this.requiredGasTokenToSchedulePayment.value.count);
     }
     return false;
@@ -534,10 +527,15 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
   composeSchedulePaymentParams() {
     if (!this.paymentTokenQuantity || !this.selectedGasToken || !this.safes.currentSafe || !this.gasEstimation) return undefined;
 
-    const defaultGas = BigNumber.from(0);
+    // Cost of the execution transaction in gas token units by max gas cost preference (standard, high, max)
     const gasRangeByMaxPrice = this.gasEstimation.gasRangeInGasTokenUnits[this.maxGasPrice];
 
-    const maxGasPriceString = String(gasRangeByMaxPrice.div(this.gasEstimation.gas) || defaultGas);
+    // To get the max gas price in smallest units, we divide the total gas cost by units of gas needed to execute the transaction
+    // Since the amount of gas units (gasEstimation.gas) can be larger then the cost in gas units in smallest units (this can happen in case of tokens with
+    // 6 decimal places such as USDC/USDT), the result of the BigNumber integer division will be 0. But we want to define at least 1 as the max gas price
+    // in smallest units, because if we use 0, then the transaction will fail because the max gas price is too low.
+    const maxGasPriceInGasToken = gasRangeByMaxPrice.div(this.gasEstimation.gas)
+    const maxGasPriceString = (maxGasPriceInGasToken.eq(BigNumber.from(0)) ? BigNumber.from(1) : maxGasPriceInGasToken).toString();
 
     const array = new Uint8Array(32);
     window.crypto.getRandomValues(array);
@@ -549,8 +547,7 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
 
     let payAt = this.selectedPaymentType === 'one-time' ? Math.round(this.paymentDate!.getTime() / 1000) : null;
     let recurringDayOfMonth = this.selectedPaymentType === 'monthly' ? this.paymentDayOfMonth! : null;
-    let recurringUntil = this.selectedPaymentType === 'monthly' ? Math.round(this.monthlyUntil!.getTime() / 1000) : null
-
+    let recurringUntil = this.selectedPaymentType === 'monthly' ? Math.round(endOfDay(this.monthlyUntil!).getTime() / 1000) : null;
     return {
       safeAddress: currentSafe.address,
       spModuleAddress: currentSafe.spModuleAddress,

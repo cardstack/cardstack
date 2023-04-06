@@ -3,7 +3,7 @@
 import BN from 'bn.js';
 import Web3 from 'web3';
 import { TransactionReceipt, Log } from 'web3-core';
-import { getConstant, ZERO_ADDRESS } from '../constants';
+import { getConstant } from '../constants';
 import { getSDK } from '../version-resolver';
 import { Signature } from './signing-utils';
 import PrepaidCardManagerABI from '../../contracts/abi/v0.9.0/prepaid-card-manager';
@@ -19,11 +19,19 @@ import { Interface, LogDescription } from 'ethers/lib/utils';
 import JsonRpcProvider from '../../providers/json-rpc-provider';
 import { BigNumber } from 'ethers';
 
+/**
+ * @group Utils
+ * @category Safe
+ */
 export interface EventABI {
   topic: string;
   abis: { type: string; name: string; indexed?: boolean }[];
 }
 
+/**
+ * @group Utils
+ * @category Safe
+ */
 export interface CreateSafe {
   safe: string;
   masterCopy: string;
@@ -35,6 +43,10 @@ export interface CreateSafe {
   setupData: string;
 }
 
+/**
+ * @group Utils
+ * @category Safe
+ */
 export interface Estimate {
   safeTxGas: string;
   baseGas: string;
@@ -45,20 +57,36 @@ export interface Estimate {
   gasToken: string;
   refundReceiver: string;
 }
+/**
+ * @group Utils
+ * @category Safe
+ */
 export interface SendPayload extends Estimate {
   data: any;
 }
 
+/**
+ * @group Utils
+ * @category Safe
+ */
 export interface GasEstimate {
   amount: BN;
   gasToken: string;
 }
 
+/**
+ * @group Utils
+ * @category Safe
+ */
 export enum Operation {
   CALL = 0,
   DELEGATECALL = 1,
 }
 
+/**
+ * @group Utils
+ * @category Safe
+ */
 export interface RelayTransaction {
   to: string;
   ethereumTx: {
@@ -79,6 +107,10 @@ export interface RelayTransaction {
     from: string;
   };
 }
+/**
+ * @group Utils
+ * @category Safe
+ */
 export interface GnosisExecTx extends RelayTransaction {
   value: number;
   nonce: number;
@@ -95,6 +127,10 @@ export interface GnosisExecTx extends RelayTransaction {
   transactionHash: string;
 }
 
+/**
+ * @group Utils
+ * @category Safe
+ */
 export async function createSafe(
   web3: Web3,
   owners: string[],
@@ -124,6 +160,10 @@ export async function createSafe(
   return await response.json();
 }
 
+/**
+ * @group Utils
+ * @category Safe
+ */
 export async function gasEstimate(
   web3OrEthersProvider: Web3 | JsonRpcProvider,
   from: string,
@@ -169,6 +209,10 @@ export async function gasEstimate(
   return await response.json();
 }
 
+/**
+ * @group Utils
+ * @category Safe
+ */
 export async function executeSendWithRateLock(
   web3: Web3,
   prepaidCardAddress: string,
@@ -204,6 +248,10 @@ export async function executeSendWithRateLock(
   return result;
 }
 
+/**
+ * @group Utils
+ * @category Safe
+ */
 export async function getSendPayload(
   web3: Web3,
   prepaidCardAddress: string,
@@ -234,6 +282,10 @@ export async function getSendPayload(
   return await response.json();
 }
 
+/**
+ * @group Utils
+ * @category Safe
+ */
 export async function executeTransaction(
   web3OrEthersProvider: Web3 | JsonRpcProvider,
   from: string,
@@ -265,7 +317,7 @@ export async function executeTransaction(
       nonce: nonce.toString(),
       signatures,
       gasToken: estimate.gasToken,
-      refundReceiver: ZERO_ADDRESS,
+      refundReceiver: estimate.refundReceiver,
       eip1271Data,
     }),
   };
@@ -276,6 +328,10 @@ export async function executeTransaction(
   return response.json();
 }
 
+/**
+ * @group Utils
+ * @category Safe
+ */
 export async function executeSend(
   web3: Web3,
   prepaidCardAddress: string,
@@ -314,6 +370,10 @@ export async function executeSend(
   return response.json();
 }
 
+/**
+ * @group Utils
+ * @category Safe
+ */
 export async function generateCreate2SafeTx(
   ethersProvider: JsonRpcProvider,
   owners: string[],
@@ -400,6 +460,10 @@ function getSafeAddressFromRevertMessage(e: any): string {
   return safeAddress;
 }
 
+/**
+ * @group Utils
+ * @category Safe
+ */
 export async function getSafeVersion(
   web3OrEthersProvider: Web3 | JsonRpcProvider,
   gnosisSafeAddress: string
@@ -440,6 +504,10 @@ async function getSafeVersionWithEthers(ethersProvider: JsonRpcProvider, gnosisS
   return safeVersion;
 }
 
+/**
+ * @group Utils
+ * @category Safe
+ */
 // allow TransactionReceipt as argument
 // eslint-disable-next-line @typescript-eslint/ban-types
 export function getParamsFromEvent(web3: Web3, txnReceipt: TransactionReceipt, eventAbi: EventABI, address: string) {
@@ -449,6 +517,10 @@ export function getParamsFromEvent(web3: Web3, txnReceipt: TransactionReceipt, e
   return eventParams;
 }
 
+/**
+ * @group Utils
+ * @category Safe
+ */
 export async function getSafeProxyCreationEvent(
   ethersProvider: JsonRpcProvider,
   logs: Log[]
@@ -465,6 +537,10 @@ function isSafeProxyCreationEvent(gnosisProxyFactoryAddress: string, _interface:
   return log.address === gnosisProxyFactoryAddress && log.topics[0] === _interface.getEventTopic('ProxyCreation');
 }
 
+/**
+ * @group Utils
+ * @category Safe
+ */
 export function getNextNonceFromEstimate(estimate: Estimate | SendPayload): BN {
   if (estimate.lastUsedNonce == null) {
     estimate.lastUsedNonce = -1;
@@ -476,18 +552,26 @@ function isEventMatch(log: Log, topic: string, address: string) {
   return log.topics[0] === topic && log.address.toLowerCase() === address.toLowerCase();
 }
 
+/**
+ * @group Utils
+ * @category Safe
+ */
 export function gasInToken(estimate: Estimate): BN {
   let gasUnits = new BN(String(estimate.baseGas)).add(new BN(String(estimate.safeTxGas)));
   return gasUnits.mul(new BN(String(estimate.gasPrice)));
 }
 
-// In the relayer, there is a check for sufficient funds inside the safe
-// The issue with occurs when want to withdraw/transfer full balances from the safe
-// The full amount has to be deducted for gas (usually it is pre-estimated).
-// This gas is estimated and can be inaccurate so we intentionally over-estimate the gas
-// to avoid a discrepancy between gas estimation of the relayer and the sdk.
-// The number is based off empirical observation of sentry errors; the baseGas difference is usually 12
-// https://github.com/cardstack/card-protocol-relay-service/blob/master/safe.py#L303-L316
+/**
+ * In the relayer, there is a check for sufficient funds inside the safe
+ * The issue with occurs when want to withdraw/transfer full balances from the safe
+ * The full amount has to be deducted for gas (usually it is pre-estimated).
+ * This gas is estimated and can be inaccurate so we intentionally over-estimate the gas
+ * to avoid a discrepancy between gas estimation of the relayer and the sdk.
+ * The number is based off empirical observation of sentry errors; the baseGas difference is usually 12
+ * https://github.com/cardstack/card-protocol-relay-service/blob/master/safe.py#L303-L316
+ * @group Utils
+ * @category Safe
+ */
 export const baseGasBuffer: BN = new BN('30');
 
 interface BalanceEntry {
@@ -501,13 +585,21 @@ interface BalanceEntry {
   } | null;
 }
 
-interface BalanceSummary {
+/**
+ * @group Utils
+ * @category Safe
+ */
+export interface BalanceSummary {
   tokenAddress: string;
   symbol: string;
   balance: BigNumber;
   decimals: number;
 }
 
+/**
+ * @group Utils
+ * @category Safe
+ */
 export async function getTokenBalancesForSafe(
   provider: JsonRpcProvider,
   tokenAddresses: string[],

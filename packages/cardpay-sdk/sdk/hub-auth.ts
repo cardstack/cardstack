@@ -6,17 +6,26 @@ import { ContractOptions } from 'web3-eth-contract';
 import { Signer } from 'ethers';
 import JsonRpcProvider from '../providers/json-rpc-provider';
 
+/**
+ * @group Hub
+ */
 export interface IHubAuth {
   getNonce(): Promise<NonceResponse>;
   authenticate(): Promise<string>;
   checkValidAuth(authToken: string): Promise<boolean>;
   getHubUrl(network?: string): Promise<string>;
 }
-interface NonceResponse {
+/**
+ * @group Hub
+ */
+export interface NonceResponse {
   nonce: string;
   version: string;
 }
 
+/**
+ * @group Hub
+ */
 export default class HubAuth implements IHubAuth {
   constructor(
     private web3OrEthersProvider: Web3 | JsonRpcProvider,

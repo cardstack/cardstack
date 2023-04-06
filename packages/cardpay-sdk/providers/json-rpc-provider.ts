@@ -121,6 +121,9 @@ function checkError(method: string, error: any): any {
 // This is the patched @ethersproject/providers/JsonRpcProvider
 // that will throw an error message in the format that
 // make SDK easier to extract revert messages from smart contracts
+/**
+ * @group Provider
+ */
 export default class JsonRpcProvider extends providers.JsonRpcProvider {
   constructor(url?: ConnectionInfo | string, network?: Networkish) {
     super(url, network);

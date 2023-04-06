@@ -1,13 +1,17 @@
 {
   "name": "@cardstack/discord-bot",
-  "version": "1.0.42",
+  "version": "1.0.46",
   "description": "Library for writing robust discord bots",
   "author": "Hassan Abdel-Rahman @habdelra",
   "license": "MIT",
   "main": "./index.ts",
+  "typedoc": {
+    "entryPoint": "./index.ts",
+    "readmeFile": "./README.md"
+  },
   "dependencies": {
-    "@cardstack/cardpay-sdk": "1.0.42",
-    "@cardstack/db": "1.0.42",
+    "@cardstack/cardpay-sdk": "1.0.46",
+    "@cardstack/db": "1.0.46",
     "@cardstack/logger": "^0.2.1",
     "@sentry/node": "^7.8.0",
     "@types/fs-extra": "^9.0.11",
@@ -24,8 +28,8 @@
     "tmp": "^0.2.1"
   },
   "devDependencies": {
-    "@cardstack/eslint-config": "1.0.42",
-    "@cardstack/test-support": "1.0.42",
+    "@cardstack/eslint-config": "1.0.46",
+    "@cardstack/test-support": "1.0.46",
     "@types/chai": "^4.2.15",
     "@types/mocha": "^8.2.1",
     "chai": "^4.3.4",

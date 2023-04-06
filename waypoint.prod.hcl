@@ -67,6 +67,8 @@ app "hub" {
         WYRE_ACCOUNT_ID       = "arn:aws:ssm:us-east-1:120317779495:parameter/production/hub/WYRE_ACCOUNT_ID"
         WYRE_API_KEY          = "arn:aws:ssm:us-east-1:120317779495:parameter/production/hub/WYRE_API_KEY"
         WYRE_SECRET_KEY       = "arn:aws:ssm:us-east-1:120317779495:parameter/production/hub/WYRE_SECRET_KEY"
+        ETHEREUM_RELAYER_ABOUT_PAGE_SECRET = "arn:aws:ssm:us-east-1:120317779495:parameter/production/safe-relay/ethereum/about_page_secret"
+        POLYGON_RELAYER_ABOUT_PAGE_SECRET  = "arn:aws:ssm:us-east-1:120317779495:parameter/production/safe-relay/polygon/about_page_secret"
 
         # secrets manager
         CHECKLY_WEBHOOK_SECRET                        = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_hub_checkly_webhook_secret-1VZEgk"
@@ -95,6 +97,8 @@ app "hub" {
         POLYGON_GAS_STATION_URL                       = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_polygon_gas_station_url-j7D7GO"
         POLYGON_RPC_NODE_HTTPS_URL                    = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_evm_polygon_infura_https_url-DlBN06"
         POLYGON_RPC_NODE_WSS_URL                      = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_evm_polygon_infura_wss_url-ErLq0E"
+        POLYGON_HUB_RPC_NODE_HTTPS_URL                = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_evm_hub_polygon_https_url-jIVW87"
+        ETHEREUM_HUB_RPC_NODE_HTTPS_URL               = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_evm_hub_mainnet_https_url-jRtxEP"
       }
     }
 
@@ -193,6 +197,8 @@ app "hub-worker" {
         POLYGON_GAS_STATION_URL             = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_polygon_gas_station_url-j7D7GO"
         POLYGON_RPC_NODE_HTTPS_URL          = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_evm_polygon_infura_https_url-DlBN06"
         POLYGON_RPC_NODE_WSS_URL            = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_evm_polygon_infura_wss_url-ErLq0E"
+        POLYGON_HUB_RPC_NODE_HTTPS_URL      = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_evm_hub_polygon_https_url-jIVW87"
+        ETHEREUM_HUB_RPC_NODE_HTTPS_URL     = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_evm_hub_mainnet_https_url-jRtxEP"
       }
     }
 
@@ -385,6 +391,8 @@ app "hub-event-listener" {
         POLYGON_GAS_STATION_URL          = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_polygon_gas_station_url-j7D7GO"
         POLYGON_RPC_NODE_HTTPS_URL       = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_evm_polygon_infura_https_url-DlBN06"
         POLYGON_RPC_NODE_WSS_URL         = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_evm_polygon_infura_wss_url-ErLq0E"
+        POLYGON_HUB_RPC_NODE_HTTPS_URL   = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_evm_hub_polygon_https_url-jIVW87"
+        ETHEREUM_HUB_RPC_NODE_HTTPS_URL   = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_evm_hub_mainnet_https_url-jRtxEP"
       }
     }
 

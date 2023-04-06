@@ -1,9 +1,17 @@
+/**
+ * @group Utils
+ * @category Currency
+ */
 enum CryptoCurrency {
   ETH = 'ETH',
   DAI = 'DAI',
   CARD = 'CARD',
 }
 
+/**
+ * @group Utils
+ * @category Currency
+ */
 enum NativeCurrency {
   USD = 'USD',
   EUR = 'EUR',
@@ -20,6 +28,10 @@ enum NativeCurrency {
   ZAR = 'ZAR',
 }
 
+/**
+ * @group Utils
+ * @category Currency
+ */
 type Currency = CryptoCurrency | NativeCurrency;
 
 export type { Currency };
@@ -38,6 +50,10 @@ interface CurrencyInfo {
   emojiName?: string;
 }
 
+/**
+ * @group Utils
+ * @category Currency
+ */
 const cryptoCurrencies: Record<CryptoCurrency, CurrencyInfo> = {
   ETH: {
     alignment: 'left',
@@ -74,6 +90,10 @@ const cryptoCurrencies: Record<CryptoCurrency, CurrencyInfo> = {
   },
 };
 
+/**
+ * @group Utils
+ * @category Currency
+ */
 const nativeCurrencies: Record<NativeCurrency, CurrencyInfo> = {
   USD: {
     alignment: 'left',
@@ -233,6 +253,10 @@ const nativeCurrencies: Record<NativeCurrency, CurrencyInfo> = {
   },
 };
 
+/**
+ * @group Utils
+ * @category Currency
+ */
 const currencies: Record<Currency, CurrencyInfo> = {
   ...cryptoCurrencies,
   ...nativeCurrencies,

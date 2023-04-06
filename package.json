@@ -105,7 +105,8 @@
     "status:subgraph-xdai-blue": "yarn --cwd packages/cardpay-subgraph xdai-blue-status",
     "waypoint-vars": "node ./scripts/waypoint-vars.js",
     "update-relay-gas-tokens": "ts-node --esm scripts/update-relay-server-gas-tokens.ts",
-    "aws:update-ecr-lifecycle-policy": "ts-node --esm scripts/ecr-lifecycle.ts"
+    "aws:update-ecr-lifecycle-policy": "ts-node --esm scripts/ecr-lifecycle.ts",
+    "build:docs": "typedoc ."
   },
   "resolutions": {
     "ember-a11y-testing": "4.0.3",
@@ -131,5 +132,10 @@
   "volta": {
     "node": "14.18.3",
     "yarn": "1.22.17"
+  },
+  "devDependencies": {
+    "typedoc": "^0.23.26",
+    "typedoc-plugin-resolve-crossmodule-references": "^0.3.3",
+    "typedoc-plugin-versions": "https://github.com/tintinthong/typedoc-plugin-versions.git#add-custom-root-package-version"
   }
 }

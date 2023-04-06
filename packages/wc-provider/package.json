@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/wc-provider",
-  "version": "1.0.42",
+  "version": "1.0.46",
   "description": "WalletConnect provider that uses websockets rather than http",
   "author": "Aierie <michael.khor@cardstack.com>",
   "homepage": "https://github.com/cardstack/cardstack#readme",
@@ -13,6 +13,10 @@
       "import": "./index.ts",
       "types": "./dist/index.d.ts"
     }
+  },
+  "typedoc": {
+    "entryPoint": "./index.ts",
+    "readmeFile": "./README.md"
   },
   "scripts": {
     "test": "mocha -r ts-node/register 'tests/**/*-test.ts' --timeout 60000 --exit",

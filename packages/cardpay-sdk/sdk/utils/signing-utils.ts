@@ -5,7 +5,6 @@ import PrepaidCardManagerABI from '../../contracts/abi/v0.9.0/prepaid-card-manag
 import { AbiItem, padLeft, toHex, numberToHex, hexToBytes } from 'web3-utils';
 
 import { getAddress } from '../../contracts/addresses';
-import { ZERO_ADDRESS } from '../constants';
 
 import { isJsonRpcProvider, networkName } from './general-utils';
 import { networkIds } from '../constants';
@@ -13,12 +12,20 @@ import { gte } from 'semver';
 import { Signer } from 'ethers';
 import JsonRpcProvider from '../../providers/json-rpc-provider';
 
+/**
+ * @group Utils
+ * @category Signing
+ */
 export interface Signature {
   v: number;
   r: string;
   s: string | 0;
 }
 
+/**
+ * @group Utils
+ * @category Signing
+ */
 export async function signPrepaidCardSendTx(
   web3: Web3,
   prepaidCardAddress: string,
@@ -51,6 +58,10 @@ export async function signPrepaidCardSendTx(
   return signatures;
 }
 
+/**
+ * @group Utils
+ * @category Signing
+ */
 export async function signSafeTx(
   web3OrEthersProvider: Web3 | JsonRpcProvider,
   safeAddress: string,
@@ -72,7 +83,7 @@ export async function signSafeTx(
     estimate.dataGas,
     estimate.gasPrice,
     estimate.gasToken,
-    ZERO_ADDRESS,
+    estimate.refundReceiver,
     nonce,
     from,
     safeAddress,
@@ -81,6 +92,10 @@ export async function signSafeTx(
   return signatures;
 }
 
+/**
+ * @group Utils
+ * @category Signing
+ */
 export async function signSafeTxAsRSV(
   web3OrEthersProvider: Web3 | JsonRpcProvider,
   to: string,
@@ -118,6 +133,10 @@ export async function signSafeTxAsRSV(
   return signatureRSV;
 }
 
+/**
+ * @group Utils
+ * @category Signing
+ */
 export async function signSafeTxAsBytes(
   web3OrEthersProvider: Web3 | JsonRpcProvider,
   to: string,
@@ -151,6 +170,10 @@ export async function signSafeTxAsBytes(
   return [await signTypedData(signer ?? web3OrEthersProvider, owner, typedData)];
 }
 
+/**
+ * @group Utils
+ * @category Signing
+ */
 export async function signSafeTxWithEIP1271AsBytes(
   web3: Web3,
   to: string,
@@ -264,6 +287,10 @@ async function safeTransactionTypedData(
   return typedData;
 }
 
+/**
+ * @group Utils
+ * @category Signing
+ */
 export async function signTypedData(
   web3OrSignerOrEthersProvider: Web3 | Signer | JsonRpcProvider,
   account: string,
@@ -288,7 +315,7 @@ export async function signTypedData(
       signature = await signer._signTypedData(domain, types, message);
     } else if (isJsonRpcProvider(web3OrSignerOrEthersProvider)) {
       let ethersProvider = web3OrSignerOrEthersProvider;
-      return await ethersProvider.send('eth_signTypedData_v4', [account, JSON.stringify(data)]);
+      signature = await ethersProvider.send('eth_signTypedData_v4', [account, JSON.stringify(data)]);
     } else {
       signature = await signTypedDataWithWeb3(web3OrSignerOrEthersProvider, account, data);
     }
@@ -296,7 +323,7 @@ export async function signTypedData(
   if (!signature) {
     throw new Error(`unable to sign typed data for EOA ${account} with data ${JSON.stringify(data, null, 2)}`);
   }
-  return signature;
+  return signature.startsWith('0x') ? signature : '0x' + signature;
 }
 
 async function signTypedDataWithWeb3(web3: Web3, account: string, data: any): Promise<string> {
@@ -326,6 +353,10 @@ async function signTypedDataWithWeb3(web3: Web3, account: string, data: any): Pr
   });
 }
 
+/**
+ * @group Utils
+ * @category Signing
+ */
 export function ethSignSignatureToRSVForSafe(ethSignSignature: string) {
   const sig = ethSignSignature.replace('0x', '');
   const sigV = parseInt(sig.slice(-2), 16);
@@ -339,6 +370,10 @@ export function ethSignSignatureToRSVForSafe(ethSignSignature: string) {
   };
 }
 
+/**
+ * @group Utils
+ * @category Signing
+ */
 export async function signRewardSafe(
   web3: Web3,
   to: string,
@@ -388,6 +423,10 @@ function createEIP1271ContractSignatureRSV(verifyingContractAddress: string): Si
   return ethSignSignatureToRSVForSafe(createEIP1271ContractSignature(verifyingContractAddress));
 }
 
+/**
+ * @group Utils
+ * @category Signing
+ */
 export function createEIP1271VerifyingData(
   web3: Web3,
   to: string,

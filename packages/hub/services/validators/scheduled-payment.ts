@@ -3,7 +3,7 @@ import { ScheduledPayment } from '@prisma/client';
 import { startCase } from 'lodash';
 import { convertChainIdToName, isSupportedChain, SchedulerCapableNetworks } from '@cardstack/cardpay-sdk';
 import { inject } from '@cardstack/di';
-import { addMonths, isAfter } from 'date-fns';
+import { addMonths, isAfter, isBefore } from 'date-fns';
 const { isAddress } = Web3.utils;
 
 type ScheduledPaymentAttribute =
@@ -62,7 +62,6 @@ export default class ScheduledPaymentValidator {
       'executionGasEstimation',
       'maxGasPrice',
       'feeFixedUsd',
-      'payAt',
       'feePercentage',
       'salt',
       'spHash',
@@ -75,6 +74,24 @@ export default class ScheduledPaymentValidator {
       if (scheduledPayment[attribute] == null) {
         errors[attribute].push(`${startCase(attribute).toLowerCase()} is required`);
       }
+    }
+
+    if (!scheduledPayment.payAt && !scheduledPayment.recurringDayOfMonth && !scheduledPayment.recurringUntil) {
+      errors['payAt'].push(
+        `you must either set pay at for one time payment, or both recurring day of month and recurring until for recurring payments`
+      );
+      errors['recurringDayOfMonth'].push(
+        `you must either set pay at for one time payment, or both recurring day of month and recurring until for recurring payments`
+      );
+      errors['recurringUntil'].push(
+        `you must either set pay at for one time payment, or both recurring day of month and recurring until for recurring payments`
+      );
+    } else if (scheduledPayment.recurringDayOfMonth && !scheduledPayment.recurringUntil) {
+      errors['recurringUntil'].push(`recurring until is required when recurring day of month is set`);
+    } else if (!scheduledPayment.recurringDayOfMonth && scheduledPayment.recurringUntil) {
+      errors['recurringDayOfMonth'].push(`recurring day of month is required when recurring until is set`);
+    } else if (scheduledPayment.recurringDayOfMonth && scheduledPayment.recurringUntil && !scheduledPayment.payAt) {
+      errors['recurringUntil'].push(`must be later than the recurring date`);
     }
 
     let addressAttributes: ScheduledPaymentAttribute[] = [
@@ -95,11 +112,19 @@ export default class ScheduledPaymentValidator {
       if (isAfter(scheduledPayment.payAt, aYearFromNow)) {
         errors['payAt'].push(`payment date cannot be further than 1 year in the future`);
       }
+
+      if (scheduledPayment.recurringUntil && isAfter(scheduledPayment.payAt, scheduledPayment.recurringUntil)) {
+        errors['payAt'].push(`payment date cannot be later than recurring payment end date`);
+      }
     }
 
     if (scheduledPayment.recurringUntil) {
       if (isAfter(scheduledPayment.recurringUntil, aYearFromNow)) {
         errors['recurringUntil'].push(`recurring payment end date cannot be further than 1 year in the future`);
+      }
+
+      if (isBefore(scheduledPayment.recurringUntil, new Date())) {
+        errors['recurringUntil'].push(`recurring payment end date must be in the future`);
       }
     }
 

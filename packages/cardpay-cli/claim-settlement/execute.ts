@@ -1,7 +1,6 @@
 import { Arguments, Argv, CommandModule } from 'yargs';
 import { getEthereumClients, getConnectionType, NETWORK_OPTION_ANY } from '../utils';
 import { getConstant, getSDK } from '@cardstack/cardpay-sdk';
-import { SignedClaim } from '@cardstack/cardpay-sdk/sdk/claim-settlement-module';
 
 export default {
   command: 'execute <moduleAddress> <encoded> <signature> [payeeSafeAddress] [gasTokenAddress]',
@@ -43,7 +42,7 @@ export default {
     let claimSettlementModule = await getSDK('ClaimSettlementModule', ethersProvider, signer);
     let blockExplorer = await getConstant('blockExplorer', ethersProvider);
     let onTxnHash = (txnHash: string) => console.log(`Transaction hash: ${blockExplorer}/tx/${txnHash}`);
-    let signedClaim: SignedClaim = {
+    let signedClaim = {
       signature,
       encoded,
     };

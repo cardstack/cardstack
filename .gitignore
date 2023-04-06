@@ -142,3 +142,4 @@ service-account.json
 
 #python
 .pdm.toml
+docs/
