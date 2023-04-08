@@ -577,4 +577,9 @@ export default abstract class SafeModule {
       expectedModuleAddress: enableModuleTxs.expectedModuleAddress,
     };
   }
+
+  async isModuleEnabled(safeAddress: string, moduleAddress: string): Promise<boolean> {
+    let gnosisSafe = new Contract(safeAddress, GnosisSafeABI, this.ethersProvider);
+    return await gnosisSafe.isModuleEnabled(moduleAddress);
+  }
 }
