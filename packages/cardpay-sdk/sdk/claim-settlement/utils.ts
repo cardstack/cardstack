@@ -47,7 +47,7 @@ class SolidityStruct {
   asMapping() {
     const data: { [key: string]: any } = {}; // eslint-disable-line @typescript-eslint/no-explicit-any
     this.properties.forEach((o, i) => {
-      data[o.name] = this.values[i];
+      data[o.name] = this.values[i] instanceof BigNumber ? this.values[i].toString() : this.values[i];
     });
     return data;
   }
