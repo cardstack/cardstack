@@ -3,7 +3,7 @@ import SafeModule from './safe-module';
 import { BigNumber, Contract, Signer, VoidSigner, utils } from 'ethers';
 import ClaimSettlementABI from '../contracts/abi/modules/claim-settlement-module';
 import { SetupArgs } from './utils/module-utils';
-import { Address, Claim, TimeRangeSeconds, TransferERC20ToCaller } from './claim-settlement/utils';
+import { NFTOwner, Claim, TimeRangeSeconds, TransferERC20ToCaller } from './claim-settlement/utils';
 import ERC20ABI from '../contracts/abi/erc-20';
 import { executeTransaction, gasEstimate, getNextNonceFromEstimate, Operation } from './utils/safe-utils';
 import { SuccessfulTransactionReceipt } from './utils/successful-transaction-receipt';
@@ -243,6 +243,7 @@ export default class ClaimSettlementModule extends SafeModule {
     amountInEth: string,
     validitySeconds = 86400
   ): Promise<Claim> {
+    let nftAddress = await getAddress('accountRegistrationNft', this.ethersProvider);
     let id = utils.hexlify(utils.randomBytes(32));
     let startBlockNum = await this.ethersProvider.getBlockNumber();
     let startBlockTime = (await this.ethersProvider.getBlock(startBlockNum)).timestamp;
@@ -252,7 +253,7 @@ export default class ClaimSettlementModule extends SafeModule {
       (await this.ethersProvider.getNetwork()).chainId.toString(),
       moduleAddress,
       new TimeRangeSeconds(startBlockTime, startBlockTime + validitySeconds),
-      new Address(payeeAddress),
+      new NFTOwner(nftAddress, BigNumber.from(payeeAddress)),
       new TransferERC20ToCaller(tokenAddress, transferAmount)
     );
   }
