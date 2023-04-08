@@ -155,6 +155,80 @@ export default class ClaimSettlementModule extends SafeModule {
     return await waitUntilTransactionMined(this.ethersProvider, txnHash);
   }
 
+  async removeValidator(txnHash: string): Promise<SuccessfulTransactionReceipt>;
+  async removeValidator(
+    moduleAddress: string,
+    avatarAddress: string,
+    validatorAddress: string,
+    txnOptions?: TransactionOptions,
+    contractOptions?: ContractOptions
+  ): Promise<SuccessfulTransactionReceipt>;
+  async removeValidator(
+    moduleAddress: string,
+    avatarAddress?: string,
+    validatorAddress?: string,
+    txnOptions?: TransactionOptions,
+    contractOptions?: ContractOptions
+  ): Promise<SuccessfulTransactionReceipt> {
+    //TODO: Multi-signature. Only supports adding single validator only
+    if (!avatarAddress) {
+      throw new Error('avatarAddress must be specified');
+    }
+    if (!validatorAddress) {
+      throw new Error('validatorAddress must be specified');
+    }
+    let { nonce, onNonce, onTxnHash } = txnOptions ?? {};
+    let module = new Contract(moduleAddress, this.abi, this.ethersProvider);
+    let data = await module.interface.encodeFunctionData('removeValidator', [validatorAddress]);
+    let signer = this.signer ? this.signer : this.ethersProvider.getSigner();
+    let from = contractOptions?.from ?? (await signer.getAddress());
+
+    let estimate = await gasEstimate(
+      this.ethersProvider,
+      avatarAddress,
+      module.address,
+      '0',
+      data,
+      Operation.CALL,
+      AddressZero,
+      true
+    );
+
+    if (nonce == null) {
+      nonce = getNextNonceFromEstimate(estimate);
+      if (typeof onNonce === 'function') {
+        onNonce(nonce);
+      }
+    }
+
+    let gnosisTxn = await executeTransaction(
+      this.ethersProvider,
+      avatarAddress,
+      module.address,
+      data,
+      Operation.CALL,
+      estimate,
+      nonce,
+      await signSafeTx(
+        this.ethersProvider,
+        avatarAddress,
+        module.address,
+        data,
+        Operation.CALL,
+        estimate,
+        nonce,
+        from,
+        this.signer
+      )
+    );
+
+    let txnHash = gnosisTxn.ethereumTx.txHash;
+    if (typeof onTxnHash === 'function') {
+      await onTxnHash(txnHash);
+    }
+    return await waitUntilTransactionMined(this.ethersProvider, txnHash);
+  }
+
   async defaultStakingClaim(moduleAddress: string, payeeAddress?: string): Promise<Claim> {
     let signer = this.signer ? this.signer : this.ethersProvider.getSigner();
     let callerAddress = await signer.getAddress();
