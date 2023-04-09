@@ -46,7 +46,7 @@ const handlers = [
   }),
 ];
 
-describe.only('Resolves web did', () => {
+describe('Resolves web did', () => {
   const server = setupServer(...handlers);
   before(() => {
     server.listen();
