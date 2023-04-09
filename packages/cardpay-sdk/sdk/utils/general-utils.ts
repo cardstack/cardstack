@@ -599,8 +599,7 @@ export async function resolveDoc(did: string) {
   let didResolver = new Resolver({
     ...getCardstackDIDResolver(),
     ...getWebDIDResolver(),
-  }
-    );
+  });
   let didResult = await didResolver.resolve(did);
   console.log(didResult);
   let subjectLocation;
