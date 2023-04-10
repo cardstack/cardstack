@@ -516,10 +516,10 @@ module('Acceptance | scheduling', function (hooks) {
       );
       await waitUntil(() =>
         find(IN_PROGRESS_MESSAGE)?.textContent?.includes(
-          'Confirming transaction'
+          'Awaiting consensus...'
         )
       );
-      assert.dom(IN_PROGRESS_MESSAGE).hasText('Confirming transaction...');
+      assert.dom(IN_PROGRESS_MESSAGE).hasText('Awaiting consensus...');
 
       scheduledPaymentGetShouldIncludeBlockNumber = true;
 
@@ -625,11 +625,9 @@ module('Acceptance | scheduling', function (hooks) {
         'Scheduled Payment updated via PATCH to API'
       );
       await waitUntil(() =>
-        find(IN_PROGRESS_MESSAGE)?.textContent?.includes(
-          'Confirming transaction'
-        )
+        find(IN_PROGRESS_MESSAGE)?.textContent?.includes('Awaiting consensus')
       );
-      assert.dom(IN_PROGRESS_MESSAGE).hasText('Confirming transaction...');
+      assert.dom(IN_PROGRESS_MESSAGE).hasText('Awaiting consensus...');
 
       scheduledPaymentGetShouldIncludeBlockNumber = true;
 
