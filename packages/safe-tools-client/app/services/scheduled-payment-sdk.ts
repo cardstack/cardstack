@@ -16,7 +16,6 @@ import SafesService, {
 } from '@cardstack/safe-tools-client/services/safes';
 import TokensService from '@cardstack/safe-tools-client/services/tokens';
 import WalletService from '@cardstack/safe-tools-client/services/wallet';
-import { action } from '@ember/object';
 import Service, { inject as service } from '@ember/service';
 import { TaskGenerator } from 'ember-concurrency';
 import { task } from 'ember-concurrency-decorators';
@@ -100,12 +99,12 @@ export default class SchedulePaymentSDKService extends Service {
     );
   }
 
-  @action
-  async getScheduledPaymentGasEstimation(
+  @task({ enqueue: true })
+  *getScheduledPaymentGasEstimation(
     scenario: GasEstimationScenario,
     token: TokenDetail,
     gasToken: TokenDetail
-  ): Promise<ServiceGasEstimationResult> {
+  ): TaskGenerator<ServiceGasEstimationResult> {
     const getGasEstimation = async (): Promise<ServiceGasEstimationResult> => {
       const scheduledPaymentModule = await this.getSchedulePaymentModule();
       const gasEstimationResult = await scheduledPaymentModule.estimateGas(
@@ -140,7 +139,7 @@ export default class SchedulePaymentSDKService extends Service {
         },
       };
     };
-    return await retry(getGasEstimation, { retries: 10 });
+    return yield retry(getGasEstimation, { retries: 10 });
   }
 
   @task *schedulePayment(
