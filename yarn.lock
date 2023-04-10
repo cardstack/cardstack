@@ -14152,7 +14152,7 @@ cross-fetch@^2.1.0, cross-fetch@^2.1.1:
     node-fetch "^2.6.7"
     whatwg-fetch "^2.0.4"
 
-cross-fetch@^3.0.6, cross-fetch@^3.1.4:
+cross-fetch@^3.0.6, cross-fetch@^3.1.4, cross-fetch@^3.1.5:
   version "3.1.5"
   resolved "https://registry.yarnpkg.com/cross-fetch/-/cross-fetch-3.1.5.tgz#e1389f44d9e7ba767907f7af8454787952ab534f"
   integrity sha512-lvb1SBsI0Z7GDwmuid+mU3kWVBwTVUbe7S0H52yaaAdQOXq2YktTCZdlAcNKFzE6QtRz0snpw9bNiPeOIkkQvw==
@@ -14873,6 +14873,11 @@ did-resolver@^3.1.0:
   version "3.1.0"
   resolved "https://registry.yarnpkg.com/did-resolver/-/did-resolver-3.1.0.tgz#84f0e3d16abe9711dc04c34a5a0e2f63868c9611"
   integrity sha512-uf3/4LfHoDn3Ek8bFegO72OemHMytBhAkud6CA1HlB5I0iVwrCpG4oh+DA6DXUuBdhrA0cY4cGz1D0VNDTlgnw==
+
+did-resolver@^4.0.0:
+  version "4.1.0"
+  resolved "https://registry.yarnpkg.com/did-resolver/-/did-resolver-4.1.0.tgz#740852083c4fd5bf9729d528eca5d105aff45eb6"
+  integrity sha512-S6fWHvCXkZg2IhS4RcVHxwuyVejPR7c+a4Go0xbQ9ps5kILa8viiYQgrM4gfTyeTjJ0ekgJH9gk/BawTpmkbZA==
 
 diff-sequences@^27.0.6:
   version "27.0.6"
@@ -33456,6 +33461,14 @@ wcwidth@^1.0.0, wcwidth@^1.0.1:
   resolved "https://registry.yarnpkg.com/wcwidth/-/wcwidth-1.0.1.tgz#f0b0dcf915bc5ff1528afadb2c0e17b532da2fe8"
   dependencies:
     defaults "^1.0.3"
+
+web-did-resolver@^2.0.21:
+  version "2.0.23"
+  resolved "https://registry.yarnpkg.com/web-did-resolver/-/web-did-resolver-2.0.23.tgz#59806a8bc6f5709403929a3d2b49c06279580632"
+  integrity sha512-7yOKnY9E322cVFfVkpV6g2j7QWB3H32aezGn2VagBmTAQr74zf0hxRN0p/PzK/kcgnc/oDCIRuiWUGwJEJAh0w==
+  dependencies:
+    cross-fetch "^3.1.5"
+    did-resolver "^4.0.0"
 
 web-encoding@1.1.5, web-encoding@^1.1.5:
   version "1.1.5"
