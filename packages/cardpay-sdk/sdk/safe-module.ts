@@ -185,7 +185,7 @@ export default abstract class SafeModule {
   async enableModuleAndGuard(txnHash: string): Promise<EnableModuleAndGuardResult>;
   async enableModuleAndGuard(
     safeAddress: string,
-    gasTokenAddress: string,
+    gasTokenAddress?: string,
     txnOptions?: TransactionOptions,
     contractOptions?: ContractOptions
   ): Promise<EnableModuleAndGuardResult>;
@@ -203,9 +203,6 @@ export default abstract class SafeModule {
     if (!safeAddress) {
       throw new Error('safeAddress must be specified');
     }
-    if (!gasTokenAddress) {
-      throw new Error('gasTokenAddress must be specified');
-    }
     let { nonce, onNonce, onTxnHash } = txnOptions ?? {};
     let signer = this.signer ? this.signer : this.ethersProvider.getSigner();
     let from = contractOptions?.from ?? (await signer.getAddress());
@@ -222,26 +219,28 @@ export default abstract class SafeModule {
       multiSendTransaction.value,
       multiSendTransaction.data,
       multiSendTransaction.operation,
-      gasTokenAddress,
+      gasTokenAddress ?? AddressZero,
       true
     );
-    let gasCost = BigNumber.from(estimate.safeTxGas)
-      .add(BigNumber.from(estimate.baseGas))
-      .mul(BigNumber.from(estimate.gasPrice));
+    if (gasTokenAddress) {
+      let gasCost = BigNumber.from(estimate.safeTxGas)
+        .add(BigNumber.from(estimate.baseGas))
+        .mul(BigNumber.from(estimate.gasPrice));
 
-    let token = new Contract(gasTokenAddress, ERC20ABI, this.ethersProvider);
-    let symbol = await token.symbol();
-    let balance = await token.callStatic.balanceOf(safeAddress);
-    let decimals = await token.callStatic.decimals();
-    if (balance.lt(gasCost)) {
-      throw new Error(
-        `Safe does not have enough balance to enable ${
-          this.name
-        } module. The gas token ${gasTokenAddress} balance of the safe ${safeAddress} is ${utils.formatUnits(
-          balance,
-          decimals
-        )}, the the gas cost is ${utils.formatUnits(gasCost, decimals)} ${symbol}`
-      );
+      let token = new Contract(gasTokenAddress, ERC20ABI, this.ethersProvider);
+      let symbol = await token.symbol();
+      let balance = await token.callStatic.balanceOf(safeAddress);
+      let decimals = await token.callStatic.decimals();
+      if (balance.lt(gasCost)) {
+        throw new Error(
+          `Safe does not have enough balance to enable ${
+            this.name
+          } module. The gas token ${gasTokenAddress} balance of the safe ${safeAddress} is ${utils.formatUnits(
+            balance,
+            decimals
+          )}, the the gas cost is ${utils.formatUnits(gasCost, decimals)} ${symbol}`
+        );
+      }
     }
     if (nonce == null) {
       nonce = getNextNonceFromEstimate(estimate);
