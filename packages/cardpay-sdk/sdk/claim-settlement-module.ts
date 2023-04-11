@@ -457,6 +457,87 @@ export default class ClaimSettlementModule extends SafeModule {
     return await waitUntilTransactionMined(this.ethersProvider, txnHash);
   }
 
+  async setConfiguration(txnHash: string): Promise<SuccessfulTransactionReceipt>;
+  async setConfiguration(
+    moduleAddress: string,
+    safeAddress: string,
+    did: string,
+    gasTokenAddress?: string,
+    txnOptions?: TransactionOptions,
+    contractOptions?: ContractOptions
+  ): Promise<SuccessfulTransactionReceipt>;
+  async setConfiguration(
+    moduleAddressOrTxnHash: string,
+    safeAddress?: string,
+    did?: string,
+    gasTokenAddress?: string,
+    txnOptions?: TransactionOptions,
+    contractOptions?: ContractOptions
+  ): Promise<SuccessfulTransactionReceipt> {
+    let moduleAddress = moduleAddressOrTxnHash;
+    if (!moduleAddress) {
+      throw new Error('moduleAddress must be specified');
+    }
+    if (!did) {
+      throw new Error('did must be specified');
+    }
+    if (!safeAddress) {
+      throw new Error('safeAddress must be specified');
+    }
+
+    let { nonce, onNonce, onTxnHash } = txnOptions ?? {};
+    let module = new Contract(moduleAddress, this.abi, this.ethersProvider);
+    let signer = this.signer ? this.signer : this.ethersProvider.getSigner();
+    let from = contractOptions?.from ?? (await signer.getAddress());
+    let data = await module.interface.encodeFunctionData('setConfiguration', [did]);
+    await module.callStatic.setConfiguration(did, { from: safeAddress });
+
+    let estimate = await gasEstimate(
+      this.ethersProvider,
+      safeAddress,
+      module.address,
+      '0',
+      data,
+      Operation.CALL,
+      gasTokenAddress ?? AddressZero,
+      true
+    );
+
+    if (nonce == null) {
+      nonce = getNextNonceFromEstimate(estimate);
+      if (typeof onNonce === 'function') {
+        onNonce(nonce);
+      }
+    }
+
+    let gnosisTxn = await executeTransaction(
+      this.ethersProvider,
+      safeAddress,
+      module.address,
+      data,
+      Operation.CALL,
+      estimate,
+      nonce,
+      await signSafeTx(
+        this.ethersProvider,
+        safeAddress,
+        module.address,
+        data,
+        Operation.CALL,
+        estimate,
+        nonce,
+        from,
+        this.signer
+      )
+    );
+
+    let txnHash = gnosisTxn.ethereumTx.txHash;
+    if (typeof onTxnHash === 'function') {
+      await onTxnHash(txnHash);
+    }
+    return await waitUntilTransactionMined(this.ethersProvider, txnHash);
+  }
+
   async tokenIds(ownerAddress: string) {
     let accountRegistrationAddress = await getAddress('accountRegistrationNft', this.ethersProvider);
     let accountRegistration = new Contract(accountRegistrationAddress, AccountRegistrationABI, this.ethersProvider);
