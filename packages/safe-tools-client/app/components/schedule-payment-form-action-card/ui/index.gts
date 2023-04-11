@@ -264,7 +264,7 @@ export default class SchedulePaymentFormActionCardUI extends Component<Signature
             @token={{@paymentToken}}
             @tokens={{@paymentTokens}}
             @searchEnabled={{gt @paymentTokens.length 3}}
-            @disabled={{this.isFormInteractionDisabled}}
+            @disabled={{or this.isFormInteractionDisabled @maxGasDescriptions.isLoading}}
             @onChooseToken={{@onUpdatePaymentToken}}
             @onBlurToken={{set this 'hasBlurredPaymentAmount' true}}
           />
@@ -290,7 +290,7 @@ export default class SchedulePaymentFormActionCardUI extends Component<Signature
             @errorMessage={{@gasTokenErrorMessage}}
             @value={{@selectedGasToken}}
             @tokens={{this.gasTokens}}
-            @disabled={{this.isFormInteractionDisabled}}
+            @disabled={{or this.isFormInteractionDisabled @maxGasDescriptions.isLoading}}
             @onChooseToken={{@onSelectGasToken}}
             @onBlur={{set this 'hasBlurredGasToken' true}}
           />
