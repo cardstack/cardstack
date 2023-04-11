@@ -233,7 +233,8 @@ export default class ClaimSettlementModule extends SafeModule {
     let signer = this.signer ? this.signer : this.ethersProvider.getSigner();
     let callerAddress = await signer.getAddress();
     let tokenAddress = await getAddress('cardToken', this.ethersProvider);
-    return this.stakingClaim(moduleAddress, payeeAddress ?? callerAddress, tokenAddress, '1');
+    let nftAddress = await getAddress('accountRegistrationNft', this.ethersProvider); // by default using our NFT
+    return this.stakingClaim(moduleAddress, payeeAddress ?? callerAddress, tokenAddress, '1', nftAddress);
   }
 
   async stakingClaim(
@@ -241,9 +242,9 @@ export default class ClaimSettlementModule extends SafeModule {
     payeeAddress: string,
     tokenAddress: string,
     amountInEth: string,
+    nftAddress: string,
     validitySeconds = 86400
   ): Promise<Claim> {
-    let nftAddress = await getAddress('accountRegistrationNft', this.ethersProvider);
     let id = utils.hexlify(utils.randomBytes(32));
     let startBlockNum = await this.ethersProvider.getBlockNumber();
     let startBlockTime = (await this.ethersProvider.getBlock(startBlockNum)).timestamp;
