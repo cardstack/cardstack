@@ -458,6 +458,11 @@ export default class ClaimSettlementModule extends SafeModule {
     return await waitUntilTransactionMined(this.ethersProvider, txnHash);
   }
 
+  async getConfiguration(moduleAddress: string) {
+    let module = new Contract(moduleAddress, this.abi, this.ethersProvider);
+    return module.configuration()
+  }
+
   async setConfiguration(txnHash: string): Promise<SuccessfulTransactionReceipt>;
   async setConfiguration(
     moduleAddress: string,
