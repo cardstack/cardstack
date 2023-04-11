@@ -100,6 +100,8 @@ export interface ScheduledPaymentAttemptIncludedData {
   'canceled-at': string;
   'next-retry-attempt-at': string;
   'scheduled-payment-attempts-in-last-payment-cycle-count': number;
+  'recurring-day-of-month': number;
+  'recurring-until': string;
   'last-scheduled-payment-attempt-id': string;
   'retries-left': number;
   'private-memo': string | null;
@@ -249,6 +251,8 @@ export default class ScheduledPaymentsService extends Service {
                 'scheduled-payment-attempts-in-last-payment-cycle-count'
               ]
             ),
+            recurringDayOfMonth: scheduledPayment!['recurring-day-of-month'],
+            recurringUntil: new Date(scheduledPayment!['recurring-until']),
             lastScheduledPaymentAttemptId:
               scheduledPayment!['last-scheduled-payment-attempt-id'],
             retriesLeft: Number(scheduledPayment!['retries-left']),

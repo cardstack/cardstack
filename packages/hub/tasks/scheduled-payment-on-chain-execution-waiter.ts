@@ -42,11 +42,9 @@ export default class ScheduledPaymentOnChainExecutionWaiter {
       });
 
       if (scheduledPayment.recurringDayOfMonth && scheduledPayment.recurringUntil) {
-        let nextPayAt = calculateNextPayAt(
-          new Date(),
-          scheduledPayment.recurringDayOfMonth,
-          scheduledPayment.recurringUntil
-        );
+        let nextPayAt = calculateNextPayAt(scheduledPayment.recurringDayOfMonth, scheduledPayment.recurringUntil, {
+          lastPayAt: scheduledPayment.payAt!,
+        });
         if (nextPayAt && nextPayAt <= scheduledPayment.recurringUntil) {
           await prisma.scheduledPayment.update({
             where: { id: scheduledPayment.id },

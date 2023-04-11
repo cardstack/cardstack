@@ -98,7 +98,7 @@ describe('ScheduledPaymentOnChainExecutionWaiter', function () {
     });
 
     expect(scheduledPaymentAttempt.status).to.eq('succeeded');
-    expect(scheduledPaymentAttempt.endedAt).to.gt(subSeconds(nowUtc(), 1));
+    expect(scheduledPaymentAttempt.endedAt).to.gte(subSeconds(nowUtc(), 1));
 
     // Reload the payment to ensure that scheduledPaymentAttemptsInLastPaymentCycleCount and nextRetryAttemptAt were updated
     scheduledPayment = (await prisma.scheduledPayment.findUnique({

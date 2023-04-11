@@ -312,7 +312,7 @@ describe('POST /api/scheduled-payments', async function () {
 
   it('persists a recurring scheduled payment', async function () {
     let now = new Date();
-    let calculatedPayAt = calculateNextPayAt(now, 1, addMonths(now, 5));
+    let calculatedPayAt = calculateNextPayAt(1, addMonths(now, 5));
     let spHash = cryptoRandomString({ length: 10 });
     let responsePayAt: string;
 
