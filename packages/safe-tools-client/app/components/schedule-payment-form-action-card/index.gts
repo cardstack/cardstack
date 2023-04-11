@@ -484,7 +484,7 @@ export default class SchedulePaymentFormActionCard extends Component<Signature> 
             self.schedulingStatus = "Recording on hub..."
           },
           onBeginWaitingForTransactionConfirmation() {
-            self.schedulingStatus = "Confirming transaction..."
+            self.schedulingStatus = "Awaiting consensus..."
           }
         }
       )

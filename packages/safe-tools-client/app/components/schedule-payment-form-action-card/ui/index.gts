@@ -475,10 +475,12 @@ export default class SchedulePaymentFormActionCardUI extends Component<Signature
         </:default>
         <:inProgress as |ac|>
           <ac.ActionStatusArea @icon={{concat @walletProviderId "-logo" }} style={{cssVar status-icon-size="2.5rem"}}>
-            <BoxelLoadingIndicator
-              class="schedule-payment-form-action-card__loading-indicator"
-              @color="var(--boxel-light)"
-            />
+            {{#if (not (eq @schedulingStatus "Awaiting consensus..."))}}
+              <BoxelLoadingIndicator
+                class="schedule-payment-form-action-card__loading-indicator"
+                @color="var(--boxel-light)"
+              />
+            {{/if}}
             <div class="schedule-payment-form-action-card__in-progress-message" data-test-in-progress-message>
               {{@schedulingStatus}}
             </div>
