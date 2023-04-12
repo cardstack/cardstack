@@ -460,7 +460,7 @@ export default class ClaimSettlementModule extends SafeModule {
 
   async getConfiguration(moduleAddress: string) {
     let module = new Contract(moduleAddress, this.abi, this.ethersProvider);
-    return module.configuration()
+    return module.configuration();
   }
 
   async setConfiguration(txnHash: string): Promise<SuccessfulTransactionReceipt>;
