@@ -25,6 +25,8 @@ export default class GasEstimationService {
       where: {
         chainId: params.chainId,
         scenario: params.scenario,
+        tokenAddress: params.tokenAddress,
+        gasTokenAddress: params.gasTokenAddress,
       },
     });
 

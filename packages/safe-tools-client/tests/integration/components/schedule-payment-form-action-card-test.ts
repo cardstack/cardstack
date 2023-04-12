@@ -29,6 +29,7 @@ import {
   subHours,
   isLastDayOfMonth,
 } from 'date-fns';
+import { TaskGenerator } from 'ember-concurrency';
 import { task } from 'ember-concurrency-decorators';
 import { selectChoose } from 'ember-power-select/test-support';
 import { BigNumber, FixedNumber } from 'ethers';
@@ -64,19 +65,20 @@ class ScheduledPaymentSDKServiceStub extends Service {
     };
   }
 
-  async getScheduledPaymentGasEstimation(
+  @task
+  *getScheduledPaymentGasEstimation(
     _scenario: GasEstimationScenario,
     _tokenAddress: ChainAddress,
     _gasTokenAddress: ChainAddress
-  ): Promise<ServiceGasEstimationResult> {
-    return {
+  ): TaskGenerator<ServiceGasEstimationResult> {
+    return yield Promise.resolve({
       gas: BigNumber.from(127864),
       gasRangeInGasTokenUnits: {
         normal: BigNumber.from('20000000'),
         high: BigNumber.from('40000000'),
         max: BigNumber.from('80000000'),
       },
-    };
+    });
   }
 
   async getUsdToken(): Promise<TokenDetail | undefined> {
