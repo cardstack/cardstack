@@ -7,7 +7,7 @@ import { NFTOwner, Claim, TimeRangeSeconds, TransferERC20ToCaller } from './clai
 import ERC20ABI from '../contracts/abi/erc-20';
 import { executeTransaction, gasEstimate, getNextNonceFromEstimate, Operation } from './utils/safe-utils';
 import { SuccessfulTransactionReceipt } from './utils/successful-transaction-receipt';
-import { TransactionOptions, waitUntilTransactionMined } from './utils/general-utils';
+import { TransactionOptions, waitUntilTransactionMined, resolveDoc } from './utils/general-utils';
 import { ContractOptions } from 'web3-eth-contract';
 import { signSafeTx } from './utils/signing-utils';
 /* eslint-disable node/no-extraneous-import */
@@ -458,9 +458,14 @@ export default class ClaimSettlementModule extends SafeModule {
     return await waitUntilTransactionMined(this.ethersProvider, txnHash);
   }
 
-  async getConfiguration(moduleAddress: string) {
+  async getDidConfiguration(moduleAddress: string) {
     let module = new Contract(moduleAddress, this.abi, this.ethersProvider);
     return module.configuration();
+  }
+
+  async getConfiguration(moduleAddress: string) {
+    let did = await this.getDidConfiguration(moduleAddress);
+    return resolveDoc(did);
   }
 
   async setConfiguration(txnHash: string): Promise<SuccessfulTransactionReceipt>;
