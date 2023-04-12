@@ -3,7 +3,7 @@ import { getEthereumClients, getConnectionType, NETWORK_OPTION_ANY } from '../ut
 import { getSDK } from '@cardstack/cardpay-sdk';
 
 export default {
-  command: 'sign <moduleAddress> <payeeAddress> <tokenAddress> <amountInEth> [validitySeconds]',
+  command: 'sign <moduleAddress> <payeeAddress> <tokenAddress> <amountInEth> <nftAddress> [validitySeconds]',
   describe: 'Sign claim',
   builder(yargs: Argv) {
     return yargs
@@ -23,19 +23,30 @@ export default {
         type: 'string',
         description: 'The amount of token being claimed',
       })
+      .positional('nftAddress', {
+        type: 'string',
+        description: 'Nft used for account registration',
+      })
       .option('network', NETWORK_OPTION_ANY);
   },
   async handler(args: Arguments) {
-    let { network, moduleAddress, payeeAddress, tokenAddress, amountInEth } = args as unknown as {
+    let { network, moduleAddress, payeeAddress, tokenAddress, amountInEth, nftAddress } = args as unknown as {
       network: string;
       moduleAddress: string;
       payeeAddress: string;
       tokenAddress: string;
       amountInEth: string;
+      nftAddress: string;
     };
     let { ethersProvider, signer } = await getEthereumClients(network, getConnectionType(args));
     let claimSettlementModule = await getSDK('ClaimSettlementModule', ethersProvider, signer);
-    let claim = await claimSettlementModule.stakingClaim(moduleAddress, payeeAddress, tokenAddress, amountInEth);
+    let claim = await claimSettlementModule.stakingClaim(
+      moduleAddress,
+      payeeAddress,
+      tokenAddress,
+      amountInEth,
+      nftAddress
+    );
     let { signature, encoded } = await claimSettlementModule.sign(claim);
     console.log(`encoded data: ${encoded}`);
     console.log(`signature: ${signature}`);

@@ -3,11 +3,11 @@ import SafeModule from './safe-module';
 import { BigNumber, Contract, Signer, VoidSigner, utils } from 'ethers';
 import ClaimSettlementABI from '../contracts/abi/modules/claim-settlement-module';
 import { SetupArgs } from './utils/module-utils';
-import { Address, Claim, TimeRangeSeconds, TransferERC20ToCaller } from './claim-settlement/utils';
+import { NFTOwner, Claim, TimeRangeSeconds, TransferERC20ToCaller } from './claim-settlement/utils';
 import ERC20ABI from '../contracts/abi/erc-20';
 import { executeTransaction, gasEstimate, getNextNonceFromEstimate, Operation } from './utils/safe-utils';
 import { SuccessfulTransactionReceipt } from './utils/successful-transaction-receipt';
-import { TransactionOptions, waitUntilTransactionMined } from './utils/general-utils';
+import { TransactionOptions, waitUntilTransactionMined, resolveDoc } from './utils/general-utils';
 import { ContractOptions } from 'web3-eth-contract';
 import { signSafeTx } from './utils/signing-utils';
 /* eslint-disable node/no-extraneous-import */
@@ -155,11 +155,86 @@ export default class ClaimSettlementModule extends SafeModule {
     return await waitUntilTransactionMined(this.ethersProvider, txnHash);
   }
 
+  async removeValidator(txnHash: string): Promise<SuccessfulTransactionReceipt>;
+  async removeValidator(
+    moduleAddress: string,
+    avatarAddress: string,
+    validatorAddress: string,
+    txnOptions?: TransactionOptions,
+    contractOptions?: ContractOptions
+  ): Promise<SuccessfulTransactionReceipt>;
+  async removeValidator(
+    moduleAddress: string,
+    avatarAddress?: string,
+    validatorAddress?: string,
+    txnOptions?: TransactionOptions,
+    contractOptions?: ContractOptions
+  ): Promise<SuccessfulTransactionReceipt> {
+    //TODO: Multi-signature. Only supports adding single validator only
+    if (!avatarAddress) {
+      throw new Error('avatarAddress must be specified');
+    }
+    if (!validatorAddress) {
+      throw new Error('validatorAddress must be specified');
+    }
+    let { nonce, onNonce, onTxnHash } = txnOptions ?? {};
+    let module = new Contract(moduleAddress, this.abi, this.ethersProvider);
+    let data = await module.interface.encodeFunctionData('removeValidator', [validatorAddress]);
+    let signer = this.signer ? this.signer : this.ethersProvider.getSigner();
+    let from = contractOptions?.from ?? (await signer.getAddress());
+
+    let estimate = await gasEstimate(
+      this.ethersProvider,
+      avatarAddress,
+      module.address,
+      '0',
+      data,
+      Operation.CALL,
+      AddressZero,
+      true
+    );
+
+    if (nonce == null) {
+      nonce = getNextNonceFromEstimate(estimate);
+      if (typeof onNonce === 'function') {
+        onNonce(nonce);
+      }
+    }
+
+    let gnosisTxn = await executeTransaction(
+      this.ethersProvider,
+      avatarAddress,
+      module.address,
+      data,
+      Operation.CALL,
+      estimate,
+      nonce,
+      await signSafeTx(
+        this.ethersProvider,
+        avatarAddress,
+        module.address,
+        data,
+        Operation.CALL,
+        estimate,
+        nonce,
+        from,
+        this.signer
+      )
+    );
+
+    let txnHash = gnosisTxn.ethereumTx.txHash;
+    if (typeof onTxnHash === 'function') {
+      await onTxnHash(txnHash);
+    }
+    return await waitUntilTransactionMined(this.ethersProvider, txnHash);
+  }
+
   async defaultStakingClaim(moduleAddress: string, payeeAddress?: string): Promise<Claim> {
     let signer = this.signer ? this.signer : this.ethersProvider.getSigner();
     let callerAddress = await signer.getAddress();
     let tokenAddress = await getAddress('cardToken', this.ethersProvider);
-    return this.stakingClaim(moduleAddress, payeeAddress ?? callerAddress, tokenAddress, '1');
+    let nftAddress = await getAddress('accountRegistrationNft', this.ethersProvider); // by default using our NFT
+    return this.stakingClaim(moduleAddress, payeeAddress ?? callerAddress, tokenAddress, '1', nftAddress);
   }
 
   async stakingClaim(
@@ -167,6 +242,7 @@ export default class ClaimSettlementModule extends SafeModule {
     payeeAddress: string,
     tokenAddress: string,
     amountInEth: string,
+    nftAddress: string,
     validitySeconds = 86400
   ): Promise<Claim> {
     let id = utils.hexlify(utils.randomBytes(32));
@@ -178,7 +254,7 @@ export default class ClaimSettlementModule extends SafeModule {
       (await this.ethersProvider.getNetwork()).chainId.toString(),
       moduleAddress,
       new TimeRangeSeconds(startBlockTime, startBlockTime + validitySeconds),
-      new Address(payeeAddress),
+      new NFTOwner(nftAddress, BigNumber.from(payeeAddress)),
       new TransferERC20ToCaller(tokenAddress, transferAmount)
     );
   }
@@ -366,6 +442,97 @@ export default class ClaimSettlementModule extends SafeModule {
         this.ethersProvider,
         safeAddress,
         accountRegistrationAddress,
+        data,
+        Operation.CALL,
+        estimate,
+        nonce,
+        from,
+        this.signer
+      )
+    );
+
+    let txnHash = gnosisTxn.ethereumTx.txHash;
+    if (typeof onTxnHash === 'function') {
+      await onTxnHash(txnHash);
+    }
+    return await waitUntilTransactionMined(this.ethersProvider, txnHash);
+  }
+
+  async getDidConfiguration(moduleAddress: string) {
+    let module = new Contract(moduleAddress, this.abi, this.ethersProvider);
+    return module.configuration();
+  }
+
+  async getConfiguration(moduleAddress: string) {
+    let did = await this.getDidConfiguration(moduleAddress);
+    return resolveDoc(did);
+  }
+
+  async setConfiguration(txnHash: string): Promise<SuccessfulTransactionReceipt>;
+  async setConfiguration(
+    moduleAddress: string,
+    safeAddress: string,
+    did: string,
+    gasTokenAddress?: string,
+    txnOptions?: TransactionOptions,
+    contractOptions?: ContractOptions
+  ): Promise<SuccessfulTransactionReceipt>;
+  async setConfiguration(
+    moduleAddressOrTxnHash: string,
+    safeAddress?: string,
+    did?: string,
+    gasTokenAddress?: string,
+    txnOptions?: TransactionOptions,
+    contractOptions?: ContractOptions
+  ): Promise<SuccessfulTransactionReceipt> {
+    let moduleAddress = moduleAddressOrTxnHash;
+    if (!moduleAddress) {
+      throw new Error('moduleAddress must be specified');
+    }
+    if (!did) {
+      throw new Error('did must be specified');
+    }
+    if (!safeAddress) {
+      throw new Error('safeAddress must be specified');
+    }
+
+    let { nonce, onNonce, onTxnHash } = txnOptions ?? {};
+    let module = new Contract(moduleAddress, this.abi, this.ethersProvider);
+    let signer = this.signer ? this.signer : this.ethersProvider.getSigner();
+    let from = contractOptions?.from ?? (await signer.getAddress());
+    let data = await module.interface.encodeFunctionData('setConfiguration', [did]);
+    await module.callStatic.setConfiguration(did, { from: safeAddress });
+
+    let estimate = await gasEstimate(
+      this.ethersProvider,
+      safeAddress,
+      module.address,
+      '0',
+      data,
+      Operation.CALL,
+      gasTokenAddress ?? AddressZero,
+      true
+    );
+
+    if (nonce == null) {
+      nonce = getNextNonceFromEstimate(estimate);
+      if (typeof onNonce === 'function') {
+        onNonce(nonce);
+      }
+    }
+
+    let gnosisTxn = await executeTransaction(
+      this.ethersProvider,
+      safeAddress,
+      module.address,
+      data,
+      Operation.CALL,
+      estimate,
+      nonce,
+      await signSafeTx(
+        this.ethersProvider,
+        safeAddress,
+        module.address,
         data,
         Operation.CALL,
         estimate,
