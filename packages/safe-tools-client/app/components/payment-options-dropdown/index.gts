@@ -4,7 +4,7 @@ import ScheduledPaymentSdkService from '@cardstack/safe-tools-client/services/sc
 import BoxelLoadingIndicator from '@cardstack/boxel/components/boxel/loading-indicator';
 import BoxelActionContainer from '@cardstack/boxel/components/boxel/action-container';
 import BoxelModal from '@cardstack/boxel/components/boxel/modal';
-import { ScheduledPaymentBase } from '@cardstack/safe-tools-client/services/scheduled-payments';
+import { ScheduledPayment } from '@cardstack/safe-tools-client/services/scheduled-payments';
 import formatDate from '@cardstack/safe-tools-client/helpers/format-date';
 import truncateMiddle from '@cardstack/safe-tools-client/helpers/truncate-middle';
 import { inject as service } from '@ember/service';
@@ -26,17 +26,21 @@ import menuItem from '@cardstack/boxel/helpers/menu-item'
 import { array, fn } from '@ember/helper';
 import not from 'ember-truth-helpers/helpers/not';
 import set from 'ember-set-helper/helpers/set';
+import eq from 'ember-truth-helpers/helpers/eq';
 import ScheduledPaymentsService from '@cardstack/safe-tools-client/services/scheduled-payments';
 import { TaskGenerator } from 'ember-concurrency';
 import { task } from 'ember-concurrency-decorators';
 import * as Sentry from '@sentry/browser';
-
+import NetworkService from '@cardstack/safe-tools-client/services/network';
+import BlockExplorerButton from '@cardstack/safe-tools-client/components/block-explorer-button';
 import './index.css';
+import cn from '@cardstack/boxel/helpers/cn';
+import { capitalize } from '@ember/string';
 
 interface Signature {
   Element: HTMLElement;
   Args: {
-    scheduledPayment: ScheduledPaymentBase;
+    scheduledPayment: ScheduledPayment;
     canCancel: boolean;
   }
 }
@@ -50,10 +54,20 @@ export default class PaymentOptionsDropdown extends Component<Signature> {
   @tracked optionsMenuOpened = false;
   @tracked isCancelPaymentModalOpen = false;
   @tracked cancelationErrorMessage?: string;
+  @service declare network: NetworkService;
 
   @action closeCancelScheduledPaymentModal(reload: boolean) {
     this.isCancelPaymentModalOpen = false;
     if (reload) this.scheduledPayments.reloadScheduledPayments();
+  }
+
+  // When the payment has a creationTransactionError, it means it was not registered on chain and it will never be attempted.
+  // In this case, we offer the user to delete the payment, which is different from canceling, because canceling includes
+  // removing it from the blockchain. Depending on the mode, we show different text and buttons. Regardless of the mode,
+  // cancelScheduledPayment is called, which is a method in the SDK which will either cancel (remove from the blockchain + update the row in the crank),
+  // or just delete the payment from the hub (no need to remove from the blockchain because it was never registered there)
+  get mode(): 'delete' | 'cancel' {
+    return this.args.scheduledPayment.creationTransactionError ? 'delete' : 'cancel';
   }
 
   get cancelPaymentState(): ActionChinState {
@@ -104,7 +118,7 @@ export default class PaymentOptionsDropdown extends Component<Signature> {
           @closeMenu={{dd.close}}
           @items={{array
             (menuItem
-              "Cancel Payment" (if this.args.canCancel (set this 'isCancelPaymentModalOpen' true) noop) disabled=(not this.args.canCancel)
+              (cn (capitalize this.mode) "Payment") (if this.args.canCancel (set this 'isCancelPaymentModalOpen' true) noop) disabled=(not this.args.canCancel)
             )
           }}
         />
@@ -121,20 +135,43 @@ export default class PaymentOptionsDropdown extends Component<Signature> {
       <BoxelActionContainer
         as |Section ActionChin|
       >
-        <Section @title="Cancel your scheduled payment">
-          <div>
-            <p>You're about to cancel your payment of <strong>{{@scheduledPayment.paymentTokenQuantity.displayable}}</strong>
-            to <span class="blockchain-address">{{truncateMiddle @scheduledPayment.payeeAddress}}</span>, scheduled for <strong>{{formatDate @scheduledPayment.payAt "d/M/yyyy"}}</strong>.</p>
+        {{#if (eq this.mode 'delete')}}
+          <Section @title="Delete your scheduled payment">
+            <div>
+              <p>
+                You're about to delete your payment of <strong>{{@scheduledPayment.paymentTokenQuantity.displayable}}</strong>
+                to <span class="blockchain-address">{{truncateMiddle @scheduledPayment.payeeAddress}}</span>,
+                scheduled for <strong>{{formatDate @scheduledPayment.payAt "d/M/yyyy"}}</strong>, which failed to be registered on the blockchain.
+              </p>
+              <p>
+                For more details on why the on-chain registration failed, please check the transaction in the blockchain explorer.
+              </p>
 
-            <p>This action will remove the scheduled payment from the scheduled payment module, and it won't be attempted in the future.</p>
-          </div>
-        </Section>
+              <BlockExplorerButton
+                @networkSymbol={{this.network.symbol}}
+                @transactionHash={{this.args.scheduledPayment.creationTransactionHash}}
+              />
+            </div>
+          </Section>
+        {{else}}
+          <Section @title="Cancel your scheduled payment">
+            <div>
+              <p>
+                You're about to cancel your payment of <strong>{{@scheduledPayment.paymentTokenQuantity.displayable}}</strong>
+                to <span class="blockchain-address">{{truncateMiddle @scheduledPayment.payeeAddress}}</span>,
+                scheduled for <strong>{{formatDate @scheduledPayment.payAt "d/M/yyyy"}}</strong>.
+              </p>
+
+              <p>This action will remove the scheduled payment from the scheduled payment module, and it won't be attempted in the future.</p>
+            </div>
+          </Section>
+        {{/if}}
 
         <ActionChin @state={{this.cancelPaymentState}}>
           <:default as |a|>
             {{#if this.cancelationErrorMessage}}
               <a.ActionButton {{on "click" this.cancelScheduledPayment}} data-test-cancel-payment-button>
-                Cancel Payment
+                {{capitalize this.mode}} Payment
               </a.ActionButton>
 
               <a.CancelButton {{on 'click' (fn this.closeCancelScheduledPaymentModal false)}} data-test-close-cancel-payment-modal>
@@ -156,7 +193,7 @@ export default class PaymentOptionsDropdown extends Component<Signature> {
               </a.InfoArea>
             {{else}}
               <a.ActionButton {{on "click" this.cancelScheduledPayment}} data-test-cancel-payment-button>
-                Cancel Payment
+                {{capitalize this.mode}} Payment
               </a.ActionButton>
               <a.CancelButton {{on 'click' (fn this.closeCancelScheduledPaymentModal false)}} data-test-close-cancel-payment-modal>
                 Close
@@ -167,12 +204,19 @@ export default class PaymentOptionsDropdown extends Component<Signature> {
             <i.ActionStatusArea>
               <BoxelLoadingIndicator class="schedule-payment-form-action-card__loading-indicator" @color="var(--boxel-light)" />
 
-              Canceling scheduled payment...
+              {{#if (eq this.mode 'cancel')}}
+                Canceling scheduled payment...
+              {{else}}
+                Deleting scheduled payment...
+              {{/if}}
             </i.ActionStatusArea>
 
             <i.InfoArea>
               <InfoIcon class='action-chin-info-icon' />
-              Canceling a payment could take up to a couple of minutes, depending on the blockchain network conditions.
+
+              {{#if (eq this.mode 'cancel')}}
+                Canceling a payment could take up to a couple of minutes, depending on the blockchain network conditions.
+              {{/if}}
             </i.InfoArea>
           </:inProgress>
         </ActionChin>

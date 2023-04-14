@@ -19,37 +19,6 @@
   justify-content: space-between;
 }
 
-.tooltip {
-  position: relative;
-  display: inline-block;
-  cursor: pointer;
-  white-space: initial;
-}
-
-.tooltip .tooltip-text {
-  visibility: hidden;
-  width: 140px;
-  position: absolute;
-  z-index: 1;
-  bottom: 100%;
-  left: 50%;
-  margin-left: -70px;
-  background-color: var(--boxel-light);
-  box-shadow: 0 0 0 1px var(--boxel-light-500);
-  color: var(--boxel-dark);
-  text-align: center;
-  border-radius: var(--boxel-sp-sm);
-  padding: var(--boxel-sp-sm);
-  margin-bottom: var(--boxel-sp-xs);
-  opacity: 0;
-  transition: ease-in-out 0.5s;
-}
-
-.tooltip:hover .tooltip-text {
-  visibility: visible;
-  opacity: 1;
-}
-
 @media (max-width: 1556px) {
   .safe-tools__dashboard-container-row {
     display: flex;

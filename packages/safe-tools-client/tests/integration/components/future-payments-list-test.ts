@@ -215,6 +215,44 @@ class ScheduledPaymentsStub extends ScheduledPaymentsService {
         recurringDayOfMonth: addDays(endOfThisMonth, 1).getTime(),
         recurringUntil: addMonths(addDays(endOfThisMonth, 1), 5),
       },
+      {
+        id: 'creation_transaction_pending',
+        paymentTokenQuantity: new TokenQuantity(
+          USDC_TOKEN,
+          BigNumber.from('11000000')
+        ),
+        feeFixedUSD: '0',
+        feePercentage: '0',
+        gasTokenAddress: '0x123',
+        chainId,
+        payeeAddress: '0xeBCC5516d44FFf5E9aBa2AcaeB65BbB49bC3EBe1',
+        senderSafeAddress,
+        payAt: addDays(endOfThisMonth, 1),
+        recurringDayOfMonth: addDays(endOfThisMonth, 1).getTime(),
+        recurringUntil: addMonths(addDays(endOfThisMonth, 1), 5),
+        creationTransactionHash: '0x123',
+        creationBlockNumber: null,
+        creationTransactionError: null,
+      },
+      {
+        id: 'creation_transaction_failed',
+        paymentTokenQuantity: new TokenQuantity(
+          USDC_TOKEN,
+          BigNumber.from('11000000')
+        ),
+        feeFixedUSD: '0',
+        feePercentage: '0',
+        gasTokenAddress: '0x123',
+        chainId,
+        payeeAddress: '0xeBCC5516d44FFf5E9aBa2AcaeB65BbB49bC3EBe1',
+        senderSafeAddress,
+        payAt: addMonths(endOfThisMonth, 1),
+        recurringDayOfMonth: addDays(endOfThisMonth, 1).getTime(),
+        recurringUntil: addMonths(addDays(endOfThisMonth, 1), 5),
+        creationTransactionHash: '0x123',
+        creationBlockNumber: null,
+        creationTransactionError: 'Insufficient funds',
+      },
     ];
 
     if (returnScheduledPaymentsUntilTomorrow) {
@@ -272,7 +310,7 @@ module('Integration | Component | future-payments-list', function (hooks) {
   });
 
   test('It renders future payments list', async function (assert) {
-    assert.expect(8);
+    assert.expect(10);
     this.set('onDepositClick', () => {});
     await render(hbs`
       <FuturePaymentsList @onDepositClick={{this.onDepositClick}} />
@@ -311,7 +349,7 @@ module('Integration | Component | future-payments-list', function (hooks) {
       document.querySelectorAll(
         `[data-test-time-bracket='later'] [data-test-scheduled-payment-card]`
       ).length,
-      1
+      3
     );
     assert.true(
       document
@@ -321,6 +359,22 @@ module('Integration | Component | future-payments-list', function (hooks) {
         .querySelector('.scheduled-payment-card__pay-at')
         ?.textContent?.includes('Recurring')
     );
+
+    assert
+      .dom(
+        `[data-test-scheduled-payment-card-id=creation_transaction_pending] .scheduled_payment_card__tooltip`
+      )
+      .includesText(
+        'The transaction to register this payment on blockchain is still pending'
+      );
+
+    assert
+      .dom(
+        `[data-test-scheduled-payment-card-id=creation_transaction_failed] .scheduled_payment_card__tooltip`
+      )
+      .includesText(
+        'The transaction to register this payment on blockchain has failed'
+      );
   });
 
   test('can cancel a payment', async function (assert) {
@@ -339,6 +393,48 @@ module('Integration | Component | future-payments-list', function (hooks) {
 
     await click('[data-test-scheduled-payment-card-options-button]');
     await click('[data-test-boxel-menu-item-text="Cancel Payment"]');
+    await click('[data-test-cancel-payment-button]');
+
+    assert
+      .dom('[data-test-cancel-scheduled-payment-modal]')
+      .includesText(
+        "Your scheduled payment was canceled and removed successfully, and it won't be attempted in the future."
+      );
+    assert.dom('[data-test-cancel-payment-button]').doesNotExist();
+
+    // On cancel, the handler calls refreshScheduledPayments (to remove the newly canceled payment) which reads stubbed scheduled payment values from this test.
+    // To test if the list reloaded after canceling a payment we simply change the stubbed values to return no payments and assert that the list is empty, which confirms that the list reloaded.
+    const scheduledPaymentsService = this.owner.lookup(
+      'service:scheduled-payments'
+    ) as ScheduledPaymentsService;
+
+    scheduledPaymentsService.fetchScheduledPayments = (): Promise<[]> => {
+      return Promise.resolve([]);
+    };
+
+    await click('[data-test-close-cancel-payment-modal]');
+    assert.dom('[data-test-cancel-scheduled-payment-modal]').doesNotExist();
+    assert.dom('[data-test-scheduled-payment-card]').doesNotExist(); // Because we stubbed fetchScheduledPayments to return no payments
+  });
+
+  test('can delete a payment', async function (assert) {
+    const scheduledPaymentSdkService = this.owner.lookup(
+      'service:scheduled-payment-sdk'
+    ) as SchedulePaymentSDKService;
+
+    scheduledPaymentSdkService.cancelScheduledPayment = (): Promise<void> => {
+      return Promise.resolve();
+    };
+
+    this.set('onDepositClick', () => {});
+    await render(hbs`
+      <FuturePaymentsList @onDepositClick={{this.onDepositClick}} />
+    `);
+
+    await click(
+      '[data-test-scheduled-payment-card-id=creation_transaction_failed] + [data-test-scheduled-payment-card-options-button]'
+    );
+    await click('[data-test-boxel-menu-item-text="Delete Payment"]');
     await click('[data-test-cancel-payment-button]');
 
     assert

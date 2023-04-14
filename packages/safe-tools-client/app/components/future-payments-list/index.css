@@ -51,7 +51,7 @@
 .future-payments-list__payments-section-time-brackets {
   position: absolute;
   left: 0; top: 0; right: 0; bottom: 0;
-  overflow: auto;
+  overflow: visible; /* To not cut off tooltips */
   flex-grow: 1;
 }
 

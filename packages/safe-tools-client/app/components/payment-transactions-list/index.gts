@@ -33,6 +33,7 @@ import BoxelActionContainer from '@cardstack/boxel/components/boxel/action-conta
 import TruncatedBlockchainAddress from '@cardstack/safe-tools-client/components/truncated-blockchain-address';
 import { svgJar } from '@cardstack/boxel/utils/svg-jar';
 import { capitalize } from '@ember/string';
+import Tooltip from '@cardstack/safe-tools-client/components/tooltip';
 
 type FilterItem = {
   display: string,
@@ -210,10 +211,14 @@ class PaymentTransactionsList extends Component {
                     🟠 <span class="transactions-table-item-status-text" data-test-scheduled-payment-attempts-item-status-canceled>Canceled</span>
                     {{else}}
                       <div class="transactions-table-item-status-line">🔴 Failed
-                        <div class="tooltip">
-                          {{svgJar "info" width="14px" height="14px" class="transactions-table-item-status-line__info-icon"}}
-                          <span class="tooltip-text">{{capitalize (paymentErrorMessage paymentAttempt.failureReason paymentAttempt.scheduledPayment.maxGasPrice paymentAttempt.executionGasPrice paymentAttempt.scheduledPayment.gasToken.decimals)}}</span>
-                        </div>
+                        <Tooltip>
+                          <:trigger>
+                            {{svgJar "info" width="14px" height="14px" class="transactions-table-item-status-line__info-icon"}}
+                          </:trigger>
+                          <:content>
+                            {{capitalize (paymentErrorMessage paymentAttempt.failureReason paymentAttempt.scheduledPayment.maxGasPrice paymentAttempt.executionGasPrice paymentAttempt.scheduledPayment.gasToken.decimals)}}
+                          </:content>
+                        </Tooltip>
                       </div>
                       <div class="transactions-table-item-status-failure-info">
                         {{#if (eq paymentAttempt.id paymentAttempt.scheduledPayment.lastScheduledPaymentAttemptId)}}

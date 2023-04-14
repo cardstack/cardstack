@@ -56,7 +56,7 @@ export interface ScheduledPaymentAttempt {
   failureReason: string;
   executionGasPrice: BigNumber;
   transactionHash?: string;
-  scheduledPayment: ScheduledPaymentBase;
+  scheduledPayment: ScheduledPayment;
 }
 
 export interface ScheduledPaymentAttemptResponseItem {
@@ -105,6 +105,11 @@ export interface ScheduledPaymentAttemptIncludedData {
   'last-scheduled-payment-attempt-id': string;
   'retries-left': number;
   'private-memo': string | null;
+  'sender-safe-address': string;
+  'module-address': string;
+  'sp-hash': string;
+  salt: string;
+  'execution-gas-estimation': string;
 }
 
 export interface ScheduledPaymentAttemptResponseIncludedItem {
@@ -257,6 +262,12 @@ export default class ScheduledPaymentsService extends Service {
               scheduledPayment!['last-scheduled-payment-attempt-id'],
             retriesLeft: Number(scheduledPayment!['retries-left']),
             privateMemo: scheduledPayment!['private-memo'],
+            executionGasEstimation:
+              scheduledPayment!['execution-gas-estimation'],
+            salt: scheduledPayment!.salt,
+            spHash: scheduledPayment!['sp-hash'],
+            senderSafeAddress: scheduledPayment!['sender-safe-address'],
+            moduleAddress: scheduledPayment!['module-address'],
           },
         };
       })
