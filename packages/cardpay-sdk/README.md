@@ -1,7 +1,5 @@
 # cardpay-sdk <!-- omit in toc -->
-This is a package that provides an SDK to use the Cardpay protocol. The SDK is divided into two main parts currently Cardpay and Champer.
-
-- [Full Documentation](https://cardstack.github.io/cardstack/stable/modules/_cardstack_cardpay_sdk.html)
+This is a package that provides an SDK to use the Cardpay protocol. The SDK is divided into two main parts currently Cardpay and Champer. See here for [full documentation](https://cardstack.github.io/cardstack/stable/modules/_cardstack_cardpay_sdk.html)
 
 ### Champer
 
