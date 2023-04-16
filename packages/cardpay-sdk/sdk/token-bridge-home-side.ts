@@ -24,10 +24,6 @@ import { Signer } from 'ethers';
  * The Foreign network can be any chain, but generally refers to the Ethereum mainnet.
  * @group Cardpay
  */
-
-/**
- * @group Cardpay
- */
 export interface ITokenBridgeHomeSide {
   waitForBridgingToLayer2Completed(recipientAddress: string, fromBlock: string): Promise<SuccessfulTransactionReceipt>;
 }
@@ -60,8 +56,9 @@ const bridgedTokensQuery = `
 `;
 
 /**
- * The `TokenBridgeHomeSide` API is used to bridge tokens into the layer 2 network in which the Card Protocol runs. The `TokenBridgeHomeSide` API can be obtained from `getSDK()` with a `Web3` instance that is configured to operate on a layer 2 network (like Gnosis Chain or Sokol). * @example
+ * The `TokenBridgeHomeSide` API is used to bridge tokens into the layer 2 network in which the Card Protocol runs. The `TokenBridgeHomeSide` API can be obtained from `getSDK()` with a `Web3` instance that is configured to operate on a layer 2 network (like Gnosis Chain or Sokol).
  * @group Cardpay
+ * @category Main
  * @example
  * ```ts
  * import { getSDK } from "@cardstack/cardpay-sdk";
@@ -94,10 +91,10 @@ export default class TokenBridgeHomeSide implements ITokenBridgeHomeSide {
   /**
    * This call will invoke the token bridge contract to relay tokens from a layer 2 safe into the account specified in layer 1.
    *
-   *@param safeAddress The layer 2 safe address that contains the tokens to be relayed to layer 1
-   *@param tokenAddress The layer 2 token address of the tokens to be relayed
-   *@param recipientAddress The address of the layer 1 recipient that will receive the tokens in layer 1
-   *@param amount The amount of tokens to relay as a string in native units of the token (e.g. `wei`). Note that in addition to the amount of tokens being relayed, the safe will also be changed the layer 2 gas costs for performing the relay as well (the gas cost will be charged in the same tokens as is being relayed). So the safe must have a balance that includes both the amount being relayed as well as the layer 2 gas charged in order to perform the relay.
+   * @param safeAddress The layer 2 safe address that contains the tokens to be relayed to layer 1
+   * @param tokenAddress The layer 2 token address of the tokens to be relayed
+   * @param recipientAddress The address of the layer 1 recipient that will receive the tokens in layer 1
+   * @param amount The amount of tokens to relay as a string in native units of the token (e.g. `wei`). Note that in addition to the amount of tokens being relayed, the safe will also be changed the layer 2 gas costs for performing the relay as well (the gas cost will be charged in the same tokens as is being relayed). So the safe must have a balance that includes both the amount being relayed as well as the layer 2 gas charged in order to perform the relay.
    * @param txnOptions You can optionally provide an object that specifies the nonce, onNonce callback, and/or onTxnHash callback as a fourth argument.
    * @param contractOptions You can optionally provide an object that specifies the from address, gas limit, and/or gas price as a fifth argument.
    * @example

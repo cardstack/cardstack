@@ -27,6 +27,7 @@ import { getAddress } from '../..';
 
 /**
  * @group Cardpay
+ * @category Main
  */
 export default class PrepaidCardMarketV2 {
   constructor(private layer2Web3: Web3, private layer2Signer?: Signer) {}
