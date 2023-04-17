@@ -59,6 +59,7 @@ const CLAIM_BRIDGED_TOKENS_GAS_LIMIT = 350000;
  *
  * The `TokenBridgeForeignSide` API is used to bridge tokens into the layer 2 network in which the Card Protocol runs. The `TokenBridgeForeignSide` API can be obtained from `getSDK()` with a `Web3` instance that is configured to operate on a layer 1 network (like Ethereum Mainnet or Kovan).
  * @group Cardpay
+ * @category Main
  * @example
  * ```ts
  * import { getSDK } from "@cardstack/cardpay-sdk";
