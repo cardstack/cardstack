@@ -35,11 +35,11 @@ yarn add @cardstack/cardpay-sdk
 
 ## Usage 
 
-```
+```bash
 yarn add @cardstack/cardpay-sdk@1.0.47 ethers@5.7.2 node-fetch@2.6.1
 ```
 
-```
+```js
 import fetch from "node-fetch";
 import { getSDK, JsonRpcProvider } from "@cardstack/cardpay-sdk";
 import { Wallet } from "ethers";
