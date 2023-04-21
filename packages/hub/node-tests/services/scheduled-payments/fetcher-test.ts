@@ -82,6 +82,10 @@ describe('fetching scheduled payments that are due', function () {
       };
     };
 
+    executor.fetchTokenToUsdcRate = async () => {
+      return 1;
+    };
+
     executor.crankNonceLock.withNonce = async () => {
       throw new Error(
         'intentional error to get into the catch block of the executor so that nextRetryAttemptAt is updated'

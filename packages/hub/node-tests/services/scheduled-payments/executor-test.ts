@@ -68,6 +68,9 @@ describe('executing scheduled payments', function () {
         gasPriceInGasToken: '1000000000',
       };
     };
+    subject.fetchTokenToUsdcRate = async () => {
+      return 1;
+    };
     prisma = await getPrisma();
     crankNonceLock = (await getContainer().lookup('crank-nonce-lock')) as CrankNonceLock;
     crankNonceLock.withNonce = async (chainId: number, cb: (nonce: BN) => Promise<any>) => {
