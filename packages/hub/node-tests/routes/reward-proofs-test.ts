@@ -23,6 +23,7 @@ describe('GET /api/rewards/proofs', function () {
         validTo: 22072275,
         explanationId: null,
         explanationData: {},
+        rootHash: '0x85a9034e056319d877c4e79d68480cd873858bdd36607c5ce5be40c62c8e5dd2',
       },
       {
         rewardProgramId: '0xab20c80fcc025451a3fc73bB953aaE1b9f640949',
@@ -40,6 +41,7 @@ describe('GET /api/rewards/proofs', function () {
         validTo: 22072276,
         explanationId: null,
         explanationData: {},
+        rootHash: '0x2c7f1466e5b1d6958e8cb52dab3cdcd115a52e7171ac5d70c6000648a0163c30',
       },
       {
         rewardProgramId: '0x0885ce31D73b63b0Fcb1158bf37eCeaD8Ff0fC72',
@@ -52,6 +54,7 @@ describe('GET /api/rewards/proofs', function () {
         validTo: 28048399,
         explanationId: null,
         explanationData: {},
+        rootHash: '0x961e720cc27d6a302493bef9da443e8a1aed6c659f44e596061d9ea3b13c9dc6',
       },
     ];
     await prismaClient.rewardProof.createMany({
@@ -85,6 +88,7 @@ describe('GET /api/rewards/proofs', function () {
               validTo: 22072275,
               explanationId: null,
               explanationData: {},
+              rootHash: '0x85a9034e056319d877c4e79d68480cd873858bdd36607c5ce5be40c62c8e5dd2',
             },
           },
           {
@@ -106,6 +110,7 @@ describe('GET /api/rewards/proofs', function () {
               validTo: 22072276,
               explanationId: null,
               explanationData: {},
+              rootHash: '0x2c7f1466e5b1d6958e8cb52dab3cdcd115a52e7171ac5d70c6000648a0163c30',
             },
           },
         ],
@@ -140,6 +145,7 @@ describe('GET /api/rewards/proofs', function () {
               validTo: 22072275,
               explanationId: null,
               explanationData: {},
+              rootHash: '0x85a9034e056319d877c4e79d68480cd873858bdd36607c5ce5be40c62c8e5dd2',
             },
           },
         ],
