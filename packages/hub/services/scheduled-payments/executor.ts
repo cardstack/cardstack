@@ -11,6 +11,7 @@ import {
   getConstant,
   ScheduledPaymentModule,
   applyRateToAmount,
+  getUsdcToTokenRate,
 } from '@cardstack/cardpay-sdk';
 import BN from 'bn.js';
 
@@ -23,6 +24,11 @@ export default class ScheduledPaymentsExecutorService {
   ethersProvider = inject('ethers-provider', { as: 'ethersProvider' });
   clock = inject('clock', { as: 'clock' });
   gasStation = inject('gas-station-service', { as: 'gasStation' });
+
+  async fetchTokenToUsdcRate(provider: JsonRpcProvider, token: string) {
+    let usdcToTokenRate = await getUsdcToTokenRate(provider, token);
+    return 1 / usdcToTokenRate.rate.toUnsafeFloat();
+  }
 
   async getCurrentGasPrice(provider: JsonRpcProvider, gasTokenAddress: string) {
     let gasPrices = await this.gasStation.getGasPriceByChainId(provider.network.chainId);
@@ -112,6 +118,7 @@ export default class ScheduledPaymentsExecutorService {
         status: 'inProgress',
         startedAt: this.clock.utcNow(),
         executionGasPrice: currentGasPrice.gasPriceInGasToken,
+        tokenToUsdcRate: await this.fetchTokenToUsdcRate(provider, scheduledPayment.tokenAddress),
       },
     });
 
