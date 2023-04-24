@@ -458,18 +458,18 @@ export default class ClaimSettlementModule extends SafeModule {
     return await waitUntilTransactionMined(this.ethersProvider, txnHash);
   }
 
-  async getDid(moduleAddress: string) {
+  async getDidConfiguration(moduleAddress: string) {
     let module = new Contract(moduleAddress, this.abi, this.ethersProvider);
     return module.configuration();
   }
 
   async getConfiguration(moduleAddress: string) {
-    let did = await this.getDid(moduleAddress);
+    let did = await this.getDidConfiguration(moduleAddress);
     return resolveDoc(did);
   }
 
-  async setDid(txnHash: string): Promise<SuccessfulTransactionReceipt>;
-  async setDid(
+  async setConfiguration(txnHash: string): Promise<SuccessfulTransactionReceipt>;
+  async setConfiguration(
     moduleAddress: string,
     safeAddress: string,
     did: string,
@@ -477,7 +477,7 @@ export default class ClaimSettlementModule extends SafeModule {
     txnOptions?: TransactionOptions,
     contractOptions?: ContractOptions
   ): Promise<SuccessfulTransactionReceipt>;
-  async setDid(
+  async setConfiguration(
     moduleAddressOrTxnHash: string,
     safeAddress?: string,
     did?: string,
