@@ -99,7 +99,6 @@ const GOERLI = {
   scheduledPaymentConfig: '0x856Bf7c80D9EAe82D9465F5590b5E846368745D7',
   scheduledPaymentExchange: '0x3c9abC74F5998805f6670C3fD61f7D24FE3D1790',
   scheduledPaymentModule: '0x4D14d82Bc37199B289db5B0bd185cB5b79893cDB',
-  claimSettlementModule: '0xfFa7AC9401dA19d3AC2aC4B548f190Fa768fE05d',
   multiSend: '0xA238CBeb142c10Ef7Ad8442C6D1f9E89e07e7761',
   multiSendCallOnly: '0x40A2aCCbd92BCA938b02010E17A5b8929b49130D',
   moduleProxyFactory: '0x00000000000DC7F163742Eb4aBEf650037b1f588',
@@ -108,6 +107,7 @@ const GOERLI = {
   usdStableCoinToken: '0xB0b4eD7E54641f96C134D27921764711Cb303e96', // CTSC
   uniswapV2Factory: '0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f',
   cardToken: '0x95093b8836ED53B4594EC748995E45b0Cd2b1389', // CTST
+  claimSettlementModuleMasterCopy: '0xfFa7AC9401dA19d3AC2aC4B548f190Fa768fE05d',
   accountRegistrationNft: '0x9551D865059dfEB352Ca278bdad35c31a84248f0',
 };
 const MUMBAI = {
@@ -145,6 +145,8 @@ const MAINNET = {
   wrappedNativeToken: '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2', // WETH
   usdStableCoinToken: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48', // USDC
   uniswapV2Factory: '0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f',
+  claimSettlementModuleMasterCopy: '0x9906DD42EA2Cc8dc0107728eB4dE831C6Fa9FE18',
+  accountRegistrationNft: '0x1B20DE8891d19F98323f275690edF6713435844a',
 };
 const GNOSIS = {
   gnosisProxyFactory_v1_2: '0x76E2cFc1F5Fa8F6a5b3fC4c8F4788F0116861F9B',
@@ -202,6 +204,8 @@ const POLYGON = {
   wrappedNativeToken: '0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270', // WMATIC
   usdStableCoinToken: '0x2791bca1f2de4661ed88a30c99a7a9449aa84174', // USDC
   uniswapV2Factory: '0xc35DADB65012eC5796536bD9864eD8773aBc74C4',
+  claimSettlementModuleMasterCopy: '0x9E9F7DD64385b7420135D20d9769323074b68C4e',
+  accountRegistrationNft: '0x46a160d7831Bf361E5faa14c1e523758840d0116',
 };
 
 const addresses: {
