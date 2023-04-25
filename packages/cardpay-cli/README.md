@@ -1700,7 +1700,7 @@ Set did configuration on module
 ```
 Positionals:
   moduleAddress  Module address enabled on safe  [string] [required]
-  safeAddress    The address receiving assets from claim  [string] [required]
+  safeAddress    The address with claim settlement module enabled  [string] [required]
   did            did identifier  [string] [required]
 
 Options:
