@@ -107,7 +107,7 @@ const GOERLI = {
   usdStableCoinToken: '0xB0b4eD7E54641f96C134D27921764711Cb303e96', // CTSC
   uniswapV2Factory: '0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f',
   cardToken: '0x95093b8836ED53B4594EC748995E45b0Cd2b1389', // CTST
-  claimSettlementModuleMasterCopy: '0xfFa7AC9401dA19d3AC2aC4B548f190Fa768fE05d',
+  claimSettlementModule: '0xfFa7AC9401dA19d3AC2aC4B548f190Fa768fE05d',
   accountRegistrationNft: '0x9551D865059dfEB352Ca278bdad35c31a84248f0',
 };
 const MUMBAI = {
@@ -145,7 +145,7 @@ const MAINNET = {
   wrappedNativeToken: '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2', // WETH
   usdStableCoinToken: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48', // USDC
   uniswapV2Factory: '0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f',
-  claimSettlementModuleMasterCopy: '0x9906DD42EA2Cc8dc0107728eB4dE831C6Fa9FE18',
+  claimSettlementModule: '0x9906DD42EA2Cc8dc0107728eB4dE831C6Fa9FE18',
   accountRegistrationNft: '0x1B20DE8891d19F98323f275690edF6713435844a',
 };
 const GNOSIS = {
@@ -204,7 +204,7 @@ const POLYGON = {
   wrappedNativeToken: '0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270', // WMATIC
   usdStableCoinToken: '0x2791bca1f2de4661ed88a30c99a7a9449aa84174', // USDC
   uniswapV2Factory: '0xc35DADB65012eC5796536bD9864eD8773aBc74C4',
-  claimSettlementModuleMasterCopy: '0x9E9F7DD64385b7420135D20d9769323074b68C4e',
+  claimSettlementModule: '0x9E9F7DD64385b7420135D20d9769323074b68C4e',
   accountRegistrationNft: '0x46a160d7831Bf361E5faa14c1e523758840d0116',
 };
 
