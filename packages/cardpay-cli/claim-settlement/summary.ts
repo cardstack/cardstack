@@ -11,10 +11,6 @@ export default {
         type: 'string',
         description: 'Module address enabled on safe',
       })
-      .positional('safeAddress', {
-        type: 'string',
-        description: 'The address of the safe whose enables the scheduled payment module',
-      })
       .option('network', NETWORK_OPTION_ANY);
   },
   async handler(args: Arguments) {
