@@ -7,13 +7,13 @@ export default {
   describe: 'Get summary of a module',
   builder(yargs: Argv) {
     return yargs
+      .positional('safeAddress', {
+        type: 'string',
+        description: 'The address of the safe whose enables the claim settlement module',
+      })
       .positional('moduleAddress', {
         type: 'string',
         description: 'Module address enabled on safe',
-      })
-      .positional('safeAddress', {
-        type: 'string',
-        description: 'The address of the safe whose enables the scheduled payment module',
       })
       .option('network', NETWORK_OPTION_ANY);
   },

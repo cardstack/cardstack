@@ -4,7 +4,7 @@ import { getSDK } from '@cardstack/cardpay-sdk';
 
 export default {
   command: 'get-configuration <moduleAddress>',
-  describe: 'Set did configuration on module',
+  describe: 'Get JSON configuration from did set on module',
   builder(yargs: Argv) {
     return yargs
       .positional('moduleAddress', {

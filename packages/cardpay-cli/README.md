@@ -135,7 +135,11 @@ yarn cardpay safe list --walletConnect
  - [`cardpay claim-settlement execute <moduleAddress> <encoded> <signature> [payeeSafeAddress] [gasTokenAddress]`](#cardpay-claim-settlement-execute-moduleaddress-encoded-signature-payeesafeaddress-gastokenaddress)
  - [`cardpay claim-settlement add-validator <moduleAddress> <avatarAddress> <validatorAddress>`](#cardpay-claim-settlement-add-validator-moduleaddress-avataraddress-validatoraddress)
  - [`cardpay claim-settlement register-account <safeAddress> [recipient] [gasTokenAddress]`](#cardpay-claim-settlement-register-account-safeaddress-recipient-gastokenaddress)
- - [`cardpay claim-settlement sign <moduleAddress> <payeeAddress> <tokenAddress> <amountInEth> [validitySeconds]`](#cardpay-claim-settlement-sign-moduleaddress-payeeaddress-tokenaddress-amountineth-validityseconds)
+ - [`cardpay claim-settlement sign <moduleAddress> <payeeAddress> <tokenAddress> <amountInEth> <nftAddress> [validitySeconds]`](#cardpay-claim-settlement-sign-moduleaddress-payeeaddress-tokenaddress-amountineth-nftaddress-validityseconds)
+ - [`cardpay claim-settlement set-did <moduleAddress> <safeAddress> <did> [gasTokenAddress]`](#cardpay-claim-settlement-set-did-moduleaddress-safeaddress-did-gastokenaddress)
+ - [`cardpay claim-settlement get-configuration <moduleAddress>`](#cardpay-claim-settlement-get-configuration-moduleaddress)
+ - [`cardpay claim-settlement summary <moduleAddress>`](#cardpay-claim-settlement-summary-moduleaddress)
+ - [`cardpay claim-settlement is-module-enabled <safeAddress> <moduleAddress>`](#cardpay-claim-settlement-is-module-enabled-safeaddress-moduleaddress)
  - [`cardpay uniswap-conversion native-to-token <tokenAddress> <amount> <invert>`](#cardpay-uniswap-conversion-native-to-token-tokenaddress-amount-invert)
  - [`cardpay uniswap-conversion usdc-to-token <tokenAddress> <amount> <invert>`](#cardpay-uniswap-conversion-usdc-to-token-tokenaddress-amount-invert)
 
@@ -1669,7 +1673,7 @@ Options:
   -n, --network          The network to run this script on  [string] [required] [choices: "sokol", "kovan", "goerli", "mumbai", "gnosis", "mainnet", "polygon"]
 ```
 
-## `cardpay claim-settlement sign <moduleAddress> <payeeAddress> <tokenAddress> <amountInEth> [validitySeconds]`
+## `cardpay claim-settlement sign <moduleAddress> <payeeAddress> <tokenAddress> <amountInEth> <nftAddress> [validitySeconds]`
 
 Sign claim
 
@@ -1679,6 +1683,75 @@ Positionals:
   payeeAddress   The address receiving assets from claim  [string] [required]
   tokenAddress   The address of token being claimed  [string] [required]
   amountInEth    The amount of token being claimed  [string] [required]
+  nftAddress     Nft used for account registration  [string] [required]
+
+Options:
+  -w, --walletConnect   A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -t, --trezor          A flag to indicate that trezor should be used for the wallet  [boolean]
+  -m, --mnemonic        Phrase for mnemonic wallet  [string]
+  -e, --ethersMnemonic  Phrase for mnemonic wallet using ethers.js signer  [string]
+  -n, --network         The network to run this script on  [string] [required] [choices: "sokol", "kovan", "goerli", "mumbai", "gnosis", "mainnet", "polygon"]
+```
+
+## `cardpay claim-settlement set-did <moduleAddress> <safeAddress> <did> [gasTokenAddress]`
+
+Set did configuration on module
+
+```
+Positionals:
+  moduleAddress  Module address enabled on safe  [string] [required]
+  safeAddress    The address receiving assets from claim  [string] [required]
+  did            did identifier  [string] [required]
+
+Options:
+  -w, --walletConnect    A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -t, --trezor           A flag to indicate that trezor should be used for the wallet  [boolean]
+  -m, --mnemonic         Phrase for mnemonic wallet  [string]
+  -e, --ethersMnemonic   Phrase for mnemonic wallet using ethers.js signer  [string]
+      --gasTokenAddress  The address of gas token  [string]
+  -n, --network          The network to run this script on  [string] [required] [choices: "sokol", "kovan", "goerli", "mumbai", "gnosis", "mainnet", "polygon"]
+```
+
+## `cardpay claim-settlement get-configuration <moduleAddress>`
+
+Get JSON configuration from did set on module
+
+```
+Positionals:
+  moduleAddress  Module address enabled on safe  [string] [required]
+
+Options:
+  -w, --walletConnect   A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -t, --trezor          A flag to indicate that trezor should be used for the wallet  [boolean]
+  -m, --mnemonic        Phrase for mnemonic wallet  [string]
+  -e, --ethersMnemonic  Phrase for mnemonic wallet using ethers.js signer  [string]
+  -n, --network         The network to run this script on  [string] [required] [choices: "sokol", "kovan", "goerli", "mumbai", "gnosis", "mainnet", "polygon"]
+```
+
+## `cardpay claim-settlement summary <moduleAddress>`
+
+Get summary of a module
+
+```
+Positionals:
+  moduleAddress  Module address enabled on safe  [string] [required]
+
+Options:
+  -w, --walletConnect   A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -t, --trezor          A flag to indicate that trezor should be used for the wallet  [boolean]
+  -m, --mnemonic        Phrase for mnemonic wallet  [string]
+  -e, --ethersMnemonic  Phrase for mnemonic wallet using ethers.js signer  [string]
+  -n, --network         The network to run this script on  [string] [required] [choices: "sokol", "kovan", "goerli", "mumbai", "gnosis", "mainnet", "polygon"]
+```
+
+## `cardpay claim-settlement is-module-enabled <safeAddress> <moduleAddress>`
+
+Get summary of a module
+
+```
+Positionals:
+  safeAddress    The address of the safe whose enables the claim settlement module  [string] [required]
+  moduleAddress  Module address enabled on safe  [string] [required]
 
 Options:
   -w, --walletConnect   A flag to indicate that wallet connect should be used for the wallet  [boolean]
