@@ -16,7 +16,6 @@ export default {
   async handler(args: Arguments) {
     let { network, moduleAddress } = args as unknown as {
       network: string;
-      safeAddress: string;
       moduleAddress: string;
       gasTokenAddress: string;
     };
