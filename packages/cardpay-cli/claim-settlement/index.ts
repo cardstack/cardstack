@@ -8,6 +8,7 @@ import registerAccount from './register-account';
 import sign from './sign';
 import setDid from './set-did';
 import getConfiguration from './get-configuration';
+import summary from './summary';
 
 export const command = 'claim-settlement <command>';
 export const desc = 'Commands to interact with the claim settlement module';
@@ -23,6 +24,7 @@ export const builder = function (yargs: Argv) {
     sign,
     setDid,
     getConfiguration,
+    summary,
   ] as any);
 };
 
