@@ -13,7 +13,7 @@ export default {
       })
       .positional('safeAddress', {
         type: 'string',
-        description: 'The address receiving assets from claim',
+        description: 'The address with claim settlement module enabled',
       })
       .positional('did', {
         type: 'string',
