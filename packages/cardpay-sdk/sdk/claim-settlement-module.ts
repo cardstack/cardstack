@@ -49,6 +49,11 @@ export default class ClaimSettlementModule extends SafeModule {
     return module.isValidator(possibleValidator);
   }
 
+  async getValidators(moduleAddress: string) {
+    let module = new Contract(moduleAddress, this.abi, this.ethersProvider);
+    return module.getValidators();
+  }
+
   async isValidState(claim: Claim, moduleAddress: string) {
     let module = new Contract(moduleAddress, this.abi, this.ethersProvider);
     return module.isValidState(claim.stateCheck.typeHash(), claim.stateCheck.abiEncode());
@@ -549,7 +554,7 @@ export default class ClaimSettlementModule extends SafeModule {
     return await waitUntilTransactionMined(this.ethersProvider, txnHash);
   }
 
-  async tokenIds(ownerAddress: string) {
+  async getAccountRegistrationNftsOwner(ownerAddress: string) {
     let accountRegistrationAddress = await getAddress('accountRegistrationNft', this.ethersProvider);
     let accountRegistration = new Contract(accountRegistrationAddress, AccountRegistrationABI, this.ethersProvider);
     let count = (await accountRegistration.balanceOf(ownerAddress)).toNumber();

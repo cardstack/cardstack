@@ -3,10 +3,14 @@ import { getEthereumClients, getConnectionType, NETWORK_OPTION_ANY } from '../ut
 import { getSDK } from '@cardstack/cardpay-sdk';
 
 export default {
-  command: 'get-configuration <moduleAddress>',
-  describe: 'Get JSON configuration from did set on module',
+  command: 'is-module-enabled <safeAddress> <moduleAddress>',
+  describe: 'Get summary of a module',
   builder(yargs: Argv) {
     return yargs
+      .positional('safeAddress', {
+        type: 'string',
+        description: 'The address of the safe whose enables the claim settlement module',
+      })
       .positional('moduleAddress', {
         type: 'string',
         description: 'Module address enabled on safe',
@@ -14,14 +18,14 @@ export default {
       .option('network', NETWORK_OPTION_ANY);
   },
   async handler(args: Arguments) {
-    let { network, moduleAddress } = args as unknown as {
+    let { network, moduleAddress, safeAddress } = args as unknown as {
       network: string;
+      safeAddress: string;
       moduleAddress: string;
-      gasTokenAddress: string;
     };
     let { ethersProvider, signer } = await getEthereumClients(network, getConnectionType(args));
     let claimSettlementModule = await getSDK('ClaimSettlementModule', ethersProvider, signer);
-    let configuration = await claimSettlementModule.getConfiguration(moduleAddress);
-    console.log(JSON.stringify(configuration, undefined, 2));
+    let isModuleEnabled = await claimSettlementModule.isModuleEnabled(safeAddress, moduleAddress);
+    console.log(isModuleEnabled);
   },
 } as CommandModule;

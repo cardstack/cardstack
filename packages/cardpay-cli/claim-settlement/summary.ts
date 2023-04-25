@@ -3,8 +3,8 @@ import { getEthereumClients, getConnectionType, NETWORK_OPTION_ANY } from '../ut
 import { getSDK } from '@cardstack/cardpay-sdk';
 
 export default {
-  command: 'get-configuration <moduleAddress>',
-  describe: 'Get JSON configuration from did set on module',
+  command: 'summary <moduleAddress>',
+  describe: 'Get summary of a module',
   builder(yargs: Argv) {
     return yargs
       .positional('moduleAddress', {
@@ -17,11 +17,32 @@ export default {
     let { network, moduleAddress } = args as unknown as {
       network: string;
       moduleAddress: string;
-      gasTokenAddress: string;
     };
     let { ethersProvider, signer } = await getEthereumClients(network, getConnectionType(args));
     let claimSettlementModule = await getSDK('ClaimSettlementModule', ethersProvider, signer);
-    let configuration = await claimSettlementModule.getConfiguration(moduleAddress);
-    console.log(JSON.stringify(configuration, undefined, 2));
+    let { owner, target, avatar } = await claimSettlementModule.getDetails(moduleAddress);
+    let did = await claimSettlementModule.getDid(moduleAddress);
+    let validators = await claimSettlementModule.getValidators(moduleAddress);
+
+    console.log(
+      `
+      Claim Settlement 
+      ================
+
+      Module Address: ${moduleAddress}
+
+      Module Details: 
+        Owner: ${owner}
+        Target: ${target}
+        Avatar: ${avatar}
+
+
+      Validators: 
+      ${validators}
+
+      Did: 
+      ${did}
+        `
+    );
   },
 } as CommandModule;
