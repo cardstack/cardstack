@@ -30,8 +30,6 @@ export default {
     };
     let { ethersProvider, signer } = await getEthereumClients(network, getConnectionType(args));
     let claimSettlementModule = await getSDK('ClaimSettlementModule', ethersProvider, signer);
-    let o = await claimSettlementModule.tokenIds(safeAddress);
-    console.log(o);
     let blockExplorer = await getConstant('blockExplorer', ethersProvider);
     let onTxnHash = (txnHash: string) => console.log(`Transaction hash: ${blockExplorer}/tx/${txnHash}`);
     await claimSettlementModule.registerAccount(safeAddress, recipient, gasTokenAddress, { onTxnHash });

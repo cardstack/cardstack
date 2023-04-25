@@ -554,7 +554,7 @@ export default class ClaimSettlementModule extends SafeModule {
     return await waitUntilTransactionMined(this.ethersProvider, txnHash);
   }
 
-  async tokenIds(ownerAddress: string) {
+  async getAccountRegistrationNftsOwner(ownerAddress: string) {
     let accountRegistrationAddress = await getAddress('accountRegistrationNft', this.ethersProvider);
     let accountRegistration = new Contract(accountRegistrationAddress, AccountRegistrationABI, this.ethersProvider);
     let count = (await accountRegistration.balanceOf(ownerAddress)).toNumber();
