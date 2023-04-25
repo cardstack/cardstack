@@ -49,6 +49,11 @@ export default class ClaimSettlementModule extends SafeModule {
     return module.isValidator(possibleValidator);
   }
 
+  async getValidators(moduleAddress: string) {
+    let module = new Contract(moduleAddress, this.abi, this.ethersProvider);
+    return module.getValidators();
+  }
+
   async isValidState(claim: Claim, moduleAddress: string) {
     let module = new Contract(moduleAddress, this.abi, this.ethersProvider);
     return module.isValidState(claim.stateCheck.typeHash(), claim.stateCheck.abiEncode());
