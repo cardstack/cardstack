@@ -18,7 +18,6 @@ export default {
       network: string;
       safeAddress: string;
       moduleAddress: string;
-      did: string;
       gasTokenAddress: string;
     };
     let { ethersProvider, signer } = await getEthereumClients(network, getConnectionType(args));
