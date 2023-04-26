@@ -4,8 +4,8 @@ import { getEthereumClients, getConnectionType, NETWORK_OPTION_ANY } from '../ut
 import { Arguments, CommandModule } from 'yargs';
 
 export default {
-  command: 'add-validator <moduleAddress> <avatarAddress> <validatorAddress>',
-  describe: 'Add validator that is enabled to sign claim',
+  command: 'remove-validator <moduleAddress> <avatarAddress> <validatorAddress>',
+  describe: 'Remove validator that is enabled to sign claim',
   builder(yargs: Argv) {
     return yargs
       .positional('moduleAddress', {
@@ -34,7 +34,7 @@ export default {
     let blockExplorer = await getConstant('blockExplorer', ethersProvider);
 
     let onTxnHash = (txnHash: string) => console.log(`Transaction hash: ${blockExplorer}/tx/${txnHash}`);
-    await claimSettlementModule.addValidator(moduleAddress, avatarAddress, validatorAddress, {
+    await claimSettlementModule.removeValidator(moduleAddress, avatarAddress, validatorAddress, {
       onTxnHash,
     });
   },

@@ -140,6 +140,8 @@ yarn cardpay safe list --walletConnect
  - [`cardpay claim-settlement get-configuration <moduleAddress>`](#cardpay-claim-settlement-get-configuration-moduleaddress)
  - [`cardpay claim-settlement summary <moduleAddress>`](#cardpay-claim-settlement-summary-moduleaddress)
  - [`cardpay claim-settlement is-module-enabled <safeAddress> <moduleAddress>`](#cardpay-claim-settlement-is-module-enabled-safeaddress-moduleaddress)
+ - [`cardpay claim-settlement is-registered <address>`](#cardpay-claim-settlement-is-registered-address)
+ - [`cardpay claim-settlement remove-validator <moduleAddress> <avatarAddress> <validatorAddress>`](#cardpay-claim-settlement-remove-validator-moduleaddress-avataraddress-validatoraddress)
  - [`cardpay uniswap-conversion native-to-token <tokenAddress> <amount> <invert>`](#cardpay-uniswap-conversion-native-to-token-tokenaddress-amount-invert)
  - [`cardpay uniswap-conversion usdc-to-token <tokenAddress> <amount> <invert>`](#cardpay-uniswap-conversion-usdc-to-token-tokenaddress-amount-invert)
 
@@ -1639,12 +1641,12 @@ Options:
 
 ## `cardpay claim-settlement add-validator <moduleAddress> <avatarAddress> <validatorAddress>`
 
-Add validator that is enabled to sign transaction
+Add validator that is enabled to sign claim
 
 ```
 Positionals:
   moduleAddress     Module address enabled on safe  [string] [required]
-  avatarAddress     The address of the safe whose enables the scheduled payment module  [string] [required]
+  avatarAddress     The address of the safe whose enables the claim settlement module  [string] [required]
   validatorAddress  Validator address (a person who can sign for claims)  [string] [required]
 
 Options:
@@ -1752,6 +1754,40 @@ Get summary of a module
 Positionals:
   safeAddress    The address of the safe whose enables the claim settlement module  [string] [required]
   moduleAddress  Module address enabled on safe  [string] [required]
+
+Options:
+  -w, --walletConnect   A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -t, --trezor          A flag to indicate that trezor should be used for the wallet  [boolean]
+  -m, --mnemonic        Phrase for mnemonic wallet  [string]
+  -e, --ethersMnemonic  Phrase for mnemonic wallet using ethers.js signer  [string]
+  -n, --network         The network to run this script on  [string] [required] [choices: "sokol", "kovan", "goerli", "mumbai", "gnosis", "mainnet", "polygon"]
+```
+
+## `cardpay claim-settlement is-registered <address>`
+
+Check if an address is registered with our account registration NFT
+
+```
+Positionals:
+  address  address  [string] [required]
+
+Options:
+  -w, --walletConnect   A flag to indicate that wallet connect should be used for the wallet  [boolean]
+  -t, --trezor          A flag to indicate that trezor should be used for the wallet  [boolean]
+  -m, --mnemonic        Phrase for mnemonic wallet  [string]
+  -e, --ethersMnemonic  Phrase for mnemonic wallet using ethers.js signer  [string]
+  -n, --network         The network to run this script on  [string] [required] [choices: "sokol", "kovan", "goerli", "mumbai", "gnosis", "mainnet", "polygon"]
+```
+
+## `cardpay claim-settlement remove-validator <moduleAddress> <avatarAddress> <validatorAddress>`
+
+Remove validator that is enabled to sign claim
+
+```
+Positionals:
+  moduleAddress     Module address enabled on safe  [string] [required]
+  avatarAddress     The address of the safe whose enables the claim settlement module  [string] [required]
+  validatorAddress  Validator address (a person who can sign for claims)  [string] [required]
 
 Options:
   -w, --walletConnect   A flag to indicate that wallet connect should be used for the wallet  [boolean]

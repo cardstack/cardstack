@@ -253,7 +253,9 @@ export default class ClaimSettlementModule extends SafeModule {
     let id = utils.hexlify(utils.randomBytes(32));
     let startBlockNum = await this.ethersProvider.getBlockNumber();
     let startBlockTime = (await this.ethersProvider.getBlock(startBlockNum)).timestamp;
-    let transferAmount = BigNumber.from(utils.parseUnits(amountInEth, 'ether'));
+    let token = new Contract(tokenAddress, ERC20ABI, this.ethersProvider);
+    let decimal = await token.decimals();
+    let transferAmount = BigNumber.from(utils.parseUnits(amountInEth, decimal));
     return new Claim(
       id,
       (await this.ethersProvider.getNetwork()).chainId.toString(),
@@ -554,7 +556,7 @@ export default class ClaimSettlementModule extends SafeModule {
     return await waitUntilTransactionMined(this.ethersProvider, txnHash);
   }
 
-  async getAccountRegistrationNftsOwner(ownerAddress: string) {
+  async getAccountRegistrationNfts(ownerAddress: string): Promise<string[]> {
     let accountRegistrationAddress = await getAddress('accountRegistrationNft', this.ethersProvider);
     let accountRegistration = new Contract(accountRegistrationAddress, AccountRegistrationABI, this.ethersProvider);
     let count = (await accountRegistration.balanceOf(ownerAddress)).toNumber();
@@ -564,6 +566,11 @@ export default class ClaimSettlementModule extends SafeModule {
     }
     let tokenIds = (await Promise.all(promises)).map((o) => o.toHexString());
     return tokenIds;
+  }
+
+  async isRegistered(address: string) {
+    let tokenIds = (await this.getAccountRegistrationNfts(address)).length;
+    return tokenIds > 0;
   }
 
   async sign(claim: Claim): Promise<SignedClaim> {
