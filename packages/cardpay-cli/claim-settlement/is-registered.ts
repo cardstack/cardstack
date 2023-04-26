@@ -4,7 +4,7 @@ import { getSDK } from '@cardstack/cardpay-sdk';
 
 export default {
   command: 'is-registered <address>',
-  describe: 'Get JSON configuration from did set on module',
+  describe: 'Check if an address is registered with our account registration NFT',
   builder(yargs: Argv) {
     return yargs
       .positional('address', {
