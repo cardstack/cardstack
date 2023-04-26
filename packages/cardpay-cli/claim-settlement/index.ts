@@ -11,6 +11,7 @@ import getConfiguration from './get-configuration';
 import summary from './summary';
 import isModuleEnabled from './is-module-enabled';
 import isRegistered from './is-registered';
+import removeValidator from './remove-validator';
 
 export const command = 'claim-settlement <command>';
 export const desc = 'Commands to interact with the claim settlement module';
@@ -29,6 +30,7 @@ export const builder = function (yargs: Argv) {
     summary,
     isModuleEnabled,
     isRegistered,
+    removeValidator,
   ] as any);
 };
 
