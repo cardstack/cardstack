@@ -253,7 +253,10 @@ export default class ClaimSettlementModule extends SafeModule {
     let id = utils.hexlify(utils.randomBytes(32));
     let startBlockNum = await this.ethersProvider.getBlockNumber();
     let startBlockTime = (await this.ethersProvider.getBlock(startBlockNum)).timestamp;
-    let transferAmount = BigNumber.from(utils.parseUnits(amountInEth, 'ether'));
+    let token = new Contract(tokenAddress, ERC20ABI, this.ethersProvider);
+    let decimal = await token.decimals();
+    let transferAmount = BigNumber.from(utils.parseUnits(amountInEth, decimal));
+    console.log(transferAmount);
     return new Claim(
       id,
       (await this.ethersProvider.getNetwork()).chainId.toString(),
