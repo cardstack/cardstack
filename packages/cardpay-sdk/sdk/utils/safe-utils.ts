@@ -391,11 +391,8 @@ export async function generateCreate2SafeTx(
     GnosisSafeProxyFactoryABI,
     ethersProvider
   );
-  let gnosisSafeMasterCopy = new Contract(
-    await getAddress('gnosisSafeMasterCopy', ethersProvider),
-    GnosisSafeABI,
-    ethersProvider
-  );
+  let gnosisSafeMasterCopyAddress = await getGnosisSafeMasterCopyAddress(ethersProvider);
+  let gnosisSafeMasterCopy = new Contract(gnosisSafeMasterCopyAddress, GnosisSafeABI, ethersProvider);
 
   let initializer = gnosisSafeMasterCopy.interface.encodeFunctionData('setup', [
     owners,
@@ -635,4 +632,16 @@ export async function getTokenBalancesForSafe(
       return balanceSummary;
     })
     .filter(nonNullable);
+}
+/**
+ * Utility to get gnosis safe master copy address. Gnosis has preferred to create safes using
+ * L2 safe singleton which extends original safe contract with events
+ * @group Utils
+ * @category Safe
+ */
+export async function getGnosisSafeMasterCopyAddress(ethersProvider: JsonRpcProvider) {
+  return (
+    (await getAddress('gnosisSafeMasterCopyL2', ethersProvider)) ??
+    (await getAddress('gnosisSafeMasterCopy', ethersProvider))
+  );
 }
