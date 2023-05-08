@@ -753,10 +753,10 @@ app "reward-scheduler" {
       memory              = "512"
       cluster             = "cardpay-reward-scheduler-staging"
       count               = 1
-      subnets             = ["subnet-004c18e7177f0a9a2", "subnet-053fc89a829849140"]
+      subnets             = ["subnet-05906e0970bfd8ed3"]
       task_role_name      = "reward-scheduler-ecs-task"
       execution_role_name = "reward-scheduler-ecs-task-execution"
-      security_group_ids  = ["sg-0aeaba4676411bb39"]
+      security_group_ids  = ["sg-01c1bd7bc5bd314f2", "sg-09e402d0389829be4"]
       disable_alb         = true
 
       static_environment = {
