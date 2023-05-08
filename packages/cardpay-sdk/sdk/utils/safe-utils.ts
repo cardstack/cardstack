@@ -634,8 +634,8 @@ export async function getTokenBalancesForSafe(
     .filter(nonNullable);
 }
 /**
- * Utility to get gnosis safe master copy address. Gnosis has preferred to create safes using
- * L2 safe singleton which extends original safe contract with events
+ * Utility to get gnosis safe master copy address. We default to the L2 safe singleton
+ * Gnosis prefers to create safes using original safe contract
  * @group Utils
  * @category Safe
  */
