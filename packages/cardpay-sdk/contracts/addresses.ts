@@ -94,6 +94,7 @@ const SOKOL = {
 };
 const GOERLI = {
   gnosisSafeMasterCopy: '0xd9Db270c1B5E3Bd161E8c8503c55cEABeE709552',
+  gnosisSafeMasterCopyL2: '0x3E5c63644E683549055b9Be8653de26E0B4CD36E',
   gnosisProxyFactory_v1_2: '0x76E2cFc1F5Fa8F6a5b3fC4c8F4788F0116861F9B',
   gnosisProxyFactory_v1_3: '0xa6B71E26C5e0845f74c812102Ca7114b6a896AB2',
   scheduledPaymentConfig: '0x856Bf7c80D9EAe82D9465F5590b5E846368745D7',
@@ -112,6 +113,7 @@ const GOERLI = {
 };
 const MUMBAI = {
   gnosisSafeMasterCopy: '0xd9Db270c1B5E3Bd161E8c8503c55cEABeE709552',
+  gnosisSafeMasterCopyL2: '0x3E5c63644E683549055b9Be8653de26E0B4CD36E',
   gnosisProxyFactory_v1_2: '0x76E2cFc1F5Fa8F6a5b3fC4c8F4788F0116861F9B',
   gnosisProxyFactory_v1_3: '0xa6B71E26C5e0845f74c812102Ca7114b6a896AB2',
   scheduledPaymentConfig: '0x9c1371554F2db7F7df79cEa1c41aBaBB42EDEb9D',
@@ -133,6 +135,7 @@ const MAINNET = {
   foreignAMB: '0x4C36d2919e407f0Cc2Ee3c993ccF8ac26d9CE64e',
   chainlinkEthToUsd: '0x5f4eC3Df9cbd43714FE2740f5E3616155c5b8419',
   gnosisSafeMasterCopy: '0xd9Db270c1B5E3Bd161E8c8503c55cEABeE709552',
+  gnosisSafeMasterCopyL2: '0x3E5c63644E683549055b9Be8653de26E0B4CD36E',
   gnosisProxyFactory_v1_2: '0x76E2cFc1F5Fa8F6a5b3fC4c8F4788F0116861F9B',
   gnosisProxyFactory_v1_3: '0xa6B71E26C5e0845f74c812102Ca7114b6a896AB2',
   scheduledPaymentConfig: '0xc0dd52489b04A01b9F4028849dABB46e1E54afDc',
@@ -192,6 +195,7 @@ const GNOSIS = {
 };
 const POLYGON = {
   gnosisSafeMasterCopy: '0xd9Db270c1B5E3Bd161E8c8503c55cEABeE709552',
+  gnosisSafeMasterCopyL2: '0x3E5c63644E683549055b9Be8653de26E0B4CD36E',
   gnosisProxyFactory_v1_2: '0x76E2cFc1F5Fa8F6a5b3fC4c8F4788F0116861F9B',
   gnosisProxyFactory_v1_3: '0xa6B71E26C5e0845f74c812102Ca7114b6a896AB2',
   scheduledPaymentConfig: '0x143310ba9eaED49D2B544e4EC9134F5776BF0Be1',

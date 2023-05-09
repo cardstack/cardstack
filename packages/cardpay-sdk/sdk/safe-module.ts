@@ -21,6 +21,7 @@ import {
   executeTransaction,
   gasEstimate,
   generateCreate2SafeTx,
+  getGnosisSafeMasterCopyAddress,
   getNextNonceFromEstimate,
   getSafeProxyCreationEvent,
   Operation,
@@ -155,9 +156,11 @@ export default abstract class SafeModule {
       data: setGuardTxs.txs[0].data,
     });
 
+    let gnosisSafeMasterCopyAddress = await getGnosisSafeMasterCopyAddress(this.ethersProvider);
+
     let estimateEnableSPModule = await gasEstimate(
       this.ethersProvider,
-      await getAddress('gnosisSafeMasterCopy', this.ethersProvider),
+      gnosisSafeMasterCopyAddress,
       utils.getAddress(enableModuleTxs.txs[1].to),
       enableModuleTxs.txs[1].value,
       enableModuleTxs.txs[1].data,
@@ -169,7 +172,7 @@ export default abstract class SafeModule {
 
     let estimateSetMetaGuard = await gasEstimate(
       this.ethersProvider,
-      await getAddress('gnosisSafeMasterCopy', this.ethersProvider),
+      gnosisSafeMasterCopyAddress,
       utils.getAddress(enableModuleTxs.txs[1].to),
       setGuardTxs.txs[1].value,
       setGuardTxs.txs[1].data,
@@ -295,11 +298,12 @@ export default abstract class SafeModule {
     let enableModuleTxs = await this.generateEnableModuleTxs(expectedSafeAddress, [from]);
     let setGuardTxs = await this.generateSetGuardTxs(expectedSafeAddress);
 
+    let gnosisSafeMasterCopyAddress = await getGnosisSafeMasterCopyAddress(this.ethersProvider);
     let multiSendTx = await encodeMultiSend(this.ethersProvider, [...enableModuleTxs.txs, ...setGuardTxs.txs]);
     let gnosisSafe = new Contract(expectedSafeAddress, GnosisSafeABI, this.ethersProvider);
     let estimate = await gasEstimate(
       this.ethersProvider,
-      await getAddress('gnosisSafeMasterCopy', this.ethersProvider),
+      gnosisSafeMasterCopyAddress,
       multiSendTx.to,
       multiSendTx.value,
       multiSendTx.data,
@@ -521,11 +525,13 @@ export default abstract class SafeModule {
     );
     let enableModuleTxs = await this.generateEnableModuleTxs(expectedSafeAddress, [from]);
 
+    let gnosisSafeMasterCopyAddress = await getGnosisSafeMasterCopyAddress(this.ethersProvider);
+
     let multiSendTx = await encodeMultiSend(this.ethersProvider, [...enableModuleTxs.txs]);
     let gnosisSafe = new Contract(expectedSafeAddress, GnosisSafeABI, this.ethersProvider);
     let estimate = await gasEstimate(
       this.ethersProvider,
-      await getAddress('gnosisSafeMasterCopy', this.ethersProvider),
+      gnosisSafeMasterCopyAddress,
       multiSendTx.to,
       multiSendTx.value,
       multiSendTx.data,
