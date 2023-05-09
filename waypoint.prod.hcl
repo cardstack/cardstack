@@ -767,8 +767,8 @@ app "reward-scheduler" {
       count               = 1
       task_role_name      = "reward-scheduler-ecs-task"
       execution_role_name = "reward-scheduler-ecs-task-execution"
-      subnets             = ["subnet-0d71c50519109f369", "subnet-03eac43ed0e35227e"]
-      security_group_ids  = ["sg-0e26577768ce001a2"]
+      subnets             = ["subnet-095ad696012f6ed6c"]
+      security_group_ids  = ["sg-0f85bb50306fe067e"]
       disable_alb         = true
 
       static_environment = {
