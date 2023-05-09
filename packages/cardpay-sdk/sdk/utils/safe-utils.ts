@@ -640,8 +640,10 @@ export async function getTokenBalancesForSafe(
  * @category Safe
  */
 export async function getGnosisSafeMasterCopyAddress(ethersProvider: JsonRpcProvider) {
-  return (
-    (await getAddress('gnosisSafeMasterCopyL2', ethersProvider)) ??
-    (await getAddress('gnosisSafeMasterCopy', ethersProvider))
-  );
+  try {
+    return await getAddress('gnosisSafeMasterCopyL2', ethersProvider);
+  } catch (e) {
+    console.log("gnosis safe master copy L2 doesn't exist, defaulting to old gnosis safe master copy");
+    return await getAddress('gnosisSafeMasterCopy', ethersProvider);
+  }
 }
