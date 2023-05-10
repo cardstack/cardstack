@@ -553,182 +553,8 @@ app "reward-submit-lambda" {
   }
 }
 
-app "reward-api" {
-  path = "./packages/cardpay-reward-api"
 
-  build {
-    use "docker" {
-      dockerfile = "Dockerfile"
-    }
 
-    registry {
-      use "aws-ecr" {
-        region     = "us-east-1"
-        repository = "reward-api"
-        tag        = "latest"
-      }
-    }
-  }
-
-  deploy {
-    use "aws-ecs" {
-      service_port        = 8000
-      region              = "us-east-1"
-      memory              = "512"
-      cluster             = "reward-api"
-      count               = 2
-      subnets             = ["subnet-004c18e7177f0a9a2", "subnet-053fc89a829849140"]
-      task_role_name      = "reward-api-ecs-task"
-      execution_role_name = "reward-api-ecs-task-execution"
-      security_group_ids  = ["sg-00a14cee54051ae62"]
-
-      alb {
-        subnets     = ["subnet-004c18e7177f0a9a2", "subnet-053fc89a829849140"]
-        certificate = "arn:aws:acm:us-east-1:680542703984:certificate/b8ba590b-e901-4e52-8a79-dcf3c8d8e48a"
-      }
-
-      static_environment = {
-        ENVIRONMENT    = "staging"
-        REWARDS_BUCKET = "s3://cardpay-staging-reward-programs"
-        SUBGRAPH_URL   = "https://graph-staging.stack.cards/subgraphs/name/habdelra/cardpay-sokol"
-      }
-
-      secrets = {
-        DB_STRING         = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_reward_api_database_url-dF3FDU"
-        SENTRY_DSN        = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_reward_api_sentry_dsn-Ugaqpm"
-        EVM_FULL_NODE_URL = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_evm_full_node_url-NBKUCq"
-      }
-    }
-
-    hook {
-      when    = "after"
-      command = ["node", "./scripts/waypoint-ecs-add-tags.mjs", "reward-api"]
-    }
-
-    hook {
-      when    = "after"
-      command = ["node", "./scripts/wait-service-stable.mjs", "reward-api"]
-    }
-  }
-
-  url {
-    auto_hostname = false
-  }
-}
-
-app "reward-indexer" {
-  path = "./packages/cardpay-reward-indexer"
-
-  build {
-    use "docker" {
-      dockerfile = "Dockerfile"
-    }
-
-    registry {
-      use "aws-ecr" {
-        region     = "us-east-1"
-        repository = "reward-indexer"
-        tag        = "latest"
-      }
-    }
-  }
-
-  deploy {
-    use "aws-ecs" {
-      region              = "us-east-1"
-      memory              = "512"
-      cluster             = "reward-indexer"
-      count               = 1
-      subnets             = ["subnet-004c18e7177f0a9a2", "subnet-053fc89a829849140"]
-      task_role_name      = "reward-indexer-ecs-task"
-      execution_role_name = "reward-indexer-ecs-task-execution"
-      security_group_ids  = ["sg-0a896e4ebe2606421"]
-      disable_alb         = true
-
-      static_environment = {
-        ENVIRONMENT    = "staging"
-        REWARDS_BUCKET = "s3://cardpay-staging-reward-programs"
-        SUBGRAPH_URL   = "https://graph-staging.stack.cards/subgraphs/name/habdelra/cardpay-sokol"
-      }
-
-      secrets = {
-        DB_STRING  = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_reward_api_database_url-dF3FDU"
-        SENTRY_DSN = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_reward_api_sentry_dsn-Ugaqpm"
-      }
-    }
-
-    hook {
-      when    = "after"
-      command = ["node", "./scripts/waypoint-ecs-add-tags.mjs", "reward-indexer"]
-    }
-
-    hook {
-      when    = "after"
-      command = ["node", "./scripts/wait-service-stable.mjs", "reward-indexer"]
-    }
-  }
-
-  url {
-    auto_hostname = false
-  }
-}
-
-app "reward-indexer-blue" {
-  path = "./packages/cardpay-reward-indexer"
-
-  build {
-    use "docker" {
-      dockerfile = "Dockerfile"
-    }
-
-    registry {
-      use "aws-ecr" {
-        region     = "us-east-1"
-        repository = "reward-indexer"
-        tag        = "latest"
-      }
-    }
-  }
-
-  deploy {
-    use "aws-ecs" {
-      region              = "us-east-1"
-      memory              = "512"
-      cluster             = "reward-indexer-blue"
-      count               = 1
-      subnets             = ["subnet-004c18e7177f0a9a2", "subnet-053fc89a829849140"]
-      task_role_name      = "reward-indexer-blue-ecs-task"
-      execution_role_name = "reward-indexer-blue-ecs-task-execution"
-      security_group_ids  = ["sg-0a896e4ebe2606421"]
-      disable_alb         = true
-
-      static_environment = {
-        ENVIRONMENT    = "staging"
-        REWARDS_BUCKET = "s3://cardpay-staging-reward-programs"
-        SUBGRAPH_URL   = "https://graph-staging.stack.cards/subgraphs/name/habdelra/cardpay-sokol"
-      }
-
-      secrets = {
-        DB_STRING  = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_reward_api_database_url_blue-Y020ZN"
-        SENTRY_DSN = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_reward_api_sentry_dsn-Ugaqpm"
-      }
-    }
-
-    hook {
-      when    = "after"
-      command = ["node", "./scripts/waypoint-ecs-add-tags.mjs", "reward-indexer-blue"]
-    }
-
-    hook {
-      when    = "after"
-      command = ["node", "./scripts/wait-service-stable.mjs", "reward-indexer-blue"]
-    }
-  }
-
-  url {
-    auto_hostname = false
-  }
-}
 
 app "reward-scheduler" {
   path = "./packages/cardpay-reward-scheduler"
@@ -753,10 +579,10 @@ app "reward-scheduler" {
       memory              = "512"
       cluster             = "cardpay-reward-scheduler-staging"
       count               = 1
-      subnets             = ["subnet-004c18e7177f0a9a2", "subnet-053fc89a829849140"]
+      subnets             = ["subnet-05906e0970bfd8ed3"]
       task_role_name      = "reward-scheduler-ecs-task"
       execution_role_name = "reward-scheduler-ecs-task-execution"
-      security_group_ids  = ["sg-0aeaba4676411bb39"]
+      security_group_ids  = ["sg-01c1bd7bc5bd314f2"]
       disable_alb         = true
 
       static_environment = {
