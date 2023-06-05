@@ -55,7 +55,7 @@ jobs:
 
       - run: yarn --prefer-offline --frozen-lockfile
       - name: Configure staging AWS credentials
-        uses: aws-actions/configure-aws-credentials@v2.0.0
+        uses: aws-actions/configure-aws-credentials@v2.1.0
         with:
           role-to-assume: arn:aws:iam::680542703984:role/waypoint
           aws-region: us-east-1
@@ -64,7 +64,7 @@ jobs:
         with:
           waypoint_config_file: waypoint.hcl
       - name: Configure prod AWS credentials
-        uses: aws-actions/configure-aws-credentials@v2.0.0
+        uses: aws-actions/configure-aws-credentials@v2.1.0
         with:
           role-to-assume: arn:aws:iam::120317779495:role/waypoint
           aws-region: us-east-1
@@ -263,7 +263,7 @@ jobs:
       - name: Extract artifact
         run: tar -xvf artifact.tar
       - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v2.0.0
+        uses: aws-actions/configure-aws-credentials@v2.1.0
         with:
           role-to-assume: arn:aws:iam::680542703984:role/waypoint
           aws-region: us-east-1
@@ -290,7 +290,7 @@ jobs:
           yarn_lock_md5: ${{ hashFiles('yarn.lock') }}
 
       - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v2.0.0
+        uses: aws-actions/configure-aws-credentials@v2.1.0
         with:
           role-to-assume: arn:aws:iam::680542703984:role/web-client
           aws-region: us-east-1
@@ -317,7 +317,7 @@ jobs:
           yarn_lock_md5: ${{ hashFiles('yarn.lock') }}
 
       - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v2.0.0
+        uses: aws-actions/configure-aws-credentials@v2.1.0
         with:
           role-to-assume: arn:aws:iam::680542703984:role/waypoint
           aws-region: us-east-1
@@ -346,7 +346,7 @@ jobs:
 
       - run: yarn --prefer-offline --frozen-lockfile
       - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v2.0.0
+        uses: aws-actions/configure-aws-credentials@v2.1.0
         with:
           role-to-assume: arn:aws:iam::680542703984:role/boxel
           aws-region: us-east-1
