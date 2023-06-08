@@ -18,6 +18,8 @@ esbuild
         buffer: true,
       }),
       NodeModulesPolyfillPlugin(),
+      //here are all the polyfills https://github.com/remorses/esbuild-plugins/blob/master/node-modules-polyfill/src/polyfills.ts
+      //it relies on these rollup-plugin-node-polyfills https://github.com/ionic-team/rollup-plugin-node-polyfills
     ],
   })
   .then(console.log('esbuild: build for browser succesful'))
