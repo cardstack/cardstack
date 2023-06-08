@@ -20,4 +20,4 @@ esbuild
     ],
   })
   .then(console.log('build succesful'))
-  .catch((e) => console.error('Build failed with error:', e));
+  .catch((e) => console.error('build failed with error:', e));
