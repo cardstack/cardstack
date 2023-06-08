@@ -2,6 +2,7 @@ const esbuild = require('esbuild');
 const { NodeModulesPolyfillPlugin } = require('@esbuild-plugins/node-modules-polyfill');
 const { NodeGlobalsPolyfillPlugin } = require('@esbuild-plugins/node-globals-polyfill');
 
+console.log('esbuild: beginning build for browser');
 esbuild
   .build({
     entryPoints: ['index.ts'],
@@ -19,5 +20,5 @@ esbuild
       NodeModulesPolyfillPlugin(),
     ],
   })
-  .then(console.log('build succesful'))
-  .catch((e) => console.error('build failed with error:', e));
+  .then(console.log('esbuild: build for browser succesful'))
+  .catch((e) => console.error('esbuild: build for browser failed with error:', e));
