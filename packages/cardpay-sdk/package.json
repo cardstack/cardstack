@@ -55,12 +55,15 @@
     "web3-utils": "1.5.2"
   },
   "devDependencies": {
+    "@esbuild-plugins/node-globals-polyfill": "^0.2.3",
+    "@esbuild-plugins/node-modules-polyfill": "^0.2.2",
     "@types/chai": "^4.3.3",
     "@types/ember__owner": "^4.0.1",
     "@types/mocha": "^10.0.0",
     "@types/sinonjs__fake-timers": "^8.1.2",
     "chai": "^4.3.6",
     "chai-as-promised": "^7.1.1",
+    "esbuild": "^0.17.19",
     "mocha": "^10.1.0",
     "node-fetch": "^2.6.1",
     "sinon": "^14.0.2",
