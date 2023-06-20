@@ -132,7 +132,7 @@ module.exports = {
     verificationUrl: null,
   },
   walletConnect: {
-    bridge: 'https://safe-walletconnect.gnosis.io/',
+    bridge: 'https://safe-walletconnect.safe.global/',
     clientURL: 'https://app.cardstack.com',
     clientName: 'Cardstack',
   },
