@@ -52,21 +52,21 @@ app "hub" {
 
       secrets = {
         # parameter store
-        CARDBOT_TOKEN         = "arn:aws:ssm:us-east-1:120317779495:parameter/production/hub/CARDBOT_TOKEN"
-        FIREBASE_CLIENT_EMAIL = "arn:aws:ssm:us-east-1:120317779495:parameter/production/hub/FIREBASE_CLIENT_EMAIL"
-        FIREBASE_DATABASE_URL = "arn:aws:ssm:us-east-1:120317779495:parameter/production/hub/FIREBASE_DATABASE_URL"
-        FIREBASE_PRIVATE_KEY  = "arn:aws:ssm:us-east-1:120317779495:parameter/production/hub/FIREBASE_PRIVATE_KEY"
-        FIREBASE_PROJECT_ID   = "arn:aws:ssm:us-east-1:120317779495:parameter/production/hub/FIREBASE_PROJECT_ID"
-        FIXER_API_KEY         = "arn:aws:ssm:us-east-1:120317779495:parameter/production/hub/FIXER_API_KEY"
-        HUB_DATABASE_URL      = "arn:aws:ssm:us-east-1:120317779495:parameter/production/hub/HUB_DATABASE_URL"
-        HUB_SENTRY_DSN        = "arn:aws:ssm:us-east-1:120317779495:parameter/production/hub/HUB_SENTRY_DSN"
-        PROVISIONER_SECRET    = "arn:aws:ssm:us-east-1:120317779495:parameter/production/hub/PROVISIONER_SECRET"
-        STATUSPAGE_API_KEY    = "arn:aws:ssm:us-east-1:120317779495:parameter/production/hub/STATUSPAGE_API_KEY"
-        STATUSPAGE_PAGE_ID    = "arn:aws:ssm:us-east-1:120317779495:parameter/production/hub/STATUSPAGE_PAGE_ID"
-        WEB3_STORAGE_TOKEN    = "arn:aws:ssm:us-east-1:120317779495:parameter/production/hub/WEB3_STORAGE_TOKEN"
-        WYRE_ACCOUNT_ID       = "arn:aws:ssm:us-east-1:120317779495:parameter/production/hub/WYRE_ACCOUNT_ID"
-        WYRE_API_KEY          = "arn:aws:ssm:us-east-1:120317779495:parameter/production/hub/WYRE_API_KEY"
-        WYRE_SECRET_KEY       = "arn:aws:ssm:us-east-1:120317779495:parameter/production/hub/WYRE_SECRET_KEY"
+        CARDBOT_TOKEN                      = "arn:aws:ssm:us-east-1:120317779495:parameter/production/hub/CARDBOT_TOKEN"
+        FIREBASE_CLIENT_EMAIL              = "arn:aws:ssm:us-east-1:120317779495:parameter/production/hub/FIREBASE_CLIENT_EMAIL"
+        FIREBASE_DATABASE_URL              = "arn:aws:ssm:us-east-1:120317779495:parameter/production/hub/FIREBASE_DATABASE_URL"
+        FIREBASE_PRIVATE_KEY               = "arn:aws:ssm:us-east-1:120317779495:parameter/production/hub/FIREBASE_PRIVATE_KEY"
+        FIREBASE_PROJECT_ID                = "arn:aws:ssm:us-east-1:120317779495:parameter/production/hub/FIREBASE_PROJECT_ID"
+        FIXER_API_KEY                      = "arn:aws:ssm:us-east-1:120317779495:parameter/production/hub/FIXER_API_KEY"
+        HUB_DATABASE_URL                   = "arn:aws:ssm:us-east-1:120317779495:parameter/production/hub/HUB_DATABASE_URL"
+        HUB_SENTRY_DSN                     = "arn:aws:ssm:us-east-1:120317779495:parameter/production/hub/HUB_SENTRY_DSN"
+        PROVISIONER_SECRET                 = "arn:aws:ssm:us-east-1:120317779495:parameter/production/hub/PROVISIONER_SECRET"
+        STATUSPAGE_API_KEY                 = "arn:aws:ssm:us-east-1:120317779495:parameter/production/hub/STATUSPAGE_API_KEY"
+        STATUSPAGE_PAGE_ID                 = "arn:aws:ssm:us-east-1:120317779495:parameter/production/hub/STATUSPAGE_PAGE_ID"
+        WEB3_STORAGE_TOKEN                 = "arn:aws:ssm:us-east-1:120317779495:parameter/production/hub/WEB3_STORAGE_TOKEN"
+        WYRE_ACCOUNT_ID                    = "arn:aws:ssm:us-east-1:120317779495:parameter/production/hub/WYRE_ACCOUNT_ID"
+        WYRE_API_KEY                       = "arn:aws:ssm:us-east-1:120317779495:parameter/production/hub/WYRE_API_KEY"
+        WYRE_SECRET_KEY                    = "arn:aws:ssm:us-east-1:120317779495:parameter/production/hub/WYRE_SECRET_KEY"
         ETHEREUM_RELAYER_ABOUT_PAGE_SECRET = "arn:aws:ssm:us-east-1:120317779495:parameter/production/safe-relay/ethereum/about_page_secret"
         POLYGON_RELAYER_ABOUT_PAGE_SECRET  = "arn:aws:ssm:us-east-1:120317779495:parameter/production/safe-relay/polygon/about_page_secret"
 
@@ -392,7 +392,7 @@ app "hub-event-listener" {
         POLYGON_RPC_NODE_HTTPS_URL       = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_evm_polygon_infura_https_url-DlBN06"
         POLYGON_RPC_NODE_WSS_URL         = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_evm_polygon_infura_wss_url-ErLq0E"
         POLYGON_HUB_RPC_NODE_HTTPS_URL   = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_evm_hub_polygon_https_url-jIVW87"
-        ETHEREUM_HUB_RPC_NODE_HTTPS_URL   = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_evm_hub_mainnet_https_url-jRtxEP"
+        ETHEREUM_HUB_RPC_NODE_HTTPS_URL  = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_evm_hub_mainnet_https_url-jRtxEP"
       }
     }
 
@@ -450,7 +450,7 @@ app "cardpay-subg-ext" {
       }
 
       secrets = {
-        SE_DATABASE_STRING = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_subg_extract_database_url-5HyPh7"
+        SE_DATABASE_STRING = "arn:aws:ssm:us-east-1:120317779495:parameter/production/subgraph-extractor/SE_DATABASE_STRING"
         SE_OUTPUT_LOCATION = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_subg_extract_output_location-YDoQUt"
       }
 
@@ -564,9 +564,6 @@ app "reward-submit-lambda" {
     auto_hostname = false
   }
 }
-
-
-
 
 app "reward-scheduler" {
   path = "./packages/cardpay-reward-scheduler"
