@@ -44,10 +44,11 @@ jobs:
 
       - name: Install dependencies
         shell: bash
-        run: |
-          curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -
-          sudo apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
-          sudo apt-get install awscli waypoint=0.8.1 jq
+        run: sudo apt-get install jq
+
+      - uses: lucasmelin/setup-waypoint@v1
+        with:
+          version: "0.11.3"
 
       - name: Build reward submitter
         run: waypoint build -app=reward-submit-lambda

@@ -38,8 +38,9 @@ app "hub" {
       security_group_ids  = ["sg-098518120fd2269f8"]
 
       alb {
-        certificate = "arn:aws:acm:us-east-1:120317779495:certificate/20f287dd-ba3c-4175-8b06-5c3b1e75f6d9"
-        subnets     = ["subnet-01d36d7bcd0334fc0", "subnet-0c22641bd41cbdd1e"]
+        certificate       = "arn:aws:acm:us-east-1:120317779495:certificate/20f287dd-ba3c-4175-8b06-5c3b1e75f6d9"
+        load_balancer_arn = "arn:aws:elasticloadbalancing:us-east-1:120317779495:loadbalancer/app/waypoint-ecs-hub/dd1b406d8190ee7f"
+        subnets           = ["subnet-01d36d7bcd0334fc0", "subnet-0c22641bd41cbdd1e"]
       }
 
       static_environment = {
@@ -52,21 +53,21 @@ app "hub" {
 
       secrets = {
         # parameter store
-        CARDBOT_TOKEN         = "arn:aws:ssm:us-east-1:120317779495:parameter/production/hub/CARDBOT_TOKEN"
-        FIREBASE_CLIENT_EMAIL = "arn:aws:ssm:us-east-1:120317779495:parameter/production/hub/FIREBASE_CLIENT_EMAIL"
-        FIREBASE_DATABASE_URL = "arn:aws:ssm:us-east-1:120317779495:parameter/production/hub/FIREBASE_DATABASE_URL"
-        FIREBASE_PRIVATE_KEY  = "arn:aws:ssm:us-east-1:120317779495:parameter/production/hub/FIREBASE_PRIVATE_KEY"
-        FIREBASE_PROJECT_ID   = "arn:aws:ssm:us-east-1:120317779495:parameter/production/hub/FIREBASE_PROJECT_ID"
-        FIXER_API_KEY         = "arn:aws:ssm:us-east-1:120317779495:parameter/production/hub/FIXER_API_KEY"
-        HUB_DATABASE_URL      = "arn:aws:ssm:us-east-1:120317779495:parameter/production/hub/HUB_DATABASE_URL"
-        HUB_SENTRY_DSN        = "arn:aws:ssm:us-east-1:120317779495:parameter/production/hub/HUB_SENTRY_DSN"
-        PROVISIONER_SECRET    = "arn:aws:ssm:us-east-1:120317779495:parameter/production/hub/PROVISIONER_SECRET"
-        STATUSPAGE_API_KEY    = "arn:aws:ssm:us-east-1:120317779495:parameter/production/hub/STATUSPAGE_API_KEY"
-        STATUSPAGE_PAGE_ID    = "arn:aws:ssm:us-east-1:120317779495:parameter/production/hub/STATUSPAGE_PAGE_ID"
-        WEB3_STORAGE_TOKEN    = "arn:aws:ssm:us-east-1:120317779495:parameter/production/hub/WEB3_STORAGE_TOKEN"
-        WYRE_ACCOUNT_ID       = "arn:aws:ssm:us-east-1:120317779495:parameter/production/hub/WYRE_ACCOUNT_ID"
-        WYRE_API_KEY          = "arn:aws:ssm:us-east-1:120317779495:parameter/production/hub/WYRE_API_KEY"
-        WYRE_SECRET_KEY       = "arn:aws:ssm:us-east-1:120317779495:parameter/production/hub/WYRE_SECRET_KEY"
+        CARDBOT_TOKEN                      = "arn:aws:ssm:us-east-1:120317779495:parameter/production/hub/CARDBOT_TOKEN"
+        FIREBASE_CLIENT_EMAIL              = "arn:aws:ssm:us-east-1:120317779495:parameter/production/hub/FIREBASE_CLIENT_EMAIL"
+        FIREBASE_DATABASE_URL              = "arn:aws:ssm:us-east-1:120317779495:parameter/production/hub/FIREBASE_DATABASE_URL"
+        FIREBASE_PRIVATE_KEY               = "arn:aws:ssm:us-east-1:120317779495:parameter/production/hub/FIREBASE_PRIVATE_KEY"
+        FIREBASE_PROJECT_ID                = "arn:aws:ssm:us-east-1:120317779495:parameter/production/hub/FIREBASE_PROJECT_ID"
+        FIXER_API_KEY                      = "arn:aws:ssm:us-east-1:120317779495:parameter/production/hub/FIXER_API_KEY"
+        HUB_DATABASE_URL                   = "arn:aws:ssm:us-east-1:120317779495:parameter/production/hub/HUB_DATABASE_URL"
+        HUB_SENTRY_DSN                     = "arn:aws:ssm:us-east-1:120317779495:parameter/production/hub/HUB_SENTRY_DSN"
+        PROVISIONER_SECRET                 = "arn:aws:ssm:us-east-1:120317779495:parameter/production/hub/PROVISIONER_SECRET"
+        STATUSPAGE_API_KEY                 = "arn:aws:ssm:us-east-1:120317779495:parameter/production/hub/STATUSPAGE_API_KEY"
+        STATUSPAGE_PAGE_ID                 = "arn:aws:ssm:us-east-1:120317779495:parameter/production/hub/STATUSPAGE_PAGE_ID"
+        WEB3_STORAGE_TOKEN                 = "arn:aws:ssm:us-east-1:120317779495:parameter/production/hub/WEB3_STORAGE_TOKEN"
+        WYRE_ACCOUNT_ID                    = "arn:aws:ssm:us-east-1:120317779495:parameter/production/hub/WYRE_ACCOUNT_ID"
+        WYRE_API_KEY                       = "arn:aws:ssm:us-east-1:120317779495:parameter/production/hub/WYRE_API_KEY"
+        WYRE_SECRET_KEY                    = "arn:aws:ssm:us-east-1:120317779495:parameter/production/hub/WYRE_SECRET_KEY"
         ETHEREUM_RELAYER_ABOUT_PAGE_SECRET = "arn:aws:ssm:us-east-1:120317779495:parameter/production/safe-relay/ethereum/about_page_secret"
         POLYGON_RELAYER_ABOUT_PAGE_SECRET  = "arn:aws:ssm:us-east-1:120317779495:parameter/production/safe-relay/polygon/about_page_secret"
 
@@ -100,16 +101,6 @@ app "hub" {
         POLYGON_HUB_RPC_NODE_HTTPS_URL                = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_evm_hub_polygon_https_url-jIVW87"
         ETHEREUM_HUB_RPC_NODE_HTTPS_URL               = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_evm_hub_mainnet_https_url-jRtxEP"
       }
-    }
-
-    hook {
-      when    = "after"
-      command = ["node", "./scripts/waypoint-ecs-add-tags.mjs", "hub"]
-    }
-
-    hook {
-      when    = "after"
-      command = ["node", "./scripts/wait-service-stable.mjs", "hub"]
     }
   }
 
@@ -201,16 +192,6 @@ app "hub-worker" {
         ETHEREUM_HUB_RPC_NODE_HTTPS_URL     = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_evm_hub_mainnet_https_url-jRtxEP"
       }
     }
-
-    hook {
-      when    = "after"
-      command = ["node", "./scripts/waypoint-ecs-add-tags.mjs", "hub-worker"]
-    }
-
-    hook {
-      when    = "after"
-      command = ["node", "./scripts/wait-service-stable.mjs", "hub-worker"]
-    }
   }
 
   url {
@@ -297,16 +278,6 @@ app "hub-bot" {
         POLYGON_RPC_NODE_WSS_URL         = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_evm_polygon_infura_wss_url-ErLq0E"
       }
     }
-
-    hook {
-      when    = "after"
-      command = ["node", "./scripts/waypoint-ecs-add-tags.mjs", "hub-bot"]
-    }
-
-    hook {
-      when    = "after"
-      command = ["node", "./scripts/wait-service-stable.mjs", "hub-bot"]
-    }
   }
 
   url {
@@ -392,18 +363,8 @@ app "hub-event-listener" {
         POLYGON_RPC_NODE_HTTPS_URL       = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_evm_polygon_infura_https_url-DlBN06"
         POLYGON_RPC_NODE_WSS_URL         = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_evm_polygon_infura_wss_url-ErLq0E"
         POLYGON_HUB_RPC_NODE_HTTPS_URL   = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_evm_hub_polygon_https_url-jIVW87"
-        ETHEREUM_HUB_RPC_NODE_HTTPS_URL   = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_evm_hub_mainnet_https_url-jRtxEP"
+        ETHEREUM_HUB_RPC_NODE_HTTPS_URL  = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_evm_hub_mainnet_https_url-jRtxEP"
       }
-    }
-
-    hook {
-      when    = "after"
-      command = ["node", "./scripts/waypoint-ecs-add-tags.mjs", "hub-event-listener"]
-    }
-
-    hook {
-      when    = "after"
-      command = ["node", "./scripts/wait-service-stable.mjs", "hub-event-listener"]
     }
   }
 
@@ -456,16 +417,6 @@ app "cardpay-subg-ext" {
 
       disable_alb = true
     }
-
-    hook {
-      when    = "after"
-      command = ["node", "./scripts/waypoint-ecs-add-tags.mjs", "cardpay-subg-ext"]
-    }
-
-    hook {
-      when    = "after"
-      command = ["node", "./scripts/wait-service-stable.mjs", "cardpay-subg-ext"]
-    }
   }
 
   url {
@@ -503,8 +454,9 @@ app "ssr-web" {
       execution_role_name = "ssr-web-ecs-task-execution"
 
       alb {
-        subnets     = ["subnet-0c22641bd41cbdd1e", "subnet-01d36d7bcd0334fc0"]
-        certificate = "arn:aws:acm:us-east-1:120317779495:certificate/e1d6a1c7-456e-4058-b90b-9c603a65734d"
+        subnets           = ["subnet-0c22641bd41cbdd1e", "subnet-01d36d7bcd0334fc0"]
+        load_balancer_arn = "arn:aws:elasticloadbalancing:us-east-1:120317779495:loadbalancer/app/waypoint-ecs-ssr-web/f1022acdebbb0fce"
+        certificate       = "arn:aws:acm:us-east-1:120317779495:certificate/e1d6a1c7-456e-4058-b90b-9c603a65734d"
       }
 
       static_environment = {
@@ -515,16 +467,6 @@ app "ssr-web" {
       secrets = {
         SSR_WEB_SERVER_SENTRY_DSN = "arn:aws:ssm:us-east-1:120317779495:parameter/production/ssr-web/SSR_WEB_SERVER_SENTRY_DSN"
       }
-    }
-
-    hook {
-      when    = "after"
-      command = ["node", "./scripts/waypoint-ecs-add-tags.mjs", "ssr-web"]
-    }
-
-    hook {
-      when    = "after"
-      command = ["node", "./scripts/wait-service-stable.mjs", "ssr-web"]
     }
   }
 
@@ -564,9 +506,6 @@ app "reward-submit-lambda" {
     auto_hostname = false
   }
 }
-
-
-
 
 app "reward-scheduler" {
   path = "./packages/cardpay-reward-scheduler"
@@ -611,16 +550,6 @@ app "reward-scheduler" {
         SENTRY_DSN        = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_reward_programs_sentry_dsn-lsCwEe"
         EVM_FULL_NODE_URL = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_evm_full_node_url-K67DON"
       }
-    }
-
-    hook {
-      when    = "after"
-      command = ["node", "./scripts/waypoint-ecs-add-tags.mjs", "reward-scheduler"]
-    }
-
-    hook {
-      when    = "after"
-      command = ["node", "./scripts/wait-service-stable.mjs", "reward-scheduler"]
     }
   }
 

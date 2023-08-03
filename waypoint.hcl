@@ -37,8 +37,9 @@ app "hub" {
       security_group_ids  = ["sg-036935079377197d1"]
 
       alb {
-        subnets     = ["subnet-09af2ce7fb316890b", "subnet-08c7d485ed397ca69"]
-        certificate = "arn:aws:acm:us-east-1:680542703984:certificate/f7de489d-e9fc-4191-8b85-efab3eda9a7f"
+        subnets           = ["subnet-09af2ce7fb316890b", "subnet-08c7d485ed397ca69"]
+        load_balancer_arn = "arn:aws:elasticloadbalancing:us-east-1:680542703984:loadbalancer/app/waypoint-ecs-hub/4e3684a15985a839"
+        certificate       = "arn:aws:acm:us-east-1:680542703984:certificate/f7de489d-e9fc-4191-8b85-efab3eda9a7f"
       }
 
       static_environment = {
@@ -51,19 +52,19 @@ app "hub" {
 
       secrets = {
         # parameter store
-        CARDBOT_TOKEN         = "arn:aws:ssm:us-east-1:680542703984:parameter/staging/hub/CARDBOT_TOKEN"
-        FIREBASE_CLIENT_EMAIL = "arn:aws:ssm:us-east-1:680542703984:parameter/staging/hub/FIREBASE_CLIENT_EMAIL"
-        FIREBASE_DATABASE_URL = "arn:aws:ssm:us-east-1:680542703984:parameter/staging/hub/FIREBASE_DATABASE_URL"
-        FIREBASE_PRIVATE_KEY  = "arn:aws:ssm:us-east-1:680542703984:parameter/staging/hub/FIREBASE_PRIVATE_KEY"
-        FIREBASE_PROJECT_ID   = "arn:aws:ssm:us-east-1:680542703984:parameter/staging/hub/FIREBASE_PROJECT_ID"
-        FIXER_API_KEY         = "arn:aws:ssm:us-east-1:680542703984:parameter/staging/hub/FIXER_API_KEY"
-        HUB_DATABASE_URL      = "arn:aws:ssm:us-east-1:680542703984:parameter/staging/hub/HUB_DATABASE_URL"
-        HUB_SENTRY_DSN        = "arn:aws:ssm:us-east-1:680542703984:parameter/staging/hub/HUB_SENTRY_DSN"
-        PROVISIONER_SECRET    = "arn:aws:ssm:us-east-1:680542703984:parameter/staging/hub/PROVISIONER_SECRET"
-        WEB3_STORAGE_TOKEN    = "arn:aws:ssm:us-east-1:680542703984:parameter/staging/hub/WEB3_STORAGE_TOKEN"
-        WYRE_ACCOUNT_ID       = "arn:aws:ssm:us-east-1:680542703984:parameter/staging/hub/WYRE_ACCOUNT_ID"
-        WYRE_API_KEY          = "arn:aws:ssm:us-east-1:680542703984:parameter/staging/hub/WYRE_API_KEY"
-        WYRE_SECRET_KEY       = "arn:aws:ssm:us-east-1:680542703984:parameter/staging/hub/WYRE_SECRET_KEY"
+        CARDBOT_TOKEN                    = "arn:aws:ssm:us-east-1:680542703984:parameter/staging/hub/CARDBOT_TOKEN"
+        FIREBASE_CLIENT_EMAIL            = "arn:aws:ssm:us-east-1:680542703984:parameter/staging/hub/FIREBASE_CLIENT_EMAIL"
+        FIREBASE_DATABASE_URL            = "arn:aws:ssm:us-east-1:680542703984:parameter/staging/hub/FIREBASE_DATABASE_URL"
+        FIREBASE_PRIVATE_KEY             = "arn:aws:ssm:us-east-1:680542703984:parameter/staging/hub/FIREBASE_PRIVATE_KEY"
+        FIREBASE_PROJECT_ID              = "arn:aws:ssm:us-east-1:680542703984:parameter/staging/hub/FIREBASE_PROJECT_ID"
+        FIXER_API_KEY                    = "arn:aws:ssm:us-east-1:680542703984:parameter/staging/hub/FIXER_API_KEY"
+        HUB_DATABASE_URL                 = "arn:aws:ssm:us-east-1:680542703984:parameter/staging/hub/HUB_DATABASE_URL"
+        HUB_SENTRY_DSN                   = "arn:aws:ssm:us-east-1:680542703984:parameter/staging/hub/HUB_SENTRY_DSN"
+        PROVISIONER_SECRET               = "arn:aws:ssm:us-east-1:680542703984:parameter/staging/hub/PROVISIONER_SECRET"
+        WEB3_STORAGE_TOKEN               = "arn:aws:ssm:us-east-1:680542703984:parameter/staging/hub/WEB3_STORAGE_TOKEN"
+        WYRE_ACCOUNT_ID                  = "arn:aws:ssm:us-east-1:680542703984:parameter/staging/hub/WYRE_ACCOUNT_ID"
+        WYRE_API_KEY                     = "arn:aws:ssm:us-east-1:680542703984:parameter/staging/hub/WYRE_API_KEY"
+        WYRE_SECRET_KEY                  = "arn:aws:ssm:us-east-1:680542703984:parameter/staging/hub/WYRE_SECRET_KEY"
         GOERLI_RELAYER_ABOUT_PAGE_SECRET = "arn:aws:ssm:us-east-1:680542703984:parameter/staging/safe-relay/goerli/about_page_secret"
 
         # secrets manager
@@ -97,16 +98,6 @@ app "hub" {
         # The below is a distribution in the production AWS account
         HUB_STORAGE_CLOUDFRONT_DISTRIBUTION = "arn:aws:secretsmanager:us-east-1:680542703984:secret:hub_storage_cloudfront_distribution-Frtsb3"
       }
-    }
-
-    hook {
-      when    = "after"
-      command = ["node", "./scripts/waypoint-ecs-add-tags.mjs", "hub"]
-    }
-
-    hook {
-      when    = "after"
-      command = ["node", "./scripts/wait-service-stable.mjs", "hub"]
     }
   }
 
@@ -197,16 +188,6 @@ app "hub-worker" {
         HUB_STORAGE_CLOUDFRONT_DISTRIBUTION = "arn:aws:secretsmanager:us-east-1:680542703984:secret:hub_storage_cloudfront_distribution-Frtsb3"
       }
     }
-
-    hook {
-      when    = "after"
-      command = ["node", "./scripts/waypoint-ecs-add-tags.mjs", "hub-worker"]
-    }
-
-    hook {
-      when    = "after"
-      command = ["node", "./scripts/wait-service-stable.mjs", "hub-worker"]
-    }
   }
 
   url {
@@ -288,16 +269,6 @@ app "hub-bot" {
         POLYGON_RPC_NODE_WSS_URL         = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_evm_polygon_infura_wss_url-UvdYiF"
       }
     }
-
-    hook {
-      when    = "after"
-      command = ["node", "./scripts/waypoint-ecs-add-tags.mjs", "hub-bot"]
-    }
-
-    hook {
-      when    = "after"
-      command = ["node", "./scripts/wait-service-stable.mjs", "hub-bot"]
-    }
   }
 
   url {
@@ -378,18 +349,8 @@ app "hub-event-listener" {
         POLYGON_RPC_NODE_HTTPS_URL       = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_evm_polygon_infura_https_url-wIF3tU"
         POLYGON_RPC_NODE_WSS_URL         = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_evm_polygon_infura_wss_url-UvdYiF"
         POLYGON_HUB_RPC_NODE_HTTPS_URL   = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_evm_polygon_infura_https_url-wIF3tU"
-        ETHEREUM_HUB_RPC_NODE_HTTPS_URL   = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_evm_infura_https_url-aCpG9I"
+        ETHEREUM_HUB_RPC_NODE_HTTPS_URL  = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_evm_infura_https_url-aCpG9I"
       }
-    }
-
-    hook {
-      when    = "after"
-      command = ["node", "./scripts/waypoint-ecs-add-tags.mjs", "hub-event-listener"]
-    }
-
-    hook {
-      when    = "after"
-      command = ["node", "./scripts/wait-service-stable.mjs", "hub-event-listener"]
     }
   }
 
@@ -442,16 +403,6 @@ app "cardpay-subg-ext" {
 
       disable_alb = true
     }
-
-    hook {
-      when    = "after"
-      command = ["node", "./scripts/waypoint-ecs-add-tags.mjs", "cardpay-subg-ext"]
-    }
-
-    hook {
-      when    = "after"
-      command = ["node", "./scripts/wait-service-stable.mjs", "cardpay-subg-ext"]
-    }
   }
 
   url {
@@ -489,8 +440,9 @@ app "ssr-web" {
       execution_role_name = "ssr-web-ecs-task-execution"
 
       alb {
-        subnets     = ["subnet-09af2ce7fb316890b", "subnet-08c7d485ed397ca69"]
-        certificate = "arn:aws:acm:us-east-1:680542703984:certificate/8b232d17-3bb7-41f5-abc0-7b32b0d5190c"
+        subnets           = ["subnet-09af2ce7fb316890b", "subnet-08c7d485ed397ca69"]
+        load_balancer_arn = "arn:aws:elasticloadbalancing:us-east-1:680542703984:loadbalancer/app/waypoint-ecs-ssr-web/03ae8931b95ea734"
+        certificate       = "arn:aws:acm:us-east-1:680542703984:certificate/8b232d17-3bb7-41f5-abc0-7b32b0d5190c"
       }
 
       static_environment = {
@@ -501,16 +453,6 @@ app "ssr-web" {
       secrets = {
         SSR_WEB_SERVER_SENTRY_DSN = "arn:aws:ssm:us-east-1:680542703984:parameter/staging/ssr-web/SSR_WEB_SERVER_SENTRY_DSN"
       }
-    }
-
-    hook {
-      when    = "after"
-      command = ["node", "./scripts/waypoint-ecs-add-tags.mjs", "ssr-web"]
-    }
-
-    hook {
-      when    = "after"
-      command = ["node", "./scripts/wait-service-stable.mjs", "ssr-web"]
     }
   }
 
@@ -552,9 +494,6 @@ app "reward-submit-lambda" {
     auto_hostname = false
   }
 }
-
-
-
 
 app "reward-scheduler" {
   path = "./packages/cardpay-reward-scheduler"
@@ -599,16 +538,6 @@ app "reward-scheduler" {
         SENTRY_DSN        = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_reward_programs_sentry_dsn-zAMOFo"
         EVM_FULL_NODE_URL = "arn:aws:secretsmanager:us-east-1:680542703984:secret:staging_evm_full_node_url-NBKUCq"
       }
-    }
-
-    hook {
-      when    = "after"
-      command = ["node", "./scripts/waypoint-ecs-add-tags.mjs", "reward-scheduler"]
-    }
-
-    hook {
-      when    = "after"
-      command = ["node", "./scripts/wait-service-stable.mjs", "reward-scheduler"]
     }
   }
 

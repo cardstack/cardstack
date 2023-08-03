@@ -12,7 +12,7 @@ inputs:
   waypoint_version:
     description: Waypoint version to use
     required: false
-    default: "0.8.1"
+    default: "0.11.3"
   environment:
     description: Deployment environment
     required: true
@@ -25,12 +25,13 @@ runs:
   steps:
     - uses: volta-cli/action@v4
 
+    - uses: lucasmelin/setup-waypoint@v1
+      with:
+        version: ${{ inputs.waypoint_version }}
+
     - name: Install dependencies
       shell: bash
       run: |
-        curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -
-        sudo apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
-        sudo apt-get install awscli waypoint=${{ inputs.waypoint_version }}
         yarn --prefer-offline --frozen-lockfile
 
     - name: Deploy app
