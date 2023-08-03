@@ -39,17 +39,6 @@ runs:
       shell: bash
       env:
         WAYPOINT_SERVER_TLS: "1"
-        WAYPOINT_SERVER_TLS_SKIP_VERIFY: "1"
-
-    - uses: ./.github/actions/waypoint-ecs-failsafe
-      with:
-        app: ${{ inputs.app }}
-
-    - name: Prune dangling resources
-      uses: ./.github/actions/waypoint-prune-dangling-resources
-      with:
-        app: ${{ inputs.app }}
-        retain: ${{ inputs.retain }}
 
     - name: Send notification to Discord
       if: ${{ always() }}

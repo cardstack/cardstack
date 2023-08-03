@@ -48,7 +48,6 @@ jobs:
         uses: ./.github/actions/deploy-ssr-web
         env:
           SENTRY_DSN: ${{ secrets.SSR_WEB_CLIENT_SENTRY_DSN }}
-          WAYPOINT_SERVER_TLS: "1"
         with:
           environment: ${{ github.event.inputs.environment }}
           discord_webhook: ${{ secrets.DISCORD_WEBHOOK }}

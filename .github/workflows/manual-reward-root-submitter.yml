@@ -54,7 +54,6 @@ jobs:
         run: waypoint build -app=reward-submit-lambda
         env:
           WAYPOINT_SERVER_TLS: "1"
-          WAYPOINT_SERVER_TLS_SKIP_VERIFY: "1"
 
       - name: Update reward submitter
         run: |
