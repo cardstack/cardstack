@@ -32904,7 +32904,7 @@ typedoc-plugin-resolve-crossmodule-references@^0.3.3:
 
 "typedoc-plugin-versions@https://github.com/tintinthong/typedoc-plugin-versions.git#add-custom-root-package-version":
   version "0.2.3"
-  resolved "https://github.com/tintinthong/typedoc-plugin-versions.git#43a5d8c4f4667b5b745705951017950de7832c6a"
+  resolved "https://github.com/tintinthong/typedoc-plugin-versions.git#d00f408ae5867074b6076e8dc02df9a692dde523"
   dependencies:
     fs-extra "^10.1.0"
     semver "^7.3.7"
