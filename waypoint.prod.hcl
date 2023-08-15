@@ -411,7 +411,7 @@ app "cardpay-subg-ext" {
       }
 
       secrets = {
-        SE_DATABASE_STRING = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_subg_extract_database_url-5HyPh7"
+        SE_DATABASE_STRING = "arn:aws:ssm:us-east-1:120317779495:parameter/production/subgraph-extractor/SE_DATABASE_STRING"
         SE_OUTPUT_LOCATION = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_subg_extract_output_location-YDoQUt"
       }
 
