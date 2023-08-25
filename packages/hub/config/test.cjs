@@ -86,4 +86,7 @@ fNnC/5IGBxBkFQIgGC1mdtwPDSBMQY0XpAzPw6dXE8z0LaoV5qXeB8LV8CECIGmi
   relay: {
     provisionerSecret: 'fakesecret',
   },
+  rewardsIndexer: {
+    enabled: true,
+  },
 };

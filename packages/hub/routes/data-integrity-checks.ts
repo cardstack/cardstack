@@ -1,9 +1,9 @@
 import Koa from 'koa';
 import autoBind from 'auto-bind';
 import { inject } from '@cardstack/di';
-import DataIntegrityChecksScheduledPayments, {
-  IntegrityCheckResult,
-} from '../services/data-integrity-checks/scheduled-payments';
+import DataIntegrityChecksScheduledPayments from '../services/data-integrity-checks/scheduled-payments';
+import DataIntegrityChecksCronTasks from '../services/data-integrity-checks/cron-tasks';
+import { IntegrityCheckResult } from '../services/data-integrity-checks/utils';
 import config from 'config';
 
 export default class DataIntegrityChecksRoute {
@@ -13,6 +13,9 @@ export default class DataIntegrityChecksRoute {
       as: 'dataIntegrityCheckScheduledPayments',
     }
   );
+  dataIntegrityCronTasks: DataIntegrityChecksCronTasks = inject('data-integrity-checks-cron-tasks', {
+    as: 'dataIntegrityCronTasks',
+  });
 
   constructor() {
     autoBind(this);
@@ -36,6 +39,10 @@ export default class DataIntegrityChecksRoute {
 
     if (checkName === 'scheduled-payments') {
       checkResult = await this.dataIntegrityCheckScheduledPayments.check();
+    }
+
+    if (checkName === 'cron-tasks') {
+      checkResult = await this.dataIntegrityCronTasks.check();
     }
 
     if (!checkResult) {

@@ -111,6 +111,7 @@ import ScheduledPaymentsAttemptsRoute from './routes/scheduled-payment-attempts'
 import ScheduledPaymentAttemptSerializer from './services/serializers/scheduled-payment-attempt-serializer';
 import GasPriceSerializer from './services/serializers/gas-price-serializer';
 import RewardProofsRoute from './routes/reward-proofs';
+import DataIntegrityChecksCronTasks from './services/data-integrity-checks/cron-tasks';
 
 //@ts-ignore polyfilling fetch
 global.fetch = fetch;
@@ -200,6 +201,7 @@ export function createRegistry(): Registry {
   registry.register('crank-nonce-lock', CrankNonceLock);
   registry.register('ethers-provider', EthersProvider);
   registry.register('data-integrity-checks-scheduled-payments', DataIntegrityChecksScheduledPayments);
+  registry.register('data-integrity-checks-cron-tasks', DataIntegrityChecksCronTasks);
   registry.register('data-integrity-checks-route', DataIntegrityChecksRoute);
   registry.register('gas-station-service', GasStationService);
   registry.register('gas-station-route', GasStationRoute);

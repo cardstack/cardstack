@@ -6,6 +6,8 @@ import { CREATION_WITHOUT_TX_HASH_ALLOWED_MINUTES } from '../../services/data-in
 import { ExtendedPrismaClient } from '../../services/prisma-manager';
 import { nowUtc } from '../../utils/dates';
 import { setupHub } from '../helpers/server';
+import { Client as DBClient } from 'pg';
+import { type TaskIdentifier } from '../../services/data-integrity-checks/cron-tasks';
 
 describe('GET /api/data-integrity-checks/scheduled-payments', async function () {
   let prisma: ExtendedPrismaClient;
@@ -82,28 +84,88 @@ describe('GET /api/data-integrity-checks/scheduled-payments', async function () 
       })
       .expect('Content-Type', 'application/vnd.api+json');
   });
+});
 
-  it('returns not found for unknown check name', async function () {
+describe('GET /api/data-integrity-checks/cron-tasks', async function () {
+  let db: DBClient;
+  type CronState = {
+    [key in TaskIdentifier]: { minutesAgo: number };
+  };
+  let { request, getContainer } = setupHub(this);
+
+  let setupKnownCrontabs = async (db: DBClient, task: CronState) => {
+    const tasks = Object.entries(task).map(async ([identifier, config]) => {
+      const query = `
+        INSERT INTO graphile_worker.known_crontabs (identifier, known_since, last_execution) 
+        VALUES ($1, current_timestamp, current_timestamp - interval '${config.minutesAgo} minutes');
+      `;
+      await db.query(query, [identifier]);
+    });
+
+    await Promise.all(tasks);
+  };
+
+  this.beforeEach(async function () {
+    let dbManager = await getContainer().lookup('database-manager');
+    db = await dbManager.getClient();
+    await getContainer().lookup('data-integrity-checks-cron-tasks');
+    await db.query('DELETE FROM graphile_worker.known_crontabs;');
+  });
+
+  it('returns an operational status for provided check', async function () {
+    await setupKnownCrontabs(db, {
+      'check-reward-roots': { minutesAgo: 5 },
+      'execute-scheduled-payments': { minutesAgo: 10 },
+      'print-queued-jobs': { minutesAgo: 5 },
+      'remove-old-sent-notifications': { minutesAgo: 600 },
+    });
+
     await request()
-      .get('/api/data-integrity-checks/unknown-check')
+      .get('/api/data-integrity-checks/cron-tasks')
       .set('X-Data-Integrity-Checks-Authorization', '123')
       .set('Accept', 'application/vnd.api+json')
       .set('Content-Type', 'application/vnd.api+json')
-      .expect(404);
+      .expect(200)
+      .expect({
+        data: {
+          type: 'data-integrity-check',
+          attributes: {
+            'cron-tasks': {
+              message: null,
+              status: 'operational',
+            },
+          },
+        },
+      })
+      .expect('Content-Type', 'application/vnd.api+json');
   });
 
-  it('returns not allowed for wrong or missing route authorization', async function () {
-    await request()
-      .get('/api/data-integrity-checks/scheduled-payments')
-      .set('X-Data-Integrity-Checks-Authorization', 'wrongauth')
-      .set('Accept', 'application/vnd.api+json')
-      .set('Content-Type', 'application/vnd.api+json')
-      .expect(403);
+  it('returns degraded status for provided check', async function () {
+    await setupKnownCrontabs(db, {
+      'check-reward-roots': { minutesAgo: 31 }, // stopped
+      'execute-scheduled-payments': { minutesAgo: 5 },
+      'print-queued-jobs': { minutesAgo: 2 },
+      'remove-old-sent-notifications': { minutesAgo: 5000 }, // stopped
+    });
 
     await request()
-      .get('/api/data-integrity-checks/scheduled-payments')
+      .get('/api/data-integrity-checks/cron-tasks')
+      .set('X-Data-Integrity-Checks-Authorization', '123')
       .set('Accept', 'application/vnd.api+json')
       .set('Content-Type', 'application/vnd.api+json')
-      .expect(403);
+      .expect(200)
+      .expect((res) => {
+        const o = res.body.data.attributes['cron-tasks'];
+        expect(o.status).to.include('degraded');
+        expect(o.message).to.include(
+          '"check-reward-roots" has not run within 30 minutes tolerance (supposed to be every 10 minutes)'
+        );
+        expect(o.message).to.include(
+          '"remove-old-sent-notifications" has not run within 1800 minutes tolerance (supposed to be every 600 minutes)'
+        );
+        expect(o.message).to.not.include('"execute-scheduled-payments"');
+        expect(o.message).to.not.include('"print-queued-jobs"');
+      })
+      .expect('Content-Type', 'application/vnd.api+json');
   });
 });
