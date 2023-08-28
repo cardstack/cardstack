@@ -10,7 +10,7 @@ export type TaskIdentifier =
   | 'print-queued-jobs';
 
 // graphile worker configuration (copied from worker-client)
-let GRPAPHILE_WORKER_TASKS: ParsedCronItem[] = parseCrontab(CRON_TAB_STRING);
+let GRAPHILE_WORKER_TASKS: ParsedCronItem[] = parseCrontab(CRON_TAB_STRING);
 
 export default class DataIntegrityChecksCronTasks {
   databaseManager = inject('database-manager', { as: 'databaseManager' });
@@ -20,7 +20,7 @@ export default class DataIntegrityChecksCronTasks {
     let db = await this.databaseManager.getClient();
 
     let checks = await Promise.all(
-      GRPAPHILE_WORKER_TASKS.map(async (parsedCronItem: ParsedCronItem) => {
+      GRAPHILE_WORKER_TASKS.map(async (parsedCronItem: ParsedCronItem) => {
         let checker = this.checkers.find((checker) => checker.isType(parsedCronItem));
         if (!checker) {
           throw new Error(`No checker found for ${parsedCronItem.identifier}`);
