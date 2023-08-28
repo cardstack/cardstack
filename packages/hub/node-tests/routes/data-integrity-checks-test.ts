@@ -7,7 +7,7 @@ import { ExtendedPrismaClient } from '../../services/prisma-manager';
 import { nowUtc } from '../../utils/dates';
 import { setupHub } from '../helpers/server';
 import { Client as DBClient } from 'pg';
-import { type TaskIdentifier } from '../../services/data-integrity-checks/cron-tasks';
+import { setupKnownCrontabs } from '../../services/data-integrity-checks/utils';
 
 describe('GET /api/data-integrity-checks/scheduled-payments', async function () {
   let prisma: ExtendedPrismaClient;
@@ -88,28 +88,11 @@ describe('GET /api/data-integrity-checks/scheduled-payments', async function () 
 
 describe('GET /api/data-integrity-checks/cron-tasks', async function () {
   let db: DBClient;
-  type CronState = {
-    [key in TaskIdentifier]: { minutesAgo: number };
-  };
   let { request, getContainer } = setupHub(this);
-
-  let setupKnownCrontabs = async (db: DBClient, task: CronState) => {
-    const tasks = Object.entries(task).map(async ([identifier, config]) => {
-      const query = `
-        INSERT INTO graphile_worker.known_crontabs (identifier, known_since, last_execution) 
-        VALUES ($1, current_timestamp, current_timestamp - interval '${config.minutesAgo} minutes');
-      `;
-      await db.query(query, [identifier]);
-    });
-
-    await Promise.all(tasks);
-  };
 
   this.beforeEach(async function () {
     let dbManager = await getContainer().lookup('database-manager');
     db = await dbManager.getClient();
-    await getContainer().lookup('data-integrity-checks-cron-tasks');
-    await db.query('DELETE FROM graphile_worker.known_crontabs;');
   });
 
   it('returns an operational status for provided check', async function () {
@@ -142,10 +125,10 @@ describe('GET /api/data-integrity-checks/cron-tasks', async function () {
 
   it('returns degraded status for provided check', async function () {
     await setupKnownCrontabs(db, {
-      'check-reward-roots': { minutesAgo: 31 }, // stopped
+      'check-reward-roots': { minutesAgo: 31 }, // lagging
       'execute-scheduled-payments': { minutesAgo: 5 },
       'print-queued-jobs': { minutesAgo: 2 },
-      'remove-old-sent-notifications': { minutesAgo: 5000 }, // stopped
+      'remove-old-sent-notifications': { minutesAgo: 5760 }, // lagging 4 days
     });
 
     await request()
@@ -160,8 +143,10 @@ describe('GET /api/data-integrity-checks/cron-tasks', async function () {
         expect(o.message).to.include(
           '"check-reward-roots" has not run within 30 minutes tolerance (supposed to be every 10 minutes)'
         );
-        expect(o.message).to.include(
-          '"remove-old-sent-notifications" has not run within 1800 minutes tolerance (supposed to be every 600 minutes)'
+        expect(
+          o.message?.includes(
+            `"remove-old-sent-notifications" has not run within 3 days tolerance (It's supposed to run every day at 5 hour 0 minutes).`
+          )
         );
         expect(o.message).to.not.include('"execute-scheduled-payments"');
         expect(o.message).to.not.include('"print-queued-jobs"');

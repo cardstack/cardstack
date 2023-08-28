@@ -12,7 +12,8 @@ import shortUuid from 'short-uuid';
 import cryptoRandomString from 'crypto-random-string';
 import { ethers } from 'ethers';
 import { Client as DBClient } from 'pg';
-import DataIntegrityChecksCronTasks, { type TaskIdentifier } from '../../services/data-integrity-checks/cron-tasks';
+import DataIntegrityChecksCronTasks from '../../services/data-integrity-checks/cron-tasks';
+import { setupKnownCrontabs } from '../../services/data-integrity-checks/utils';
 
 describe('data integrity checks', function () {
   let prisma: ExtendedPrismaClient;
@@ -396,30 +397,14 @@ describe('data integrity checks', function () {
     let service: DataIntegrityChecksCronTasks;
     let db: DBClient;
     let { getContainer } = setupHub(this);
-    type CronState = {
-      [key in TaskIdentifier]: { minutesAgo: number };
-    };
-
-    let setupKnownCrontabs = async (db: DBClient, task: CronState) => {
-      const tasks = Object.entries(task).map(async ([identifier, config]) => {
-        const query = `
-          INSERT INTO graphile_worker.known_crontabs (identifier, known_since, last_execution) 
-          VALUES ($1, current_timestamp, current_timestamp - interval '${config.minutesAgo} minutes');
-        `;
-        await db.query(query, [identifier]);
-      });
-
-      await Promise.all(tasks);
-    };
 
     this.beforeEach(async function () {
       let dbManager = await getContainer().lookup('database-manager');
       db = await dbManager.getClient();
       service = await getContainer().lookup('data-integrity-checks-cron-tasks');
-      await db.query('DELETE FROM graphile_worker.known_crontabs;');
     });
 
-    it('returns an operational check when all task have not stopped', async function () {
+    it('returns an operational check when all task not been lagging', async function () {
       await setupKnownCrontabs(db, {
         'check-reward-roots': { minutesAgo: 5 },
         'execute-scheduled-payments': { minutesAgo: 10 },
@@ -435,12 +420,12 @@ describe('data integrity checks', function () {
       });
     });
 
-    it('returns a degraded check when there is at least one task stopped outside of multiplier tolerance', async function () {
+    it('returns a degraded check when there is at least one task lagging outside of multiplier tolerance', async function () {
       await setupKnownCrontabs(db, {
-        'check-reward-roots': { minutesAgo: 31 }, // stopped
+        'check-reward-roots': { minutesAgo: 31 }, // lagging
         'execute-scheduled-payments': { minutesAgo: 5 },
         'print-queued-jobs': { minutesAgo: 2 },
-        'remove-old-sent-notifications': { minutesAgo: 5000 }, // stopped
+        'remove-old-sent-notifications': { minutesAgo: 5760 }, // lagging 4 days
       });
 
       let result = await service.check();
@@ -453,7 +438,7 @@ describe('data integrity checks', function () {
       ).to.be.true;
       expect(
         result.message?.includes(
-          '"remove-old-sent-notifications" has not run within 1800 minutes tolerance (supposed to be every 600 minutes).'
+          `"remove-old-sent-notifications" has not run within 3 days tolerance (It's supposed to run every day at 5 hour 0 minutes).`
         )
       ).to.be.true;
       expect(result.message?.includes('"execute-scheduled-payments"')).to.be.false;

@@ -51,6 +51,17 @@ const workerLogFactory: LogFunctionFactory = (scope: any) => {
   };
 };
 
+// https://github.com/graphile/worker#recurring-tasks-crontab
+// remove old notifications at midnight every day
+// 5am in utc equivalent to midnight in ny
+// 0 mins, 5 hours, any day (of month), any month, any day (of week), task
+export const CRON_TAB_STRING: string = [
+  '0 5 * * * remove-old-sent-notifications ?max=5',
+  '*/5 * * * * print-queued-jobs',
+  '*/5 * * * * execute-scheduled-payments',
+  ...(config.get('rewardsIndexer.enabled') ? ['*/10 * * * * check-reward-roots'] : []),
+].join('\n');
+
 export class HubWorker {
   constructor() {
     runInitializers();
@@ -94,16 +105,7 @@ export class HubWorker {
         'process-reward-root': this.instantiateTask(ProcessRewardRoot),
         'check-reward-roots': this.instantiateTask(CheckRewardRoots),
       },
-      // https://github.com/graphile/worker#recurring-tasks-crontab
-      // remove old notifications at midnight every day
-      // 5am in utc equivalent to midnight in ny
-      // 0 mins, 5 hours, any day (of month), any month, any day (of week), task
-      crontab: [
-        '0 5 * * * remove-old-sent-notifications ?max=5',
-        '*/5 * * * * print-queued-jobs',
-        '*/5 * * * * execute-scheduled-payments',
-        ...(config.get('rewardsIndexer.enabled') ? ['*/10 * * * * check-reward-roots'] : []),
-      ].join('\n'),
+      crontab: CRON_TAB_STRING,
     });
 
     runner.events.on('job:error', ({ error, job }) => {
