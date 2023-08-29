@@ -457,6 +457,9 @@ describe('data integrity checks', function () {
       expect(() => calculateMinuteInterval('*/5 */3 * * * print-queued-jobs')).to.throw(
         'Cannot parse the provided cron expression: */5 */3 * * * print-queued-jobs'
       );
+      expect(() => calculateMinuteInterval('*/5 3 * * * print-queued-jobs')).to.throw(
+        'Cannot parse the provided cron expression: */5 3 * * * print-queued-jobs'
+      );
     });
   });
 });
