@@ -14,6 +14,7 @@ import { ethers } from 'ethers';
 import { Client as DBClient } from 'pg';
 import DataIntegrityChecksCronTasks from '../../services/data-integrity-checks/cron-tasks';
 import { setupKnownCrontabs } from '../../services/data-integrity-checks/utils';
+import { calculateMinuteInterval } from '../../services/data-integrity-checks/cron-tab-utils';
 
 describe('data integrity checks', function () {
   let prisma: ExtendedPrismaClient;
@@ -438,11 +439,24 @@ describe('data integrity checks', function () {
       ).to.be.true;
       expect(
         result.message?.includes(
-          `"remove-old-sent-notifications" has not run within 3 days tolerance (It's supposed to run every day at 5 hour 0 minutes).`
+          `"remove-old-sent-notifications" has not run within 4320 minutes tolerance (supposed to be every 1440 minutes)`
         )
       ).to.be.true;
       expect(result.message?.includes('"execute-scheduled-payments"')).to.be.false;
       expect(result.message?.includes('"print-queued-jobs"')).to.be.false;
+    });
+
+    it('calculateMinuteInterval', async function () {
+      expect(calculateMinuteInterval('0 5 * * * remove-old-sent-notifications ?max=5').minuteInterval).to.equal(
+        60 * 24
+      );
+      expect(calculateMinuteInterval('*/5 * * * * print-queued-jobs').minuteInterval).to.equal(5);
+      expect(() => calculateMinuteInterval('0 5 2 * * remove-old-sent-notifications ?max=5')).to.throw(
+        'Cannot parse the provided cron expression: 0 5 2 * * remove-old-sent-notifications ?max=5'
+      );
+      expect(() => calculateMinuteInterval('*/5 */3 * * * print-queued-jobs')).to.throw(
+        'Cannot parse the provided cron expression: */5 */3 * * * print-queued-jobs'
+      );
     });
   });
 });

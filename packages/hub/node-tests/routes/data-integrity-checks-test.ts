@@ -145,7 +145,7 @@ describe('GET /api/data-integrity-checks/cron-tasks', async function () {
         );
         expect(
           o.message?.includes(
-            `"remove-old-sent-notifications" has not run within 3 days tolerance (It's supposed to run every day at 5 hour 0 minutes).`
+            `"remove-old-sent-notifications" has not run within 4320 minutes tolerance (suposed to be every 1440 minutes).`
           )
         );
         expect(o.message).to.not.include('"execute-scheduled-payments"');

@@ -55,13 +55,13 @@ const workerLogFactory: LogFunctionFactory = (scope: any) => {
 // remove old notifications at midnight every day
 // 5am in utc equivalent to midnight in ny
 // 0 mins, 5 hours, any day (of month), any month, any day (of week), task
-export const CRON_TAB_STRING: string = [
+export const CRON_TAB = [
   '0 5 * * * remove-old-sent-notifications ?max=5',
   '*/5 * * * * print-queued-jobs',
   '*/5 * * * * execute-scheduled-payments',
   ...(config.get('rewardsIndexer.enabled') ? ['*/10 * * * * check-reward-roots'] : []),
-].join('\n');
-
+];
+const CRON_TAB_STRING: string = CRON_TAB.join('\n');
 export class HubWorker {
   constructor() {
     runInitializers();

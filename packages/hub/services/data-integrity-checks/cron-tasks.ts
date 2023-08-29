@@ -1,31 +1,49 @@
 import { inject } from '@cardstack/di';
 import { IntegrityCheckResult } from './utils';
-import { parseCrontab, type ParsedCronItem } from 'graphile-worker';
-import { CRON_TAB_STRING } from '../../worker';
-import { AtTimeEveryDayChecker, MinuteIntervalLessThanHourChecker, TaskCheck } from './cron-tab-utils';
+import { CRON_TAB } from '../../worker';
+import { calculateMinuteInterval } from './cron-tab-utils';
 export type TaskIdentifier =
   | 'check-reward-roots'
   | 'execute-scheduled-payments'
   | 'remove-old-sent-notifications'
   | 'print-queued-jobs';
 
-// graphile worker configuration (copied from worker-client)
-let GRPAPHILE_WORKER_TASKS: ParsedCronItem[] = parseCrontab(CRON_TAB_STRING);
+let DEFAULT_MULTIPLIER = 3;
+
+export interface TaskCheck {
+  identifier: string;
+  lagging: boolean;
+  lastExecution: Date | null;
+  errorMessage?: string;
+}
 
 export default class DataIntegrityChecksCronTasks {
   databaseManager = inject('database-manager', { as: 'databaseManager' });
-  checkers = [new MinuteIntervalLessThanHourChecker(), new AtTimeEveryDayChecker()];
 
   async check(): Promise<IntegrityCheckResult> {
     let db = await this.databaseManager.getClient();
 
     let checks = await Promise.all(
-      GRPAPHILE_WORKER_TASKS.map(async (parsedCronItem: ParsedCronItem) => {
-        let checker = this.checkers.find((checker) => checker.isType(parsedCronItem));
-        if (!checker) {
-          throw new Error(`No checker found for ${parsedCronItem.identifier}`);
+      CRON_TAB.map(async (expression: string) => {
+        let { identifier, minuteInterval } = calculateMinuteInterval(expression);
+        let minuteThreshold = minuteInterval * DEFAULT_MULTIPLIER;
+        let query = `
+        SELECT 
+          COALESCE((current_timestamp - last_execution) >= make_interval(mins => $2) OR last_execution IS NULL, false) AS lagging,
+          identifier,   
+          $2 AS "minuteThreshold",
+          last_execution as "lastExecution" 
+      FROM 
+          graphile_worker.known_crontabs
+      WHERE 
+          identifier = $1;
+    `;
+        let { rows: data } = await db.query(query, [identifier, minuteThreshold]);
+        let r = { ...data[0], minuteInterval };
+        if (r.lagging) {
+          r.errorMessage = `"${r.identifier}" has not run within ${r.minuteThreshold} minutes tolerance (supposed to be every ${r.minuteInterval} minutes). Last execution is ${r.lastExecution}`;
         }
-        return await checker.check(db, parsedCronItem);
+        return r;
       })
     );
 
