@@ -6,6 +6,7 @@ import fetch from 'node-fetch';
 import { getConstantByNetwork, SchedulerCapableNetworks } from '@cardstack/cardpay-sdk';
 import { BigNumber, ethers, Wallet } from 'ethers';
 import { JsonRpcProvider } from '@cardstack/cardpay-sdk';
+import { IntegrityCheckResult } from './utils';
 
 export const CREATION_WITHOUT_TX_HASH_ALLOWED_MINUTES = 2;
 export const CREATION_UNMINED_ALLOWED_MINUTES = 3 * 60;
@@ -43,12 +44,6 @@ function lowBalanceThreshold(networkName: SchedulerCapableNetworks) {
   }
 
   return min;
-}
-
-export interface IntegrityCheckResult {
-  name: string;
-  status: 'degraded' | 'operational';
-  message: string | null;
 }
 
 export default class DataIntegrityChecksScheduledPayments {

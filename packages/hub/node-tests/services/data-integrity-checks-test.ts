@@ -11,6 +11,10 @@ import DataIntegrityChecksScheduledPayments, {
 import shortUuid from 'short-uuid';
 import cryptoRandomString from 'crypto-random-string';
 import { ethers } from 'ethers';
+import { Client as DBClient } from 'pg';
+import DataIntegrityChecksCronTasks from '../../services/data-integrity-checks/cron-tasks';
+import { setupKnownCrontabs } from '../../services/data-integrity-checks/utils';
+import { calculateMinuteInterval } from '../../services/data-integrity-checks/cron-tab-utils';
 
 describe('data integrity checks', function () {
   let prisma: ExtendedPrismaClient;
@@ -387,6 +391,75 @@ describe('data integrity checks', function () {
         name: 'scheduled-payments',
         message: `Crank balance low on goerli: 0.5 ETH`,
       });
+    });
+  });
+
+  describe('cron-tasks', function () {
+    let service: DataIntegrityChecksCronTasks;
+    let db: DBClient;
+    let { getContainer } = setupHub(this);
+
+    this.beforeEach(async function () {
+      let dbManager = await getContainer().lookup('database-manager');
+      db = await dbManager.getClient();
+      service = await getContainer().lookup('data-integrity-checks-cron-tasks');
+    });
+
+    it('returns an operational check when all task not been lagging', async function () {
+      await setupKnownCrontabs(db, {
+        'check-reward-roots': { minutesAgo: 5 },
+        'execute-scheduled-payments': { minutesAgo: 10 },
+        'print-queued-jobs': { minutesAgo: 5 },
+        'remove-old-sent-notifications': { minutesAgo: 600 },
+      });
+
+      let result = await service.check();
+      expect(result).to.deep.equal({
+        status: 'operational',
+        name: 'cron-tasks',
+        message: null,
+      });
+    });
+
+    it('returns a degraded check when there is at least one task lagging outside of multiplier tolerance', async function () {
+      await setupKnownCrontabs(db, {
+        'check-reward-roots': { minutesAgo: 31 }, // lagging
+        'execute-scheduled-payments': { minutesAgo: 5 },
+        'print-queued-jobs': { minutesAgo: 2 },
+        'remove-old-sent-notifications': { minutesAgo: 5760 }, // lagging 4 days
+      });
+
+      let result = await service.check();
+      expect(result.name).to.equal('cron-tasks');
+      expect(result.status).to.equal('degraded');
+      expect(
+        result.message?.includes(
+          '"check-reward-roots" has not run within 30 minutes tolerance (supposed to be every 10 minutes)'
+        )
+      ).to.be.true;
+      expect(
+        result.message?.includes(
+          `"remove-old-sent-notifications" has not run within 4320 minutes tolerance (supposed to be every 1440 minutes)`
+        )
+      ).to.be.true;
+      expect(result.message?.includes('"execute-scheduled-payments"')).to.be.false;
+      expect(result.message?.includes('"print-queued-jobs"')).to.be.false;
+    });
+
+    it('calculateMinuteInterval', async function () {
+      expect(calculateMinuteInterval('0 5 * * * remove-old-sent-notifications ?max=5').minuteInterval).to.equal(
+        60 * 24
+      );
+      expect(calculateMinuteInterval('*/5 * * * * print-queued-jobs').minuteInterval).to.equal(5);
+      expect(() => calculateMinuteInterval('0 5 2 * * remove-old-sent-notifications ?max=5')).to.throw(
+        'Cannot parse the provided cron expression: 0 5 2 * * remove-old-sent-notifications ?max=5'
+      );
+      expect(() => calculateMinuteInterval('*/5 */3 * * * print-queued-jobs')).to.throw(
+        'Cannot parse the provided cron expression: */5 */3 * * * print-queued-jobs'
+      );
+      expect(() => calculateMinuteInterval('*/5 3 * * * print-queued-jobs')).to.throw(
+        'Cannot parse the provided cron expression: */5 3 * * * print-queued-jobs'
+      );
     });
   });
 });
