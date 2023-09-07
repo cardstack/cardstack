@@ -28,6 +28,7 @@ app "hub" {
     use "aws-ecs" {
       service_port        = 3000
       region              = "us-east-1"
+      cpu                 = "256"
       memory              = "512"
       cluster             = "hub-staging"
       count               = 2
@@ -380,7 +381,8 @@ app "ssr-web" {
     use "aws-ecs" {
       service_port        = 4000
       region              = "us-east-1"
-      memory              = "512"
+      cpu                 = "512"
+      memory              = "1024"
       cluster             = "ssr-web-staging"
       count               = 2
       subnets             = ["subnet-09af2ce7fb316890b", "subnet-08c7d485ed397ca69"]
