@@ -12,6 +12,7 @@ let log = Logger('checkly-webhook');
 type CheckName =
   | 'graph-production status check'
   | 'xdai archive health check (eth_blockNumber)'
+  | 'xdai archive health check (eth_getBlockByNumber)'
   | 'xdai non-archive health check - lively-wandering-flower (eth_blockNumber)'
   | 'relay-production health check';
 type ComponentName =
@@ -39,6 +40,12 @@ export default class ChecklyWebhookRoute {
       incidentMessage: `We are experiencing blockchain indexing delays. The blockchain index is delayed by at least ${degradedSubgraphThreshold} blocks. This will result increased transaction processing times.`,
     },
     'xdai archive health check (eth_blockNumber)': {
+      componentName: 'Archive RPC node',
+      incidentName: 'Transactions delayed',
+      incidentMessage:
+        'We are experiencing degraded service with our archive RPC node. This will result in increased transaction processing times.',
+    },
+    'xdai archive health check (eth_getBlockByNumber)': {
       componentName: 'Archive RPC node',
       incidentName: 'Transactions delayed',
       incidentMessage:
