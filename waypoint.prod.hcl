@@ -9,6 +9,8 @@ app "hub" {
   build {
     use "docker" {
       dockerfile = "Dockerfile"
+      buildkit   = true
+      platform   = "linux/amd64"
 
       build_args = {
         hub_command = "server"
@@ -30,6 +32,7 @@ app "hub" {
       region              = "us-east-1"
       cpu                 = "256"
       memory              = "512"
+      architecture        = "x86_64"
       cluster             = "hub-prod"
       count               = 2
       subnets             = ["subnet-0c22641bd41cbdd1e", "subnet-01d36d7bcd0334fc0"]
@@ -115,6 +118,8 @@ app "hub-worker" {
   build {
     use "docker" {
       dockerfile = "Dockerfile"
+      buildkit   = true
+      platform   = "linux/amd64"
 
       build_args = {
         hub_command = "worker"
@@ -134,6 +139,7 @@ app "hub-worker" {
     use "aws-ecs" {
       region              = "us-east-1"
       memory              = "512"
+      architecture        = "x86_64"
       cluster             = "hub-worker-prod"
       count               = 2
       subnets             = ["subnet-0c22641bd41cbdd1e", "subnet-01d36d7bcd0334fc0"]
@@ -205,6 +211,8 @@ app "hub-bot" {
   build {
     use "docker" {
       dockerfile = "Dockerfile"
+      buildkit   = true
+      platform   = "linux/amd64"
 
       build_args = {
         hub_command = "bot"
@@ -224,6 +232,7 @@ app "hub-bot" {
     use "aws-ecs" {
       region              = "us-east-1"
       memory              = "512"
+      architecture        = "x86_64"
       cluster             = "hub-bot-prod"
       count               = 1
       subnets             = ["subnet-0c22641bd41cbdd1e", "subnet-01d36d7bcd0334fc0"]
@@ -291,6 +300,8 @@ app "hub-event-listener" {
   build {
     use "docker" {
       dockerfile = "Dockerfile"
+      buildkit   = true
+      platform   = "linux/amd64"
 
       build_args = {
         hub_command = "event-listener"
@@ -310,6 +321,7 @@ app "hub-event-listener" {
     use "aws-ecs" {
       region              = "us-east-1"
       memory              = "512"
+      architecture        = "x86_64"
       cluster             = "hub-event-listener-prod"
       count               = 1
       subnets             = ["subnet-0c22641bd41cbdd1e", "subnet-01d36d7bcd0334fc0"]
@@ -384,6 +396,8 @@ app "cardpay-subg-ext" {
   build {
     use "docker" {
       dockerfile = "Dockerfile"
+      buildkit   = true
+      platform   = "linux/amd64"
     }
 
     registry {
@@ -399,6 +413,7 @@ app "cardpay-subg-ext" {
     use "aws-ecs" {
       region              = "us-east-1"
       memory              = "512"
+      architecture        = "x86_64"
       cluster             = "cardpay-production-subgraph-extraction"
       count               = 1
       subnets             = ["subnet-0544d680b5f494842", "subnet-051e48e37cf15329c"]
@@ -430,6 +445,8 @@ app "ssr-web" {
   build {
     use "docker" {
       dockerfile = "Dockerfile"
+      buildkit   = true
+      platform   = "linux/amd64"
     }
 
     registry {
@@ -447,6 +464,7 @@ app "ssr-web" {
       region              = "us-east-1"
       cpu                 = "512"
       memory              = "1024"
+      architecture        = "x86_64"
       cluster             = "ssr-web-prod"
       count               = 2
       subnets             = ["subnet-0c22641bd41cbdd1e", "subnet-01d36d7bcd0334fc0"]
@@ -482,6 +500,8 @@ app "reward-submit-lambda" {
   build {
     use "docker" {
       dockerfile = "Dockerfile"
+      buildkit   = true
+      platform   = "linux/amd64"
     }
 
     registry {
@@ -514,6 +534,8 @@ app "reward-scheduler" {
   build {
     use "docker" {
       dockerfile = "Dockerfile"
+      buildkit   = true
+      platform   = "linux/amd64"
     }
 
     registry {
@@ -529,6 +551,7 @@ app "reward-scheduler" {
     use "aws-ecs" {
       region              = "us-east-1"
       memory              = "512"
+      architecture        = "x86_64"
       cluster             = "cardpay-reward-scheduler-production"
       count               = 1
       task_role_name      = "reward-scheduler-ecs-task"
