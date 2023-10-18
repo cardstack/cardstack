@@ -99,10 +99,25 @@ jobs:
     needs: [build]
     uses: cardstack/gh-actions/.github/workflows/waypoint-deploy.yml@main
     secrets: inherit
-    if: ${{ inputs.environment != 'staging' || matrix.app != 'hub-event-listener' }}
-    strategy:
-      matrix:
-        app: [hub, hub-worker, hub-event-listener]
     with:
-      app: ${{ matrix.app }}
+      app: "hub"
+      environment: ${{ inputs.environment }}
+
+  deploy-hub-worker:
+    name: Deploy
+    needs: [build]
+    uses: cardstack/gh-actions/.github/workflows/waypoint-deploy.yml@main
+    secrets: inherit
+    with:
+      app: "hub-worker"
+      environment: ${{ inputs.environment }}
+
+  deploy-hub-event-lister:
+    name: Deploy
+    needs: [build]
+    uses: cardstack/gh-actions/.github/workflows/waypoint-deploy.yml@main
+    secrets: inherit
+    if: ${{ inputs.environment != 'staging' }}
+    with:
+      app: "hub-event-listener"
       environment: ${{ inputs.environment }}
