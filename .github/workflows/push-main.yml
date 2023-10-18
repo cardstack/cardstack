@@ -219,7 +219,7 @@ jobs:
     name: Deploy hub to staging cluster via waypoint
     needs: change_check
     #if: ${{ needs.change_check.outputs.hub == 'true' }}
-    uses: ./.github/workflows/manual-hub.yml@main
+    uses: ./.github/workflows/manual-hub.yml
 
   deploy-web-client-staging:
     name: Deploy web-client to S3 staging bucket
