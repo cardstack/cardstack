@@ -95,8 +95,8 @@ jobs:
           WAYPOINT_SERVER_TLS: "1"
 
   deploy:
-    name: Deploy
-    needs: [build]
+    name: Deploy hub
+    needs: [waypoint-build]
     uses: cardstack/gh-actions/.github/workflows/waypoint-deploy.yml@main
     secrets: inherit
     with:
@@ -104,8 +104,8 @@ jobs:
       environment: ${{ inputs.environment }}
 
   deploy-hub-worker:
-    name: Deploy
-    needs: [build]
+    name: Deploy hub-worker
+    needs: [waypoint-build]
     uses: cardstack/gh-actions/.github/workflows/waypoint-deploy.yml@main
     secrets: inherit
     with:
@@ -113,8 +113,8 @@ jobs:
       environment: ${{ inputs.environment }}
 
   deploy-hub-event-lister:
-    name: Deploy
-    needs: [build]
+    name: Deploy hub-event-listener
+    needs: [waypoint-build]
     uses: cardstack/gh-actions/.github/workflows/waypoint-deploy.yml@main
     secrets: inherit
     if: ${{ inputs.environment != 'staging' }}
