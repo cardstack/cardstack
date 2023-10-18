@@ -12,6 +12,7 @@ runs:
       id: yarn-cache-dir-path
       shell: bash
       run: echo CACHE_DIR=$(yarn cache dir) >> $GITHUB_OUTPUT
+
     - name: Set up node_modules cache
       uses: actions/cache@v3
       with:

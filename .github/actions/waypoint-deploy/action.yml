@@ -23,22 +23,47 @@ inputs:
 runs:
   using: composite
   steps:
-    - uses: volta-cli/action@v4
+    - uses: ./.github/actions/init
 
     - uses: lucasmelin/setup-waypoint@v1
       with:
         version: ${{ inputs.waypoint_version }}
 
-    - name: Install dependencies
-      shell: bash
-      run: |
-        yarn --prefer-offline --frozen-lockfile
-
-    - name: Deploy app
-      run: waypoint up -app=${{ inputs.app }} -plain
+    - name: Build ${{ inputs.app }}
+      run: waypoint build -app=${{ inputs.app }} -plain -push
       shell: bash
       env:
         WAYPOINT_SERVER_TLS: "1"
+
+    - name: Deploy app
+      shell: bash
+      run: waypoint deploy -app=${{ inputs.app }} -plain -local -release=false
+      env:
+        WAYPOINT_SERVER_TLS: "1"
+
+    - name: Add tags
+      uses: cardstack/gh-actions/waypoint-ecs-add-tags@main
+      with:
+        app: ${{ inputs.app }}
+        environment: ${{ inputs.environment }}
+
+    - name: Wait service stable
+      uses: cardstack/gh-actions/waypoint-wait-service-stable@main
+      with:
+        app: ${{ inputs.app }}
+        waypoint-hcl: ${{ inputs.working-directory }}/waypoint.hcl
+
+    - name: Release app
+      shell: bash
+      run: waypoint release -app=${{ inputs.app }} -prune=false -plain -local
+      env:
+        WAYPOINT_SERVER_TLS: "1"
+
+    - name: Prune old resources
+      uses: cardstack/gh-actions/waypoint-ecs-prune@main
+      with:
+        app: ${{ inputs.app }}
+        environment: ${{ inputs.environment }}
 
     - name: Send notification to Discord
       if: ${{ always() }}
