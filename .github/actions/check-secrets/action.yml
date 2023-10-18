@@ -10,10 +10,7 @@ inputs:
 runs:
   using: composite
   steps:
-    - uses: volta-cli/action@v4
-
-    - run: yarn --prefer-offline --frozen-lockfile
-      shell: bash
+    - uses: ./.github/actions/init
 
     - name: Check access to secrets specified in ${{ inputs.waypoint_config_file }}
       run: yarn check:waypoint-secrets ${{ inputs.waypoint_config_file }}

@@ -12,11 +12,7 @@ inputs:
 runs:
   using: composite
   steps:
-    - uses: volta-cli/action@v4
-
-    - name: Install dependencies
-      shell: bash
-      run: yarn --prefer-offline --frozen-lockfile
+    - uses: ./.github/actions/init
 
     - name: Build
       run: SSR_WEB_ENVIRONMENT=${{ inputs.environment }} yarn build:ssr-web:${{ inputs.environment }}

@@ -12,10 +12,7 @@ inputs:
 runs:
   using: composite
   steps:
-    - uses: volta-cli/action@v4
-
-    - run: yarn --prefer-offline --frozen-lockfile
-      shell: bash
+    - uses: ./.github/actions/init
 
     - name: Deploy
       shell: bash

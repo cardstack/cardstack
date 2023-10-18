@@ -12,6 +12,8 @@ inputs:
 runs:
   using: composite
   steps:
+    - uses: ./.github/actions/init
+
     - name: Set up env
       shell: bash
       env:
@@ -31,11 +33,6 @@ runs:
           echo "unrecognized environment"
           exit 1;
         fi
-
-    - uses: volta-cli/action@v4
-
-    - run: yarn --prefer-offline --frozen-lockfile
-      shell: bash
 
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v1-node16
