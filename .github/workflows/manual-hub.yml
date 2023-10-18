@@ -98,6 +98,7 @@ jobs:
     with:
       app: "hub"
       environment: ${{ inputs.environment }}
+      init: false
 
   deploy-hub-worker:
     name: Deploy hub-worker
@@ -107,6 +108,7 @@ jobs:
     with:
       app: "hub-worker"
       environment: ${{ inputs.environment }}
+      init: false
 
   deploy-hub-event-lister:
     name: Deploy hub-event-listener
@@ -117,3 +119,4 @@ jobs:
     with:
       app: "hub-event-listener"
       environment: ${{ inputs.environment }}
+      init: false
