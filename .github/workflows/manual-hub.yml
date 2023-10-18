@@ -45,10 +45,6 @@ jobs:
     strategy:
       matrix:
         app: [hub, hub-worker, hub-event-listener]
-        include:
-          - retain: "0"
-          - retain: "1"
-            app: hub
     steps:
       - uses: actions/checkout@v3
       - uses: ./.github/actions/init
