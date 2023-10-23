@@ -18,15 +18,10 @@ jobs:
         with:
           ref: main
 
-      - uses: volta-cli/action@v4
-
-      - uses: ./.github/actions/setup-node-modules-cache
-        with:
-          yarn_lock_md5: ${{ hashFiles('yarn.lock') }}
+      - uses: ./.github/actions/init
 
       - name: Prepare dependencies
         run: |
-          yarn --prefer-offline --frozen-lockfile
           echo '//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}' > $HOME/.npmrc
           git config user.name "${{ github.actor }}"
           git config user.email "${{ github.actor }}@users.noreply.github.com"
