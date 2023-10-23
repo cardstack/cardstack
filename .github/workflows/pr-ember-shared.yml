@@ -4,7 +4,7 @@ on:
   pull_request:
     paths:
       - "packages/ember-shared/**"
-      - 'packages/eslint-config/**'
+      - "packages/eslint-config/**"
       - ".github/workflows/pr-ember-shared.yml"
       - "package.json"
       - "yarn.lock"
@@ -22,11 +22,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: volta-cli/action@v4
-      - uses: ./.github/actions/setup-node-modules-cache
-        with:
-          yarn_lock_md5: ${{ hashFiles('yarn.lock') }}
-      - name: Install dependencies
-        run: yarn --prefer-offline --frozen-lockfile
+      - uses: ./.github/actions/init
       - name: Run tests
         run: yarn test:ember-shared

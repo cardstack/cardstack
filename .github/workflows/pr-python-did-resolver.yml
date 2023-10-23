@@ -24,18 +24,12 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
+      - uses: ./.github/actions/init
 
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
-
-      - uses: volta-cli/action@v4
-      - uses: ./.github/actions/setup-node-modules-cache
-        with:
-          yarn_lock_md5: ${{ hashFiles('yarn.lock') }}
-
-      - run: yarn add -W ts-node --prefer-offline
 
       - name: Install dependencies
         run: |

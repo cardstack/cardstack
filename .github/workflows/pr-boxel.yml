@@ -21,11 +21,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: volta-cli/action@v4
-      - uses: ./.github/actions/setup-node-modules-cache
-        with:
-          yarn_lock_md5: ${{ hashFiles('yarn.lock') }}
-
+      - uses: ./.github/actions/init
 
   check-if-requires-preview:
     name: Check if a preview deploy is required
@@ -55,12 +51,7 @@ jobs:
       S3_PREVIEW_REGION: us-east-1
     steps:
       - uses: actions/checkout@v3
-      - uses: volta-cli/action@v4
-      - uses: ./.github/actions/setup-node-modules-cache
-        with:
-          yarn_lock_md5: ${{ hashFiles('yarn.lock') }}
-      - name: Install dependencies
-        run: yarn --prefer-offline --frozen-lockfile
+      - uses: ./.github/actions/init
       - name: Set PR branch name
         run: echo "PR_BRANCH_NAME=${{ github.head_ref }}" >> $GITHUB_ENV
       - name: Test with percy
@@ -86,12 +77,7 @@ jobs:
       S3_PREVIEW_WEBSITE_URL: https://boxel.stack.cards
     steps:
       - uses: actions/checkout@v3
-      - uses: volta-cli/action@v4
-      - uses: ./.github/actions/setup-node-modules-cache
-        with:
-          yarn_lock_md5: ${{ hashFiles('yarn.lock') }}
-      - name: Install dependencies
-        run: yarn --prefer-offline --frozen-lockfile
+      - uses: ./.github/actions/init
       - name: Find pull request number for branch
         uses: ./.github/actions/find-pr-number
         id: fpr
