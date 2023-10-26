@@ -31,7 +31,7 @@ app "hub" {
       service_port        = 3000
       region              = "us-east-1"
       cpu                 = "512"
-      memory              = "512"
+      memory              = "1024"
       architecture        = "x86_64"
       cluster             = "hub-prod"
       count               = 2
