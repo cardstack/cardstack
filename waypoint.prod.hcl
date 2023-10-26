@@ -30,7 +30,7 @@ app "hub" {
     use "aws-ecs" {
       service_port        = 3000
       region              = "us-east-1"
-      cpu                 = "256"
+      cpu                 = "512"
       memory              = "512"
       architecture        = "x86_64"
       cluster             = "hub-prod"
