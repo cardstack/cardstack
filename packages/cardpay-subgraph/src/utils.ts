@@ -61,6 +61,14 @@ export function makeEOATransaction(event: ethereum.Event, address: string, safe:
 
 export function makeEOATransactionForSafe(event: ethereum.Event, safe: string): void {
   let safeContract = GnosisSafe.bind(Address.fromString(safe));
+  // block 30438533 with transaction 0xf52593bad6b798e1ef40e2ac1497d67926aa5d7597f0a755321a67e6001a54d1
+  // sets the master copy address to 0x0 which is weird but technically valid
+  // Ensure we check that we can actually get the owners before trying to get them
+  let ownersResult = safeContract.try_getOwners();
+  if (ownersResult.reverted) {
+    log.warning('utils/makeEOATransactionForSafe: Failed to get owners for safe {}', [safe]);
+    return;
+  }
   let owners = safeContract.getOwners();
   for (let i = 0; i < owners.length; i++) {
     makeEOATransaction(event, toChecksumAddress(owners[i]), safe);
@@ -69,6 +77,12 @@ export function makeEOATransactionForSafe(event: ethereum.Event, safe: string): 
 
 export function setSafeType(safe: string, type: string): void {
   let safeContract = GnosisSafe.bind(Address.fromString(safe));
+  // As above, we must check that we can get owners before we actually get them
+  let ownersResult = safeContract.try_getOwners();
+  if (ownersResult.reverted) {
+    log.warning('utils/setSafeType: Failed to get owners for safe {}', [safe]);
+    return;
+  }
   let owners = safeContract.getOwners();
   for (let i = 0; i < owners.length; i++) {
     let ownerAddress = toChecksumAddress(owners[i]);

@@ -68,6 +68,11 @@ $ graph auth https://graph-admin-blue.cardstack.com <Cardstack access token>
 
 After you have performed this authorization you will not need to perform this again for subsequent deployments.
 
+If this does not work, you must take the deployment CLI call from package.json and add the token with `--access-token` 
+
+    --access-token <Cardstack access token>
+
+
 ### Deployment
 To deploy the subgraph to both The Graph and one of our hosted graph nodes, run either the following in the `@cardstack/cardpay-subgraph`:
 ```
