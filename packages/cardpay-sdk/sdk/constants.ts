@@ -271,7 +271,7 @@ const constants: {
       'https://rpc-mainnet.maticvigil.com',
       'https://rpc-mainnet.matic.quiknode.pro',
     ],
-    safeTransactionServiceUrl: 'https://safe-transaction.polygon.gnosis.io',
+    safeTransactionServiceUrl: 'https://safe-transaction-polygon.safe.global',
   },
 };
 
