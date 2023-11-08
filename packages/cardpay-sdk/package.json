@@ -1,7 +1,7 @@
 {
   "name": "@cardstack/cardpay-sdk",
   "description": "An SDK for using the cardpay protocol",
-  "version": "1.0.53",
+  "version": "1.0.54",
   "author": "Hassan Abdel-Rahman @habdelra",
   "main": "./dist/esm/index.js",
   "types": "./dist/index.d.ts",
@@ -17,7 +17,7 @@
     "readmeFile": "./README.md"
   },
   "dependencies": {
-    "@cardstack/did-resolver": "1.0.53",
+    "@cardstack/did-resolver": "1.0.54",
     "@ethersproject/contracts": "^5.7.0",
     "@ethersproject/networks": "^5.7.0",
     "@ethersproject/providers": "^5.7.1",
