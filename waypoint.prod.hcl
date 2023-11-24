@@ -385,60 +385,6 @@ app "hub-event-listener" {
   }
 }
 
-# This name has been chosen to be much shorter than 32 characters
-# If the name comes close to 32 characters there are unreliable
-# deployments. See
-#  https://github.com/hashicorp/waypoint/issues/2957
-# for more details
-app "cardpay-subg-ext" {
-  path = "./packages/cardpay-subgraph-extraction"
-
-  build {
-    use "docker" {
-      dockerfile = "Dockerfile"
-      buildkit   = true
-      platform   = "linux/amd64"
-    }
-
-    registry {
-      use "aws-ecr" {
-        region     = "us-east-1"
-        repository = "cardpay-production-subgraph-extraction"
-        tag        = "latest"
-      }
-    }
-  }
-
-  deploy {
-    use "aws-ecs" {
-      region              = "us-east-1"
-      memory              = "512"
-      architecture        = "x86_64"
-      cluster             = "cardpay-production-subgraph-extraction"
-      count               = 1
-      subnets             = ["subnet-0544d680b5f494842", "subnet-051e48e37cf15329c"]
-      task_role_name      = "cardpay-subg-ext-ecs-task"
-      execution_role_name = "cardpay-subg-ext-ecs-task-execution"
-      security_group_ids  = ["sg-08a9f0f453e7e7a43"]
-
-      static_environment = {
-        ENVIRONMENT = "production"
-      }
-
-      secrets = {
-        SE_DATABASE_STRING = "arn:aws:ssm:us-east-1:120317779495:parameter/production/subgraph-extractor/SE_DATABASE_STRING"
-        SE_OUTPUT_LOCATION = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_subg_extract_output_location-YDoQUt"
-      }
-
-      disable_alb = true
-    }
-  }
-
-  url {
-    auto_hostname = false
-  }
-}
-
 app "ssr-web" {
   path = "./packages/ssr-web/deployment"
 
