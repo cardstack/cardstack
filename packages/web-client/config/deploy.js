@@ -18,7 +18,7 @@ module.exports = function (deployTarget) {
         s3: {
           as: ['s3Pages', 's3WellKnown', 's3Assets'],
         },
-        compress: {
+        'smart-compress': {
           as: ['compressOwnAssets', 'compressPrepaidCardPatterns'],
         },
       },

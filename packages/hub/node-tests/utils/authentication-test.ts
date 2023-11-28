@@ -59,7 +59,7 @@ describe('AuthenticationUtils', function () {
       let ivTamperedAuthToken = `tampering${authToken}`;
       expect(function () {
         subject.validateAuthToken(ivTamperedAuthToken);
-      }).to.throw('Invalid IV');
+      }).to.throw('Invalid initialization vector');
 
       let ciperTextTamperedAuthToken = authToken
         .split('--')

@@ -44,7 +44,7 @@
     "firebase-functions": "^3.14.1"
   },
   "engines": {
-    "node": "14"
+    "node": "16.* || >= 18"
   },
   "private": true
 }

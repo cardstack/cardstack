@@ -58,7 +58,7 @@
     "ember-source": "^3"
   },
   "engines": {
-    "node": ">= 14"
+    "node": "16.* || >= 18"
   },
   "scripts": {
     "start": "webpack serve",
