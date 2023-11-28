@@ -19,7 +19,7 @@
     }
   },
   "engines": {
-    "node": ">= 14"
+    "node": "16.* || >= 18"
   },
   "dependencies": {
     "@cardstack/boxel": "1.0.54",

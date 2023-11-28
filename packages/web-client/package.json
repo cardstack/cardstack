@@ -93,7 +93,7 @@
     "ember-cli-deploy": "^1.0.2",
     "ember-cli-deploy-build": "^2.0.0",
     "ember-cli-deploy-cloudfront": "^3.1.0",
-    "ember-cli-deploy-compress": "^0.3.2",
+    "ember-cli-deploy-smart-compress": "^2.0.0",
     "ember-cli-deploy-display-revisions": "^2.1.2",
     "ember-cli-deploy-revision-data": "^1.0.0",
     "ember-cli-deploy-s3": "^3.0.0",
@@ -153,7 +153,7 @@
     "webpack": "^5.74.0"
   },
   "engines": {
-    "node": "14.* || >= 16"
+    "node": "16.* || >= 18"
   },
   "ember": {
     "edition": "octane"
