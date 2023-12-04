@@ -385,60 +385,6 @@ app "hub-event-listener" {
   }
 }
 
-# This name has been chosen to be much shorter than 32 characters
-# If the name comes close to 32 characters there are unreliable
-# deployments. See
-#  https://github.com/hashicorp/waypoint/issues/2957
-# for more details
-app "cardpay-subg-ext" {
-  path = "./packages/cardpay-subgraph-extraction"
-
-  build {
-    use "docker" {
-      dockerfile = "Dockerfile"
-      buildkit   = true
-      platform   = "linux/amd64"
-    }
-
-    registry {
-      use "aws-ecr" {
-        region     = "us-east-1"
-        repository = "cardpay-production-subgraph-extraction"
-        tag        = "latest"
-      }
-    }
-  }
-
-  deploy {
-    use "aws-ecs" {
-      region              = "us-east-1"
-      memory              = "512"
-      architecture        = "x86_64"
-      cluster             = "cardpay-production-subgraph-extraction"
-      count               = 1
-      subnets             = ["subnet-0544d680b5f494842", "subnet-051e48e37cf15329c"]
-      task_role_name      = "cardpay-subg-ext-ecs-task"
-      execution_role_name = "cardpay-subg-ext-ecs-task-execution"
-      security_group_ids  = ["sg-08a9f0f453e7e7a43"]
-
-      static_environment = {
-        ENVIRONMENT = "production"
-      }
-
-      secrets = {
-        SE_DATABASE_STRING = "arn:aws:ssm:us-east-1:120317779495:parameter/production/subgraph-extractor/SE_DATABASE_STRING"
-        SE_OUTPUT_LOCATION = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_subg_extract_output_location-YDoQUt"
-      }
-
-      disable_alb = true
-    }
-  }
-
-  url {
-    auto_hostname = false
-  }
-}
-
 app "ssr-web" {
   path = "./packages/ssr-web/deployment"
 
@@ -520,60 +466,6 @@ app "reward-submit-lambda" {
 
     static_environment = {
       ENVIRONMENT = "production"
-    }
-  }
-
-  url {
-    auto_hostname = false
-  }
-}
-
-app "reward-scheduler" {
-  path = "./packages/cardpay-reward-scheduler"
-
-  build {
-    use "docker" {
-      dockerfile = "Dockerfile"
-      buildkit   = true
-      platform   = "linux/amd64"
-    }
-
-    registry {
-      use "aws-ecr" {
-        region     = "us-east-1"
-        repository = "cardpay-reward-scheduler-production"
-        tag        = "latest"
-      }
-    }
-  }
-
-  deploy {
-    use "aws-ecs" {
-      region              = "us-east-1"
-      memory              = "512"
-      architecture        = "x86_64"
-      cluster             = "cardpay-reward-scheduler-production"
-      count               = 1
-      task_role_name      = "reward-scheduler-ecs-task"
-      execution_role_name = "reward-scheduler-ecs-task-execution"
-      subnets             = ["subnet-095ad696012f6ed6c"]
-      security_group_ids  = ["sg-0f85bb50306fe067e"]
-      disable_alb         = true
-
-      static_environment = {
-        ENVIRONMENT                        = "production"
-        REWARDS_BUCKET                     = "s3://cardpay-production-reward-programs"
-        SUBGRAPH_URL                       = "https://graph.cardstack.com/subgraphs/name/habdelra/cardpay-xdai"
-        REWARD_SCHEDULER_APPROVED_PROGRAMS = "0x979C9F171fb6e9BC501Aa7eEd71ca8dC27cF1185"
-        REWARD_MANAGER_ADDRESS             = "0xDbAe2bC81bFa4e46df43a34403aAcde5FFdB2A9D"
-        REWARDS_SUBGRAPH_EXTRACTION        = "s3://cardpay-production-partitioned-graph-data/data/rewards/0.0.2/"
-        REWARD_SCHEDULER_UPDATE_FREQUENCY  = "600"
-      }
-
-      secrets = {
-        SENTRY_DSN        = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_reward_programs_sentry_dsn-lsCwEe"
-        EVM_FULL_NODE_URL = "arn:aws:secretsmanager:us-east-1:120317779495:secret:production_evm_full_node_url-K67DON"
-      }
     }
   }
 
