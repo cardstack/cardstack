@@ -8,7 +8,7 @@ permissions:
   id-token: write
 
 jobs:
-  deploy:
+  restart:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -32,5 +32,10 @@ jobs:
 
       - name: Restart ssr-web
         uses: cardstack/gh-actions/waypoint-ecs-restart@add-waypoint-restart
+        with:
+          app: "ssr-web"
+
+      - name: Wait service stable
+        uses: cardstack/gh-actions/waypoint-wait-service-stable@main
         with:
           app: "ssr-web"
