@@ -1,0 +1,31 @@
+name: Restart [ssr-web]
+
+on:
+  push:
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up env
+        run: |
+          echo "AWS_ROLE_ARN=arn:aws:iam::680542703984:role/waypoint" >> $GITHUB_ENV
+          echo "WAYPOINT_SERVER_TOKEN=${{ secrets.STAGING_WAYPOINT_SERVER_TOKEN }}" >> $GITHUB_ENV
+          echo "WAYPOINT_SERVER_ADDR=${{ secrets.STAGING_WAYPOINT_SERVER_ADDR }}" >> $GITHUB_ENV
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2.0.0
+        with:
+          role-to-assume: ${{ env.AWS_ROLE_ARN }}
+          aws-region: us-east-1
+
+      - name: Restart ssr-web
+        uses: cardstack/gh-actions/waypoint-ecs-restart@add-waypoint-restart
+        with:
+          app: "ssr-web"
