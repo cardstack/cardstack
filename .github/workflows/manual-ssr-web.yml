@@ -23,7 +23,7 @@ jobs:
     name: Build Docker image
     runs-on: ubuntu-latest
     outputs:
-      image: ${{ steps.docker-ecr.outputs.tag_sha }}
+      image: ${{ steps.docker-ecr.outputs.image }}
     steps:
       - uses: actions/checkout@v3
       - uses: ./.github/actions/init
