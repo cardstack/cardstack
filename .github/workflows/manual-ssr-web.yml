@@ -23,7 +23,7 @@ jobs:
     name: Build Docker image
     runs-on: ubuntu-latest
     outputs:
-      image: ${{ steps.docker-ecr.outputs.image }}
+      image: ${{ steps.docker-ecr.outputs.tag_sha }}
     steps:
       - uses: actions/checkout@v3
       - uses: ./.github/actions/init
@@ -52,7 +52,7 @@ jobs:
         run: mv dist deployment/
         working-directory: packages/ssr-web
 
-      - uses: cardstack/gh-actions/docker-ecr@docker-ecr-action
+      - uses: cardstack/gh-actions/docker-ecr@main
         id: docker-ecr
         with:
           repository: "ssr-web-${{ inputs.environment }}"
