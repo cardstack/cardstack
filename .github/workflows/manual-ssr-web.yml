@@ -22,8 +22,6 @@ jobs:
   build:
     name: Build Docker image
     runs-on: ubuntu-latest
-    env:
-      SENTRY_DSN: ${{ secrets.SSR_WEB_CLIENT_SENTRY_DSN }}
     steps:
       - uses: actions/checkout@v3
       - uses: ./.github/actions/init
@@ -43,12 +41,13 @@ jobs:
           fi
 
       - name: Build
-        run: SSR_WEB_ENVIRONMENT=${{ inputs.environment }} yarn build:ssr-web:${{ inputs.environment }}
-        shell: bash
+        env:
+          SENTRY_DSN: ${{ secrets.SSR_WEB_CLIENT_SENTRY_DSN }}
+          SSR_WEB_ENVIRONMENT: ${{ inputs.environment }}
+        run: yarn build:ssr-web:${{ inputs.environment }}
 
       - name: Move dist content
         run: mv dist deployment/
-        shell: bash
         working-directory: packages/ssr-web
 
       - uses: cardstack/gh-actions/docker-ecr@docker-ecr-action
@@ -60,6 +59,7 @@ jobs:
 
   deploy:
     needs: [build]
+    if: ${{ false }}
     name: Deploy to AWS ECS
     uses: cardstack/gh-actions/.github/workflows/ecs-deploy.yml@main
     secrets: inherit
