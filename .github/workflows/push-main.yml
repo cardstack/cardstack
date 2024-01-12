@@ -180,7 +180,7 @@ jobs:
               - 'packages/cardpay-sdk/**'
               - 'packages/did-resolver/**'
               - '.github/workflows/push-main.yml'
-              - '.github/actions/deploy-ssr-web/**'
+              - '.github/workflows/manual-ssr-web.yml'
               - 'yarn.lock'
               - 'waypoint.hcl'
             safe-tools-client:
