@@ -223,29 +223,14 @@ jobs:
           environment: staging
           discord_webhook: ${{ secrets.DISCORD_WEBHOOK }}
 
-  deploy-ssr-web-staging:
+  deploy-ssr-web:
     name: Deploy ssr-web
     needs: change_check
     if: ${{ needs.change_check.outputs.ssr_web == 'true' }}
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: ./.github/actions/init
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v2.0.0
-        with:
-          role-to-assume: arn:aws:iam::680542703984:role/waypoint
-          aws-region: us-east-1
-      - name: Deploy ssr-web
-        uses: ./.github/actions/deploy-ssr-web
-        env:
-          HUB_URL: https://hub-staging.stack.cards
-          SENTRY_DSN: ${{ secrets.SSR_WEB_CLIENT_SENTRY_DSN }}
-          WAYPOINT_SERVER_TOKEN: ${{ secrets.STAGING_WAYPOINT_SERVER_TOKEN }}
-          WAYPOINT_SERVER_ADDR: ${{ secrets.STAGING_WAYPOINT_SERVER_ADDR }}
-        with:
-          environment: staging
-          discord_webhook: ${{ secrets.DISCORD_WEBHOOK }}
+    uses: ./.github/workflows/manual-ssr-web.yml
+    secrets: inherit
+    with:
+      environment: "staging"
 
   deploy-boxel:
     name: Deploy boxel to S3 bucket
