@@ -44,4 +44,6 @@ COPY dist/universalify node_modules/universalify
 
 RUN mkdir node_modules/graphile-worker/dist
 WORKDIR /workspace/packages/hub
-CMD node --no-deprecation ./dist/hub.js db migrate up --no-check-order && node --no-deprecation ./dist/hub.js $stored_hub_command
+COPY entrypoint.sh .
+ENTRYPOINT ["entrypoint.sh"]
+CMD $stored_hub_command
