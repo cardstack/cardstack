@@ -385,61 +385,6 @@ app "hub-event-listener" {
   }
 }
 
-app "ssr-web" {
-  path = "./packages/ssr-web/deployment"
-
-  build {
-    use "docker" {
-      dockerfile = "Dockerfile"
-      buildkit   = true
-      platform   = "linux/amd64"
-    }
-
-    registry {
-      use "aws-ecr" {
-        region     = "us-east-1"
-        repository = "ssr-web-prod"
-        tag        = "latest"
-      }
-    }
-  }
-
-  deploy {
-    use "aws-ecs" {
-      service_port        = 4000
-      region              = "us-east-1"
-      cpu                 = "512"
-      memory              = "1024"
-      architecture        = "x86_64"
-      cluster             = "ssr-web-prod"
-      count               = 2
-      subnets             = ["subnet-0c22641bd41cbdd1e", "subnet-01d36d7bcd0334fc0"]
-      security_group_ids  = ["sg-0c8b6a2abf52d009a"]
-      task_role_name      = "ssr-web-ecs-task"
-      execution_role_name = "ssr-web-ecs-task-execution"
-
-      alb {
-        subnets           = ["subnet-0c22641bd41cbdd1e", "subnet-01d36d7bcd0334fc0"]
-        load_balancer_arn = "arn:aws:elasticloadbalancing:us-east-1:120317779495:loadbalancer/app/waypoint-ecs-ssr-web/f1022acdebbb0fce"
-        certificate       = "arn:aws:acm:us-east-1:120317779495:certificate/e1d6a1c7-456e-4058-b90b-9c603a65734d"
-      }
-
-      static_environment = {
-        ENVIRONMENT         = "production"
-        SSR_WEB_ENVIRONMENT = "production"
-      }
-
-      secrets = {
-        SSR_WEB_SERVER_SENTRY_DSN = "arn:aws:ssm:us-east-1:120317779495:parameter/production/ssr-web/SSR_WEB_SERVER_SENTRY_DSN"
-      }
-    }
-  }
-
-  url {
-    auto_hostname = false
-  }
-}
-
 app "reward-submit-lambda" {
   path = "./packages/reward-root-submitter"
 

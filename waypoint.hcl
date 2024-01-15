@@ -372,61 +372,6 @@ app "hub-event-listener" {
   }
 }
 
-app "ssr-web" {
-  path = "./packages/ssr-web/deployment"
-
-  build {
-    use "docker" {
-      dockerfile = "Dockerfile"
-      buildkit   = true
-      platform   = "linux/amd64"
-    }
-
-    registry {
-      use "aws-ecr" {
-        region     = "us-east-1"
-        repository = "ssr-web-staging"
-        tag        = "latest"
-      }
-    }
-  }
-
-  deploy {
-    use "aws-ecs" {
-      service_port        = 4000
-      region              = "us-east-1"
-      cpu                 = "512"
-      memory              = "1024"
-      architecture        = "x86_64"
-      cluster             = "ssr-web-staging"
-      count               = 2
-      subnets             = ["subnet-09af2ce7fb316890b", "subnet-08c7d485ed397ca69"]
-      security_group_ids  = ["sg-00c44baca348e403b"]
-      task_role_name      = "ssr-web-ecs-task"
-      execution_role_name = "ssr-web-ecs-task-execution"
-
-      alb {
-        subnets           = ["subnet-09af2ce7fb316890b", "subnet-08c7d485ed397ca69"]
-        load_balancer_arn = "arn:aws:elasticloadbalancing:us-east-1:680542703984:loadbalancer/app/waypoint-ecs-ssr-web/03ae8931b95ea734"
-        certificate       = "arn:aws:acm:us-east-1:680542703984:certificate/8b232d17-3bb7-41f5-abc0-7b32b0d5190c"
-      }
-
-      static_environment = {
-        ENVIRONMENT         = "staging"
-        SSR_WEB_ENVIRONMENT = "staging"
-      }
-
-      secrets = {
-        SSR_WEB_SERVER_SENTRY_DSN = "arn:aws:ssm:us-east-1:680542703984:parameter/staging/ssr-web/SSR_WEB_SERVER_SENTRY_DSN"
-      }
-    }
-  }
-
-  url {
-    auto_hostname = false
-  }
-}
-
 app "reward-submit-lambda" {
   path = "./packages/reward-root-submitter"
 
@@ -462,4 +407,3 @@ app "reward-submit-lambda" {
     auto_hostname = false
   }
 }
-
