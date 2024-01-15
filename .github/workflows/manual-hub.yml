@@ -35,7 +35,8 @@ jobs:
         working-directory: packages/hub
         run: yarn build
 
-      - uses: cardstack/gh-actions/docker-ecr@main
+      - name: Build hub-server
+        uses: cardstack/gh-actions/docker-ecr@main
         id: build-server
         with:
           repository: "hub-server-${{ inputs.environment }}"
@@ -45,7 +46,8 @@ jobs:
           build-args: |
             hub_command="server"
 
-      - uses: cardstack/gh-actions/docker-ecr@main
+      - name: Build hub-worker
+        uses: cardstack/gh-actions/docker-ecr@main
         id: build-worker
         with:
           repository: "hub-worker-${{ inputs.environment }}"
@@ -55,7 +57,8 @@ jobs:
           build-args: |
             hub_command="worker"
 
-      - uses: cardstack/gh-actions/docker-ecr@main
+      - name: Build hub-event-listener
+        uses: cardstack/gh-actions/docker-ecr@main
         if: ${{ inputs.environment == 'production' }}
         id: build-event-listener
         with:
@@ -66,7 +69,8 @@ jobs:
           build-args: |
             hub_command="event-listener"
 
-      - uses: cardstack/gh-actions/docker-ecr@main
+      - name: Build hub-bot
+        uses: cardstack/gh-actions/docker-ecr@main
         if: ${{ false }}
         id: build-bot
         with:
