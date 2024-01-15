@@ -20,103 +20,109 @@ permissions:
 
 jobs:
   build:
+    name: Build Docker image
     runs-on: ubuntu-latest
+    outputs:
+      image-server: ${{ steps.build-server.outputs.tag_sha }}
+      image-worker: ${{ steps.build-worker.outputs.tag_sha }}
+      image-event-listener: ${{ steps.build-event-listener.outputs.tag_sha }}
+      image-bot: ${{ steps.build-bot.outputs.tag_sha }}
     steps:
       - uses: actions/checkout@v3
       - uses: ./.github/actions/init
 
       - name: Build
-        run: yarn build
-        shell: bash
         working-directory: packages/hub
+        run: yarn build
 
-      - name: Tar artifact
-        run: tar -cvf artifact.tar packages/hub/dist
-        shell: bash
-
-      - uses: actions/upload-artifact@v3
+      - uses: cardstack/gh-actions/docker-ecr@main
+        id: build-server
         with:
-          name: hub-${{ github.sha }}
-          path: artifact.tar
+          repository: "hub-server-${{ inputs.environment }}"
+          environment: ${{ inputs.environment }}
+          dockerfile: "packages/hub/Dockerfile"
+          context: "packages/hub"
+          build-args: |
+            hub_command="server"
 
-  waypoint-build:
-    needs: build
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        app: [hub, hub-worker, hub-event-listener]
-    steps:
-      - uses: actions/checkout@v3
-      - uses: ./.github/actions/init
-
-      - uses: actions/download-artifact@v3
+      - uses: cardstack/gh-actions/docker-ecr@main
+        id: build-worker
         with:
-          name: hub-${{ github.sha }}
+          repository: "hub-worker-${{ inputs.environment }}"
+          environment: ${{ inputs.environment }}
+          dockerfile: "packages/hub/Dockerfile"
+          context: "packages/hub"
+          build-args: |
+            hub_command="worker"
 
-      - name: Extract artifact
-        run: tar -xvf artifact.tar
-        shell: bash
-
-      - name: Set up env
-        env:
-          INPUT_ENVIRONMENT: ${{ inputs.environment }}
-        run: |
-          if [ "$INPUT_ENVIRONMENT" = "production" ]; then
-            echo "AWS_ROLE_ARN=arn:aws:iam::120317779495:role/waypoint" >> $GITHUB_ENV
-            echo "WAYPOINT_SERVER_TOKEN=${{ secrets.PRODUCTION_WAYPOINT_SERVER_TOKEN }}" >> $GITHUB_ENV
-            echo "WAYPOINT_SERVER_ADDR=${{ secrets.PRODUCTION_WAYPOINT_SERVER_ADDR }}" >> $GITHUB_ENV
-            cp waypoint.prod.hcl waypoint.hcl
-          elif [ "$INPUT_ENVIRONMENT" = "staging" ]; then
-            echo "AWS_ROLE_ARN=arn:aws:iam::680542703984:role/waypoint" >> $GITHUB_ENV
-            echo "WAYPOINT_SERVER_TOKEN=${{ secrets.STAGING_WAYPOINT_SERVER_TOKEN }}" >> $GITHUB_ENV
-            echo "WAYPOINT_SERVER_ADDR=${{ secrets.STAGING_WAYPOINT_SERVER_ADDR }}" >> $GITHUB_ENV
-          else
-            echo "unrecognized environment"
-            exit 1;
-          fi
-
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v2.0.0
+      - uses: cardstack/gh-actions/docker-ecr@main
+        if: ${{ input.environment == 'production' }}
+        id: build-event-listener
         with:
-          role-to-assume: ${{ env.AWS_ROLE_ARN }}
-          aws-region: us-east-1
+          repository: "hub-event-listener-${{ inputs.environment }}"
+          environment: ${{ inputs.environment }}
+          dockerfile: "packages/hub/Dockerfile"
+          context: "packages/hub"
+          build-args: |
+            hub_command="event-listener"
 
-      - uses: lucasmelin/setup-waypoint@v1
+      - uses: cardstack/gh-actions/docker-ecr@main
+        if: ${{ false }}
+        id: build-bot
         with:
-          version: "0.11.3"
+          repository: "hub-bot-${{ inputs.environment }}"
+          environment: ${{ inputs.environment }}
+          dockerfile: "packages/hub/Dockerfile"
+          context: "packages/hub"
+          build-args: |
+            hub_command="bot"
 
-      - name: Build ${{ matrix.app }}
-        run: waypoint build -app=${{ matrix.app }} -plain -push
-        env:
-          WAYPOINT_SERVER_TLS: "1"
-
-  deploy:
-    name: Deploy hub
-    needs: [waypoint-build]
-    uses: cardstack/gh-actions/.github/workflows/waypoint-deploy.yml@main
+  deploy-server:
+    needs: [build]
+    name: Deploy hub-server to AWS ECS
+    uses: cardstack/gh-actions/.github/workflows/ecs-deploy.yml@main
     secrets: inherit
     with:
-      app: "hub"
+      container-name: "hub-server"
+      service-name: "hub-server-${{ inputs.environment }}"
       environment: ${{ inputs.environment }}
-      init: false
+      cluster: ${{ inputs.environment }}
+      image: ${{ needs.build.outputs.image-server }}
 
-  deploy-hub-worker:
-    name: Deploy hub-worker
-    needs: [waypoint-build]
-    uses: cardstack/gh-actions/.github/workflows/waypoint-deploy.yml@main
+  deploy-worker:
+    needs: [build]
+    name: Deploy hub-worker to AWS ECS
+    uses: cardstack/gh-actions/.github/workflows/ecs-deploy.yml@main
     secrets: inherit
     with:
-      app: "hub-worker"
+      container-name: "hub-worker"
+      service-name: "hub-worker-${{ inputs.environment }}"
       environment: ${{ inputs.environment }}
-      init: false
+      cluster: ${{ inputs.environment }}
+      image: ${{ needs.build.outputs.image-worker }}
 
-  deploy-hub-event-lister:
-    name: Deploy hub-event-listener
-    needs: [waypoint-build]
-    uses: cardstack/gh-actions/.github/workflows/waypoint-deploy.yml@main
+  deploy-event-listener:
+    needs: [build]
+    if: ${{ inputs.environment == 'production' }}
+    name: Deploy hub-event-listener to AWS ECS
+    uses: cardstack/gh-actions/.github/workflows/ecs-deploy.yml@main
     secrets: inherit
-    if: ${{ inputs.environment != 'staging' }}
     with:
-      app: "hub-event-listener"
+      container-name: "hub-event-listener"
+      service-name: "hub-event-listener-${{ inputs.environment }}"
       environment: ${{ inputs.environment }}
-      init: false
+      cluster: ${{ inputs.environment }}
+      image: ${{ needs.build.outputs.image-event-listener }}
+
+  deploy-bot:
+    needs: [build]
+    if: ${{ false }}
+    name: Deploy hub-bot to AWS ECS
+    uses: cardstack/gh-actions/.github/workflows/ecs-deploy.yml@main
+    secrets: inherit
+    with:
+      container-name: "hub-bot"
+      service-name: "hub-bot-${{ inputs.environment }}"
+      environment: ${{ inputs.environment }}
+      cluster: ${{ inputs.environment }}
+      image: ${{ needs.build.outputs.image-bot }}
