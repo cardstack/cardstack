@@ -56,7 +56,7 @@ jobs:
             hub_command="worker"
 
       - uses: cardstack/gh-actions/docker-ecr@main
-        if: ${{ input.environment == 'production' }}
+        if: ${{ inputs.environment == 'production' }}
         id: build-event-listener
         with:
           repository: "hub-event-listener-${{ inputs.environment }}"
