@@ -45,5 +45,5 @@ COPY dist/universalify node_modules/universalify
 RUN mkdir node_modules/graphile-worker/dist
 WORKDIR /workspace/packages/hub
 COPY entrypoint.sh .
-ENTRYPOINT ["entrypoint.sh"]
+ENTRYPOINT ["/workspace/packages/hub/entrypoint.sh"]
 CMD $stored_hub_command
