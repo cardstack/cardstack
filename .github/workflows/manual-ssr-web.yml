@@ -34,7 +34,6 @@ jobs:
         run: |
           if [ "$INPUT_ENVIRONMENT" = "production" ]; then
             echo "HUB_URL=https://hub.cardstack.com" >> $GITHUB_ENV
-            cp waypoint.prod.hcl waypoint.hcl
           elif [ "$INPUT_ENVIRONMENT" = "staging" ]; then
             echo "HUB_URL=https://hub-staging.stack.cards" >> $GITHUB_ENV
           else
