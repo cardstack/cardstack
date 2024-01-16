@@ -43,7 +43,7 @@ jobs:
           dockerfile: "packages/hub/Dockerfile"
           context: "packages/hub"
           build-args: |
-            hub_command="server"
+            hub_command=server
 
       - name: Build hub-worker
         uses: cardstack/gh-actions/docker-ecr@main
@@ -54,7 +54,7 @@ jobs:
           dockerfile: "packages/hub/Dockerfile"
           context: "packages/hub"
           build-args: |
-            hub_command="worker"
+            hub_command=worker
 
       - name: Build hub-event-listener
         uses: cardstack/gh-actions/docker-ecr@main
@@ -66,7 +66,7 @@ jobs:
           dockerfile: "packages/hub/Dockerfile"
           context: "packages/hub"
           build-args: |
-            hub_command="event-listener"
+            hub_command=event-listener
 
       - name: Build hub-bot
         uses: cardstack/gh-actions/docker-ecr@main
@@ -78,7 +78,7 @@ jobs:
           dockerfile: "packages/hub/Dockerfile"
           context: "packages/hub"
           build-args: |
-            hub_command="bot"
+            hub_command=bot
 
   deploy-server:
     needs: [build]
