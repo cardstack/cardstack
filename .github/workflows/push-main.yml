@@ -32,33 +32,6 @@ jobs:
       - uses: ./.github/actions/init
       - run: yarn lint
 
-  check_secrets:
-    name: Check Secret Access
-    needs: update-cache
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: ./.github/actions/init
-
-      - name: Configure staging AWS credentials
-        uses: aws-actions/configure-aws-credentials@v2.0.0
-        with:
-          role-to-assume: arn:aws:iam::680542703984:role/waypoint
-          aws-region: us-east-1
-      - name: Check access to secrets specified in waypoint.hcl
-        uses: ./.github/actions/check-secrets
-        with:
-          waypoint_config_file: waypoint.hcl
-      - name: Configure prod AWS credentials
-        uses: aws-actions/configure-aws-credentials@v2.0.0
-        with:
-          role-to-assume: arn:aws:iam::120317779495:role/waypoint
-          aws-region: us-east-1
-      - name: Check access to secrets specified in waypoint.prod.hcl
-        uses: ./.github/actions/check-secrets
-        with:
-          waypoint_config_file: waypoint.prod.hcl
-
   test_node_packages:
     needs: lint
     runs-on: ubuntu-latest
@@ -160,7 +133,6 @@ jobs:
               - '.github/workflows/push-main.yml'
               - '.github/actions/deploy-hub/**'
               - 'yarn.lock'
-              - 'waypoint.hcl'
             web_client:
               - 'packages/web-client/**'
               - 'packages/boxel/**'
@@ -182,7 +154,6 @@ jobs:
               - '.github/workflows/push-main.yml'
               - '.github/workflows/manual-ssr-web.yml'
               - 'yarn.lock'
-              - 'waypoint.hcl'
             safe-tools-client:
               - 'packages/safe-tools-client/**'
               - 'packages/boxel/**'
@@ -191,8 +162,8 @@ jobs:
               - '.github/actions/deploy-safe-tools-client/**'
               - 'yarn.lock'
 
-  deploy-hub-staging:
-    name: Deploy hub to staging cluster via waypoint
+  deploy-hub:
+    name: Deploy hub to staging
     needs: change_check
     if: ${{ needs.change_check.outputs.hub == 'true' }}
     uses: ./.github/workflows/manual-hub.yml
