@@ -70,3 +70,18 @@ jobs:
       cluster: ${{ inputs.environment }}
       service-name: "ssr-web-${{ inputs.environment }}"
       image: ${{ needs.build.outputs.image }}
+
+  notify:
+    runs-on: ubuntu-latest
+    needs:
+      - build
+      - deploy
+    if: ${{ always() }}
+    steps:
+      - name: Send notification to Discord
+        uses: cardstack/gh-actions/discord-notification-deploy@main
+        with:
+          app: ssr-web
+          status: ${{ job.status }}
+          environment: ${{ inputs.environment }}
+          webhook: ${{ secrets.DISCORD_WEBHOOK }}
