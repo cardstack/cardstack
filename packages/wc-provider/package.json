@@ -5,7 +5,7 @@
   "author": "Aierie <michael.khor@cardstack.com>",
   "homepage": "https://github.com/cardstack/cardstack#readme",
   "license": "Apache-2.0",
-  "main": "./dist/esm/index.js",
+  "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
@@ -19,8 +19,8 @@
     "readmeFile": "./README.md"
   },
   "scripts": {
-    "test": "mocha -r ts-node/register 'tests/**/*-test.ts' --timeout 60000 --exit",
-    "autotest": "mocha -r ts-node/register -w --reporter=min 'tests/**/*-test.ts' --timeout 60000",
+    "test": "ts-mocha -p tsconfig.json 'tests/**/*-test.ts' --timeout 60000 --exit",
+    "autotest": "ts-mocha -p tsconfig.json -w --reporter=min 'tests/**/*-test.ts' --timeout 60000",
     "prepack": "rm -rf ./dist && tsup ./index.ts --format esm,cjs --dts --legacy-output"
   },
   "dependencies": {
@@ -32,6 +32,7 @@
     "@walletconnect/web3-provider": "^1.6.0",
     "eth-block-tracker": "^5.0.1",
     "json-rpc-engine": "^5.1.3",
+    "ts-node": "^10.9.2",
     "web3-core-helpers": "^1.5.1",
     "web3-provider-engine": "^16.0.3",
     "web3-providers-ws": "^1.5.1"
@@ -57,6 +58,7 @@
     "ethereum-test-network": "https://github.com/cardstack/ethereum-test-network#4d335bf1528d714693444b5d4cb53d968c25a5e1",
     "ethers": "5.7.2",
     "mocha": "^9.1.3",
+    "ts-mocha": "^10.0.0",
     "tsup": "^5.11.7",
     "typescript": "^4.9.3",
     "web3": "^1.6.1"

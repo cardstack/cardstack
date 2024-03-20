@@ -2,7 +2,7 @@
   "compilerOptions": {
     "declaration": false,
     "esModuleInterop": true,
-    "module": "commonjs",
+    "module": "CommonJs",
     "moduleResolution": "Node",
     "outDir": "dist",
     "pretty": true,
