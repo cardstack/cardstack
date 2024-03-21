@@ -3,13 +3,13 @@ name: CI [python-did-resolver]
 on:
   pull_request:
     paths:
-      - "packages/python-did-resolver/**"
-      - "packages/did-resolver/**"
-      - "packages/test-support/**"
-      - "packages/eslint-config/**"
-      - ".github/workflows/pr-python-did-resolver.yml"
-      - "package.json"
-      - "yarn.lock"
+      - 'packages/python-did-resolver/**'
+      - 'packages/did-resolver/**'
+      - 'packages/test-support/**'
+      - 'packages/eslint-config/**'
+      - '.github/workflows/pr-python-did-resolver.yml'
+      - 'package.json'
+      - 'yarn.lock'
 
 jobs:
   test:
@@ -20,7 +20,7 @@ jobs:
         working-directory: ./packages/python-did-resolver
     strategy:
       matrix:
-        python-version: ["3.10"]
+        python-version: ['3.10']
 
     steps:
       - uses: actions/checkout@v3
@@ -36,6 +36,9 @@ jobs:
           python -m pip install --upgrade pdm
           pdm config python.use_venv false
           pdm install -d
+
+      - name: Package JS did resolver to test against
+        run: cd ../did-resolver && yarn prepack && cd -
 
       - name: Test with pytest
         run: |

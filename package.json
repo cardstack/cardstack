@@ -5,9 +5,7 @@
   "repository": "https://github.com/cardstack/cardstack",
   "author": "Edward Faulkner <edward@eaf4.com>",
   "license": "MIT",
-  "engines": {
-    "node": "^14.0.0"
-  },
+  "engines": {},
   "dependencies": {
     "@actions/core": "^1.2.6",
     "@actions/github": "^4.0.0",
@@ -17,6 +15,7 @@
     "@typescript-eslint/eslint-plugin": "^5.45.0",
     "@typescript-eslint/parser": "^5.45.0",
     "babel-eslint": "^10.1.0",
+    "caniuse-lite": "^1.0.30001566",
     "cli-table3": "^0.6.1",
     "discord.js": "^12.5.3",
     "ember-template-lint": "^3.16.0",
@@ -108,12 +107,14 @@
     "build:docs": "typedoc ."
   },
   "resolutions": {
+    "bufferutil": "~4.0.8",
     "ember-a11y-testing": "4.0.3",
     "axe-core": "4.1.4",
     "ember-get-config": "2.1.0",
     "@babel/generator": "~7.16.0",
     "web3-core": "~1.7.3",
-    "@ethersproject/abi": "~5.7.0"
+    "@ethersproject/abi": "~5.7.0",
+    "utf-8-validate": "~6.0.3"
   },
   "workspaces": {
     "packages": [
@@ -129,7 +130,7 @@
   },
   "private": true,
   "volta": {
-    "node": "14.18.3",
+    "node": "16.20.2",
     "yarn": "1.22.17"
   },
   "devDependencies": {

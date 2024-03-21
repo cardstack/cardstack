@@ -59,7 +59,7 @@ const TEST_ETH_TRANSFER = {
   data: '0x',
 };
 
-describe('WalletConnectProvider', function () {
+describe.skip('WalletConnectProvider - WalletConnect 1.0 is no longer supported', function () {
   this.timeout(30_000);
   let testNetwork: TestNetwork;
   let mockKovanTestNetwork: TestNetwork;
